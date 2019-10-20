@@ -1,0 +1,31 @@
+﻿<UserControl x:Class="CNC.Controls.Viewer.Renderer"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:helix="clr-namespace:HelixToolkit.Wpf;assembly=HelixToolkit.Wpf"
+             xmlns:local="clr-namespace:CNC.Controls.Viewer"
+             mc:Ignorable="d" 
+             d:DesignHeight="350" d:DesignWidth="350">
+    <Grid>
+        <helix:HelixViewport3D x:Name="viewport" Grid.Column="0" ZoomExtentsWhenLoaded="True" ShowViewCube="False">
+            <helix:HelixViewport3D.DefaultCamera>
+                <PerspectiveCamera x:Name="camera" 
+                        Position="0,0,100" 
+                        LookDirection="0,0,-100" 
+                        UpDirection="0,1,0.5" 
+                        FieldOfView="61" 
+                        NearPlaneDistance="0.001">
+                </PerspectiveCamera>
+            </helix:HelixViewport3D.DefaultCamera>
+            <helix:SunLight/>
+            <helix:SphereVisual3D Center="0,0,0" Radius="0.05" Fill="Blue"/>
+            <helix:PipeVisual3D x:Name="Tool3D" Diameter="1" Point1="0,0,0" Point2="0,0,5" Visible="False" >
+                <helix:PipeVisual3D.Fill>
+                    <SolidColorBrush Color="Gray" Opacity="0.5"/>
+                </helix:PipeVisual3D.Fill>
+            </helix:PipeVisual3D>
+            <helix:GridLinesVisual3D Thickness="0.1" Center="0,0,0" Fill="#FFDADADA" Width="1000" Length="1000" />
+        </helix:HelixViewport3D>
+    </Grid>
+</UserControl>

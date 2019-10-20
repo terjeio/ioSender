@@ -1,0 +1,43 @@
+﻿<UserControl x:Class="CNC.Controls.DROControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CNC.Controls"
+             xmlns:core="clr-namespace:CNC.Core;assembly=CNC.Core"
+             mc:Ignorable="d" 
+             d:DesignHeight="290" d:DesignWidth="216">
+    <UserControl.Resources>
+        <local:LatheModeToStringConverter x:Key="LatheModeConverter" />
+    </UserControl.Resources>
+    <GroupBox x:Name="grpDRO" Header="DRO" HorizontalAlignment="Center" VerticalAlignment="Top" Width="216">
+        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="2,5,0,5">
+            <Label x:Name="lblXMode" Content="{Binding Path=LatheMode, Mode=OneWay, Converter={StaticResource LatheModeConverter}}" Visibility="Collapsed" Height="25" HorizontalContentAlignment="Right" Margin="20,0,65,0"/>
+            <local:DROBaseControl x:Name="axisX" Label="X"
+                Value="{Binding Path=Position.X, Mode=TwoWay}"
+                IsScaled="{Binding Path=AxisScaled[(core:AxisFlags)X], Mode=OneWay}"
+            />
+            <local:DROBaseControl x:Name="axisY" Label="Y"
+                Value="{Binding Path=Position.Y, Mode=TwoWay}"
+                IsScaled="{Binding Path=AxisScaled[(core:AxisFlags)Y], Mode=OneWay}"
+             />
+            <local:DROBaseControl x:Name="axisZ" Label="Z"
+                Value="{Binding Path=Position.Z, Mode=TwoWay}"
+                IsScaled="{Binding Path=AxisScaled[(core:AxisFlags)Z], Mode=OneWay}"
+            />
+            <local:DROBaseControl x:Name="axisA" Label="A" Visibility="Collapsed"
+                Value="{Binding Path=Position.A, Mode=TwoWay}"
+                IsScaled="{Binding Path=AxisScaled[(core:AxisFlags)A], Mode=OneWay}"
+            />
+            <local:DROBaseControl x:Name="axisB" Label="B" Visibility="Collapsed"
+                Value="{Binding Path=Position.B, Mode=TwoWay}"
+                IsScaled="{Binding Path=AxisScaled[(core:AxisFlags)B], Mode=OneWay}"
+            />
+            <local:DROBaseControl x:Name="axisC" Label="C" Visibility="Collapsed"
+                Value="{Binding Path=Position.C, Mode=TwoWay}"
+                IsScaled="{Binding Path=AxisScaled[(core:AxisFlags)C], Mode=OneWay}"
+            />
+            <Button x:Name="btnZeroAll" Content="Zero all" Focusable="False" Height="28" Width="180" HorizontalAlignment="Center" Margin="2,3" Click="btnZeroAll_Click"/>
+        </StackPanel>
+    </GroupBox>
+</UserControl>

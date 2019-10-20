@@ -1,0 +1,37 @@
+﻿<UserControl x:Class="CNC.Controls.ToolView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CNC.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="515" d:DesignWidth="875">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="507*"/>
+            <ColumnDefinition Width="368*"/>
+        </Grid.ColumnDefinitions>
+        <DataGrid x:Name="dgrTools" Grid.Row="0" ItemsSource="{Binding}" Width="300" IsReadOnly="True" SelectionMode="Single" SelectionUnit="FullRow" AutoGenerateColumns="False" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"
+                            CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserResizeRows="False" CanUserSortColumns="False" CanUserAddRows="False" SelectionChanged="dgrTools_SelectionChanged">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Tool" Binding="{Binding code}" Width="*"/>
+                <DataGridTextColumn Header="X" Binding="{Binding X}" Width="70"/>
+                <DataGridTextColumn Header="Y" Binding="{Binding Y}" Width="70"/>
+                <DataGridTextColumn Header="Z" Binding="{Binding Z}" Width="70"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        <StackPanel Grid.Column="1" HorizontalAlignment="Left" Margin="74,122,0,0" VerticalAlignment="Top" Width="219">
+            <local:CoordValueSetControl x:Name="cvXOffset" Label="X axis:" Tag="X" Value="{Binding Path=offset.X, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" Click="cvOffset_Click"/>
+            <local:CoordValueSetControl x:Name="cvYOffset" Label="Y axis:" Tag="Y" Value="{Binding Path=offset.Y, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" Click="cvOffset_Click"/>
+            <local:CoordValueSetControl x:Name="cvZOffset" Label="Z axis:" Tag="Z" Value="{Binding Path=offset.Z, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" Click="cvOffset_Click"/>
+            <local:CoordValueSetControl x:Name="cvTipRadius" Label="Tip radius:" Tag="R" Click="cvOffset_Click"/>
+            <StackPanel Orientation="Horizontal" Margin="5,0">
+                <Button x:Name="btnCurrPos" Content="Get current position" Margin="3,0" Click="btnCurrPos_Click"/>
+                <Button x:Name="btnClear" Content="Clear all" Click="btnClearAll_Click"/>
+                <Button x:Name="btnSetAll" Content="Set all" Margin="3,0" Click="btnSetAll_Click"/>
+            </StackPanel>
+        </StackPanel>
+        <Label x:Name="lblTool" Content="Tool:" Grid.Column="1" HorizontalAlignment="Left" Margin="96,81,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="txtTool" Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="139,81,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="50" IsReadOnly="True"/>
+    </Grid>
+</UserControl>

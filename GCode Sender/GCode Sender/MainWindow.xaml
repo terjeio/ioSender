@@ -1,0 +1,115 @@
+﻿<Window x:Class="GCode_Sender.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:cnccontrols="clr-namespace:CNC.Controls;assembly=CNC.Controls.WPF"
+        xmlns:cncviewer="clr-namespace:CNC.Controls.Viewer;assembly=CNC.Controls.Viewer"
+        xmlns:cnclathecontrols="clr-namespace:CNC.Controls.Lathe;assembly=CNC.Controls.Lathe"
+        xmlns:local="clr-namespace:GCode_Sender"
+        mc:Ignorable="d"
+        Title="GCode Sender" Height="600" Width="900"
+        Loaded="Window_Load"
+        Closing="Window_Closing"
+        Closed="Window_Closed" Icon="App.ico">
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem x:Name="menuFile" Header="_File">
+                <MenuItem Header="_Open"/>
+                <MenuItem x:Name="menuCloseFile" Header="_Close" Click="exitMenuItem_Click"/>
+                <MenuItem Header="_About" Click="aboutMenuItem_Click"/>
+                <MenuItem Header="_Exit" Click="exitMenuItem_Click"/>
+            </MenuItem>
+            <MenuItem x:Name="menuCamera" Header="_Camera">
+                <MenuItem Header="_Open" Click="CameraOpen_Click"/>
+            </MenuItem>
+        </Menu>
+        <Grid>
+            <TabControl x:Name="tabMode" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" SelectionChanged="TabMode_SelectionChanged">
+                <TabItem x:Name="tabGrbl" Header="Grbl">
+                    <Grid x:Name="Grbl" Background="#FFE5E5E5">
+                        <local:JobView HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top"/>
+                    </Grid>
+                </TabItem>
+                <TabItem x:Name="tabViewer" Header="3D View">
+                    <Grid x:Name="GCodeView" Background="#FFE5E5E5">
+                        <cncviewer:Viewer x:Name="viewer" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top"/>
+                    </Grid>
+                </TabItem>
+                <TabItem x:Name="tabSDCard" Header="SD Card">
+                    <Grid Background="#FFE5E5E5">
+                        <cnccontrols:SDCardView x:Name="toolSDCard" HorizontalAlignment="Left" Height="515" VerticalAlignment="Top" Width="875"/>
+                    </Grid>
+                </TabItem>
+                <TabItem x:Name="tabTurning" Header="Turning">
+                    <Grid Background="#FFE5E5E5">
+                        <cnclathecontrols:TurningWizard x:Name="turningWizard" HorizontalAlignment="Left" Height="515" VerticalAlignment="Top" Width="875"/>
+                    </Grid>
+                </TabItem>
+                <!--
+                <TabItem x:Name="tabTurning" Header="Turning">
+                    <Grid Background="#FFE5E5E5">
+                        <cnclathecontrols:TurningWizard x:Name="turningWizard" HorizontalAlignment="Left" Height="515" VerticalAlignment="Top" Width="875"/>
+                    </Grid>
+                </TabItem> -->
+                <TabItem x:Name="tabThreading" Header="Threading">
+                    <Grid Background="#FFE5E5E5">
+                        <cnclathecontrols:ThreadingWizard x:Name="threadingWizard" HorizontalAlignment="Left" Height="515" VerticalAlignment="Top" Width="875"/>
+                    </Grid>
+                </TabItem>
+                <TabItem x:Name="tabOffsets" Header="Offsets">
+                    <Grid Background="#FFE5E5E5">
+                        <cnccontrols:OffsetView x:Name="offsetControl" HorizontalAlignment="Left" Height="515" VerticalAlignment="Top" Width="875"/>
+                    </Grid>
+                </TabItem>
+                <TabItem x:Name="tabTools" Header="Tools">
+                    <Grid Background="#FFE5E5E5">
+                        <cnccontrols:ToolView x:Name="toolControl" HorizontalAlignment="Left" Height="515" VerticalAlignment="Top" Width="875"/>
+                    </Grid>
+                </TabItem>
+                <TabItem x:Name="tabTrinamic" Header="Trinamic tuner">
+                    <Grid Background="#FFE5E5E5">
+                        <cnccontrols:TrinamicView x:Name="toolTrinamic" HorizontalAlignment="Left" Height="515" VerticalAlignment="Top" Width="875"/>
+                    </Grid>
+                </TabItem>
+                <TabItem x:Name="tabConfig" Header="Settings" Height="23" VerticalAlignment="Top">
+                    <Grid Background="#FFE5E5E5">
+                        <cnccontrols:ConfigView x:Name="configControl" HorizontalAlignment="Left" Height="515" VerticalAlignment="Top" Width="875"/>
+                    </Grid>
+                </TabItem>
+                <TabItem x:Name="tabPIDTuner" Header="PID Tuner">
+                    <Grid Background="#FFE5E5E5">
+                        <cnccontrols:PIDLogView x:Name="toolPIDTuner" HorizontalAlignment="Left" Height="515" VerticalAlignment="Top" Width="875"/>
+                    </Grid>
+                </TabItem>
+                <!--
+                <TabItem x:Name="tabTurning" Header="Turning">
+                    <Grid Background="#FFE5E5E5">
+                        <cnc:TurningWizard x:Name="toolTurning" HorizontalAlignment="Left" Height="515" VerticalAlignment="Top" Width="875"/>
+                    </Grid>
+                </TabItem>
+                <TabItem x:Name="tabFacing" Header="Facing">
+                    <Grid Background="#FFE5E5E5">
+                        <WindowsFormsHost HorizontalAlignment="Left" Height="515" VerticalAlignment="Top" Width="875">
+                            <cnc:FacingWizard x:Name="toolFacing" AutoScaleMode="Inherit"/>
+                        </WindowsFormsHost>
+                    </Grid>
+                </TabItem>
+
+
+                <TabItem x:Name="tabConfig" Header="Settings">
+                    <Grid Background="#FFE5E5E5">
+                        <cnccontrols:ConfigView x:Name="configControl" HorizontalAlignment="Left" Height="515" VerticalAlignment="Top" Width="875"/>
+                    </Grid>
+                </TabItem>
+                <TabItem x:Name="tabPIDTuner" Header="PID Tuner">
+                    <Grid Background="#FFE5E5E5">
+                        <cnccontrols:PIDLogView x:Name="toolPIDTuner" HorizontalAlignment="Left" Height="515" VerticalAlignment="Top" Width="875"/>
+                    </Grid>
+                </TabItem>
+
+                -->
+            </TabControl>
+        </Grid>
+    </DockPanel>
+</Window>

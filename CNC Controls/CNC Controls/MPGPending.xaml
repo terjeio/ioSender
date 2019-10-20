@@ -1,0 +1,13 @@
+﻿<Window x:Class="CNC.Controls.MPGPending"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CNC.Controls"
+        mc:Ignorable="d"
+        Title="GCode Sender" Height="125" Width="460" ResizeMode="NoResize"
+        Closing="Window_Closing" Icon="App.ico">
+    <Grid Background="LightGray">
+        <Label x:Name="label" Content="MPG mode active, waiting for it to be disabled..." HorizontalAlignment="Center" Margin="000,0,0,0" VerticalAlignment="Center"/>
+    </Grid>
+</Window>

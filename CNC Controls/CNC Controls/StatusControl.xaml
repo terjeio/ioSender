@@ -1,0 +1,48 @@
+﻿<UserControl x:Class="CNC.Controls.StatusControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CNC.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="66" d:DesignWidth="190">
+    <UserControl.Resources>
+        <local:GrblStateToColorConverter x:Key="ToColorConverter" />
+        <local:GrblStateToStringConverter x:Key="ToStringConverter" />
+        <local:HomedStateToColorConverter x:Key="HomedStateConverter" />
+        <local:IsHomingEnabledConverter x:Key="HomingEnabledConverter" />
+        <local:InvertBooleanConverter x:Key="SleepEnabledConverter" />
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30*"/>
+            <RowDefinition Height="40*"/>
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Height="30" Margin="3,0" VerticalAlignment="Center" Width="184">
+            <Label x:Name="lblState" Content="State:" HorizontalContentAlignment="Right" HorizontalAlignment="Left" VerticalAlignment="Center" Height="25" Width="40"/>
+            <TextBox x:Name="txtState" HorizontalAlignment="Left" Height="24" Margin="2,0" TextWrapping="NoWrap" IsReadOnly="True" TextAlignment="Center" VerticalAlignment="Center" Width="74"
+                     Text="{Binding Path=GrblState, Converter={StaticResource ToStringConverter}}"
+                     Background="{Binding Path=GrblState, Converter={StaticResource ToColorConverter}}"
+             />
+            <CheckBox x:Name="chkCheckMode" Content="Check" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Center" Height="16" Width="50" Click="btn_Click"
+                IsChecked="{Binding Path=IsCheckMode, Mode=OneWay}"
+                IsEnabled="{Binding Path=IsSleepMode, Converter={StaticResource SleepEnabledConverter}, Mode=OneWay}"
+            />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Height="34" Margin="3,3,0,0" Grid.Row="1" VerticalAlignment="Top" Width="184">
+            <Button x:Name="btnHome" Content="Home" Background="{Binding Path=HomedState, Converter={StaticResource HomedStateConverter}}" Focusable="False" Width="55" Height="32" Click="btn_Click">
+                <Button.IsEnabled>
+                    <MultiBinding Converter="{StaticResource HomingEnabledConverter}">
+                        <Binding Path="GrblState" Mode="OneWay"/>
+                        <Binding Path="IsJobRunning" Mode="OneWay"/>
+                        <Binding Path="IsSleepMode" Mode="OneWay"/>
+                    </MultiBinding>
+                </Button.IsEnabled>
+            </Button>
+            <Button x:Name="btnUnlock" Content="Unlock" Focusable="False" Width="55" Height="32" Margin="3,0,0,0" Click="btn_Click"
+                IsEnabled="{Binding Path=IsSleepMode, Converter={StaticResource SleepEnabledConverter}, Mode=OneWay}"
+            />
+            <Button x:Name="btnReset" Content="Reset" Focusable="False" Width="55" Height="32" Margin="3,0,0,0" Background="Red" Foreground="White" Click="btn_Click" FontFamily="Segoe UI Semibold" FontSize="14"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

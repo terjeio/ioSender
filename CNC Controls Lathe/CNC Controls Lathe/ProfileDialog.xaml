@@ -1,0 +1,53 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CNC.Controls.Lathe"
+        xmlns:Controls="clr-namespace:CNC.Controls;assembly=CNC.Controls.WPF" x:Class="CNC.Controls.Lathe.ProfileDialog"
+        xmlns:DialogConverters="clr-namespace:CNC.Controls.Lathe"
+        mc:Ignorable="d"
+        Title="Lathe Profile" Height="390" Width="430"
+        Loaded="Window_Loaded" Icon="App.ico" ResizeMode="NoResize">
+    <Window.Resources>
+        <DialogConverters:LatheModeRadiusBoolConverter x:Key="RadiusConverter" />
+        <DialogConverters:LatheModeDiameterBoolConverter x:Key="DiameterConverter" />
+    </Window.Resources>
+    <Grid Background="#FFE5E5E5">
+        <Label x:Name="lblProfile" Content="Profile:" HorizontalContentAlignment="Right" HorizontalAlignment="Right" Margin="0,10,350,0" VerticalAlignment="Top"/>
+        <ComboBox x:Name="cbxProfile" IsEditable="True" ItemsSource="{Binding Path=Profiles}" DisplayMemberPath="Name" SelectedValuePath="Id" SelectedItem="{Binding Path=Profile, Mode=TwoWay}" HorizontalAlignment="Left" Margin="75,10,0,0" VerticalAlignment="Top" Width="280" SelectionChanged="cbxProfile_SelectionChanged" TextBoxBase.TextChanged="cbxProfile_TextChanged"/>
+        <Button x:Name="btnAddProfile" Content="Add" IsEnabled="False" HorizontalAlignment="Left" Margin="366,10,0,0" VerticalAlignment="Top" Width="46" Click="btnAddProfile_Click"/>
+        <GroupBox x:Name="grpCutDepths" Header="Cut depths" HorizontalAlignment="Left" Margin="22,40,0,0" VerticalAlignment="Top" Height="100" Width="390">
+            <StackPanel HorizontalAlignment="Left" Height="80" Margin="5,0,0,0" VerticalAlignment="Top" Width="370">
+                <StackPanel Orientation="Horizontal" Height="25">
+                    <Controls:NumericField x:Name="cvFirstCut" Label="(First) pass:" Value="{Binding Path=PassDepthFirst, Mode=TwoWay}"/>
+                    <Controls:NumericField x:Name="cvFeedRate" Label="Feedrate:" Value="{Binding Path=Feedrate, Mode=TwoWay}" Visibility="{Binding Path=threadVisibility}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Height="25">
+                    <Controls:NumericField x:Name="cvLastCut" Label="Last pass:" Value="{Binding Path=PassDepthLast, Mode=TwoWay}"/>
+                    <Controls:NumericField x:Name="cvFeedRateLast" Label="Feedrate:" Value="{Binding Path=FeedrateLast, Mode=TwoWay}" Visibility="{Binding Path=threadVisibility}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Height="25">
+                    <Controls:NumericField x:Name="cvMinCut" Label="Min:" Value="{Binding Path=PassDepthMin, Mode=TwoWay}"/>
+                </StackPanel>
+            </StackPanel>
+        </GroupBox>
+        <GroupBox x:Name="grpClearance" Header="Clearance" HorizontalAlignment="Left" Margin="22,140,0,0" VerticalAlignment="Top" Height="50" Width="390">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Height="25" Margin="5,0,0,0" VerticalAlignment="Top" Width="370">
+                <Controls:NumericField x:Name="cvXClearance" Label="X-axis:" Value="{Binding Path=XClearance, Mode=TwoWay}"/>
+                <Controls:NumericField x:Name="cvZClearance" Label="Z-Axis:" Value="{Binding Path=ZClearance, Mode=TwoWay}"/>
+            </StackPanel>
+        </GroupBox>
+        <GroupBox x:Name="grpXMode" Header="X-axis" HorizontalAlignment="Left" Margin="22,250,0,0" VerticalAlignment="Top" Height="50" Width="390">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Height="25" Margin="5,0,0,0" VerticalAlignment="Top" Width="370">
+                <RadioButton x:Name="btnRadius" Content="Radius mode" IsChecked="{Binding Path=xmode, Mode=TwoWay, Converter={StaticResource RadiusConverter}}" IsEnabled="{Binding Path=xmodeenabled}" HorizontalAlignment="Left" Height="18" Margin="20,10,0,0" VerticalAlignment="Top"/>
+                <RadioButton x:Name="btnDiameter" Content="Diameter mode" IsChecked="{Binding Path=xmode, Mode=TwoWay, Converter={StaticResource DiameterConverter}}" IsEnabled="{Binding Path=xmodeenabled}" HorizontalAlignment="Left" Height="18" Margin="20,10,0,0" VerticalAlignment="Top"/>
+            </StackPanel>
+        </GroupBox>
+        <Controls:NumericField x:Name="cvRPM" Label="Spindle:" Format="####0" Value="{Binding Path=RPM, Mode=TwoWay}" Visibility="{Binding Path=rpmVisibility}" Unit="RPM" Margin="220,193,0,0" VerticalAlignment="Top"/>
+        <local:CssControl x:Name="css" IsCssEnabled="{Binding Path=CSS, Mode=TwoWay}" Value="{Binding Path=RPM, Mode=TwoWay}" Visibility="{Binding Path=threadVisibility}" HorizontalAlignment="Left" Margin="26,193,0,0" VerticalAlignment="Top"/>
+        <Controls:NumericField x:Name="cvCSSMaxRPM" Label="Max:" Format="#####" Value="{Binding Path=CSSMaxRPM, Mode=TwoWay}" Unit="RPM" HorizontalAlignment="Left" Margin="221,225,0,0" VerticalAlignment="Top"/>
+        <Button x:Name="btnOk" Content="Ok" HorizontalAlignment="Left" Margin="112,315,0,0" VerticalAlignment="Top" Width="75" Click="btnOk_Click"/>
+        <Button x:Name="btnCancel" Content="Cancel" HorizontalAlignment="Left" Margin="212,315,0,0" VerticalAlignment="Top" Width="75" Click="btnCancel_Click"/>
+    </Grid>
+</Window>

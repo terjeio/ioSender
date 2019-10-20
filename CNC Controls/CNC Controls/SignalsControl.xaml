@@ -1,0 +1,27 @@
+﻿<UserControl x:Class="CNC.Controls.SignalsControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CNC.Controls"
+             xmlns:core="clr-namespace:CNC.Core;assembly=CNC.Core"
+             mc:Ignorable="d" 
+             d:DesignHeight="65" d:DesignWidth="216">
+    <Grid>
+        <GroupBox x:Name="grpSignals" Header="Signals" HorizontalAlignment="Left" VerticalAlignment="Top" Height="60" Width="216">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Height="35" Margin="3,3,0,0" VerticalAlignment="Top" Width="200">
+                <local:SignalControl x:Name="signalX" Label="X" IsSet="{Binding Path=Signals[(core:Signals)LimitX], Mode=OneWay}" Height="35" Width="18" Padding="0"/>
+                <local:SignalControl x:Name="signalY" Label="Y" IsSet="{Binding Path=Signals[(core:Signals)LimitY], Mode=OneWay}" Height="35" Width="18" Padding="0"/>
+                <local:SignalControl x:Name="signalZ" Label="Z" IsSet="{Binding Path=Signals[(core:Signals)LimitZ], Mode=OneWay}" Height="35" Width="18" Padding="0"/>
+                <local:SignalControl x:Name="signalA" Label="A" IsSet="{Binding Path=Signals[(core:Signals)LimitA], Mode=OneWay}" Height="35" Width="18" Padding="0"/>
+                <local:SignalControl x:Name="signalB" Label="B" IsSet="{Binding Path=Signals[(core:Signals)LimitB], Mode=OneWay}" Height="35" Width="18" Padding="0"/>
+                <local:SignalControl x:Name="signalC" Label="C" IsSet="{Binding Path=Signals[(core:Signals)LimitC], Mode=OneWay}" Height="35" Width="18" Padding="0"/>
+                <local:SignalControl x:Name="signalH" Label="H" IsSet="{Binding Path=Signals[(core:Signals)Hold], Mode=OneWay}" Height="35" Width="18" Padding="0"/>
+                <local:SignalControl x:Name="signalS" Label="S" IsSet="{Binding Path=Signals[(core:Signals)CycleStart], Mode=OneWay}" Height="35" Width="18" Padding="0"/>
+                <local:SignalControl x:Name="signalR" Label="R" IsSet="{Binding Path=Signals[(core:Signals)Reset], Mode=OneWay}" Height="35" Width="18" Padding="0"/>
+                <local:SignalControl x:Name="signalD" Label="D" IsSet="{Binding Path=Signals[(core:Signals)SafetyDoor], Mode=OneWay}" Height="35" Width="18" Padding="0"/>
+                <local:SignalControl x:Name="signalP" Label="P" IsSet="{Binding Path=Signals[(core:Signals)Probe], Mode=OneWay}" Height="35" Width="18" Padding="0"/>
+            </StackPanel>
+        </GroupBox>
+    </Grid>
+</UserControl>

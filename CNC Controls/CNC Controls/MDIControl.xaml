@@ -1,0 +1,27 @@
+﻿<UserControl x:Class="CNC.Controls.MDIControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CNC.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="50" d:DesignWidth="450">
+    <UserControl.Resources>
+        <local:InvertBooleanConverter x:Key="BooleanConverter" />
+    </UserControl.Resources>
+    <UserControl.IsEnabled>
+        <Binding Path="IsJobRunning" Converter="{StaticResource BooleanConverter}"/>
+    </UserControl.IsEnabled>
+    <Grid>
+        <GroupBox x:Name="grpMDI" Header="MDI" Margin="0,0" HorizontalAlignment="Center" VerticalAlignment="Top">
+            <Grid Margin="0,5,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="400*"/>
+                    <ColumnDefinition Width="60*"/>
+                </Grid.ColumnDefinitions>
+                <TextBox x:Name="txtMDI" Grid.Column="0" HorizontalAlignment="Left" Height="22" Margin="3,0" TextWrapping="NoWrap" VerticalAlignment="Center" Width="400"/>
+            <Button x:Name="btnSend" Content="Send" Grid.Column="1" HorizontalAlignment="Right" Margin="3,0" VerticalAlignment="Center" Width="42" Height="22" Click="btnSend_Click"/>
+            </Grid>
+        </GroupBox>
+    </Grid>
+</UserControl>
