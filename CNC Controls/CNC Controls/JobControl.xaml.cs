@@ -159,25 +159,35 @@ namespace CNC.Controls
 
         public bool Activate(bool activate)
         {
-            if (activate)
+            if (activate && !initOK)
             {
-                if (!initOK)
+                initOK = true;
+                serialSize = Math.Min(300, (int)(GrblInfo.SerialBufferSize * 0.9f)); // size should be less than hardware handshake HWM
+            }
+
+            EnablePolling(activate);
+
+            return activate;
+        }
+
+        public void EnablePolling(bool enable)
+        {
+            if (enable)
+            {
+                if (!poller.IsEnabled)
                 {
-                    initOK = true;
-                    serialSize = Math.Min(300, (int)(GrblInfo.SerialBufferSize * 0.9f)); // size should be less than hardware handshake HWM
+                    Comms.com.DataReceived += DataReceived;
+                    poller.SetState(PollInterval);
                 }
-                Comms.com.DataReceived += DataReceived;
-                //if (activate) // Request a complete status report
-                //    Comms.com.WriteByte(GrblLegacy.ConvertRTCommand(GrblConstants.CMD_STATUS_REPORT_ALL));
-                poller.SetState(PollInterval);
             }
             else
             {
-                poller.SetState(0);
-                Comms.com.DataReceived -= DataReceived;
+                if (poller.IsEnabled)
+                {
+                    poller.SetState(0);
+                    Comms.com.DataReceived -= DataReceived;
+                }
             }
-
-            return activate;
         }
 
         // Configure to match Grbl settings (if loaded)

@@ -56,7 +56,14 @@ namespace CNC.Controls.Camera
             InitializeComponent();
         }
 
-        public CameraControl CameraControl { get { return this.CNCCamera; } }
+        public CameraControl CameraControl { get { return CNCCamera; } }
+
+        public void ApplySettings(CameraConfig config)
+        {
+            CameraControl.XOffset = config.XOffset;
+            CameraControl.YOffset = config.YOffset;
+            CameraControl.Mode = config.MoveMode;
+        }
 
         public void Open()
         {

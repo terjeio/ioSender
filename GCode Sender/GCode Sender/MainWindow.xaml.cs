@@ -1,7 +1,7 @@
 ﻿/*
  * MainWindow.xaml.cs - part of Grbl Code Sender
  *
- * v0.02 / 2019-10-02 / Io Engineering (Terje Io)
+ * v0.03 / 2019-10-20 / Io Engineering (Terje Io)
  *
  */
 
@@ -40,11 +40,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Xml;
 using CNC.Core;
 using CNC.Controls;
 using CNC.View;
-using System.Globalization;
 #if ADD_CAMERA
 using CNC.Controls.Camera;
 #endif
@@ -58,6 +56,7 @@ namespace GCode_Sender
 
         public static MainWindow ui = null;
         public static CNC.Controls.Viewer.Viewer GCodeViewer = null;
+        public static AppConfig Profile = new AppConfig();
 #if ADD_CAMERA
         public static Camera Camera = null;
 #endif
@@ -68,12 +67,10 @@ namespace GCode_Sender
         {
             InitializeComponent();
 
-            MainWindow.ui = this;
-            MainWindow.GCodeViewer = viewer;
+            ui = this;
+            GCodeViewer = viewer;
 
             CNC.Core.Resources.Path = AppDomain.CurrentDomain.BaseDirectory;
-
-            string PortParams = "";
 
             string[] args = Environment.GetCommandLineArgs();
 
@@ -93,109 +90,38 @@ namespace GCode_Sender
                     break;
             }
 
-            try
+            if(!Profile.Load(CNC.Core.Resources.IniFile))
             {
-                XmlDocument config = new XmlDocument();
-
-                config.Load(CNC.Core.Resources.IniName);
-
-                foreach (XmlNode N in config.SelectNodes("Config/*"))
+                if (MessageBox.Show("Config file not found or invalid, create new?", this.Title, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                 {
-                    switch (N.Name)
+                    if (!Profile.Save(CNC.Core.Resources.IniFile))
                     {
-                        case "PortParams":
-                            PortParams = N.InnerText;
-                            break;
-#if ADD_CAMERA
-                        case "CameraXOffset":
-                            if (enableCamera(this))
-                                Camera.CameraControl.XOffset = dbl.Parse(N.InnerText);
-                            break;
-
-                        case "CameraYOffset":
-                            if (enableCamera(this))
-                                Camera.CameraControl.YOffset = dbl.Parse(N.InnerText);
-                            break;
-
-                        case "CameraMoveMode":
-                            if (enableCamera(this))
-                                Camera.CameraControl.Mode = (CameraControl.MoveMode)Enum.Parse(typeof(CameraControl.MoveMode), N.InnerText);
-                            break;
-#endif
-                        case "LatheMode":
-                            if (N.InnerText.ToLower() == "true")
-                                GrblInfo.LatheModeEnabled = true;
-                            break;
+                        MessageBox.Show("Could not save config file.", this.Title);
+                        Environment.Exit(1);
                     }
-                }
-
-                foreach (XmlNode N in config.SelectNodes("Config/GCodeViewer/*"))
-                {
-                    string value = N.InnerText.Trim();
-                    switch (N.Name)
-                    {
-                        case "ArcResolution":
-                            GCodeViewer.ArcResolution = int.Parse(value);
-                            break;
-
-                        case "MinDistance":
-                            GCodeViewer.MinDistance = dbl.Parse(value);
-                            break;
-
-                        case "ShowGrid":
-                            GCodeViewer.ShowGrid = bool.Parse(value);
-                            break;
-
-                        case "ShowAxes":
-                            GCodeViewer.ShowGrid = bool.Parse(value);
-                            break;
-
-                        case "ShowBoundingBox":
-                            GCodeViewer.ShowGrid = bool.Parse(value);
-                            break;
-
-                        case "ShowViewCube":
-                            GCodeViewer.ShowGrid = bool.Parse(value);
-                            break;
-                    }
-                }
+                } else
+                    Environment.Exit(1);
             }
-            catch
-            {
-                MessageBox.Show("Config file not found or invalid.", this.Title);
-                System.Environment.Exit(1);
-            }
-
-#if ADD_CAMERA
-#else
-            menuCamera.Visibility = Visibility.Hidden;
-#endif
 
 #if DEBUG
-            PortParams = "com21:115200,N,8,1,P";
-            //PortParams = "10.0.0.75:23";
+            Profile.Config.PortParams = "com21:115200,N,8,1,P";
+            //Profile.Config.PortParams = "10.0.0.75:23";
 #endif
 
-            if (Char.IsDigit(PortParams[0])) // We have an IP address
-            {
-                new IPComms(PortParams);
-            }
+            if (char.IsDigit(Profile.Config.PortParams[0])) // We have an IP address
+                new IPComms(Profile.Config.PortParams);
             else
-            {
-                new SerialComms(PortParams, Comms.ResetMode.None, App.Current.Dispatcher);
-            }
+                new SerialComms(Profile.Config.PortParams, Comms.ResetMode.None, App.Current.Dispatcher);
 
             if (!Comms.com.IsOpen)
             {
                 // this.com = null;
                 // this.disableUI();
                 MessageBox.Show("Unable to open connection!", this.Title);
-                System.Environment.Exit(2);
+                Environment.Exit(2);
             }
 
-            //            this.SDCardControl.FileSelected += new CNC_Controls.SDCardControl.FileSelectedHandler(SDCardControl_FileSelected);
-
-            System.Threading.Thread.Sleep(400);
+            System.Threading.Thread.Sleep(400); // Wait to see if MPG is polling Grbl
 
             if (!(Comms.com.Reply == "" || Comms.com.Reply.StartsWith("Grbl")))
             {
@@ -204,22 +130,30 @@ namespace GCode_Sender
                 if (await.Cancelled)
                 {
                     Comms.com.Close();
-                    System.Environment.Exit(2);
+                    Environment.Exit(2);
                 }
-               // await.re;
             }
 
-      //      turningWizard.GCodePush += wizard_GCodePush;
+            GrblInfo.LatheModeEnabled = Profile.Config.LatheMode;
+
+            turningWizard.ApplySettings(Profile.Config.Lathe);
+            threadingWizard.ApplySettings(Profile.Config.Lathe);
+            GCodeViewer.ApplySettings(Profile.Config.GCodeViewer);
+#if ADD_CAMERA
+            enableCamera(this);
+#else
+            menuCamera.Visibility = Visibility.Hidden;
+#endif
+
+            turningWizard.GCodePush += wizard_GCodePush;
             threadingWizard.GCodePush += wizard_GCodePush;
-            //            facingWizard.GCodePush += wizard_GCodePush;
+            //facingWizard.GCodePush += wizard_GCodePush;
+            //SDCardControl.FileSelected += new CNC_Controls.SDCardControl.FileSelectedHandler(SDCardControl_FileSelected);
 
+            tabMode.SelectedIndex = 0;
 
-            this.tabMode.SelectedIndex = 0;
-
-            foreach (TabItem tab in CNC.Controls.UIUtils.FindLogicalChildren<TabItem>(ui.tabMode))
-            {
+            foreach (TabItem tab in UIUtils.FindLogicalChildren<TabItem>(ui.tabMode))
                 tab.IsEnabled = GetRenderer(tab).mode == ViewType.GRBL;
-            }
 
             currentRenderer = GetRenderer((TabItem)tabMode.Items[tabMode.SelectedIndex]);
         }
@@ -243,6 +177,13 @@ namespace GCode_Sender
             }
         }
 
+        void wizard_GCodePush(string gcode, CNC.Core.Action action)
+        {
+            GCodePush?.Invoke(gcode, action);
+        }
+
+        #region UIEvents
+
         private void Window_Load(object sender, EventArgs e)
         {
             System.Threading.Thread.Sleep(50);
@@ -265,15 +206,25 @@ namespace GCode_Sender
             }
         }
 
-        void wizard_GCodePush(string gcode, CNC.Core.Action action)
-        {
-            GCodePush?.Invoke(gcode, action);
-        }
-
-
         private void Window_Closed(object sender, EventArgs e)
         {
   //          Comms.com.Close(); // Makes fking process hang
+        }
+
+        private void exitMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+
+        void aboutMenuItem_Click(object sender, EventArgs e)
+        {
+            About about = new About(this);
+            about.ShowDialog();
+        }
+
+        private void fileCloseMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            GetRenderer(getTab(ViewType.GRBL)).CloseFile();
         }
 
         private void TabMode_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -290,16 +241,8 @@ namespace GCode_Sender
                 }
             }
         }
-        void exitMenuItem_Click(object sender, EventArgs e)
-        {
-            Close();
-        }
 
-        void aboutMenuItem_Click(object sender, EventArgs e)
-        {
-            About about = new About(this);
-            about.ShowDialog();
-        }
+        #endregion  
 
         private string GetArg(string[] args, int i)
         {
@@ -310,7 +253,7 @@ namespace GCode_Sender
         {
             TabItem tab = null;
 
-            foreach (TabItem tabitem in CNC.Controls.UIUtils.FindLogicalChildren<TabItem>(MainWindow.ui.tabMode))
+            foreach (TabItem tabitem in UIUtils.FindLogicalChildren<TabItem>(ui.tabMode))
             {
                 if (GetRenderer(tabitem).mode == mode)
                 {
@@ -337,13 +280,15 @@ namespace GCode_Sender
             if (tab != null && !show)
                 ui.tabMode.Items.Remove(tab);
         }
+
 #if ADD_CAMERA
         private static bool enableCamera(MainWindow owner)
         {
             if (Camera == null)
             {
                 Camera = new Camera();
-        //        Camera.Owner = owner;
+                Camera.ApplySettings(Profile.Config.Camera);
+                //        Camera.Owner = owner;
                 owner.menuCamera.IsEnabled = true;
             }
 
@@ -359,6 +304,7 @@ namespace GCode_Sender
         {
         }
 #endif
+
         private static CNCView GetRenderer(TabItem tab)
         {
             CNCView renderer = null;

@@ -86,6 +86,10 @@ namespace CNC.Controls.Lathe
             logic.GCodePush += Logic_GCodePush;
             logic.Model.ErrorsChanged += Model_ErrorsChanged;
         }
+        public void ApplySettings(LatheConfig config)
+        {
+            model.wz.ApplySettings(config);
+        }
 
         private void Model_ErrorsChanged(object sender, System.ComponentModel.DataErrorsChangedEventArgs e)
         {

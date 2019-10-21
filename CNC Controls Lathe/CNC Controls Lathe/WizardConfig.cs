@@ -277,7 +277,6 @@ namespace CNC.Controls.Lathe
     {
         public LatheProfile profile;
 
-        private static bool iniLoaded = false;
         public WizardConfig(string name)
         {
             zdir = -1.0d;
@@ -303,10 +302,14 @@ namespace CNC.Controls.Lathe
                 else
                     ActiveProfile.Profile = profile.profiles[0];
 
-                if (!iniLoaded)
-                    WizardConfig.Load();
             }
+        }
 
+        public void ApplySettings(LatheConfig config)
+        {
+            zdir = config.ZDirFactor;
+            xmode = config.XMode;
+            xmodelock = xmode != LatheMode.Disabled;
         }
 
         public ActiveProfile ActiveProfile { get; private set; }
@@ -315,58 +318,13 @@ namespace CNC.Controls.Lathe
   
         public ObservableCollection<ProfileData> Profiles { get { return profile.profiles; } }
 
-        public static double zdir { get; private set; }
-        public static LatheMode xmode { get; private set; }
-        public static bool xmodelock { get; private set; }
+        public static double zdir { get; private set; } = -1d;
+        public static LatheMode xmode { get; private set; } = LatheMode.Disabled;
+        public static bool xmodelock { get; private set; } = false;
 
         public ProfileData Add()
         {
             return profile.Add();
-        }
-
-        private static void Load()
-        {
-            XmlDocument config = new XmlDocument();
-
-            try
-            {
-                config.Load(CNC.Core.Resources.IniName);
-
-                foreach (XmlNode N in config.SelectNodes("Config/Lathe/*"))
-                {
-                    switch (N.Name)
-                    {
-                        case "ZDirection":
-                            zdir = N.InnerText.Trim().ToUpper() == "POSITIVE" ? 1.0 : -1.0;
-                            break;
-
-                        case "XMode":
-                            switch (N.InnerText.ToUpper())
-                            {
-                                case "DIAMETER":
-                                    xmodelock = true;
-                                    xmode = LatheMode.Diameter;
-                                    break;
-
-                                case "RADIUS":
-                                    xmodelock = true;
-                                    xmode = LatheMode.Radius;
-                                    break;
-
-                                default:
-                                    xmodelock = false;
-                                    break;
-                            }
-                            break;
-                    }
-                }
-
-                iniLoaded = true;
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show(e.Message, "LatheWizards");
-            }
         }
 
         public bool Update(ProfileData profile, double xclear, LatheMode xmode)

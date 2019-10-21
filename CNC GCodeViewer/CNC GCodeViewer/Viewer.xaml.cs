@@ -101,6 +101,16 @@ public partial class Viewer : UserControl, CNCView
         {
         }
 
+        public void ApplySettings(GCodeViewerConfig config)
+        {
+            ArcResolution = config.ArcResolution;
+            MinDistance = config.MinDistance;
+            ShowGrid = config.ShowGrid;
+            ShowAxes = config.ShowAxes;
+            ShowBoundingBox = config.ShowBoundingBox;
+            ShowViewCube = config.ShowViewCube;
+        }
+
         public void Open(string title, List<GCodeToken> tokens, gcodeBoundingBox bbox)
         {
             cvMinX.Value = bbox.MinX;

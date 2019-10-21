@@ -146,6 +146,8 @@ namespace CNC.Controls
             this.widget = widget;
             model = ((WidgetViewModel)Canvas.DataContext);
 
+            model.NumericValue = double.NaN;
+
             Grid grid, labelGrid = null;
 
             switch (widget.DataType)
@@ -346,21 +348,6 @@ namespace CNC.Controls
             return AddGrid(120);
         }
 
-        private bool isValid()
-        {
-            bool ok = true;
-
-            switch (widget.DataType)
-            {
-                case DataTypes.INTEGER:
-                case DataTypes.FLOAT:
-                    //    ok = wNumericTextBox.IsValueValid;
-                    break;
-            }
-
-            return ok;
-        }
-
         #region Attributes
         public bool IsEnabled
         {
@@ -444,7 +431,7 @@ namespace CNC.Controls
 
                     case DataTypes.INTEGER:
                     case DataTypes.FLOAT:
-                        value = ((WidgetViewModel)Canvas.DataContext).NumericValue.ToInvariantString();
+                        value = model.NumericValue.ToInvariantString();
                         break;
 
                     case DataTypes.BOOL:
@@ -503,13 +490,13 @@ namespace CNC.Controls
         /* Hack for bug in API */
         public void wWidget_TextChanged(object sender, System.EventArgs e)
         {
-            bool changed;
+            //bool changed;
 
             switch (widget.DataType)
             {
                 case DataTypes.XBITFIELD:
                     CheckBox firstCheckBox = null;
-                    foreach (CheckBox checkBox in UIUtils.FindLogicalChildren<CheckBox>(this.Canvas))
+                    foreach (CheckBox checkBox in UIUtils.FindLogicalChildren<CheckBox>(Canvas))
                     {
                         if (firstCheckBox == null)
                             firstCheckBox = checkBox;
@@ -519,7 +506,7 @@ namespace CNC.Controls
                     break;
 
                 case DataTypes.RADIOBUTTONS:
-                    foreach (RadioButton radioButton in UIUtils.FindLogicalChildren<RadioButton>(this.Canvas))
+                    foreach (RadioButton radioButton in UIUtils.FindLogicalChildren<RadioButton>(Canvas))
                     {
                         if (radioButton != (RadioButton)sender)
                             radioButton.IsChecked = false;
@@ -527,17 +514,32 @@ namespace CNC.Controls
                     break;
             }
 
-            changed = Modified ? widget.Value == Text : widget.Value != Text;
-            if (changed)
-                Modified = !Modified;
-            orgText = Text;
+            //changed = Modified ? widget.Value == Text : widget.Value != Text;
+            //if (changed)
+            //    Modified = !Modified;
+            //orgText = Text;
         }
 
         #endregion
 
+        private bool isValid()
+        {
+            bool ok = true;
+
+            switch (widget.DataType)
+            {
+                case DataTypes.INTEGER:
+                case DataTypes.FLOAT:
+                    ok = !Validation.GetHasError(wNumericTextBox);
+                    break;
+            }
+
+            return ok;
+        }
+
         public void Assign()
         {
-            if (Modified && isValid())
+            if (isValid() && Text != widget.Value)
             {
                 Modified = false;
                 widget.Assign(Text);
@@ -547,18 +549,18 @@ namespace CNC.Controls
 
         public void Dispose()
         {
-            this.Dispose(true);
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
 
         private void Dispose(bool disposing)
         {
-            if (!this.disposed && disposing)
+            if (!disposed && disposing)
             {
                 //          this.components.Dispose();
                 //  this.Canvas.Controls.Remove(this);
             }
-            this.disposed = true;
+            disposed = true;
         }
     }
 }

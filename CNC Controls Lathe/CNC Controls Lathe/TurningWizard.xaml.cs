@@ -68,6 +68,11 @@ namespace CNC.Controls.Lathe
             logic.GCodePush += Logic_GCodePush;
         }
 
+        public void ApplySettings(LatheConfig config)
+        {
+            model.wz.ApplySettings(config);
+        }
+
         private void Logic_GCodePush(string gcode, Core.Action action)
         {
             GCodePush?.Invoke(gcode, action); // Forward

@@ -47,6 +47,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using AForge.Video.DirectShow;
+using CNC.Core;
 
 namespace CNC.Controls.Camera
 {
@@ -59,14 +60,7 @@ namespace CNC.Controls.Camera
         public FilterInfoCollection LoaclWebCamsCollection;
         private int cpct = 20;
 
-        public enum MoveMode
-        {
-            XAxisFirst = 1,
-            YAxisFirst = 2,
-            BothAxes = 3
-        }
-
-        public delegate void MoveOffsetHandler(MoveMode Mode, double XOffset, double YOffset);
+        public delegate void MoveOffsetHandler(CameraMoveMode Mode, double XOffset, double YOffset);
         public event MoveOffsetHandler MoveOffset;
 
         private RenderTargetBitmap overlay = null;
@@ -78,7 +72,7 @@ namespace CNC.Controls.Camera
             InitializeComponent();
 
             XOffset = YOffset = 0.0;
-            Mode = MoveMode.BothAxes;
+            Mode = CameraMoveMode.BothAxes;
 
             pen = new System.Windows.Media.Pen(System.Windows.Media.Brushes.Red, 1);
 
@@ -89,7 +83,7 @@ namespace CNC.Controls.Camera
 
         public double XOffset { get; set; }
         public double YOffset { get; set; }
-        public MoveMode Mode { get; set; }
+        public CameraMoveMode Mode { get; set; }
         public bool IsCameraOpen { get { return videoSource != null; } }
         public FilterInfoCollection Cameras { get; private set; } = new FilterInfoCollection(FilterCategory.VideoInputDevice);
         public FilterInfo Camera { get; private set; }

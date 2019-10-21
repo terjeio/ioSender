@@ -204,23 +204,23 @@ namespace GCode_Sender
             this.Focus();
         }
 
-        void Camera_MoveOffset(MoveMode Mode, double XOffset, double YOffset)
+        void Camera_MoveOffset(CameraMoveMode Mode, double XOffset, double YOffset)
         {
             Comms.com.WriteString("G91G0\r"); // Enter relative G0 mode - set scale to 1.0?
 
             switch (Mode)
             {
-                case MoveMode.XAxisFirst:
+                case CameraMoveMode.XAxisFirst:
                     Comms.com.WriteString(string.Format("X{0}\r", XOffset.ToInvariantString("F3")));
                     Comms.com.WriteString(string.Format("Y{0}\r", YOffset.ToInvariantString("F3")));
                     break;
 
-                case MoveMode.YAxisFirst:
+                case CameraMoveMode.YAxisFirst:
                     Comms.com.WriteString(string.Format("Y{0}\r", YOffset.ToInvariantString("F3")));
                     Comms.com.WriteString(string.Format("X{0}\r", XOffset.ToInvariantString("F3")));
                     break;
 
-                case MoveMode.BothAxes:
+                case CameraMoveMode.BothAxes:
                     Grbl.MDICommand(DataContext, string.Format("X{0}Y{1}", XOffset.ToInvariantString("F3"), YOffset.ToInvariantString("F3")));
                     break;
             }
@@ -235,10 +235,12 @@ namespace GCode_Sender
             // TODO: check if grbl is in a state that allows replies
             using (new UIUtils.WaitCursor())
             {
+                GCodeSender.EnablePolling(false);
                 GrblInfo.Get();
                 GrblSettings.Get();
                 GrblParserState.Get();
                 GrblWorkParameters.Get();
+                GCodeSender.EnablePolling(true);
             }
 
             workParametersControl.ToolChangeCommand = GrblInfo.ManualToolChange ? "T{0}M6" : "T{0}";

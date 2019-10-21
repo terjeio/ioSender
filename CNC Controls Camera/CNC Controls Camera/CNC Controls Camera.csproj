@@ -107,6 +107,16 @@
   <ItemGroup>
     <Resource Include="App.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\CNC Controls\CNC Controls\CNC Controls.csproj">
+      <Project>{fa7fef55-aa80-4b20-b345-e3ca7204dd18}</Project>
+      <Name>CNC Controls</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\CNC Core\CNC Core\CNC Core.csproj">
+      <Project>{F245FF89-A838-4D6E-AA40-92CFD3D072D3}</Project>
+      <Name>CNC Core</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

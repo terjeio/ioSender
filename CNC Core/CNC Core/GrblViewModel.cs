@@ -1,0 +1,545 @@
+﻿/*
+ * GrblViewModel.cs - part of CNC Controls library
+ *
+ * v0.02 / 2019-10-21 / Io Engineering (Terje Io)
+ *
+ */
+
+/*
+
+Copyright (c) 2019, Io Engineering (Terje Io)
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
+
+· Redistributions of source code must retain the above copyright notice, this
+list of conditions and the following disclaimer.
+
+· Redistributions in binary form must reproduce the above copyright notice, this
+list of conditions and the following disclaimer in the documentation and/or
+other materials provided with the distribution.
+
+· Neither the name of the copyright holder nor the names of its contributors may
+be used to endorse or promote products derived from this software without
+specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+*/
+
+using System;
+using System.Linq;
+using System.Windows.Media;
+using System.Collections.ObjectModel;
+
+namespace CNC.Core
+{
+    public class GrblViewModel : ViewModelBase
+    {
+        private string _tool, _message, _WPos, _MPos, _wco, _wcs, _a, _fs, _mpg, _ov, _pn, _sc, _sd, _ex, _d, _gc, _h, _mdiCommand, _fileName;
+        private bool _flood, _mist, _toolChange, _reset, _isMPos, _isJobRunning;
+        private double _feedrate = 0d;
+        private double _rpm = 0d;
+        private double _rpmActual = double.NaN;
+        private double _feedOverride = 100d;
+        private double _rapidsOverride = 100d;
+        private double _rpmOverride = 100d;
+        private GrblState _grblState;
+        private LatheMode _latheMode = LatheMode.Disabled;
+        private HomedState _homedState = HomedState.Unknown;
+        private StreamingState _streamingState;
+
+        public GrblViewModel()
+        {
+            _a = _pn = _fs = _sc = string.Empty;
+            _tool = "";
+            Clear();
+        }
+
+        public void Clear()
+        {
+            _fileName = Ex = _mdiCommand = string.Empty;
+            _streamingState = StreamingState.NoFile;
+            _isMPos = _reset = _isJobRunning = false;
+            _mpg = "";
+
+            _grblState.Error = 0;
+            _grblState.State = GrblStates.Unknown;
+            _grblState.Substate = 0;
+            _grblState.MPG = false;
+            GrblState = _grblState;
+            IsMPGActive = null; //??
+
+            _MPos = _WPos = _wco = string.Empty;
+            Position.Clear();
+            MachinePosition.Clear();
+            WorkPosition.Clear();
+            WorkPositionOffset.Clear();
+
+            Set("Pn", string.Empty);
+            Set("A", string.Empty);
+            Set("FS", string.Empty);
+            Set("Sc", string.Empty);
+            Set("T", "0");
+            Set("Ov", string.Empty);
+            SDCardStatus = string.Empty;
+            HomedState = HomedState.Unknown;
+            if (_latheMode != LatheMode.Disabled)
+                LatheMode = LatheMode.Radius;
+        }
+
+        #region Dependencyproperties
+
+        public string MDICommand { get { return _mdiCommand; } set { _mdiCommand = value; if (_mdiCommand != string.Empty) OnPropertyChanged(); } }
+        public ObservableCollection<CoordinateSystem> CoordinateSystems { get { return GrblWorkParameters.CoordinateSystems; } }
+        public ObservableCollection<Tool> Tools { get { return GrblWorkParameters.Tools; } }
+        public string Tool { get { return _tool; } set { _tool = value; OnPropertyChanged(); } }
+        public bool GrblReset { get { return _reset; } set { _reset = value; _grblState.Error = 0; OnPropertyChanged(); Message = ""; } }
+        public GrblState GrblState { get { return _grblState; } set { _grblState = value; OnPropertyChanged(); } }
+        public bool IsCheckMode { get { return _grblState.State == GrblStates.Check; } }
+        public bool IsSleepMode { get { return _grblState.State == GrblStates.Sleep; } }
+        public bool IsJobRunning { get { return _isJobRunning; } set { if (_isJobRunning != value) { _isJobRunning = value; OnPropertyChanged(); } } }
+        public int GrblError { get { return _grblState.Error; } set { _grblState.Error = value; OnPropertyChanged(); } }
+        public StreamingState StreamingState { get { return _streamingState; } set { if (_streamingState != value) { _streamingState = value; OnPropertyChanged(); } } }
+        public string WorkCoordinateSystem { get { return _wcs; } private set { _wcs = value; OnPropertyChanged(); } }
+        public Position MachinePosition { get; private set; } = new Position();
+        public Position WorkPosition { get; private set; } = new Position();
+        public Position Position { get; private set; } = new Position();
+        public bool IsMachinePosition { get { return _isMPos; } set { _isMPos = value; OnPropertyChanged(); } }
+        public bool SuspendPositionNotifications
+        {
+            get { return Position.SuspendNotifications; }
+            set { Position.SuspendNotifications = value; }
+        }
+        public Position WorkPositionOffset { get; private set; } = new Position();
+        public EnumFlags<SpindleState> SpindleState { get; private set; } = new EnumFlags<SpindleState>(Core.SpindleState.Off);
+        public EnumFlags<Signals> Signals { get; private set; } = new EnumFlags<Signals>(Core.Signals.Off);
+        public EnumFlags<AxisFlags> AxisScaled { get; private set; } = new EnumFlags<AxisFlags>(Core.AxisFlags.None);
+        public string FileName { get { return _fileName; } set { _fileName = value; OnPropertyChanged(); } }
+        public bool? IsMPGActive { get { return string.IsNullOrEmpty(_mpg) ? null : (bool?)(_mpg == "1"); } private set { _mpg = value == null ? "" : (value == true ? "1" : "0"); OnPropertyChanged(); } }
+        public string Scaling { get { return _sc; } private set { _sc = value; OnPropertyChanged(); } }
+        public string SDCardStatus { get { return _sd; } private set { _sd = value; OnPropertyChanged(); } }
+        public HomedState HomedState { get { return _homedState; } private set { _homedState = value; OnPropertyChanged(); } }
+        public LatheMode LatheMode { get { return _latheMode; } private set { _latheMode = value; OnPropertyChanged(); } }
+
+        #region A - Spindle, Coolant and Tool change status
+
+        public bool Mist
+        {
+            get { return _mist; }
+            private set
+            {
+                if (_mist != value)
+                {
+                    _mist = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public bool Flood
+        {
+            get { return _flood; }
+            private set
+            {
+                if (_flood != value)
+                {
+                    _flood = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public bool IsToolChanging
+        {
+            get { return _toolChange; }
+            set
+            {
+                if (_toolChange != value)
+                {
+                    _toolChange = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        #endregion
+
+        #region FS - Feed and Speed
+
+        public double FeedRate { get { return _feedrate; } private set { _feedrate = value; OnPropertyChanged(); } }
+        public double ProgrammedRPM { get { return _rpm; } private set { _rpm = value; OnPropertyChanged(); } }
+        public double ActualRPM { get { return _rpmActual; } private set { _rpmActual = value; OnPropertyChanged(); } }
+
+        #endregion
+
+        #region Ov - Feed and spindle overrides
+
+        public double FeedOverride { get { return _feedOverride; } private set { _feedOverride = value; OnPropertyChanged(); } }
+        public double RapidsOverride { get { return _rapidsOverride; } private set { _rapidsOverride = value; OnPropertyChanged(); } }
+        public double RPMOverride { get { return _rpmOverride; } private set { _rpmOverride = value; OnPropertyChanged(); } }
+
+        #endregion
+
+        public string Message
+        {
+            get { return _message; }
+            set
+            {
+                if (_message != value)
+                {
+                    _message = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public string Ex //??
+        {
+            get { return _ex; }
+            private set
+            {
+                _ex = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string ParserState
+        {
+            get { return _gc; }
+            set
+            {
+                _gc = value;
+                if (GrblParserState.WorkOffset != _wcs)
+                    WorkCoordinateSystem = GrblParserState.WorkOffset;
+                if (GrblParserState.Tool != _tool)
+                    Tool = GrblParserState.Tool;
+                if (GrblInfo.LatheMode != _latheMode)
+                    LatheMode = GrblInfo.LatheMode;
+                if (GrblParserState.IsActive("G51") != null)
+                    Set("Sc", GrblParserState.IsActive("G51"));
+                OnPropertyChanged();
+            }
+        }
+
+        #endregion
+
+        public bool SetGRBLState(string newState, int substate, bool force)
+        {
+            GrblStates newstate = _grblState.State;
+
+            Enum.TryParse(newState, true, out newstate);
+
+            if (newstate != _grblState.State || substate != _grblState.Substate || force)
+            {
+
+                bool checkChanged = _grblState.State == GrblStates.Check || newstate == GrblStates.Check;
+                bool sleepChanged = _grblState.State == GrblStates.Sleep || newstate == GrblStates.Sleep;
+
+                _grblState.State = newstate;
+                _grblState.Substate = substate;
+
+                force = true;
+
+                switch (_grblState.State)
+                {
+
+                    case GrblStates.Run:
+                        _grblState.Color = Colors.LightGreen;
+                        break;
+
+                    case GrblStates.Alarm:
+                        _grblState.Color = Colors.Red;
+                        break;
+
+                    case GrblStates.Jog:
+                        _grblState.Color = Colors.Yellow;
+                        break;
+
+                    case GrblStates.Tool:
+                        _grblState.Color = Colors.LightSalmon;
+                        break;
+
+                    case GrblStates.Hold:
+                        _grblState.Color = Colors.LightSalmon;
+                        break;
+
+                    case GrblStates.Door:
+                        if (_grblState.Substate > 0)
+                            _grblState.Color = _grblState.Substate == 1 ? Colors.Red : Colors.LightSalmon;
+                        break;
+
+                    case GrblStates.Home:
+                    case GrblStates.Sleep:
+                        _grblState.Color = Colors.LightSkyBlue;
+                        break;
+
+                    case GrblStates.Check:
+                        _grblState.Color = Colors.White;
+                        break;
+
+                    default:
+                        _grblState.Color = Colors.White;
+                        break;
+                }
+
+                OnPropertyChanged(nameof(GrblState));
+
+                if (checkChanged || force)
+                    OnPropertyChanged(nameof(IsCheckMode));
+
+                if (sleepChanged || force)
+                    OnPropertyChanged(nameof(IsSleepMode));
+
+                if (newstate == GrblStates.Sleep)
+                    Message = "<Reset> to continue.";
+                else if (newstate == GrblStates.Alarm)
+                    Message = substate == 11 ? "<Home> to continue." : "<Reset> then <Unlock> to continue.";
+            }
+
+            return force;
+        }
+
+        public void SetError(int error)
+        {
+            GrblError = error;
+            Message = error == 0 ? "" : GrblErrors.GetMessage(error.ToString());
+        }
+
+        public bool ParseGCStatus(string data)
+        {
+            GrblParserState.Process(data);
+            if (GrblParserState.Loaded)
+                ParserState = data;
+
+            return GrblParserState.Loaded;
+        }
+
+        public bool ParseStatus(string data)
+        {
+            bool parseState = true, changed = false;
+
+            string[] elements = data.Split('|');
+
+            foreach (string e in elements)
+            {
+                string[] pair = e.Split(':');
+
+                if (parseState)
+                {
+                    changed = SetGRBLState(pair[0].Substring(1), pair.Count() == 1 ? -1 : int.Parse(pair[1]), false);
+                    parseState = false;
+                }
+                else if (pair.Length == 2 && Set(pair[0], pair[1]))
+                    changed = true;
+            }
+
+            if (!data.Contains("|Pn:") && Set("Pn", ""))
+                changed = true;
+
+            return changed;
+        }
+
+        public bool Set(string parameter, string value)
+        {
+            bool changed = false;
+
+            switch (parameter)
+            {
+                case "MPos":
+                    if ((changed = _MPos != value))
+                    {
+                        if (!_isMPos)
+                            IsMachinePosition = true;
+                        _MPos = value;
+                        MachinePosition.Parse(_MPos);
+                        for (int i = 0; i < GrblInfo.NumAxes; i++)
+                        {
+                            double newpos = MachinePosition.Values[i] - WorkPositionOffset.Values[i];
+                            if (!Position.Values[i].Equals(newpos))
+                                Position.Values[i] = newpos;
+                        }
+                    }
+                    break;
+
+                case "WPos":
+                    if ((changed = _WPos != value))
+                    {
+                        if (_isMPos)
+                            IsMachinePosition = false;
+                        _WPos = value;
+                        WorkPosition.Parse(_WPos);
+                        for (int i = 0; i < GrblInfo.NumAxes; i++)
+                            if (!Position.Values[i].Equals(WorkPosition.Values[i]))
+                                Position.Values[i] = WorkPosition.Values[i];
+
+                    }
+                    break;
+
+                case "A":
+                    if ((changed = _a != value))
+                    {
+                        _a = value;
+
+                        if (_a == "")
+                        {
+                            Mist = Flood = IsToolChanging = false;
+                            SpindleState.Value = Core.SpindleState.Off;
+                        }
+                        else
+                        {
+                            Mist = value.Contains("M");
+                            Flood = value.Contains("F");
+                            IsToolChanging = value.Contains("T");
+                            SpindleState.Value = value.Contains("S") ? Core.SpindleState.CW : (value.Contains("C") ? Core.SpindleState.CCW : Core.SpindleState.Off);
+                        }
+                    }
+                    break;
+
+                case "WCO":
+                    if ((changed = _wco != value))
+                    {
+                        _wco = value;
+                        WorkPositionOffset.Parse(value);
+                        if (_isMPos)
+                        {
+                            for (int i = 0; i < GrblInfo.NumAxes; i++)
+                            {
+                                double newpos = MachinePosition.Values[i] - WorkPositionOffset.Values[i];
+                                if (!Position.Values[i].Equals(newpos))
+                                    Position.Values[i] = newpos;
+                            }
+                        }
+                    }
+                    break;
+
+                case "WCS":
+                    if ((changed = _wcs != value))
+                        WorkCoordinateSystem = GrblParserState.WorkOffset = value;
+                    break;
+
+                case "FS":
+                    if ((changed = _fs != value))
+                    {
+                        _fs = value;
+                        if (_fs == "")
+                        {
+                            FeedRate = ProgrammedRPM = 0d;
+                            if (!double.IsNaN(ActualRPM))
+                                ActualRPM = 0d;
+                        }
+                        else
+                        {
+                            double[] values = dbl.ParseList(_fs);
+                            if (_feedrate != values[0])
+                                FeedRate = values[0];
+                            if (_rpm != values[1])
+                                ProgrammedRPM = values[1];
+                            if (values.Length > 2 && _rpmActual != values[2])
+                                ActualRPM = values[2];
+                        }
+                    }
+                    break;
+
+                case "Pn":
+                    if ((changed = _pn != value))
+                    {
+                        _pn = value;
+
+                        int s = 0;
+                        foreach (char c in _pn)
+                        {
+                            int i = GrblConstants.SIGNALS.IndexOf(c);
+                            if (i >= 0)
+                                s |= (1 << i);
+                        }
+                        Signals.Value = (Signals)s;
+                    }
+                    break;
+
+                case "Ov":
+                    if ((changed = _ov != value))
+                    {
+                        _ov = value;
+                        if (_ov == string.Empty)
+                            FeedOverride = RapidsOverride = RPMOverride = 100d;
+                        else
+                        {
+                            double[] values = dbl.ParseList(_ov);
+                            if (_feedOverride != values[0])
+                                FeedOverride = values[0];
+                            if (_rapidsOverride != values[1])
+                                RapidsOverride = values[1];
+                            if (_rpmOverride != values[2])
+                                RPMOverride = values[2];
+                        }
+                    }
+                    break;
+
+                case "Sc":
+                    if ((changed = _sc != value))
+                    {
+                        int s = 0;
+                        foreach (char c in value)
+                        {
+                            int i = GrblInfo.AxisLetterToIndex(c);
+                            if (i >= 0)
+                                s |= (1 << i);
+                        }
+                        AxisScaled.Value = (AxisFlags)s;
+                        Scaling = value;
+                    }
+                    break;
+
+                case "Ex":
+                    if ((changed = _ex != value))
+                        Ex = value;
+                    break;
+
+                case "SD":
+                    value = string.Format("SD Card streaming {0}% complete", value);
+                    if ((changed = SDCardStatus != value))
+                        Message = SDCardStatus = value;
+                    break;
+
+                case "T":
+                    if ((changed = _tool != value))
+                        Tool = GrblParserState.Tool = value == "0" ? GrblConstants.NO_TOOL : value;
+                    break;
+
+                case "MPG":
+                    GrblInfo.MPGMode = _grblState.MPG = value == "1";
+                    IsMPGActive = _grblState.MPG;
+                    changed = true;
+                    break;
+
+                case "H":
+                    if (_h != value)
+                    {
+                        _h = value;
+                        HomedState = value == "1" ? HomedState.Homed : HomedState.Unknown;
+                        changed = true;
+                    }
+                    break;
+
+                case "D":
+                    _d = value;
+                    LatheMode = GrblInfo.LatheMode = value == "0" ? LatheMode.Radius : LatheMode.Diameter;
+                    changed = true;
+                    break;
+            }
+
+            return changed;
+        }
+    }
+}

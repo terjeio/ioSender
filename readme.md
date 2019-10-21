@@ -18,7 +18,7 @@ The references to the Aforge libraries can be removed if the _Conditional compil
 
 Current layout, most likely to change. Since using the VMMV coding pattern this is fairly easy to do.
 
-![Sender](media/sender.png)
+![Sender](Media/Sender.png)
 
 ---
 2019-10-21
