@@ -46,12 +46,13 @@ namespace CNC.Controls.Lathe
     class TurningLogic
     {
         private double last_rpm = 0d, last_css = 0d;
-        private BaseViewModel model = new BaseViewModel("Turning");
+        private BaseViewModel model;
 
         public event GCodePushHandler GCodePush;
 
         public TurningLogic()
         {
+            model = new BaseViewModel("Turning");
             model.PropertyChanged += Model_PropertyChanged;
             SetDefaults();
         }

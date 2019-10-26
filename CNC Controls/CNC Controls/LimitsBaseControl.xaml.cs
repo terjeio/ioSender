@@ -1,7 +1,7 @@
 ﻿/*
- * CoordValueSetControl.xaml.cs - part of CNC Controls library
+ * LimitsBaseControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.02 / 2019-10-21 / Io Engineering (Terje Io)
+ * v0.01 / 2019-10-21 / Io Engineering (Terje Io)
  *
  */
 
@@ -43,37 +43,43 @@ using System.Windows.Controls;
 namespace CNC.Controls
 {
     /// <summary>
-    /// Interaction logic for CoordValueSetControl.xaml
+    /// Interaction logic for LimitsBaseControl.xaml
     /// </summary>
-    public partial class CoordValueSetControl : UserControl
+    public partial class LimitsBaseControl : UserControl
     {
-        public delegate void ClickHandler(object sender, RoutedEventArgs e);
-        public event ClickHandler Click;
-
-        public CoordValueSetControl()
+        public LimitsBaseControl()
         {
             InitializeComponent();
+
+            //UnitProperty.OverrideMetadata(typeof(string), new PropertyMetadata("mm"));
         }
 
-        public static readonly DependencyProperty ValueProperty = DependencyProperty.Register(nameof(Value), typeof(double), typeof(CoordValueSetControl), new PropertyMetadata(double.NaN));
-        public double Value
-        {
-            get { return (double)GetValue(ValueProperty); }
-            set { SetValue(ValueProperty, value); }
-        }
-
-        public static readonly DependencyProperty LabelProperty = DependencyProperty.Register(nameof(Label), typeof(string), typeof(CoordValueSetControl), new PropertyMetadata());
+        public static readonly DependencyProperty LabelProperty = DependencyProperty.Register(nameof(Label), typeof(string), typeof(LimitsBaseControl), new PropertyMetadata());
         public string Label
         {
             get { return (string)GetValue(LabelProperty); }
             set { SetValue(LabelProperty, value); }
         }
 
-        public string Text { get { return cvValue.Text; } }
-
-        private void btnSet_Click(object sender, RoutedEventArgs e)
+        public static readonly DependencyProperty UnitProperty = DependencyProperty.Register(nameof(Unit), typeof(string), typeof(LimitsBaseControl), new PropertyMetadata("mm"));
+        public string Unit
         {
-            Click?.Invoke(this, e);
+            get { return (string)GetValue(UnitProperty); }
+            set { SetValue(UnitProperty, value); }
+        }
+
+        public static readonly DependencyProperty MinValueProperty = DependencyProperty.Register(nameof(MinValue), typeof(double), typeof(LimitsBaseControl), new PropertyMetadata());
+        public double MinValue
+        {
+            get { return (double)GetValue(MinValueProperty); }
+            set { SetValue(MinValueProperty, value); }
+        }
+
+        public static readonly DependencyProperty MaxValueProperty = DependencyProperty.Register(nameof(MaxValue), typeof(double), typeof(LimitsBaseControl), new PropertyMetadata());
+        public double MaxValue
+        {
+            get { return (double)GetValue(MinValueProperty); }
+            set { SetValue(MaxValueProperty, value); }
         }
     }
 }

@@ -11,7 +11,12 @@
             <ColumnDefinition Width="177*"/>
             <ColumnDefinition Width="43*"/>
         </Grid.ColumnDefinitions>
-        <local:NumericField x:Name="cvValue" Format="-###0.000" Value="{Binding Value, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" HorizontalAlignment="Left" Margin="3,2,0,2" VerticalAlignment="Center" Height="26" Width="170"/>
+        <local:NumericField x:Name="cvValue" HorizontalAlignment="Left" Margin="3,2,0,2" VerticalAlignment="Center" Height="26" Width="170"
+            Format="{Binding Path=Format, Mode=OneWay}"
+            Value="{Binding Path=Value, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
+            Unit="{Binding Path=Unit, Mode=OneWay}"
+            Label="{Binding Path=Label, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=OneWay}"
+        />
         <Button x:Name="btnSet" Content="Set" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Width="35" Height="22" Margin="0,4" Click="btnSet_Click"/>
     </Grid>
 </UserControl>

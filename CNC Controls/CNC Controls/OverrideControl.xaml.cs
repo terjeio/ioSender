@@ -70,29 +70,23 @@ namespace CNC.Controls
         public byte CoarsePlusCommand { set { btnOvCoarsePlus.Tag = ((char)value).ToString(); } }
         public byte CoarseMinusCommand { set { btnOvCoarseMinus.Tag = ((char)value).ToString(); } }
 
+        public static readonly DependencyProperty ValueProperty = DependencyProperty.Register(nameof(Value), typeof(double), typeof(OverrideControl), new PropertyMetadata(double.NaN, new PropertyChangedCallback(OnValuehanged)));
         public double Value
         {
             get { return (double)GetValue(ValueProperty); }
             set { SetValue(ValueProperty, value); }
         }
-
-        public static readonly DependencyProperty ValueProperty =
-            DependencyProperty.Register("Value", typeof(double), typeof(OverrideControl), new PropertyMetadata(double.NaN, new PropertyChangedCallback(OnValuehanged)));
-
         private static void OnValuehanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ((OverrideControl)d).txtOverride.Text = ((double)e.NewValue).ToString() + "%"; ;
         }
 
+        public static readonly DependencyProperty MinusOnlyProperty =  DependencyProperty.Register(nameof(MinusOnly), typeof(bool), typeof(OverrideControl), new PropertyMetadata(false));
         public bool MinusOnly
         {
             get { return (bool)GetValue(MinusOnlyProperty); }
             set { SetValue(MinusOnlyProperty, value); }
         }
-
-        public static readonly DependencyProperty MinusOnlyProperty =
-            DependencyProperty.Register("MinusOnly", typeof(bool), typeof(OverrideControl), new PropertyMetadata(false));
-
         public void OnMinusChanged(object sender, EventArgs args)
         {
             if (MinusOnly)

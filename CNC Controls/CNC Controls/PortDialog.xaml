@@ -1,0 +1,17 @@
+﻿<Window x:Class="CNC.Controls.PortDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CNC.Controls"
+        mc:Ignorable="d"
+        Title="Select COM port" Height="120" Width="185" Icon="App.ico" ResizeMode="NoResize">
+    <Grid Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
+        <ComboBox x:Name="comboBox" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="150"
+            ItemsSource="{Binding Path=PortNames}"
+            SelectedValue="{Binding Path=SelectedPort, Mode=TwoWay}"
+        />
+        <Button x:Name="btnOk" Content="Ok" HorizontalAlignment="Left" Margin="10,49,0,0" VerticalAlignment="Top" Width="70" Click="btnOk_Click"/>
+        <Button x:Name="btnCancel" Content="Cancel" HorizontalAlignment="Left" Margin="90,49,0,0" VerticalAlignment="Top" Width="70" Click="btnCancel_Click"/>
+    </Grid>
+</Window>

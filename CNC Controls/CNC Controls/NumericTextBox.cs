@@ -1,7 +1,7 @@
 ﻿/*
  * NumericTextBox.cs - part of CNC Controls library
  *
- * v0.02 / 2019-10-15 / Io Engineering (Terje Io)
+ * v0.02 / 2019-10-21 / Io Engineering (Terje Io)
  *
  */
 
@@ -62,7 +62,7 @@ namespace CNC.Controls
         public string DisplayFormat { get { return np.DisplayFormat; } }
 
         public static readonly DependencyProperty ValueProperty =
-            DependencyProperty.Register("Value", typeof(double), typeof(NumericTextBox), new PropertyMetadata(0.0d, new PropertyChangedCallback(OnValueChanged)));
+            DependencyProperty.Register(nameof(Value), typeof(double), typeof(NumericTextBox), new PropertyMetadata(0.0d, new PropertyChangedCallback(OnValueChanged)));
         public double Value
         {
             get { return (double)GetValue(ValueProperty); }
@@ -82,7 +82,7 @@ namespace CNC.Controls
         //        }
 
         public static readonly DependencyProperty FormatProperty =
-            DependencyProperty.Register("Format", typeof(string), typeof(NumericTextBox), new PropertyMetadata(NumericProperties.MetricFormat, new PropertyChangedCallback(OnFormatChanged)));
+            DependencyProperty.Register(nameof(Format), typeof(string), typeof(NumericTextBox), new PropertyMetadata(NumericProperties.MetricFormat, new PropertyChangedCallback(OnFormatChanged)));
         public string Format
         {
             get { return (string)GetValue(FormatProperty); }

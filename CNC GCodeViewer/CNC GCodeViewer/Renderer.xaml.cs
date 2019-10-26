@@ -1,7 +1,7 @@
 ﻿/*
  * Renderer.xaml.cs - part of CNC Controls library
  *
- * v0.02 / 2019-10-02 / Io Engineering (Terje Io)
+ * v0.02 / 2019-10-23 / Io Engineering (Terje Io)
  *
  */
 
@@ -39,14 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
@@ -65,6 +59,7 @@ namespace CNC.Controls.Viewer
         private Point3D point0;  // last point
         private Vector3D delta0;  // (dx,dy,dz)
         private List<LinesVisual3D> trace;
+        private List<LinesVisual3D> position = new List<LinesVisual3D>();
         private LinesVisual3D path;
         private double minDistanceSquared;
 
@@ -86,15 +81,60 @@ namespace CNC.Controls.Viewer
         public bool ShowAxes { get; set; } = true;
         public bool ShowBoundingBox { get; set; } = true;
 
-        public void Render(List<GCodeToken> tokens, gcodeBoundingBox bbox)
+        public void ClearViewport()
         {
+            viewport.Children.Clear();
+        }
+
+        public void ShowPosition()
+        {
+            GrblViewModel model = (GrblViewModel)DataContext;
+
+            foreach (var path in position)
+                viewport.Children.Remove(path);
+
+            position.Clear();
+
+            double maxX = GrblSettings.GetDouble(GrblSetting.AxisSetting_XMaxTravel);
+            double maxY = GrblSettings.GetDouble(GrblSetting.AxisSetting_YMaxTravel);
+            double maxZ = GrblSettings.GetDouble(GrblSetting.AxisSetting_ZMaxTravel);
+
+            var positionX = new LinesVisual3D();
+            positionX.Color = Colors.Green;
+            positionX.Thickness = 1;
+            positionX.Points.Add(new Point3D(model.ProgramLimits.MinX - 5d, model.Position.Y, model.Position.Z));
+            positionX.Points.Add(new Point3D(maxX, model.Position.Y, model.Position.Z));
+            position.Add(positionX);
+
+            var positionY = new LinesVisual3D();
+            positionY.Color = Colors.Green;
+            positionY.Thickness = 1;
+            positionY.Points.Add(new Point3D(model.Position.X, model.ProgramLimits.MinY - 5d, model.Position.Z));
+            positionY.Points.Add(new Point3D(model.Position.X, maxY, model.Position.Z));
+            position.Add(positionY);
+
+            var positionZ = new LinesVisual3D();
+            positionZ.Color = Colors.Green;
+            positionZ.Thickness = 1;
+            positionZ.Points.Add(new Point3D(model.Position.X, model.Position.Y, model.ProgramLimits.MinZ - 5d));
+            positionZ.Points.Add(new Point3D(model.Position.X, model.Position.Y, maxZ));
+            position.Add(positionZ);
+
+            foreach (var path in position)
+                viewport.Children.Add(path);
+        }
+
+        public void Render(List<GCodeToken> tokens)
+        {
+            var bbox = ((GrblViewModel)DataContext).ProgramLimits;
+
             double lineThickness = bbox.MaxSize / 1000;
             double arrowOffset = lineThickness * 30;
             double labelOffset = lineThickness * 50;
             bool canned = false;
 
             Plane plane = Plane.XY;
-            IJKMode ijkmode = IJKMode.Absolute;
+            IJKMode ijkmode = IJKMode.Incremental;
 
             //trace.Clear();
             trace = null;
@@ -102,74 +142,74 @@ namespace CNC.Controls.Viewer
 
             if (ShowGrid)
             {
-                var grid = new GridLinesVisual3D();
-                grid.Center = new Point3D(bbox.MinX + 0.5 * bbox.SizeX, bbox.MinY + 0.5 * bbox.SizeY, 0.0);
-                grid.Length = bbox.SizeX;
-                grid.Width = bbox.SizeY;
-                grid.MinorDistance = TickSize;
-                grid.MajorDistance = bbox.MaxSize;
-                grid.Width = bbox.SizeY + 10;
-                grid.Length = bbox.SizeX + 10;
-                grid.Thickness = lineThickness;
-                grid.Fill = AxisBrush;
-                viewport.Children.Add(grid);
+                viewport.Children.Add(new GridLinesVisual3D()
+                {
+                    Center = new Point3D(bbox.SizeX / 2d - TickSize - bbox.MinX / 2d, bbox.SizeY / 2d - TickSize - bbox.MinY / 2d, 0.0),
+                    MinorDistance = TickSize,
+                    MajorDistance = bbox.MaxSize,
+                    Width = bbox.SizeY + TickSize * 2d,
+                    Length = bbox.SizeX + TickSize * 2d,
+                    Thickness = lineThickness,
+                    Fill = AxisBrush
+                });
             }
 
             if (ShowAxes)
             {
-                var arrow = new ArrowVisual3D();
-                arrow.Point2 = new Point3D(bbox.SizeX + arrowOffset, 0.0, 0.0);
-                arrow.Diameter = lineThickness * 5;
-                arrow.Fill = AxisBrush;
-                viewport.Children.Add(arrow);
+                viewport.Children.Add(new ArrowVisual3D() {
+                    Point2 = new Point3D(bbox.SizeX + arrowOffset, 0.0, 0.0),
+                    Diameter = lineThickness * 5,
+                    Fill = AxisBrush
+                });
 
-                var label = new BillboardTextVisual3D();
-                label.Text = "X";
-                label.FontWeight = FontWeights.Bold;
-                label.Foreground = AxisBrush;
-                label.Position = new Point3D(bbox.SizeX + labelOffset, 0.0, 0.0);
-                viewport.Children.Add(label);
+                viewport.Children.Add(new BillboardTextVisual3D() {
+                    Text = "X",
+                    FontWeight = FontWeights.Bold,
+                    Foreground = AxisBrush,
+                    Position = new Point3D(bbox.SizeX + labelOffset, 0.0, 0.0)
+                });
 
-                arrow = new ArrowVisual3D();
-                arrow.Point2 = new Point3D(0.0, bbox.SizeY + arrowOffset, 0.0);
-                arrow.Diameter = lineThickness * 5;
-                arrow.Fill = AxisBrush;
-                viewport.Children.Add(arrow);
+                viewport.Children.Add(new ArrowVisual3D() {
+                    Point2 = new Point3D(0.0, bbox.SizeY + arrowOffset, 0.0),
+                    Diameter = lineThickness * 5,
+                    Fill = AxisBrush
+                });
 
-                label = new BillboardTextVisual3D();
-                label.Text = "Y";
-                label.FontWeight = FontWeights.Bold;
-                label.Foreground = AxisBrush;
-                label.Position = new Point3D(0.0, bbox.SizeY + labelOffset, 0.0);
-                viewport.Children.Add(label);
-
-                if (bbox.SizeZ > 0.0)
+                viewport.Children.Add(new BillboardTextVisual3D()
                 {
-                    arrow = new ArrowVisual3D();
-                    arrow.Point1 = new Point3D(0.0, 0.0, bbox.MinZ);
-                    arrow.Point2 = new Point3D(0.0, 0.0, bbox.MaxZ + arrowOffset);
-                    arrow.Diameter = lineThickness * 5;
-                    arrow.Fill = AxisBrush;
-                    viewport.Children.Add(arrow);
+                    Text = "Y",
+                    FontWeight = FontWeights.Bold,
+                    Foreground = AxisBrush,
+                    Position = new Point3D(0.0, bbox.SizeY + labelOffset, 0.0)
+                });
 
-                    label = new BillboardTextVisual3D();
-                    label.Text = "Z";
-                    label.FontWeight = FontWeights.Bold;
-                    label.Foreground = AxisBrush;
-                    label.Position = new Point3D(0.0, 0.0, bbox.MaxZ + labelOffset);
-                    viewport.Children.Add(label);
+                if (bbox.SizeZ > 0d)
+                {
+                    viewport.Children.Add(new ArrowVisual3D() {
+                        Point1 = new Point3D(0.0, 0.0, bbox.MinZ),
+                        Point2 = new Point3D(0.0, 0.0, bbox.MaxZ + arrowOffset),
+                        Diameter = lineThickness * 5,
+                        Fill = AxisBrush
+                    });
+                
+                    viewport.Children.Add(new BillboardTextVisual3D()
+                    {
+                        Text = "Z",
+                        FontWeight = FontWeights.Bold,
+                        Foreground = AxisBrush,
+                        Position = new Point3D(0.0, 0.0, bbox.MaxZ + labelOffset)
+                    });
                 }
             }
 
-            if (ShowBoundingBox && bbox.SizeZ > 0.0)
+            if (ShowBoundingBox && bbox.SizeZ > 0d)
             {
-                Rect3D BoundingBox = new Rect3D(bbox.MinX, bbox.MinY, bbox.MinZ, bbox.SizeX, bbox.SizeY, bbox.SizeZ);
-
-                var box = new BoundingBoxWireFrameVisual3D();
-                box.BoundingBox = BoundingBox;
-                box.Thickness = 1;
-                box.Color = Colors.Gray;
-                viewport.Children.Add(box);
+                viewport.Children.Add(new BoundingBoxWireFrameVisual3D()
+                {
+                    BoundingBox = new Rect3D(bbox.MinX, bbox.MinY, bbox.MinZ, bbox.SizeX, bbox.SizeY, bbox.SizeZ),
+                    Thickness = 1d,
+                    Color = Colors.Gray
+                });
             }
 
             GCodeToken last = new GCodeToken();
@@ -246,7 +286,26 @@ namespace CNC.Controls.Viewer
             refreshCamera(bbox);
 
         }
-        //-------------
+        public void refreshCamera(ProgramLimits bbox)
+        {
+            var position = new Point3D(bbox.SizeX / 2d, bbox.SizeY / 2d, 100d);
+
+            viewport.Camera.Position = position;
+            viewport.DefaultCamera.Position = position;
+//                viewport.CameraController.AddRotateForce(0.001, 0.001); // emulate move camera 
+        }
+
+        //private void DrawLine(LinesVisual3D lines, double x_start, double y_start, double z_start, double x_stop, double y_stop, double z_stop)
+        //{
+        //    lines.Points.Add(new Point3D(x_start, y_start, z_start));
+        //    lines.Points.Add(new Point3D(x_stop, y_stop, z_stop));
+        //}
+
+        //private void DrawLine(LinesVisual3D lines, Point3D start, Point3D end)
+        //{
+        //    lines.Points.Add(start);
+        //    lines.Points.Add(end);
+        //}
 
         public void NewTrace(Point3D point, Color color, double thickness = 1)
         {
@@ -342,22 +401,6 @@ namespace CNC.Controls.Viewer
         }
 
         //-------------
-        public void refreshCamera(gcodeBoundingBox bbox)
-        {
-            viewport.DefaultCamera.Position = new Point3D(bbox.SizeX / 2, bbox.SizeY / 2, 100);
-            //    viewport.CameraController.AddRotateForce(0.001, 0.001); // emulate move camera 
-        }
-        //private void DrawLine(LinesVisual3D lines, double x_start, double y_start, double z_start, double x_stop, double y_stop, double z_stop)
-        //{
-        //    lines.Points.Add(new Point3D(x_start, y_start, z_start));
-        //    lines.Points.Add(new Point3D(x_stop, y_stop, z_stop));
-        //}
-
-        //private void DrawLine(LinesVisual3D lines, Point3D start, Point3D end)
-        //{
-        //    lines.Points.Add(start);
-        //    lines.Points.Add(end);
-        //}
 
         private void DrawArc(Plane plane, double x_start, double y_start, double z_start,
                               double x_stop, double y_stop, double z_stop,

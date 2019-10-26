@@ -1,7 +1,7 @@
 ﻿/*
  * GrblCore.cs - part of CNC Controls library
  *
- * v0.02 / 2019-10-21 / Io Engineering (Terje Io)
+ * v0.02 / 2019-10-23 / Io Engineering (Terje Io)
  *
  */
 
@@ -101,8 +101,8 @@ namespace CNC.Core
             CMD_SDCARD_MOUNT = "$FM",
             CMD_SDCARD_DIR = "$F",
             CMD_SDCARD_RUN = "$F=",
-            FORMAT_METRIC = "###0.0##",
-            FORMAT_IMPERIAL = "##0.0###",
+            FORMAT_METRIC = "###0.000",
+            FORMAT_IMPERIAL = "##0.0000",
             NO_TOOL = "None",
             SIGNALS = "XYZABCEPRDHSBT"; // Keep in sync with Signals enum below!!
 
@@ -150,7 +150,7 @@ namespace CNC.Core
         JunctionDeviation = 11,
         ArcTolerance = 12,
         ReportInches = 13,
-        ControlInvertMask = 14,
+        ControlInvertMask = 14, // Note: Used for detecting GrblHAL firmware
         CoolantInvertMask = 15,
         SpindleInvertMask = 16,
         ControlPullUpDisableMask = 17,
@@ -191,10 +191,13 @@ namespace CNC.Core
         JogFastDistance = 55,
         AxisSetting_XMaxRate = 110,
         AxisSetting_XAcceleration = 120,
+        AxisSetting_XMaxTravel = 130,
         AxisSetting_YMaxRate = 111,
         AxisSetting_YAcceleration = 121,
+        AxisSetting_YMaxTravel = 131,
         AxisSetting_ZMaxRate = 112,
         AxisSetting_ZAcceleration = 122,
+        AxisSetting_ZMaxTravel = 132
     }
 
     public enum StreamingState
@@ -907,6 +910,7 @@ namespace CNC.Core
         public static bool Loaded { get { return settings.Rows.Count > 0; } }
         public static bool HomingEnabled { get; private set; }
         public static bool UseLegacyRTCommands { get; private set; }
+        public static bool IsGrblHAL { get; private set; }
 
         public static string GetString(GrblSetting key)
         {
@@ -938,6 +942,9 @@ namespace CNC.Core
             Comms.com.AwaitAck();
 #endif
             Comms.com.DataReceived -= Process;
+
+            if (IsGrblHAL)
+                Resources.ConfigName = "hal_" + Resources.ConfigName;
 
             try
             {
@@ -1055,13 +1062,16 @@ namespace CNC.Core
                         case GrblSetting.EnableLegacyRTCommands:
                             UseLegacyRTCommands = valuepair[1] != "0";
                             break;
+
+                        case GrblSetting.ControlInvertMask:
+                            IsGrblHAL = true;
+                            break;
                     }
 
                     settings.Rows.Add(new object[] { id, "", valuepair[1], "", "", "", "", double.NaN, double.NaN });
                 }
             }
         }
-
     }
 
     public class PollGrbl

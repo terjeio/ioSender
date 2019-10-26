@@ -6,11 +6,11 @@
              xmlns:helix="clr-namespace:HelixToolkit.Wpf;assembly=HelixToolkit.Wpf"
              xmlns:local="clr-namespace:CNC.Controls.Viewer"
              mc:Ignorable="d" 
-             d:DesignHeight="350" d:DesignWidth="350">
+             d:DesignHeight="500" d:DesignWidth="500">
     <Grid>
-        <helix:HelixViewport3D x:Name="viewport" Grid.Column="0" ZoomExtentsWhenLoaded="True" ShowViewCube="False">
+        <helix:HelixViewport3D x:Name="viewport" Grid.Column="0" ZoomExtentsWhenLoaded="False" RotateAroundMouseDownPoint="true" ZoomAroundMouseDownPoint="true">
             <helix:HelixViewport3D.DefaultCamera>
-                <PerspectiveCamera x:Name="camera" 
+                <PerspectiveCamera x:Name="camera"
                         Position="0,0,100" 
                         LookDirection="0,0,-100" 
                         UpDirection="0,1,0.5" 

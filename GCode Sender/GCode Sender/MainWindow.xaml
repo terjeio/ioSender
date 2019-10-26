@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:cnccore="clr-namespace:CNC.Core;assembly=CNC.Core"
         xmlns:cnccontrols="clr-namespace:CNC.Controls;assembly=CNC.Controls.WPF"
         xmlns:cncviewer="clr-namespace:CNC.Controls.Viewer;assembly=CNC.Controls.Viewer"
         xmlns:cnclathecontrols="clr-namespace:CNC.Controls.Lathe;assembly=CNC.Controls.Lathe"
@@ -12,6 +13,9 @@
         Loaded="Window_Load"
         Closing="Window_Closing"
         Closed="Window_Closed" Icon="App.ico">
+    <Window.DataContext>
+        <cnccore:GrblViewModel />
+    </Window.DataContext>
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem x:Name="menuFile" Header="_File">

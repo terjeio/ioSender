@@ -46,6 +46,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GCodeParser.cs" />
     <Compile Include="Grbl.cs" />
     <Compile Include="Comms.cs" />
     <Compile Include="GCode.cs" />

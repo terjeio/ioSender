@@ -78,6 +78,12 @@
     <Compile Include="JobControl.xaml.cs">
       <DependentUpon>JobControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="LimitsBaseControl.xaml.cs">
+      <DependentUpon>LimitsBaseControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="LimitsControl.xaml.cs">
+      <DependentUpon>LimitsControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="MDIControl.xaml.cs">
       <DependentUpon>MDIControl.xaml</DependentUpon>
     </Compile>
@@ -91,6 +97,9 @@
     </Compile>
     <Compile Include="PIDLogView.xaml.cs">
       <DependentUpon>PIDLogView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PortDialog.xaml.cs">
+      <DependentUpon>PortDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="ProfileData.cs" />
     <Compile Include="SDCardView.xaml.cs">
@@ -128,6 +137,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="CoolantControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="LimitsBaseControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="LimitsControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -178,6 +195,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="PIDLogView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="PortDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

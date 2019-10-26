@@ -1,7 +1,7 @@
 ﻿/*
  * Comms.cs - part of CNC Controls library
  *
- * v0.02 / 2019-09-21 / Io Engineering (Terje Io)
+ * v0.02 / 2019-10-25 / Io Engineering (Terje Io)
  *
  */
 
@@ -668,6 +668,35 @@ public class SerialComms : StreamComms
             ((DispatcherFrame)f).Continue = false;
 
             return null;
+        }
+    }
+
+    public class SerialPorts : ViewModelBase
+    {
+
+        string _selected = string.Empty;
+
+        public SerialPorts()
+        {
+            Array.Sort(PortNames);
+
+            if (PortNames.Length > 0)
+                _selected = PortNames[0];
+        }
+
+        public string[] PortNames { get; private set; } = SerialPort.GetPortNames();
+
+        public string SelectedPort
+        {
+            get { return _selected; }
+            set
+            {
+                if(_selected != value)
+                {
+                    _selected = value;
+                    OnPropertyChanged();
+                }
+            }
         }
     }
 }

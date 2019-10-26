@@ -70,8 +70,7 @@ namespace CNC.Controls
             }
         }
 
-        public static readonly DependencyProperty FormatProperty =
-            DependencyProperty.Register("Format", typeof(string), typeof(NumericComboBox), new PropertyMetadata(GrblConstants.FORMAT_METRIC, new PropertyChangedCallback(OnFormatChanged)));
+        public static readonly DependencyProperty FormatProperty = DependencyProperty.Register(nameof(Format), typeof(string), typeof(NumericComboBox), new PropertyMetadata(GrblConstants.FORMAT_METRIC, new PropertyChangedCallback(OnFormatChanged)));
         public string Format
         {
             get { return (string)GetValue(FormatProperty); }

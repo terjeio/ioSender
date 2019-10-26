@@ -1,7 +1,7 @@
 ﻿/*
  * GCode.cs - part of CNC Controls library
  *
- * v0.02 / 2019-09-21 / Io Engineering (Terje Io)
+ * v0.02 / 2019-09-23 / Io Engineering (Terje Io)
  *
  */
 
@@ -42,8 +42,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Data;
 using System.IO;
-using System.Globalization;
-using System.Windows.Forms;
+using System.ComponentModel;
+using System.Windows;
 
 namespace CNC.Core
 {
@@ -115,11 +115,8 @@ namespace CNC.Core
 
         uint LineNumber = 0;
 
-        private string filename;
+        private string filename = string.Empty;
         private DataTable gcode = new DataTable("GCode");
-        private BindingSource source = new BindingSource();
-        private DistanceMode distance = DistanceMode.Absolute;
-        private GCodeToken last_token = new GCodeToken();
 
         public Queue<string> commands = new Queue<string>();
 
@@ -140,18 +137,21 @@ namespace CNC.Core
             gcode.Columns.Add("Ok", typeof(bool));
             gcode.PrimaryKey = new DataColumn[] { gcode.Columns["LineNum"] };
 
-            filename = "";
-            source.DataSource = gcode;
-
             Reset();
+
+            Parser.ToolChanged += Parser_ToolChanged;
+        }
+
+        private bool Parser_ToolChanged(int toolNumber)
+        {
+            return ToolChanged == null ? true : ToolChanged(toolNumber);
         }
 
         public DataTable Data { get { return gcode; } }
-        public BindingSource Source { get { return source; } }
         public bool Loaded { get { return gcode.Rows.Count > 0; } }
-
-        public gcodeBoundingBox BoundingBox { get; private set; } = new gcodeBoundingBox();
-        public List<GCodeToken> Tokens { get; private set; } = new List<GCodeToken>();
+        public List<GCodeToken> Tokens { get { return Parser.Tokens; } }
+        public GcodeBoundingBox BoundingBox { get; private set; } = new GcodeBoundingBox();
+        public GCodeParser Parser { get; private set; } = new GCodeParser();
 
         public double min_feed { get; private set; }
         public double max_feed { get; private set; }
@@ -211,7 +211,7 @@ namespace CNC.Core
             {
                 try
                 {
-                    if (ParseBlock(s.Trim() + "\r", false))
+                    if (Parser.ParseBlock(s.Trim() + "\r", false))
                     {
                         end = s == "M30" || s == "M2" || s == "M02";
                         gcode.Rows.Add(new object[] { LineNumber++, s, s.Length + 1, true, end, "", false });
@@ -222,23 +222,21 @@ namespace CNC.Core
                 }
                 catch (Exception e)
                 {
-                    if ((ok = MessageBox.Show(string.Format("Line: {0}\rBlock: \"{1}\"\r\rContinue loading?", LineNumber, s), e.Message, MessageBoxButtons.YesNo) == DialogResult.Yes))
+                    if ((ok = MessageBox.Show(string.Format("Line: {0}\rBlock: \"{1}\"\r\rContinue loading?", LineNumber, s), e.Message, MessageBoxButton.YesNo ) == MessageBoxResult.Yes))
                         s = sr.ReadLine();
                     else
                         s = null;
                 }
             }
 
-            AddBlock("", Action.End);
-
             sr.Close();
 
             if (ok)
-                FileChanged?.Invoke(filename);
+                AddBlock("", Action.End);
             else
                 CloseFile();
 
-            return true;
+            return ok;
         }
 
         public void AddBlock(string block, Action action)
@@ -259,7 +257,7 @@ namespace CNC.Core
             }
             else if (block != null && block.Trim() != "") try
             {
-                if (ParseBlock(block.Trim() + "\r", false))
+                if (Parser.ParseBlock(block.Trim() + "\r", false))
                 {
                     end = block == "M30" || block == "M2" || block == "M02";
                     gcode.Rows.Add(new object[] { LineNumber++, block, block.Length + 1, true, end, "", false });
@@ -277,7 +275,6 @@ namespace CNC.Core
                 gcode.EndLoadData();
 
 //                Serializer.Save(@"d:\tokens.xml", Tokens);
-
 
                 foreach (GCodeToken token in Tokens)
                 {
@@ -317,380 +314,116 @@ namespace CNC.Core
         {
             min_feed = double.MaxValue;
             max_feed = double.MinValue;
-            distance = DistanceMode.Absolute;
-            last_token.Clear();
-            last_token.command = GCodeToken.Command.Undefined;
             BoundingBox.Reset();
-            Tokens.Clear();
             LineNumber = 0;
+            Parser.Reset();
         }
 
         // IMPORTANT: block must be terminated with \r
-        public bool ParseBlock(string block, bool quiet)
-        {
-            const string ignore = "$!~?";
-            const string codes = "MTSGFXYZIJKR";
-            const string all = "MTFGPSXYZIJKRHD [](\r";
-            const string special = "HTSFXYZIJKRD";
 
-            bool collect = false, axis_cmd = false;
-            string gcode = "";
-            GCodeToken.Command cmd = GCodeToken.Command.Undefined;
-            double value;
-            List<string> gcodes = new List<string>();
-
-            block = block.ToUpper();
-
-            if (block.Length == 0 || ignore.Contains(block.Substring(0, 1)))
-                return false;
-            if (quiet)
-                return true;
-
-            foreach (char c in block)
-            {
-                if (all.Contains(c))
-                {
-                    collect = false;
-
-                    if (gcode != "")
-                    {
-                        gcodes.Add(gcode);
-                        gcode = "";
-                    }
-
-                    if (c == '(')
-                        break;
-
-                    if (codes.Contains(c))
-                    {
-                        collect = true;
-                        gcode += c;
-                    }
-                }
-                else if (collect)
-                    gcode += c;
-            }
-
-            foreach (string code in gcodes)
-            {
-                if (code.Substring(0, 1) == "G")
-                {
-                    if (cmd != GCodeToken.Command.Undefined)
-                    {
-                        last_token.command = cmd;
-                        axis_cmd = false;
-                        Tokens.Add(new GCodeToken(cmd, last_token));
-                        cmd = GCodeToken.Command.Undefined;
-                    }
-
-                    value = double.Parse(code.Remove(0, 1), CultureInfo.InvariantCulture);
-                    int fv = (int)Math.Round((value - Math.Floor(value)) * 10.0, 0);
-                    int iv = (int)Math.Floor(value);
-
-                    switch (iv)
-                    {
-                        case 0:
-                        case 1:
-                            cmd = (GCodeToken.Command)iv;
-                            break;
-                        case 2:
-                        case 3:
-                            cmd = (GCodeToken.Command)iv;
-                            break;
-
-                        case 17:
-                        case 18:
-                        case 19:
-                            cmd = GCodeToken.Command.G17 + (iv - 17);
-                            break;
-
-                        case 20:
-                            cmd = GCodeToken.Command.G20;
-                            break;
-
-                        case 21:
-                            cmd = GCodeToken.Command.G21;
-                            break;
-
-                        case 80:
-                            cmd = GCodeToken.Command.G80;
-                            last_token.z = last_token.r;
-                            break;
-
-                        case 81:
-                            // add default retract distance?
-                            cmd = GCodeToken.Command.G81;
-                            break;
-
-                        case 90:
-                            if (fv == 0)
-                                distance = DistanceMode.Absolute;
-                            cmd = fv == 0 ? GCodeToken.Command.G90 : GCodeToken.Command.G90_1;
-                            break;
-
-                        case 91:
-                            if (fv == 0)
-                                distance = DistanceMode.Relative;
-                            cmd = fv == 0 ? GCodeToken.Command.G91 : GCodeToken.Command.G91_1;
-                            break;
-                    }
-
-                    //if (cmd != GCodeToken.Command.Undefined)
-                    //{
-                    //    added = true;
-                    //    tokens.Add((last_token = new GCodeToken(cmd, last_token)));
-                    //}
-
-                }
-                else if (special.Contains(code.Substring(0, 1)))
-                {
-                    try
-                    {
-                        value = double.Parse(code.Remove(0, 1), CultureInfo.InvariantCulture);
-
-                        switch (code.Substring(0, 1))
-                        {
-                            case "F":
-                                last_token.f = value;
-                                break;
-
-                            case "I":
-                                last_token.i = value;
-                                break;
-
-                            case "J":
-                                last_token.j = value;
-                                break;
-
-                            case "K":
-                                last_token.k = value;
-                                break;
-
-                            case "R":
-                                last_token.r = value;
-                                break;
-
-                            case "T":
-                                if (!quiet && ToolChanged != null)
-                                {
-                                    if (!ToolChanged((int)value))
-                                        MessageBox.Show(string.Format("Tool {0} not associated with a profile!", value.ToString()), "GCode parser", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                                }
-                                break;
-
-                            case "X":
-                                axis_cmd = true;
-                                if (distance == DistanceMode.Relative)
-                                    last_token.x += value;
-                                else
-                                    last_token.x = value;
-                                break;
-
-                            case "Y":
-                                axis_cmd = true;
-                                if (distance == DistanceMode.Relative)
-                                    last_token.y += value;
-                                else
-                                    last_token.y = value;
-                                break;
-
-                            case "Z":
-                                axis_cmd = true;
-                                if (distance == DistanceMode.Relative)
-                                    last_token.z += value;
-                                else
-                                    last_token.z = value;
-                                break;
-
-
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        throw new System.ArgumentException("Invalid GCode", e);
-                    }
-
-                }
-                else switch (code)
-                    {
-                        case "G20":
-                            break;
-                        case "M6":
-                        case "M06":
-                            string s = code;
-                            break;
-                    }
-            }
-
-            if (cmd != GCodeToken.Command.Undefined)
-            {
-                last_token.command = cmd;
-                Tokens.Add(new GCodeToken(cmd, last_token));
-                cmd = GCodeToken.Command.Undefined;
-            }
-            else if (axis_cmd && last_token.command != GCodeToken.Command.Undefined)
-                Tokens.Add(new GCodeToken(last_token.command, last_token));
-
-            return true;
-        }
     }
 
-    public class ControlledPoint
+    public class ProgramLimits : ViewModelBase
     {
-        public double X { get; set; }
-        public double Y { get; set; }
-        public double Z { get; set; }
-        public double A { get; set; }
-        public double B { get; set; }
-        public double C { get; set; }
-    }
-
-    public class gcodeBoundingBox
-    {
-        public gcodeBoundingBox()
+        public ProgramLimits()
         {
-            Reset();
+            init();
         }
 
-        public void Reset()
+        private void init()
         {
-            MinX = MinY = MinZ = double.MaxValue;
-            MaxX = MaxY = MaxZ = double.MinValue;
+            Clear();
+
+            MinValues.PropertyChanged += MinValues_PropertyChanged;
+            MaxValues.PropertyChanged += MaxValues_PropertyChanged;
         }
 
-        public void AddPoint(double x, double y, double z)
+        public void Clear()
         {
-            MinX = Math.Min(MinX, x);
-            MaxX = Math.Max(MaxX, x);
-
-            MinY = Math.Min(MinY, y);
-            MaxY = Math.Max(MaxY, y);
-
-            MinZ = Math.Min(MinZ, z);
-            MaxZ = Math.Max(MaxZ, z);
+            for (var i = 0; i < MinValues.Length; i++)
+            {
+                MinValues[i] = double.NaN;
+                MaxValues[i] = double.NaN;
+            }
         }
 
-        public void Normalize()
+        public bool SuspendNotifications
         {
-            if (MaxX == double.MinValue)
-                MinX = MaxX = 0.0;
-
-            if (MaxY == double.MinValue)
-                MinY = MaxY = 0.0;
-
-            if (MaxZ == double.MinValue)
-                MinZ = MaxZ = 0.0;
+            get { return MinValues.SuspendNotifications; }
+            set { MinValues.SuspendNotifications = MaxValues.SuspendNotifications = value; }
         }
 
-        public double MaxX { get; set; }
-        public double MinX { get; set; }
-        public double MaxY { get; set; }
-        public double MinY { get; set; }
-        public double MaxZ { get; set; }
-        public double MinZ { get; set; }
+        private void MinValues_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            OnPropertyChanged("Min" + e.PropertyName);
+        }
+        private void MaxValues_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            OnPropertyChanged("Max" + e.PropertyName);
+        }
+
+        public CoordinateValues<double> MinValues { get; private set; } = new CoordinateValues<double>();
+        public double MinX { get { return MinValues[0]; } set { MinValues[0] = value; } }
+        public double MinY { get { return MinValues[1]; } set { MinValues[1] = value; } }
+        public double MinZ { get { return MinValues[2]; } set { MinValues[2] = value; } }
+        public double MinA { get { return MinValues[3]; } set { MinValues[3] = value; } }
+        public double MinB { get { return MinValues[4]; } set { MinValues[4] = value; } }
+        public double MinC { get { return MinValues[5]; } set { MinValues[5] = value; } }
+        public CoordinateValues<double> MaxValues { get; private set; } = new CoordinateValues<double>();
+        public double MaxX { get { return MaxValues[0]; } set { MaxValues[0] = value; } }
+        public double MaxY { get { return MaxValues[1]; } set { MaxValues[1] = value; } }
+        public double MaxZ { get { return MaxValues[2]; } set { MaxValues[2] = value; } }
+        public double MaxA { get { return MaxValues[3]; } set { MaxValues[3] = value; } }
+        public double MaxB { get { return MaxValues[4]; } set { MaxValues[4] = value; } }
+        public double MaxC { get { return MaxValues[5]; } set { MaxValues[5] = value; } }
+
         public double SizeX { get { return MaxX - MinX; } }
         public double SizeY { get { return MaxY - MinY; } }
         public double SizeZ { get { return MaxZ - MinZ; } }
         public double MaxSize { get { return Math.Max(Math.Max(SizeX, SizeY), SizeZ); } }
     }
 
-    [Serializable]
-    public class GCodeToken
+    public class GcodeBoundingBox
     {
-        public enum Command
+        public double[] Min = new double[6];
+        public double[] Max = new double[6];
+
+        public GcodeBoundingBox()
         {
-            G0,
-            G1,
-            G2,
-            G3,
-            G17,
-            G18,
-            G19,
-            G20,
-            G21,
-            G29,
-            G30,
-            G50,
-            G51,
-            G80,
-            G81,
-            G90,
-            G90_1,
-            G91,
-            G91_1,
-            Undefined
+            Reset();
         }
 
-        public GCodeToken()
+        public void Reset()
         {
-            Clear();
-        }
-
-        public GCodeToken(Command command, GCodeToken values)
-        {
-            this.command = command;
-            f = values.f;
-            i = values.i;
-            j = values.j;
-            k = values.k;
-            r = values.r;
-            x = values.x;
-            y = values.y;
-            z = values.z;
-        }
-
-        public void Clear()
-        {
-            command = Command.G0;
-            f = r = x = y = z = 0.0;
-            i = j = k = double.NaN;
-        }
-
-        public Command command;
-        public double f;
-        public double i;
-        public double j;
-        public double k;
-        public double r;
-        public double x;
-        public double y;
-        public double z;
-    }
-
-    public static class Serializer
-    {
-        public static void Save(string filePath, List<GCodeToken> objToSerialize)
-        {
-            try
+            for (int i = 0; i < Min.Length; i++)
             {
-                using (Stream stream = File.Open(filePath, FileMode.Create))
-                {
-                    System.Xml.Serialization.XmlSerializer bin = new System.Xml.Serialization.XmlSerializer((typeof(List<GCodeToken>)));
-                    bin.Serialize(stream, objToSerialize);
-                }
-            }
-            catch (IOException)
-            {
+                Min[i] = double.MaxValue;
+                Max[i] = double.MinValue;
             }
         }
 
-        public static T Load<T>(string filePath) where T : new()
+        public void AddPoint(double x, double y, double z)
         {
-            T rez = new T();
+            Min[0] = Math.Min(Min[0], x);
+            Max[0] = Math.Max(Max[0], x);
 
-            try
-            {
-                using (Stream stream = File.Open(filePath, FileMode.Open))
-                {
-                    System.Runtime.Serialization.Formatters.Binary.BinaryFormatter bin = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-                    rez = (T)bin.Deserialize(stream);
-                }
-            }
-            catch (IOException)
-            {
-            }
+            Min[1] = Math.Min(Min[1], y);
+            Max[1] = Math.Max(Max[1], y);
 
-            return rez;
+            Min[2] = Math.Min(Min[2], z);
+            Max[2] = Math.Max(Max[2], z);
+        }
+
+        public void Normalize()
+        {
+            if (Max[0] == double.MinValue)
+                Min[0] = Max[0] = 0.0;
+
+            if (Max[1] == double.MinValue)
+                Min[1] = Max[1] = 0.0;
+
+            if (Max[2] == double.MinValue)
+                Min[2] = Max[2] = 0.0;
         }
     }
 }

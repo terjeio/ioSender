@@ -13,10 +13,12 @@
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="37*"/>
         </Grid.ColumnDefinitions>
-        <Label x:Name="label" Content="{Binding Label, RelativeSource={RelativeSource AncestorType=UserControl}}" Grid.Column="0" HorizontalContentAlignment="Right" HorizontalAlignment="Right" Margin="0,1,0,0" VerticalAlignment="Top" Height="26"/>
-        <local:NumericTextBox x:Name="data" IsReadOnly="{Binding IsReadOnly, RelativeSource={RelativeSource AncestorType=UserControl}}" Grid.Column="1" HorizontalAlignment="Left" TextWrapping="NoWrap" VerticalAlignment="Center" UndoLimit="9" Width="64"
-                              Value="{Binding Value, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}">
+        <Label x:Name="label" Content="{Binding Path=Label, RelativeSource={RelativeSource AncestorType=UserControl}}" Grid.Column="0" HorizontalContentAlignment="Right" HorizontalAlignment="Right" Margin="0,1,0,0" VerticalAlignment="Top" Height="26"/>
+        <local:NumericTextBox x:Name="data" Grid.Column="1" HorizontalAlignment="Left" TextWrapping="NoWrap" VerticalAlignment="Center" UndoLimit="9" Width="64"
+            IsReadOnly="{Binding Path=IsReadOnly, RelativeSource={RelativeSource AncestorType=UserControl}}"
+            Value="{Binding Path=Value, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
+            Format="{Binding Path=Format, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=OneWay}">
         </local:NumericTextBox>
-        <Label x:Name="unit" Content="{Binding Unit, RelativeSource={RelativeSource AncestorType=UserControl}}" Grid.Column="2" HorizontalAlignment="Left" Margin="0,1,0,0" VerticalAlignment="Top" Height="26"/>
+        <Label x:Name="unit" Content="{Binding Path=Unit, RelativeSource={RelativeSource AncestorType=UserControl}}" Grid.Column="2" HorizontalAlignment="Left" Margin="0,1,0,0" VerticalAlignment="Top" Height="26"/>
     </Grid>
 </UserControl>

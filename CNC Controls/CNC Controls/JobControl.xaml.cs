@@ -1,7 +1,7 @@
 ﻿/*
  * JobControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.02 / 2019-10-12 / Io Engineering (Terje Io)
+ * v0.02 / 2019-10-23 / Io Engineering (Terje Io)
  *
  */
 
@@ -71,7 +71,7 @@ namespace CNC.Controls
         private double[] jogSpeed = new double[3] { 100.0, 200.0, 500.0 };
         private volatile StreamingState streamingState = StreamingState.NoFile;
         private GrblState grblState;
-        private GrblViewModel model = new GrblViewModel();
+        private GrblViewModel model;
         private ScrollViewer scroll = null;
 
         private int PollInterval = 200, serialSize = 128, CurrLine = 0, PendingLine = 0, PgmEndLine = -1, ACKPending = 0;
@@ -105,6 +105,14 @@ namespace CNC.Controls
 
         void gcode_FileChanged(string filename)
         {
+            if (filename == "")
+                ((GrblViewModel)DataContext).ProgramLimits.Clear();
+            else for (int i = 0; i < GrblInfo.NumAxes; i++)
+            {
+                ((GrblViewModel)DataContext).ProgramLimits.MinValues[i] = GCode.BoundingBox.Min[i];
+                ((GrblViewModel)DataContext).ProgramLimits.MaxValues[i] = GCode.BoundingBox.Max[i];
+            }
+
             ((GrblViewModel)DataContext).FileName = filename;
         }
 
@@ -113,7 +121,10 @@ namespace CNC.Controls
             if (e.OldValue != null && e.OldValue is INotifyPropertyChanged)
                 ((INotifyPropertyChanged)e.OldValue).PropertyChanged -= OnDataContextPropertyChanged;
             if (e.NewValue != null && e.NewValue is INotifyPropertyChanged)
-                ((INotifyPropertyChanged)e.NewValue).PropertyChanged += OnDataContextPropertyChanged;
+            {
+                model = (GrblViewModel)e.NewValue;
+                model.PropertyChanged += OnDataContextPropertyChanged;
+            }
         }
 
         private void OnDataContextPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -145,10 +156,7 @@ namespace CNC.Controls
             }
         }
 
-        public GrblViewModel Parameters { get { return model;  } }
-        public GrblStates state { get { return grblState.State; } }
         public GCode GCode { get; private set; } = new GCode();
-        public StreamingState StreamingState { get { return streamingState; } }
         public bool canJog { get { return grblState.State == GrblStates.Idle || grblState.State == GrblStates.Tool || grblState.State == GrblStates.Jog; } }
         public bool JobPending { get { return GCode.Loaded && !JobTimer.IsRunning; } }
 
@@ -208,6 +216,12 @@ namespace CNC.Controls
                     jogSpeed[(int)JogMode.Slow] = val;
                 if (!(val = GrblSettings.GetDouble(GrblSetting.JogFastSpeed)).Equals(double.NaN))
                     jogSpeed[(int)JogMode.Fast] = val;
+
+                if (GrblSettings.GetString(GrblSetting.ReportInches) == "1")
+                {
+                    model.Unit = "in";
+                    model.Format = GrblConstants.FORMAT_IMPERIAL;
+                }
             }
 
             return GrblSettings.Loaded;
@@ -499,7 +513,7 @@ namespace CNC.Controls
                 //                command = command.ToUpper();
                 try
                 {
-                    GCode.ParseBlock(command + "\r", true);
+                    GCode.Parser.ParseBlock(command + "\r", true);
                     GCode.commands.Enqueue(command);
                     if (streamingState != StreamingState.SendMDI)
                     {

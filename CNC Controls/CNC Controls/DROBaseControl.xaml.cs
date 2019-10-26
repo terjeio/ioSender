@@ -59,14 +59,14 @@ namespace CNC.Controls
      //       DataContext = this;
         }
 
-        public static readonly DependencyProperty LabelProperty = DependencyProperty.Register("Label", typeof(string), typeof(DROBaseControl), new PropertyMetadata());
+        public static readonly DependencyProperty LabelProperty = DependencyProperty.Register(nameof(Label), typeof(string), typeof(DROBaseControl), new PropertyMetadata());
         public string Label
         {
             get { return (string)GetValue(LabelProperty); }
             set { SetValue(LabelProperty, value); }
         }
 
-        public static readonly DependencyProperty ValueProperty = DependencyProperty.Register("Value", typeof(double), typeof(DROBaseControl), new PropertyMetadata());
+        public static readonly DependencyProperty ValueProperty = DependencyProperty.Register(nameof(Value), typeof(double), typeof(DROBaseControl), new PropertyMetadata());
         public double Value
         {
             get { return (double)GetValue(ValueProperty); }
@@ -79,7 +79,7 @@ namespace CNC.Controls
             set { txtReadout.IsReadOnly = value; }
         }
 
-        public static readonly DependencyProperty IsScaledProperty = DependencyProperty.Register("IsScaled", typeof(bool), typeof(DROBaseControl), new PropertyMetadata(false, new PropertyChangedCallback(OnIsScaledChanged)));
+        public static readonly DependencyProperty IsScaledProperty = DependencyProperty.Register(nameof(IsScaled), typeof(bool), typeof(DROBaseControl), new PropertyMetadata(false, new PropertyChangedCallback(OnIsScaledChanged)));
         public bool IsScaled
         {
             get { return (bool)GetValue(IsScaledProperty); }

@@ -138,8 +138,8 @@ namespace CNC.Controls.Lathe
                 OnPropertyChanged();
             }
         }
-        public DataView _ts;
-        public DataView _ThreadSizes;
+
+        private DataView _ThreadSizes;
 
         public DataView ThreadSizes
         {

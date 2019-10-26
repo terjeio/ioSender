@@ -25,14 +25,14 @@ namespace CNC.Controls.Lathe
             InitializeComponent();
         }
 
-        public static readonly DependencyProperty IsPassesEnabledProperty = DependencyProperty.Register("IsPassesEnabled", typeof(bool), typeof(SpringPassControl), new PropertyMetadata(/*"Label:"  , new PropertyChangedCallback(OnLabelChanged)*/));
+        public static readonly DependencyProperty IsPassesEnabledProperty = DependencyProperty.Register(nameof(IsPassesEnabled), typeof(bool), typeof(SpringPassControl), new PropertyMetadata(/*"Label:"  , new PropertyChangedCallback(OnLabelChanged)*/));
         public bool IsPassesEnabled
         {
             get { return (bool)GetValue(IsPassesEnabledProperty); }
             set { SetValue(IsPassesEnabledProperty, value); }
         }
 
-        public static readonly DependencyProperty ValueProperty = DependencyProperty.Register("Value", typeof(double), typeof(SpringPassControl), new PropertyMetadata(double.NaN));
+        public static readonly DependencyProperty ValueProperty = DependencyProperty.Register(nameof(Value), typeof(double), typeof(SpringPassControl), new PropertyMetadata(double.NaN));
         public double Value
         {
             get { return (double)GetValue(ValueProperty); }

@@ -1,7 +1,7 @@
 ﻿/*
  * NumericField.xaml.cs - part of CNC Controls library
  *
- * v0.02 / 2019-10.15 / Io Engineering (Terje Io)
+ * v0.02 / 2019-10-21 / Io Engineering (Terje Io)
  *
  */
 
@@ -63,7 +63,7 @@ namespace CNC.Controls
             Metric = true;
         }
 
-        public static readonly DependencyProperty ValueProperty = DependencyProperty.Register("Value", typeof(double), typeof(NumericField), new PropertyMetadata(double.NaN, new PropertyChangedCallback(OnValueChanged)), new ValidateValueCallback(IsValidReading));
+        public static readonly DependencyProperty ValueProperty = DependencyProperty.Register(nameof(Value), typeof(double), typeof(NumericField), new PropertyMetadata(double.NaN, new PropertyChangedCallback(OnValueChanged)), new ValidateValueCallback(IsValidReading));
         public double Value
         {
             get { return (double)GetValue(ValueProperty); }
@@ -75,28 +75,35 @@ namespace CNC.Controls
                 ((NumericField)d).data.Clear();
         }
 
-        public static readonly DependencyProperty LabelProperty = DependencyProperty.Register("Label", typeof(string), typeof(NumericField), new PropertyMetadata("Label:"));
+        public static readonly DependencyProperty FormatProperty = DependencyProperty.Register(nameof(Format), typeof(string), typeof(NumericField), new PropertyMetadata(NumericProperties.MetricFormat));
+        public string Format
+        {
+            get { return (string)GetValue(FormatProperty); }
+            set { SetValue(FormatProperty, value); }
+        }
+
+        public static readonly DependencyProperty LabelProperty = DependencyProperty.Register(nameof(Label), typeof(string), typeof(NumericField), new PropertyMetadata("Label:"));
         public string Label
         {
             get { return (string)GetValue(LabelProperty); }
             set { SetValue(LabelProperty, value); }
         }
 
-        public static readonly DependencyProperty UnitProperty = DependencyProperty.Register("Unit", typeof(string), typeof(NumericField), new PropertyMetadata(String.Empty));
+        public static readonly DependencyProperty UnitProperty = DependencyProperty.Register(nameof(Unit), typeof(string), typeof(NumericField), new PropertyMetadata(String.Empty));
         public string Unit
         {
             get { return (string)GetValue(UnitProperty); }
             set { SetValue(UnitProperty, value); }
         }
 
-        public static readonly DependencyProperty IsReadOnlyProperty = DependencyProperty.Register("IsReadOnly", typeof(bool), typeof(NumericField), new PropertyMetadata());
+        public static readonly DependencyProperty IsReadOnlyProperty = DependencyProperty.Register(nameof(IsReadOnly), typeof(bool), typeof(NumericField), new PropertyMetadata());
         public bool IsReadOnly
         {
             get { return (bool)GetValue(IsReadOnlyProperty); }
             set { SetValue(IsReadOnlyProperty, value); }
         }
 
-        public static readonly DependencyProperty ColonAtProperty = DependencyProperty.Register("ColonAt", typeof(double), typeof(NumericField), new PropertyMetadata(70.0d, new PropertyChangedCallback(OnColonAtChanged)));
+        public static readonly DependencyProperty ColonAtProperty = DependencyProperty.Register(nameof(ColonAt), typeof(double), typeof(NumericField), new PropertyMetadata(70.0d, new PropertyChangedCallback(OnColonAtChanged)));
         public double ColonAt
         {
             get { return (double)GetValue(ColonAtProperty); }
@@ -141,8 +148,8 @@ namespace CNC.Controls
 
         public static bool IsValidReading(object value)
         {
-            Double v = (Double)value;
-            return (!v.Equals(Double.PositiveInfinity));
+            double v = (double)value;
+            return (!v.Equals(double.PositiveInfinity));
         }
                    
         public Control Field { get { return data; } }
@@ -153,7 +160,7 @@ namespace CNC.Controls
             set { data.Value = Math.Round(value / (metric ? 1.0d : 25.4d), metric ? 3 : 4); }
         }
 
-        public string Format
+        public string xFormat
         {
             get { return data.Tag == null ? GrblConstants.FORMAT_METRIC : data.Format; }
             set { data.Format = value; }

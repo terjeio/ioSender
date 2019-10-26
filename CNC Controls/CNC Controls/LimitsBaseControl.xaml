@@ -1,0 +1,18 @@
+﻿<UserControl x:Class="CNC.Controls.LimitsBaseControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CNC.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="26" d:DesignWidth="200">
+    <Grid>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Height="26" VerticalAlignment="Top" Width="200">
+            <Label x:Name="axis" Content="{Binding Label, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=OneWay}"/>
+            <local:NumericTextBox x:Name="cvMin" Format="{Binding Path=Format, Mode=OneWay}" Value="{Binding Path=MinValue, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=OneWay}" IsReadOnly="True" Focusable="False" Background="#FFF8F8F8" TextWrapping="NoWrap"/>
+            <Label Content="-"/>
+            <local:NumericTextBox x:Name="cVMax" Format="{Binding Path=Format, Mode=OneWay}" Value="{Binding Path=MaxValue, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=OneWay}" IsReadOnly="True" Focusable="False" Background="#FFF8F8F8" TextWrapping="NoWrap"/>
+            <Label x:Name="unit" Content="{Binding Path=Unit, Mode=OneWay}"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

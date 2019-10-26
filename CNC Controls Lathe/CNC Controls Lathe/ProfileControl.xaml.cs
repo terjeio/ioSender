@@ -45,14 +45,14 @@ namespace CNC.Controls.Lathe
             cbxProfile.SelectedValue = options.Profiles.First().Id;
         }
 
-        public static readonly DependencyProperty SelectedItemProperty = DependencyProperty.Register("SelectedItem", typeof(ProfileData), typeof(ProfileControl), new PropertyMetadata());
+        public static readonly DependencyProperty SelectedItemProperty = DependencyProperty.Register(nameof(SelectedItem), typeof(ProfileData), typeof(ProfileControl), new PropertyMetadata());
         public string SelectedItem
         {
             get { return (string)GetValue(SelectedItemProperty); }
             set { SetValue(SelectedItemProperty, value); }
         }
 
-        public static readonly DependencyProperty ItemsSourceProperty = DependencyProperty.Register("ItemsSource", typeof(IEnumerable), typeof(ProfileControl), new PropertyMetadata());
+        public static readonly DependencyProperty ItemsSourceProperty = DependencyProperty.Register(nameof(ItemsSource), typeof(IEnumerable), typeof(ProfileControl), new PropertyMetadata());
         public IEnumerable ItemsSource
         {
             get { return (IEnumerable)GetValue(ItemsSourceProperty); }

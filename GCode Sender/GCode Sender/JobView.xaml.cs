@@ -1,7 +1,7 @@
 ﻿/*
  * JobView.xaml.cs - part of Grbl Code Sender
  *
- * v0.02 / 2019-10-02 / Io Engineering (Terje Io)
+ * v0.02 / 2019-10-23 / Io Engineering (Terje Io)
  *
  */
 
@@ -68,14 +68,25 @@ namespace GCode_Sender
         {
             InitializeComponent();
 
-            DataContext = model = GCodeSender.Parameters;
+//            MainWindow.ui.DataContext = model = GCodeSender.Parameters;
 
             DRO.DROEnabledChanged += DRO_DROEnabledChanged;
 
+            DataContextChanged += View_DataContextChanged;
+            //    GCodeSender.GotFocus += GCodeSender_GotFocus;
 
-        //    GCodeSender.GotFocus += GCodeSender_GotFocus;
+          //  ((INotifyPropertyChanged)DataContext).PropertyChanged += OnDataContextPropertyChanged;
+        }
 
-            ((INotifyPropertyChanged)DataContext).PropertyChanged += OnDataContextPropertyChanged;
+        private void View_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (e.OldValue != null && e.OldValue is INotifyPropertyChanged)
+                ((INotifyPropertyChanged)e.OldValue).PropertyChanged -= OnDataContextPropertyChanged;
+            if (e.NewValue != null && e.NewValue is INotifyPropertyChanged)
+            {
+                model = (GrblViewModel)e.NewValue;
+                model.PropertyChanged += OnDataContextPropertyChanged;
+            }
         }
 
         private void OnDataContextPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -113,7 +124,7 @@ namespace GCode_Sender
                     MainWindow.ui.WindowTitle = filename;
                     if (filename != string.Empty) {
                         MainWindow.enableControl(true, ViewType.GCodeViewer);
-                        MainWindow.GCodeViewer.Open(filename, GCodeSender.GCode.Tokens, GCodeSender.GCode.BoundingBox);
+                        MainWindow.GCodeViewer.Open(filename, GCodeSender.GCode.Tokens);
                     }
                     break;
             }

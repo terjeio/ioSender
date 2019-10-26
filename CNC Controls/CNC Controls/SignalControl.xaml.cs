@@ -54,7 +54,7 @@ namespace CNC.Controls
             LEDOff = btnLED.Background;
         }
 
-        public static readonly DependencyProperty IsSetProperty = DependencyProperty.Register("IsSet", typeof(bool), typeof(SignalControl), new PropertyMetadata(false, new PropertyChangedCallback(OnIsSetChanged)));
+        public static readonly DependencyProperty IsSetProperty = DependencyProperty.Register(nameof(IsSet), typeof(bool), typeof(SignalControl), new PropertyMetadata(false, new PropertyChangedCallback(OnIsSetChanged)));
         public bool IsSet
         {
             get { return (bool)GetValue(IsSetProperty); }
@@ -65,7 +65,7 @@ namespace CNC.Controls
             ((SignalControl)d).btnLED.Background = (bool)e.NewValue ? LEDOn : LEDOff;
         }
 
-        public static readonly DependencyProperty LabelProperty = DependencyProperty.Register("Label", typeof(string), typeof(SignalControl), new PropertyMetadata());
+        public static readonly DependencyProperty LabelProperty = DependencyProperty.Register(nameof(Label), typeof(string), typeof(SignalControl), new PropertyMetadata());
         public string Label
         {
             get { return (string)GetValue(LabelProperty); }

@@ -14,7 +14,7 @@ namespace CNC.Controls.Lathe
             InitializeComponent();
         }
 
-        public static readonly DependencyProperty IsCssEnabledProperty = DependencyProperty.Register("IsCssEnabled", typeof(bool), typeof(CssControl), new PropertyMetadata(new PropertyChangedCallback(OnCssEnabledChanged)));
+        public static readonly DependencyProperty IsCssEnabledProperty = DependencyProperty.Register(nameof(IsCssEnabled), typeof(bool), typeof(CssControl), new PropertyMetadata(new PropertyChangedCallback(OnCssEnabledChanged)));
         public bool? IsCssEnabled
         {
             get { return (bool?)GetValue(IsCssEnabledProperty); }
@@ -27,7 +27,7 @@ namespace CNC.Controls.Lathe
             ((CssControl)d).data.Unit = ((CssControl)d).IsCssEnabled == true ? "m/min" : "RPM";
         }
 
-        public static readonly DependencyProperty ValueProperty = DependencyProperty.Register("Value", typeof(double), typeof(CssControl), new PropertyMetadata(double.NaN));
+        public static readonly DependencyProperty ValueProperty = DependencyProperty.Register(nameof(Value), typeof(double), typeof(CssControl), new PropertyMetadata(double.NaN));
         public double Value
         {
             get { return (double)GetValue(ValueProperty); }

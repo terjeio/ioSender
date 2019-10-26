@@ -1,7 +1,7 @@
 ﻿/*
- * CoordValueSetControl.xaml.cs - part of CNC Controls library
+ * PortDialog.xaml.cs - part of CNC Controls library
  *
- * v0.02 / 2019-10-21 / Io Engineering (Terje Io)
+ * v0.02 / 2019-10-25 / Io Engineering (Terje Io)
  *
  */
 
@@ -38,42 +38,35 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 using System.Windows;
-using System.Windows.Controls;
+using CNC.Core;
 
 namespace CNC.Controls
 {
-    /// <summary>
-    /// Interaction logic for CoordValueSetControl.xaml
-    /// </summary>
-    public partial class CoordValueSetControl : UserControl
+    public partial class PortDialog : Window
     {
-        public delegate void ClickHandler(object sender, RoutedEventArgs e);
-        public event ClickHandler Click;
-
-        public CoordValueSetControl()
+        private string port = null;
+        public PortDialog()
         {
             InitializeComponent();
+
+            DataContext = new SerialPorts();
         }
 
-        public static readonly DependencyProperty ValueProperty = DependencyProperty.Register(nameof(Value), typeof(double), typeof(CoordValueSetControl), new PropertyMetadata(double.NaN));
-        public double Value
+        public new string ShowDialog()
         {
-            get { return (double)GetValue(ValueProperty); }
-            set { SetValue(ValueProperty, value); }
+            base.ShowDialog();
+            return port;
         }
 
-        public static readonly DependencyProperty LabelProperty = DependencyProperty.Register(nameof(Label), typeof(string), typeof(CoordValueSetControl), new PropertyMetadata());
-        public string Label
+        private void btnOk_Click(object sender, RoutedEventArgs e)
         {
-            get { return (string)GetValue(LabelProperty); }
-            set { SetValue(LabelProperty, value); }
+            port = ((SerialPorts)DataContext).SelectedPort;
+            Close();
         }
 
-        public string Text { get { return cvValue.Text; } }
-
-        private void btnSet_Click(object sender, RoutedEventArgs e)
+        private void btnCancel_Click(object sender, RoutedEventArgs e)
         {
-            Click?.Invoke(this, e);
+            Close();
         }
     }
 }

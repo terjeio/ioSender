@@ -24,14 +24,14 @@ namespace CNC.Controls.Lathe
         {
             InitializeComponent();
         }
-        public static readonly DependencyProperty IsTaperEnabledProperty = DependencyProperty.Register("IsTaperEnabled", typeof(bool), typeof(TaperControl), new PropertyMetadata(/*"Label:"  , new PropertyChangedCallback(OnLabelChanged)*/));
+        public static readonly DependencyProperty IsTaperEnabledProperty = DependencyProperty.Register(nameof(IsTaperEnabled), typeof(bool), typeof(TaperControl), new PropertyMetadata(/*"Label:"  , new PropertyChangedCallback(OnLabelChanged)*/));
         public bool IsTaperEnabled
         {
             get { return (bool)GetValue(IsTaperEnabledProperty); }
             set { SetValue(IsTaperEnabledProperty, value); }
         }
 
-        public static readonly DependencyProperty ValueProperty = DependencyProperty.Register("Value", typeof(double), typeof(TaperControl), new PropertyMetadata(/*"Label:"  , new PropertyChangedCallback(OnLabelChanged)*/));
+        public static readonly DependencyProperty ValueProperty = DependencyProperty.Register(nameof(Value), typeof(double), typeof(TaperControl), new PropertyMetadata(/*"Label:"  , new PropertyChangedCallback(OnLabelChanged)*/));
         public double Value
         {
             get { return (double)GetValue(ValueProperty); }

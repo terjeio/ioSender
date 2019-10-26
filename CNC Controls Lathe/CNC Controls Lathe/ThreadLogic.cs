@@ -10,15 +10,13 @@ namespace CNC.Controls.Lathe
 {
     class ThreadLogic
     {
-        private ThreadModel model;
+        private ThreadModel model = new ThreadModel();
         private bool suspendFractionInput = false;
 
         public event GCodePushHandler GCodePush;
 
         public ThreadLogic()
         {
-            model = new ThreadModel();
-
             model.PropertyChanged += Model_PropertyChanged1;
             model.Thread.PropertyChanged += Model_PropertyChanged;
             model.Inch.PropertyChanged += Inch_PropertyChanged;

@@ -224,7 +224,15 @@ namespace GCode_Sender
 
         private void fileCloseMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            GetRenderer(getTab(ViewType.GRBL)).CloseFile();
+            CNCView view, grbl = GetRenderer(getTab(ViewType.GRBL));
+            
+            grbl.CloseFile();
+
+            foreach (TabItem tabitem in UIUtils.FindLogicalChildren<TabItem>(ui.tabMode))
+            {
+                if ((view = GetRenderer(tabitem)) != null && view != grbl)
+                    view.CloseFile();
+            }
         }
 
         private void TabMode_SelectionChanged(object sender, SelectionChangedEventArgs e)

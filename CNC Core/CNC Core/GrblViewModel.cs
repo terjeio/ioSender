@@ -46,8 +46,9 @@ namespace CNC.Core
 {
     public class GrblViewModel : ViewModelBase
     {
-        private string _tool, _message, _WPos, _MPos, _wco, _wcs, _a, _fs, _mpg, _ov, _pn, _sc, _sd, _ex, _d, _gc, _h, _mdiCommand, _fileName;
-        private bool _flood, _mist, _toolChange, _reset, _isMPos, _isJobRunning;
+        private string _tool, _message, _WPos, _MPos, _wco, _wcs, _a, _fs, _mpg, _ov, _pn, _sc, _sd, _ex, _d, _gc, _h;
+        private string  _unit, _format, _mdiCommand, _fileName;
+        private bool _flood, _mist, _tubeCoolant, _toolChange, _reset, _isMPos, _isJobRunning;
         private double _feedrate = 0d;
         private double _rpm = 0d;
         private double _rpmActual = double.NaN;
@@ -62,13 +63,13 @@ namespace CNC.Core
         public GrblViewModel()
         {
             _a = _pn = _fs = _sc = string.Empty;
-            _tool = "";
+            _tool = ""; _unit = "mm"; _format = GrblConstants.FORMAT_METRIC;
             Clear();
         }
 
         public void Clear()
         {
-            _fileName = Ex = _mdiCommand = string.Empty;
+            _fileName = _mdiCommand = string.Empty;
             _streamingState = StreamingState.NoFile;
             _isMPos = _reset = _isJobRunning = false;
             _mpg = "";
@@ -85,6 +86,7 @@ namespace CNC.Core
             MachinePosition.Clear();
             WorkPosition.Clear();
             WorkPositionOffset.Clear();
+            ProgramLimits.Clear();
 
             Set("Pn", string.Empty);
             Set("A", string.Empty);
@@ -92,6 +94,7 @@ namespace CNC.Core
             Set("Sc", string.Empty);
             Set("T", "0");
             Set("Ov", string.Empty);
+            Set("Ex", string.Empty);
             SDCardStatus = string.Empty;
             HomedState = HomedState.Unknown;
             if (_latheMode != LatheMode.Disabled)
@@ -100,6 +103,11 @@ namespace CNC.Core
 
         #region Dependencyproperties
 
+        public string Unit { get { return _unit; } set { _unit = value; OnPropertyChanged(); } }
+        public string Format { get { return _format; } set { _format = value; OnPropertyChanged(); } }
+
+
+        public ProgramLimits ProgramLimits { get; private set; } = new ProgramLimits();
         public string MDICommand { get { return _mdiCommand; } set { _mdiCommand = value; if (_mdiCommand != string.Empty) OnPropertyChanged(); } }
         public ObservableCollection<CoordinateSystem> CoordinateSystems { get { return GrblWorkParameters.CoordinateSystems; } }
         public ObservableCollection<Tool> Tools { get { return GrblWorkParameters.Tools; } }
@@ -131,6 +139,9 @@ namespace CNC.Core
         public string SDCardStatus { get { return _sd; } private set { _sd = value; OnPropertyChanged(); } }
         public HomedState HomedState { get { return _homedState; } private set { _homedState = value; OnPropertyChanged(); } }
         public LatheMode LatheMode { get { return _latheMode; } private set { _latheMode = value; OnPropertyChanged(); } }
+
+        // CO2 Laser
+        public bool TubeCoolant { get { return _tubeCoolant; } private set { _tubeCoolant = value; OnPropertyChanged(); } }
 
         #region A - Spindle, Coolant and Tool change status
 
@@ -201,16 +212,6 @@ namespace CNC.Core
                     _message = value;
                     OnPropertyChanged();
                 }
-            }
-        }
-
-        public string Ex //??
-        {
-            get { return _ex; }
-            private set
-            {
-                _ex = value;
-                OnPropertyChanged();
             }
         }
 
@@ -503,7 +504,7 @@ namespace CNC.Core
 
                 case "Ex":
                     if ((changed = _ex != value))
-                        Ex = value;
+                        TubeCoolant = value == "C";
                     break;
 
                 case "SD":

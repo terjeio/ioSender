@@ -7,23 +7,8 @@
              xmlns:Controls="clr-namespace:CNC.Controls;assembly=CNC.Controls.WPF" x:Class="CNC.Controls.Viewer.Viewer"
              mc:Ignorable="d" 
              d:DesignHeight="515" d:DesignWidth="875">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="175"/>
-            <ColumnDefinition Width="185*"/>
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="28*"/>
-            <RowDefinition Height="31*"/>
-            <RowDefinition Height="36*"/>
-            <RowDefinition Height="420*"/>
-        </Grid.RowDefinitions>
-        <Controls:NumericField x:Name="cvMinX" Label="Min X" IsReadOnly="true" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-        <Controls:NumericField x:Name="cvMaxX" Label="Max X" IsReadOnly="true" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top"/>
-        <Controls:NumericField x:Name="cvMinY" Label="Min Y" IsReadOnly="true" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-        <Controls:NumericField x:Name="cvMaxY" Label="Max Y" IsReadOnly="true" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top"/>
-        <Controls:NumericField x:Name="cvMinZ" Label="Max Z" IsReadOnly="true" Grid.Row="2" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-        <Controls:NumericField x:Name="cvMaxZ" Label="Max Z" IsReadOnly="true" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top"/>
-        <local:Renderer x:Name="gcodeView" Width="850" Height="350" HorizontalAlignment="Left" Margin="10,42,0,0" VerticalAlignment="Top" Grid.Row="3" Grid.ColumnSpan="2"/>
+    <Grid Height="515" Width="875">
+        <local:Renderer x:Name="gcodeView" Width="850" Height="500" HorizontalAlignment="Left" Margin="7,10,0,0" VerticalAlignment="Bottom"/>
+        <Controls:LimitsControl HorizontalAlignment="Left" Margin="5,5" VerticalAlignment="Top"/>
     </Grid>
 </UserControl>

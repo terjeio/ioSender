@@ -21,9 +21,15 @@
             </DataGrid.Columns>
         </DataGrid>
         <StackPanel Grid.Column="1" HorizontalAlignment="Left" Margin="74,122,0,0" VerticalAlignment="Top" Width="219">
-            <local:CoordValueSetControl x:Name="cvXOffset" Label="X axis:" Tag="X" Value="{Binding Path=offset.X, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" Click="cvOffset_Click"/>
-            <local:CoordValueSetControl x:Name="cvYOffset" Label="Y axis:" Tag="Y" Value="{Binding Path=offset.Y, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" Click="cvOffset_Click"/>
-            <local:CoordValueSetControl x:Name="cvZOffset" Label="Z axis:" Tag="Z" Value="{Binding Path=offset.Z, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" Click="cvOffset_Click"/>
+            <local:CoordValueSetControl x:Name="cvXOffset" Label="X axis:" Tag="X" Click="cvOffset_Click"
+                Value="{Binding Path=offset.X, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
+            />
+            <local:CoordValueSetControl x:Name="cvYOffset" Label="Y axis:" Tag="Y" Click="cvOffset_Click"
+                Value="{Binding Path=offset.Y, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
+            />
+            <local:CoordValueSetControl x:Name="cvZOffset" Label="Z axis:" Tag="Z"  Click="cvOffset_Click"
+                Value="{Binding Path=offset.Z, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
+            />
             <StackPanel Orientation="Horizontal" Height="28" Margin="0,5">
                 <Button x:Name="btnCurrPos" Content="Get current position" Margin="3,0" Click="btnCurrPos_Click"/>
                 <Button x:Name="btnClear" Content="Clear all" Click="btnClearAll_Click"/>

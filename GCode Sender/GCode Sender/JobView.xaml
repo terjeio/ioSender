@@ -22,6 +22,7 @@
         <cnccontrols:SpindleControl x:Name="spindleControl" HorizontalAlignment="Left" Height="130" VerticalAlignment="Top" Width="216" Margin="645,130,0,0"/>
         <cnccontrols:FeedControl x:Name="feedControl" HorizontalAlignment="Left" Height="160" VerticalAlignment="Top" Width="216" Margin="645,270,0,0"/>
         <TextBox x:Name="txtStatus" Text="{Binding Path=Message}" HorizontalAlignment="Center" Height="23" Margin="2,4" TextWrapping="Wrap" VerticalAlignment="Bottom" Width="860" IsEnabled="False" UndoLimit="0"/>
-    </Grid>
+            <cnccontrols:LimitsControl HorizontalAlignment="Left" Margin="2,170,0,0" VerticalAlignment="Top"/>
+        </Grid>
     </StackPanel>
 </UserControl>

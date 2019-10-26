@@ -1,7 +1,7 @@
 ﻿/*
  * Viewer.xaml.cs - part of CNC Controls library
  *
- * v0.02 / 2019-10-02 / Io Engineering (Terje Io)
+ * v0.02 / 2019-10-23 / Io Engineering (Terje Io)
  *
  */
 
@@ -93,12 +93,13 @@ public partial class Viewer : UserControl, CNCView
         {
             if (activate)
             {
-
+                gcodeView.ShowPosition();
             }
         }
 
         public void CloseFile()
         {
+            gcodeView.ClearViewport();
         }
 
         public void ApplySettings(GCodeViewerConfig config)
@@ -111,16 +112,9 @@ public partial class Viewer : UserControl, CNCView
             ShowViewCube = config.ShowViewCube;
         }
 
-        public void Open(string title, List<GCodeToken> tokens, gcodeBoundingBox bbox)
+        public void Open(string title, List<GCodeToken> tokens)
         {
-            cvMinX.Value = bbox.MinX;
-            cvMaxX.Value = bbox.MaxX;
-            cvMinY.Value = bbox.MinY;
-            cvMaxY.Value = bbox.MaxY;
-            cvMinZ.Value = bbox.MinZ;
-            cvMaxZ.Value = bbox.MaxZ;
-            ShowViewCube = true;
-            gcodeView.Render(tokens, bbox);
+            gcodeView.Render(tokens);
         }
     }
 }
