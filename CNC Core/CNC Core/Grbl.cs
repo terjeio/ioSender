@@ -267,7 +267,7 @@ namespace CNC.Core
             Path = @"./";
             Language = "en_US";
             IniName = "App.config";
-            ConfigName = string.Format("setting_codes_{0}.txt", CNC.Core.Resources.Language);
+            ConfigName = string.Format("setting_codes_{0}.txt", Language);
         }
     }
 
@@ -943,7 +943,7 @@ namespace CNC.Core
 #endif
             Comms.com.DataReceived -= Process;
 
-            if (IsGrblHAL)
+            if (IsGrblHAL && !Resources.ConfigName.StartsWith("hal_"))
                 Resources.ConfigName = "hal_" + Resources.ConfigName;
 
             try
@@ -1023,12 +1023,14 @@ namespace CNC.Core
                     StreamWriter file = new StreamWriter(filename);
                     if (file != null)
                     {
-                        file.WriteLine('%');
+                        if (IsGrblHAL)
+                            file.WriteLine('%');
                         foreach (DataRow Setting in settings.Rows)
                         {
                             file.WriteLine(string.Format("${0}={1}", (int)Setting["Id"], (string)Setting["Value"]));
                         }
-                        file.WriteLine('%');
+                        if (IsGrblHAL)
+                            file.WriteLine('%');
                         file.Close();
                     }
                 }

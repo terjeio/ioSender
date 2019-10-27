@@ -1,7 +1,7 @@
 ﻿/*
  * AppConfig.cs - part of Grbl Code Sender
  *
- * v0.01 / 2019-10-20 / Io Engineering (Terje Io)
+ * v0.01 / 2019-10-27 / Io Engineering (Terje Io)
  *
  */
 
@@ -41,6 +41,7 @@ using System;
 using System.IO;
 using System.Xml.Serialization;
 using CNC.Core;
+using System.Windows;
 
 namespace CNC.Controls
 {
@@ -142,6 +143,123 @@ namespace CNC.Controls
             }
 
             return ok;
+        }
+
+        private void setPort (string port)
+        {
+            Config.PortParams = port + ":" + Config.PortParams.Substring(Config.PortParams.IndexOf(':') + 1);
+        }
+
+        public int SetupAndOpen(string appname, System.Windows.Threading.Dispatcher dispatcher)
+        {
+            int status = 0;
+            bool selectPort = false;
+            string port = string.Empty;
+
+            CNC.Core.Resources.Path = AppDomain.CurrentDomain.BaseDirectory;
+
+            string[] args = Environment.GetCommandLineArgs();
+
+            int p = 0;
+            while (p < args.GetLength(0)) switch (args[p++])
+            {
+                case "-inifile":
+                    CNC.Core.Resources.IniName = GetArg(args, p++);
+                    break;
+
+                case "-configmapping":
+                    CNC.Core.Resources.ConfigName = GetArg(args, p++);
+                    break;
+
+                case "-language":
+                    CNC.Core.Resources.Language = GetArg(args, p++);
+                    break;
+
+                case "-port":
+                    port = GetArg(args, p++);
+                    break;
+
+                case "-selectport":
+                    selectPort = true;
+                    break;
+            }
+
+            if (!Load(CNC.Core.Resources.IniFile))
+            {
+                if (MessageBox.Show("Config file not found or invalid, create new?", appname, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                {
+                    if (!Save(CNC.Core.Resources.IniFile))
+                    {
+                        MessageBox.Show("Could not save config file.", appname);
+                        status = 1;
+                    }
+                }
+                else
+                    status = 1;
+            }
+
+            if (!string.IsNullOrEmpty(port))
+                selectPort = false;
+
+            if (!selectPort)
+            {
+                if (!string.IsNullOrEmpty(port))
+                    setPort(port);
+
+                if (char.IsDigit(Config.PortParams[0])) // We have an IP address
+                    new IPComms(Config.PortParams);
+                else
+                    new SerialComms(Config.PortParams, Comms.ResetMode.None, dispatcher);
+            }
+
+            if ((Comms.com == null || !Comms.com.IsOpen) && string.IsNullOrEmpty(port))
+            {
+                PortDialog portsel = new PortDialog();
+
+                port = portsel.ShowDialog();
+                if (port == null)
+                    status = 2;
+
+                if (char.IsDigit(port[0]))
+                { // We have an IP address
+                    Config.PortParams = port;
+                    new IPComms(Config.PortParams);
+                }
+                else
+                {
+                    setPort(port);
+                    new SerialComms(Config.PortParams, Comms.ResetMode.None, dispatcher);
+                }
+                Save(CNC.Core.Resources.IniFile);
+            }
+
+            if (Comms.com.IsOpen)
+            {
+                System.Threading.Thread.Sleep(400); // Wait to see if MPG is polling Grbl
+
+                if (!(Comms.com.Reply == "" || Comms.com.Reply.StartsWith("Grbl")))
+                {
+                    MPGPending await = new MPGPending();
+                    await.ShowDialog();
+                    if (await.Cancelled)
+                    {
+                        Comms.com.Close();
+                        status = 2;
+                    }
+                }
+            }
+            else
+            {
+                MessageBox.Show(string.Format("Unable to open connection ({0})", Config.PortParams), appname, MessageBoxButton.OK, MessageBoxImage.Error);
+                status = 2;
+            }
+
+            return status;
+        }
+
+        private string GetArg(string[] args, int i)
+        {
+            return i < args.GetLength(0) ? args[i] : null;
         }
     }
 }

@@ -2,7 +2,7 @@
 /*
  * MainWindow.xaml.cs - part of Grbl Code Sender
  *
- * v0.03 / 2019-10-20 / Io Engineering (Terje Io)
+ * v0.03 / 2019-10-27 / Io Engineering (Terje Io)
  *
  */
 
@@ -56,100 +56,24 @@ namespace Grbl_Config_App
         {
             InitializeComponent();
 
-            CNC.Core.Resources.Path = AppDomain.CurrentDomain.BaseDirectory;
-
-            string[] args = Environment.GetCommandLineArgs();
-
-            int p = 0;
-            while (p < args.GetLength(0)) switch (args[p++])
-            {
-                case "-inifile":
-                    CNC.Core.Resources.IniName = GetArg(args, p++);
-                    break;
-
-                case "-configmapping":
-                    CNC.Core.Resources.ConfigName = GetArg(args, p++);
-                    break;
-
-                case "-language":
-                    CNC.Core.Resources.Language = GetArg(args, p++);
-                    break;
-            }
-
-            if (!Profile.Load(CNC.Core.Resources.IniFile))
-            {
-                if (MessageBox.Show("Config file not found or invalid, create new?", Title, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
-                {
-                    if (!Profile.Save(CNC.Core.Resources.IniFile))
-                    {
-                        MessageBox.Show("Could not save config file.", Title);
-                        Environment.Exit(1);
-                    }
-                }
-                else
-                    Environment.Exit(1);
-            }
-
-            if (char.IsDigit(Profile.Config.PortParams[0])) // We have an IP address
-                new IPComms(Profile.Config.PortParams);
-            else
-                new SerialComms(Profile.Config.PortParams, Comms.ResetMode.None, App.Current.Dispatcher);
-
-            if (!Comms.com.IsOpen)
-            {
-                PortDialog portsel = new PortDialog();
-
-                var port = portsel.ShowDialog();
-                if (port == null)
-                    Environment.Exit(2);
-
-                if (char.IsDigit(port[0]))
-                { // We have an IP address
-                    Profile.Config.PortParams = port;
-                    new IPComms(Profile.Config.PortParams);
-                }
-                else
-                {
-                    Profile.Config.PortParams = port + ":" + Profile.Config.PortParams.Substring(Profile.Config.PortParams.IndexOf(':') + 1);
-                    new SerialComms(Profile.Config.PortParams, Comms.ResetMode.None, App.Current.Dispatcher);
-                }
-                Profile.Save(CNC.Core.Resources.IniFile);
-            }
-
-            if (!Comms.com.IsOpen)
-            {
-                MessageBox.Show("Unable to open connection!", Title);
-                Environment.Exit(2);
-            }
-
-            System.Threading.Thread.Sleep(400); // Wait to see if MPG is polling Grbl
-
-            if (!(Comms.com.Reply == "" || Comms.com.Reply.StartsWith("Grbl")))
-            {
-                MPGPending await = new MPGPending();
-                await.ShowDialog();
-                if (await.Cancelled)
-                {
-                    Comms.com.Close();
-                    Environment.Exit(2);
-                }
-            }
+            int res;
+            if ((res = Profile.SetupAndOpen(Title, App.Current.Dispatcher)) != 0)
+                Environment.Exit(res);            
         }
 
         #region UIEvents
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            System.Threading.Thread.Sleep(50);
+            Comms.com.PurgeQueue();
+
             using (new UIUtils.WaitCursor())
             {
                 GrblInfo.Get();
                 GrblSettings.Get();
-                GrblParserState.Get();
-                GrblWorkParameters.Get();
             }
 
-            System.Threading.Thread.Sleep(50);
-            Comms.com.PurgeQueue();
             configView.Activate(true, ViewType.Startup);
         }
 
@@ -170,10 +94,5 @@ namespace Grbl_Config_App
         }
 
         #endregion  
-
-        private string GetArg(string[] args, int i)
-        {
-            return i < args.GetLength(0) ? args[i] : null;
-        }
     }
 }
