@@ -1,7 +1,7 @@
 ﻿/*
  * PIDLogView.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.01 / 2019-09-26 / Io Engineering (Terje Io)
+ * v0.01 / 2019-10-27 / Io Engineering (Terje Io)
  *
  */
 
@@ -39,21 +39,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using System;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Globalization;
 using CNC.Core;
 using CNC.View;
-using System.Globalization;
 
 namespace CNC.Controls
 {
@@ -62,74 +54,16 @@ namespace CNC.Controls
     /// </summary>
     public partial class PIDLogView : UserControl, CNCView
     {
-        private double errorScale = 2500.0;
+        private double errorScale = 2500d;
 
         public PIDLogView()
         {
             InitializeComponent();
 
-            //btnGetPIDData.Click += new EventHandler(btnGetPIDData_Click);
-            //PIDPlot.Paint += new PaintEventHandler(PIDPlot_Paint);
-            //tbError.Value = (int)errorScale;
-            //tbError.ValueChanged += new EventHandler(tbError_ValueChanged);
+            sldError.Value = errorScale;
         }
 
-        void tbError_ValueChanged(object sender, EventArgs e)
-        {
-            this.errorScale = sldError.Value;
-            //   PIDPlot.Refresh();
-        }
-
-        //void PIDPlot_Paint(object sender, PaintEventArgs e)
-        //{
-        //    int center = this.PIDPlot.Height / 2;
-        //    double Xstep, Xpos;
-        //    Point a = new Point(0, center), b = new Point(0, center);
-        //    Point c = new Point(0, center), d = new Point(0, center);
-        //    Point g = new Point(0, center), h = new Point(0, center);
-        //    Pen TargetPen = new Pen(System.Drawing.Color.Green);
-        //    Pen ActualPen = new Pen(System.Drawing.Color.Blue);
-        //    Pen ErrorPen = new Pen(System.Drawing.Color.Red);
-        //    Pen BlackPen = new Pen(System.Drawing.Color.Black, 1);
-        //    BlackPen.DashStyle = DashStyle.Dot;
-
-        //    e.Graphics.Clear(this.PIDPlot.BackColor);
-        //    e.Graphics.DrawLine(BlackPen, 0, center, this.PIDPlot.Width, center);
-
-        //    if (GrblPIDData.data.Rows.Count > 0)
-        //    {
-        //        Xpos = Xstep = this.PIDPlot.Width / GrblPIDData.data.Rows.Count;
-        //        foreach (DataRow sample in GrblPIDData.data.Rows)
-        //        {
-        //            b.Y = center + (int)((double)sample["Target"] * 5.0);
-        //            e.Graphics.DrawLine(TargetPen, a, b);
-        //            a.X = b.X;
-        //            a.Y = b.Y;
-        //            b.X = (int)Math.Floor(Xpos);
-
-        //            d.Y = center + (int)((double)sample["Actual"] * 5.0);
-        //            e.Graphics.DrawLine(ActualPen, c, d);
-        //            c.X = d.X;
-        //            c.Y = d.Y;
-        //            d.X = (int)Math.Floor(Xpos);
-
-        //            h.Y = center + (int)((double)sample["Error"] * this.errorScale);
-        //            e.Graphics.DrawLine(ErrorPen, g, h);
-        //            g.X = h.X;
-        //            g.Y = h.Y;
-        //            h.X = (int)Math.Floor(Xpos);
-        //            Xpos += Xstep;
-        //        }
-        //    }
-        //}
-
-        void btnGetPIDData_Click(object sender, EventArgs e)
-        {
-            btnGetPIDData.IsEnabled = false;
-            GrblPIDData.Load();
-            //   PIDPlot.Refresh();
-            btnGetPIDData.IsEnabled = true;
-        }
+        #region Methods and properties required by CNCView interface
 
         public ViewType mode { get { return ViewType.PIDTuner; } }
 
@@ -139,6 +73,107 @@ namespace CNC.Controls
 
         public void CloseFile()
         {
+        }
+
+        #endregion
+
+        private void sldError_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            errorScale = sldError.Value;
+            PlotData(); // TODO: only plot on mouse up!
+        }
+
+        private void btnGetPIDData_Click(object sender, RoutedEventArgs e)
+        {
+ 
+            btnGetPIDData.IsEnabled = false;
+            GrblPIDData.Load();
+            btnGetPIDData.IsEnabled = true;
+
+            PlotData();
+        }
+
+        private void PlotData()
+        {
+            double center = PIDPlot.Height / 2d;
+            double Xstep, Xpos;
+            Point a = new Point(0d, center), b = new Point(0d, center);
+            Point c = new Point(0d, center), d = new Point(0d, center);
+            Point g = new Point(0d, center), h = new Point(0d, center);
+
+            PIDPlot.Children.Clear();
+
+            PIDPlot.Children.Add(new Line()
+            {
+                X1 = 0d,
+                X2 = PIDPlot.Width,
+                Y1 = center,
+                Y2 = center,
+                Stroke = Brushes.Black,
+                StrokeThickness = 0.5d,
+                StrokeDashArray = new DoubleCollection() { 2d }
+            });
+
+            if (GrblPIDData.data.Rows.Count > 0)
+            {
+                Xpos = Xstep = this.PIDPlot.Width / GrblPIDData.data.Rows.Count;
+
+                foreach (DataRow sample in GrblPIDData.data.Rows)
+                {
+
+                    b.Y = center + (int)((double)sample["Target"] * 5.0);
+
+                    PIDPlot.Children.Add(new Line()
+                    {
+                        X1 = a.X,
+                        X2 = b.X,
+                        Y1 = a.Y,
+                        Y2 = b.Y,
+                        Stroke = Brushes.Green,
+                        StrokeThickness = 1
+                    });
+
+                    a.X = b.X;
+                    a.Y = b.Y;
+                    b.X = (int)Math.Floor(Xpos);
+
+
+                    d.Y = center + (int)((double)sample["Actual"] * 5.0);
+
+                    PIDPlot.Children.Add(new Line()
+                    {
+                        X1 = c.X,
+                        X2 = d.X,
+                        Y1 = c.Y,
+                        Y2 = d.Y,
+                        Stroke = Brushes.Blue,
+                        StrokeThickness = 1
+                    });
+
+                    c.X = d.X;
+                    c.Y = d.Y;
+                    d.X = (int)Math.Floor(Xpos);
+
+
+                    h.Y = center + (int)((double)sample["Error"] * errorScale);
+
+                    PIDPlot.Children.Add(new Line()
+                    {
+                        X1 = g.X,
+                        X2 = h.X,
+                        Y1 = g.Y,
+                        Y2 = h.Y,
+                        Stroke = Brushes.Red,
+                        StrokeThickness = 1
+                    });
+
+                    g.X = h.X;
+                    g.Y = h.Y;
+                    h.X = (int)Math.Floor(Xpos);
+
+                    Xpos += Xstep;
+                }
+            }
         }
     }
 
@@ -155,7 +190,7 @@ namespace CNC.Controls
             data.Columns.Add("Target", typeof(double));
             data.Columns.Add("Actual", typeof(double));
             data.Columns.Add("Error", typeof(double));
-            data.PrimaryKey = new DataColumn[] { GrblPIDData.data.Columns["Id"] };
+            data.PrimaryKey = new DataColumn[] { data.Columns["Id"] };
         }
 
         public static void Load()
@@ -163,12 +198,8 @@ namespace CNC.Controls
             RawData = "";
             data.Clear();
 
-            Comms.com.DataReceived += new DataReceivedHandler(Process);
-
-            Comms.com.PurgeQueue();
-            Comms.com.WriteCommand(((char)GrblConstants.CMD_PID_REPORT).ToString(CultureInfo.InvariantCulture));
-            Comms.com.AwaitAck();
-
+            Comms.com.DataReceived += Process;
+            Comms.com.AwaitAck(((char)GrblConstants.CMD_PID_REPORT).ToString(CultureInfo.InvariantCulture));
             Comms.com.DataReceived -= Process;
 
             if (RawData != "")
@@ -194,7 +225,7 @@ namespace CNC.Controls
                 }
             }
         }
-
+         
         private static void Process(string data)
         {
             if (data.StartsWith("[PID:"))

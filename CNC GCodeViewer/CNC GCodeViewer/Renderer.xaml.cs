@@ -1,7 +1,7 @@
 ﻿/*
  * Renderer.xaml.cs - part of CNC Controls library
  *
- * v0.02 / 2019-10-23 / Io Engineering (Terje Io)
+ * v0.02 / 2019-10-29 / Io Engineering (Terje Io)
  *
  */
 
@@ -134,7 +134,6 @@ namespace CNC.Controls.Viewer
             bool canned = false;
 
             Plane plane = Plane.XY;
-            IJKMode ijkmode = IJKMode.Incremental;
 
             //trace.Clear();
             trace = null;
@@ -216,64 +215,63 @@ namespace CNC.Controls.Viewer
 
             foreach (GCodeToken token in tokens)
             {
-                switch (token.command)
+                switch (token.Command)
                 {
-                    case GCodeToken.Command.G0:
-                        if(last.command == GCodeToken.Command.G1 && (last.x != point0.X || last.y != point0.Y))
-                            path.Points.Add(new Point3D(token.x, token.y, token.z));
-
-                        AddPoint(new Point3D(token.x, token.y, token.z), Colors.Red, 0.5);
+                    case GCodeToken.Commands.G0:
+                        {
+                            GCLinearMotion motion = (GCLinearMotion)token;
+                            if (last.Command == GCodeToken.Commands.G1 && (((GCLinearMotion)last).X != point0.X || ((GCLinearMotion)last).Y != point0.Y))
+                                path.Points.Add(new Point3D(motion.X, motion.Y, motion.Z));
+                            AddPoint(new Point3D(motion.X, motion.Y, motion.Z), Colors.Red, 0.5);
+                        }
                         break;
 
-                    case GCodeToken.Command.G1:
-                        if (last.command == GCodeToken.Command.G0 && (last.x != point0.X || last.y != point0.Y))
-                            path.Points.Add(new Point3D(token.x, token.y, token.z));
-                        //    AddPoint(point0, Colors.Blue, 1);
-                        AddPoint(new Point3D(token.x, token.y, token.z), Colors.Blue, 1);
+                    case GCodeToken.Commands.G1:
+                        {
+                            GCLinearMotion motion = (GCLinearMotion)token;
+                            if (last.Command == GCodeToken.Commands.G0 && (((GCLinearMotion)last).X != point0.X || ((GCLinearMotion)last).Y != point0.Y))
+                                path.Points.Add(new Point3D(motion.X, motion.Y, motion.Z));
+                            //AddPoint(point0, Colors.Blue, 1);
+                            AddPoint(new Point3D(motion.X, motion.Y, motion.Z), Colors.Blue, 1);
+                        }
                         break;
 
-                    case GCodeToken.Command.G2:
-                    case GCodeToken.Command.G3:
-                        if (double.IsNaN(token.i) && double.IsNaN(token.j) && double.IsNaN(token.k))
-                            DrawArc(plane, last.x, last.y, last.z, token.x, token.y, token.z, token.r, token.command == GCodeToken.Command.G2);
+                    case GCodeToken.Commands.G2:
+                    case GCodeToken.Commands.G3:
+                        GCArc arc = (GCArc)token;
+                        if (arc.IsRadiusMode)
+                            DrawArc(plane, point0.X, point0.Y, point0.Z, arc.X, arc.Y, arc.Z, arc.R, arc.IsClocwise);
                         else
-                            DrawArc(plane, last.x, last.y, last.z, token.x, token.y, token.z, token.i, token.j, ijkmode == IJKMode.Absolute, token.command == GCodeToken.Command.G2);
+                            DrawArc(plane, point0.X, point0.Y, point0.Z, arc.X, arc.Y, arc.Z, arc.I, arc.J, arc.IJKMode == IJKMode.Absolute, arc.IsClocwise);
                         break;
 
-                    case GCodeToken.Command.G17:
+                    case GCodeToken.Commands.G17:
                         plane = Plane.XY;
                         break;
 
-                    case GCodeToken.Command.G18:
+                    case GCodeToken.Commands.G18:
                         plane = Plane.ZX;
                         break;
 
-                    case GCodeToken.Command.G19:
+                    case GCodeToken.Commands.G19:
                         plane = Plane.YZ;
                         break;
 
-                    case GCodeToken.Command.G80:
+                    case GCodeToken.Commands.G80:
                         canned = false;
                         break;
 
-                    case GCodeToken.Command.G81:
+                    case GCodeToken.Commands.G81:
+                        GCCannedDrill drill = (GCCannedDrill)token;
                         if (!canned)
                         {
                             canned = true;
-                            if (point0.Z < token.r)
-                                AddPoint(new Point3D(point0.X, point0.Y, token.r), Colors.Red, 1);
+                            if (point0.Z < drill.R)
+                                AddPoint(new Point3D(point0.X, point0.Y, drill.R), Colors.Red, 1);
                         }
-                        AddPoint(new Point3D(token.x, token.y, Math.Max(token.z, token.r)), Colors.Red, 1);
-                        AddPoint(new Point3D(token.x, token.y, token.z), Colors.Blue, 1);
-                        AddPoint(new Point3D(token.x, token.y, token.r), Colors.Green, 1);
-                        break;
-
-                    case GCodeToken.Command.G90_1:
-                        ijkmode = IJKMode.Absolute;
-                        break;
-
-                    case GCodeToken.Command.G91_1:
-                        ijkmode = IJKMode.Incremental;
+                        AddPoint(new Point3D(drill.X, drill.Y, Math.Max(drill.Z, drill.R)), Colors.Red, 1);
+                        AddPoint(new Point3D(drill.X, drill.Y, drill.Z), Colors.Blue, 1);
+                        AddPoint(new Point3D(drill.X, drill.Y, drill.R), Colors.Green, 1);
                         break;
                 }
                 last = token;
@@ -288,6 +286,7 @@ namespace CNC.Controls.Viewer
         }
         public void refreshCamera(ProgramLimits bbox)
         {
+            // TODO: set a sensible viewing distance dynamically
             var position = new Point3D(bbox.SizeX / 2d, bbox.SizeY / 2d, 100d);
 
             viewport.Camera.Position = position;

@@ -274,14 +274,18 @@ namespace CNC.Core
             {
                 gcode.EndLoadData();
 
-//                Serializer.Save(@"d:\tokens.xml", Tokens);
+        //        GCodeParser.Save(@"d:\tokens.xml", Tokens);
 
                 foreach (GCodeToken token in Tokens)
                 {
-                    min_feed = Math.Min(min_feed, token.f);
-                    max_feed = Math.Max(max_feed, token.f);
-
-                    BoundingBox.AddPoint(token.x, token.y, token.z);
+                    //min_feed = Math.Min(min_feed, token.f);
+                    //max_feed = Math.Max(max_feed, token.f);
+                    if(token is GCLinearMotion)
+                        BoundingBox.AddPoint(((GCLinearMotion)token).X, ((GCLinearMotion)token).Y, ((GCLinearMotion)token).Z);
+                    else if (token is GCArc)
+                        BoundingBox.AddPoint(((GCArc)token).X, ((GCArc)token).Y, ((GCArc)token).Z); // Expand...
+                    else if (token is GCCannedDrill)
+                        BoundingBox.AddPoint(((GCCannedDrill)token).X, ((GCCannedDrill)token).Y, ((GCCannedDrill)token).Z);
                 }
 
                 if (max_feed == double.MinValue)
@@ -320,7 +324,6 @@ namespace CNC.Core
         }
 
         // IMPORTANT: block must be terminated with \r
-
     }
 
     public class ProgramLimits : ViewModelBase

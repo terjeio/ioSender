@@ -1,7 +1,7 @@
 ﻿/*
  * JobControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.02 / 2019-10-23 / Io Engineering (Terje Io)
+ * v0.02 / 2019-10-29 / Io Engineering (Terje Io)
  *
  */
 
@@ -411,17 +411,22 @@ namespace CNC.Controls
             CycleStart();
         }
 
-        private void grdGCode_DragEnter(object sender, DragEventArgs e)
+        private void grdGCode_Drag(object sender, DragEventArgs e)
         {
             bool allow = streamingState == StreamingState.Idle || streamingState == StreamingState.NoFile;
 
             if (allow && e.Data.GetDataPresent(DataFormats.FileDrop))
             {
                 string[] files = (string[])e.Data.GetData(DataFormats.FileDrop, false);
-                allow = files.Count() == 1 && (files[0].Contains(".nc") || files[0].Contains(".gcode") || files[0].Contains(".txt"));
+                if ((allow = files.Count() == 1))
+                {
+                    string file = files[0].ToLower();
+                    allow = (file.EndsWith(".nc") || file.EndsWith(".ncc") || file.EndsWith(".gcode") || file.EndsWith(".txt"));
+                }
             }
 
-            e.Effects = allow ? DragDropEffects.All : DragDropEffects.None;
+            e.Handled = true;
+            e.Effects = allow ? DragDropEffects.Copy : DragDropEffects.None;
         }
 
         private void grdGCode_Drop(object sender, DragEventArgs e)

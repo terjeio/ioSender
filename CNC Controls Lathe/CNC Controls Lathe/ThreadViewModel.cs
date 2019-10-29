@@ -139,12 +139,12 @@ namespace CNC.Controls.Lathe
             }
         }
 
-        private DataView _ThreadSizes;
+        private DataView _threadSizes;
 
         public DataView ThreadSizes
         {
-            get { return _ThreadSizes; }
-            private set { _ThreadSizes = value; OnPropertyChanged(); }
+            get { return _threadSizes; }
+            private set { _threadSizes = value; OnPropertyChanged(); }
         }
 
         DataRowView _sizerow = null;

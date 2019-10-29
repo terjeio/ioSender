@@ -7,11 +7,13 @@
              mc:Ignorable="d" 
              d:DesignHeight="515" d:DesignWidth="875">
     <Grid>
-        <Canvas x:Name="SGPlot" Background="White" HorizontalAlignment="Left" Height="256" Margin="25,10,0,0" VerticalAlignment="Top" Width="512"/>
+        <Border BorderThickness="1" BorderBrush="DarkGray" Height="258" Width="514" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10">
+            <Canvas x:Name="SGPlot" Background="WhiteSmoke" HorizontalAlignment="Left" Height="256" VerticalAlignment="Top" Width="512"/>
+        </Border>
         <TextBox x:Name="txtStatus" IsReadOnly="True" HorizontalAlignment="Left" Height="460" Margin="561,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="300"/>
         <Button x:Name="btnGetState" Content="Get status" HorizontalAlignment="Left" Margin="561,484,0,0" VerticalAlignment="Top" Width="76"/>
-        <Label x:Name="lblLoad" Content="Load (SG_RESULT)" Foreground="Blue" HorizontalAlignment="Left" Margin="440,262,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.132,9.308"/>
-        <CheckBox x:Name="chkEnableSfilt" Content="Enable stallGuard filter (SFILT)" HorizontalAlignment="Left" Margin="25,275,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="lblLoad" Content="Load (SG_RESULT)" Foreground="Blue" HorizontalAlignment="Left" Margin="423,268,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.132,9.308"/>
+        <CheckBox x:Name="chkEnableSfilt" Content="Enable stallGuard filter (SFILT)" HorizontalAlignment="Left" Margin="10,275,0,0" VerticalAlignment="Top"/>
         <local:MDIControl x:Name="mdiControl" HorizontalAlignment="Left" Margin="26,446,0,0" VerticalAlignment="Top"/>
 
     </Grid>

@@ -70,69 +70,9 @@ namespace GCode_Sender
             ui = this;
             GCodeViewer = viewer;
 
-            CNC.Core.Resources.Path = AppDomain.CurrentDomain.BaseDirectory;
-
-            string[] args = Environment.GetCommandLineArgs();
-
-            int p = 0;
-            while (p < args.GetLength(0)) switch (args[p++])
-            {
-                case "-inifile":
-                    CNC.Core.Resources.IniName = GetArg(args, p++);
-                    break;
-
-                case "-configmapping":
-                    CNC.Core.Resources.ConfigName = GetArg(args, p++);
-                    break;
-
-                case "-language":
-                    CNC.Core.Resources.Language = GetArg(args, p++);
-                    break;
-            }
-
-            if(!Profile.Load(CNC.Core.Resources.IniFile))
-            {
-                if (MessageBox.Show("Config file not found or invalid, create new?", this.Title, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
-                {
-                    if (!Profile.Save(CNC.Core.Resources.IniFile))
-                    {
-                        MessageBox.Show("Could not save config file.", this.Title);
-                        Environment.Exit(1);
-                    }
-                } else
-                    Environment.Exit(1);
-            }
-
-#if DEBUG
-            Profile.Config.PortParams = "com21:115200,N,8,1,P";
-            //Profile.Config.PortParams = "10.0.0.75:23";
-#endif
-
-            if (char.IsDigit(Profile.Config.PortParams[0])) // We have an IP address
-                new IPComms(Profile.Config.PortParams);
-            else
-                new SerialComms(Profile.Config.PortParams, Comms.ResetMode.None, App.Current.Dispatcher);
-
-            if (!Comms.com.IsOpen)
-            {
-                // this.com = null;
-                // this.disableUI();
-                MessageBox.Show("Unable to open connection!", this.Title);
-                Environment.Exit(2);
-            }
-
-            System.Threading.Thread.Sleep(400); // Wait to see if MPG is polling Grbl
-
-            if (!(Comms.com.Reply == "" || Comms.com.Reply.StartsWith("Grbl")))
-            {
-                MPGPending await = new MPGPending();
-                await.ShowDialog();
-                if (await.Cancelled)
-                {
-                    Comms.com.Close();
-                    Environment.Exit(2);
-                }
-            }
+            int res;
+            if((res = Profile.SetupAndOpen(Title, App.Current.Dispatcher)) != 0)
+                Environment.Exit(res);
 
             GrblInfo.LatheModeEnabled = Profile.Config.LatheMode;
 

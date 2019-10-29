@@ -7,11 +7,13 @@
              mc:Ignorable="d" 
              d:DesignHeight="515" d:DesignWidth="875">
     <Grid>
-        <Canvas x:Name="canvasPID" HorizontalAlignment="Left" Height="400" Margin="31,26,0,0" VerticalAlignment="Top" Width="640"/>
-        <Button x:Name="btnGetPIDData" Content="Get data" HorizontalAlignment="Left" Height="34" Margin="47,471,0,0" VerticalAlignment="Top" Width="75"/>
-        <Label x:Name="lblTarget" Content="Target" HorizontalAlignment="Left" Margin="698,26,0,0" VerticalAlignment="Top" Width="100"/>
-        <Label x:Name="lblError" Content="Error" HorizontalAlignment="Left" Margin="698,56,0,0" VerticalAlignment="Top" Width="100"/>
-        <Label x:Name="lblActual" Content="Actual" HorizontalAlignment="Left" Margin="698,86,0,0" VerticalAlignment="Top" Width="100"/>
-        <Slider x:Name="sldError" HorizontalAlignment="Left" Margin="671,450,0,0" VerticalAlignment="Top" Width="169"/>
+        <Border BorderThickness="1" BorderBrush="DarkGray" Height="442" Width="642" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10">
+            <Canvas x:Name="PIDPlot" Background="WhiteSmoke" Height="440" Width="640" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+        </Border>
+        <Label x:Name="lblTarget" Content="Target" Foreground="Green" HorizontalAlignment="Left" Margin="660,20,0,0" VerticalAlignment="Top" Width="100"/>
+        <Label x:Name="lblError" Content="Error" Foreground="Red" HorizontalAlignment="Left" Margin="660,40,0,0" VerticalAlignment="Top" Width="100"/>
+        <Label x:Name="lblActual" Content="Actual" Foreground="Blue" HorizontalAlignment="Left" Margin="660,60,0,0" VerticalAlignment="Top" Width="100"/>
+        <Button x:Name="btnGetPIDData" Content="Get data" HorizontalAlignment="Left" Height="34" Margin="10,462,0,0" VerticalAlignment="Top" Width="75" Click="btnGetPIDData_Click"/>
+        <Slider x:Name="sldError" HorizontalAlignment="Left" Margin="676,430,0,0" VerticalAlignment="Top" Width="169" Minimum="1" Maximum="3000" Value="2500" ValueChanged="sldError_ValueChanged"/>
     </Grid>
 </UserControl>

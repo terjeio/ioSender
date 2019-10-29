@@ -1,7 +1,7 @@
 ﻿/*
  * TrinamicView.xaml.cs - part of CNC Controls library
  *
- * v0.01 / 2019-05-22 / Io Engineering (Terje Io)
+ * v0.01 / 2019-10-27 / Io Engineering (Terje Io)
  *
  */
 
@@ -43,6 +43,8 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using CNC.Core;
 using CNC.View;
+using System.Windows.Shapes;
+using System.Collections.Generic;
 
 namespace CNC.Controls
 {
@@ -51,11 +53,10 @@ namespace CNC.Controls
     /// </summary>
     public partial class TrinamicView : UserControl, CNCView
     {
-        private int[] sg_data = new int[512];
         private int sg_index = 0;
-        Point a = new Point(0, 0), b = new Point(0, 0);
-        Pen ActualPen;
         private bool plot = false, read_status = false;
+
+        private List<Line> lines;
 
         private delegate void StatusCallback(string data);
 
@@ -66,7 +67,7 @@ namespace CNC.Controls
             double ydelta = SGPlot.Height / 10;
             double ypos = SGPlot.Height - ydelta;
 
-            ActualPen = new Pen(lblLoad.Foreground, 1);
+            lines = new List<Line>((int)SGPlot.Width);
 
             //while (ypos > 0)
             //{
@@ -82,15 +83,11 @@ namespace CNC.Controls
             //    ypos -= ydelta;
             //}
 
-            for (int i = 0; i < SGPlot.Width; i++)
-                sg_data[i] = -1;
-
             btnGetState.Click += btnGetState_Click;
             chkEnableSfilt.Checked += chkEnableSfilt_CheckedChanged;
-            //       SGPlot.Paint += new PaintEventHandler(SGPlot_Paint);
         }
 
-        #region Methods required by IRenderer interface
+        #region Methods and properties required by CNCView interface
 
         public ViewType mode { get { return ViewType.TrinamicTuner; } }
 
@@ -111,48 +108,6 @@ namespace CNC.Controls
 
         #region UIEvents
 
-        //void SGPlot_Paint(object sender, PaintEventArgs e)
-        //{
-        //    int samples;
-        //    // Point a = new Point(0, sg_data[0]), b = new Point(0, sg_data[0]);
-        //    // Point c = new Point(0, 0), d = new Point(0, 0);
-        //    Pen TargetPen = new Pen(Brushes.LightGray, 1);
-        //    Pen ErrorPen = new Pen(Brushes.Red, 1);
-        //    Pen BlackPen = new Pen(Brushes.Black, 1);
-        //  //  BlackPen.DashStyle = DashStyle.DashesProperty.;
-
-        //    //   e.Graphics.Clear(this.SGPlot.BackColor);
-        //    samples = e.ClipRectangle.X & 0xFFE;
-        //    e.Graphics.DrawLine(BlackPen, samples, 128, samples + e.ClipRectangle.Width, 128);
-
-        //    double ydelta = SGPlot.Height / 10;
-        //    double ypos = SGPlot.Height - ydelta;
-
-        //    while (ypos > 0)
-        //    {
-        //        e.Graphics.DrawLine(TargetPen, samples, ypos, samples + e.ClipRectangle.Width, ypos);
-        //        ypos -= ydelta;
-        //    }
-
-        //    samples = e.ClipRectangle.Width; // == 4 ? 1 : e.ClipRectangle.Width;
-        //    while (e.ClipRectangle.X + samples > 511)
-        //        samples--;
-        //    b.X = e.ClipRectangle.X;
-        //    a.X = e.ClipRectangle.X == 0 ? e.ClipRectangle.X : e.ClipRectangle.X - 1;
-        //    a.Y = 255 - sg_data[a.X];
-        //    if (plot || e.ClipRectangle.Width > 2) do
-        //        {
-        //            if (sg_data[b.X] >= 0)
-        //            {
-        //                b.Y = 255 - sg_data[b.X];
-        //                //      b = a;
-        //                e.Graphics.DrawLine(ActualPen, a, b);
-        //            }
-        //            a = b;
-        //            b.X++;
-        //        } while (--samples > 0);
-        //}
-
         void chkEnableSfilt_CheckedChanged(object sender, EventArgs e)
         {
             Comms.com.WriteCommand(string.Format("M122H{0}", chkEnableSfilt.IsChecked == true ? 1 : 0));
@@ -160,16 +115,10 @@ namespace CNC.Controls
 
         void btnGetState_Click(object sender, EventArgs e)
         {
-            this.txtStatus.Clear();
+            txtStatus.Clear();
 
-            Comms.com.DataReceived += new DataReceivedHandler(ProcessStatus);
-
-            Comms.com.PurgeQueue();
-            Comms.com.WriteCommand("M122");
-
-            //while (Comms.com.CommandState == Comms.State.DataReceived || Comms.com.CommandState == Comms.State.AwaitAck)
-            //    Application.DoEvents();
-
+            Comms.com.DataReceived += ProcessStatus;
+            Comms.com.AwaitAck("M122");
             Comms.com.DataReceived -= ProcessStatus;
         }
 
@@ -179,21 +128,52 @@ namespace CNC.Controls
         {
             if (!command.StartsWith("M"))
             {
-                for (sg_index = 0; sg_index < SGPlot.Width; sg_index++)
-                    sg_data[sg_index] = -1;
-                sg_index = 0;
+                PlotGrid();
+                for (int i = 0; i < lines.Capacity; i++)
+                    lines[i] = null;
                 plot = false;
-            //      SGPlot.Refresh();
             }
             Comms.com.WriteCommand(command);
         }
 
+        void PlotGrid ()
+        {
+            SGPlot.Children.Clear();
+
+            SGPlot.Children.Add(new Line()
+            {
+                X1 = 0d,
+                X2 = SGPlot.Width,
+                Y1 = SGPlot.Height / 2d,
+                Y2 = SGPlot.Height / 2d,
+                Stroke = Brushes.Black,
+                StrokeThickness = 0.5d,
+                StrokeDashArray = new DoubleCollection() { 2d }
+            });
+
+            double ydelta = SGPlot.Height / 10;
+            double ypos = SGPlot.Height - ydelta;
+
+            while (ypos > 0)
+            {
+                SGPlot.Children.Add(new Line()
+                {
+                    X1 = 0d,
+                    X2 = SGPlot.Width,
+                    Y1 = SGPlot.Height / 2d,
+                    Y2 = SGPlot.Height / 2d,
+                    Stroke = Brushes.DarkGray,
+                    StrokeThickness = 0.5d,
+                    StrokeDashArray = new DoubleCollection() { 2d }
+                });
+
+                ypos -= ydelta;
+            }
+        }
+
         private void AddStatusData(string data)
         {
-            //if (this.txtStatus.InvokeRequired)
-            //    this.BeginInvoke(new StatusCallback(AddStatusData), new object[] { data });
-            //else
-                this.txtStatus.AppendText(data + "\r\n");
+            txtStatus.AppendText(data + "\r\n");
         }
 
         private void ProcessStatus(string data)
@@ -203,7 +183,7 @@ namespace CNC.Controls
             else if (data == "ok")
                 read_status = false;
             else if (read_status)
-                this.AddStatusData(data);
+                AddStatusData(data);
         }
 
         private void ProcessSGValue(string data)
@@ -213,10 +193,23 @@ namespace CNC.Controls
                 int sep = data.IndexOf(":");
                 data = data.Substring(sep + 1, data.IndexOf("]") - sep - 1);
 
-                sg_data[sg_index] = int.Parse(data) / 4;
-        //         SGPlot.Invalidate(new Rectangle(sg_index == 0 ? 0 : sg_index - 1, 0, 2, SGPlot.Height));
-                //SGPlot.Invalidate(new Rectangle(sg_index, 0, 1, SGPlot.Height));
-                if (++sg_index >= sg_data.Length)
+                int value = int.Parse(data) / 4;
+
+                if (lines[sg_index] != null)
+                    SGPlot.Children.Remove(lines[sg_index]);
+
+                lines[sg_index] = new Line()
+                {
+                    X1 = sg_index == 0 ? 0 : sg_index - 1,
+                    X2 = sg_index,
+                    Y1 = sg_index == 0 ? value : lines[sg_index - 1].Y2,
+                    Y2 = value,
+                    Stroke = Brushes.Blue,
+                };
+
+                SGPlot.Children.Add(lines[sg_index++]);
+
+                if (++sg_index >= lines.Capacity)
                     sg_index = 0;
             }
         }
