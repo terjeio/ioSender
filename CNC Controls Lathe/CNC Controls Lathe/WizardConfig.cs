@@ -1,7 +1,7 @@
 ﻿/*
  * WizardConfig.cs - part of CNC Controls library for Grbl
  *
- * v0.01 / 2019-06-13 / Io Engineering (Terje Io)
+ * v0.01 / 2019-06-31 / Io Engineering (Terje Io)
  *
  */
 
@@ -38,15 +38,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Xml;
 using System.Xml.Serialization;
 using CNC.Core;
-using static CNC.Core.GCode;
-using System.Windows;
+using CNC.GCode;
 
 namespace CNC.Controls.Lathe
 {

@@ -1,7 +1,7 @@
 ﻿/*
  * HelperClasses.cs - part of CNC Controls library for Grbl
  *
- * v0.02 / 2019-10-12 / Io Engineering (Terje Io)
+ * v0.02 / 2019-10-31 / Io Engineering (Terje Io)
  *
  */
 
@@ -14,7 +14,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Windows;
 using System.Diagnostics.Contracts;
-using System.Linq;
+using CNC.GCode;
 
 namespace CNC.Core
 {

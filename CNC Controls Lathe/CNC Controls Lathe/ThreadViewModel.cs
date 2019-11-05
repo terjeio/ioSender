@@ -1,7 +1,7 @@
 ﻿/*
  * ThreadViewModel.cs - part of CNC Controls library
  *
- * v0.01 / 2019-10-10 / Io Engineering (Terje Io)
+ * v0.01 / 2019-10-31 / Io Engineering (Terje Io)
  *
  */
 
@@ -37,13 +37,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-using CNC.Core;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Windows;
-using static CNC.Core.GCode;
+using CNC.Core;
+using CNC.GCode;
 
 namespace CNC.Controls.Lathe
 {

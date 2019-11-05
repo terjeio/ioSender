@@ -1,7 +1,7 @@
 ﻿/*
  * ProfileDialog.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.02 / 2019-09-30 / Io Engineering (Terje Io)
+ * v0.02 / 2019-09-31 / Io Engineering (Terje Io)
  *
  */
 
@@ -39,13 +39,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using System.Windows;
 using System.Windows.Controls;
-using CNC.Core;
-using CNC.View;
-using static CNC.Core.GCode;
 using System.Windows.Data;
 using System;
 using System.Globalization;
 using System.Collections.ObjectModel;
+using CNC.GCode;
 
 namespace CNC.Controls.Lathe
 {

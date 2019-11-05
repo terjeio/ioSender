@@ -1,7 +1,7 @@
 ﻿/*
  * AppConfig.cs - part of Grbl Code Sender
  *
- * v0.01 / 2019-10-27 / Io Engineering (Terje Io)
+ * v0.01 / 2019-10-31 / Io Engineering (Terje Io)
  *
  */
 
@@ -42,6 +42,7 @@ using System.IO;
 using System.Xml.Serialization;
 using CNC.Core;
 using System.Windows;
+using CNC.GCode;
 
 namespace CNC.Controls
 {

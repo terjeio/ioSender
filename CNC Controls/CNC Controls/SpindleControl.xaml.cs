@@ -1,7 +1,7 @@
 ﻿/*
  * SpindleControl.xaml.cs - part of CNC Controls library
  *
- * v0.02 / 2019-10-16 / Io Engineering (Terje Io)
+ * v0.02 / 2019-10-31 / Io Engineering (Terje Io)
  *
  */
 
@@ -41,6 +41,7 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using CNC.Core;
+using CNC.GCode;
 
 namespace CNC.Controls
 {

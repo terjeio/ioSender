@@ -1,7 +1,7 @@
 ﻿/*
  * TurningWizard.xaml.cs - part of CNC Controls library
  *
- * v0.01 / 2019-10-16 / Io Engineering (Terje Io)
+ * v0.01 / 2019-10-31 / Io Engineering (Terje Io)
  *
  */
 
@@ -39,11 +39,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using System;
 using System.Collections.ObjectModel;
-using System.Globalization;
 using System.Windows.Controls;
 using CNC.Core;
 using CNC.View;
-using static CNC.Core.GCode;
 
 namespace CNC.Controls.Lathe
 {

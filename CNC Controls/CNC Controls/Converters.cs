@@ -1,7 +1,7 @@
 ﻿/*
  * Converters.cs - part of CNC Controls library for Grbl
  *
- * v0.01 / 2019-10-28 / Io Engineering (Terje Io)
+ * v0.01 / 2019-10-31 / Io Engineering (Terje Io)
  *
  */
 
@@ -42,6 +42,7 @@ using System.Globalization;
 using System.Windows.Data;
 using System.Windows.Media;
 using CNC.Core;
+using CNC.GCode;
 
 namespace CNC.Controls
 {

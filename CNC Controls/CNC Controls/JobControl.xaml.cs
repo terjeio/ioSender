@@ -1,7 +1,7 @@
 ﻿/*
  * JobControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.02 / 2019-10-29 / Io Engineering (Terje Io)
+ * v0.02 / 2019-10-31 / Io Engineering (Terje Io)
  *
  */
 
@@ -45,8 +45,8 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 using CNC.Core;
+using CNC.GCode;
 
 namespace CNC.Controls
 {
@@ -156,7 +156,7 @@ namespace CNC.Controls
             }
         }
 
-        public GCode GCode { get; private set; } = new GCode();
+        public GCodeJob GCode { get; private set; } = new GCodeJob();
         public bool canJog { get { return grblState.State == GrblStates.Idle || grblState.State == GrblStates.Tool || grblState.State == GrblStates.Jog; } }
         public bool JobPending { get { return GCode.Loaded && !JobTimer.IsRunning; } }
 
@@ -518,7 +518,7 @@ namespace CNC.Controls
                 //                command = command.ToUpper();
                 try
                 {
-                    GCode.Parser.ParseBlock(command + "\r", true);
+                    GCode.Parser.ParseBlock(command, true);
                     GCode.commands.Enqueue(command);
                     if (streamingState != StreamingState.SendMDI)
                     {
@@ -692,7 +692,7 @@ namespace CNC.Controls
                 else
                 {
                     currentRow = nextRow;
-                    string line = GCode.StripSpaces((string)currentRow["Data"]);
+                    string line = GCodeUtils.StripSpaces((string)currentRow["Data"]);
                     currentRow["Sent"] = "*";
                     if (line == "%")
                     {

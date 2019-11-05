@@ -1,7 +1,7 @@
 ﻿/*
  * GrblViewModel.cs - part of CNC Controls library
  *
- * v0.02 / 2019-10-21 / Io Engineering (Terje Io)
+ * v0.02 / 2019-10-31 / Io Engineering (Terje Io)
  *
  */
 
@@ -41,6 +41,7 @@ using System;
 using System.Linq;
 using System.Windows.Media;
 using System.Collections.ObjectModel;
+using CNC.GCode;
 
 namespace CNC.Core
 {
@@ -130,9 +131,9 @@ namespace CNC.Core
             set { Position.SuspendNotifications = value; }
         }
         public Position WorkPositionOffset { get; private set; } = new Position();
-        public EnumFlags<SpindleState> SpindleState { get; private set; } = new EnumFlags<SpindleState>(Core.SpindleState.Off);
+        public EnumFlags<SpindleState> SpindleState { get; private set; } = new EnumFlags<SpindleState>(GCode.SpindleState.Off);
         public EnumFlags<Signals> Signals { get; private set; } = new EnumFlags<Signals>(Core.Signals.Off);
-        public EnumFlags<AxisFlags> AxisScaled { get; private set; } = new EnumFlags<AxisFlags>(Core.AxisFlags.None);
+        public EnumFlags<AxisFlags> AxisScaled { get; private set; } = new EnumFlags<AxisFlags>(AxisFlags.None);
         public string FileName { get { return _fileName; } set { _fileName = value; OnPropertyChanged(); } }
         public bool? IsMPGActive { get { return string.IsNullOrEmpty(_mpg) ? null : (bool?)(_mpg == "1"); } private set { _mpg = value == null ? "" : (value == true ? "1" : "0"); OnPropertyChanged(); } }
         public string Scaling { get { return _sc; } private set { _sc = value; OnPropertyChanged(); } }
@@ -395,14 +396,14 @@ namespace CNC.Core
                         if (_a == "")
                         {
                             Mist = Flood = IsToolChanging = false;
-                            SpindleState.Value = Core.SpindleState.Off;
+                            SpindleState.Value = GCode.SpindleState.Off;
                         }
                         else
                         {
                             Mist = value.Contains("M");
                             Flood = value.Contains("F");
                             IsToolChanging = value.Contains("T");
-                            SpindleState.Value = value.Contains("S") ? Core.SpindleState.CW : (value.Contains("C") ? Core.SpindleState.CCW : Core.SpindleState.Off);
+                            SpindleState.Value = value.Contains("S") ? GCode.SpindleState.CW : (value.Contains("C") ? GCode.SpindleState.CCW : GCode.SpindleState.Off);
                         }
                     }
                     break;

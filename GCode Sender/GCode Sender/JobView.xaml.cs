@@ -124,9 +124,11 @@ namespace GCode_Sender
                     MainWindow.ui.WindowTitle = filename;
                     if (filename != string.Empty) {
                         MainWindow.enableControl(true, ViewType.GCodeViewer);
+                        GCodeSender.EnablePolling(false);
                         MainWindow.GCodeViewer.Open(filename, GCodeSender.GCode.Tokens);
-                    }
-                    break;
+                        GCodeSender.EnablePolling(true);
+                        }
+                        break;
             }
         }
 

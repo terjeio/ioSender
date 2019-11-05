@@ -1,7 +1,7 @@
 ﻿/*
  * TurningLogic.cs - part of CNC Controls library
  *
- * v0.02 / 2019-10-10 / Io Engineering (Terje Io)
+ * v0.02 / 2019-10-31 / Io Engineering (Terje Io)
  *
  */
 
@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using System;
 using System.Globalization;
 using CNC.Core;
+using CNC.GCode;
 
 namespace CNC.Controls.Lathe
 {

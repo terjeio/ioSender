@@ -1,7 +1,7 @@
 ﻿/*
  * GrblCore.cs - part of CNC Controls library
  *
- * v0.02 / 2019-10-23 / Io Engineering (Terje Io)
+ * v0.02 / 2019-10-31 / Io Engineering (Terje Io)
  *
  */
 
@@ -49,6 +49,7 @@ using System.Diagnostics;
 using System.Windows.Media;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using CNC.GCode;
 
 namespace CNC.Core
 {
@@ -443,10 +444,10 @@ namespace CNC.Core
         public static bool MPGMode { get; set; }
         public static bool LatheModeEnabled
         {
-            get { return LatheMode != Core.LatheMode.Disabled; }
-            set { if(value && LatheMode == Core.LatheMode.Disabled) LatheMode = Core.LatheMode.Radius; }
+            get { return LatheMode != LatheMode.Disabled; }
+            set { if(value && LatheMode == LatheMode.Disabled) LatheMode = LatheMode.Radius; }
         }
-        public static LatheMode LatheMode { get; set; } = Core.LatheMode.Disabled;
+        public static LatheMode LatheMode { get; set; } = LatheMode.Disabled;
         public static bool Loaded { get; private set; }
 
         #endregion

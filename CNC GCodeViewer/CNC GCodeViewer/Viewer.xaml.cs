@@ -1,7 +1,7 @@
 ﻿/*
  * Viewer.xaml.cs - part of CNC Controls library
  *
- * v0.02 / 2019-10-23 / Io Engineering (Terje Io)
+ * v0.02 / 2019-10-31 / Io Engineering (Terje Io)
  *
  */
 
@@ -39,8 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using System.Collections.Generic;
 using System.Windows.Controls;
+using CNC.GCode;
 using CNC.View;
-using CNC.Core;
 
 namespace CNC.Controls.Viewer
 {

@@ -1,7 +1,7 @@
 ﻿/*
  * ToolView.xaml.cs - part of CNC Controls library
  *
- * v0.01 / 2019-05-22 / Io Engineering (Terje Io)
+ * v0.01 / 2019-05-31 / Io Engineering (Terje Io)
  *
  */
 
@@ -41,6 +41,7 @@ using System;
 using System.Windows;
 using System.Windows.Controls;
 using CNC.Core;
+using CNC.GCode;
 using CNC.View;
 
 namespace CNC.Controls
