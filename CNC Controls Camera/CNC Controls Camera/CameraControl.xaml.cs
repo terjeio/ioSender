@@ -77,13 +77,17 @@ namespace CNC.Controls.Camera
             pen = new System.Windows.Media.Pen(System.Windows.Media.Brushes.Red, 1);
 
             DataContext = this;
-            Camera = Cameras[0];
-            cbxCamera.SelectedItem = Camera;
+            if (Cameras.Count > 0)
+            {
+                Camera = Cameras[0];
+                cbxCamera.SelectedItem = Camera;
+            }
         }
 
         public double XOffset { get; set; }
         public double YOffset { get; set; }
         public CameraMoveMode Mode { get; set; }
+        public bool HasCamera { get { return Cameras.Count > 0; } }
         public bool IsCameraOpen { get { return videoSource != null; } }
         public FilterInfoCollection Cameras { get; private set; } = new FilterInfoCollection(FilterCategory.VideoInputDevice);
         public FilterInfo Camera { get; private set; }

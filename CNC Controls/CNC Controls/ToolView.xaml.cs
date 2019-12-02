@@ -1,7 +1,7 @@
 ﻿/*
  * ToolView.xaml.cs - part of CNC Controls library
  *
- * v0.01 / 2019-05-31 / Io Engineering (Terje Io)
+ * v0.01 / 2019-11-07 / Io Engineering (Terje Io)
  *
  */
 
@@ -153,7 +153,7 @@ namespace CNC.Controls
         void saveOffset(string axis)
         {
             string s, axes;
-            string xOffset = GrblWorkParameters.ConvertX(GrblWorkParameters.LatheMode, GrblInfo.LatheMode, selectedTool.X).ToInvariantString();
+            string xOffset = GrblWorkParameters.ConvertX(GrblWorkParameters.LatheMode, GrblParserState.LatheMode, selectedTool.X).ToInvariantString();
 
             switch (axis)
             {
@@ -195,7 +195,7 @@ namespace CNC.Controls
                     selectedTool.Values[i] = offset.Values[i];
             }
 
-            string xOffset = GrblWorkParameters.ConvertX(GrblWorkParameters.LatheMode, GrblInfo.LatheMode, cvXOffset.Value).ToInvariantString();
+            string xOffset = GrblWorkParameters.ConvertX(GrblWorkParameters.LatheMode, GrblParserState.LatheMode, cvXOffset.Value).ToInvariantString();
 
             string s = string.Format("G10L1P{0}X{1}Y{2}Z{3}R{4}", selectedTool.Code, xOffset, cvYOffset.Text, cvZOffset.Text, cvTipRadius.Text);
             Comms.com.WriteCommand(s);
@@ -208,7 +208,7 @@ namespace CNC.Controls
                 for (var i = 0; i < offset.Values.Length; i++)
                     offset.Values[i] = selectedTool.Values[i] = 0d;
 
-                string xOffset = GrblWorkParameters.ConvertX(GrblWorkParameters.LatheMode, GrblInfo.LatheMode, cvXOffset.Value).ToInvariantString();
+                string xOffset = GrblWorkParameters.ConvertX(GrblWorkParameters.LatheMode, GrblParserState.LatheMode, cvXOffset.Value).ToInvariantString();
 
                 string s = string.Format("G10L1P{0}X{1}Y{2}Z{3}R{4}", selectedTool.Code, xOffset, cvYOffset.Text, cvZOffset.Text, cvTipRadius.Text);
                 Comms.com.WriteCommand(s);

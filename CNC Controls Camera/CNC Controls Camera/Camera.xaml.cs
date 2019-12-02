@@ -56,6 +56,7 @@ namespace CNC.Controls.Camera
             InitializeComponent();
         }
 
+        public bool HasCamera { get { return CNCCamera.HasCamera; } }
         public CameraControl CameraControl { get { return CNCCamera; } }
 
         public void ApplySettings(CameraConfig config)

@@ -12,6 +12,11 @@
         <local:HomedStateToColorConverter x:Key="HomedStateConverter" />
         <local:IsHomingEnabledConverter x:Key="HomingEnabledConverter" />
         <local:InvertBooleanConverter x:Key="SleepEnabledConverter" />
+        <local:LogicalOrConverter x:Key="LogicalNorConverter">
+            <local:LogicalOrConverter.FinalConverter>
+                <local:InvertBooleanConverter />
+            </local:LogicalOrConverter.FinalConverter>
+        </local:LogicalOrConverter>
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -25,9 +30,14 @@
                      Background="{Binding Path=GrblState, Converter={StaticResource ToColorConverter}}"
              />
             <CheckBox x:Name="chkCheckMode" Content="Check" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Center" Height="16" Width="50" Click="btn_Click"
-                IsChecked="{Binding Path=IsCheckMode, Mode=OneWay}"
-                IsEnabled="{Binding Path=IsSleepMode, Converter={StaticResource SleepEnabledConverter}, Mode=OneWay}"
-            />
+                IsChecked="{Binding Path=IsCheckMode, Mode=OneWay}">
+                <CheckBox.IsEnabled>
+                    <MultiBinding Converter="{StaticResource LogicalNorConverter}">
+                        <Binding Path="IsJobRunning"/>
+                        <Binding Path="IsSleepMode"/>
+                    </MultiBinding>
+                </CheckBox.IsEnabled>
+            </CheckBox>
         </StackPanel>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Height="34" Margin="3,3,0,0" Grid.Row="1" VerticalAlignment="Top" Width="184">
             <Button x:Name="btnHome" Content="Home" Background="{Binding Path=HomedState, Converter={StaticResource HomedStateConverter}}" Focusable="False" Width="55" Height="32" Click="btn_Click">

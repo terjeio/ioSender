@@ -1,7 +1,7 @@
 ﻿/*
  * GrblViewModel.cs - part of CNC Controls library
  *
- * v0.02 / 2019-10-31 / Io Engineering (Terje Io)
+ * v0.02 / 2019-11-07 / Io Engineering (Terje Io)
  *
  */
 
@@ -226,8 +226,8 @@ namespace CNC.Core
                     WorkCoordinateSystem = GrblParserState.WorkOffset;
                 if (GrblParserState.Tool != _tool)
                     Tool = GrblParserState.Tool;
-                if (GrblInfo.LatheMode != _latheMode)
-                    LatheMode = GrblInfo.LatheMode;
+                if (GrblParserState.LatheMode != _latheMode)
+                    LatheMode = GrblParserState.LatheMode;
                 if (GrblParserState.IsActive("G51") != null)
                     Set("Sc", GrblParserState.IsActive("G51"));
                 OnPropertyChanged();
@@ -536,7 +536,7 @@ namespace CNC.Core
 
                 case "D":
                     _d = value;
-                    LatheMode = GrblInfo.LatheMode = value == "0" ? LatheMode.Radius : LatheMode.Diameter;
+                    LatheMode = GrblParserState.LatheMode = value == "0" ? LatheMode.Radius : LatheMode.Diameter;
                     changed = true;
                     break;
             }

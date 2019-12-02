@@ -1,7 +1,7 @@
 ﻿/*
  * JobView.xaml.cs - part of Grbl Code Sender
  *
- * v0.02 / 2019-10-23 / Io Engineering (Terje Io)
+ * v0.02 / 2019-11-30 / Io Engineering (Terje Io)
  *
  */
 
@@ -47,9 +47,6 @@ using System.ComponentModel;
 using System.Threading.Tasks;
 using CNC.Controls;
 using System.Windows.Threading;
-#if ADD_CAMERA
-using static CNC.Controls.Camera.CameraControl;
-#endif
 
 namespace GCode_Sender
 {
@@ -68,14 +65,20 @@ namespace GCode_Sender
         {
             InitializeComponent();
 
-//            MainWindow.ui.DataContext = model = GCodeSender.Parameters;
+            //            MainWindow.ui.DataContext = model = GCodeSender.Parameters;
 
+            MainWindow.FileOpen += MainWindow_FileOpen;
             DRO.DROEnabledChanged += DRO_DROEnabledChanged;
 
             DataContextChanged += View_DataContextChanged;
             //    GCodeSender.GotFocus += GCodeSender_GotFocus;
 
           //  ((INotifyPropertyChanged)DataContext).PropertyChanged += OnDataContextPropertyChanged;
+        }
+
+        private void MainWindow_FileOpen()
+        {
+            GCodeSender.OpenFile();
         }
 
         private void View_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -122,13 +125,13 @@ namespace GCode_Sender
                 case nameof(GrblViewModel.FileName):
                     string filename = ((GrblViewModel)sender).FileName;
                     MainWindow.ui.WindowTitle = filename;
-                    if (filename != string.Empty) {
-                        MainWindow.enableControl(true, ViewType.GCodeViewer);
+                    if (filename != string.Empty && MainWindow.IsViewVisible(ViewType.GCodeViewer)) {
+                        MainWindow.EnableView(true, ViewType.GCodeViewer);
                         GCodeSender.EnablePolling(false);
                         MainWindow.GCodeViewer.Open(filename, GCodeSender.GCode.Tokens);
                         GCodeSender.EnablePolling(true);
-                        }
-                        break;
+                    }
+                    break;
             }
         }
 
@@ -260,48 +263,45 @@ namespace GCode_Sender
 
             GCodeSender.Config();
 
-MainWindow.enableControl(true, ViewType.G76Threading);
-MainWindow.enableControl(true, ViewType.Turning);
-
             if (GrblInfo.LatheModeEnabled)
             {
                 DRO.EnableLatheMode();
                 signalsControl.SetLatheMode();
-                MainWindow.enableControl(true, ViewType.Turning);
-                MainWindow.enableControl(true, ViewType.Facing);
-                MainWindow.enableControl(true, ViewType.G76Threading);
+                MainWindow.EnableView(true, ViewType.Turning);
+                MainWindow.EnableView(true, ViewType.Facing);
+                MainWindow.EnableView(true, ViewType.G76Threading);
             }
             else
             {
                 DRO.SetNumAxes(GrblInfo.NumAxes);
                 signalsControl.SetNumAxes(GrblInfo.NumAxes);
-       //         MainWindow.showControl(false, ViewType.Turning);
-                MainWindow.showControl(false, ViewType.Facing);
-      //          MainWindow.showControl(false, ViewType.G76Threading);
+                MainWindow.ShowView(false, ViewType.Turning);
+                MainWindow.ShowView(false, ViewType.Facing);
+                MainWindow.ShowView(false, ViewType.G76Threading);
             }
 
             if (GrblInfo.HasSDCard)
-                MainWindow.enableControl(true, ViewType.SDCard);
+                MainWindow.EnableView(true, ViewType.SDCard);
             else
-                MainWindow.showControl(false, ViewType.SDCard);
+                MainWindow.ShowView(false, ViewType.SDCard);
 
             if (GrblInfo.HasPIDLog)
-                MainWindow.enableControl(true, ViewType.PIDTuner);
+                MainWindow.EnableView(true, ViewType.PIDTuner);
             else
-                MainWindow.showControl(false, ViewType.PIDTuner);
+                MainWindow.ShowView(false, ViewType.PIDTuner);
 
             if (GrblInfo.NumTools > 0)
-                MainWindow.enableControl(true, ViewType.Tools);
+                MainWindow.EnableView(true, ViewType.Tools);
             else
-                MainWindow.showControl(false, ViewType.Tools);
+                MainWindow.ShowView(false, ViewType.Tools);
 
-            MainWindow.enableControl(true, ViewType.Offsets);
-            MainWindow.enableControl(true, ViewType.GRBLConfig);
+            MainWindow.EnableView(true, ViewType.Offsets);
+            MainWindow.EnableView(true, ViewType.GRBLConfig);
 
             if(!string.IsNullOrEmpty(GrblInfo.TrinamicDrivers))
-                MainWindow.enableControl(true, ViewType.TrinamicTuner);
+                MainWindow.EnableView(true, ViewType.TrinamicTuner);
             else
-                MainWindow.showControl(false, ViewType.TrinamicTuner);
+                MainWindow.ShowView(false, ViewType.TrinamicTuner);
 
             MainWindow.GCodePush += UserUI_GCodePush;
 

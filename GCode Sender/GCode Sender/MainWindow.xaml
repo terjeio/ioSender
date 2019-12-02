@@ -19,8 +19,8 @@
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem x:Name="menuFile" Header="_File">
-                <MenuItem Header="_Open"/>
-                <MenuItem x:Name="menuCloseFile" Header="_Close" Click="fileCloseMenuItem_Click"/>
+                <MenuItem Header="_Open" Click="fileOpenMenuItem_Click"/>
+                <MenuItem x:Name="menuCloseFile" Header="_Close" IsEnabled="false" Click="fileCloseMenuItem_Click"/>
                 <MenuItem Header="_About" Click="aboutMenuItem_Click"/>
                 <MenuItem Header="_Exit" Click="exitMenuItem_Click"/>
             </MenuItem>

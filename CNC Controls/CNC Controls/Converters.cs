@@ -1,7 +1,7 @@
 ﻿/*
  * Converters.cs - part of CNC Controls library for Grbl
  *
- * v0.01 / 2019-10-31 / Io Engineering (Terje Io)
+ * v0.01 / 2019-11-30 / Io Engineering (Terje Io)
  *
  */
 
@@ -49,11 +49,13 @@ namespace CNC.Controls
     public static class Converters
     {
         public static LatheModeToStringConverter LatheModeToStringConverter = new LatheModeToStringConverter();
-        public static InvertBooleanConverter InvertBooleanConverter = new InvertBooleanConverter();
         public static GrblStateToColorConverter GrblStateToColorConverter = new GrblStateToColorConverter();
         public static GrblStateToStringConverter GrblStateToStringConverter = new GrblStateToStringConverter();
         public static HomedStateToColorConverter HomedStateToColorConverter = new HomedStateToColorConverter();
         public static IsHomingEnabledConverter IsHomingEnabledConverter = new IsHomingEnabledConverter();
+        public static InvertBooleanConverter InvertBooleanConverter = new InvertBooleanConverter();
+        public static LogicalAndConverter LogicalAndConverter = new LogicalAndConverter();
+        public static LogicalOrConverter LogicalOrConverter = new LogicalOrConverter();
     }
 
     public class LatheModeToStringConverter : IValueConverter
@@ -163,6 +165,46 @@ namespace CNC.Controls
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             return !(bool)value;
+        }
+    }
+
+    public class LogicalAndConverter : IMultiValueConverter
+    {
+        public IValueConverter FinalConverter { get; set; }
+
+        public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            bool result = true;
+
+            foreach (var value in values)
+                result &= value is bool && (bool)value;
+
+            return FinalConverter == null ? result : FinalConverter.Convert(result, targetType, parameter, culture);
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class LogicalOrConverter : IMultiValueConverter
+    {
+        public IValueConverter FinalConverter { get; set; }
+
+        public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            bool result = false;
+
+            foreach (var value in values)
+                result |= value is bool && (bool)value;
+
+            return FinalConverter == null ? result : FinalConverter.Convert(result, targetType, parameter, culture);
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotImplementedException();
         }
     }
 }

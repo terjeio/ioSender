@@ -1,0 +1,5 @@
+<Project>
+    <PropertyGroup>
+        <DefineConstants>xUSEWEBSOCKET</DefineConstants>
+    </PropertyGroup>
+</Project>

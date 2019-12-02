@@ -1,7 +1,7 @@
 ﻿/*
  * Widget.cs - part of CNC Controls library for Grbl
  *
- * v0.03 / 2019-10-21 / Io Engineering (Terje Io)
+ * v0.03 / 2019-11-30 / Io Engineering (Terje Io)
  *
  */
 
@@ -76,7 +76,9 @@ namespace CNC.Controls
             RADIOBUTTONS,
             INTEGER,
             FLOAT,
-            TEXT
+            TEXT,
+            PASSWORD,
+            IP4
         };
 
         public int Id { get; private set; }
@@ -531,6 +533,11 @@ namespace CNC.Controls
                 case DataTypes.INTEGER:
                 case DataTypes.FLOAT:
                     ok = !Validation.GetHasError(wNumericTextBox);
+                    break;
+
+                case DataTypes.IP4:
+                    System.Net.IPAddress ip4;
+                    ok = System.Net.IPAddress.TryParse(widget.Value, out ip4);
                     break;
             }
 

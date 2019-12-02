@@ -1,7 +1,7 @@
 ﻿/*
  * About.xaml.cs - for CO2 Laser Engraver
  *
- * v2.0 / 2019-09-24 / Io Engineering (Terje Io)
+ * v2.0 / 2019-12-01 / Io Engineering (Terje Io)
  *
  */
 
@@ -45,18 +45,20 @@ namespace CNC.Controls
     public partial class About : Window
     {
         private Window parent;
-        public About(Window parent)
+
+        public About(Window parent, string title)
         {
             this.parent = parent;
 
             InitializeComponent();
+
+            Title = title;
         }
 
         private void About_Load(object sender, System.EventArgs e)
         {
             Left = parent.Left + (parent.Width - Width) / 2;
             Top = parent.Top + 100;
-            Title = "About " + parent.Title + "...";
 
             txtGrblVersion.Content = GrblInfo.Version;
             txtGrblOptions.Content = GrblInfo.Options;

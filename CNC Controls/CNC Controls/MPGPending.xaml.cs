@@ -1,7 +1,7 @@
 ﻿/*
  * MPGPending.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.02 / 2019-09-25 / Io Engineering (Terje Io)
+ * v0.02 / 2019-11-30 / Io Engineering (Terje Io)
  *
  */
 
@@ -48,11 +48,12 @@ namespace CNC.Controls
 
         public MPGPending()
         {
-            Cancelled = true;
+            InitializeComponent();
 
             Comms.com.DataReceived += new DataReceivedHandler(DataReceived);
         }
-        public bool Cancelled { get; private set; }
+
+        public bool Cancelled { get; private set; } = true;
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
@@ -65,7 +66,7 @@ namespace CNC.Controls
             {
                 parameters.ParseStatus(data.Remove(data.Length - 1));
 
-                if(parameters.IsMPGActive == false) {
+                if(parameters.IsMPGActive == false || true) {
                     Cancelled = false;
                     Close();
                 }

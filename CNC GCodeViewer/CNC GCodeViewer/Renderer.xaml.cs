@@ -1,7 +1,7 @@
 ﻿/*
  * Renderer.xaml.cs - part of CNC Controls library
  *
- * v0.02 / 2019-11-05 / Io Engineering (Terje Io)
+ * v0.02 / 2019-11-07 / Io Engineering (Terje Io)
  *
  */
 
@@ -94,6 +94,7 @@ namespace CNC.Controls.Viewer
         public SolidColorBrush AxisBrush { get; set; }
         public double TickSize { get; set; }
         private GCPlane plane = new GCPlane(Commands.G17, 0);
+        DistanceMode distanceMode = DistanceMode.Absolute;
         private List<CoordinateSystem> coordinateSystems = new List<CoordinateSystem>();
         private CoordinateSystem coordinateSystem;
 
@@ -169,6 +170,8 @@ namespace CNC.Controls.Viewer
             viewport.Children.Clear();
 
             coordinateSystems.Clear();
+
+            distanceMode = GrblParserState.DistanceMode;
 
             foreach (CoordinateSystem c in GrblWorkParameters.CoordinateSystems)
                 coordinateSystems.Add(c);
@@ -261,6 +264,8 @@ namespace CNC.Controls.Viewer
                         {
                             GCLinearMotion motion = (GCLinearMotion)token;
                             var pt = toPoint(motion.Values);
+                            if (distanceMode == DistanceMode.Incremental)
+                                pt.Offset(point0.X, point0.Y, point0.Z);
                             if (last.Command == Commands.G1 && (((GCLinearMotion)last).X != point0.X || ((GCLinearMotion)last).Y != point0.Y))
                                 path.Points.Add(pt);
                             AddPoint(pt, Colors.Red, 0.5);
@@ -271,6 +276,8 @@ namespace CNC.Controls.Viewer
                         {
                             GCLinearMotion motion = (GCLinearMotion)token;
                             var pt = toPoint(motion.Values);
+                            if (distanceMode == DistanceMode.Incremental)
+                                pt.Offset(point0.X, point0.Y, point0.Z);
                             if (last.Command == Commands.G0 && (((GCLinearMotion)last).X != point0.X || ((GCLinearMotion)last).Y != point0.Y))
                                 path.Points.Add(pt);
                             AddPoint(point0, Colors.Blue, 1);
@@ -281,6 +288,12 @@ namespace CNC.Controls.Viewer
                     case Commands.G2:
                     case Commands.G3:
                         GCArc arc = (GCArc)token;
+                        if (distanceMode == DistanceMode.Incremental)
+                        {
+                            arc.X += point0.X;
+                            arc.Y += point0.Y;
+                            arc.Z += point0.Z;
+                        }
                         if (arc.IsRadiusMode)
                             DrawArc(plane, point0.ToArray(), arc.Values, arc.R, arc.IsClocwise);
                         else
@@ -348,17 +361,42 @@ namespace CNC.Controls.Viewer
                         canned = false;
                         break;
 
-                    case Commands.G81:
-                        GCCannedDrill drill = (GCCannedDrill)token;
-                        if (!canned)
+                    case Commands.G81: // TODO: add plane handling
                         {
-                            canned = true;
-                            if (point0.Z < drill.R)
-                                AddPoint(toPoint(point0.X, point0.Y, drill.R), Colors.Red, 1);
+                            GCCannedDrill drill = (GCCannedDrill)token;
+                            uint repeats = distanceMode == DistanceMode.Incremental ? drill.L : 1; // no need to draw absolute repeats(?)
+                            double[] values = new double[3];
+
+                            for (var i = 0; i < values.Length; i++)
+                                values[i] = distanceMode == DistanceMode.Incremental && i < 2 ? 0d : drill.Values[i];
+
+                            if (!canned)
+                            {
+                                canned = true;
+                                if (point0.Z < drill.R)
+                                    AddPoint(toPoint(point0.X, point0.Y, drill.R), Colors.Red, 1);
+                            }
+
+                            AddPoint(toPoint(drill.X, drill.Y, Math.Max(drill.Z, drill.R)), Colors.Red, 1);
+
+                            do
+                            {
+                                AddPoint(toPoint(values), Colors.Blue, 3d);
+                                AddPoint(toPoint(values[0], values[1], drill.R), Colors.Green, 1);
+                                if(repeats > 1)
+                                {
+                                    AddPoint(toPoint(values[0], values[1], drill.R), Colors.Red, 1);
+                                    values[0] += drill.X;
+                                    values[1] += drill.Y;
+                                    AddPoint(toPoint(values[0], values[1], drill.R), Colors.Red, 1);
+                                }
+                            } while (--repeats > 0);
                         }
-                        AddPoint(toPoint(drill.X, drill.Y, Math.Max(drill.Z, drill.R)), Colors.Red, 1);
-                        AddPoint(toPoint(drill.Values), Colors.Blue, 1);
-                        AddPoint(toPoint(drill.X, drill.Y, drill.R), Colors.Green, 1);
+                        break;
+
+                    case Commands.G90:
+                    case Commands.G91:
+                        distanceMode = ((GCDistanceMode)token).DistanceMode;
                         break;
                 }
                 last = token;

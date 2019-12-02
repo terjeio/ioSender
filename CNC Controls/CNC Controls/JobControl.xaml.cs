@@ -1,7 +1,7 @@
 ﻿/*
  * JobControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.02 / 2019-10-31 / Io Engineering (Terje Io)
+ * v0.02 / 2019-11-30 / Io Engineering (Terje Io)
  *
  */
 
@@ -47,6 +47,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using CNC.Core;
 using CNC.GCode;
+using Microsoft.Win32;
 
 namespace CNC.Controls
 {
@@ -171,6 +172,7 @@ namespace CNC.Controls
             {
                 initOK = true;
                 serialSize = Math.Min(300, (int)(GrblInfo.SerialBufferSize * 0.9f)); // size should be less than hardware handshake HWM
+                GCode.Parser.Dialect = GrblSettings.IsGrblHAL ? Dialect.GrblHAL : Dialect.Grbl;
             }
 
             EnablePolling(activate);
@@ -454,6 +456,28 @@ namespace CNC.Controls
         }
 
         #endregion
+
+        public void OpenFile ()
+        {
+            OpenFileDialog file = new OpenFileDialog();
+
+            file.Filter = "GCode files (*.nc;*ncc;*gcode)|*.nc;*ncc;*gcode|Text files (*.txt)|*.txt|All files (*.*)|*.*";
+
+            if (file.ShowDialog() == true) {
+                using (new UIUtils.WaitCursor())
+                {
+                    GCode.LoadFile(file.FileName);
+                    grdGCode.DataContext = GCode.Data.DefaultView;
+                    CurrLine = 0;
+                    PendingLine = 0;
+                    PgmEndLine = GCode.Data.Rows.Count - 1;
+                    scroll = UIUtils.GetScrollViewer(grdGCode);
+
+                    SetStreamingState(GCode.Loaded ? StreamingState.Idle : StreamingState.NoFile);
+                }
+            }
+        }
+
         public void CycleStart()
         {
             if (grblState.State == GrblStates.Hold || grblState.State == GrblStates.Tool || (grblState.State == GrblStates.Run && grblState.Substate == 1))

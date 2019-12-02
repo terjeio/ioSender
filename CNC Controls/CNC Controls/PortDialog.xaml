@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CNC.Controls"
         mc:Ignorable="d"
+        Loaded="PortDialog_Loaded"
         Title="Select COM port" Height="120" Width="185" Icon="App.ico" ResizeMode="NoResize">
     <Grid Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
         <ComboBox x:Name="comboBox" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="150"

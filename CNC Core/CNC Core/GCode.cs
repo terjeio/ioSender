@@ -1,7 +1,7 @@
 ﻿/*
  * GCode.cs - part of CNC Controls library
  *
- * v0.02 / 2019-10-31 / Io Engineering (Terje Io)
+ * v0.02 / 2019-11-07 / Io Engineering (Terje Io)
  *
  */
 
@@ -42,6 +42,13 @@ using System;
 namespace CNC.GCode
 {
 
+    public enum Dialect
+    {
+        Grbl,
+        GrblHAL,
+        LinuxCNC
+    }
+
     [Flags]
     public enum AxisFlags : int
     {
@@ -64,13 +71,19 @@ namespace CNC.GCode
     public enum DistanceMode
     {
         Absolute,
-        Relative
+        Incremental
     }
 
     public enum IJKMode
     {
         Absolute,
         Incremental
+    }
+
+    public enum Units
+    {
+        Imperial = 0,
+        Metric
     }
 
     [Flags]
@@ -146,6 +159,9 @@ namespace CNC.GCode
         G59_1,
         G59_2,
         G59_3,
+        G61,
+        G61_1,
+        G64,
         G73,
         G76,
         G80,
@@ -181,9 +197,11 @@ namespace CNC.GCode
         M8,
         M9,
         M30,
+        M48,
         M49,
         M50,
         M51,
+        M52,
         M53,
         M56,
         M61,
@@ -193,6 +211,7 @@ namespace CNC.GCode
         Dwell,
         Coolant,
         Comment,
+        UserMCommand,
         Undefined
     }
 

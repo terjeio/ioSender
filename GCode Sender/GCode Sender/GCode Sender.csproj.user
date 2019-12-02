@@ -4,6 +4,6 @@
     <EnableUnmanagedDebugging>true</EnableUnmanagedDebugging>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <StartArguments>-xxinifile d:\appcfg.xml</StartArguments>
+    <StartArguments>-xinifile d:\appcfg.xml -port  ws://10.0.0.70:81</StartArguments>
   </PropertyGroup>
 </Project>

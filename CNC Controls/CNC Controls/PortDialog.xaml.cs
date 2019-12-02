@@ -1,7 +1,7 @@
 ﻿/*
  * PortDialog.xaml.cs - part of CNC Controls library
  *
- * v0.02 / 2019-10-25 / Io Engineering (Terje Io)
+ * v0.02 / 2019-12-01 / Io Engineering (Terje Io)
  *
  */
 
@@ -44,7 +44,7 @@ namespace CNC.Controls
 {
     public partial class PortDialog : Window
     {
-        private string port = null;
+        private string port = null, orgport = "";
         public PortDialog()
         {
             InitializeComponent();
@@ -52,9 +52,19 @@ namespace CNC.Controls
             DataContext = new SerialPorts();
         }
 
-        public new string ShowDialog()
+        private void PortDialog_Loaded(object sender, RoutedEventArgs e)
         {
-            base.ShowDialog();
+            if (!string.IsNullOrEmpty(orgport) && comboBox.Items.Contains(orgport))
+                comboBox.SelectedItem = orgport; 
+        }
+
+        public string ShowDialog(string orgport)
+        {
+            if (orgport.IndexOf(':') > 0)
+                this.orgport = orgport.Substring(0, orgport.IndexOf(':'));
+
+            ShowDialog();
+
             return port;
         }
 

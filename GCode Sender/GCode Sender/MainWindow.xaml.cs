@@ -1,7 +1,7 @@
 ﻿/*
  * MainWindow.xaml.cs - part of Grbl Code Sender
  *
- * v0.03 / 2019-10-20 / Io Engineering (Terje Io)
+ * v0.03 / 2019-12-01 / Io Engineering (Terje Io)
  *
  */
 
@@ -63,6 +63,9 @@ namespace GCode_Sender
         public delegate void GCodePushHandler(string gcode, CNC.Core.Action action);
         public static event GCodePushHandler GCodePush;
 
+        public delegate void FileOpenHandler();
+        public static event FileOpenHandler FileOpen;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -74,11 +77,18 @@ namespace GCode_Sender
             if((res = Profile.SetupAndOpen(Title, App.Current.Dispatcher)) != 0)
                 Environment.Exit(res);
 
+            BaseWindowTitle = Title;
+
             GrblInfo.LatheModeEnabled = Profile.Config.LatheMode;
 
             turningWizard.ApplySettings(Profile.Config.Lathe);
             threadingWizard.ApplySettings(Profile.Config.Lathe);
-            GCodeViewer.ApplySettings(Profile.Config.GCodeViewer);
+
+            if (Profile.Config.EnableGCodeViewer)
+                GCodeViewer.ApplySettings(Profile.Config.GCodeViewer);
+            else
+                ShowView(false, ViewType.GCodeViewer);
+
 #if ADD_CAMERA
             enableCamera(this);
 #else
@@ -98,12 +108,14 @@ namespace GCode_Sender
             currentRenderer = GetRenderer((TabItem)tabMode.Items[tabMode.SelectedIndex]);
         }
 
+        public string BaseWindowTitle { get; set; }
+
         public string WindowTitle
         {
             set
             {
-                ui.Title = "GCode Sender" + (value == "" ? "" : " - " + value);
-                ui.menuCloseFile.IsEnabled = !(value == null || value.StartsWith("SDCard:"));
+                ui.Title = BaseWindowTitle + (string.IsNullOrEmpty(value) ? "" : " - " + value);
+                ui.menuCloseFile.IsEnabled = !(string.IsNullOrEmpty(value) || value.StartsWith("SDCard:"));
             }
         }
 
@@ -142,7 +154,13 @@ namespace GCode_Sender
                     Camera.CloseCamera();
                     Camera.Close();
                 }
+
 #endif
+                using (new UIUtils.WaitCursor()) // disconnecting from websocket may take some time...
+                {
+                    if (Comms.com.StreamType != Comms.StreamType.Serial) // Serial makes fking process hang
+                        Comms.com.Close();
+                }
             }
         }
 
@@ -158,8 +176,13 @@ namespace GCode_Sender
 
         void aboutMenuItem_Click(object sender, EventArgs e)
         {
-            About about = new About(this);
+            About about = new About(this, BaseWindowTitle);
             about.ShowDialog();
+        }
+
+        private void fileOpenMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            FileOpen?.Invoke();
         }
 
         private void fileCloseMenuItem_Click(object sender, RoutedEventArgs e)
@@ -192,11 +215,6 @@ namespace GCode_Sender
 
         #endregion  
 
-        private string GetArg(string[] args, int i)
-        {
-            return i < args.GetLength(0) ? args[i] : null;
-        }
-
         private static TabItem getTab(ViewType mode)
         {
             TabItem tab = null;
@@ -213,20 +231,27 @@ namespace GCode_Sender
             return tab;
         }
 
-        public static bool enableControl(bool enable, ViewType control)
+        public static bool EnableView(bool enable, ViewType view)
         {
-            TabItem tab = getTab(control);
+            TabItem tab = getTab(view);
             if (tab != null)
                 tab.IsEnabled = enable;
 
             return tab != null && enable;
         }
 
-        public static void showControl(bool show, ViewType control)
+        public static void ShowView(bool show, ViewType view)
         {
-            TabItem tab = getTab(control);
+            TabItem tab = getTab(view);
             if (tab != null && !show)
                 ui.tabMode.Items.Remove(tab);
+        }
+
+        public static bool IsViewVisible(ViewType view)
+        {
+            TabItem tab = getTab(view);
+
+            return tab != null;
         }
 
 #if ADD_CAMERA
@@ -237,7 +262,7 @@ namespace GCode_Sender
                 Camera = new Camera();
                 Camera.ApplySettings(Profile.Config.Camera);
                 //        Camera.Owner = owner;
-                owner.menuCamera.IsEnabled = true;
+                owner.menuCamera.IsEnabled = Camera.HasCamera;
             }
 
             return Camera != null;

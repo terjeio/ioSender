@@ -1,7 +1,7 @@
 ﻿/*
- * GrblCore.cs - part of CNC Controls library
+ * Grbl.cs - part of CNC Controls library
  *
- * v0.02 / 2019-10-31 / Io Engineering (Terje Io)
+ * v0.02 / 2019-11-07 / Io Engineering (Terje Io)
  *
  */
 
@@ -444,10 +444,9 @@ namespace CNC.Core
         public static bool MPGMode { get; set; }
         public static bool LatheModeEnabled
         {
-            get { return LatheMode != LatheMode.Disabled; }
-            set { if(value && LatheMode == LatheMode.Disabled) LatheMode = LatheMode.Radius; }
+            get { return GrblParserState.LatheMode != LatheMode.Disabled; }
+            set { if(value && GrblParserState.LatheMode == LatheMode.Disabled) GrblParserState.LatheMode = LatheMode.Radius; }
         }
-        public static LatheMode LatheMode { get; set; } = LatheMode.Disabled;
         public static bool Loaded { get; private set; }
 
         #endregion
@@ -594,6 +593,13 @@ namespace CNC.Core
         }
         public static string WorkOffset { get; set; }
         public static bool Loaded { get { return state.Count > 0; } }
+        public static DistanceMode DistanceMode { get; private set; } = DistanceMode.Absolute;
+        public static LatheMode LatheMode { get; set; } = LatheMode.Disabled;
+        public static IJKMode IJKMode { get; private set; } = IJKMode.Incremental;
+        public static Units Units { get; private set; } = Units.Metric;
+        public static bool IsMetric { get { return Units == Units.Metric; } }
+        public static Plane Plane { get; private set; } = Plane.XY;
+        public static bool IsScalingActive { get; private set; } = false;
 
         public static string IsActive(string key) // returns null if not active, "" or parsed value if not
         {
@@ -632,11 +638,52 @@ namespace CNC.Core
                         switch (val)
                         {
                             case "G7":
-                                GrblInfo.LatheMode = LatheMode.Radius;
+                                LatheMode = LatheMode.Radius;
                                 break;
 
                             case "G8":
-                                GrblInfo.LatheMode = LatheMode.Diameter;
+                                LatheMode = LatheMode.Diameter;
+                                break;
+
+                            case "G17":
+                                Plane = Plane.XY;
+                                break;
+
+                            case "G18":
+                                Plane = Plane.XZ;
+                                break;
+
+                            case "G19":
+                                Plane = Plane.YZ;
+                                break;
+
+                            case "G20":
+                                Units = Units.Imperial;
+                                break;
+
+                            case "G21":
+                                Units = Units.Metric;
+                                break;
+
+                            case "G50":
+                            case "G51":
+                                IsScalingActive = val == "G51";
+                                break;
+
+                            case "G90":
+                                DistanceMode = DistanceMode.Absolute;
+                                break;
+
+                            case "G90.1": // not supported or reported by grbl
+                                IJKMode = IJKMode.Absolute;
+                                break;
+
+                            case "G91":
+                                DistanceMode = DistanceMode.Incremental;
+                                break;
+
+                            case "G91.1": // not reported by grbl, default state
+                                IJKMode = IJKMode.Incremental;
                                 break;
                         }
                     }
@@ -682,7 +729,7 @@ namespace CNC.Core
             if (!GrblParserState.Loaded)
                 GrblParserState.Get();
 
-            LatheMode = GrblInfo.LatheMode;
+            LatheMode = GrblParserState.LatheMode;
 
             Comms.com.DataReceived += process;
 #if USE_ASYNC

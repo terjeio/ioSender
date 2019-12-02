@@ -1,7 +1,7 @@
 ﻿/*
  * GCodeJob.cs - part of CNC Controls library
  *
- * v0.02 / 2019-09-31 / Io Engineering (Terje Io)
+ * v0.02 / 2019-11-07 / Io Engineering (Terje Io)
  *
  */
 
@@ -186,7 +186,7 @@ namespace CNC.Core
                     if(token is GCLinearMotion)
                         BoundingBox.AddPoint(((GCLinearMotion)token).X, ((GCLinearMotion)token).Y, ((GCLinearMotion)token).Z);
                     else if (token is GCArc)
-                        BoundingBox.AddPoint(((GCArc)token).X, ((GCArc)token).Y, ((GCArc)token).Z); // Expand...
+                        BoundingBox.AddPoint(((GCArc)token).X, ((GCArc)token).Y, ((GCArc)token).Z); // TODO: Expand...
                     else if (token is GCCannedDrill)
                         BoundingBox.AddPoint(((GCCannedDrill)token).X, ((GCCannedDrill)token).Y, ((GCCannedDrill)token).Z);
                 }
@@ -225,8 +225,6 @@ namespace CNC.Core
             LineNumber = 0;
             Parser.Reset();
         }
-
-        // IMPORTANT: block must be terminated with \r
     }
 
     public class ProgramLimits : ViewModelBase

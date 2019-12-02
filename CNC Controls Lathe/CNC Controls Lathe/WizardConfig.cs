@@ -1,7 +1,7 @@
 ﻿/*
  * WizardConfig.cs - part of CNC Controls library for Grbl
  *
- * v0.01 / 2019-06-31 / Io Engineering (Terje Io)
+ * v0.01 / 2019-11-07 / Io Engineering (Terje Io)
  *
  */
 
@@ -118,9 +118,9 @@ namespace CNC.Controls.Lathe
 
                 GrblParserState.Get();
 
-                metric = GrblParserState.IsActive("G21") != null;
+                metric = GrblParserState.IsMetric;
                 if (!xmodelock)
-                    xmode = GrblInfo.LatheMode;
+                    xmode = GrblParserState.LatheMode;
 
                 SetLimits();
             }

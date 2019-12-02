@@ -1,7 +1,7 @@
 ﻿/*
  * AppConfig.cs - part of Grbl Code Sender
  *
- * v0.01 / 2019-10-31 / Io Engineering (Terje Io)
+ * v0.01 / 2019-12-01 / Io Engineering (Terje Io)
  *
  */
 
@@ -90,7 +90,8 @@ namespace CNC.Controls
     {
         public string PortParams { get; set; } = "COM1:115200,N,8,1";
         public bool LatheMode { get; set; } = false;
-  
+        public bool EnableGCodeViewer { get; set; } = true;
+
         public LatheConfig Lathe = new LatheConfig();
 
         public CameraConfig Camera = new CameraConfig();
@@ -148,7 +149,9 @@ namespace CNC.Controls
 
         private void setPort (string port)
         {
-            Config.PortParams = port + ":" + Config.PortParams.Substring(Config.PortParams.IndexOf(':') + 1);
+            Config.PortParams = port;
+            if(!(Config.PortParams.ToLower().StartsWith("ws://") || char.IsDigit(Config.PortParams[0])) && Config.PortParams.IndexOf(':') == -1)
+                 Config.PortParams += ":115200,N,8,1";
         }
 
         public int SetupAndOpen(string appname, System.Windows.Threading.Dispatcher dispatcher)
@@ -206,39 +209,52 @@ namespace CNC.Controls
             {
                 if (!string.IsNullOrEmpty(port))
                     setPort(port);
-
-                if (char.IsDigit(Config.PortParams[0])) // We have an IP address
-                    new IPComms(Config.PortParams);
+#if USEWEBSOCKET
+                if (Config.PortParams.ToLower().StartsWith("ws://"))
+                    new WebsocketStream(Config.PortParams, dispatcher);
                 else
-                    new SerialComms(Config.PortParams, Comms.ResetMode.None, dispatcher);
+#endif
+                if (char.IsDigit(Config.PortParams[0])) // We have an IP address
+                    new TelnetStream(Config.PortParams, dispatcher);
+                else
+                    new SerialStream(Config.PortParams, Comms.ResetMode.None, dispatcher);
             }
 
             if ((Comms.com == null || !Comms.com.IsOpen) && string.IsNullOrEmpty(port))
             {
                 PortDialog portsel = new PortDialog();
 
-                port = portsel.ShowDialog();
-                if (port == null)
+                port = portsel.ShowDialog(Config.PortParams);
+                if (string.IsNullOrEmpty(port))
                     status = 2;
 
-                if (char.IsDigit(port[0]))
-                { // We have an IP address
-                    Config.PortParams = port;
-                    new IPComms(Config.PortParams);
-                }
                 else
                 {
                     setPort(port);
-                    new SerialComms(Config.PortParams, Comms.ResetMode.None, dispatcher);
+#if USEWEBSOCKET
+                    if (port.ToLower().StartsWith("ws://"))
+                        new WebsocketStream(Config.PortParams, dispatcher);
+                    else
+#endif
+                    if (char.IsDigit(port[0])) // We have an IP address
+                        new TelnetStream(Config.PortParams, dispatcher);
+                    else
+                        new SerialStream(Config.PortParams, Comms.ResetMode.None, dispatcher);
+
+                    Save(CNC.Core.Resources.IniFile);
                 }
-                Save(CNC.Core.Resources.IniFile);
             }
 
-            if (Comms.com.IsOpen)
+            if (Comms.com != null && Comms.com.IsOpen)
             {
-                System.Threading.Thread.Sleep(400); // Wait to see if MPG is polling Grbl
+                int delay = 40; // 400 ms
 
-                if (!(Comms.com.Reply == "" || Comms.com.Reply.StartsWith("Grbl")))
+                // Wait to see if a MPG is polling Grbl...
+                while (delay-- != 0 && Comms.com.Reply == "")
+                    System.Threading.Thread.Sleep(10);
+
+                // ...if so show dialog for wait for it to stop polling and relinquish control.
+                if (!(Comms.com.Reply == "" || Comms.com.Reply.StartsWith("Grbl") || Comms.com.Reply.StartsWith("[MSG:")))
                 {
                     MPGPending await = new MPGPending();
                     await.ShowDialog();
@@ -249,7 +265,7 @@ namespace CNC.Controls
                     }
                 }
             }
-            else
+            else if (status != 2)
             {
                 MessageBox.Show(string.Format("Unable to open connection ({0})", Config.PortParams), appname, MessageBoxButton.OK, MessageBoxImage.Error);
                 status = 2;

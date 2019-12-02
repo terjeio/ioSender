@@ -8,6 +8,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CNC Core", "..\CNC Core\CNC Core\CNC Core.csproj", "{F245FF89-A838-4D6E-AA40-92CFD3D072D3}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B3A29C73-390B-47B8-8A5A-08C4F3733DA5}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CNC Controls Lathe", "..\CNC Controls Lathe\CNC Controls Lathe\CNC Controls Lathe.csproj", "{9D8754AE-BC40-45EC-B308-2EE7ED579439}"
 EndProject

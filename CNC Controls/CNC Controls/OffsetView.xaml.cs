@@ -1,7 +1,7 @@
 ﻿/*
  * OffsetControl.xaml.cs - part of CNC Controls library
  *
- * v0.02 / 2019-10-31 / Io Engineering (Terje Io)
+ * v0.02 / 2019-11-07 / Io Engineering (Terje Io)
  *
  */
 
@@ -149,7 +149,7 @@ namespace CNC.Controls
         {
             string s;
             string axes = axis == "All" ? "X{1}Y{2}Z{3}" : (axis + "{" + (GrblInfo.AxisLetterToIndex(axis) + 1).ToString() + "}");
-            string xOffset = GrblWorkParameters.ConvertX(GrblWorkParameters.LatheMode, GrblInfo.LatheMode, selectedOffset.X).ToInvariantString();
+            string xOffset = GrblWorkParameters.ConvertX(GrblWorkParameters.LatheMode, GrblParserState.LatheMode, selectedOffset.X).ToInvariantString();
 
             if (selectedOffset.Id == 0)
             {
