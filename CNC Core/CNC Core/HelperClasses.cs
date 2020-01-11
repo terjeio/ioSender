@@ -41,13 +41,13 @@ namespace CNC.Core
             List<string> properties = new List<string>();
 
             foreach (var error in _validationErrors)
-                if(!properties.Contains(error.Key))
+                if (!properties.Contains(error.Key))
                     properties.Add(error.Key);
 
             _validationErrors.Clear();
 
             foreach (var property in properties)
-                if(!string.IsNullOrEmpty(property))
+                if (!string.IsNullOrEmpty(property))
                     RaiseErrorsChanged(property);
         }
         public void SetError(string message)
@@ -180,6 +180,25 @@ namespace CNC.Core
 
                 OnPropertyChanged("Item[]");
             }
+        }
+    }
+
+    public static class FileUtils
+    {
+        public static bool IsAllowedFile (string filename, string extensions)
+        {
+            int pos = filename.LastIndexOf('.');
+
+            return pos > 0 && ("," + extensions + ",").Contains("," + filename.Substring(pos + 1).ToLower() + ",");
+        }
+        public static string ExtensionsToFilter(string extensions)
+        {
+            string[] filetypes = extensions.Split(',');
+
+            for (int i = 0; i < filetypes.Length; i++)
+                filetypes[i] = "*." + filetypes[i];
+
+            return string.Join(";", filetypes);
         }
     }
 

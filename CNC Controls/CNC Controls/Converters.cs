@@ -1,7 +1,7 @@
 ﻿/*
  * Converters.cs - part of CNC Controls library for Grbl
  *
- * v0.01 / 2019-11-30 / Io Engineering (Terje Io)
+ * v0.03 / 2019-12-03 / Io Engineering (Terje Io)
  *
  */
 
@@ -98,10 +98,11 @@ namespace CNC.Controls
     {
         public object Convert(object[] value, Type targetType, object parameter, CultureInfo culture)
         {
-            bool result = GrblSettings.HomingEnabled && value.Length > 2 && value[1] is bool && !(bool)value[1] && value[2] is bool && !(bool)value[2];
+            // If ALARM:11 homing is required
+            bool result = value[0] is GrblState && ((GrblState)value[0]).State == GrblStates.Alarm && ((GrblState)value[0]).Substate == 11;
 
-            if (result && value[0] is GrblState)
-                result = result && !((GrblState)value[0]).MPG && ((GrblState)value[0]).State == GrblStates.Idle;
+            if (!result && GrblSettings.HomingEnabled && value.Length > 2 && value[1] is bool && !(bool)value[1] && value[2] is bool && !(bool)value[2])
+                result = value[0] is GrblState && !((GrblState)value[0]).MPG && ((GrblState)value[0]).State == GrblStates.Idle;
 
             return result;
         }

@@ -1,13 +1,13 @@
-﻿/*
+/*
  * TelnetStream.cs - part of CNC Controls library
  *
- * v0.02 / 2019-11-30 / Io Engineering (Terje Io)
+ * v0.03 / 2020-01-05 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2019, Io Engineering (Terje Io)
+Copyright (c) 2018-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -61,6 +61,9 @@ namespace CNC.Core
             Reply = "";
             Dispatcher = dispatcher;
 
+            if (!host.Contains(":"))
+                host += ":23";
+
             string[] parameter = host.Split(':');
 
             if (parameter.Length == 2) try
@@ -99,6 +102,7 @@ namespace CNC.Core
                 ipstream.Close(300);
                 ipstream = null;
                 ipserver.Close();
+                ipserver = null;
             }
         }
 
@@ -153,7 +157,7 @@ namespace CNC.Core
             while (Comms.com.CommandState == Comms.State.AwaitAck) ;
         }
 
-        public string getReply(string command)
+        public string GetReply(string command)
         {
             Reply = "";
             WriteCommand(command);

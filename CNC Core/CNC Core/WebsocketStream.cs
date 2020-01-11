@@ -1,7 +1,7 @@
 ﻿/*
  * WebsocketStream.cs - part of CNC Controls library
  *
- * v0.02 / 2019-11-30 / Io Engineering (Terje Io)
+ * v0.03 / 2019-12-04 / Io Engineering (Terje Io)
  *
  */
 
@@ -153,7 +153,7 @@ namespace CNC.Core
             while (Comms.com.CommandState == Comms.State.AwaitAck) ;
         }
 
-        public string getReply(string command)
+        public string GetReply(string command)
         {
             Reply = "";
             WriteCommand(command);

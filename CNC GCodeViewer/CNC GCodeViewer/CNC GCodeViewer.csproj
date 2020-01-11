@@ -51,12 +51,19 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConfigControl.xaml.cs">
+      <DependentUpon>ConfigControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Renderer.xaml.cs">
       <DependentUpon>Renderer.xaml</DependentUpon>
     </Compile>
     <Compile Include="Viewer.xaml.cs">
       <DependentUpon>Viewer.xaml</DependentUpon>
     </Compile>
+    <Page Include="ConfigControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Renderer.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

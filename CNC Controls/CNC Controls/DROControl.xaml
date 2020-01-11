@@ -9,6 +9,7 @@
              d:DesignHeight="290" d:DesignWidth="216">
     <UserControl.Resources>
         <local:LatheModeToStringConverter x:Key="LatheModeConverter" />
+        <local:InvertBooleanConverter x:Key="BooleanConverter" />
     </UserControl.Resources>
     <GroupBox x:Name="grpDRO" Header="DRO" HorizontalAlignment="Center" VerticalAlignment="Top" Width="216">
         <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="2,5,0,5">
@@ -37,7 +38,7 @@
                 Value="{Binding Path=Position.C, Mode=TwoWay}"
                 IsScaled="{Binding Path=AxisScaled[(gcode:AxisFlags)C], Mode=OneWay}"
             />
-            <Button x:Name="btnZeroAll" Content="Zero all" Focusable="False" Height="28" Width="180" HorizontalAlignment="Center" Margin="2,3" Click="btnZeroAll_Click"/>
+            <Button x:Name="btnZeroAll" Content="Zero all" IsEnabled="{Binding Path=IsJobRunning, Converter={StaticResource BooleanConverter}}" Focusable="False" Height="28" Width="180" HorizontalAlignment="Center" Margin="2,3" Click="btnZeroAll_Click"/>
         </StackPanel>
     </GroupBox>
 </UserControl>

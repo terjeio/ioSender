@@ -9,25 +9,20 @@
     <UserControl.Resources>
         <local:InvertBooleanConverter x:Key="BooleanConverter" />
     </UserControl.Resources>
-    <UserControl.IsEnabled>
-        <Binding Path="IsJobRunning" Converter="{StaticResource BooleanConverter}"/>
-    </UserControl.IsEnabled>
-    <Grid>
-        <GroupBox x:Name="grpWorkParams" Header="Work Parameters" HorizontalAlignment="Left" VerticalAlignment="Top" Height="60" Width="216">
-            <Grid HorizontalAlignment="Left" Height="38" Margin="0,4,0,0" VerticalAlignment="Top" Width="206">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="50*"/>
-                    <ColumnDefinition Width="56*"/>
-                    <ColumnDefinition Width="38*"/>
-                    <ColumnDefinition Width="60*"/>
-                </Grid.ColumnDefinitions>
-                <Label x:Name="lblOffset" Content="Offset:" HorizontalContentAlignment="Right" HorizontalAlignment="Right" VerticalAlignment="Center" Height="26" Margin="0,7" Width="45"/>
-                <ComboBox x:Name="cbxOffset" Grid.Column="1" DisplayMemberPath="Code" SelectedValuePath="Code" ItemsSource="{Binding Path=CoordinateSystems}" SelectedValue="{Binding Path=WorkCoordinateSystem, Mode=OneWay}" HorizontalAlignment="Left" VerticalAlignment="Center" Width="55" Height="22" SelectionChanged="cbxOffset_SelectionChanged"/>
-                <Label x:Name="lblTool" Content="Tool:" Grid.Column="2" HorizontalContentAlignment="Right" HorizontalAlignment="Right" VerticalAlignment="Center" Height="26" Width="36"/>
-                <Border x:Name="bgTool" Grid.Column="3" HorizontalAlignment="Left" VerticalAlignment="Center" CornerRadius="2" Width="60" Height="30" Margin="0,6">
-                    <local:NumericComboBox x:Name="cbxTool" DisplayMemberPath="Code" SelectedValuePath="Code" ItemsSource="{Binding Path=Tools}" SelectedValue="{Binding Path=Tool, Mode=OneWay}"  Grid.Column="3" Format="##0" HorizontalAlignment="Left" VerticalAlignment="Center" Width="56" Height="22" Margin="2,2" SelectionChanged="cbxTool_SelectionChanged"/>
-                </Border>
-            </Grid>
-        </GroupBox>
-    </Grid>
+    <GroupBox x:Name="grpWorkParams" Header="Work Parameters" IsEnabled="{Binding Path=IsJobRunning, Converter={StaticResource BooleanConverter}}" HorizontalAlignment="Left" VerticalAlignment="Top" Height="60" Width="216">
+        <Grid HorizontalAlignment="Left" Height="38" Margin="0,4,0,0" VerticalAlignment="Top" Width="206">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="50*"/>
+                <ColumnDefinition Width="56*"/>
+                <ColumnDefinition Width="38*"/>
+                <ColumnDefinition Width="60*"/>
+            </Grid.ColumnDefinitions>
+            <Label x:Name="lblOffset" Content="Offset:" HorizontalContentAlignment="Right" HorizontalAlignment="Right" VerticalAlignment="Center" Height="26" Margin="0,7" Width="45"/>
+            <ComboBox x:Name="cbxOffset" Grid.Column="1" DisplayMemberPath="Code" SelectedValuePath="Code" ItemsSource="{Binding Path=CoordinateSystems}" SelectedValue="{Binding Path=WorkCoordinateSystem, Mode=OneWay}" HorizontalAlignment="Left" VerticalAlignment="Center" Width="55" Height="22" SelectionChanged="cbxOffset_SelectionChanged"/>
+            <Label x:Name="lblTool" Content="Tool:" Grid.Column="2" HorizontalContentAlignment="Right" HorizontalAlignment="Right" VerticalAlignment="Center" Height="26" Width="36"/>
+            <Border x:Name="bgTool" Grid.Column="3" HorizontalAlignment="Left" VerticalAlignment="Center" CornerRadius="2" Width="60" Height="30" Margin="0,6">
+                <local:NumericComboBox x:Name="cbxTool" DisplayMemberPath="Code" SelectedValuePath="Code" ItemsSource="{Binding Path=Tools}" SelectedValue="{Binding Path=Tool, Mode=OneWay}"  Grid.Column="3" Format="##0" HorizontalAlignment="Left" VerticalAlignment="Center" Width="56" Height="22" Margin="2,2" SelectionChanged="cbxTool_SelectionChanged"/>
+            </Border>
+        </Grid>
+    </GroupBox>
 </UserControl>

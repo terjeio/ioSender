@@ -1,7 +1,7 @@
 ﻿/*
  * IView.cs - part of CNC Controls library for Grbl
  *
- * v0.01 / 2019-05-19 / Io Engineering (Terje Io)
+ * v0.03 / 2019-12-04 / Io Engineering (Terje Io)
  *
  */
 
@@ -43,6 +43,7 @@ namespace CNC.View
     {
         Startup = 0,
         Shutdown,
+        AppConfig,
         Engraving,
         Mach3,
         GRBL,
@@ -56,7 +57,8 @@ namespace CNC.View
         Parting,
         Tools,
         TrinamicTuner,
-        GCodeViewer
+        GCodeViewer,
+        SpindleLinearizer
     }
 
     public interface CNCView

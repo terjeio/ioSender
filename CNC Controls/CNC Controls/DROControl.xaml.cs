@@ -1,7 +1,7 @@
 ﻿/*
  * DROControl.xaml.cs - part of CNC Controls library
  *
- * v0.02 / 2018-10-17 / Io Engineering (Terje Io)
+ * v0.03 / 2019-12-06 / Io Engineering (Terje Io)
  *
  */
 
@@ -81,7 +81,7 @@ namespace CNC.Controls
 
         private void TxtReadout_GotFocus(object sender, RoutedEventArgs e)
         {
-            if (IsFocusable)
+            if (IsFocusable && !((GrblViewModel)DataContext).IsJobRunning)
             {
                 ((GrblViewModel)DataContext).SuspendPositionNotifications = true;
 
@@ -146,10 +146,10 @@ namespace CNC.Controls
                 string s = "G90G10L20P0";
                 for (int i = 0; i < GrblInfo.NumAxes; i++)
                     s += GrblInfo.AxisIndexToLetter(i) + "{0}";
-                Grbl.MDICommand(DataContext, string.Format(s, position.ToInvariantString("F3")));
+                ((GrblViewModel)DataContext).ExecuteMDI(string.Format(s, position.ToInvariantString("F3")));
             }
             else
-                Grbl.MDICommand(DataContext, string.Format("G10L20P0{0}{1}", axis, position.ToInvariantString("F3")));
+                ((GrblViewModel)DataContext).ExecuteMDI(string.Format("G10L20P0{0}{1}", axis, position.ToInvariantString("F3")));
         }
 
         public void EnableLatheMode()

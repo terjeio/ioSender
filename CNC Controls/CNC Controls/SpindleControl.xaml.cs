@@ -1,7 +1,7 @@
 ﻿/*
  * SpindleControl.xaml.cs - part of CNC Controls library
  *
- * v0.02 / 2019-10-31 / Io Engineering (Terje Io)
+ * v0.03 / 2019-12-06 / Io Engineering (Terje Io)
  *
  */
 
@@ -137,14 +137,14 @@ namespace CNC.Controls
                 _rpm = cvRPM.Value;
 
             if (hold)
-                Grbl.MDICommand(DataContext, ((char)GrblConstants.CMD_SPINDLE_OVR_STOP).ToString());
+                ((GrblViewModel)DataContext).ExecuteMDI(((char)GrblConstants.CMD_SPINDLE_OVR_STOP).ToString());
             else
-                Grbl.MDICommand(DataContext, string.Format((string)((RadioButton)sender).Tag, "S" + cvRPM.Value.ToInvariantString()));
+                ((GrblViewModel)DataContext).ExecuteMDI(string.Format((string)((RadioButton)sender).Tag, "S" + cvRPM.Value.ToInvariantString()));
         }
 
         void overrideControl_CommandGenerated(string command)
         {
-            Grbl.MDICommand(DataContext, command);
+            ((GrblViewModel)DataContext).ExecuteMDI(command);
         }
     }
 }

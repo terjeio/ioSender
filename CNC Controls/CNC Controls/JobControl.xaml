@@ -12,7 +12,7 @@
             <RowDefinition Height="22*"/>
         </Grid.RowDefinitions>
         <DataGrid x:Name="grdGCode" Grid.Row="0" ItemsSource="{Binding}" AllowDrop="True" Width="410" Height="340" AutoGenerateColumns="False" HorizontalAlignment="Left" Margin="3,3,0,0" VerticalAlignment="Top"
-                   CanUserSortColumns="false" DragEnter="grdGCode_Drag" DragOver="grdGCode_Drag" DragLeave="grdGCode_Drag" Drop="grdGCode_Drop">
+                   CanUserSortColumns="false" IsReadOnly="true" DragEnter="grdGCode_Drag" DragOver="grdGCode_Drag" DragLeave="grdGCode_Drag" Drop="grdGCode_Drop">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Line" Binding="{Binding LineNum}" Width="50"/>
                 <DataGridTextColumn Header="" Binding="{Binding Sent}" Width="20"/>

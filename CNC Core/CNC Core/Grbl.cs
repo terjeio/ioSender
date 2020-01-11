@@ -1,13 +1,13 @@
 ﻿/*
  * Grbl.cs - part of CNC Controls library
  *
- * v0.02 / 2019-11-07 / Io Engineering (Terje Io)
+ * v0.03 / 2020-01-07 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2019, Io Engineering (Terje Io)
+Copyright (c) 2018-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -211,6 +211,7 @@ namespace CNC.Core
         Halted,
         FeedHold,
         ToolChange,
+        Start,
         Stop,
         Reset,
         AwaitResetAck,
@@ -274,12 +275,6 @@ namespace CNC.Core
 
     public static class Grbl
     {
-        public static void MDICommand (object context, string command)
-        {
-            if (context != null && context is GrblViewModel)
-                ((GrblViewModel)context).MDICommand = command;
-        }
-
         public static void Reset()
         {
             Comms.com.WriteByte((byte)GrblConstants.CMD_RESET);
@@ -288,8 +283,6 @@ namespace CNC.Core
             //grblState.Substate = 0;
         }
     }
-
-
 
     public class CoordinateValues<T> : ViewModelBase
     {
@@ -384,11 +377,9 @@ namespace CNC.Core
 
     public class CoordinateSystem : Position
     {
-        public CoordinateSystem(string code, string data)
+        public CoordinateSystem(string code, string data) : base(data)
         {
             Code = code;
-
-            Parse(data);
 
             if (code.StartsWith("G5"))
             {
@@ -404,16 +395,14 @@ namespace CNC.Core
 
     public class Tool : Position
     {
-        public Tool(string code)
+        public Tool(string code) : base()
         {
             Code = code;
         }
 
-        public Tool(string code, string offsets)
+        public Tool(string code, string offsets) : base(offsets)
         {
             Code = code;
-
-            Parse(offsets);
         }
 
         public string Code { get; set; }
@@ -421,7 +410,6 @@ namespace CNC.Core
         double _r;
 
         public double R { get { return R; } set { _r = value; OnPropertyChanged(); } }
-
     }
 
     public static class GrblInfo

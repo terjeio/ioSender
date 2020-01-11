@@ -1,7 +1,7 @@
 ﻿/*
  * StatusControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.02 / 2019-10-04 / Io Engineering (Terje Io)
+ * v0.03 / 2019-12-06 / Io Engineering (Terje Io)
  *
  */
 
@@ -94,12 +94,12 @@ namespace CNC.Controls
                     break;
 
                 case StatusButton.Unlock:
-                    Grbl.MDICommand(DataContext, GrblConstants.CMD_UNLOCK);
+                    ((GrblViewModel)DataContext).ExecuteMDI(GrblConstants.CMD_UNLOCK);
                     break;
 
                 case StatusButton.Home:
-                   // ((Control)sender).Background = Brushes.LightSkyBlue;
-                    Grbl.MDICommand(DataContext, GrblConstants.CMD_HOMING);
+                    // ((Control)sender).Background = Brushes.LightSkyBlue;
+                    ((GrblViewModel)DataContext).ExecuteMDI(GrblConstants.CMD_HOMING);
                     break;
 
                 case StatusButton.Check:
@@ -107,7 +107,7 @@ namespace CNC.Controls
                     if(state == GrblStates.Check && ((CheckBox)sender).IsChecked == false)
                         Grbl.Reset();
                     else if (state == GrblStates.Idle && ((CheckBox)sender).IsChecked == true)
-                        Grbl.MDICommand(DataContext, GrblConstants.CMD_CHECK);
+                        ((GrblViewModel)DataContext).ExecuteMDI(GrblConstants.CMD_CHECK);
                     break;
             }
         }

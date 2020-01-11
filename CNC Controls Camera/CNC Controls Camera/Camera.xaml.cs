@@ -1,7 +1,7 @@
 ﻿/*
  * Camera.xaml.cs - part of CNC Controls library
  *
- * v0.01 / 2019-10-13 / Io Engineering (Terje Io)
+ * v0.03 / 2019-12-03 / Io Engineering (Terje Io)
  *
  */
 

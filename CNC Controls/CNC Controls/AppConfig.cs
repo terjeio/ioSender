@@ -1,7 +1,7 @@
 ﻿/*
  * AppConfig.cs - part of Grbl Code Sender
  *
- * v0.01 / 2019-12-01 / Io Engineering (Terje Io)
+ * v0.03 / 2019-12-03 / Io Engineering (Terje Io)
  *
  */
 
@@ -48,34 +48,49 @@ namespace CNC.Controls
 {
 
     [Serializable]
-    public class LatheConfig
+    public class LatheConfig : ViewModelBase
     {
-        public enum ZDirections
-        {
-            Positive = 0,
-            Negative
-        }
+        private bool _isEnabled = false;
+        private LatheMode _latheMode = LatheMode.Disabled;
 
         [XmlIgnore]
-        public double ZDirFactor { get { return ZDirection== ZDirections.Negative? -1d : 1d;} }
+        public double ZDirFactor { get { return ZDirection == ZDirection.Negative? -1d : 1d;} }
 
-        public LatheMode XMode { get; set; } = LatheMode.Radius;
-        public ZDirections ZDirection { get; set; } = ZDirections.Negative;
+        [XmlIgnore]
+        public LatheMode[] LatheModes { get { return (LatheMode[])Enum.GetValues(typeof(LatheMode)); } }
+
+        [XmlIgnore]
+        public ZDirection[] ZDirections { get { return (ZDirection[])Enum.GetValues(typeof(ZDirection)); } }
+
+        [XmlIgnore]
+        public bool IsEnabled { get { return _isEnabled; }  set { _isEnabled = value; OnPropertyChanged(); } }
+
+
+        public LatheMode XMode { get { return _latheMode; } set { _latheMode = value; IsEnabled = value != LatheMode.Disabled; } }
+        public ZDirection ZDirection { get; set; } = ZDirection.Negative;
         public double PassDepthLast { get; set; } = 0.02d;
         public double FeedRate { get; set; } = 300d;
     }
 
     [Serializable]
-    public class CameraConfig
+    public class CameraConfig : ViewModelBase
     {
-        public double XOffset { get; set; } = 0d;
-        public double YOffset { get; set; } = 0d;
+        double _xoffset = 0d, _yoffset = 0d;
+
+        [XmlIgnore]
+        public CameraMoveMode[] MoveModes { get { return (CameraMoveMode[])Enum.GetValues(typeof(CameraMoveMode)); } }
+
+        public double XOffset { get { return _xoffset; } set { _xoffset = value; OnPropertyChanged(); } }
+        public double YOffset { get { return _yoffset; } set { _yoffset = value; OnPropertyChanged(); } }
         public CameraMoveMode MoveMode { get; set; } = CameraMoveMode.BothAxes;
     }
 
     [Serializable]
-    public class GCodeViewerConfig
+    public class GCodeViewerConfig : ViewModelBase
     {
+        private bool _isEnabled = false;
+
+        public bool IsEnabled { get { return _isEnabled; } set { _isEnabled = value; OnPropertyChanged(); } }
         public int ArcResolution { get; set; } = 10;
         public double MinDistance { get; set; } = 0.05d;
         public bool ShowGrid { get; set; } = true;
@@ -86,22 +101,22 @@ namespace CNC.Controls
 
     [Serializable]
 
-    public class Config
+    public class Config : ViewModelBase
     {
+        public int PollInterval { get; set; } = 200; // ms
         public string PortParams { get; set; } = "COM1:115200,N,8,1";
-        public bool LatheMode { get; set; } = false;
-        public bool EnableGCodeViewer { get; set; } = true;
-
-        public LatheConfig Lathe = new LatheConfig();
-
-        public CameraConfig Camera = new CameraConfig();
-
-        public GCodeViewerConfig GCodeViewer = new GCodeViewerConfig();
+        public LatheConfig Lathe { get; set; } = new LatheConfig();
+        public CameraConfig Camera { get; set; } = new CameraConfig();
+        public GCodeViewerConfig GCodeViewer { get; set; } = new GCodeViewerConfig();
     }
 
     public class AppConfig
     {
-        public Config Config = null; 
+        public Config Config = null;
+
+        private string configfile = null;
+
+        public string FileName { get; private set; }
 
         public bool Save (string filename)
         {
@@ -114,10 +129,11 @@ namespace CNC.Controls
 
             try
             {
-                FileStream fsout = new FileStream(filename, FileMode.Create, FileAccess.Write, FileShare.None);
+                FileStream fsout = new FileStream(configfile, FileMode.Create, FileAccess.Write, FileShare.None);
                 using (fsout)
                 {
                     xs.Serialize(fsout, Config);
+                    this.configfile = filename;
                     ok = true;
                 }
             }
@@ -126,6 +142,11 @@ namespace CNC.Controls
             }
 
             return ok;
+        }
+
+        public bool Save()
+        {
+            return configfile != null && Save(configfile);
         }
 
         public bool Load(string filename)
@@ -138,6 +159,7 @@ namespace CNC.Controls
                 StreamReader reader = new StreamReader(filename);
                 Config = (Config)xs.Deserialize(reader);
                 reader.Close();
+                configfile = filename;
                 ok = true;
             }
             catch
@@ -154,7 +176,7 @@ namespace CNC.Controls
                  Config.PortParams += ":115200,N,8,1";
         }
 
-        public int SetupAndOpen(string appname, System.Windows.Threading.Dispatcher dispatcher)
+        public int SetupAndOpen(string appname, GrblViewModel model, System.Windows.Threading.Dispatcher dispatcher)
         {
             int status = 0;
             bool selectPort = false;
@@ -185,6 +207,11 @@ namespace CNC.Controls
 
                 case "-selectport":
                     selectPort = true;
+                    break;
+
+                default:
+                    if(File.Exists(args[p - 1]))
+                        FileName = args[p - 1];
                     break;
             }
 
@@ -256,7 +283,7 @@ namespace CNC.Controls
                 // ...if so show dialog for wait for it to stop polling and relinquish control.
                 if (!(Comms.com.Reply == "" || Comms.com.Reply.StartsWith("Grbl") || Comms.com.Reply.StartsWith("[MSG:")))
                 {
-                    MPGPending await = new MPGPending();
+                    MPGPending await = new MPGPending(model);
                     await.ShowDialog();
                     if (await.Cancelled)
                     {
@@ -264,6 +291,8 @@ namespace CNC.Controls
                         status = 2;
                     }
                 }
+
+                model.PollInterval = Config.PollInterval;
             }
             else if (status != 2)
             {

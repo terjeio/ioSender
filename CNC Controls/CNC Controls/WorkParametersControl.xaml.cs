@@ -1,7 +1,7 @@
 ﻿/*
  * WorkParametersControl.xaml.cs - part of CNC Controls library
  *
- * v0.02 / 2019-10-17 / Io Engineering (Terje Io)
+ * v0.03 / 2019-12-06 / Io Engineering (Terje Io)
  *
  */
 
@@ -95,13 +95,13 @@ namespace CNC.Controls
         private void cbxOffset_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (e.AddedItems.Count == 1 && ((ComboBox)sender).IsDropDownOpen)
-                Grbl.MDICommand(DataContext, ((CoordinateSystem)e.AddedItems[0]).Code);
+                ((GrblViewModel)DataContext).ExecuteMDI(((CoordinateSystem)e.AddedItems[0]).Code);
         }
 
         private void cbxTool_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (e.AddedItems.Count == 1 && ((ComboBox)sender).IsDropDownOpen)
-                Grbl.MDICommand(DataContext, string.Format(ToolChangeCommand, ((Tool)e.AddedItems[0]).Code));
+                ((GrblViewModel)DataContext).ExecuteMDI(string.Format(ToolChangeCommand, ((Tool)e.AddedItems[0]).Code));
         }
 
         #endregion

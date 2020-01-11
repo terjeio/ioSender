@@ -1,13 +1,13 @@
 ﻿/*
  * JobView.xaml.cs - part of Grbl Code Sender
  *
- * v0.02 / 2019-11-30 / Io Engineering (Terje Io)
+ * v0.02 / 2020-01-07 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019, Io Engineering (Terje Io)
+Copyright (c) 2019-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -55,7 +55,7 @@ namespace GCode_Sender
     /// </summary>
     public partial class JobView : UserControl, CNCView
     {
-        private bool initOK = false;
+        private bool initOK = false, sdStream = false;
         private GrblViewModel model;
 
      //   private Viewer viewer = null;
@@ -68,12 +68,18 @@ namespace GCode_Sender
             //            MainWindow.ui.DataContext = model = GCodeSender.Parameters;
 
             MainWindow.FileOpen += MainWindow_FileOpen;
+            MainWindow.FileLoad += MainWindow_FileLoad;
             DRO.DROEnabledChanged += DRO_DROEnabledChanged;
 
             DataContextChanged += View_DataContextChanged;
             //    GCodeSender.GotFocus += GCodeSender_GotFocus;
 
           //  ((INotifyPropertyChanged)DataContext).PropertyChanged += OnDataContextPropertyChanged;
+        }
+
+        private void MainWindow_FileLoad(string filename)
+        {
+            GCodeSender.LoadFile(filename);
         }
 
         private void MainWindow_FileOpen()
@@ -125,7 +131,13 @@ namespace GCode_Sender
                 case nameof(GrblViewModel.FileName):
                     string filename = ((GrblViewModel)sender).FileName;
                     MainWindow.ui.WindowTitle = filename;
-                    if (filename != string.Empty && MainWindow.IsViewVisible(ViewType.GCodeViewer)) {
+                    if (filename.StartsWith("SDCard:"))
+                    {
+                        sdStream = true;
+                        MainWindow.EnableView(false, ViewType.GCodeViewer);
+                    }
+                    else if (!string.IsNullOrEmpty(filename) && MainWindow.IsViewVisible(ViewType.GCodeViewer))
+                    {
                         MainWindow.EnableView(true, ViewType.GCodeViewer);
                         GCodeSender.EnablePolling(false);
                         MainWindow.GCodeViewer.Open(filename, GCodeSender.GCode.Tokens);
@@ -144,7 +156,8 @@ namespace GCode_Sender
             if (activate)
             {
                 GCodeSender.RewindFile();
-                GCodeSender.SetStreamingState(GCodeSender.GCode.Loaded ? StreamingState.Idle : StreamingState.NoFile);
+                GCodeSender.SetStreamingState(GCodeSender.GCode.Loaded ? StreamingState.Idle : (sdStream ? StreamingState.Start : StreamingState.NoFile));
+                sdStream = false;
 
                 if (!initOK)
                 {
@@ -158,19 +171,12 @@ namespace GCode_Sender
 
                     if (Comms.com.Reply.StartsWith("<Alarm"))
                     {
-                        if (Comms.com.Reply.StartsWith("<Alarm:"))
-                        {
-                            int i = Comms.com.Reply.IndexOf('|');
-                            string s = Comms.com.Reply.Substring(7, i - 7);
-                            if (!"1,2,10".Contains(s)) // Alarm 1, 2 and 10 are critical events
-                                InitSystem();
-                            if (s == "11")
-                                txtStatus.Text = "<Home> to continue.";
-                            else
-                                txtStatus.Text = "<Reset> then <Unlock> to continue.";
-                        }
-                        else
-                            txtStatus.Text = "<Reset> then <Unlock> to continue.";
+                        GrblViewModel data = (GrblViewModel)DataContext;
+                        data.ParseStatus(Comms.com.Reply);
+
+                        // Alarm 1, 2 and 10 are critical events
+                        if (!(data.GrblState.Substate == 1 || data.GrblState.Substate == 2 || data.GrblState.Substate == 10))
+                            InitSystem();
                     }
                     else
                         InitSystem();
@@ -237,7 +243,7 @@ namespace GCode_Sender
                     break;
 
                 case CameraMoveMode.BothAxes:
-                    Grbl.MDICommand(DataContext, string.Format("X{0}Y{1}", XOffset.ToInvariantString("F3"), YOffset.ToInvariantString("F3")));
+                    ((GrblViewModel)DataContext).ExecuteMDI(string.Format("X{0}Y{1}", XOffset.ToInvariantString("F3"), YOffset.ToInvariantString("F3")));
                     break;
             }
 
@@ -304,8 +310,6 @@ namespace GCode_Sender
                 MainWindow.ShowView(false, ViewType.TrinamicTuner);
 
             MainWindow.GCodePush += UserUI_GCodePush;
-
-            txtStatus.Text = "";
         }
 
         void EnableUI(bool enable)

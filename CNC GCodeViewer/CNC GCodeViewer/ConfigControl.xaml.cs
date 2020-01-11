@@ -1,13 +1,13 @@
 ﻿/*
- * FeedControl.xaml.cs - part of CNC Controls library
+ * ConfigControl.xaml.cs - part of Grbl Code Sender
  *
- * v0.03 / 2019-12-06 / Io Engineering (Terje Io)
+ * v0.03 / 2019-12-03 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2019, Io Engineering (Terje Io)
+Copyright (c) 2019, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -38,33 +38,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 using System.Windows.Controls;
-using CNC.Core;
 
-namespace CNC.Controls
+namespace CNC.Controls.Viewer
 {
     /// <summary>
-    /// Interaction logic for FeedControl.xaml
+    /// Interaction logic for ConfigControl.xaml
     /// </summary>
-    public partial class FeedControl : UserControl
+    public partial class ConfigControl : UserControl
     {
-        public FeedControl()
+        public ConfigControl()
         {
             InitializeComponent();
-
-            feedOverrideControl.ResetCommand = GrblConstants.CMD_FEED_OVR_RESET;
-            feedOverrideControl.FineMinusCommand = GrblConstants.CMD_FEED_OVR_FINE_MINUS;
-            feedOverrideControl.FinePlusCommand = GrblConstants.CMD_FEED_OVR_FINE_PLUS;
-            feedOverrideControl.CoarseMinusCommand = GrblConstants.CMD_FEED_OVR_COARSE_MINUS;
-            feedOverrideControl.CoarsePlusCommand = GrblConstants.CMD_FEED_OVR_COARSE_PLUS;
-
-            rapidsOverrideControl.ResetCommand = GrblConstants.CMD_RAPID_OVR_RESET;
-            rapidsOverrideControl.FineMinusCommand = GrblConstants.CMD_RAPID_OVR_MEDIUM;
-            rapidsOverrideControl.CoarseMinusCommand = GrblConstants.CMD_RAPID_OVR_LOW;
-        }
-
-        void override_CommandGenerated(string command)
-        {
-            ((GrblViewModel)DataContext).ExecuteMDI(command);
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿/*
  * Comms.cs - part of CNC Controls library
  *
- * v0.02 / 2019-12-02 / Io Engineering (Terje Io)
+ * v0.03 / 2019-12-04 / Io Engineering (Terje Io)
  *
  */
 
@@ -85,7 +85,7 @@ namespace CNC.Core
         void WriteBytes(byte[] bytes, int len);
         void WriteString(string data);
         void WriteCommand(string command);
-        string getReply(string command);
+        string GetReply(string command);
         void AwaitAck();
         void AwaitAck(string command);
         void AwaitResponse(string command);

@@ -9,7 +9,18 @@
              Loaded="ConfigView_Loaded">
 
     <UserControl.Resources>
-        <Style x:Key="ErrorStyle" TargetType="local:NumericTextBox">
+        <Style x:Key="NumericErrorStyle" TargetType="local:NumericTextBox">
+            <Style.Triggers>
+                <Trigger Property="Validation.HasError" Value="true">
+                    <Setter Property="local:NumericTextBox.ToolTip">
+                        <Setter.Value>
+                            <Binding RelativeSource="{RelativeSource Self}" Path="(Validation.Errors)[0].ErrorContent" />
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="Ip4ErrorStyle" TargetType="TextBox">
             <Style.Triggers>
                 <Trigger Property="Validation.HasError" Value="true">
                     <Setter Property="local:NumericTextBox.ToolTip">

@@ -1,7 +1,7 @@
 ﻿/*
  * DROBaseControl.xaml.cs - part of CNC Controls library
  *
- * v0.02 / 2019-10-17 / Io Engineering (Terje Io)
+ * v0.03 / 2019-12-06 / Io Engineering (Terje Io)
  *
  */
 

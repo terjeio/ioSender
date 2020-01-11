@@ -1,13 +1,13 @@
 ﻿/*
  * UIUtils.cs - part of CNC Controls library
  *
- * v0.02 / 2019-09-24 / Io Engineering (Terje Io)
+ * v0.03 / 2020-01-10 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2019, Io Engineering (Terje Io)
+Copyright (c) 2018-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -135,6 +135,20 @@ namespace CNC.Controls
 
             if (!double.IsNaN(Max) && v > Max)
                 return new ValidationResult(false, $"Invalid input: maximum allowed value is {Max}.");
+
+            return ValidationResult.ValidResult;
+        }
+    }
+
+    public class IP4ValueRule : ValidationRule
+    {
+        public override ValidationResult Validate(object value, CultureInfo cultureInfo)
+        {
+            string ip4address = (string)value;
+
+            System.Net.IPAddress ip4;
+            if(!System.Net.IPAddress.TryParse(ip4address, out ip4))
+                return new ValidationResult(false, $"Invalid input: not an IP4 address.");
 
             return ValidationResult.ValidResult;
         }

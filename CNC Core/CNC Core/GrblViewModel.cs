@@ -1,13 +1,13 @@
-﻿/*
+/*
  * GrblViewModel.cs - part of CNC Controls library
  *
- * v0.02 / 2019-11-07 / Io Engineering (Terje Io)
+ * v0.03 / 2020-01-07 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019, Io Engineering (Terje Io)
+Copyright (c) 2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -41,6 +41,7 @@ using System;
 using System.Linq;
 using System.Windows.Media;
 using System.Collections.ObjectModel;
+using System.Windows.Input;
 using CNC.GCode;
 
 namespace CNC.Core
@@ -50,6 +51,7 @@ namespace CNC.Core
         private string _tool, _message, _WPos, _MPos, _wco, _wcs, _a, _fs, _mpg, _ov, _pn, _sc, _sd, _ex, _d, _gc, _h;
         private string  _unit, _format, _mdiCommand, _fileName;
         private bool _flood, _mist, _tubeCoolant, _toolChange, _reset, _isMPos, _isJobRunning;
+        private int _pwm;
         private double _feedrate = 0d;
         private double _rpm = 0d;
         private double _rpmActual = double.NaN;
@@ -66,6 +68,8 @@ namespace CNC.Core
             _a = _pn = _fs = _sc = string.Empty;
             _tool = ""; _unit = "mm"; _format = GrblConstants.FORMAT_METRIC;
             Clear();
+
+            MDICommand = new ActionCommand<string>(ExecuteMDI);
         }
 
         public void Clear()
@@ -74,6 +78,7 @@ namespace CNC.Core
             _streamingState = StreamingState.NoFile;
             _isMPos = _reset = _isJobRunning = false;
             _mpg = "";
+            _pwm = 0;
 
             _grblState.Error = 0;
             _grblState.State = GrblStates.Unknown;
@@ -102,6 +107,16 @@ namespace CNC.Core
                 LatheMode = LatheMode.Radius;
         }
 
+        public ICommand MDICommand { get; private set; }
+
+        public void ExecuteMDI(string command)
+        {
+            if (!string.IsNullOrEmpty(command))
+                MDI = command;
+        }
+
+        public int PollInterval { get; set; } = 200; // ms
+
         #region Dependencyproperties
 
         public string Unit { get { return _unit; } set { _unit = value; OnPropertyChanged(); } }
@@ -109,11 +124,11 @@ namespace CNC.Core
 
 
         public ProgramLimits ProgramLimits { get; private set; } = new ProgramLimits();
-        public string MDICommand { get { return _mdiCommand; } set { _mdiCommand = value; if (_mdiCommand != string.Empty) OnPropertyChanged(); } }
+        public string MDI { get { return _mdiCommand; } set { _mdiCommand = value; if (_mdiCommand != string.Empty) OnPropertyChanged(); } }
         public ObservableCollection<CoordinateSystem> CoordinateSystems { get { return GrblWorkParameters.CoordinateSystems; } }
         public ObservableCollection<Tool> Tools { get { return GrblWorkParameters.Tools; } }
         public string Tool { get { return _tool; } set { _tool = value; OnPropertyChanged(); } }
-        public bool GrblReset { get { return _reset; } set { _reset = value; _grblState.Error = 0; OnPropertyChanged(); Message = ""; } }
+        public bool GrblReset { get { return _reset; } set { _reset = value; _grblState.Error = 0; OnPropertyChanged(); if(_reset) Message = ""; } }
         public GrblState GrblState { get { return _grblState; } set { _grblState = value; OnPropertyChanged(); } }
         public bool IsCheckMode { get { return _grblState.State == GrblStates.Check; } }
         public bool IsSleepMode { get { return _grblState.State == GrblStates.Sleep; } }
@@ -142,14 +157,14 @@ namespace CNC.Core
         public LatheMode LatheMode { get { return _latheMode; } private set { _latheMode = value; OnPropertyChanged(); } }
 
         // CO2 Laser
-        public bool TubeCoolant { get { return _tubeCoolant; } private set { _tubeCoolant = value; OnPropertyChanged(); } }
+        public bool TubeCoolant { get { return _tubeCoolant; }  set { _tubeCoolant = value; OnPropertyChanged(); } }
 
         #region A - Spindle, Coolant and Tool change status
 
         public bool Mist
         {
             get { return _mist; }
-            private set
+            set
             {
                 if (_mist != value)
                 {
@@ -162,7 +177,7 @@ namespace CNC.Core
         public bool Flood
         {
             get { return _flood; }
-            private set
+            set
             {
                 if (_flood != value)
                 {
@@ -187,12 +202,12 @@ namespace CNC.Core
 
         #endregion
 
-        #region FS - Feed and Speed
+        #region FS - Feed and Speed (RPM)
 
         public double FeedRate { get { return _feedrate; } private set { _feedrate = value; OnPropertyChanged(); } }
-        public double ProgrammedRPM { get { return _rpm; } private set { _rpm = value; OnPropertyChanged(); } }
+        public double ProgrammedRPM { get { return _rpm; } set { _rpm = value; OnPropertyChanged(); } }
         public double ActualRPM { get { return _rpmActual; } private set { _rpmActual = value; OnPropertyChanged(); } }
-
+        public int PWM { get { return _pwm; } private set { _pwm = value; OnPropertyChanged(); } }
         #endregion
 
         #region Ov - Feed and spindle overrides
@@ -306,7 +321,11 @@ namespace CNC.Core
                 if (newstate == GrblStates.Sleep)
                     Message = "<Reset> to continue.";
                 else if (newstate == GrblStates.Alarm)
+                {
                     Message = substate == 11 ? "<Home> to continue." : "<Reset> then <Unlock> to continue.";
+                    if (substate == 11)
+                        HomedState = HomedState.NotHomed;
+                }
             }
 
             return force;
@@ -453,6 +472,10 @@ namespace CNC.Core
                     }
                     break;
 
+                case "PWM":
+                    PWM = int.Parse(value);
+                    break;
+
                 case "Pn":
                     if ((changed = _pn != value))
                     {
@@ -509,7 +532,7 @@ namespace CNC.Core
                     break;
 
                 case "SD":
-                    value = string.Format("SD Card streaming {0}% complete", value);
+                    value = string.Format("SD Card streaming {0}% complete", value.Split(',')[0]);
                     if ((changed = SDCardStatus != value))
                         Message = SDCardStatus = value;
                     break;
@@ -529,7 +552,7 @@ namespace CNC.Core
                     if (_h != value)
                     {
                         _h = value;
-                        HomedState = value == "1" ? HomedState.Homed : HomedState.Unknown;
+                        HomedState = value == "1" ? HomedState.Homed : (GrblState.State == GrblStates.Alarm && GrblState.Substate == 11 ? HomedState.NotHomed : HomedState.Unknown);
                         changed = true;
                     }
                     break;

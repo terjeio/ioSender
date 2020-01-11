@@ -1,13 +1,13 @@
 ﻿/*
  * JobControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.02 / 2019-11-30 / Io Engineering (Terje Io)
+ * v0.03 / 2020-01-07 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2019, Io Engineering (Terje Io)
+Copyright (c) 2018-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -64,6 +64,8 @@ namespace CNC.Controls
             None // must be last!
         }
 
+        const string allowedTypes = "nc,ncc,gcode,tap";
+
         private volatile int serialUsed = 0;
         private bool holdSignal = false;
         private JogMode jogMode = JogMode.None;
@@ -75,7 +77,7 @@ namespace CNC.Controls
         private GrblViewModel model;
         private ScrollViewer scroll = null;
 
-        private int PollInterval = 200, serialSize = 128, CurrLine = 0, PendingLine = 0, PgmEndLine = -1, ACKPending = 0;
+        private int serialSize = 128, CurrLine = 0, PendingLine = 0, PgmEndLine = -1, ACKPending = 0;
         private bool initOK = false, pgmStarted = false, pgmComplete = false;
         private PollGrbl poller = null;
         private Thread polling = null;
@@ -136,12 +138,12 @@ namespace CNC.Controls
                     GrblStateChanged(((GrblViewModel)sender).GrblState);
                     break;
 
-                case nameof(GrblViewModel.MDICommand):
-                    SendMDICommand(((GrblViewModel)sender).MDICommand);
-                    ((GrblViewModel)sender).MDICommand = string.Empty;
-                    break;
+                    case nameof(GrblViewModel.MDI):
+                        SendMDICommand(((GrblViewModel)sender).MDI);
+                        ((GrblViewModel)sender).MDI = string.Empty;
+                        break;
 
-                case nameof(GrblViewModel.IsMPGActive):
+                    case nameof(GrblViewModel.IsMPGActive):
                     grblState.MPG = ((GrblViewModel)sender).IsMPGActive == true;
                     SetStreamingState(grblState.MPG ? StreamingState.Disabled : StreamingState.Idle);
                     break;
@@ -163,6 +165,7 @@ namespace CNC.Controls
 
         public void CloseFile()
         {
+            nextRow = null;
             GCode.CloseFile();
         }
 
@@ -187,7 +190,7 @@ namespace CNC.Controls
                 if (!poller.IsEnabled)
                 {
                     Comms.com.DataReceived += DataReceived;
-                    poller.SetState(PollInterval);
+                    poller.SetState(model.PollInterval);
                 }
             }
             else
@@ -420,11 +423,7 @@ namespace CNC.Controls
             if (allow && e.Data.GetDataPresent(DataFormats.FileDrop))
             {
                 string[] files = (string[])e.Data.GetData(DataFormats.FileDrop, false);
-                if ((allow = files.Count() == 1))
-                {
-                    string file = files[0].ToLower();
-                    allow = (file.EndsWith(".nc") || file.EndsWith(".ncc") || file.EndsWith(".gcode") || file.EndsWith(".txt"));
-                }
+                allow = files.Count() == 1 && FileUtils.IsAllowedFile(files[0].ToLower(), allowedTypes + ",txt"); 
             }
 
             e.Handled = true;
@@ -461,20 +460,25 @@ namespace CNC.Controls
         {
             OpenFileDialog file = new OpenFileDialog();
 
-            file.Filter = "GCode files (*.nc;*ncc;*gcode)|*.nc;*ncc;*gcode|Text files (*.txt)|*.txt|All files (*.*)|*.*";
+            file.Filter = string.Format("GCode files ({0})|{0}|Text files (*.txt)|*.txt|All files (*.*)|*.*", FileUtils.ExtensionsToFilter(allowedTypes));
 
-            if (file.ShowDialog() == true) {
-                using (new UIUtils.WaitCursor())
-                {
-                    GCode.LoadFile(file.FileName);
-                    grdGCode.DataContext = GCode.Data.DefaultView;
-                    CurrLine = 0;
-                    PendingLine = 0;
-                    PgmEndLine = GCode.Data.Rows.Count - 1;
-                    scroll = UIUtils.GetScrollViewer(grdGCode);
+            if (file.ShowDialog() == true)
+                LoadFile(file.FileName);
+        }
 
-                    SetStreamingState(GCode.Loaded ? StreamingState.Idle : StreamingState.NoFile);
-                }
+        public void LoadFile(string filename)
+        {
+//            if(FileUtils.IsAllowedFile(filename, allowedTypes))
+            using (new UIUtils.WaitCursor())
+            {
+                GCode.LoadFile(filename);
+                grdGCode.DataContext = GCode.Data.DefaultView;
+                CurrLine = 0;
+                PendingLine = 0;
+                PgmEndLine = GCode.Data.Rows.Count - 1;
+                scroll = UIUtils.GetScrollViewer(grdGCode);
+
+                SetStreamingState(GCode.Loaded ? StreamingState.Idle : StreamingState.NoFile);
             }
         }
 
@@ -604,11 +608,15 @@ namespace CNC.Controls
                     btnHold.IsEnabled = !grblState.MPG;
                     btnStop.IsEnabled = !grblState.MPG;
                     btnRewind.IsEnabled = false;
-                    if (GCode.Loaded && !grblState.MPG)
+                    if (!string.IsNullOrEmpty(model.FileName) && !grblState.MPG)
                     {
                         model.IsJobRunning = true;
                         SendNextLine();
                     }
+                    break;
+
+                case StreamingState.Start: // Streaming from SD Card
+                    JobTimer.Start();
                     break;
 
                 case StreamingState.Halted:

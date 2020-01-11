@@ -5,13 +5,18 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CNC.Controls"
              mc:Ignorable="d" 
-             d:DesignHeight="515" d:DesignWidth="875">
+             d:DesignHeight="515" d:DesignWidth="875"
+             Loaded="SDCardView_Loaded">
     <Grid>
-        <DataGrid x:Name="dgrSDCard" Grid.Row="0" ItemsSource="{Binding}" Width="374" Height="502" SelectionMode="Single" SelectionUnit="FullRow" AutoGenerateColumns="False" HorizontalAlignment="Left" Margin="3,3,0,0" VerticalAlignment="Top"
-                           CanUserAddRows="False" CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserResizeRows="False" CanUserSortColumns="False">
-            <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="250"/>
-            <DataGridTextColumn Header="Size" Binding="{Binding Size}" Width="70"/>
-            <DataGridTextColumn Header="Remark" Binding="{Binding Invalid}" Width="*"/>
+        <DataGrid x:Name="dgrSDCard" ItemsSource="{Binding}" IsReadOnly="True" HorizontalAlignment="Left" Margin="30,30,0,0" VerticalAlignment="Top" Height="450" Width="380"
+                  SelectionMode="Single" SelectionUnit="FullRow" AutoGenerateColumns="False"
+                  CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserResizeRows="False" CanUserSortColumns="False" CanUserAddRows="False"
+                  SelectionChanged="dgrSDCard_SelectionChanged" MouseDoubleClick="dgrSDCard_MouseDoubleClick">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="250"/>
+                <DataGridTextColumn Header="Size" Binding="{Binding Size}" Width="70"/>
+                <DataGridTextColumn Header="Remark" Binding="{Binding Invalid}" Width="*"/>
+            </DataGrid.Columns>
         </DataGrid>
     </Grid>
 </UserControl>

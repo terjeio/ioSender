@@ -119,6 +119,12 @@ namespace CNC.GCode
         Radius = 2    // Do not change
     }
 
+    public enum ZDirection
+    {
+        Positive = 0,
+        Negative
+    }
+
     public enum Commands
     {
         G0,

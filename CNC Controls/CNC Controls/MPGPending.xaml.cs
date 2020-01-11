@@ -44,11 +44,13 @@ namespace CNC.Controls
 {
     public partial class MPGPending : Window
     {
-        private GrblViewModel parameters = new GrblViewModel();
+        private GrblViewModel model;
 
-        public MPGPending()
+        public MPGPending(GrblViewModel model)
         {
             InitializeComponent();
+
+            this.model = model;
 
             Comms.com.DataReceived += new DataReceivedHandler(DataReceived);
         }
@@ -64,9 +66,9 @@ namespace CNC.Controls
         {
             if (data.Length > 1 && data.Substring(0, 1) == "<")
             {
-                parameters.ParseStatus(data.Remove(data.Length - 1));
+                model.ParseStatus(data.Remove(data.Length - 1));
 
-                if(parameters.IsMPGActive == false || true) {
+                if(model.IsMPGActive == false) {
                     Cancelled = false;
                     Close();
                 }

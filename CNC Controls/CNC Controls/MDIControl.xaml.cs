@@ -1,7 +1,7 @@
 ﻿/*
  * MDIControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.02 / 2019-09-25 / Io Engineering (Terje Io)
+ * v0.03 / 2019-12-06 / Io Engineering (Terje Io)
  *
  */
 
@@ -37,7 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-using CNC.Core;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -50,13 +49,13 @@ namespace CNC.Controls
             InitializeComponent();
         }
 
-        void btnSend_Click(object sender, RoutedEventArgs e)
-        {
-            if (txtMDI.Text != "")
-                Grbl.MDICommand(DataContext, txtMDI.Text);
-        }
-
-        public string Text { get { return txtMDI.Text; } set { txtMDI.Text = value; } }
         public new bool IsFocused { get { return txtMDI.IsFocused; } }
+
+        public static readonly DependencyProperty CommandProperty = DependencyProperty.Register(nameof(Command), typeof(string), typeof(MDIControl), new PropertyMetadata(""));
+        public string Command
+        {
+            get { return (string)GetValue(CommandProperty); }
+            set { SetValue(CommandProperty, value); }
+        }
     }
 }

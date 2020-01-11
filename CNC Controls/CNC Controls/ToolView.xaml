@@ -14,7 +14,7 @@
         <DataGrid x:Name="dgrTools" Grid.Row="0" ItemsSource="{Binding}" Width="300" IsReadOnly="True" SelectionMode="Single" SelectionUnit="FullRow" AutoGenerateColumns="False" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"
                             CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserResizeRows="False" CanUserSortColumns="False" CanUserAddRows="False" SelectionChanged="dgrTools_SelectionChanged">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Tool" Binding="{Binding code}" Width="*"/>
+                <DataGridTextColumn Header="Tool" Binding="{Binding Code}" Width="*"/>
                 <DataGridTextColumn Header="X" Binding="{Binding X}" Width="70"/>
                 <DataGridTextColumn Header="Y" Binding="{Binding Y}" Width="70"/>
                 <DataGridTextColumn Header="Z" Binding="{Binding Z}" Width="70"/>

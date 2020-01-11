@@ -1,0 +1,22 @@
+﻿<UserControl
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:GCode_Sender"
+             xmlns:Camera="clr-namespace:CNC.Controls.Camera;assembly=CNC.Controls.Camera" xmlns:Viewer="clr-namespace:CNC.Controls.Viewer;assembly=CNC.Controls.Viewer" xmlns:Lathe="clr-namespace:CNC.Controls.Lathe;assembly=CNC.Controls.Lathe" x:Class="GCode_Sender.ConfigView"
+             mc:Ignorable="d" 
+             d:DesignHeight="515" d:DesignWidth="875">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="11*"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <StackPanel HorizontalAlignment="Left" Height="Auto" Margin="10,10,0,0" VerticalAlignment="Top" Width="400">
+            <Camera:ConfigControl x:Name="cameraConfig"/>
+            <Viewer:ConfigControl/>
+            <Lathe:ConfigControl/>
+        </StackPanel>
+        <Button x:Name="btnSave" Content="Save settings" HorizontalAlignment="Left" Margin="10,5,0,0" Grid.Row="1" VerticalAlignment="Top" Width="100" Click="btnSave_Click"/>
+    </Grid>
+</UserControl>

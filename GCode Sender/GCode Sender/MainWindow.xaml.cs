@@ -1,13 +1,13 @@
 ﻿/*
  * MainWindow.xaml.cs - part of Grbl Code Sender
  *
- * v0.03 / 2019-12-01 / Io Engineering (Terje Io)
+ * v0.03 / 2020-01-07 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019, Io Engineering (Terje Io)
+Copyright (c) 2019-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -52,7 +52,7 @@ namespace GCode_Sender
 
     public partial class MainWindow : Window
     {
-        private CNCView currentRenderer = null;
+        private CNCView currentView = null;
 
         public static MainWindow ui = null;
         public static CNC.Controls.Viewer.Viewer GCodeViewer = null;
@@ -64,7 +64,10 @@ namespace GCode_Sender
         public static event GCodePushHandler GCodePush;
 
         public delegate void FileOpenHandler();
-        public static event FileOpenHandler FileOpen;
+        public static event FileOpenHandler FileOpen; // Issued if File > Open menu cliked
+
+        public delegate void FileLoadHandler(string filename);
+        public static event FileLoadHandler FileLoad; // Issued on load of main window if filename provided as command line argument
 
         public MainWindow()
         {
@@ -74,17 +77,17 @@ namespace GCode_Sender
             GCodeViewer = viewer;
 
             int res;
-            if((res = Profile.SetupAndOpen(Title, App.Current.Dispatcher)) != 0)
+            if ((res = Profile.SetupAndOpen(Title, (GrblViewModel)DataContext, App.Current.Dispatcher)) != 0)
                 Environment.Exit(res);
 
             BaseWindowTitle = Title;
 
-            GrblInfo.LatheModeEnabled = Profile.Config.LatheMode;
+            GrblInfo.LatheModeEnabled = Profile.Config.Lathe.IsEnabled;
 
             turningWizard.ApplySettings(Profile.Config.Lathe);
             threadingWizard.ApplySettings(Profile.Config.Lathe);
 
-            if (Profile.Config.EnableGCodeViewer)
+            if (Profile.Config.GCodeViewer.IsEnabled)
                 GCodeViewer.ApplySettings(Profile.Config.GCodeViewer);
             else
                 ShowView(false, ViewType.GCodeViewer);
@@ -103,9 +106,11 @@ namespace GCode_Sender
             tabMode.SelectedIndex = 0;
 
             foreach (TabItem tab in UIUtils.FindLogicalChildren<TabItem>(ui.tabMode))
-                tab.IsEnabled = GetRenderer(tab).mode == ViewType.GRBL;
+                tab.IsEnabled = getView(tab).mode == ViewType.GRBL || getView(tab).mode == ViewType.AppConfig;
 
-            currentRenderer = GetRenderer((TabItem)tabMode.Items[tabMode.SelectedIndex]);
+            currentView = getView((TabItem)tabMode.Items[tabMode.SelectedIndex]);
+
+            getTab(ViewType.AppConfig).DataContext = Profile.Config;
         }
 
         public string BaseWindowTitle { get; set; }
@@ -125,7 +130,7 @@ namespace GCode_Sender
             set {
                 menuFile.IsEnabled = !value;
                 foreach (TabItem tabitem in UIUtils.FindLogicalChildren<TabItem>(ui.tabMode))
-                    tabitem.IsEnabled = !value || GetRenderer(tabitem).mode == ViewType.GRBL;
+                    tabitem.IsEnabled = !value || getView(tabitem).mode == ViewType.GRBL;
             }
         }
 
@@ -140,14 +145,16 @@ namespace GCode_Sender
         {
             System.Threading.Thread.Sleep(50);
             Comms.com.PurgeQueue();
-            currentRenderer.Activate(true, ViewType.Startup);
+            currentView.Activate(true, ViewType.Startup);
+            if (!string.IsNullOrEmpty(Profile.FileName))
+                FileLoad?.Invoke(Profile.FileName);
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             if (!(e.Cancel = !menuFile.IsEnabled))
             {
-                currentRenderer.Activate(false, ViewType.Shutdown);
+                currentView.Activate(false, ViewType.Shutdown);
 #if ADD_CAMERA
                 if (Camera != null)
                 {
@@ -166,7 +173,7 @@ namespace GCode_Sender
 
         private void Window_Closed(object sender, EventArgs e)
         {
-  //          Comms.com.Close(); // Makes fking process hang
+            //          Comms.com.Close(); // Makes fking process hang
         }
 
         private void exitMenuItem_Click(object sender, RoutedEventArgs e)
@@ -187,33 +194,45 @@ namespace GCode_Sender
 
         private void fileCloseMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            CNCView view, grbl = GetRenderer(getTab(ViewType.GRBL));
-            
-            grbl.CloseFile();
-
-            foreach (TabItem tabitem in UIUtils.FindLogicalChildren<TabItem>(ui.tabMode))
-            {
-                if ((view = GetRenderer(tabitem)) != null && view != grbl)
-                    view.CloseFile();
-            }
+            closeFile();
         }
 
         private void TabMode_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if(currentRenderer != null && e.AddedItems.Count > 0)
+            if (currentView != null && e.AddedItems.Count > 0)
             {
-                ViewType prevMode = currentRenderer.mode;
-                CNCView nextRenderer = GetRenderer((TabItem)tabMode.Items[tabMode.SelectedIndex]);
-                if (nextRenderer != currentRenderer)
+                ViewType prevMode = currentView.mode;
+                CNCView nextView = getView((TabItem)tabMode.Items[tabMode.SelectedIndex]);
+                if (nextView != currentView)
                 {
-                    currentRenderer.Activate(false, nextRenderer.mode);
-                    currentRenderer = nextRenderer;
-                    currentRenderer.Activate(true, prevMode);
+                    currentView.Activate(false, nextView.mode);
+                    currentView = nextView;
+                    currentView.Activate(true, prevMode);
                 }
             }
         }
 
-        #endregion  
+        private void SDCardView_FileSelected(string filename)
+        {
+            closeFile();
+            ((GrblViewModel)ui.DataContext).FileName = filename;
+            Dispatcher.BeginInvoke((System.Action)(() => ui.tabMode.SelectedItem = getTab(ViewType.GRBL)));
+        }
+
+        #endregion
+
+        private static void closeFile ()
+        {
+            CNCView view, grbl = getView(getTab(ViewType.GRBL));
+
+            grbl.CloseFile();
+
+            foreach (TabItem tabitem in UIUtils.FindLogicalChildren<TabItem>(ui.tabMode))
+            {
+                if ((view = getView(tabitem)) != null && view != grbl)
+                    view.CloseFile();
+            }
+        }
 
         private static TabItem getTab(ViewType mode)
         {
@@ -221,7 +240,7 @@ namespace GCode_Sender
 
             foreach (TabItem tabitem in UIUtils.FindLogicalChildren<TabItem>(ui.tabMode))
             {
-                if (GetRenderer(tabitem).mode == mode)
+                if (getView(tabitem).mode == mode)
                 {
                     tab = tabitem;
                     break;
@@ -278,16 +297,19 @@ namespace GCode_Sender
         }
 #endif
 
-        private static CNCView GetRenderer(TabItem tab)
+        private static CNCView getView(TabItem tab)
         {
-            CNCView renderer = null;
+            CNCView view = null;
 
             foreach (UserControl uc in UIUtils.FindLogicalChildren<UserControl>(tab))
             {
-                if (uc is CNCView) { renderer = (CNCView)uc; break; }
+                if (uc is CNCView) {
+                    view = (CNCView)uc;
+                    break;
+                }
             }
 
-            return renderer;
+            return view;
         }
     }
 }

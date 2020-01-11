@@ -42,7 +42,7 @@
                 </TabItem>
                 <TabItem x:Name="tabSDCard" Header="SD Card">
                     <Grid Background="#FFE5E5E5">
-                        <cnccontrols:SDCardView x:Name="toolSDCard" HorizontalAlignment="Left" Height="515" VerticalAlignment="Top" Width="875"/>
+                        <cnccontrols:SDCardView x:Name="SDCardView" FileSelected="SDCardView_FileSelected" HorizontalAlignment="Left" Height="515" VerticalAlignment="Top" Width="875"/>
                     </Grid>
                 </TabItem>
                 <TabItem x:Name="tabTurning" Header="Turning">
@@ -76,14 +76,23 @@
                         <cnccontrols:TrinamicView x:Name="toolTrinamic" HorizontalAlignment="Left" Height="515" VerticalAlignment="Top" Width="875"/>
                     </Grid>
                 </TabItem>
-                <TabItem x:Name="tabConfig" Header="Settings" Height="23" VerticalAlignment="Top">
+                <TabItem x:Name="tabConfig" Header="Settings: Grbl" Height="23" VerticalAlignment="Top">
                     <Grid Background="#FFE5E5E5">
                         <cnccontrols:ConfigView x:Name="configControl" HorizontalAlignment="Left" Height="515" VerticalAlignment="Top" Width="875"/>
                     </Grid>
                 </TabItem>
+                <TabItem x:Name="tabAppConfig" Header="Settings: App" Height="23" VerticalAlignment="Top">
+                    <Grid Background="#FFE5E5E5">
+                        <local:ConfigView x:Name="appConfigControl" HorizontalAlignment="Left" Height="515" VerticalAlignment="Top" Width="875"/>
+                    </Grid>
+                </TabItem>
                 <TabItem x:Name="tabPIDTuner" Header="PID Tuner">
                     <Grid Background="#FFE5E5E5">
-                        <cnccontrols:PIDLogView x:Name="toolPIDTuner" HorizontalAlignment="Left" Height="515" VerticalAlignment="Top" Width="875"/>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="125*"/>
+                            <ColumnDefinition Width="751*"/>
+                        </Grid.ColumnDefinitions>
+                        <cnccontrols:PIDLogView x:Name="toolPIDTuner" HorizontalAlignment="Left" Height="515" VerticalAlignment="Top" Width="875" Grid.ColumnSpan="2" Margin="0,0,0,-1"/>
                     </Grid>
                 </TabItem>
                 <!--

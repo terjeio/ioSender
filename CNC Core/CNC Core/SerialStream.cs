@@ -1,7 +1,7 @@
 ﻿/*
  * SerialStream.cs - part of CNC Controls library
  *
- * v0.02 / 2019-11-30 / Io Engineering (Terje Io)
+ * v0.03 / 2019-12-04 / Io Engineering (Terje Io)
  *
  */
 
@@ -272,7 +272,7 @@ StreamWriter log = null;
                 System.Threading.Thread.Sleep(15);
         }
 
-        public string getReply(string command)
+        public string GetReply(string command)
         {
             Reply = "";
             WriteCommand(command);

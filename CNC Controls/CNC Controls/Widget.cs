@@ -1,13 +1,13 @@
 ﻿/*
  * Widget.cs - part of CNC Controls library for Grbl
  *
- * v0.03 / 2019-11-30 / Io Engineering (Terje Io)
+ * v0.03 / 2020-01-10 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2019, Io Engineering (Terje Io)
+Copyright (c) 2018-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -255,7 +255,7 @@ namespace CNC.Controls
                         Min = widget.Min,
                         Max = widget.Max
                     });
-                    wNumericTextBox.Style = View.Resources["ErrorStyle"] as Style;
+                    wNumericTextBox.Style = View.Resources["NumericErrorStyle"] as Style;
                     BindingOperations.SetBinding(wNumericTextBox, NumericTextBox.ValueProperty, binding);
                     model.NumericValue = dbl.Parse(widget.Value);
                     break;
@@ -274,6 +274,21 @@ namespace CNC.Controls
                         int.TryParse(widget.Format.Substring(2).Replace(")", ""), out length);
                         wTextBox.MaxLength = length;
                         //  this.wTextBox.Size = new System.Drawing.Size(Math.Min(length * PPU, Canvas.Width - x - 15), 20);
+                    }
+                    else if (widget.DataType == DataTypes.IP4)
+                    {
+                        wTextBox.MaxLength = 16;
+                        Binding sbinding = new Binding("Text")
+                        {
+                            Source = Canvas.DataContext,
+                            Path = new PropertyPath("TextValue"),
+                            Mode = BindingMode.TwoWay,
+                            UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
+                            ValidatesOnDataErrors = true
+                        };
+                        sbinding.ValidationRules.Add(new IP4ValueRule());
+                        wTextBox.Style = View.Resources["Ip4ErrorStyle"] as Style;
+                        BindingOperations.SetBinding(wTextBox, TextBox.TextProperty, sbinding);
                     }
                     grid = labelGrid = AddGrid();
                     grid.Children.Add(wTextBox);
@@ -465,7 +480,7 @@ namespace CNC.Controls
                         break;
 
                     case DataTypes.BOOL:
-                        this.wCheckBox.IsChecked = value == "1";
+                        wCheckBox.IsChecked = value == "1";
                         break;
 
                     case DataTypes.INTEGER:
@@ -536,8 +551,7 @@ namespace CNC.Controls
                     break;
 
                 case DataTypes.IP4:
-                    System.Net.IPAddress ip4;
-                    ok = System.Net.IPAddress.TryParse(widget.Value, out ip4);
+                    ok = !Validation.GetHasError(wTextBox);
                     break;
             }
 
