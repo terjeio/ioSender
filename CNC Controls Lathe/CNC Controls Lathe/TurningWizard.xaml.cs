@@ -1,7 +1,7 @@
 ﻿/*
  * TurningWizard.xaml.cs - part of CNC Controls library
  *
- * v0.01 / 2019-10-31 / Io Engineering (Terje Io)
+ * v0.01 / 2020-01-17 / Io Engineering (Terje Io)
  *
  */
 
@@ -107,7 +107,7 @@ namespace CNC.Controls.Lathe
                     if (config == null)
                     {
 
-                     //   cbxProfile.BindOptions(config, mode);
+                        //   cbxProfile.BindOptions(config, mode);
                     }
 
                     model.config.Update();
@@ -120,7 +120,10 @@ namespace CNC.Controls.Lathe
                     //}
                 }
                 else
+                {
                     model.gCode.Clear();
+                    model.PassData.Clear();
+                }
             }
         }
 

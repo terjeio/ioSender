@@ -1,13 +1,13 @@
 ﻿/*
- * TurningLogic.cs - part of CNC Controls library
+ * TurningLogic.cs - part of CNC Controls Lathe library
  *
- * v0.02 / 2019-10-31 / Io Engineering (Terje Io)
+ * v0.01 / 2020-01-17 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019, Io Engineering (Terje Io)
+Copyright (c) 2019-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -202,7 +202,6 @@ namespace CNC.Controls.Lathe
             uint pass = 1;
 
             model.gCode.Clear();
-
             model.gCode.Add(string.Format("G18 G{0} G{1}", model.config.xmode == LatheMode.Radius ? "8" : "7", model.IsMetric ? "21" : "20"));
             model.gCode.Add(string.Format("M3S{0} G4P1", speed.ToString()));
             model.gCode.Add(string.Format("G0 X{0}", FormatValue(diameter + xclearance)));

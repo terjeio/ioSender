@@ -1,7 +1,7 @@
 ﻿/*
- * ThreadingWizard.xaml.cs - part of CNC Controls library for Grbl
+ * ThreadingWizard.xaml.cs - part of CNC Controls Lathe library
  *
- * v0.01 / 2019-05-27 / Io Engineering (Terje Io)
+ * v0.01 / 2020-01-17 / Io Engineering (Terje Io)
  *
  */
 
@@ -17,7 +17,7 @@
 
 Additional code:
 
-Copyright (c) 2019, Io Engineering (Terje Io)
+Copyright (c) 2019-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -53,9 +53,6 @@ using System.Windows.Input;
 using CNC.Core;
 using CNC.View;
 using System.Collections.Generic;
-using System.Windows.Media;
-using System.Windows.Documents;
-using System.Windows.Data;
 
 namespace CNC.Controls.Lathe
 {
@@ -78,6 +75,8 @@ namespace CNC.Controls.Lathe
         public ThreadingWizard()
         {
             InitializeComponent();
+
+            grpOptionsMach3.Visibility = Visibility.Hidden;
 
             logic = new ThreadLogic();
 
@@ -110,6 +109,7 @@ namespace CNC.Controls.Lathe
             //UIUtils.GroupBoxCaptionBold(grpOptionsLinuxCNC);
             //UIUtils.GroupBoxCaptionBold(grpOptionsMach3);
             //UIUtils.GroupBoxCaptionBold(grpTool);
+     //       logic.ResetUI();
         }
 
         private void Logic_GCodePush(string gcode, Action action)
@@ -184,6 +184,16 @@ namespace CNC.Controls.Lathe
 
         private void btnCalculate_Click(object sender, RoutedEventArgs e)
         {
+            if(!model.Thread.CompoundAngles.Contains(cbxCompoundAngle.Value))
+            {
+                model.Thread.CompoundAngles.Add(cbxCompoundAngle.Value);
+                model.Thread.CompoundAngle = cbxCompoundAngle.Value;
+            }
+            if (model.Thread.DepthDegression == null)
+            {
+                model.Thread.DepthDegressions.Add(cbxDepthDegression.Text);
+                model.Thread.DepthDegression = cbxDepthDegression.Text;
+            }
             logic.Calculate();
         }
     }

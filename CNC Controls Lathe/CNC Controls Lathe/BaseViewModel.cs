@@ -1,13 +1,13 @@
 ﻿/*
- * BaseViewModel.cs - part of CNC Controls library
+ * BaseViewModel.cs - part of CNC Controls Lathe library
  *
- * v0.01 / 2019-10-10 / Io Engineering (Terje Io)
+ * v0.01 / 2020-01-17 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019, Io Engineering (Terje Io)
+Copyright (c) 2019-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -53,7 +53,7 @@ namespace CNC.Controls.Lathe
         double _xlen = double.NaN, _xstart = double.NaN, _zlen = double.NaN, _zstart = double.NaN;
         uint _springPasses = 0, _cssSpeed = 0;
         bool _isMetric = true, _isSpringPassesEnabled = false, _isCssEnabled = false, _isTaperEnabled = false;
-        string _unit = "mm", _passInfo = string.Empty;
+        string _unit = "mm";
 
         Thread.Format _format = Thread.Format.LinuxCNC;
 
@@ -64,6 +64,7 @@ namespace CNC.Controls.Lathe
         {
    //         Error = new ErrorProperties();
             gCode = new ObservableCollection<string>();
+            PassData = new ObservableCollection<string>();
             GCodeFormat = Thread.Format.LinuxCNC;
             ZLength = 10;
             ZStart = 0;
@@ -73,6 +74,7 @@ namespace CNC.Controls.Lathe
         }
 
         public ObservableCollection<string> gCode { get; private set; }
+        public ObservableCollection<string> PassData { get; private set; }
 
         //public ErrorProperties Error {
         //    get { return _error; }
@@ -124,12 +126,6 @@ namespace CNC.Controls.Lathe
         {
             get { return _unitFactor; }
             set { _unitFactor = value; OnPropertyChanged(); }
-        }
-
-        public string PassInfo
-        {
-            get { return _passInfo; }
-            set { _passInfo = value; OnPropertyChanged(); }
         }
 
         public double RPM

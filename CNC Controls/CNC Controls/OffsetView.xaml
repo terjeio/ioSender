@@ -20,6 +20,8 @@
                 <DataGridTextColumn Header="Z" Binding="{Binding Z}" Width="70"/>
             </DataGrid.Columns>
         </DataGrid>
+        <Label x:Name="lblOffset" Content="Offset:" Grid.Column="1" HorizontalAlignment="Left" Margin="102,95,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="txtOffset" Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="147,95,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="50" IsReadOnly="True"/>
         <StackPanel Grid.Column="1" HorizontalAlignment="Left" Margin="74,122,0,0" VerticalAlignment="Top" Width="219">
             <local:CoordValueSetControl x:Name="cvXOffset" Label="X axis:" Tag="X" Click="cvOffset_Click"
                 Value="{Binding Path=offset.X, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
@@ -36,7 +38,5 @@
                 <Button x:Name="btnSetAll" Content="Set all" Margin="3,0" Click="btnSetAll_Click"/>
             </StackPanel>
         </StackPanel>
-        <Label x:Name="lblOffset" Content="Offset:" Grid.Column="1" HorizontalAlignment="Left" Margin="96,81,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="txtOffset" Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="139,81,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="50" IsReadOnly="True"/>
     </Grid>
 </UserControl>

@@ -1,7 +1,7 @@
 ﻿/*
  * JobView.xaml.cs - part of Grbl Code Sender
  *
- * v0.02 / 2020-01-07 / Io Engineering (Terje Io)
+ * v0.02 / 2020-01-22 / Io Engineering (Terje Io)
  *
  */
 
@@ -113,6 +113,13 @@ namespace GCode_Sender
 
                 case nameof(GrblViewModel.IsJobRunning):
                     MainWindow.ui.JobRunning = ((GrblViewModel)sender).IsJobRunning;
+                    if(GrblInfo.ManualToolChange)
+                        workParametersControl.ToolChangeCommand = MainWindow.ui.JobRunning ? "T{0}M6" : "M61Q{0}";
+                    break;
+
+                case nameof(GrblViewModel.Tool):
+                    if (GrblInfo.ManualToolChange && ((GrblViewModel)sender).Tool != GrblConstants.NO_TOOL)
+                        GrblWorkParameters.RemoveNoTool();
                     break;
 
                 case nameof(GrblViewModel.GrblReset):
@@ -131,18 +138,26 @@ namespace GCode_Sender
                 case nameof(GrblViewModel.FileName):
                     string filename = ((GrblViewModel)sender).FileName;
                     MainWindow.ui.WindowTitle = filename;
-                    if (filename.StartsWith("SDCard:"))
-                    {
-                        sdStream = true;
-                        MainWindow.EnableView(false, ViewType.GCodeViewer);
-                    }
-                    else if (!string.IsNullOrEmpty(filename) && MainWindow.IsViewVisible(ViewType.GCodeViewer))
-                    {
-                        MainWindow.EnableView(true, ViewType.GCodeViewer);
-                        GCodeSender.EnablePolling(false);
-                        MainWindow.GCodeViewer.Open(filename, GCodeSender.GCode.Tokens);
-                        GCodeSender.EnablePolling(true);
-                    }
+                        if (filename.StartsWith("SDCard:"))
+                        {
+                            sdStream = true;
+                            MainWindow.EnableView(false, ViewType.GCodeViewer);
+                        }
+                        else if (filename.StartsWith("Wizard:"))
+                        {
+                            if (MainWindow.IsViewVisible(ViewType.GCodeViewer))
+                            {
+                                MainWindow.EnableView(false, ViewType.GCodeViewer);
+// For now - rendering of G76 must be implemented first                                MainWindow.GCodeViewer.Open(filename, GCodeSender.GCode.Tokens);
+                            }
+                        }
+                        else if (!string.IsNullOrEmpty(filename) && MainWindow.IsViewVisible(ViewType.GCodeViewer))
+                        {
+                            MainWindow.EnableView(true, ViewType.GCodeViewer);
+                            GCodeSender.EnablePolling(false);
+                            MainWindow.GCodeViewer.Open(filename, GCodeSender.GCode.Tokens);
+                            GCodeSender.EnablePolling(true);
+                        }
                     break;
             }
         }
@@ -265,9 +280,9 @@ namespace GCode_Sender
                 GCodeSender.EnablePolling(true);
             }
 
-            workParametersControl.ToolChangeCommand = GrblInfo.ManualToolChange ? "T{0}M6" : "T{0}";
+            workParametersControl.ToolChangeCommand = GrblInfo.ManualToolChange ? "M61Q{0}" : "T{0}";
 
-            GCodeSender.Config();
+            GCodeSender.Config(MainWindow.Profile.Config);
 
             if (GrblInfo.LatheModeEnabled)
             {

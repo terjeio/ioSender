@@ -1,13 +1,13 @@
 ﻿/*
- * MPGPending.xaml.cs - part of CNC Controls library for Grbl
+ * JogConfigControl.xaml.cs - part of CNC Controls library
  *
- * v0.02 / 2020-01-18 / Io Engineering (Terje Io)
+ * v0.01 / 2020-01-22 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2020, Io Engineering (Terje Io)
+Copyright (c) 2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -37,49 +37,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-using System.Windows;
-using CNC.Core;
+using System.Windows.Controls;
 
 namespace CNC.Controls
 {
-    public partial class MPGPending : Window
+    /// <summary>
+    /// Interaction logic for JogSetupControl.xaml
+    /// </summary>
+    public partial class JogConfigControl : UserControl
     {
-        private GrblViewModel model;
-
-        public MPGPending(GrblViewModel model)
+        public JogConfigControl()
         {
             InitializeComponent();
-
-            this.model = model;
-
-            Comms.com.DataReceived += new DataReceivedHandler(DataReceived);
-        }
-
-        public bool Cancelled { get; private set; } = true;
-
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            Comms.com.DataReceived -= DataReceived;
-
-            using (new UIUtils.WaitCursor()) // disconnecting from websocket may take some time...
-            {
-                if (Comms.com.StreamType != Comms.StreamType.Serial) // Serial makes fking process hang
-                    Comms.com.Close();
-            }
-        }
-
-        private void DataReceived(string data)
-        {
-            if (data.Length > 1 && data.Substring(0, 1) == "<")
-            {
-                model.ParseStatus(data.Remove(data.Length - 1));
-
-                if(model.IsMPGActive == false) {
-                    Cancelled = false;
-                    Close();
-                }
-            }
         }
     }
 }
-

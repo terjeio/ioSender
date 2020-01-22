@@ -1,0 +1,19 @@
+﻿<UserControl x:Class="CNC.Controls.JogConfigControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CNC.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="200" d:DesignWidth="250">
+    <GroupBox x:Name="grpJog" Header="Keyboard jogging" HorizontalAlignment="Left" VerticalAlignment="Top" Height="Auto" Width="250">
+        <StackPanel HorizontalAlignment="Left" Height="Auto" Margin="0,3,0,0" VerticalAlignment="Top" Width="235">
+            <local:NumericField Label="Fast feedrate:" ColonAt="90" Unit="mm/min" Format="###0" Value="{Binding Path=Jog.FastFeedrate, Mode=TwoWay}" Height="29" VerticalAlignment="Bottom" Grid.ColumnSpan="2"/>
+            <local:NumericField Label="Fast distance:" ColonAt="90" Grid.Column="1" Value="{Binding Path=Jog.FastDistance, Mode=TwoWay}" />
+            <local:NumericField Label="Slow feedrate:" ColonAt="90" Unit="mm/min" Format="###0" Value="{Binding Path=Jog.SlowFeedrate, Mode=TwoWay}" Height="29" VerticalAlignment="Bottom" Grid.ColumnSpan="2"/>
+            <local:NumericField Label="Slow distance:" ColonAt="90" Grid.Column="1" Value="{Binding Path=Jog.SlowDistance, Mode=TwoWay}" />
+            <local:NumericField Label="Step feedrate:" ColonAt="90" Unit="mm/min" Format="###0" Value="{Binding Path=Jog.StepFeedrate, Mode=TwoWay}" Height="29" VerticalAlignment="Bottom" Grid.ColumnSpan="2"/>
+            <local:NumericField Label="Step distance:" ColonAt="90" Grid.Column="1" Value="{Binding Path=Jog.StepDistance, Mode=TwoWay}" />
+        </StackPanel>
+    </GroupBox>
+</UserControl>

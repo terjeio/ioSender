@@ -56,6 +56,9 @@
       <DependentUpon>About.xaml</DependentUpon>
     </Compile>
     <Compile Include="AppConfig.cs" />
+    <Compile Include="BasicConfigControl.xaml.cs">
+      <DependentUpon>BasicConfigControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ConfigView.xaml.cs">
       <DependentUpon>ConfigView.xaml</DependentUpon>
     </Compile>
@@ -77,6 +80,9 @@
     </Compile>
     <Compile Include="JobControl.xaml.cs">
       <DependentUpon>JobControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="JogConfigControl.xaml.cs">
+      <DependentUpon>JogConfigControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="LimitsBaseControl.xaml.cs">
       <DependentUpon>LimitsBaseControl.xaml</DependentUpon>
@@ -131,11 +137,19 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="BasicConfigControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="ConfigView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="CoolantControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="JogConfigControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -1,13 +1,13 @@
 ﻿/*
  * ProfileDialog.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.02 / 2019-09-31 / Io Engineering (Terje Io)
+ * v0.02 / 2020-01-16 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019, Io Engineering (Terje Io)
+Copyright (c) 2019-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -61,10 +61,8 @@ namespace CNC.Controls.Lathe
 
         }
         public bool xmodeenabled { get; set; }
-
         public Visibility threadVisibility { get; set; }
         public Visibility rpmVisibility { get; set; }
-
         public ObservableCollection<ProfileData> Profiles { get; set; }
 
         ProfileData _profile;

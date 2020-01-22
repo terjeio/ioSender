@@ -4,6 +4,7 @@
     <EnableUnmanagedDebugging>true</EnableUnmanagedDebugging>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <StartArguments>-xinifile d:\appcfg.xml -xport  ws://10.0.0.70:81 c:\users\terjeio\desktop\landscape.nc</StartArguments>
+    <StartArguments>
+    </StartArguments>
   </PropertyGroup>
 </Project>

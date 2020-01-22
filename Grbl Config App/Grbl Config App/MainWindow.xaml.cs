@@ -2,7 +2,7 @@
 /*
  * MainWindow.xaml.cs - part of Grbl Code Sender
  *
- * v0.03 / 2019-10-27 / Io Engineering (Terje Io)
+ * v0.03 / 2019-12-10 / Io Engineering (Terje Io)
  *
  */
 
@@ -57,7 +57,7 @@ namespace Grbl_Config_App
             InitializeComponent();
 
             int res;
-            if ((res = Profile.SetupAndOpen(Title, App.Current.Dispatcher)) != 0)
+            if ((res = Profile.SetupAndOpen(Title, (GrblViewModel)DataContext, App.Current.Dispatcher)) != 0)
                 Environment.Exit(res);            
         }
 
@@ -80,6 +80,11 @@ namespace Grbl_Config_App
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             configView.Activate(false, ViewType.Shutdown);
+
+            using (new UIUtils.WaitCursor()) // disconnecting from websocket may take some time...
+            {
+               Comms.com.Close();
+            }
         }
 
         private void exitMenuItem_Click(object sender, RoutedEventArgs e)
@@ -89,7 +94,7 @@ namespace Grbl_Config_App
 
         void aboutMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            About about = new About(this);
+            About about = new About(this, this.Title);
             about.ShowDialog();
         }
 

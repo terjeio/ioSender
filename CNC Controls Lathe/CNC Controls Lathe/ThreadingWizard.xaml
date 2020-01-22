@@ -9,13 +9,14 @@
              mc:Ignorable="d" 
              d:DesignHeight="515" d:DesignWidth="875"
              Loaded="ThreadingWizard_Loaded">
-    
+
     <UserControl.Resources>
         <Converters:StringCollectionToTextConverter x:Key="GCodeConverter" />
         <Converters:CNCMeasureToTextConverter x:Key="MeasureConverter" />
         <Converters:SideToInsideBoolConverter x:Key="InsideConverter" />
         <Converters:SideToOutsideBoolConverter x:Key="OutsideConverter" />
         <Converters:SideToIsEnabledConverter x:Key="IsSideEnabledConverter" />
+        <Converters:SideToStringConverter x:Key="SideToStringConverter" />
         <Converters:ToolToRoundedBoolConverter x:Key="ToolIsRoundedConverter" />
         <Converters:ToolToChamferedBoolConverter x:Key="ToolIsChamferedConverter" />
         <Converters:ToolToLabelStringConverter x:Key="ToolLabelConverter" />
@@ -57,7 +58,7 @@
         <Label x:Name="lblThreadSize" Content="Size:" HorizontalContentAlignment="Right" HorizontalAlignment="Left" Margin="10,70,0,0" Width="48" VerticalAlignment="Top"/>
         <ComboBox x:Name="cbxThreadSize" HorizontalAlignment="Left" Margin="63,70,0,0" VerticalAlignment="Top" Width="300"
                 ItemsSource="{Binding Path=Thread.ThreadSizes}"    
-                SelectedItem="{Binding Path=Thread.ThreadSize, Mode=TwoWay}"  
+                SelectedItem="{Binding Path=Thread.ThreadSize, Mode=TwoWay}"
                 DisplayMemberPath="Name"
                 SelectedValuePath="Id" 
         />
@@ -81,11 +82,18 @@
                 <Controls:NumericField x:Name="cvLength" Label="Length:" Value="{Binding Path=ZLength, Mode=TwoWay}" Unit="{Binding Path=Unit, Mode=OneWay}" IsReadOnly="{Binding Path=Thread.FixedLength}" Margin="10,0"/>
             </StackPanel>
             <Controls:NumericField Name="cvSpindleRPM" Label="Spindle:" Format="####0" Value="{Binding Path=RPM, Mode=TwoWay}" Unit="RPM" Style="{StaticResource ErrorStyle}">
- 
+
             </Controls:NumericField>
             <local:SpringPassControl x:Name="springPasses" IsPassesEnabled="{Binding Path=IsSpringPassesEnabled, Mode=TwoWay}" Value="{Binding Path=SpringPasses, Mode=TwoWay}" Margin="35,0,0,0"/>
         </StackPanel>
-        <TextBox x:Name="txtPasses" HorizontalAlignment="Left" Height="84" Margin="20,298,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="300"/>
+        <TextBox x:Name="txtPasses" HorizontalAlignment="Left" Height="84" Margin="20,298,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="300">
+            <TextBox.Text>
+                <MultiBinding Converter="{StaticResource GCodeConverter}">
+                    <Binding Path="PassData" Mode="OneWay"/>
+                    <Binding Path="PassData.Count" Mode="OneWay" />
+                </MultiBinding>
+            </TextBox.Text>
+        </TextBox>
         <TextBox x:Name="txtGCode" HorizontalAlignment="Left" Height="85" Margin="20,387,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="450">
             <TextBox.Text>
                 <MultiBinding Converter="{StaticResource GCodeConverter}">
@@ -106,7 +114,7 @@
                 <RowDefinition Height="24*"/>
                 <RowDefinition Height="24*"/>
             </Grid.RowDefinitions>
-            <Label x:Name="lblDiameter" Content="{Binding Path=Thread.SideLabel}" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.RowSpan="2"/>
+            <Label x:Name="lblDiameter" Content="{Binding Path=Thread.Side, Converter={StaticResource SideToStringConverter}}" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.RowSpan="2"/>
             <TextBox x:Name="txtOutsideDia" Text="{Binding Path=Thread.Diameter, Mode=OneWay, Converter={StaticResource MeasureConverter}}" Grid.Row="1" HorizontalContentAlignment="Right" Height="20" Margin="10,0,130,0" TextWrapping="NoWrap" VerticalAlignment="Top"/>
             <Label x:Name="label" Content="±" Grid.Row="1" HorizontalAlignment="Left" Margin="62,0" VerticalAlignment="Top"/>
             <TextBox x:Name="txtOutsideTol" Text="{Binding Path=Thread.DiameterTolerance, Mode=OneWay, Converter={StaticResource MeasureConverter}}" Grid.Row="1" HorizontalContentAlignment="Right" HorizontalAlignment="Left" Height="20" Margin="80,0,0,0" TextWrapping="NoWrap" VerticalAlignment="Top" Width="50"/>
@@ -132,27 +140,27 @@
             <Controls:NumericTextBox x:Name="cvInches" Grid.Row="1" Grid.RowSpan="2" HorizontalAlignment="Left" Format="###0" Value="{Binding Path=Inch.Whole, Mode=TwoWay}" IsReadOnly="{Binding Path=Inch.IsReadonly}" Width="50" Margin="6,0,0,0" VerticalAlignment="Center"/>
             <Label x:Name="lblInch" Content="inch" HorizontalAlignment="Left" Margin="110,0,0,0" VerticalAlignment="Center" Grid.Row="1" Grid.RowSpan="2"/>
         </Grid>
-        <GroupBox x:Name="grpOptionsLinuxCNC" Header="Options: linuxCNC" HorizontalAlignment="Left" Margin="540,17,0,0" VerticalAlignment="Top" Height="120" Width="325">
-            <Grid HorizontalAlignment="Left" Height="75" Margin="0,5,0,0" VerticalAlignment="Top" Width="290">
+        <GroupBox x:Name="grpOptionsLinuxCNC" Header="Options: linuxCNC" HorizontalAlignment="Left" Margin="540,17,0,0" VerticalAlignment="Top" Height="105" Width="325">
+            <Grid HorizontalAlignment="Left" Height="78" Margin="0,5,0,0" VerticalAlignment="Top" Width="290">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="100*"/>
                     <ColumnDefinition Width="75*"/>
                     <ColumnDefinition Width="25*"/>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="24*"/>
-                    <RowDefinition Height="24*"/>
-                    <RowDefinition Height="24*"/>
+                    <RowDefinition Height="26*"/>
+                    <RowDefinition Height="26*"/>
+                    <RowDefinition Height="26*"/>
                 </Grid.RowDefinitions>
                 <Label x:Name="lblLinuxTaper" Content="Taper:" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top"/>
                 <ComboBox x:Name="cbxTapertype" ItemsSource="{Binding Path=Thread.TaperTypes}" SelectedItem="{Binding Path=Thread.TaperType, Mode=TwoWay}" HorizontalAlignment="Left" Margin="55,0,0,0" VerticalAlignment="Top"/>
                 <Controls:NumericTextBox x:Name="cvTaperLength" Grid.Column="1" Format="##0.0##" Value="{Binding Path=Thread.TaperLength, Mode=TwoWay}" IsEnabled="{Binding Path=Thread.TaperType, Converter={StaticResource TaperEnableConverter}}" HorizontalAlignment="Left" Margin="10,0,0,3" TextWrapping="NoWrap" VerticalAlignment="Bottom"/>
                 <Label x:Name="lblUnitE2Taper" Content="{Binding Path=Unit, Mode=OneWay}" Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Top"/>
                 <Label x:Name="lblE1SA" Content="Compound slide angle:" Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Top"/>
-                <Controls:NumericComboBox x:Name="cbxCompoundAngle" Format="00.0" ItemsSource="{Binding Path=Thread.CompoundAngles}" SelectedItem="{Binding Path=Thread.CompoundAngle, Mode=TwoWay}" Grid.Column="1" HorizontalAlignment="Left" Margin="10,0,0,0" Grid.Row="1" VerticalAlignment="Top"/>
+                <Controls:NumericComboBox x:Name="cbxCompoundAngle" Format="00.0" Width="55" ItemsSource="{Binding Path=Thread.CompoundAngles}" SelectedItem="{Binding Path=Thread.CompoundAngle, Mode=TwoWay}" Grid.Column="1" HorizontalAlignment="Left" Margin="10,0,0,0" Grid.Row="1" VerticalAlignment="Top"/>
                 <Label x:Name="lblDegE2SA" Content="deg" Grid.Row="1" Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Top"/>
                 <Label x:Name="lblE2SA" Content="Depth degression:" Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Top"/>
-                <Controls:NumericComboBox x:Name="cbxDepthDegression" Format="00.0" ItemsSource="{Binding Path=Thread.DepthDegressions}" SelectedItem="{Binding Path=Thread.DepthDegression, Mode=TwoWay}" Grid.Column="1" HorizontalAlignment="Left" Margin="10,0,0,0" Grid.Row="2" VerticalAlignment="Top"/>
+                <Controls:NumericComboBox x:Name="cbxDepthDegression" Format="00.0" Width="55" ItemsSource="{Binding Path=Thread.DepthDegressions}" SelectedItem="{Binding Path=Thread.DepthDegression, Mode=TwoWay}" Grid.Column="1" HorizontalAlignment="Left" Margin="10,0,0,0" Grid.Row="2" VerticalAlignment="Top"/>
             </Grid>
         </GroupBox>
         <GroupBox x:Name="grpTool" Header="Tool" HorizontalAlignment="Left" Margin="540,360,0,0" VerticalAlignment="Top" Height="140" Width="325">
@@ -163,9 +171,9 @@
                 </Grid.ColumnDefinitions>
                 <StackPanel Grid.Column="1" HorizontalAlignment="Left" Height="109" VerticalAlignment="Top" Width="175">
                     <Controls:NumericField x:Name="cvTool" Label="{Binding Path=Tool.Shape, Converter={StaticResource ToolLabelConverter}}" Format="##0.0##" Value="{Binding Path=Tool.Tip}" Unit="{Binding Path=Unit, Mode=OneWay}" Style="{StaticResource ErrorStyle}"/>
-                    <Controls:NumericField x:Name="cvTooltipMin" Label="minimum:" Format="##0.0##" Value="{Binding Path=Tool.TipMinimum}" Unit="{Binding Path=Unit, Mode=OneWay}"/>
-                    <Controls:NumericField x:Name="cvTooltipMax" Label="maximum:" Format="##0.0##" Value="{Binding Path=Tool.TipMaximum}" Unit="{Binding Path=Unit, Mode=OneWay}"/>
-                    <Controls:NumericField x:Name="cvAngle" Label="Angle:" Format="##0" Value="{Binding Path=Tool.Angle, Mode=TwoWay}" Unit="deg"/>
+                    <Controls:NumericField x:Name="cvTooltipMin" Label="minimum:" Format="##0.0##" Value="{Binding Path=Tool.TipMinimum}" Unit="{Binding Path=Unit, Mode=OneWay}" IsEnabled="False"/>
+                    <Controls:NumericField x:Name="cvTooltipMax" Label="maximum:" Format="##0.0##" Value="{Binding Path=Tool.TipMaximum}" Unit="{Binding Path=Unit, Mode=OneWay}" IsEnabled="False"/>
+                    <Controls:NumericField x:Name="cvAngle" Label="Angle:" Format="##0" Value="{Binding Path=Tool.Angle, Mode=OneWay}" Unit="deg" IsEnabled="False"/>
                 </StackPanel>
                 <Image x:Name="pictureChamfer" HorizontalAlignment="Left" Height="60" Margin="10,10,0,0" VerticalAlignment="Top" Width="50" MouseUp="pictureTool_MouseUp" Source="Resources/ToolChamfer.png"/>
                 <Image x:Name="pictureRadius" HorizontalAlignment="Left" Height="60" Margin="70,10,0,0" VerticalAlignment="Top" Width="50" MouseUp="pictureTool_MouseUp" Source="Resources/ToolRadius.png"/>
@@ -188,9 +196,9 @@
                 </Grid.RowDefinitions>
                 <Controls:NumericField x:Name="cvRetract" Label="Retract:" Value="{Binding Path=Thread.RetractDegrees, Mode=TwoWay}" Unit="deg" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Height="27" Width="184" Style="{StaticResource ErrorStyle}"/>
                 <Label x:Name="lblPasses" Content="Passes:" HorizontalAlignment="Right" Grid.Row="1" VerticalAlignment="Top" Height="26" Width="47"/>
-                <Controls:NumericTextBox x:Name="cvPasses" HorizontalAlignment="Left" Margin="3,0,0,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Grid.Column="1" Height="22" Width="97"/>
+                <Controls:NumericTextBox x:Name="cvPasses" HorizontalAlignment="Left" Margin="3,0,0,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Grid.Column="1" Height="22" Width="60"/>
                 <Label x:Name="lblPassesExecuted" Content="executed:" HorizontalAlignment="Right" Grid.Row="2" VerticalAlignment="Top" Height="26" Width="60"/>
-                <Controls:NumericTextBox x:Name="cvPassesExecuted" HorizontalAlignment="Left" Margin="14,0,0,0" Grid.Row="2" TextWrapping="Wrap" VerticalAlignment="Top" Grid.Column="1" Height="22" Width="97"/>
+                <Controls:NumericTextBox x:Name="cvPassesExecuted" HorizontalAlignment="Left" Margin="3,0,0,0" Grid.Row="2" TextWrapping="Wrap" VerticalAlignment="Top" Grid.Column="1" Height="22" Width="60"/>
             </Grid>
         </GroupBox>
     </Grid>

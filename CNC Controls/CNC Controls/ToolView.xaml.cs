@@ -1,13 +1,13 @@
 ﻿/*
  * ToolView.xaml.cs - part of CNC Controls library
  *
- * v0.01 / 2019-11-07 / Io Engineering (Terje Io)
+ * v0.01 / 2020-01-18 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2019, Io Engineering (Terje Io)
+Copyright (c) 2018-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -40,6 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Collections.ObjectModel;
+using System.Linq;
 using CNC.Core;
 using CNC.GCode;
 using CNC.View;
@@ -73,7 +75,7 @@ namespace CNC.Controls
 
                 Comms.com.DataReceived += DataReceived;
 
-                dgrTools.ItemsSource = GrblWorkParameters.Tools;
+                dgrTools.ItemsSource = new ObservableCollection<Tool>(from tool in GrblWorkParameters.Tools where tool.Code != GrblConstants.NO_TOOL orderby tool.Code select tool);
                 dgrTools.SelectedIndex = 0;
             }
             else
@@ -132,6 +134,7 @@ namespace CNC.Controls
 
                     offset.Values[i] = selectedTool.Values[i];
                 }
+                txtTool.Text = selectedTool.Code;
             }
             else
                 selectedTool = null;

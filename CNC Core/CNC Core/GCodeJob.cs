@@ -7,7 +7,7 @@
 
 /*
 
-Copyright (c) 2018-2019, Io Engineering (Terje Io)
+Copyright (c) 2018-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -58,7 +58,7 @@ namespace CNC.Core
     {
 //         public SpindleState BBB;
 
-        uint LineNumber = 0;
+        uint LineNumber = 1;
 
         private string filename = string.Empty;
         private DataTable gcode = new DataTable("GCode");
@@ -142,6 +142,8 @@ namespace CNC.Core
             else
                 CloseFile();
 
+//            GCodeParser.Save(@"d:\tokens.xml", Parser.Tokens);
+
             return ok;
         }
 
@@ -222,7 +224,7 @@ namespace CNC.Core
             min_feed = double.MaxValue;
             max_feed = double.MinValue;
             BoundingBox.Reset();
-            LineNumber = 0;
+            LineNumber = 1;
             Parser.Reset();
         }
     }

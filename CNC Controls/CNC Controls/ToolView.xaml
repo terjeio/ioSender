@@ -20,6 +20,8 @@
                 <DataGridTextColumn Header="Z" Binding="{Binding Z}" Width="70"/>
             </DataGrid.Columns>
         </DataGrid>
+        <Label x:Name="lblTool" Content="Tool:" Grid.Column="1" HorizontalAlignment="Left" Margin="111,95,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="txtTool" Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="147,95,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="25" IsReadOnly="True"/>
         <StackPanel Grid.Column="1" HorizontalAlignment="Left" Margin="74,122,0,0" VerticalAlignment="Top" Width="219">
             <local:CoordValueSetControl x:Name="cvXOffset" Label="X axis:" Tag="X" Value="{Binding Path=offset.X, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" Click="cvOffset_Click"/>
             <local:CoordValueSetControl x:Name="cvYOffset" Label="Y axis:" Tag="Y" Value="{Binding Path=offset.Y, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" Click="cvOffset_Click"/>
@@ -31,7 +33,5 @@
                 <Button x:Name="btnSetAll" Content="Set all" Margin="3,0" Click="btnSetAll_Click"/>
             </StackPanel>
         </StackPanel>
-        <Label x:Name="lblTool" Content="Tool:" Grid.Column="1" HorizontalAlignment="Left" Margin="96,81,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="txtTool" Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="139,81,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="50" IsReadOnly="True"/>
     </Grid>
 </UserControl>

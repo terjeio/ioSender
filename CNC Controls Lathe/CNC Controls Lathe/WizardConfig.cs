@@ -96,7 +96,7 @@ namespace CNC.Controls.Lathe
 
         private void SetLimits()
         {
-            if (IsLoaded)
+            if (IsLoaded && GrblSettings.Loaded)
             {
                 if (!CSS)
                     active.RPM = Math.Min(Math.Max(RPM, RpmMin), RpmMax);

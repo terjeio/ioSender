@@ -1,13 +1,13 @@
 ﻿/*
  * AppConfig.cs - part of Grbl Code Sender
  *
- * v0.03 / 2019-12-03 / Io Engineering (Terje Io)
+ * v0.03 / 2020-01-22 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019, Io Engineering (Terje Io)
+Copyright (c) 2019-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -65,7 +65,6 @@ namespace CNC.Controls
         [XmlIgnore]
         public bool IsEnabled { get { return _isEnabled; }  set { _isEnabled = value; OnPropertyChanged(); } }
 
-
         public LatheMode XMode { get { return _latheMode; } set { _latheMode = value; IsEnabled = value != LatheMode.Disabled; } }
         public ZDirection ZDirection { get; set; } = ZDirection.Negative;
         public double PassDepthLast { get; set; } = 0.02d;
@@ -100,11 +99,28 @@ namespace CNC.Controls
     }
 
     [Serializable]
+    public class JogConfig : ViewModelBase
+    {
+        private double _fastFeedrate = 500d, _slowFeedrate = 200d, _stepFeedrate = 100d;
+        private double _fastDistance = 500d, _slowDistance = 500d, _stepDistance = 0.05d;
 
+        public double FastFeedrate { get { return _fastFeedrate; } set { _fastFeedrate = value; OnPropertyChanged(); } }
+        public double SlowFeedrate { get { return _slowFeedrate; } set { _slowFeedrate = value; OnPropertyChanged(); } }
+        public double StepFeedrate { get { return _stepFeedrate; } set { _stepFeedrate = value; OnPropertyChanged(); } }
+        public double FastDistance { get { return _fastDistance; } set { _fastDistance = value; OnPropertyChanged(); } }
+        public double SlowDistance { get { return _slowDistance; } set { _slowDistance = value; OnPropertyChanged(); } }
+        public double StepDistance { get { return _stepDistance; } set { _stepDistance = value; OnPropertyChanged(); } }
+    }
+
+    [Serializable]
     public class Config : ViewModelBase
     {
-        public int PollInterval { get; set; } = 200; // ms
-        public string PortParams { get; set; } = "COM1:115200,N,8,1";
+        private int _pollInterval = 200; // ms
+
+        public int PollInterval { get { return _pollInterval < 100 ? 100 : _pollInterval; } set { _pollInterval = value; OnPropertyChanged(); } }
+        public string PortParams { get; set; } = "COMn:115200,N,8,1";
+
+        public JogConfig Jog { get; set; } = new JogConfig();
         public LatheConfig Lathe { get; set; } = new LatheConfig();
         public CameraConfig Camera { get; set; } = new CameraConfig();
         public GCodeViewerConfig GCodeViewer { get; set; } = new GCodeViewerConfig();
@@ -129,11 +145,11 @@ namespace CNC.Controls
 
             try
             {
-                FileStream fsout = new FileStream(configfile, FileMode.Create, FileAccess.Write, FileShare.None);
+                FileStream fsout = new FileStream(filename, FileMode.Create, FileAccess.Write, FileShare.None);
                 using (fsout)
                 {
                     xs.Serialize(fsout, Config);
-                    this.configfile = filename;
+                    configfile = filename;
                     ok = true;
                 }
             }
@@ -210,7 +226,7 @@ namespace CNC.Controls
                     break;
 
                 default:
-                    if(File.Exists(args[p - 1]))
+                    if(!args[p - 1].EndsWith(".exe") && File.Exists(args[p - 1]))
                         FileName = args[p - 1];
                     break;
             }

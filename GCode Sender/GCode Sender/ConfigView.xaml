@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:GCode_Sender"
-             xmlns:Camera="clr-namespace:CNC.Controls.Camera;assembly=CNC.Controls.Camera" xmlns:Viewer="clr-namespace:CNC.Controls.Viewer;assembly=CNC.Controls.Viewer" xmlns:Lathe="clr-namespace:CNC.Controls.Lathe;assembly=CNC.Controls.Lathe" x:Class="GCode_Sender.ConfigView"
+             xmlns:Camera="clr-namespace:CNC.Controls.Camera;assembly=CNC.Controls.Camera" xmlns:Viewer="clr-namespace:CNC.Controls.Viewer;assembly=CNC.Controls.Viewer" xmlns:Lathe="clr-namespace:CNC.Controls.Lathe;assembly=CNC.Controls.Lathe" xmlns:Controls="clr-namespace:CNC.Controls;assembly=CNC.Controls.WPF" x:Class="GCode_Sender.ConfigView"
              mc:Ignorable="d" 
              d:DesignHeight="515" d:DesignWidth="875">
     <Grid>
@@ -12,11 +12,13 @@
             <RowDefinition Height="11*"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <StackPanel HorizontalAlignment="Left" Height="Auto" Margin="10,10,0,0" VerticalAlignment="Top" Width="400">
-            <Camera:ConfigControl x:Name="cameraConfig"/>
+        <WrapPanel Orientation="Vertical" ItemWidth="255"  Height="460" Margin="10,10,0,5" HorizontalAlignment="Left" VerticalAlignment="Top" Width="850">
+            <Controls:BasicConfigControl/>
+            <Controls:JogConfigControl x:Name="jogConfig"/>
             <Viewer:ConfigControl/>
+            <Camera:ConfigControl x:Name="cameraConfig"/>
             <Lathe:ConfigControl/>
-        </StackPanel>
+        </WrapPanel>
         <Button x:Name="btnSave" Content="Save settings" HorizontalAlignment="Left" Margin="10,5,0,0" Grid.Row="1" VerticalAlignment="Top" Width="100" Click="btnSave_Click"/>
     </Grid>
 </UserControl>

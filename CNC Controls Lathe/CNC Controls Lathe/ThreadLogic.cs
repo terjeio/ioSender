@@ -1,13 +1,13 @@
 ﻿/*
- * ThreadLogic.cs - part of CNC Controls library
+ * ThreadLogic.cs - part of CNC Controls Lathe library
  *
- * v0.01 / 2019-10-31 / Io Engineering (Terje Io)
+ * v0.01 / 2020-01-17 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019, Io Engineering (Terje Io)
+Copyright (c) 2019-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -56,9 +56,10 @@ namespace CNC.Controls.Lathe
 
         public ThreadLogic()
         {
-            model.PropertyChanged += Model_PropertyChanged1;
-            model.Thread.PropertyChanged += Model_PropertyChanged;
+            model.PropertyChanged += Model_PropertyChanged;
+            model.Thread.PropertyChanged += Model_ThreadPropertyChanged;
             model.Inch.PropertyChanged += Inch_PropertyChanged;
+            model.Thread.Type = Thread.type.First().Key;
             SetDefaults();
         }
 
@@ -83,7 +84,7 @@ namespace CNC.Controls.Lathe
             }
         }
 
-        private void Model_PropertyChanged1(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void Model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(model.Profile))
             {
@@ -103,6 +104,7 @@ namespace CNC.Controls.Lathe
         {
             model.ClearErrors();
             model.gCode.Clear();
+            model.PassData.Clear();
 
             model.Tool.Angle = 60;
             model.Tool.TipMinimum = double.NaN;
@@ -138,7 +140,7 @@ namespace CNC.Controls.Lathe
         void CombotextToMetric(string text)
         {
             string[] values = text.Split(' ');
-            model.Thread.Diameter = double.Parse(values[1], CultureInfo.InvariantCulture);
+            model.Thread.DiameterNominal = double.Parse(values[1], CultureInfo.InvariantCulture);
             model.Thread.Lead = double.Parse(values[3], CultureInfo.InvariantCulture);
             if (!model.IsMetric)
             {
@@ -213,17 +215,8 @@ namespace CNC.Controls.Lathe
             return fraction;
         }
 
-        private void Model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void Model_ThreadPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-
-            if (e.PropertyName == nameof(model.Thread.Side)) {
-
-              //  ResetUI();
-
-                model.Thread.SideLabel = model.Thread.Side == Thread.Side.Outside ? "Outside diameter:" : "Inside diameter:";
-
-            }
-
             if (e.PropertyName == nameof(model.Thread.ThreadSize) && model.Thread.ThreadSize != null)
             {
                 suspendFractionInput = true;
@@ -239,6 +232,7 @@ namespace CNC.Controls.Lathe
                     model.Thread.Sides = Thread.Side.Both;
                     model.Thread.RetractDegrees = 360;
                     model.Thread.TaperControlsVisibility = Visibility.Hidden;
+                    model.Tool.Angle = 60;
 
                     Thread.Type ttype = (Thread.Type)(selection["type"]);
 
@@ -378,6 +372,7 @@ namespace CNC.Controls.Lathe
 
             model.ClearErrors();
             model.gCode.Clear();
+            model.PassData.Clear();
 
             if (rpm * lead >= model.config.ZMaxFeedRate * 0.8d)
             {
@@ -901,10 +896,10 @@ namespace CNC.Controls.Lathe
             thread.retract = model.Thread.RetractDegrees;
             // end Mach3 options
             //LinuxCNC options
-            thread.taperlength = model.Thread.Taper;
+            thread.taperlength = model.Thread.TaperLength;
             thread.taper = model.Thread.TaperType;
             thread.compoundangle = model.Thread.CompoundAngle;
-            thread.degression = model.Thread.DepthDegression; // == "None" ? 0.0f : cbxDepthDegression.Value;
+            thread.degression = model.Thread.DepthDegression == "None" ? 0d : dbl.Parse(model.Thread.DepthDegression); // == "None" ? 0.0f : cbxDepthDegression.Value;
             if (thread.degression > 0.0d && thread.degression < 1.0d)
             {
                 model.SetError(nameof(model.Thread.DepthDegression), "Minimum value is 1.0");
@@ -1040,23 +1035,23 @@ namespace CNC.Controls.Lathe
 
             if (model.GCodeFormat == Thread.Format.LinuxCNC)
             {
-                model.PassInfo = string.Empty;
                 double depth = 0.0d, depth_prev = 0.0d, inv_degression = 1.0d / (thread.degression == 0.0d ? 1.0d : thread.degression);
                 double area = 0.0d, area_prev = 0.0d;
                 uint passes = 0;
+
+                model.PassData.Add("P   Depth Cut    Area");
 
                 while (depth < thread.depth)
                 {
                     depth = Math.Min(model.config.PassDepthFirst * Math.Pow(++passes, inv_degression), thread.depth);
                     area = Math.Tan(angle) * depth * depth;
-                    model.PassInfo += string.Format("{0} {1} {2} {3}\r\n", passes, FormatValue(depth * 2.0 / rfact), FormatValue((depth - depth_prev) * 2.0 / rfact), Math.Round(area - area_prev, 3));
+                    model.PassData.Add(string.Format("{0} {1}  {2} {3}", passes.ToString("00"), FormatValue(depth * 2.0 / rfact), FormatValue((depth - depth_prev) * 2.0 / rfact), Math.Round(area - area_prev, 3)));
                     depth_prev = depth;
                     area_prev = area;
                 }
             }
             else
             {
-
                 thread.lastpass = model.config.PassDepthLast;
                 uint passes = model.Thread.Mach3Passes;
 
@@ -1103,7 +1098,7 @@ namespace CNC.Controls.Lathe
                     if (i == 1)
                         thread.firstpass = increment;
 
-                    model.PassInfo += string.Format("{0} {1} {2}\r\n", i, FormatValue(increment * 2.0 / rfact), FormatValue(cutpos * 2.0 / rfact));
+                    model.PassData.Add(string.Format("{0} {1} {2}", i, FormatValue(increment * 2.0 / rfact), FormatValue(cutpos * 2.0 / rfact)));
 
                     if (exitloop || i == passes)
                         model.Thread.Mach3PassesExecuted = (uint)i;
@@ -1115,7 +1110,7 @@ namespace CNC.Controls.Lathe
                 {
                     cutpos += thread.lastpass;
 
-                    model.PassInfo += string.Format("{0} {1} {2}\r\n", 6, FormatValue(thread.lastpass * 2.0 / rfact), FormatValue(cutpos * 2.0 / rfact));
+                    model.PassData.Add(string.Format("{0} {1} {2}", 6, FormatValue(thread.lastpass * 2.0 / rfact), FormatValue(cutpos * 2.0 / rfact)));
 
                     // show # of passes calculated
                 }
@@ -1151,7 +1146,6 @@ namespace CNC.Controls.Lathe
                 thread.ToImperial();
 
             model.gCode.Clear();
-
             model.gCode.Add(string.Format("G18 G{0} G{1}", thread.xmode == LatheMode.Radius ? "8" : "7", thread.IsImperial ? "20" : "21"));
             model.gCode.Add(string.Format("M3S{0} G4P1", ((uint)thread.rpm).ToString()));
             model.gCode.Add(string.Format("G0 X{0}", FormatValue(xstart)));

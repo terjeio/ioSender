@@ -1,13 +1,13 @@
 ﻿/*
- * OffsetControl.xaml.cs - part of CNC Controls library
+ * OffsetView.xaml.cs - part of CNC Controls library
  *
- * v0.02 / 2019-11-07 / Io Engineering (Terje Io)
+* v0.02 / 2020-01-18 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2019, Io Engineering (Terje Io)
+Copyright (c) 2018-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,

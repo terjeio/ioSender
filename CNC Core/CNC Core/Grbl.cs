@@ -712,7 +712,7 @@ namespace CNC.Core
 #endif
         {
             if (Tools.Count == 0)
-                Tools.Add(new Tool("None"));
+                Tools.Add(new Tool(GrblConstants.NO_TOOL));
 
             if (!GrblParserState.Loaded)
                 GrblParserState.Get();
@@ -753,6 +753,13 @@ namespace CNC.Core
             }
             parameters = "";
             return "";
+        }
+
+        public static void RemoveNoTool()
+        {
+            Tool tool = Tools.Where(x => x.Code == GrblConstants.NO_TOOL).FirstOrDefault();
+            if (tool != null)
+                Tools.Remove(tool);
         }
 
         private static void AddOrUpdateTool(string gCode, string data)

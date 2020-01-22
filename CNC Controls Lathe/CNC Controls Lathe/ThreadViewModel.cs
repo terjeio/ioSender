@@ -1,13 +1,13 @@
 ﻿/*
- * ThreadViewModel.cs - part of CNC Controls library
+ * ThreadViewModel.cs - part of CNC Controls Lathe library
  *
- * v0.01 / 2019-10-31 / Io Engineering (Terje Io)
+ * v0.01 / 2020-01-17 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019, Io Engineering (Terje Io)
+Copyright (c) 2019-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -102,7 +102,7 @@ namespace CNC.Controls.Lathe
                 AllowDelete = false,
                 AllowEdit = false
             };
-            Type = Thread.type.First().Key;
+//            Type = Thread.type.First().Key;
 
             CompoundAngles = new List<double>();
             CompoundAngles.Add(0d);
@@ -110,10 +110,11 @@ namespace CNC.Controls.Lathe
             CompoundAngles.Add(29.5d);
             CompoundAngles.Add(30d);
 
-            DepthDegressions = new List<double>();
-            DepthDegressions.Add(0);
-            DepthDegressions.Add(1);
-            DepthDegressions.Add(2);
+            DepthDegressions = new List<string>();
+            DepthDegressions.Add("None");
+            DepthDegressions.Add("1");
+            DepthDegressions.Add("2");
+            _depthDegression = "None";
         }
 
         public EnumFlags<Thread.Side> ESide
@@ -236,15 +237,15 @@ namespace CNC.Controls.Lathe
             set { _tpiLabel = value; OnPropertyChanged(); }
         }
 
-        public List<double> DepthDegressions { get; private set; }
+        public List<string> DepthDegressions { get; private set; }
 
-        private double _depthDegression;
+        private string _depthDegression;
 
-        public double DepthDegression
+        public string DepthDegression
         {
             get { return _depthDegression; }
             set {
-                if (double.IsNaN(value) ? !double.IsNaN(_depthDegression) : _depthDegression != value)
+                if (_depthDegression != value)
                 {
                     _depthDegression = value;
                     OnPropertyChanged();
@@ -322,15 +323,6 @@ namespace CNC.Controls.Lathe
                 }
             }
         }
-
-        private string _sideLabel = "xx";
-
-        public string SideLabel
-        {
-            get { return _sideLabel; }
-            set { if (_sideLabel != value) { _sideLabel = value; OnPropertyChanged(); } }
-        }
-
 
         private double _lead;
         public double Lead

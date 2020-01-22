@@ -1,13 +1,13 @@
 ﻿/*
  * SerialStream.cs - part of CNC Controls library
  *
- * v0.03 / 2019-12-04 / Io Engineering (Terje Io)
+ * v0.03 / 2020-01-16 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2019, Io Engineering (Terje Io)
+Copyright (c) 2018-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -65,6 +65,9 @@ StreamWriter log = null;
             Comms.com = this;
             Dispatcher = dispatcher;
             Reply = "";
+
+            if (PortParams.IndexOf(":") < 0)
+                PortParams += ":115200,N,8,1";
 
             string[] parameter = PortParams.Substring(PortParams.IndexOf(":") + 1).Split(',');
 
@@ -253,7 +256,7 @@ StreamWriter log = null;
             WriteCommand(command);
 
             while (Comms.com.CommandState == Comms.State.DataReceived || Comms.com.CommandState == Comms.State.AwaitAck)
-                System.Threading.Thread.Sleep(10);
+                EventUtils.DoEvents();
         }
 
         public void AwaitResponse()

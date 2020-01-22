@@ -1,7 +1,7 @@
 ﻿/*
  * JobControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.03 / 2020-01-07 / Io Engineering (Terje Io)
+ * v0.03 / 2020-01-22 / Io Engineering (Terje Io)
  *
  */
 
@@ -204,12 +204,14 @@ namespace CNC.Controls
         }
 
         // Configure to match Grbl settings (if loaded)
-        public bool Config()
+        public bool Config(Config config)
         {
+            bool useFirmwareJog = false;
+
             if (GrblSettings.Loaded)
             {
                 double val;
-                if (!(val = GrblSettings.GetDouble(GrblSetting.JogStepDistance)).Equals(double.NaN))
+                if ((useFirmwareJog = !(val = GrblSettings.GetDouble(GrblSetting.JogStepDistance)).Equals(double.NaN)) )
                     jogDistance[(int)JogMode.Step] = val;
                 if (!(val = GrblSettings.GetDouble(GrblSetting.JogSlowDistance)).Equals(double.NaN))
                     jogDistance[(int)JogMode.Slow] = val;
@@ -227,6 +229,16 @@ namespace CNC.Controls
                     model.Unit = "in";
                     model.Format = GrblConstants.FORMAT_IMPERIAL;
                 }
+            }
+
+            if(!useFirmwareJog)
+            {
+                jogDistance[(int)JogMode.Step] = config.Jog.StepDistance;
+                jogDistance[(int)JogMode.Slow] = config.Jog.SlowDistance;
+                jogDistance[(int)JogMode.Fast] = config.Jog.SlowDistance;
+                jogSpeed[(int)JogMode.Step] = config.Jog.StepFeedrate;
+                jogSpeed[(int)JogMode.Slow] = config.Jog.SlowFeedrate;
+                jogSpeed[(int)JogMode.Fast] = config.Jog.FastFeedrate;
             }
 
             return GrblSettings.Loaded;

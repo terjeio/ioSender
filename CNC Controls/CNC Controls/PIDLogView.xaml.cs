@@ -224,8 +224,9 @@ namespace CNC.Controls
                     }
                 }
             }
+            data.WriteXml(CNC.Core.Resources.Path + @"\PIDLog.xml"); // For now...
         }
-         
+
         private static void Process(string data)
         {
             if (data.StartsWith("[PID:"))
