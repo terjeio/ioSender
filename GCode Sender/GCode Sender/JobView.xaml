@@ -6,11 +6,11 @@
              xmlns:local="clr-namespace:GCode_Sender"
              xmlns:cnccontrols="clr-namespace:CNC.Controls;assembly=CNC.Controls.WPF"
              mc:Ignorable="d" 
-             d:DesignHeight="500" d:DesignWidth="870"
+             d:DesignHeight="500" d:DesignWidth="875"
              Focusable="True"
              Loaded="JobView_Load"
              IsVisibleChanged="JobView_IsVisibleChanged">
-    <StackPanel Background="Transparent" MouseDown="outside_MouseDown">
+    <StackPanel Background="Transparent" MouseDown="outside_MouseDown" Width="870">
         <Grid Height="500">
             <StackPanel Margin="4,5,0,0" Width="220" Height="Auto" HorizontalAlignment="Left">
                 <cnccontrols:DROControl x:Name="DRO" HorizontalAlignment="Left" VerticalAlignment="Top"/>

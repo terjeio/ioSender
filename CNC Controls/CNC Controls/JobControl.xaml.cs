@@ -1,7 +1,7 @@
 ﻿/*
  * JobControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.03 / 2020-01-22 / Io Engineering (Terje Io)
+ * v0.03 / 2020-01-24 / Io Engineering (Terje Io)
  *
  */
 
@@ -498,6 +498,12 @@ namespace CNC.Controls
         {
             if (grblState.State == GrblStates.Hold || grblState.State == GrblStates.Tool || (grblState.State == GrblStates.Run && grblState.Substate == 1))
                 Comms.com.WriteByte(GrblLegacy.ConvertRTCommand(GrblConstants.CMD_CYCLE_START));
+            else if(streamingState == StreamingState.Error || streamingState == StreamingState.Stop)
+            {
+                model.Message = "";
+                JobTimer.Start();
+                SetStreamingState(StreamingState.Send);
+            }
             else if (GCode.Loaded)
             {
                 lblRunTime.Content = "";
@@ -515,7 +521,7 @@ namespace CNC.Controls
 
         public void SendReset()
         {
-            Comms.com.WriteByte((byte)GrblConstants.CMD_RESET);
+            Comms.com.WriteByte(GrblConstants.CMD_RESET);
             System.Threading.Thread.Sleep(20);
             grblState.State = GrblStates.Unknown;
             grblState.Substate = 0;
@@ -526,7 +532,7 @@ namespace CNC.Controls
             streamingState = StreamingState.Idle;
             while (Comms.com.OutCount != 0);
             //    Application.DoEvents(); //??
-            Comms.com.WriteByte((byte)GrblConstants.CMD_JOG_CANCEL); // Cancel jog
+            Comms.com.WriteByte(GrblConstants.CMD_JOG_CANCEL); // Cancel jog
             jogMode = JogMode.None;
         }
 
@@ -536,7 +542,7 @@ namespace CNC.Controls
             {
                 while (Comms.com.OutCount != 0);
                     //Application.DoEvents(); //??
-                Comms.com.WriteByte((byte)GrblConstants.CMD_JOG_CANCEL); // Cancel current jog
+                Comms.com.WriteByte(GrblConstants.CMD_JOG_CANCEL); // Cancel current jog
             }
             streamingState = StreamingState.Jogging;
             Comms.com.WriteCommand(command);
@@ -599,6 +605,8 @@ namespace CNC.Controls
 
         public void SetStreamingState(StreamingState newState)
         {
+            bool start = false;
+
             switch (newState)
             {
                 case StreamingState.Disabled:
@@ -621,16 +629,14 @@ namespace CNC.Controls
                     btnStop.IsEnabled = !grblState.MPG;
                     btnRewind.IsEnabled = false;
                     if (!string.IsNullOrEmpty(model.FileName) && !grblState.MPG)
-                    {
-                        model.IsJobRunning = true;
-                        SendNextLine();
-                    }
+                        model.IsJobRunning = start = true;
                     break;
 
                 case StreamingState.Start: // Streaming from SD Card
                     JobTimer.Start();
                     break;
 
+                case StreamingState.Error:
                 case StreamingState.Halted:
                     btnStart.IsEnabled = !grblState.MPG;
                     btnHold.IsEnabled = false;
@@ -640,6 +646,7 @@ namespace CNC.Controls
                 case StreamingState.FeedHold:
                     btnStart.IsEnabled = !grblState.MPG;
                     btnHold.IsEnabled = false;
+                    btnStop.IsEnabled = GrblSettings.IsGrblHAL;
                     break;
 
                 case StreamingState.ToolChange:
@@ -648,13 +655,15 @@ namespace CNC.Controls
                     break;
 
                 case StreamingState.Stop:
-                    btnStart.IsEnabled = false;
+                    btnStart.IsEnabled = !GrblSettings.IsGrblHAL;
+                    btnHold.IsEnabled = false;
                     btnStop.IsEnabled = false;
                     btnRewind.IsEnabled = !grblState.MPG;
                     model.IsJobRunning = false;
                     if (!grblState.MPG)
                     {
-                        Comms.com.WriteByte((byte)GrblConstants.CMD_STOP);
+                        if(GrblSettings.IsGrblHAL)
+                            Comms.com.WriteByte(GrblConstants.CMD_STOP);
                         if (JobTimer.IsRunning)
                             JobTimer.Stop();
                     }
@@ -662,6 +671,9 @@ namespace CNC.Controls
             }
 
             model.StreamingState = streamingState = newState;
+
+            if (start)
+                DataReceived("ok");
 
             StreamingStateChanged?.Invoke(streamingState, grblState.MPG);
         }
@@ -679,7 +691,7 @@ namespace CNC.Controls
                     }
                     if (JobTimer.IsRunning)
                         JobTimer.Pause = true;
-                    else
+                    else if (streamingState != StreamingState.Stop)
                         SetStreamingState(StreamingState.Idle);
                     break;
 
@@ -690,7 +702,8 @@ namespace CNC.Controls
                 case GrblStates.Run:
                     if (JobTimer.IsPaused)
                         JobTimer.Pause = false;
-                    SetStreamingState(StreamingState.Send);
+                    if(model.StreamingState != StreamingState.Error)
+                        SetStreamingState(StreamingState.Send);
                     if (newstate.Substate == 1)
                     {
                         btnStart.IsEnabled = !grblState.MPG;
@@ -706,7 +719,7 @@ namespace CNC.Controls
                 case GrblStates.Tool:
                     SetStreamingState(StreamingState.ToolChange);
                     if (!grblState.MPG)
-                        Comms.com.WriteByte((byte)GrblConstants.CMD_TOOL_ACK);
+                        Comms.com.WriteByte(GrblConstants.CMD_TOOL_ACK);
                     break;
 
                 case GrblStates.Hold:
@@ -751,6 +764,9 @@ namespace CNC.Controls
                     Comms.com.WriteCommand(line);
                 }
                 ACKPending++;
+
+                if(!GrblSettings.IsGrblHAL)
+                    break;
             }
         }
 
@@ -819,8 +835,8 @@ namespace CNC.Controls
                     {
                         if (data.StartsWith("error"))
                         {
-                            SetStreamingState(StreamingState.Halted);
-                            //   Comms.com.WriteByte((byte)GrblConstants.CMD_JOG_CANCEL); // Flush grbl buffers
+                            SetStreamingState(StreamingState.Error);
+//                          Comms.com.WriteByte(GrblLegacy.ConvertRTCommand(GrblConstants.CMD_RESET));
                         }
                         else if ((pgmComplete = PgmEndLine == PendingLine))
                         {
@@ -828,8 +844,8 @@ namespace CNC.Controls
                             if (grblState.State == GrblStates.Idle)
                                 model.SetGRBLState(GrblStates.Idle.ToString(), -1, true);
                         }
-                        else
-                            SendNextLine();
+                        //else
+                        //    SendNextLine();
                     }
                     PendingLine++;
                 }
@@ -860,4 +876,3 @@ namespace CNC.Controls
         }
     }
 }
-

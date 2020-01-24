@@ -1,13 +1,13 @@
 ﻿/*
  * MDIControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.03 / 2019-12-06 / Io Engineering (Terje Io)
+ * v0.04 / 2020-01-24 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2019, Io Engineering (Terje Io)
+Copyright (c) 2018-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -39,6 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
+using CNC.Core;
 
 namespace CNC.Controls
 {
@@ -56,6 +58,12 @@ namespace CNC.Controls
         {
             get { return (string)GetValue(CommandProperty); }
             set { SetValue(CommandProperty, value); }
+        }
+
+        private void txtMDI_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == Key.Return)
+                ((GrblViewModel)DataContext).ExecuteMDI((sender as TextBox).Text);
         }
     }
 }

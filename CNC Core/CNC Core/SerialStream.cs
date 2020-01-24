@@ -1,7 +1,7 @@
 ﻿/*
  * SerialStream.cs - part of CNC Controls library
  *
- * v0.03 / 2020-01-16 / Io Engineering (Terje Io)
+ * v0.03 / 2020-01-23 / Io Engineering (Terje Io)
  *
  */
 
@@ -311,16 +311,24 @@ StreamWriter log = null;
     public class SerialPorts : ViewModelBase
     {
         string _selected = string.Empty;
+        string[] _portnames;
 
         public SerialPorts()
         {
-            Array.Sort(PortNames);
+            Refresh();
 
             if (PortNames.Length > 0)
                 _selected = PortNames[0];
         }
 
-        public string[] PortNames { get; private set; } = SerialPort.GetPortNames();
+        public void Refresh ()
+        {
+            string[] _portnames = SerialPort.GetPortNames();
+            Array.Sort(_portnames);
+            PortNames = _portnames;
+        }
+
+        public string[] PortNames { get { return _portnames; } private set { _portnames = value; OnPropertyChanged(); } }
 
         public string SelectedPort
         {

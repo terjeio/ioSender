@@ -128,7 +128,7 @@ namespace GCode_Sender
         {
             get { return menuFile.IsEnabled != true; }
             set {
-                menuFile.IsEnabled = !value;
+                menuFile.IsEnabled = jogButton.IsEnabled = !value;
                 foreach (TabItem tabitem in UIUtils.FindLogicalChildren<TabItem>(ui.tabMode))
                     tabitem.IsEnabled = !value || getView(tabitem).mode == ViewType.GRBL;
             }
@@ -310,6 +310,11 @@ namespace GCode_Sender
             }
 
             return view;
+        }
+
+        private void jogbtn_Click(object sender, RoutedEventArgs e)
+        {
+            jogControl.Visibility = jogControl.Visibility == Visibility.Visible ? Visibility.Hidden : Visibility.Visible;
         }
     }
 }

@@ -8,7 +8,8 @@
         Loaded="PortDialog_Loaded"
         Title="Select COM port" Height="120" Width="185" Icon="App.ico" ResizeMode="NoResize">
     <Grid Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
-        <ComboBox x:Name="comboBox" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="150"
+        <ComboBox x:Name="cbxPorts" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="150"
+            DropDownOpened="CbxPorts_DropDownOpened"
             ItemsSource="{Binding Path=PortNames}"
             SelectedValue="{Binding Path=SelectedPort, Mode=TwoWay}"
         />

@@ -16,7 +16,7 @@
                     <ColumnDefinition Width="400*"/>
                     <ColumnDefinition Width="60*"/>
                 </Grid.ColumnDefinitions>
-                <TextBox x:Name="txtMDI" Text="{Binding Path=Command, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" Grid.Column="0" HorizontalAlignment="Left" Height="22" Margin="3,0" TextWrapping="NoWrap" VerticalAlignment="Center" Width="400"/>
+                <TextBox x:Name="txtMDI" Text="{Binding Path=Command, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" Grid.Column="0" HorizontalAlignment="Left" Height="22" Margin="3,0" TextWrapping="NoWrap" VerticalAlignment="Center" Width="400" KeyDown="txtMDI_KeyDown"/>
                 <Button Command="{Binding MDICommand}" CommandParameter="{Binding Path=Command, RelativeSource={RelativeSource AncestorType=UserControl}}"  Content="Send" Grid.Column="1" HorizontalAlignment="Right" Margin="3,0" VerticalAlignment="Center" Width="42" Height="22"/>
             </Grid>
         </GroupBox>

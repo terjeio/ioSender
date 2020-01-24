@@ -1,13 +1,13 @@
 ﻿/*
  * PortDialog.xaml.cs - part of CNC Controls library
  *
- * v0.02 / 2019-12-01 / Io Engineering (Terje Io)
+ * v0.02 / 2020-01-23 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019, Io Engineering (Terje Io)
+Copyright (c) 2019-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -52,10 +52,15 @@ namespace CNC.Controls
             DataContext = new SerialPorts();
         }
 
+        private void CbxPorts_DropDownOpened(object sender, System.EventArgs e)
+        {
+            ((SerialPorts)DataContext).Refresh();
+        }
+
         private void PortDialog_Loaded(object sender, RoutedEventArgs e)
         {
-            if (!string.IsNullOrEmpty(orgport) && comboBox.Items.Contains(orgport))
-                comboBox.SelectedItem = orgport; 
+            if (!string.IsNullOrEmpty(orgport) && cbxPorts.Items.Contains(orgport))
+                cbxPorts.SelectedItem = orgport; 
         }
 
         public string ShowDialog(string orgport)

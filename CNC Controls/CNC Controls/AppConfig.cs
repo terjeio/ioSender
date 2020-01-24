@@ -46,6 +46,16 @@ using CNC.GCode;
 
 namespace CNC.Controls
 {
+    [Serializable]
+    public class IgnoreCommand
+    {
+        public enum IgnoreStates
+        {
+            No = 0,
+            Prompt,
+            Skip,
+        }
+    }
 
     [Serializable]
     public class LatheConfig : ViewModelBase
@@ -119,6 +129,10 @@ namespace CNC.Controls
 
         public int PollInterval { get { return _pollInterval < 100 ? 100 : _pollInterval; } set { _pollInterval = value; OnPropertyChanged(); } }
         public string PortParams { get; set; } = "COMn:115200,N,8,1";
+
+        public IgnoreCommand.IgnoreStates IgnoreM6 { get; set; } = IgnoreCommand.IgnoreStates.No;
+        public IgnoreCommand.IgnoreStates IgnoreM7 { get; set; } = IgnoreCommand.IgnoreStates.No;
+        public IgnoreCommand.IgnoreStates IgnoreM8 { get; set; } = IgnoreCommand.IgnoreStates.No;
 
         public JogConfig Jog { get; set; } = new JogConfig();
         public LatheConfig Lathe { get; set; } = new LatheConfig();

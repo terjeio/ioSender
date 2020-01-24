@@ -9,10 +9,10 @@
         xmlns:cnclathecontrols="clr-namespace:CNC.Controls.Lathe;assembly=CNC.Controls.Lathe"
         xmlns:local="clr-namespace:GCode_Sender"
         mc:Ignorable="d"
-        Title="GCode Sender" Height="600" Width="900"
+        Title="GCode Sender" Height="600" Width="920"
         Loaded="Window_Load"
         Closing="Window_Closing"
-        Closed="Window_Closed" Icon="App.ico">
+        Closed="Window_Closed" Icon="App.ico" ResizeMode="NoResize">
     <Window.DataContext>
         <cnccore:GrblViewModel />
     </Window.DataContext>
@@ -123,6 +123,12 @@
 
                 -->
             </TabControl>
+            <Button x:Name="jogButton" Content="Jog" Tag="collapsed" HorizontalAlignment="Left" Margin="884,25,-51,0" VerticalAlignment="Top" Width="75" Click="jogbtn_Click">
+                <Button.LayoutTransform>
+                    <RotateTransform Angle="90"/>
+                </Button.LayoutTransform>
+            </Button>
+            <cnccontrols:JogControl x:Name="jogControl" HorizontalAlignment="Right" Margin="0,25,24,0" VerticalAlignment="Top" Visibility="Hidden"/>
         </Grid>
     </DockPanel>
 </Window>

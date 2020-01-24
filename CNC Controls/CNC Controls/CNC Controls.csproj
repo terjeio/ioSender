@@ -84,6 +84,9 @@
     <Compile Include="JogConfigControl.xaml.cs">
       <DependentUpon>JogConfigControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="JogControl.xaml.cs">
+      <DependentUpon>JogControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="LimitsBaseControl.xaml.cs">
       <DependentUpon>LimitsBaseControl.xaml</DependentUpon>
     </Compile>
@@ -150,6 +153,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="JogConfigControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="JogControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
