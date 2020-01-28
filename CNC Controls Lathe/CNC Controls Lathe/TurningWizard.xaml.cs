@@ -1,13 +1,13 @@
-﻿/*
+/*
  * TurningWizard.xaml.cs - part of CNC Controls library
  *
- * v0.01 / 2020-01-17 / Io Engineering (Terje Io)
+ * v0.03 / 2020-01-28 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019, Io Engineering (Terje Io)
+Copyright (c) 2019-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -106,18 +106,11 @@ namespace CNC.Controls.Lathe
                     initOk = true;
                     if (config == null)
                     {
-
                         //   cbxProfile.BindOptions(config, mode);
                     }
-
                     model.config.Update();
-
-                    //if (fMetric != config.metric)
-                    //{
-                    //    fMetric = config.metric;
-                    //    model.IsCSSEnabled = config.css;
-                    //    SetUnitLabels(this, fMetric ? "mm" : "in");
-                    //}
+                    Converters.IsMetric = model.IsMetric = GrblParserState.IsMetric;
+                    model.XStart = model.IsMetric ? 10.0d : 0.5d;
                 }
                 else
                 {

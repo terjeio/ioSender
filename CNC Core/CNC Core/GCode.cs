@@ -1,13 +1,13 @@
 ﻿/*
  * GCode.cs - part of CNC Controls library
  *
- * v0.02 / 2019-11-07 / Io Engineering (Terje Io)
+ * v0.03 / 2020-01-26 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2019, Io Engineering (Terje Io)
+Copyright (c) 2018-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -38,6 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 using System;
+using System.Xml.Serialization;
+using CNC.Core;
 
 namespace CNC.GCode
 {
@@ -260,5 +262,18 @@ namespace CNC.GCode
 
             return s;
         }
+    }
+
+    [Serializable]
+    public class Macro : ViewModelBase
+    {
+        string _name;
+
+        [XmlIgnore]
+        public bool IsSession { get; set; }
+
+        public int Id { get;  set; }
+        public string Name { get { return _name; } set { _name = value;  OnPropertyChanged(); } }
+        public string Code { get; set; }
     }
 }

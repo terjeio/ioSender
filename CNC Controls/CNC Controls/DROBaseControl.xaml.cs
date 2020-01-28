@@ -1,13 +1,13 @@
 ﻿/*
  * DROBaseControl.xaml.cs - part of CNC Controls library
  *
- * v0.03 / 2019-12-06 / Io Engineering (Terje Io)
+ * v0.03 / 2020-01-27 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2019, Io Engineering (Terje Io)
+Copyright (c) 2018-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -37,7 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -56,7 +55,6 @@ namespace CNC.Controls
             InitializeComponent();
 
             ScaledOff = btnScaled.Background;
-     //       DataContext = this;
         }
 
         public static readonly DependencyProperty LabelProperty = DependencyProperty.Register(nameof(Label), typeof(string), typeof(DROBaseControl), new PropertyMetadata());

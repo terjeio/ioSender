@@ -16,6 +16,7 @@
             <Controls:BasicConfigControl/>
             <Controls:JogConfigControl x:Name="jogConfig"/>
             <Viewer:ConfigControl/>
+            <Controls:StripGCodeConfigControl/>
             <Camera:ConfigControl x:Name="cameraConfig"/>
             <Lathe:ConfigControl/>
         </WrapPanel>

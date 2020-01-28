@@ -8,7 +8,7 @@
         xmlns:DialogConverters="clr-namespace:CNC.Controls.Lathe"
         mc:Ignorable="d"
         Title="Lathe Profile" Height="375" Width="430"
-        Loaded="Window_Loaded" Icon="App.ico" ResizeMode="NoResize">
+        Loaded="Window_Loaded" Icon="App.ico" ResizeMode="NoResize" ShowInTaskbar="False" WindowStartupLocation="CenterOwner">
     <Window.Resources>
         <DialogConverters:LatheModeRadiusBoolConverter x:Key="RadiusConverter" />
         <DialogConverters:LatheModeDiameterBoolConverter x:Key="DiameterConverter" />

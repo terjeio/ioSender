@@ -1,7 +1,7 @@
 /*
- * JogControl.xaml.cs - part of CNC Controls library
+ * MacroExecuteControl.xaml.cs - part of CNC Controls library
  *
- * v0.01 / 2020-01-26 / Io Engineering (Terje Io)
+ * v0.01 / 2020-01-27 / Io Engineering (Terje Io)
  *
  */
 
@@ -37,24 +37,30 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-using System.ComponentModel;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using CNC.Core;
+using System.Windows.Data;
+using System.Globalization;
+using System;
+using System.ComponentModel;
 
 namespace CNC.Controls
 {
     /// <summary>
-    /// Interaction logic for JogControl.xaml
+    /// Interaction logic for MacroExecuteControl.xaml
     /// </summary>
-    public partial class JogControl : UserControl
+    public partial class MacroExecuteControl : UserControl
     {
-        private double distance = 1d, feedrate = 500d;
 
-        public JogControl()
+        public delegate void MacrosChangedHandler();
+        public event MacrosChangedHandler MacrosChanged;
+
+        public MacroExecuteControl()
         {
             InitializeComponent();
-
             DataContextChanged += View_DataContextChanged;
         }
         private void View_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -81,14 +87,38 @@ namespace CNC.Controls
             }
         }
 
-        private void dx10_Click(object sender, RoutedEventArgs e)
+        public static readonly DependencyProperty MacrosProperty = DependencyProperty.Register(nameof(Macros), typeof(ObservableCollection<GCode.Macro>), typeof(MacroExecuteControl), new PropertyMetadata(new PropertyChangedCallback(OnMacrosChanged)));
+        public ObservableCollection<GCode.Macro> Macros
         {
-            distance = dbl.Parse((string)(sender as RadioButton).Content);
+            get { return (ObservableCollection<GCode.Macro>)GetValue(MacrosProperty); }
+            set { SetValue(MacrosProperty, value); }
         }
 
-        private void f1000_Click(object sender, RoutedEventArgs e)
+        private static void OnMacrosChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            feedrate = dbl.Parse((string)(sender as RadioButton).Content);
+            ((MacroExecuteControl)d).OnMacrosChanged();
+        }
+        private void OnMacrosChanged()
+        {
+            Macros.CollectionChanged += Macros_CollectionChanged;
+            Macros_CollectionChanged(Macros, null);
+        }
+        private void Macros_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            IsMessageVisible = (sender as ObservableCollection<GCode.Macro>).Count == 0 ? Visibility.Visible : Visibility.Hidden;
+        }
+
+        public static readonly DependencyProperty IsMessageVisibleProperty = DependencyProperty.Register(nameof(IsMessageVisible), typeof(Visibility), typeof(MacroExecuteControl), new PropertyMetadata(Visibility.Visible));
+        public Visibility IsMessageVisible
+        {
+            get { return (Visibility)GetValue(IsMessageVisibleProperty); }
+            set { SetValue(IsMessageVisibleProperty, value); }
+        }
+
+        private void button_Click(object sender, RoutedEventArgs e)
+        {
+            GCode.Macro macro = Macros.FirstOrDefault(o => o.Id == (int)(sender as Button).Tag);
+            (DataContext as GrblViewModel).ExecuteMDI(macro.Code);
         }
 
         private void btn_Close(object sender, RoutedEventArgs e)
@@ -96,10 +126,11 @@ namespace CNC.Controls
             Visibility = Visibility.Hidden;
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void button_Edit(object sender, RoutedEventArgs e)
         {
-            string cmd = string.Format("$J=G91{0}{1}F{2}", ((string)(sender as Button).Content).Replace("+", ""), distance.ToInvariantString(), feedrate.ToInvariantString());
-            (DataContext as GrblViewModel).ExecuteMDI(cmd);
+            MacroEditor editor = new MacroEditor(Macros) {Owner = Application.Current.MainWindow};
+            editor.ShowDialog();
+            MacrosChanged?.Invoke();
         }
     }
 }

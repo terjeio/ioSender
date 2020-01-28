@@ -1,7 +1,7 @@
 ﻿/*
  * GCodeJob.cs - part of CNC Controls library
  *
- * v0.02 / 2019-11-07 / Io Engineering (Terje Io)
+ * v0.02 / 2020-01-24 / Io Engineering (Terje Io)
  *
  */
 
@@ -117,7 +117,8 @@ namespace CNC.Core
             {
                 try
                 {
-                    if (Parser.ParseBlock(s.Trim(), false))
+                    s = s.Trim();
+                    if (Parser.ParseBlock(ref s, false))
                     {
                         end = s == "M30" || s == "M2" || s == "M02";
                         gcode.Rows.Add(new object[] { LineNumber++, s, s.Length + 1, true, end, "", false });
@@ -163,7 +164,8 @@ namespace CNC.Core
             }
             else if (block != null && block.Trim().Length > 0) try
             {
-                if (Parser.ParseBlock(block.Trim(), false))
+                block = block.Trim();
+                if (Parser.ParseBlock(ref block, false))
                 {
                     gcode.Rows.Add(new object[] { LineNumber++, block, block.Length + 1, true, Parser.ProgramEnd, "", false });
                     while (commands.Count > 0)

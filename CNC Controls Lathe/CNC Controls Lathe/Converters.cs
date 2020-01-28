@@ -1,7 +1,7 @@
-﻿/*
+/*
  * Converters.cs - part of CNC Controls Lathe library
  *
- * v0.01 / 2020-01-17 / Io Engineering (Terje Io)
+ * v0.03 / 2020-01-28 / Io Engineering (Terje Io)
  *
  */
 
@@ -44,6 +44,7 @@ using System.Globalization;
 using System.Text;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows;
 using CNC.Core;
 using CNC.GCode;
 
@@ -52,7 +53,6 @@ namespace CNC.Controls.Lathe
     public static class Converters
     {
         public static bool IsMetric = true;
-        public static StringCollectionToTextConverter StringCollectionToTextConverter = new StringCollectionToTextConverter();
         public static CNCMeasureToTextConverter CNCMeasureToTextConverter = new CNCMeasureToTextConverter();
         public static SideToInsideBoolConverter SideToInsideBoolConverter = new SideToInsideBoolConverter();
         public static SideToOutsideBoolConverter SideToOutsideBoolConverter = new SideToOutsideBoolConverter();
@@ -63,33 +63,6 @@ namespace CNC.Controls.Lathe
         public static ToolToLabelStringConverter ToolToLabelStringConverter = new ToolToLabelStringConverter();
         public static TaperTypeToBoolConverter TaperTypeToBoolConverter = new TaperTypeToBoolConverter();
         public static MultiLineConverter MultiLineConverter = new MultiLineConverter();
-    }
-
-    // Adapted from: https://stackoverflow.com/questions/4353186/binding-observablecollection-to-a-textbox/8847910#8847910
-
-    public class StringCollectionToTextConverter : IMultiValueConverter
-    {
-        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
-        {
-            var data = values[0] as ObservableCollection<string>;
-
-            if (data != null && data.Count > 0)
-            {
-                StringBuilder sb = new StringBuilder();
-                foreach (var s in data)
-                {
-                    sb.AppendLine(s.ToString());
-                }
-                return sb.ToString();
-            }
-            else
-                return String.Empty;
-        }
-
-        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
     }
 
     public class CNCMeasureToTextConverter : IValueConverter
@@ -108,6 +81,31 @@ namespace CNC.Controls.Lathe
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
+        }
+    }
+
+    public class CNCMeasureConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            double result = double.NaN;
+            bool isMetric = parameter is bool ? (bool)parameter : Converters.IsMetric;
+            double f = values.Length > 1 && values[1] is double ? (double)values[1] : (isMetric ? 1.0d : 25.4d);
+
+            if (values[0] is double && !double.IsNaN((double)values[0]))
+                result = Math.Round((double)values[0] / f, f == 1.0d ? 3 : 4);
+
+            return result;
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            object[] result = new object[2];
+
+            result[0] = value;
+            result[1] = DependencyProperty.UnsetValue;
+
+            return result;
         }
     }
 

@@ -1,7 +1,7 @@
 ﻿/*
  * MainWindow.xaml.cs - part of Grbl Code Sender
  *
- * v0.03 / 2020-01-07 / Io Engineering (Terje Io)
+ * v0.03 / 2020-01-24 / Io Engineering (Terje Io)
  *
  */
 
@@ -80,6 +80,9 @@ namespace GCode_Sender
             if ((res = Profile.SetupAndOpen(Title, (GrblViewModel)DataContext, App.Current.Dispatcher)) != 0)
                 Environment.Exit(res);
 
+            macroControl.Macros = Profile.Config.Macros;
+            macroControl.MacrosChanged += MacroControl_MacrosChanged;
+
             BaseWindowTitle = Title;
 
             GrblInfo.LatheModeEnabled = Profile.Config.Lathe.IsEnabled;
@@ -109,8 +112,14 @@ namespace GCode_Sender
                 tab.IsEnabled = getView(tab).mode == ViewType.GRBL || getView(tab).mode == ViewType.AppConfig;
 
             currentView = getView((TabItem)tabMode.Items[tabMode.SelectedIndex]);
+            ((GrblViewModel)ui.DataContext).ActiveView = currentView.mode;
 
             getTab(ViewType.AppConfig).DataContext = Profile.Config;
+        }
+
+        private void MacroControl_MacrosChanged()
+        {
+            Profile.Save();
         }
 
         public string BaseWindowTitle { get; set; }
@@ -128,7 +137,7 @@ namespace GCode_Sender
         {
             get { return menuFile.IsEnabled != true; }
             set {
-                menuFile.IsEnabled = jogButton.IsEnabled = !value;
+                menuFile.IsEnabled = stpRight.IsEnabled = !value;
                 foreach (TabItem tabitem in UIUtils.FindLogicalChildren<TabItem>(ui.tabMode))
                     tabitem.IsEnabled = !value || getView(tabitem).mode == ViewType.GRBL;
             }
@@ -161,7 +170,6 @@ namespace GCode_Sender
                     Camera.CloseCamera();
                     Camera.Close();
                 }
-
 #endif
                 using (new UIUtils.WaitCursor()) // disconnecting from websocket may take some time...
                 {
@@ -183,7 +191,7 @@ namespace GCode_Sender
 
         void aboutMenuItem_Click(object sender, EventArgs e)
         {
-            About about = new About(this, BaseWindowTitle);
+            About about = new About(BaseWindowTitle) { Owner = Application.Current.MainWindow };
             about.ShowDialog();
         }
 
@@ -207,7 +215,10 @@ namespace GCode_Sender
                 {
                     currentView.Activate(false, nextView.mode);
                     currentView = nextView;
+                    ((GrblViewModel)ui.DataContext).ActiveView = currentView.mode;
                     currentView.Activate(true, prevMode);
+
+                    btnJogPanel.IsEnabled = currentView.mode == ViewType.GRBL;
                 }
             }
         }
@@ -314,7 +325,14 @@ namespace GCode_Sender
 
         private void jogbtn_Click(object sender, RoutedEventArgs e)
         {
+            macroControl.Visibility = Visibility.Hidden;
             jogControl.Visibility = jogControl.Visibility == Visibility.Visible ? Visibility.Hidden : Visibility.Visible;
+        }
+
+        private void macrobtn_Click(object sender, RoutedEventArgs e)
+        {
+            jogControl.Visibility = Visibility.Hidden;
+            macroControl.Visibility = macroControl.Visibility == Visibility.Visible ? Visibility.Hidden : Visibility.Visible;
         }
     }
 }

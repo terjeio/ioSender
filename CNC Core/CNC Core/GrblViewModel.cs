@@ -1,13 +1,13 @@
 /*
  * GrblViewModel.cs - part of CNC Controls library
  *
- * v0.03 / 2020-01-07 / Io Engineering (Terje Io)
+ * v0.03 / 2020-01-28 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020, Io Engineering (Terje Io)
+Copyright (c) 2019-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -43,13 +43,14 @@ using System.Windows.Media;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using CNC.GCode;
+using CNC.View;
 
 namespace CNC.Core
 {
-    public class GrblViewModel : ViewModelBase
+    public class GrblViewModel : MeasureViewModel
     {
         private string _tool, _message, _WPos, _MPos, _wco, _wcs, _a, _fs, _mpg, _ov, _pn, _sc, _sd, _ex, _d, _gc, _h;
-        private string  _unit, _format, _mdiCommand, _fileName;
+        private string _mdiCommand, _fileName;
         private bool _flood, _mist, _tubeCoolant, _toolChange, _reset, _isMPos, _isJobRunning;
         private int _pwm;
         private double _feedrate = 0d;
@@ -62,11 +63,12 @@ namespace CNC.Core
         private LatheMode _latheMode = LatheMode.Disabled;
         private HomedState _homedState = HomedState.Unknown;
         private StreamingState _streamingState;
+        private ViewType _activeView = ViewType.Startup;
 
         public GrblViewModel()
         {
-            _a = _pn = _fs = _sc = string.Empty;
-            _tool = ""; _unit = "mm"; _format = GrblConstants.FORMAT_METRIC;
+            _a = _pn = _fs = _sc = _tool = string.Empty;
+
             Clear();
 
             MDICommand = new ActionCommand<string>(ExecuteMDI);
@@ -116,12 +118,12 @@ namespace CNC.Core
         }
 
         public int PollInterval { get; set; } = 200; // ms
+        public bool ResponseLogEnable { get; set; } = false;
 
         #region Dependencyproperties
 
-        public string Unit { get { return _unit; } set { _unit = value; OnPropertyChanged(); } }
-        public string Format { get { return _format; } set { _format = value; OnPropertyChanged(); } }
-
+        public ViewType ActiveView { get { return _activeView; } set { _activeView = value; OnPropertyChanged(); } }
+        public ObservableCollection<string> ResponseLog { get; private set; } = new ObservableCollection<string>();
 
         public ProgramLimits ProgramLimits { get; private set; } = new ProgramLimits();
         public string MDI { get { return _mdiCommand; } set { _mdiCommand = value; if (_mdiCommand != string.Empty) OnPropertyChanged(); } }

@@ -1,7 +1,7 @@
 ﻿/*
  * WorkParametersControl.xaml.cs - part of CNC Controls library
  *
- * v0.03 / 2019-12-06 / Io Engineering (Terje Io)
+ * v0.03 / 2020-01-25 / Io Engineering (Terje Io)
  *
  */
 
@@ -37,8 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-using System;
-using System.Data;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -60,7 +58,6 @@ namespace CNC.Controls
 
         #region Properties
 
-        public string ToolChangeCommand { get; set; } = "T{0}";
         public new bool IsFocused { get { return cbxTool.IsFocused || cbxOffset.IsFocused; } }
 
         public static readonly DependencyProperty IsToolChangingProperty = DependencyProperty.Register(nameof(IsToolChanging), typeof(bool), typeof(WorkParametersControl), new PropertyMetadata(false, new PropertyChangedCallback(IsToolChangingChanged)));
@@ -101,7 +98,7 @@ namespace CNC.Controls
         private void cbxTool_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (e.AddedItems.Count == 1 && ((ComboBox)sender).IsDropDownOpen)
-                ((GrblViewModel)DataContext).ExecuteMDI(string.Format(ToolChangeCommand, ((Tool)e.AddedItems[0]).Code));
+                ((GrblViewModel)DataContext).ExecuteMDI(string.Format(GrblCommand.ToolChange, ((Tool)e.AddedItems[0]).Code));
         }
 
         #endregion

@@ -1,13 +1,13 @@
 ﻿/*
  * NumericField.xaml.cs - part of CNC Controls library
  *
- * v0.02 / 2019-10-21 / Io Engineering (Terje Io)
+ * v0.03 / 2020-01-28 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2019, Io Engineering (Terje Io)
+Copyright (c) 2018-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -37,7 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-using System;
 using System.Windows;
 using System.Windows.Controls;
 using CNC.Core;
@@ -58,9 +57,6 @@ namespace CNC.Controls
             InitializeComponent();
 
             data.DataContext = this;
-
-            Unit = "mm";
-            Metric = true;
         }
 
         public static readonly DependencyProperty ValueProperty = DependencyProperty.Register(nameof(Value), typeof(double), typeof(NumericField), new PropertyMetadata(double.NaN, new PropertyChangedCallback(OnValueChanged)), new ValidateValueCallback(IsValidReading));
@@ -89,7 +85,7 @@ namespace CNC.Controls
             set { SetValue(LabelProperty, value); }
         }
 
-        public static readonly DependencyProperty UnitProperty = DependencyProperty.Register(nameof(Unit), typeof(string), typeof(NumericField), new PropertyMetadata(String.Empty));
+        public static readonly DependencyProperty UnitProperty = DependencyProperty.Register(nameof(Unit), typeof(string), typeof(NumericField), new PropertyMetadata("mm"));
         public string Unit
         {
             get { return (string)GetValue(UnitProperty); }
@@ -121,29 +117,6 @@ namespace CNC.Controls
         public string Text
         {
             get { return Value.ToInvariantString(data.DisplayFormat); }
-            //set
-            //{
-            //    if (value == "")
-            //        data.Text = value;
-            //    else
-            //    {
-            //        double v = 0.0d;
-            //        double.TryParse(value, data.Styles, CultureInfo.InvariantCulture, out v);
-            //        data.Text = v.ToString(format, CultureInfo.InvariantCulture);
-            //    }
-            //}
-        }
-
-        public bool Metric
-        {
-            get { return metric; }
-            set
-            {
-                if (metric != value)
-                    unit.Content = ((string)unit.Content).Replace(metric ? "mm" : "in", metric ? "in" : "mm");
-                metric = value;
-                Format = metric ? GrblConstants.FORMAT_METRIC : GrblConstants.FORMAT_IMPERIAL;
-            }
         }
 
         public static bool IsValidReading(object value)
@@ -153,24 +126,6 @@ namespace CNC.Controls
         }
                    
         public Control Field { get { return data; } }
-
-        public double dValue // always metric
-        {
-            get { return Math.Round(data.Value * (metric ? 1.0d : 25.4d), 3); }
-            set { data.Value = Math.Round(value / (metric ? 1.0d : 25.4d), metric ? 3 : 4); }
-        }
-
-        public string xFormat
-        {
-            get { return data.Tag == null ? GrblConstants.FORMAT_METRIC : data.Format; }
-            set { data.Format = value; }
-        }
-
-        public double ValueImperial
-        {
-            get { return Math.Round(Value / 25.4d, 4); }
-            set { Value = value * 25.4d; }
-        }
 
         public void Clear()
         {

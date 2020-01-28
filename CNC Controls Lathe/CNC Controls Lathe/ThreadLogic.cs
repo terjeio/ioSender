@@ -1,7 +1,7 @@
 ﻿/*
  * ThreadLogic.cs - part of CNC Controls Lathe library
  *
- * v0.01 / 2020-01-17 / Io Engineering (Terje Io)
+ * v0.03 / 2020-01-28 / Io Engineering (Terje Io)
  *
  */
 
@@ -112,17 +112,12 @@ namespace CNC.Controls.Lathe
             model.Thread.CutDepth = double.NaN;
             model.Thread.Diameter = double.NaN;
             model.Thread.DiameterTolerance = double.NaN;
-            model.Thread.TpiLabel = "TPI";
         }
 
         void EnableMetricInput(bool enable)
         {
             model.Inch.IsMetricInputReadonly = !enable;
-            if (!model.IsMetric)
-            {
-              //  cvSize.Metric = enable;
-                model.Thread.TpiLabel = enable ? "in" : "TPI";
-            }
+            model.Thread.IsMetric = model.IsMetric || enable;
         }
 
         void OnlyInside(bool enable)
@@ -145,10 +140,10 @@ namespace CNC.Controls.Lathe
             if (!model.IsMetric)
             {
                 model.Thread.TPI = model.Thread.Lead / model.UnitFactor;
-                model.Thread.Diameter /= model.UnitFactor;
-                double inches = Math.Floor(model.Thread.Diameter);
+                double size = model.Thread.DiameterNominal / model.UnitFactor;
+                double inches = Math.Floor(size);
                 model.Inch.Whole = inches == 0.0d ? double.NaN : inches;
-                model.Inch.Numerator = (Math.Round((model.Thread.Diameter - inches), 3) * 1000.0d);
+                model.Inch.Numerator = (Math.Round((size - inches), 3) * 1000.0d);
                 model.Inch.Denominator = 1000;
             }
         }
@@ -177,8 +172,6 @@ namespace CNC.Controls.Lathe
                 model.Inch.Whole = fractions[0] == "" ? double.NaN : double.Parse(fractions[0]);
                 model.Inch.Numerator = fractions.Length > 1 ? double.Parse(fractions[1]) : double.NaN;
                 model.Inch.Denominator = fractions.Length > 2 ? double.Parse(fractions[2]) : double.NaN;
-                //       model.Tool.Angle = double.NaN;
-                model.Tool.Angle = 0d;
             }
 
             if (tpi > 0.0d)
@@ -264,7 +257,7 @@ namespace CNC.Controls.Lathe
                         case Thread.Type.BSW:
                         case Thread.Type.BSF:
                             if (ttype == Thread.Type.BSW || ttype == Thread.Type.BSF)
-                                model.Tool.Angle = 55; // cvAngle.Value = 55;
+                                model.Tool.Angle = 55;
                             model.Inch.IsReadonly = false;
                             CombotextToInches((string)selection["Name"]);
                             break;
@@ -328,12 +321,6 @@ namespace CNC.Controls.Lathe
         public ThreadModel Model { get { return model; } }
         public WizardConfig config { get; set; }
 
-        string FormatValue(double value)
-        {
-            return (string)Converters.CNCMeasureToTextConverter.Convert(value, typeof(string), model.IsMetric, CultureInfo.InvariantCulture);
-            //    Math.Round(value, precision).ToString(formstr, CultureInfo.InvariantCulture);
-        }
-
         public void Calculate()
         {
             double cta, cti, di, da, h, pitch, taperminus, taperplus;
@@ -354,9 +341,9 @@ namespace CNC.Controls.Lathe
             // 	Get Data from ViewModel, convert everything to metric
             // ------------------------------------------------------
 
-            double dia = model.Thread.DiameterNominal;
-            double lead = model.Thread.Lead;
-            double zlen = model.ZLength * unit;
+            double dia = model.Thread.DiameterNominal * model.Thread.UnitFactor; // thread dep!
+            double lead = model.Thread.Lead * model.Thread.UnitFactor;
+            double zlen = model.ZLength * model.UnitFactor;
             double tpi = model.Thread.TPI;
             double angle = Math.PI * model.Tool.Angle / 360.0d; // angle / 2 for further calculations
             double tw = model.Tool.Tip; // cvTool.Value;
@@ -371,12 +358,14 @@ namespace CNC.Controls.Lathe
             double rpm = model.RPM;
 
             model.ClearErrors();
+            model.Tool.ClearErrors();
+            model.Thread.ClearErrors();
             model.gCode.Clear();
             model.PassData.Clear();
 
             if (rpm * lead >= model.config.ZMaxFeedRate * 0.8d)
             {
-                model.SetError(nameof(model.Thread.Lead), "Spindle RPM is too high for pitch.");
+                model.Thread.SetError(nameof(model.Thread.Lead), "Spindle RPM is too high for pitch.");
                 model.SetError(nameof(model.RPM), "Spindle RPM is too high for pitch.");
                 return;
             }
@@ -902,7 +891,7 @@ namespace CNC.Controls.Lathe
             thread.degression = model.Thread.DepthDegression == "None" ? 0d : dbl.Parse(model.Thread.DepthDegression); // == "None" ? 0.0f : cbxDepthDegression.Value;
             if (thread.degression > 0.0d && thread.degression < 1.0d)
             {
-                model.SetError(nameof(model.Thread.DepthDegression), "Minimum value is 1.0");
+                model.Thread.SetError(nameof(model.Thread.DepthDegression), "Minimum value is 1.0");
                 return;
             }
             // End LinuxCNC options
@@ -926,12 +915,12 @@ namespace CNC.Controls.Lathe
                 thread.depth += tw - (tw / Math.Sin(angle));
                 if (tw > nrmax)
                 {
-                    model.SetError(nameof(model.Tool.Tip), string.Format("Tooltip is too big (max {0}).", FormatValue(nrmax)));
+                    model.Tool.SetError(nameof(model.Tool.Tip), string.Format("Tooltip is too big (max {0}).", model.FormatValue(nrmax)));
                     return;
                 }
                 else if (tw < nrmin)
                 {
-                    model.SetError(nameof(model.Tool.Tip), string.Format("Warning: Tooltip is too small (min {0}).", FormatValue(nrmin)));
+                    model.Tool.SetError(nameof(model.Tool.Tip), string.Format("Warning: Tooltip is too small (min {0}).", model.FormatValue(nrmin)));
                 }
             }
             else
@@ -939,12 +928,12 @@ namespace CNC.Controls.Lathe
                 thread.depth -= tw / (2.0d * Math.Tan(angle));
                 if (tw > fmax)
                 {
-                    model.SetError(nameof(model.Tool.Tip), string.Format("Tooltip is too big (max {0}).", FormatValue(fmax)));
+                    model.Tool.SetError(nameof(model.Tool.Tip), string.Format("Tooltip is too big (max {0}).", model.FormatValue(fmax)));
                     return;
                 }
                 else if (tw < fmin)
                 {
-                    model.SetError(nameof(model.Tool.Tip), string.Format("Warning: Tooltip is too small (min {0}).", FormatValue(fmin)));
+                    model.Tool.SetError(nameof(model.Tool.Tip), string.Format("Warning: Tooltip is too small (min {0}).", model.FormatValue(fmin)));
                 }
             }
 
@@ -973,7 +962,7 @@ namespace CNC.Controls.Lathe
                 else
                 {
                     model.SetError(nameof(model.RPM), "Retraction too short / rotational speed too high for breaking Z-axis");
-                    model.SetError(nameof(model.Thread.RetractDegrees), "Retraction too short / rotational speed too high for breaking Z-axis");
+                    model.Thread.SetError(nameof(model.Thread.RetractDegrees), "Retraction too short / rotational speed too high for breaking Z-axis");
                     return;
                 }
 
@@ -1001,7 +990,7 @@ namespace CNC.Controls.Lathe
                 if (tretX > tretZ)
                 {
                     model.SetError(nameof(model.RPM), "Retraction too short / rotational speed too high for acceleration X-axis");
-                    model.SetError(nameof(model.Thread.RetractDegrees), "Retraction too short / rotational speed too high for acceleration X-axis");
+                    model.Thread.SetError(nameof(model.Thread.RetractDegrees), "Retraction too short / rotational speed too high for acceleration X-axis");
                     return;
                 }
             }
@@ -1010,22 +999,22 @@ namespace CNC.Controls.Lathe
             //	show calculated diameters
             //---------------------------
 
-            model.Thread.Diameter = thread.diameter / unit;
-            model.Thread.DiameterTolerance = (ag ? tolda : toldi) / (2.0d * unit);
-            model.Thread.PitchDiameter = (ag ? fadia : fidia) / unit;
-            model.Thread.PitchDiameterTolerance = (ag ? tolfa : tolfi) / (2.0d * unit);
+            model.Thread.Diameter = thread.diameter;
+            model.Thread.DiameterTolerance = (ag ? tolda : toldi) / 2.0d;
+            model.Thread.PitchDiameter = (ag ? fadia : fidia);
+            model.Thread.PitchDiameterTolerance = (ag ? tolfa : tolfi) / 2.0d;
 
             if (thread.tapered)
             {
                 zlen = ag ? zlena : zleni;
-                model.ZLength = zlen / unit;
-                model.Thread.MeasurePosition = thread.testlen / unit;
-                model.Thread.MaxDiameter = thread.maxdiameter / unit;
+                model.ZLength = zlen / model.UnitFactor;
+                model.Thread.MeasurePosition = thread.testlen;
+                model.Thread.MaxDiameter = thread.maxdiameter;
             }
 
-            model.Tool.TipMaximum = (toolshape == Thread.Toolshape.Rounded ? nrmax : fmax) / unit;
-            model.Tool.TipMinimum = (toolshape == Thread.Toolshape.Rounded ? nrmin : fmin) / unit;
-            model.Thread.CutDepth = thread.depth * 2.0d / ((double)model.config.xmode * unit);
+            model.Tool.TipMaximum = (toolshape == Thread.Toolshape.Rounded ? nrmax : fmax);
+            model.Tool.TipMinimum = (toolshape == Thread.Toolshape.Rounded ? nrmin : fmin);
+            model.Thread.CutDepth = thread.depth * 2.0d / (double)model.config.xmode;
 
             thread.ztarget = thread.zstart + zlen * model.config.ZDirection;
 
@@ -1045,7 +1034,7 @@ namespace CNC.Controls.Lathe
                 {
                     depth = Math.Min(model.config.PassDepthFirst * Math.Pow(++passes, inv_degression), thread.depth);
                     area = Math.Tan(angle) * depth * depth;
-                    model.PassData.Add(string.Format("{0} {1}  {2} {3}", passes.ToString("00"), FormatValue(depth * 2.0 / rfact), FormatValue((depth - depth_prev) * 2.0 / rfact), Math.Round(area - area_prev, 3)));
+                    model.PassData.Add(string.Format("{0} {1}  {2} {3}", passes.ToString("00"), model.FormatValue(depth * 2.0 / rfact), model.FormatValue((depth - depth_prev) * 2.0 / rfact), Math.Round(area - area_prev, 3)));
                     depth_prev = depth;
                     area_prev = area;
                 }
@@ -1098,7 +1087,7 @@ namespace CNC.Controls.Lathe
                     if (i == 1)
                         thread.firstpass = increment;
 
-                    model.PassData.Add(string.Format("{0} {1} {2}", i, FormatValue(increment * 2.0 / rfact), FormatValue(cutpos * 2.0 / rfact)));
+                    model.PassData.Add(string.Format("{0} {1} {2}", i, model.FormatValue(increment * 2.0 / rfact), model.FormatValue(cutpos * 2.0 / rfact)));
 
                     if (exitloop || i == passes)
                         model.Thread.Mach3PassesExecuted = (uint)i;
@@ -1110,7 +1099,7 @@ namespace CNC.Controls.Lathe
                 {
                     cutpos += thread.lastpass;
 
-                    model.PassData.Add(string.Format("{0} {1} {2}", 6, FormatValue(thread.lastpass * 2.0 / rfact), FormatValue(cutpos * 2.0 / rfact)));
+                    model.PassData.Add(string.Format("{0} {1} {2}", 6, model.FormatValue(thread.lastpass * 2.0 / rfact), model.FormatValue(cutpos * 2.0 / rfact)));
 
                     // show # of passes calculated
                 }
@@ -1148,26 +1137,26 @@ namespace CNC.Controls.Lathe
             model.gCode.Clear();
             model.gCode.Add(string.Format("G18 G{0} G{1}", thread.xmode == LatheMode.Radius ? "8" : "7", thread.IsImperial ? "20" : "21"));
             model.gCode.Add(string.Format("M3S{0} G4P1", ((uint)thread.rpm).ToString()));
-            model.gCode.Add(string.Format("G0 X{0}", FormatValue(xstart)));
-            model.gCode.Add(string.Format("G0 Z{0}", FormatValue(thread.zstart + model.config.ZClearance)));
+            model.gCode.Add(string.Format("G0 X{0}", model.FormatValue(xstart)));
+            model.gCode.Add(string.Format("G0 Z{0}", model.FormatValue(thread.zstart + model.config.ZClearance)));
 
             string code;
 
             while (thread.starts-- > 0)
             {
-                code = string.Format("G76 P{0} Z{1} I{2} J{3} K{4}", FormatValue(thread.pitch), FormatValue(thread.ztarget), FormatValue(thread.xclear), FormatValue(thread.firstpass), FormatValue(thread.depth));
+                code = string.Format("G76 P{0} Z{1} I{2} J{3} K{4}", model.FormatValue(thread.pitch), model.FormatValue(thread.ztarget), model.FormatValue(thread.xclear), model.FormatValue(thread.firstpass), model.FormatValue(thread.depth));
 
                 if (thread.springpasses > 0)
                     code += string.Format(" H{0}", thread.springpasses);
 
                 if (thread.compoundangle > 0.0d)
-                    code += string.Format(" Q{0}", FormatValue(thread.compoundangle));
+                    code += string.Format(" Q{0}", model.FormatValue(thread.compoundangle));
 
                 if (thread.degression >= 1.0d)
-                    code += string.Format(" R{0}", FormatValue(thread.degression));
+                    code += string.Format(" R{0}", model.FormatValue(thread.degression));
 
                 if (thread.taper != ThreadTaper.None && thread.taperlength > 0.0d)
-                    code += string.Format(" L{0} E{1}", (uint)thread.taper, FormatValue(thread.taperlength));
+                    code += string.Format(" L{0} E{1}", (uint)thread.taper, model.FormatValue(thread.taperlength));
 
                 model.gCode.Add(code);
             }
@@ -1177,7 +1166,6 @@ namespace CNC.Controls.Lathe
                 string threadSize = (string)model.Thread.ThreadSize["Name"];
 
                 GCodePush(string.Format("Wizard: {0}{1}", model.Thread.Type.ToString(), threadSize == "" ? "" : ", " + threadSize.Trim()), Core.Action.New);
-                GCodePush(string.Format("({0})", Uncomment(threadSize)), Core.Action.Add);
                 if (threadSize != "")
                     GCodePush(string.Format("({0})", Uncomment(threadSize)), Core.Action.Add);
                 foreach (string s in model.gCode)
@@ -1226,8 +1214,8 @@ namespace CNC.Controls.Lathe
             model.gCode.Clear();
             model.gCode.Add(string.Format("G18 G{0} G{1}", thread.xmode == LatheMode.Radius ? "8" : "7", thread.IsImperial ? "20" : "21"));
             model.gCode.Add(string.Format("M3S{0} G4P1", ((uint)thread.rpm).ToString()));
-            model.gCode.Add(string.Format("G0 X{0}", FormatValue(xstart)));
-            model.gCode.Add(string.Format("G0 Z{0}", FormatValue(model.config.ZClearance)));
+            model.gCode.Add(string.Format("G0 X{0}", model.FormatValue(xstart)));
+            model.gCode.Add(string.Format("G0 Z{0}", model.FormatValue(model.config.ZClearance)));
 
             uint i = 0;
             string code;
@@ -1235,12 +1223,12 @@ namespace CNC.Controls.Lathe
             while (thread.starts-- > 0)
             {
                 code = string.Format("G76 P{0} X{1} Z{2} H{3} I{4} C{5}",
-                    FormatValue(thread.pitch), FormatValue(thread.diameter + thread.depth * (thread.intern ? 1.0d : -1.0d)), FormatValue(thread.ztarget),
-                    FormatValue(thread.firstpass), FormatValue(thread.angle), FormatValue(thread.xclear));
+                    model.FormatValue(thread.pitch), model.FormatValue(thread.diameter + thread.depth * (thread.intern ? 1.0d : -1.0d)), model.FormatValue(thread.ztarget),
+                    model.FormatValue(thread.firstpass), model.FormatValue(thread.angle), model.FormatValue(thread.xclear));
 
-                code += string.Format(" R{0}", FormatValue(thread.diameter)); // X start (optional)
+                code += string.Format(" R{0}", model.FormatValue(thread.diameter)); // X start (optional)
 
-                code += string.Format(" K{0}", FormatValue(thread.zstart - (thread.pitch * i++ + thread.zaccdist) * model.config.ZDirection)); // Z start (optional)
+                code += string.Format(" K{0}", model.FormatValue(thread.zstart - (thread.pitch * i++ + thread.zaccdist) * model.config.ZDirection)); // Z start (optional)
 
                 if (thread.lastpass != 0.0d)
                     code += string.Format(" B{0}", thread.lastpass);
@@ -1249,7 +1237,7 @@ namespace CNC.Controls.Lathe
                     code += string.Format(" Q{0}", thread.springpasses);
 
                 if (thread.retract != 0.0d) // = linucnc chamfer but in degrees
-                    code += string.Format(" L{0}", FormatValue(thread.retract));
+                    code += string.Format(" L{0}", model.FormatValue(thread.retract));
 
                 model.gCode.Add(code);
             }

@@ -1,13 +1,13 @@
 ﻿/*
- * CoolantControl.xaml.cs - part of CNC Controls library
+ * MeasureViewModel.cs - part of CNC Controls library
  *
- * v0.03 / 2020-01-25 / Io Engineering (Terje Io)
+ * v0.03 / 2020-01-28 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2020, Io Engineering (Terje Io)
+Copyright (c) 2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -37,28 +37,35 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-using System.Windows.Controls;
-using CNC.Core;
-
-namespace CNC.Controls
+namespace CNC.Core
 {
-    public partial class CoolantControl : UserControl
+    public class MeasureViewModel : ViewModelBase
     {
+        bool _isMetric = true;
 
-        public CoolantControl()
+        public bool IsMetric
         {
-            InitializeComponent();
-
-            chkFlood.Tag = "Flood";
-            chkMist.Tag = "Mist";
+            get { return _isMetric; }
+            set
+            {
+                if (value != _isMetric)
+                {
+                    _isMetric = value;
+                    OnPropertyChanged("Unit");
+                    OnPropertyChanged("FeedrateUnit");
+                    OnPropertyChanged("UnitFactor");
+                    OnPropertyChanged("Format");
+                    OnPropertyChanged("FormatSigned");
+                    OnPropertyChanged();
+                }
+            }
         }
 
-        private void chkBox_Click(object sender, System.Windows.RoutedEventArgs e)
-        {
-            if((string)(sender as Button).Tag == "Flood")
-                ((GrblViewModel)DataContext).ExecuteMDI(GrblCommand.Flood);
-            else
-                ((GrblViewModel)DataContext).ExecuteMDI(GrblCommand.Mist);
-        }
+        public string Unit { get { return _isMetric ? "mm" : "in"; } }
+        public string FeedrateUnit { get { return _isMetric ? "mm/min" : "in/min"; } }
+        public double UnitFactor { get { return _isMetric ? 1.0d : 25.4d; } }
+        public string Format { get { return _isMetric ? GrblConstants.FORMAT_METRIC : GrblConstants.FORMAT_IMPERIAL; } }
+        public string FormatSigned { get { return "-" + Format; } }
+        public int Precision { get { return _isMetric ? 3 : 4; } }
     }
 }

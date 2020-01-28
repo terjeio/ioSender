@@ -1,13 +1,13 @@
-﻿/*
+/*
  * Converters.cs - part of CNC Controls library for Grbl
  *
- * v0.03 / 2019-12-03 / Io Engineering (Terje Io)
+ * v0.03 / 2020-01-27 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019, Io Engineering (Terje Io)
+Copyright (c) 2019-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -41,6 +41,8 @@ using System;
 using System.Globalization;
 using System.Windows.Data;
 using System.Windows.Media;
+using System.Collections.ObjectModel;
+using System.Text;
 using CNC.Core;
 using CNC.GCode;
 
@@ -48,6 +50,7 @@ namespace CNC.Controls
 {
     public static class Converters
     {
+        public static StringCollectionToTextConverter StringCollectionToTextConverter = new StringCollectionToTextConverter();
         public static LatheModeToStringConverter LatheModeToStringConverter = new LatheModeToStringConverter();
         public static GrblStateToColorConverter GrblStateToColorConverter = new GrblStateToColorConverter();
         public static GrblStateToStringConverter GrblStateToStringConverter = new GrblStateToStringConverter();
@@ -57,6 +60,34 @@ namespace CNC.Controls
         public static LogicalAndConverter LogicalAndConverter = new LogicalAndConverter();
         public static LogicalOrConverter LogicalOrConverter = new LogicalOrConverter();
     }
+
+    // Adapted from: https://stackoverflow.com/questions/4353186/binding-observablecollection-to-a-textbox/8847910#8847910
+    public class StringCollectionToTextConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            var data = values[0] as ObservableCollection<string>;
+
+            if (data != null && data.Count > 0)
+            {
+                StringBuilder sb = new StringBuilder();
+                foreach (var s in data)
+                {
+                    sb.AppendLine(s.ToString());
+                }
+                return sb.ToString();
+            }
+            else
+                return String.Empty;
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    // --
 
     public class LatheModeToStringConverter : IValueConverter
     {

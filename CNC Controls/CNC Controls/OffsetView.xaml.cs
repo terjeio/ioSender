@@ -1,7 +1,7 @@
 ﻿/*
  * OffsetView.xaml.cs - part of CNC Controls library
  *
-* v0.02 / 2020-01-18 / Io Engineering (Terje Io)
+* v0.02 / 2020-01-27 / Io Engineering (Terje Io)
  *
  */
 
@@ -60,6 +60,8 @@ namespace CNC.Controls
             InitializeComponent();
 
             parameters.WorkPositionOffset.PropertyChanged += Parameters_PropertyChanged;
+            if(!GrblSettings.IsGrblHAL)
+                parameters.Position.PropertyChanged += Parameters_PropertyChanged;
         }
 
         public Position offset { get; private set; } = new Position();
@@ -98,16 +100,17 @@ namespace CNC.Controls
             switch (e.PropertyName)
             {
                 case "Z":
-                    if (parameters.IsMachinePosition)
-                        for (int i = 0; i < offset.Values.Length; i++)
-                            offset.Values[i] = parameters.MachinePosition.Values[i];
-                    else
-                        for (int i = 0; i < offset.Values.Length; i++)
-                            offset.Values[i] = parameters.WorkPosition.Values[i] + parameters.WorkPositionOffset.Values[i];
-                    parameters.WorkPositionOffset.SuspendNotifications = true;
-                    parameters.Clear();
-                    parameters.WorkPositionOffset.SuspendNotifications = false;
-                    awaitCoord = false;
+                    if (!(awaitCoord = double.IsNaN(parameters.WorkPositionOffset.Values[0]))) {
+                        if (parameters.IsMachinePosition)
+                            for (int i = 0; i < offset.Values.Length; i++)
+                                offset.Values[i] = parameters.MachinePosition.Values[i];
+                        else
+                            for (int i = 0; i < offset.Values.Length; i++)
+                                offset.Values[i] = parameters.WorkPosition.Values[i] + parameters.WorkPositionOffset.Values[i];
+                        parameters.Position.SuspendNotifications = parameters.WorkPositionOffset.SuspendNotifications = true;
+                        parameters.Clear();
+                        parameters.WorkPositionOffset.SuspendNotifications = parameters.Position.SuspendNotifications = false;
+                    }
                     break;
             }
         }
@@ -206,7 +209,10 @@ namespace CNC.Controls
             awaitCoord = true;
 
             while (awaitCoord)
+            {
+                EventUtils.DoEvents();
                 Comms.com.AwaitResponse(); // TODO: add timeout?
+            }
         }
 
         #endregion
@@ -215,6 +221,9 @@ namespace CNC.Controls
         {
             if (data.Length > 1 && data.Substring(0, 1) == "<")
                 parameters.ParseStatus(data.Remove(data.Length - 1));
+
+            if (awaitCoord)
+                Comms.com.WriteByte(GrblLegacy.ConvertRTCommand(GrblConstants.CMD_STATUS_REPORT));
         }
     }
 }

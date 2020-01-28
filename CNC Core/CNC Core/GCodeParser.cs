@@ -1,13 +1,13 @@
 ﻿/*
  * GCodeParser.cs - part of CNC Controls library
  *
- * v0.02 / 2019-11-07 / Io Engineering (Terje Io)
+ * v0.02 / 2020-01-24 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019, Io Engineering (Terje Io)
+Copyright (c) 2019-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -49,8 +49,14 @@ namespace CNC.GCode
 {
     public class GCodeParser
     {
-
         #region Helper classes, enums etc.
+
+        public enum CommandIgnoreState
+        {
+            No = 0,
+            Prompt,
+            Strip,
+        }
 
         internal class GCValues
         {
@@ -222,6 +228,10 @@ namespace CNC.GCode
             Reset();
         }
 
+        public static CommandIgnoreState IgnoreM6 { get; set; } = CommandIgnoreState.Prompt;
+        public static CommandIgnoreState IgnoreM7 { get; set; } = CommandIgnoreState.No;
+        public static CommandIgnoreState IgnoreM8 { get; set; } = CommandIgnoreState.No;
+
         public Dialect Dialect { get; set; } = Dialect.GrblHAL;
         public bool ProgramEnd { get; private set; }
         public List<GCodeToken> Tokens { get; private set; } = new List<GCodeToken>();
@@ -249,14 +259,37 @@ namespace CNC.GCode
                 toolOffsets[i] = 0d;
         }
 
-        public bool ParseBlock(string block, bool quiet)
+        private string rewrite_block (string remove, List<string> gcodes)
+        {
+            string block = string.Empty;
+
+            foreach(string gcode in gcodes)
+            {
+                if (gcode != remove)
+                    block += gcode;
+            }
+
+            return block == string.Empty ? "(line removed)" : block;
+        }
+
+        private bool VerifyIgnore (string code, CommandIgnoreState state)
+        {
+            bool strip = state == CommandIgnoreState.Strip;
+
+            if(!strip && state != CommandIgnoreState.No)
+                strip = MessageBox.Show(string.Format("{0} command found, strip?", code), "Strip command", MessageBoxButton.YesNo) == MessageBoxResult.Yes;
+
+            return strip;
+        }
+
+        public bool ParseBlock(ref string line, bool quiet)
         {
             WordFlags wordFlags = 0, axisWords = 0, ijkWords = 0, wordFlag = 0;
             ModalGroups modalGroups = 0, modalGroup = 0;
 
             uint userMCode = 0;
             bool isDwell = false, isScaling = false, inMessage = false;
-            string gcode = string.Empty, comment = string.Empty;
+            string gcode = string.Empty, comment = string.Empty, block = line;
             double value;
             AxisCommand axisCommand = AxisCommand.None;
 
@@ -556,17 +589,30 @@ namespace CNC.GCode
                             break;
 
                         case 6:
-                            modalGroup = ModalGroups.M6;
+                            if(VerifyIgnore(code, IgnoreM6))
+                                line = rewrite_block(code, gcodes);
+                            else
+                                modalGroup = ModalGroups.M6;
                             break;
 
                         case 7:
-                            coolantState |= CoolantState.Mist;
-                            modalGroup = ModalGroups.M8;
+                            if (VerifyIgnore(code, IgnoreM7))
+                                line = rewrite_block(code, gcodes);
+                            else
+                            {
+                                coolantState |= CoolantState.Mist;
+                                modalGroup = ModalGroups.M8;
+                            }
                             break;
 
                         case 8:
-                            coolantState |= CoolantState.Flood;
-                            modalGroup = ModalGroups.M8;
+                            if (VerifyIgnore(code, IgnoreM8))
+                                line = rewrite_block(code, gcodes);
+                            else
+                            {
+                                coolantState |= CoolantState.Flood;
+                                modalGroup = ModalGroups.M8;
+                            }
                             break;
 
                         case 9:

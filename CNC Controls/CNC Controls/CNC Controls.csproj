@@ -62,6 +62,9 @@
     <Compile Include="ConfigView.xaml.cs">
       <DependentUpon>ConfigView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ConsoleControl.xaml.cs">
+      <DependentUpon>ConsoleControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Converters.cs" />
     <Compile Include="CoolantControl.xaml.cs">
       <DependentUpon>CoolantControl.xaml</DependentUpon>
@@ -92,6 +95,12 @@
     </Compile>
     <Compile Include="LimitsControl.xaml.cs">
       <DependentUpon>LimitsControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MacroEditor.xaml.cs">
+      <DependentUpon>MacroEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MacroExecuteControl.xaml.cs">
+      <DependentUpon>MacroExecuteControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="MDIControl.xaml.cs">
       <DependentUpon>MDIControl.xaml</DependentUpon>
@@ -125,6 +134,9 @@
     <Compile Include="StatusControl.xaml.cs">
       <DependentUpon>StatusControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="StripGCodeConfigControl.xaml.cs">
+      <DependentUpon>StripGCodeConfigControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ToolView.xaml.cs">
       <DependentUpon>ToolView.xaml</DependentUpon>
     </Compile>
@@ -148,6 +160,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="ConsoleControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="CoolantControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -165,6 +181,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="LimitsControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MacroEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MacroExecuteControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -239,6 +263,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="StatusControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="StripGCodeConfigControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

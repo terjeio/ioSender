@@ -1,13 +1,13 @@
 ﻿/*
- * CoolantControl.xaml.cs - part of CNC Controls library
+ * ConsoleControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.03 / 2020-01-25 / Io Engineering (Terje Io)
+ * v0.01 / 2020-01-27 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2020, Io Engineering (Terje Io)
+Copyright (c) 2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -37,28 +37,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+using System.Windows;
 using System.Windows.Controls;
 using CNC.Core;
 
 namespace CNC.Controls
 {
-    public partial class CoolantControl : UserControl
+    /// <summary>
+    /// Interaction logic for ConsoleControl.xaml
+    /// </summary>
+    public partial class ConsoleControl : UserControl
     {
-
-        public CoolantControl()
+        public ConsoleControl()
         {
             InitializeComponent();
-
-            chkFlood.Tag = "Flood";
-            chkMist.Tag = "Mist";
         }
 
-        private void chkBox_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void btn_Clear(object sender, RoutedEventArgs e)
         {
-            if((string)(sender as Button).Tag == "Flood")
-                ((GrblViewModel)DataContext).ExecuteMDI(GrblCommand.Flood);
-            else
-                ((GrblViewModel)DataContext).ExecuteMDI(GrblCommand.Mist);
+            (DataContext as GrblViewModel).ResponseLog.Clear();
         }
     }
 }

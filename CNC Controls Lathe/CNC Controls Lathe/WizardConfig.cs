@@ -1,13 +1,13 @@
-﻿/*
+/*
  * WizardConfig.cs - part of CNC Controls library for Grbl
  *
- * v0.01 / 2019-11-07 / Io Engineering (Terje Io)
+ * v0.01 / 2020-01-27 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019, Io Engineering (Terje Io)
+Copyright (c) 2019-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -85,7 +85,6 @@ namespace CNC.Controls.Lathe
 
         public double RpmMin { get; private set; }
         public double RpmMax { get; private set; }
-        public bool metric { get; private set; }
         public double XMaxFeedRate { get; private set; }
         public double XAcceleration { get; private set; }
         public double ZMaxFeedRate { get; private set; }
@@ -118,7 +117,6 @@ namespace CNC.Controls.Lathe
 
                 GrblParserState.Get();
 
-                metric = GrblParserState.IsMetric;
                 if (!xmodelock)
                     xmode = GrblParserState.LatheMode;
 

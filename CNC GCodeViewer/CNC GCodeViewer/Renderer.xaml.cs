@@ -1,7 +1,7 @@
-﻿/*
+/*
  * Renderer.xaml.cs - part of CNC Controls library
  *
- * v0.02 / 2019-11-07 / Io Engineering (Terje Io)
+ * v0.02 / 2020-01-27 / Io Engineering (Terje Io)
  *
  */
 
@@ -403,7 +403,7 @@ namespace CNC.Controls.Viewer
             }
             last = null;
 
-            foreach (var path in trace)
+            if(trace != null) foreach (var path in trace)
                 viewport.Children.Add(path);
 
             refreshCamera(bbox);

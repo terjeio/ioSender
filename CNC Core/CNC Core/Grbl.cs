@@ -1,7 +1,7 @@
 ﻿/*
  * Grbl.cs - part of CNC Controls library
  *
- * v0.03 / 2020-01-07 / Io Engineering (Terje Io)
+ * v0.03 / 2020-01-25 / Io Engineering (Terje Io)
  *
  */
 
@@ -412,6 +412,13 @@ namespace CNC.Core
         public double R { get { return R; } set { _r = value; OnPropertyChanged(); } }
     }
 
+    public static class GrblCommand
+    {
+        public static string Mist { get; set; } = "((char)GrblConstants.CMD_COOLANT_MIST_OVR_TOGGLE).ToString()";
+        public static string Flood { get; set; } = ((char)GrblConstants.CMD_COOLANT_FLOOD_OVR_TOGGLE).ToString();
+        public static string ToolChange { get; set; } = "T{0}";
+    }
+
     public static class GrblInfo
     {
         #region Attributes
@@ -739,6 +746,9 @@ namespace CNC.Core
             }
 
             GrblParserState.Tool = GrblParserState.Tool; // Add tool to Tools if not in list
+
+            // Reeread parser state since work offset and tool lists are now populated
+            Comms.com.WriteCommand(GrblConstants.CMD_GETPARSERSTATE);
 
             return Loaded;
         }
@@ -1161,6 +1171,10 @@ namespace CNC.Core
         {
             if (GrblSettings.UseLegacyRTCommands) switch (cmd)
                 {
+                    case GrblConstants.CMD_STATUS_REPORT_ALL:
+                        cmd = (byte)GrblConstants.CMD_STATUS_REPORT_LEGACY[0];
+                        break;
+
                     case GrblConstants.CMD_STATUS_REPORT:
                         cmd = (byte)GrblConstants.CMD_STATUS_REPORT_LEGACY[0];
                         break;

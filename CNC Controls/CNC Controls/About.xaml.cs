@@ -1,13 +1,13 @@
 ﻿/*
- * About.xaml.cs - for CO2 Laser Engraver
+ * About.xaml.cs - part of CNC Controls library
  *
- * v2.0 / 2019-12-01 / Io Engineering (Terje Io)
+ * v2.0 / 2020-01-26 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019, Io Engineering (Terje Io)
+Copyright (c) 2019-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -44,12 +44,9 @@ namespace CNC.Controls
 {
     public partial class About : Window
     {
-        private Window parent;
 
-        public About(Window parent, string title)
+        public About(string title)
         {
-            this.parent = parent;
-
             InitializeComponent();
 
             Title = title;
@@ -57,9 +54,6 @@ namespace CNC.Controls
 
         private void About_Load(object sender, System.EventArgs e)
         {
-            Left = parent.Left + (parent.Width - Width) / 2;
-            Top = parent.Top + 100;
-
             txtGrblVersion.Content = GrblInfo.Version;
             txtGrblOptions.Content = GrblInfo.Options;
             txtGrblNewOpts.Content = GrblInfo.NewOptions;

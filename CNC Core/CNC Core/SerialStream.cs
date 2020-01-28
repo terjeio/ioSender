@@ -43,6 +43,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.IO.Ports;
 using System.Windows.Threading;
+using System.IO;
 
 namespace CNC.Core
 {

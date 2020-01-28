@@ -43,20 +43,11 @@ using System.Xml.Serialization;
 using CNC.Core;
 using System.Windows;
 using CNC.GCode;
+using static CNC.GCode.GCodeParser;
+using System.Collections.ObjectModel;
 
 namespace CNC.Controls
 {
-    [Serializable]
-    public class IgnoreCommand
-    {
-        public enum IgnoreStates
-        {
-            No = 0,
-            Prompt,
-            Skip,
-        }
-    }
-
     [Serializable]
     public class LatheConfig : ViewModelBase
     {
@@ -123,6 +114,12 @@ namespace CNC.Controls
     }
 
     [Serializable]
+    public class Macros : ViewModelBase
+    {
+        public ObservableCollection<GCode.Macro> Macro { get; private set; } = new ObservableCollection<GCode.Macro>();
+    }
+
+    [Serializable]
     public class Config : ViewModelBase
     {
         private int _pollInterval = 200; // ms
@@ -130,9 +127,13 @@ namespace CNC.Controls
         public int PollInterval { get { return _pollInterval < 100 ? 100 : _pollInterval; } set { _pollInterval = value; OnPropertyChanged(); } }
         public string PortParams { get; set; } = "COMn:115200,N,8,1";
 
-        public IgnoreCommand.IgnoreStates IgnoreM6 { get; set; } = IgnoreCommand.IgnoreStates.No;
-        public IgnoreCommand.IgnoreStates IgnoreM7 { get; set; } = IgnoreCommand.IgnoreStates.No;
-        public IgnoreCommand.IgnoreStates IgnoreM8 { get; set; } = IgnoreCommand.IgnoreStates.No;
+        [XmlIgnore]
+        public CommandIgnoreState[] CommandIgnoreStates { get { return (CommandIgnoreState[])Enum.GetValues(typeof(CommandIgnoreState)); } }
+
+        public CommandIgnoreState IgnoreM6 { get; set; } = CommandIgnoreState.No;
+        public CommandIgnoreState IgnoreM7 { get; set; } = CommandIgnoreState.No;
+        public CommandIgnoreState IgnoreM8 { get; set; } = CommandIgnoreState.No;
+        public ObservableCollection<GCode.Macro> Macros { get;  set; } = new ObservableCollection<GCode.Macro>();
 
         public JogConfig Jog { get; set; } = new JogConfig();
         public LatheConfig Lathe { get; set; } = new LatheConfig();
@@ -152,7 +153,7 @@ namespace CNC.Controls
         {
             bool ok = false;
 
-            if(Config == null)
+            if (Config == null)
                 Config = new Config();
 
             XmlSerializer xs = new XmlSerializer(typeof(Config));
@@ -190,6 +191,14 @@ namespace CNC.Controls
                 Config = (Config)xs.Deserialize(reader);
                 reader.Close();
                 configfile = filename;
+
+                // temp hack...
+                foreach (var macro in Config.Macros)
+                {
+                    if (macro.IsSession)
+                        Config.Macros.Remove(macro);
+                }
+
                 ok = true;
             }
             catch

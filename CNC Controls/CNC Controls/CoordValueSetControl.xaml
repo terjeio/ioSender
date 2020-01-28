@@ -12,7 +12,7 @@
             <ColumnDefinition Width="43*"/>
         </Grid.ColumnDefinitions>
         <local:NumericField x:Name="cvValue" HorizontalAlignment="Left" Margin="3,2,0,2" VerticalAlignment="Center" Height="26" Width="170"
-            Format="{Binding Path=Format, Mode=OneWay}"
+            Format="{Binding Path=FormatSigned, Mode=OneWay}"
             Value="{Binding Path=Value, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
             Unit="{Binding Path=Unit, Mode=OneWay}"
             Label="{Binding Path=Label, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=OneWay}"

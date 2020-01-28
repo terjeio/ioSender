@@ -1,7 +1,7 @@
-﻿/*
+/*
  * JobControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.03 / 2020-01-24 / Io Engineering (Terje Io)
+ * v0.03 / 2020-01-27 / Io Engineering (Terje Io)
  *
  */
 
@@ -224,11 +224,7 @@ namespace CNC.Controls
                 if (!(val = GrblSettings.GetDouble(GrblSetting.JogFastSpeed)).Equals(double.NaN))
                     jogSpeed[(int)JogMode.Fast] = val;
 
-                if (GrblSettings.GetString(GrblSetting.ReportInches) == "1")
-                {
-                    model.Unit = "in";
-                    model.Format = GrblConstants.FORMAT_IMPERIAL;
-                }
+                model.IsMetric = GrblSettings.GetString(GrblSetting.ReportInches) != "1";
             }
 
             if(!useFirmwareJog)
@@ -240,6 +236,10 @@ namespace CNC.Controls
                 jogSpeed[(int)JogMode.Slow] = config.Jog.SlowFeedrate;
                 jogSpeed[(int)JogMode.Fast] = config.Jog.FastFeedrate;
             }
+
+            GCodeParser.IgnoreM6 = config.IgnoreM6;
+            GCodeParser.IgnoreM7 = config.IgnoreM7;
+            GCodeParser.IgnoreM8 = config.IgnoreM8;
 
             return GrblSettings.Loaded;
         }
@@ -564,7 +564,7 @@ namespace CNC.Controls
                 //                command = command.ToUpper();
                 try
                 {
-                    GCode.Parser.ParseBlock(command, true);
+                    GCode.Parser.ParseBlock(ref command, true);
                     GCode.commands.Enqueue(command);
                     if (streamingState != StreamingState.SendMDI)
                     {
@@ -774,6 +774,9 @@ namespace CNC.Controls
         {
             if (data.Length == 0)
                 return;
+
+            //if (model.ResponseLogEnable)
+            //    model.ResponseLog.Add(data);
 
             if (data.Substring(0, 1) == "<")
             {

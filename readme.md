@@ -2,6 +2,12 @@
 
 ---
 
+2020-01-28: Third alpha release of binary. Use with care and please report issues!
+
+Added macro support, configurable stripping of M6-M8 G codes, improved handling for non-grblHAL controllers and readied lathe wizards for testing.
+
+---
+
 2020-01-22: First alpha release of binary. Use with care and please report issues!
 
 __NOTE:__ Keyboard jogging with a grbl firmware other than grblHAL is likely to fail, this is a firmware problem so no plan to fix. grblHAL _may_ also occasionally fail \(likely due to issues in the sender\) so be ready to hit reset/estop if it goes wrong!
@@ -36,4 +42,4 @@ Current layout, most likely to change. Since using the VMMV coding pattern this 
 ![Sender](Media/Sender.png)
 
 ---
-2020-01-22
+2020-01-28

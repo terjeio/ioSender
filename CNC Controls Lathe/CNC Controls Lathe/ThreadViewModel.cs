@@ -59,8 +59,19 @@ namespace CNC.Controls.Lathe
             Tool = new ToolProperties();
             Thread = new ThreadProperties();
             GCodeFormat = Lathe.Thread.Format.LinuxCNC;
-            ZLength = 10;
-            ZStart = 0;
+            ZLength = 10d;
+            ZStart = 0d;
+
+            PropertyChanged += ThreadModel_PropertyChanged;
+        }
+
+        private void ThreadModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(IsMetric))
+            {
+                Thread.ThreadSize = Thread.ThreadSize; // Force recalculation of model values
+                ZLength = IsMetric ? 10.0d : 0.5d;
+            }
         }
 
         public InchProperties Inch
@@ -82,7 +93,7 @@ namespace CNC.Controls.Lathe
         }
     }
 
-    public class ThreadProperties : ViewModelBase
+    public class ThreadProperties : MeasureViewModel
     {
 
         private bool _oneLead = false;
@@ -115,6 +126,17 @@ namespace CNC.Controls.Lathe
             DepthDegressions.Add("1");
             DepthDegressions.Add("2");
             _depthDegression = "None";
+
+            PropertyChanged += Thread_PropertyChanged;
+        }
+
+        private void Thread_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if(e.PropertyName == nameof(IsMetric))
+            {
+                OnPropertyChanged(nameof(TpiFormat));
+                OnPropertyChanged(nameof(TpiLabel));
+            }
         }
 
         public EnumFlags<Thread.Side> ESide
@@ -229,12 +251,14 @@ namespace CNC.Controls.Lathe
             set { _tpi = value; OnPropertyChanged(); }
         }
 
-        private string _tpiLabel = "TPI";
-
         public string TpiLabel
         {
-            get { return _tpiLabel; }
-            set { _tpiLabel = value; OnPropertyChanged(); }
+            get { return IsMetric ? "in" : "TPI"; }
+        }
+
+        public string TpiFormat
+        {
+            get { return IsMetric ? GrblConstants.FORMAT_IMPERIAL : "##0"; }
         }
 
         public List<string> DepthDegressions { get; private set; }

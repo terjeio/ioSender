@@ -1,13 +1,13 @@
 ﻿/*
  * NumericTextBox.cs - part of CNC Controls library
  *
- * v0.02 / 2019-10-21 / Io Engineering (Terje Io)
+ * v0.03 / 2020-01-27 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2019, Io Engineering (Terje Io)
+Copyright (c) 2018-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -38,7 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 using System;
-using System.ComponentModel;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
@@ -109,7 +108,7 @@ namespace CNC.Controls
             if (!(e.Handled = !NumericProperties.IsStringNumeric(text, np)))
             {
                 updateText = false;
-                Value = double.Parse(text == "" || text == "." ? "0" : text, np.Styles, CultureInfo.InvariantCulture);
+                Value = double.Parse(text == "" || text == "." || text == "-" || text == "-." ? "0" : text, np.Styles, CultureInfo.InvariantCulture);
                 updateText = true;
             }
 

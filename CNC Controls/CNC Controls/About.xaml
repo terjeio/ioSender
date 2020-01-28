@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:CNC.Controls"
         mc:Ignorable="d"
         Title="About" Height="223" Width="315" ResizeMode="NoResize" ShowInTaskbar="False"
+        WindowStartupLocation="CenterOwner"
         Loaded="About_Load" Icon="App.ico">
     <Grid Background="#FFF8F8F8">
         <Grid.RowDefinitions>

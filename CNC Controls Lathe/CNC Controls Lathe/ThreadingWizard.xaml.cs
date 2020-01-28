@@ -1,12 +1,12 @@
 ﻿/*
  * ThreadingWizard.xaml.cs - part of CNC Controls Lathe library
  *
- * v0.01 / 2020-01-17 / Io Engineering (Terje Io)
+ * v0.01 / 2020-01-27 / Io Engineering (Terje Io)
  *
  */
 
 /*
- * Adapted from original code by Stephan Brunker (written in FreeBasic)
+ * Adapted from original code by Stephan Brunker (written in FreeBasic) [r16 - v0.32]
  *
  * Project Homepage:
  * www.sourceforge.net/p/mach3threadinghelper 
@@ -139,12 +139,7 @@ namespace CNC.Controls.Lathe
 
                     model.config.Update();
 
-                    if (model.IsMetric != model.config.metric)
-                    {
-                        model.IsMetric = model.config.metric;
-                        // cbxThreadType_SelectionChanged(null, null);
-                        //  SetUnitLabels(this);
-                    }
+                    Converters.IsMetric = model.IsMetric = GrblParserState.IsMetric;;
                 }
                 else
                     model.gCode.Clear();

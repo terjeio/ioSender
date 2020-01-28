@@ -9,13 +9,28 @@
         xmlns:cnclathecontrols="clr-namespace:CNC.Controls.Lathe;assembly=CNC.Controls.Lathe"
         xmlns:local="clr-namespace:GCode_Sender"
         mc:Ignorable="d"
-        Title="GCode Sender" Height="600" Width="920"
+        Title="GCode Sender (alpha-3)" Height="600" Width="923"
         Loaded="Window_Load"
         Closing="Window_Closing"
         Closed="Window_Closed" Icon="App.ico" ResizeMode="NoResize">
     <Window.DataContext>
         <cnccore:GrblViewModel />
     </Window.DataContext>
+    <Window.Resources>
+        <Style TargetType="Button" x:Key="btnSidebar">
+            <Setter Property="Background" Value="#FFEFEFEF"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="3" BorderThickness="1" BorderBrush="DarkGray">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center">
+                            </ContentPresenter>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem x:Name="menuFile" Header="_File">
@@ -123,12 +138,20 @@
 
                 -->
             </TabControl>
-            <Button x:Name="jogButton" Content="Jog" Tag="collapsed" HorizontalAlignment="Left" Margin="884,25,-51,0" VerticalAlignment="Top" Width="75" Click="jogbtn_Click">
-                <Button.LayoutTransform>
-                    <RotateTransform Angle="90"/>
-                </Button.LayoutTransform>
-            </Button>
-            <cnccontrols:JogControl x:Name="jogControl" HorizontalAlignment="Right" Margin="0,25,24,0" VerticalAlignment="Top" Visibility="Hidden"/>
+            <StackPanel x:Name="stpRight" Orientation="Vertical" HorizontalAlignment="Right" Height="510" Margin="0,25,-3,0" VerticalAlignment="Top" Width="22">
+                <Button x:Name="btnJogPanel" Content="Jog" HorizontalAlignment="Left"  VerticalAlignment="Top" Width="75" Height="25" Focusable="False" Click="jogbtn_Click" Style="{StaticResource btnSidebar}">
+                    <Button.LayoutTransform>
+                        <RotateTransform Angle="90"/>
+                    </Button.LayoutTransform>
+                </Button>
+                <Button x:Name="btnMacroPanel" Content="Macros" HorizontalAlignment="Left"  VerticalAlignment="Top" Width="75" Height="25" Focusable="False" Click="macrobtn_Click" Style="{StaticResource btnSidebar}">
+                    <Button.LayoutTransform>
+                        <RotateTransform Angle="90"/>
+                    </Button.LayoutTransform>
+                </Button>
+            </StackPanel>
+            <cnccontrols:JogControl x:Name="jogControl" HorizontalAlignment="Right" Margin="0,25,22,0" VerticalAlignment="Top" Visibility="Hidden"/>
+            <cnccontrols:MacroExecuteControl x:Name="macroControl" HorizontalAlignment="Right" Margin="0,25,22,0" VerticalAlignment="Top" Visibility="Hidden"/>
         </Grid>
     </DockPanel>
 </Window>
