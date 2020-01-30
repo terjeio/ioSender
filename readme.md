@@ -2,6 +2,14 @@
 
 ---
 
+2020-01-30: Fourth alpha release of binary. Use with care and please report issues!
+
+Improved button interlocks, added [direct output to machine](https://github.com/terjeio/Grbl-GCode-Sender/wiki/Vectric-Direct-Output) from Vectric applications.
+
+---
+
+---
+
 2020-01-28: Third alpha release of binary. Use with care and please report issues!
 
 Added macro support, configurable stripping of M6-M8 G codes, improved handling for non-grblHAL controllers and readied lathe wizards for testing.
