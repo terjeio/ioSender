@@ -1,7 +1,7 @@
 /*
  * JobControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.03 / 2020-01-27 / Io Engineering (Terje Io)
+ * v0.03 / 2020-01-30 / Io Engineering (Terje Io)
  *
  */
 
@@ -154,6 +154,13 @@ namespace CNC.Controls
                     if (JobPending && signals[Signals.CycleStart] && !signals[Signals.Hold] && holdSignal)
                         CycleStart();
                     holdSignal = signals[Signals.Hold];
+                }
+                break;
+
+                case nameof(GrblViewModel.GrblReset):
+                {
+                    if (model.IsJobRunning || streamingState == StreamingState.Stop)
+                        RewindFile();
                 }
                 break;
             }
@@ -485,8 +492,7 @@ namespace CNC.Controls
             {
                 GCode.LoadFile(filename);
                 grdGCode.DataContext = GCode.Data.DefaultView;
-                CurrLine = 0;
-                PendingLine = 0;
+                CurrLine = PendingLine = ACKPending = 0;
                 PgmEndLine = GCode.Data.Rows.Count - 1;
                 scroll = UIUtils.GetScrollViewer(grdGCode);
 
@@ -507,7 +513,7 @@ namespace CNC.Controls
             else if (GCode.Loaded)
             {
                 lblRunTime.Content = "";
-                ACKPending = CurrLine = serialUsed = 0;
+                ACKPending = CurrLine = ACKPending = serialUsed = 0;
                 pgmStarted = false;
                 System.Threading.Thread.Sleep(250);
                 Comms.com.PurgeQueue();
@@ -596,7 +602,7 @@ namespace CNC.Controls
 
                 scroll.ScrollToTop();
 
-                CurrLine = PendingLine = 0;
+                CurrLine = PendingLine = ACKPending = 0;
                 PgmEndLine = GCode.Data.Rows.Count - 1;
 
                 SetStreamingState(StreamingState.Idle);
@@ -646,7 +652,7 @@ namespace CNC.Controls
                 case StreamingState.FeedHold:
                     btnStart.IsEnabled = !grblState.MPG;
                     btnHold.IsEnabled = false;
-                    btnStop.IsEnabled = GrblSettings.IsGrblHAL;
+                    btnStop.IsEnabled = model.IsJobRunning;
                     break;
 
                 case StreamingState.ToolChange:
@@ -658,7 +664,7 @@ namespace CNC.Controls
                     btnStart.IsEnabled = !GrblSettings.IsGrblHAL;
                     btnHold.IsEnabled = false;
                     btnStop.IsEnabled = false;
-                    btnRewind.IsEnabled = !grblState.MPG;
+                    btnRewind.IsEnabled = (GrblSettings.IsGrblHAL || grblState.State != GrblStates.Hold) && !grblState.MPG;
                     model.IsJobRunning = false;
                     if (!grblState.MPG)
                     {
@@ -691,7 +697,9 @@ namespace CNC.Controls
                     }
                     if (JobTimer.IsRunning)
                         JobTimer.Pause = true;
-                    else if (streamingState != StreamingState.Stop)
+                    else if (streamingState == StreamingState.Stop)
+                        RewindFile();
+                    else
                         SetStreamingState(StreamingState.Idle);
                     break;
 
@@ -780,7 +788,7 @@ namespace CNC.Controls
 
             if (data.Substring(0, 1) == "<")
             {
-                model.ParseStatus(data.Remove(data.Length - 1));
+                model.ParseStatus(data);
 
                 if (JobTimer.IsRunning && !JobTimer.IsPaused)
                     lblRunTime.Content = JobTimer.RunTime;
@@ -791,6 +799,8 @@ namespace CNC.Controls
 
                 model.SetGRBLState("Alarm", alarm.Length == 2 ? int.Parse(alarm[1]) : -1, false);
             }
+            else if (data.StartsWith("[PRB:"))
+                model.ParseProbeStatus(data);
             else if (data.StartsWith("[GC:"))
                 model.ParseGCStatus(data);
             else if (data.StartsWith("["))

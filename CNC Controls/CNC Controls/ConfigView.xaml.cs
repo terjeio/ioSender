@@ -92,7 +92,7 @@ namespace CNC.Controls
 
         void btnBackup_Click(object sender, RoutedEventArgs e)
         {
-            GrblSettings.Backup(string.Format("{0}\\settings.txt", CNC.Core.Resources.Path));
+            GrblSettings.Backup(string.Format("{0}settings.txt", CNC.Core.Resources.Path));
         }
 
         private void dgrSettings_SelectionChanged(object sender, SelectionChangedEventArgs e)

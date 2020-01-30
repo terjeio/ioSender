@@ -1,7 +1,7 @@
 ﻿/*
  * AppConfig.cs - part of Grbl Code Sender
  *
- * v0.03 / 2020-01-22 / Io Engineering (Terje Io)
+ * v0.03 / 2020-01-28 / Io Engineering (Terje Io)
  *
  */
 
@@ -265,7 +265,7 @@ namespace CNC.Controls
                     }
                 }
                 else
-                    status = 1;
+                    return 1;
             }
 
             if (!string.IsNullOrEmpty(port))

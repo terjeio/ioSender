@@ -55,7 +55,7 @@ namespace CNC.Controls
 
         private void chkBox_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            if((string)(sender as Button).Tag == "Flood")
+            if((string)(sender as CheckBox).Tag == "Flood")
                 ((GrblViewModel)DataContext).ExecuteMDI(GrblCommand.Flood);
             else
                 ((GrblViewModel)DataContext).ExecuteMDI(GrblCommand.Mist);

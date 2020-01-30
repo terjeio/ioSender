@@ -414,7 +414,7 @@ namespace CNC.Core
 
     public static class GrblCommand
     {
-        public static string Mist { get; set; } = "((char)GrblConstants.CMD_COOLANT_MIST_OVR_TOGGLE).ToString()";
+        public static string Mist { get; set; } = ((char)GrblConstants.CMD_COOLANT_MIST_OVR_TOGGLE).ToString();
         public static string Flood { get; set; } = ((char)GrblConstants.CMD_COOLANT_FLOOD_OVR_TOGGLE).ToString();
         public static string ToolChange { get; set; } = "T{0}";
     }
@@ -758,7 +758,7 @@ namespace CNC.Core
             int sep = data.IndexOf(":");
             if (sep > 0)
             {
-                parameters = data.Substring(sep + 1, data.IndexOf("]") - sep - 1);
+                parameters = data.Substring(sep + 1).TrimEnd(']');
                 return data.Substring(1, sep - 1);
             }
             parameters = "";
@@ -851,7 +851,7 @@ namespace CNC.Core
         {
             try
             {
-                StreamReader file = new StreamReader(string.Format("{0}\\error_codes_{1}.csv", Resources.Path, Resources.Language));
+                StreamReader file = new StreamReader(string.Format("{0}error_codes_{1}.csv", Resources.Path, Resources.Language));
 
                 if (file != null)
                 {
@@ -898,7 +898,7 @@ namespace CNC.Core
         {
             try
             {
-                StreamReader file = new StreamReader(string.Format("{0}\\alarm_codes_{1}.csv", Resources.Path, Resources.Language));
+                StreamReader file = new StreamReader(string.Format("{0}alarm_codes_{1}.csv", Resources.Path, Resources.Language));
 
                 if (file != null)
                 {
@@ -1001,7 +1001,7 @@ namespace CNC.Core
 
             try
             {
-                StreamReader file = new StreamReader(string.Format("{0}\\{1}", Resources.Path, Resources.ConfigName));
+                StreamReader file = new StreamReader(string.Format("{0}{1}", Resources.Path, Resources.ConfigName));
 
                 if (file != null)
                 {

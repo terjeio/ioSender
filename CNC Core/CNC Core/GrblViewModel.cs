@@ -1,7 +1,7 @@
 /*
  * GrblViewModel.cs - part of CNC Controls library
  *
- * v0.03 / 2020-01-28 / Io Engineering (Terje Io)
+ * v0.03 / 2020-01-29 / Io Engineering (Terje Io)
  *
  */
 
@@ -51,7 +51,7 @@ namespace CNC.Core
     {
         private string _tool, _message, _WPos, _MPos, _wco, _wcs, _a, _fs, _mpg, _ov, _pn, _sc, _sd, _ex, _d, _gc, _h;
         private string _mdiCommand, _fileName;
-        private bool _flood, _mist, _tubeCoolant, _toolChange, _reset, _isMPos, _isJobRunning;
+        private bool _flood, _mist, _tubeCoolant, _toolChange, _reset, _isMPos, _isJobRunning, _probeState;
         private int _pwm;
         private double _feedrate = 0d;
         private double _rpm = 0d;
@@ -78,7 +78,7 @@ namespace CNC.Core
         {
             _fileName = _mdiCommand = string.Empty;
             _streamingState = StreamingState.NoFile;
-            _isMPos = _reset = _isJobRunning = false;
+            _isMPos = _reset = _isJobRunning = _probeState = false;
             _mpg = "";
             _pwm = 0;
 
@@ -148,6 +148,9 @@ namespace CNC.Core
             set { Position.SuspendNotifications = value; }
         }
         public Position WorkPositionOffset { get; private set; } = new Position();
+        public Position ProbePosition { get; private set; } = new Position();
+        public bool ProbeState { get { return _probeState; } private set { _probeState = value; OnPropertyChanged(); } }
+
         public EnumFlags<SpindleState> SpindleState { get; private set; } = new EnumFlags<SpindleState>(GCode.SpindleState.Off);
         public EnumFlags<Signals> Signals { get; private set; } = new EnumFlags<Signals>(Core.Signals.Off);
         public EnumFlags<AxisFlags> AxisScaled { get; private set; } = new EnumFlags<AxisFlags>(AxisFlags.None);
@@ -348,11 +351,25 @@ namespace CNC.Core
             return GrblParserState.Loaded;
         }
 
+        public bool ParseProbeStatus(string data)
+        {
+            string[] values = data.TrimEnd(']').Split(':');
+            if (values.Length == 3)
+            {
+                ProbePosition.Parse(values[1]);
+                ProbeState = values[2] == "1";
+                for (int i = 0; i < GrblInfo.NumAxes; i++)
+                    GrblWorkParameters.ProbePosition.Values[i] = ProbePosition.Values[i];
+            }
+
+            return ProbeState && values.Length == 3;
+        }
+
         public bool ParseStatus(string data)
         {
             bool parseState = true, changed = false;
 
-            string[] elements = data.Split('|');
+            string[] elements = data.TrimEnd('>').Split('|');
 
             foreach (string e in elements)
             {

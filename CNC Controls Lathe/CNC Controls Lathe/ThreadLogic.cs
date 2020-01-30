@@ -6,6 +6,14 @@
  */
 
 /*
+ * Adapted from original code by Stephan Brunker (written in FreeBasic) [r16 - v0.32]
+ *
+ * Project Homepage:
+ * www.sourceforge.net/p/mach3threadinghelper 
+ * 
+ */
+
+/*
 
 Copyright (c) 2019-2020, Io Engineering (Terje Io)
 All rights reserved.

@@ -1,7 +1,7 @@
 ﻿/*
- * MPGPending.xaml.cs - part of CNC Controls library for Grbl
+ * MPGPending.xaml.cs - part of CNC Controls library
  *
- * v0.02 / 2020-01-18 / Io Engineering (Terje Io)
+ * v0.02 / 2020-01-29 / Io Engineering (Terje Io)
  *
  */
 
@@ -72,7 +72,7 @@ namespace CNC.Controls
         {
             if (data.Length > 1 && data.Substring(0, 1) == "<")
             {
-                model.ParseStatus(data.Remove(data.Length - 1));
+                model.ParseStatus(data);
 
                 if(model.IsMPGActive == false) {
                     Cancelled = false;

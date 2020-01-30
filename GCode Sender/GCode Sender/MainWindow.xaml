@@ -9,7 +9,7 @@
         xmlns:cnclathecontrols="clr-namespace:CNC.Controls.Lathe;assembly=CNC.Controls.Lathe"
         xmlns:local="clr-namespace:GCode_Sender"
         mc:Ignorable="d"
-        Title="GCode Sender (alpha-3)" Height="600" Width="923"
+        Title="GCode Sender (alpha-4)" Height="600" Width="923"
         Loaded="Window_Load"
         Closing="Window_Closing"
         Closed="Window_Closed" Icon="App.ico" ResizeMode="NoResize">

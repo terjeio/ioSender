@@ -1,7 +1,7 @@
 ﻿/*
  * OffsetView.xaml.cs - part of CNC Controls library
  *
-* v0.02 / 2020-01-27 / Io Engineering (Terje Io)
+* v0.02 / 2020-01-29 / Io Engineering (Terje Io)
  *
  */
 
@@ -220,7 +220,7 @@ namespace CNC.Controls
         private void DataReceived(string data)
         {
             if (data.Length > 1 && data.Substring(0, 1) == "<")
-                parameters.ParseStatus(data.Remove(data.Length - 1));
+                parameters.ParseStatus(data);
 
             if (awaitCoord)
                 Comms.com.WriteByte(GrblLegacy.ConvertRTCommand(GrblConstants.CMD_STATUS_REPORT));

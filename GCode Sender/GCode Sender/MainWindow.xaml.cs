@@ -1,7 +1,7 @@
 ﻿/*
  * MainWindow.xaml.cs - part of Grbl Code Sender
  *
- * v0.03 / 2020-01-24 / Io Engineering (Terje Io)
+ * v0.03 / 2020-01-29 / Io Engineering (Terje Io)
  *
  */
 
@@ -71,6 +71,8 @@ namespace GCode_Sender
 
         public MainWindow()
         {
+            CNC.Core.Resources.Path = AppDomain.CurrentDomain.BaseDirectory;
+
             InitializeComponent();
 
             ui = this;
@@ -115,6 +117,9 @@ namespace GCode_Sender
             ((GrblViewModel)ui.DataContext).ActiveView = currentView.mode;
 
             getTab(ViewType.AppConfig).DataContext = Profile.Config;
+
+            new PipeServer(App.Current.Dispatcher);
+            PipeServer.FileTransfer += Pipe_FileTransfer;
         }
 
         private void MacroControl_MacrosChanged()
@@ -193,6 +198,11 @@ namespace GCode_Sender
         {
             About about = new About(BaseWindowTitle) { Owner = Application.Current.MainWindow };
             about.ShowDialog();
+        }
+
+        private void Pipe_FileTransfer(string filename)
+        {
+            FileLoad?.Invoke(filename);
         }
 
         private void fileOpenMenuItem_Click(object sender, RoutedEventArgs e)

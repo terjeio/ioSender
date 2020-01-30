@@ -217,7 +217,7 @@ namespace CNC.Controls.Lathe
 
         public LatheProfile(string filename)
         {
-            this.filename = Core.Resources.Path + "\\" + filename;
+            this.filename = Core.Resources.Path + filename;
         }
 
         public ProfileData Add()
@@ -235,10 +235,9 @@ namespace CNC.Controls.Lathe
         public void Save()
         {
             XmlSerializer xs = new XmlSerializer(typeof(ObservableCollection<ProfileData>));
-
-            FileStream fsout = new FileStream(filename, FileMode.Create, FileAccess.Write, FileShare.None);
             try
             {
+                FileStream fsout = new FileStream(filename, FileMode.Create, FileAccess.Write, FileShare.None);
                 using (fsout)
                 {
                     xs.Serialize(fsout, profiles);
