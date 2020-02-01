@@ -9,7 +9,7 @@
         xmlns:cnclathecontrols="clr-namespace:CNC.Controls.Lathe;assembly=CNC.Controls.Lathe"
         xmlns:local="clr-namespace:GCode_Sender"
         mc:Ignorable="d"
-        Title="GCode Sender (alpha-4)" Height="600" Width="923"
+        Title="GCode Sender (alpha-4)" Height="800" Width="923"
         Loaded="Window_Load"
         Closing="Window_Closing"
         Closed="Window_Closed" Icon="App.ico" ResizeMode="NoResize">
@@ -47,7 +47,7 @@
             <TabControl x:Name="tabMode" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" SelectionChanged="TabMode_SelectionChanged">
                 <TabItem x:Name="tabGrbl" Header="Grbl">
                     <Grid x:Name="Grbl" Background="#FFE5E5E5">
-                        <local:JobView HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top"/>
+                        <local:JobView HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Loaded="JobView_Loaded"/>
                     </Grid>
                 </TabItem>
                 <TabItem x:Name="tabViewer" Header="3D View">
@@ -137,6 +137,11 @@
                 </TabItem>
 
                 -->
+                <TabItem x:Name="tabProbeZ" Header=" Probe Z">
+                    <Grid Background="Aqua">
+                        <local:ProbeView x:Name="Probe"></local:ProbeView>
+                    </Grid>
+                </TabItem>
             </TabControl>
             <StackPanel x:Name="stpRight" Orientation="Vertical" HorizontalAlignment="Right" Height="510" Margin="0,25,-3,0" VerticalAlignment="Top" Width="22">
                 <Button x:Name="btnJogPanel" Content="Jog" HorizontalAlignment="Left"  VerticalAlignment="Top" Width="75" Height="25" Focusable="False" Click="jogbtn_Click" Style="{StaticResource btnSidebar}">

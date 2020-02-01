@@ -41,15 +41,21 @@ using System;
 using System.Linq;
 using System.Windows.Media;
 using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using System.Windows.Input;
+
 using CNC.GCode;
 using CNC.View;
+using System.Windows.Controls;
+using System.Windows.Threading;
 
 namespace CNC.Core
 {
     public class GrblViewModel : MeasureViewModel
     {
-        private string _tool, _message, _WPos, _MPos, _wco, _wcs, _a, _fs, _mpg, _ov, _pn, _sc, _sd, _ex, _d, _gc, _h;
+        private string _tool, _message, _WPos, _MPos, _wco, _wcs, _a, _fs, _mpg, _ov, _pn, _sc, _sd, _ex, _d, _gc, _h, _lastMsg;
+        private ObservableCollection<string> _messages;
+        
         private string _mdiCommand, _fileName;
         private bool _flood, _mist, _tubeCoolant, _toolChange, _reset, _isMPos, _isJobRunning, _probeState;
         private int _pwm;
@@ -72,6 +78,7 @@ namespace CNC.Core
             Clear();
 
             MDICommand = new ActionCommand<string>(ExecuteMDI);
+            _messages = new ObservableCollection<string>() { "Welcome to GCode Sender!!!!!" };
         }
 
         public void Clear()
@@ -108,7 +115,7 @@ namespace CNC.Core
             if (_latheMode != LatheMode.Disabled)
                 LatheMode = LatheMode.Radius;
         }
-
+        
         public ICommand MDICommand { get; private set; }
 
         public void ExecuteMDI(string command)
@@ -231,10 +238,26 @@ namespace CNC.Core
                 if (_message != value)
                 {
                     _message = value;
+                    _messages.Add(value);
                     OnPropertyChanged();
                 }
             }
         }
+        public string LastMsg
+        {
+            get { return Messages.Last(); }
+        }
+        public ObservableCollection<string> Messages
+        {
+            get { return _messages; }
+            set {
+                _lastMsg = value.Last();
+                OnPropertyChanged();
+            }
+        }
+
+        
+
 
         public string ParserState
         {

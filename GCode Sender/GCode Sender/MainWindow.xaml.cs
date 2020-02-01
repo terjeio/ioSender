@@ -344,6 +344,11 @@ namespace GCode_Sender
             jogControl.Visibility = Visibility.Hidden;
             macroControl.Visibility = macroControl.Visibility == Visibility.Visible ? Visibility.Hidden : Visibility.Visible;
         }
+
+        private void JobView_Loaded(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
 

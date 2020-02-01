@@ -3,15 +3,28 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+             xmlns:ei="clr-namespace:Microsoft.Expression.Interactivity.Core;assembly=Microsoft.Expression.Interactions"
              xmlns:local="clr-namespace:GCode_Sender"
              xmlns:cnccontrols="clr-namespace:CNC.Controls;assembly=CNC.Controls.WPF"
              mc:Ignorable="d" 
-             d:DesignHeight="500" d:DesignWidth="875"
+             d:DesignHeight="800" d:DesignWidth="875"
              Focusable="True"
              Loaded="JobView_Load"
              IsVisibleChanged="JobView_IsVisibleChanged">
     <StackPanel Background="Transparent" MouseDown="outside_MouseDown" Width="870">
-        <Grid Height="500">
+        <Grid Height="800">
+            <Grid.ColumnDefinitions>
+                
+                <ColumnDefinition Width="*">
+                </ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                
+                <RowDefinition Height="475"></RowDefinition>
+                <RowDefinition Height="2" />
+                <RowDefinition Height="200"></RowDefinition>
+            </Grid.RowDefinitions>
             <StackPanel Margin="4,5,0,0" Width="220" Height="Auto" HorizontalAlignment="Left">
                 <cnccontrols:DROControl x:Name="DRO" HorizontalAlignment="Left" VerticalAlignment="Top"/>
                 <cnccontrols:LimitsControl HorizontalAlignment="Left" VerticalAlignment="Top"/>
@@ -26,7 +39,18 @@
                 <cnccontrols:FeedControl x:Name="feedControl" HorizontalAlignment="Left" Height="160" VerticalAlignment="Top" />
             </StackPanel>
             <cnccontrols:MDIControl x:Name="mdiControl" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="4,420,0,0"/>
-            <TextBox x:Name="txtStatus" Text="{Binding Path=Message}" HorizontalAlignment="Center" Height="23" Margin="2,4" TextWrapping="Wrap" VerticalAlignment="Bottom" Width="860" IsEnabled="False" UndoLimit="0"/>
-        </Grid>
+            
+            <ScrollViewer Grid.Row="2" Name="ServerScroll"
+                      VerticalScrollBarVisibility="Auto">
+                <ListView x:Name="listView" ItemsSource="{Binding Messages}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger SourceObject="{Binding Messages}" EventName="CollectionChanged">
+                            <ei:CallMethodAction MethodName="ScrollToEnd" TargetObject="{Binding ElementName=ServerScroll}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </ListView>
+            </ScrollViewer>
+            
+            </Grid>
     </StackPanel>
 </UserControl>

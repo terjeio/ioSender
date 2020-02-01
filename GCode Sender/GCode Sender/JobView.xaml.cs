@@ -53,6 +53,8 @@ namespace GCode_Sender
     /// <summary>
     /// Interaction logic for JobView.xaml
     /// </summary>
+    /// 
+
     public partial class JobView : UserControl, CNCView
     {
         private bool initOK = false, sdStream = false;
@@ -162,7 +164,9 @@ namespace GCode_Sender
             }
         }
 
-#region Methods required by CNCView interface
+        
+
+        #region Methods required by CNCView interface
 
         public ViewType mode { get { return ViewType.GRBL; } }
 
