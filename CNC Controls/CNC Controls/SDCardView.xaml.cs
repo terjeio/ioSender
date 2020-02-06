@@ -1,7 +1,7 @@
 ﻿/*
  * SDCardView.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.01 / 2020-01-07 / Io Engineering (Terje Io)
+ * v0.05 / 2020-02-06 / Io Engineering (Terje Io)
  *
  */
 
@@ -43,6 +43,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using CNC.Core;
 using CNC.View;
+using System.Threading;
 
 namespace CNC.Controls
 {
@@ -68,7 +69,7 @@ namespace CNC.Controls
         public void Activate(bool activate, ViewType chgMode)
         {
             if (activate)
-                GrblSDCard.Load();
+                GrblSDCard.Load((GrblViewModel)DataContext);
         }
 
         public void CloseFile()
@@ -107,7 +108,7 @@ namespace CNC.Controls
     public static class GrblSDCard
     {
         private static DataTable data;
-        private static bool mounted = false;
+        private static bool? mounted = null;
         private static int id = 0;
 
         static GrblSDCard()
@@ -125,29 +126,52 @@ namespace CNC.Controls
         public static DataView Files { get { return data.DefaultView; } }
         public static bool Loaded { get { return data.Rows.Count > 0; } }
 
-        public static void Load()
+        public static void Load(GrblViewModel model)
         {
+            bool? res = null;
+            CancellationToken cancellationToken = new CancellationToken();
+
             data.Clear();
 
-            Comms.com.PurgeQueue();
-
-            if (!mounted)
+            if (mounted == null)
             {
-                Comms.com.WriteCommand(GrblConstants.CMD_SDCARD_MOUNT);
-                Comms.com.AwaitAck();
+                Comms.com.PurgeQueue();
 
-                mounted = Comms.com.CommandState == Comms.State.ACK;
+                new Thread(() =>
+                {
+                    mounted = WaitFor.AckResponse<string>(
+                        cancellationToken,
+                        null,
+                        a => model.OnResponseReceived += a,
+                        a => model.OnResponseReceived -= a,
+                        500, () => Comms.com.WriteCommand(GrblConstants.CMD_SDCARD_MOUNT));
+                }).Start();
+
+                while (mounted == null)
+                    EventUtils.DoEvents();
             }
 
-            if (mounted)
+            if (mounted == true)
             {
+                Comms.com.PurgeQueue();
+
                 id = 0;
-                Comms.com.DataReceived += new DataReceivedHandler(Process);
+                model.Silent = true;
 
-                Comms.com.WriteCommand(GrblConstants.CMD_SDCARD_DIR);
-                Comms.com.AwaitAck();
+                new Thread(() =>
+                {
+                    res = WaitFor.AckResponse<string>(
+                        cancellationToken,
+                        response => Process(response),
+                        a => model.OnResponseReceived += a,
+                        a => model.OnResponseReceived -= a,
+                        2000, () => Comms.com.WriteCommand(GrblConstants.CMD_SDCARD_DIR));
+                }).Start();
 
-                Comms.com.DataReceived -= GrblSDCard.Process;
+                while (res == null)
+                    EventUtils.DoEvents();
+
+                model.Silent = false;
 
                 data.AcceptChanges();
             }

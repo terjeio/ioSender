@@ -1,7 +1,7 @@
 ﻿/*
  * CoolantControl.xaml.cs - part of CNC Controls library
  *
- * v0.03 / 2020-01-25 / Io Engineering (Terje Io)
+ * v0.05 / 2020-02-01 / Io Engineering (Terje Io)
  *
  */
 
@@ -56,9 +56,9 @@ namespace CNC.Controls
         private void chkBox_Click(object sender, System.Windows.RoutedEventArgs e)
         {
             if((string)(sender as CheckBox).Tag == "Flood")
-                ((GrblViewModel)DataContext).ExecuteMDI(GrblCommand.Flood);
+                (DataContext as GrblViewModel).ExecuteCommand(GrblCommand.Flood);
             else
-                ((GrblViewModel)DataContext).ExecuteMDI(GrblCommand.Mist);
+                (DataContext as GrblViewModel).ExecuteCommand(GrblCommand.Mist);
         }
     }
 }

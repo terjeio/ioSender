@@ -1,7 +1,7 @@
 /*
  * JogControl.xaml.cs - part of CNC Controls library
  *
- * v0.01 / 2020-01-26 / Io Engineering (Terje Io)
+ * v0.05 / 2020-02-01 / Io Engineering (Terje Io)
  *
  */
 
@@ -99,7 +99,7 @@ namespace CNC.Controls
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             string cmd = string.Format("$J=G91{0}{1}F{2}", ((string)(sender as Button).Content).Replace("+", ""), distance.ToInvariantString(), feedrate.ToInvariantString());
-            (DataContext as GrblViewModel).ExecuteMDI(cmd);
+            (DataContext as GrblViewModel).ExecuteCommand(cmd);
         }
     }
 }

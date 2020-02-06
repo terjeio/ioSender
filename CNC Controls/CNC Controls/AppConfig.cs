@@ -1,7 +1,7 @@
 ﻿/*
  * AppConfig.cs - part of Grbl Code Sender
  *
- * v0.03 / 2020-01-28 / Io Engineering (Terje Io)
+ * v0.05 / 2020-02-06 / Io Engineering (Terje Io)
  *
  */
 
@@ -45,6 +45,7 @@ using System.Windows;
 using CNC.GCode;
 using static CNC.GCode.GCodeParser;
 using System.Collections.ObjectModel;
+using System.Threading;
 
 namespace CNC.Controls
 {
@@ -55,7 +56,7 @@ namespace CNC.Controls
         private LatheMode _latheMode = LatheMode.Disabled;
 
         [XmlIgnore]
-        public double ZDirFactor { get { return ZDirection == ZDirection.Negative? -1d : 1d;} }
+        public double ZDirFactor { get { return ZDirection == ZDirection.Negative ? -1d : 1d; } }
 
         [XmlIgnore]
         public LatheMode[] LatheModes { get { return (LatheMode[])Enum.GetValues(typeof(LatheMode)); } }
@@ -64,7 +65,7 @@ namespace CNC.Controls
         public ZDirection[] ZDirections { get { return (ZDirection[])Enum.GetValues(typeof(ZDirection)); } }
 
         [XmlIgnore]
-        public bool IsEnabled { get { return _isEnabled; }  set { _isEnabled = value; OnPropertyChanged(); } }
+        public bool IsEnabled { get { return _isEnabled; } set { _isEnabled = value; OnPropertyChanged(); } }
 
         public LatheMode XMode { get { return _latheMode; } set { _latheMode = value; IsEnabled = value != LatheMode.Disabled; } }
         public ZDirection ZDirection { get; set; } = ZDirection.Negative;
@@ -133,7 +134,7 @@ namespace CNC.Controls
         public CommandIgnoreState IgnoreM6 { get; set; } = CommandIgnoreState.No;
         public CommandIgnoreState IgnoreM7 { get; set; } = CommandIgnoreState.No;
         public CommandIgnoreState IgnoreM8 { get; set; } = CommandIgnoreState.No;
-        public ObservableCollection<GCode.Macro> Macros { get;  set; } = new ObservableCollection<GCode.Macro>();
+        public ObservableCollection<GCode.Macro> Macros { get; set; } = new ObservableCollection<GCode.Macro>();
 
         public JogConfig Jog { get; set; } = new JogConfig();
         public LatheConfig Lathe { get; set; } = new LatheConfig();
@@ -146,10 +147,11 @@ namespace CNC.Controls
         public Config Config = null;
 
         private string configfile = null;
+        private bool? MPGactive = null;
 
         public string FileName { get; private set; }
 
-        public bool Save (string filename)
+        public bool Save(string filename)
         {
             bool ok = false;
 
@@ -208,11 +210,11 @@ namespace CNC.Controls
             return ok;
         }
 
-        private void setPort (string port)
+        private void setPort(string port)
         {
             Config.PortParams = port;
-            if(!(Config.PortParams.ToLower().StartsWith("ws://") || char.IsDigit(Config.PortParams[0])) && Config.PortParams.IndexOf(':') == -1)
-                 Config.PortParams += ":115200,N,8,1";
+            if (!(Config.PortParams.ToLower().StartsWith("ws://") || char.IsDigit(Config.PortParams[0])) && Config.PortParams.IndexOf(':') == -1)
+                Config.PortParams += ":115200,N,8,1";
         }
 
         public int SetupAndOpen(string appname, GrblViewModel model, System.Windows.Threading.Dispatcher dispatcher)
@@ -227,32 +229,32 @@ namespace CNC.Controls
 
             int p = 0;
             while (p < args.GetLength(0)) switch (args[p++])
-            {
-                case "-inifile":
-                    CNC.Core.Resources.IniName = GetArg(args, p++);
-                    break;
+                {
+                    case "-inifile":
+                        CNC.Core.Resources.IniName = GetArg(args, p++);
+                        break;
 
-                case "-configmapping":
-                    CNC.Core.Resources.ConfigName = GetArg(args, p++);
-                    break;
+                    case "-configmapping":
+                        CNC.Core.Resources.ConfigName = GetArg(args, p++);
+                        break;
 
-                case "-language":
-                    CNC.Core.Resources.Language = GetArg(args, p++);
-                    break;
+                    case "-language":
+                        CNC.Core.Resources.Language = GetArg(args, p++);
+                        break;
 
-                case "-port":
-                    port = GetArg(args, p++);
-                    break;
+                    case "-port":
+                        port = GetArg(args, p++);
+                        break;
 
-                case "-selectport":
-                    selectPort = true;
-                    break;
+                    case "-selectport":
+                        selectPort = true;
+                        break;
 
-                default:
-                    if(!args[p - 1].EndsWith(".exe") && File.Exists(args[p - 1]))
-                        FileName = args[p - 1];
-                    break;
-            }
+                    default:
+                        if (!args[p - 1].EndsWith(".exe") && File.Exists(args[p - 1]))
+                            FileName = args[p - 1];
+                        break;
+                }
 
             if (!Load(CNC.Core.Resources.IniFile))
             {
@@ -313,20 +315,33 @@ namespace CNC.Controls
 
             if (Comms.com != null && Comms.com.IsOpen)
             {
-                int delay = 40; // 400 ms
+                Comms.com.DataReceived += model.DataReceived;
 
-                // Wait to see if a MPG is polling Grbl...
-                while (delay-- != 0 && Comms.com.Reply == "")
-                    System.Threading.Thread.Sleep(10);
+                CancellationToken cancellationToken = new CancellationToken();
+
+                // Wait 400ms to see if a MPG is polling Grbl...
+
+                new Thread(() =>
+                {
+                    MPGactive = WaitFor.SingleEvent<string>(
+                    cancellationToken,
+                    null,
+                    a => model.OnRealtimeStatusProcessed += a,
+                    a => model.OnRealtimeStatusProcessed -= a,
+                    400);
+                }).Start();
+
+                while (MPGactive == null)
+                    EventUtils.DoEvents();
 
                 // ...if so show dialog for wait for it to stop polling and relinquish control.
-                if (!(Comms.com.Reply == "" || Comms.com.Reply.StartsWith("Grbl") || Comms.com.Reply.StartsWith("[MSG:")))
+                if (MPGactive == true)
                 {
                     MPGPending await = new MPGPending(model);
                     await.ShowDialog();
                     if (await.Cancelled)
                     {
-                        Comms.com.Close();
+                        Comms.com.Close(); //!!
                         status = 2;
                     }
                 }

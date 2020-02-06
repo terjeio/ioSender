@@ -1,13 +1,13 @@
 ﻿/*
  * SpindleControl.xaml.cs - part of CNC Controls library
  *
- * v0.03 / 2019-12-06 / Io Engineering (Terje Io)
+ * v0.05 / 2020-02-01 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2019, Io Engineering (Terje Io)
+Copyright (c) 2018-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -90,9 +90,9 @@ namespace CNC.Controls
 
                 case nameof(GrblViewModel.ActualRPM):
                 case nameof(GrblViewModel.ProgrammedRPM):
-                    ProgrammedRPM = ((GrblViewModel)sender).ProgrammedRPM;
-                    if (!double.IsNaN(((GrblViewModel)sender).ActualRPM))
-                        RPM = ((GrblViewModel)sender).ActualRPM;
+                    ProgrammedRPM = (sender as GrblViewModel).ProgrammedRPM;
+                    if (!double.IsNaN((sender as GrblViewModel).ActualRPM))
+                        RPM = (sender as GrblViewModel).ActualRPM;
                     else
                         RPM = ProgrammedRPM;
                 break;
@@ -137,14 +137,14 @@ namespace CNC.Controls
                 _rpm = cvRPM.Value;
 
             if (hold)
-                ((GrblViewModel)DataContext).ExecuteMDI(((char)GrblConstants.CMD_SPINDLE_OVR_STOP).ToString());
+                (DataContext as GrblViewModel).ExecuteCommand(((char)GrblConstants.CMD_SPINDLE_OVR_STOP).ToString());
             else
-                ((GrblViewModel)DataContext).ExecuteMDI(string.Format((string)((RadioButton)sender).Tag, "S" + cvRPM.Value.ToInvariantString()));
+                (DataContext as GrblViewModel).ExecuteCommand(string.Format((string)((RadioButton)sender).Tag, "S" + cvRPM.Value.ToInvariantString()));
         }
 
         void overrideControl_CommandGenerated(string command)
         {
-            ((GrblViewModel)DataContext).ExecuteMDI(command);
+            (DataContext as GrblViewModel).ExecuteCommand(command);
         }
     }
 }

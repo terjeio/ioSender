@@ -1,13 +1,13 @@
 ﻿/*
  * StatusControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.03 / 2019-12-06 / Io Engineering (Terje Io)
+ * v0.05 / 2020-02-01 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2019, Io Engineering (Terje Io)
+Copyright (c) 2018-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -82,7 +82,7 @@ namespace CNC.Controls
         private void OnDataContextPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (sender is GrblViewModel && e.PropertyName == nameof(GrblViewModel.HomedState))
-                SetHomingState(((GrblViewModel)sender).HomedState);
+                SetHomingState((sender as GrblViewModel).HomedState);
         }
 
         void btn_Click(object sender, RoutedEventArgs e)
@@ -94,20 +94,20 @@ namespace CNC.Controls
                     break;
 
                 case StatusButton.Unlock:
-                    ((GrblViewModel)DataContext).ExecuteMDI(GrblConstants.CMD_UNLOCK);
+                    (DataContext as GrblViewModel).ExecuteCommand(GrblConstants.CMD_UNLOCK);
                     break;
 
                 case StatusButton.Home:
                     // ((Control)sender).Background = Brushes.LightSkyBlue;
-                    ((GrblViewModel)DataContext).ExecuteMDI(GrblConstants.CMD_HOMING);
+                    (DataContext as GrblViewModel).ExecuteCommand(GrblConstants.CMD_HOMING);
                     break;
 
                 case StatusButton.Check:
-                    GrblStates state = ((GrblViewModel)DataContext).GrblState.State;
-                    if(state == GrblStates.Check && ((CheckBox)sender).IsChecked == false)
+                    GrblStates state = (DataContext as GrblViewModel).GrblState.State;
+                    if(state == GrblStates.Check && (sender as CheckBox).IsChecked == false)
                         Grbl.Reset();
-                    else if (state == GrblStates.Idle && ((CheckBox)sender).IsChecked == true)
-                        ((GrblViewModel)DataContext).ExecuteMDI(GrblConstants.CMD_CHECK);
+                    else if (state == GrblStates.Idle && (sender as CheckBox).IsChecked == true)
+                        (DataContext as GrblViewModel).ExecuteCommand(GrblConstants.CMD_CHECK);
                     break;
             }
         }

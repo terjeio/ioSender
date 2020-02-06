@@ -1,7 +1,7 @@
 ﻿/*
  * ToolView.xaml.cs - part of CNC Controls library
  *
- * v0.01 / 2020-01-29 / Io Engineering (Terje Io)
+ * v0.05 / 2020-02-06 / Io Engineering (Terje Io)
  *
  */
 
@@ -45,6 +45,7 @@ using System.Linq;
 using CNC.Core;
 using CNC.GCode;
 using CNC.View;
+using System.Threading;
 
 namespace CNC.Controls
 {
@@ -53,6 +54,7 @@ namespace CNC.Controls
         Tool selectedTool = null;
         private GrblViewModel parameters = new GrblViewModel();
         private volatile bool awaitCoord = false;
+        private Action<string> GotPosition;
 
         public ToolView()
         {
@@ -71,17 +73,16 @@ namespace CNC.Controls
         {
             if (activate)
             {
-                GrblWorkParameters.Get();
+                Comms.com.DataReceived += parameters.DataReceived;
 
-                Comms.com.DataReceived += DataReceived;
+                GrblWorkParameters.Get(parameters);
 
                 dgrTools.ItemsSource = new ObservableCollection<Tool>(from tool in GrblWorkParameters.Tools where tool.Code != GrblConstants.NO_TOOL orderby tool.Code select tool);
                 dgrTools.SelectedIndex = 0;
             }
             else
             {
-                Comms.com.DataReceived -= DataReceived;
-
+                Comms.com.DataReceived -= parameters.DataReceived;
                 dgrTools.ItemsSource = null;
             }
         }
@@ -97,16 +98,19 @@ namespace CNC.Controls
             switch (e.PropertyName)
             {
                 case "Z":
-                    if (parameters.IsMachinePosition)
-                        for (int i = 0; i < offset.Values.Length; i++)
-                            offset.Values[i] = parameters.MachinePosition.Values[i];
-                    else
-                        for (int i = 0; i < offset.Values.Length; i++)
-                            offset.Values[i] = parameters.WorkPosition.Values[i] + parameters.WorkPositionOffset.Values[i];
-                    parameters.WorkPositionOffset.SuspendNotifications = true;
-                    parameters.Clear();
-                    parameters.WorkPositionOffset.SuspendNotifications = false;
-                    awaitCoord = false;
+                    if (!(awaitCoord = double.IsNaN(parameters.WorkPositionOffset.Values[0])))
+                    {
+                        if (parameters.IsMachinePosition)
+                            for (int i = 0; i < offset.Values.Length; i++)
+                                offset.Values[i] = parameters.MachinePosition.Values[i];
+                        else
+                            for (int i = 0; i < offset.Values.Length; i++)
+                                offset.Values[i] = parameters.WorkPosition.Values[i] + parameters.WorkPositionOffset.Values[i];
+                        parameters.Position.SuspendNotifications = parameters.WorkPositionOffset.SuspendNotifications = true;
+                        parameters.Clear();
+                        parameters.WorkPositionOffset.SuspendNotifications = parameters.Position.SuspendNotifications = false;
+
+                    }
                     break;
             }
         }
@@ -218,25 +222,49 @@ namespace CNC.Controls
             }
         }
 
-        private void btnCurrPos_Click(object sender, RoutedEventArgs e)
+        private void RequestStatus()
         {
-            Comms.com.CommandState = Comms.State.AwaitAck;
-
-            if (double.IsNaN(parameters.WorkPosition.X)) // If not NaN then MPG is polling
+            parameters.WorkPositionOffset.Z = double.NaN;
+            if (double.IsNaN(parameters.WorkPosition.X) || true) // If not NaN then MPG is polling
                 Comms.com.WriteByte(GrblLegacy.ConvertRTCommand(GrblConstants.CMD_STATUS_REPORT_ALL));
+        }
+
+        void btnCurrPos_Click(object sender, RoutedEventArgs e)
+        {
+            bool? res = null;
+            CancellationToken cancellationToken = new CancellationToken();
 
             awaitCoord = true;
 
-            while (awaitCoord)
-                Comms.com.AwaitResponse(); // TODO: add timeout?
+            parameters.OnRealtimeStatusProcessed += DataReceived;
+
+            new Thread(() =>
+            {
+                res = WaitFor.AckResponse<string>(
+                    cancellationToken,
+                    null,
+                    a => GotPosition += a,
+                    a => GotPosition -= a,
+                    1000, () => RequestStatus());
+            }).Start();
+
+            while (res == null)
+                EventUtils.DoEvents();
+
+            parameters.OnRealtimeStatusProcessed -= DataReceived;
         }
 
         #endregion
 
         private void DataReceived(string data)
         {
-            if (data.Length > 1 && data.Substring(0, 1) == "<")
-                parameters.ParseStatus(data);
+            if (awaitCoord)
+            {
+                Thread.Sleep(50);
+                Comms.com.WriteByte(GrblLegacy.ConvertRTCommand(GrblConstants.CMD_STATUS_REPORT));
+            }
+            else
+                GotPosition?.Invoke("ok");
         }
     }
 }

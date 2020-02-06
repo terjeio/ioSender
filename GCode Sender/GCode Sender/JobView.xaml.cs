@@ -1,7 +1,7 @@
 ﻿/*
  * JobView.xaml.cs - part of Grbl Code Sender
  *
- * v0.02 / 2020-01-25 / Io Engineering (Terje Io)
+ * v0.05 / 2020-02-06 / Io Engineering (Terje Io)
  *
  */
 
@@ -55,7 +55,8 @@ namespace GCode_Sender
     /// </summary>
     public partial class JobView : UserControl, CNCView
     {
-        private bool initOK = false, sdStream = false;
+        private bool? initOK = null;
+        private bool sdStream = false;
         private GrblViewModel model;
 
      //   private Viewer viewer = null;
@@ -95,7 +96,14 @@ namespace GCode_Sender
             {
                 model = (GrblViewModel)e.NewValue;
                 model.PropertyChanged += OnDataContextPropertyChanged;
+      //          model.OnGrblReset += Model_OnGrblReset;
             }
+        }
+
+        private void Model_OnGrblReset()
+        {
+            initOK = null;
+            Activate(true, ViewType.GRBL);
         }
 
         private void OnDataContextPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -103,7 +111,7 @@ namespace GCode_Sender
             if (sender is GrblViewModel) switch(e.PropertyName)
             {
                 case nameof(GrblViewModel.GrblState):
-                    if (!initOK && ((GrblViewModel)sender).GrblState.State != GrblStates.Alarm)
+                    if (initOK == false && ((GrblViewModel)sender).GrblState.State != GrblStates.Alarm)
                         InitSystem();
                     break;
 
@@ -124,7 +132,11 @@ namespace GCode_Sender
 
                 case nameof(GrblViewModel.GrblReset):
                     if (((GrblViewModel)sender).GrblReset)
-                        Comms.com.WriteCommand(GrblConstants.CMD_GETPARSERSTATE);
+                        {
+                            initOK = null;
+                            Activate(true, ViewType.GRBL);
+                        }
+               //         Comms.com.WriteCommand(GrblConstants.CMD_GETPARSERSTATE);
                     break;
 
                 case nameof(GrblViewModel.ParserState):
@@ -174,8 +186,11 @@ namespace GCode_Sender
                 GCodeSender.SetStreamingState(GCodeSender.GCode.Loaded ? StreamingState.Idle : (sdStream ? StreamingState.Start : StreamingState.NoFile));
                 sdStream = false;
 
-                if (!initOK)
+                if (initOK != true)
                 {
+                    model.Message = "Waiting for controller...";
+
+                    Comms.com.PurgeQueue();
                     Comms.com.WriteByte(GrblLegacy.ConvertRTCommand(GrblConstants.CMD_STATUS_REPORT));
 
                     int timeout = 30; // 1.5s
@@ -193,9 +208,13 @@ namespace GCode_Sender
                         if (!(data.GrblState.Substate == 1 || data.GrblState.Substate == 2 || data.GrblState.Substate == 10))
                             InitSystem();
                     }
-                    else
+                    else if (Comms.com.Reply != "")
                         InitSystem();
                 }
+
+                if (initOK == null)
+                    initOK = false;
+
                 #if ADD_CAMERA
                 if (MainWindow.Camera != null)
                 {
@@ -258,7 +277,7 @@ namespace GCode_Sender
                     break;
 
                 case CameraMoveMode.BothAxes:
-                    ((GrblViewModel)DataContext).ExecuteMDI(string.Format("X{0}Y{1}", XOffset.ToInvariantString("F3"), YOffset.ToInvariantString("F3")));
+                    ((GrblViewModel)DataContext).ExecuteCommand(string.Format("X{0}Y{1}", XOffset.ToInvariantString("F3"), YOffset.ToInvariantString("F3")));
                     break;
             }
 
@@ -279,6 +298,8 @@ namespace GCode_Sender
                 GrblWorkParameters.Get();
                 GCodeSender.EnablePolling(true);
             }
+
+            model.Message = "";
 
             GrblCommand.ToolChange = GrblInfo.ManualToolChange ? "M61Q{0}" : "T{0}";
 

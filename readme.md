@@ -2,6 +2,14 @@
 
 ---
 
+2020-02-06: Fifth alpha release of binary.
+
+Moved main response handler to view model, added timeouts for waiting for controller responses. Improved MPG/Sender switching. 
+
+---
+
+---
+
 2020-01-30: Fourth alpha release of binary. Use with care and please report issues!
 
 Improved button interlocks, added [direct output to machine](https://github.com/terjeio/Grbl-GCode-Sender/wiki/Vectric-Direct-Output) from Vectric applications.
@@ -45,7 +53,7 @@ A complete rewrite of my [Grbl CNC Controls library](https://github.com/terjeio/
 ---
 
 
-Current layout, most likely to change. Since using the VMMV coding pattern this is fairly easy to do.
+Current layout, most likely to change. Since using the MVVM coding pattern this is fairly easy to do.
 
 ![Sender](Media/Sender.png)
 

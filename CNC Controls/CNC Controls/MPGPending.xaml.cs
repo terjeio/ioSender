@@ -1,7 +1,7 @@
 ﻿/*
  * MPGPending.xaml.cs - part of CNC Controls library
  *
- * v0.02 / 2020-01-29 / Io Engineering (Terje Io)
+ * v0.05 / 2020-02-06 / Io Engineering (Terje Io)
  *
  */
 
@@ -52,14 +52,15 @@ namespace CNC.Controls
 
             this.model = model;
 
-            Comms.com.DataReceived += new DataReceivedHandler(DataReceived);
+            model.OnRealtimeStatusProcessed += OnRealtimeStatusProcessed;
         }
 
         public bool Cancelled { get; private set; } = true;
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            Comms.com.DataReceived -= DataReceived;
+            Comms.com.DataReceived -= model.DataReceived;
+            model.OnRealtimeStatusProcessed -= OnRealtimeStatusProcessed;
 
             using (new UIUtils.WaitCursor()) // disconnecting from websocket may take some time...
             {
@@ -68,16 +69,12 @@ namespace CNC.Controls
             }
         }
 
-        private void DataReceived(string data)
+        private void OnRealtimeStatusProcessed(string response)
         {
-            if (data.Length > 1 && data.Substring(0, 1) == "<")
+            if (model.IsMPGActive == false)
             {
-                model.ParseStatus(data);
-
-                if(model.IsMPGActive == false) {
-                    Cancelled = false;
-                    Close();
-                }
+                Cancelled = false;
+                Close();
             }
         }
     }

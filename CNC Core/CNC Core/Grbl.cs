@@ -1,7 +1,7 @@
 ﻿/*
  * Grbl.cs - part of CNC Controls library
  *
- * v0.03 / 2020-01-25 / Io Engineering (Terje Io)
+ * v0.05 / 2020-02-06 / Io Engineering (Terje Io)
  *
  */
 
@@ -50,6 +50,9 @@ using System.Windows.Media;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using CNC.GCode;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Threading;
 
 namespace CNC.Core
 {
@@ -282,6 +285,8 @@ namespace CNC.Core
             //grblState.State = GrblStates.Unknown;
             //grblState.Substate = 0;
         }
+
+        public static GrblViewModel GrblViewModel { get; set; } = null;
     }
 
     public class CoordinateValues<T> : ViewModelBase
@@ -461,30 +466,36 @@ namespace CNC.Core
             return AxisLetters.IndexOf(letter);
         }
 
-#if USE_ASYNC
-        public static async void Get()
-#else
-        public static bool Get()
-#endif
+        public static bool Get(GrblViewModel model)
         {
-            NumAxes = 3;
-            SerialBufferSize = 128;
-            HasATC = false;
+            bool? res = null;
+            CancellationToken cancellationToken = new CancellationToken();
 
-            Comms.com.DataReceived += Process;
-#if USE_ASYNC
-            var task = Task.Run(() => Comms.com.AwaitAck(GrblConstants.CMD_GETINFO));
-            await await Task.WhenAny(task, Task.Delay(2500));
-#else
             Comms.com.PurgeQueue();
-            Comms.com.WriteCommand(GrblConstants.CMD_GETINFO);
-            Comms.com.AwaitAck();
-#endif
-            Comms.com.DataReceived -= Process;
 
-            Loaded = true;
+            model.Silent = true;
 
-            return Loaded;
+            new Thread(() =>
+            {
+                res = WaitFor.AckResponse<string>(
+                    cancellationToken,
+                    response => Process(response),
+                    a => model.OnResponseReceived += a,
+                    a => model.OnResponseReceived -= a,
+                    400, () => Comms.com.WriteCommand(GrblConstants.CMD_GETINFO));
+            }).Start();
+
+            while (res == null)
+                EventUtils.DoEvents();
+
+            model.Silent = false;
+
+            return res == true;
+        }
+
+        public static bool Get()
+        {
+            return Grbl.GrblViewModel != null && Get(Grbl.GrblViewModel);
         }
 
         private static void Process(string data)
@@ -556,24 +567,32 @@ namespace CNC.Core
         private static string _tool = string.Empty;
         private static Dictionary<string, string> state = new Dictionary<string, string>();
 
-#if USE_ASYNC
-        public async static void Get()
-#else
-        public static bool Get()
-#endif
+        public static bool Get(GrblViewModel model)
         {
-            Comms.com.DataReceived += Process;
-#if USE_ASYNC
-            var task = Task.Run(() => Comms.com.AwaitAck(GrblConstants.CMD_GETPARSERSTATE));
-            await await Task.WhenAny(task, Task.Delay(2500));
-#else
-            Comms.com.PurgeQueue();
-            Comms.com.WriteCommand(GrblConstants.CMD_GETPARSERSTATE);
-            Comms.com.AwaitAck();
-#endif
-            Comms.com.DataReceived -= Process;
+            bool? res = null;
+            CancellationToken cancellationToken = new CancellationToken();
 
-            return Loaded;
+            Comms.com.PurgeQueue();
+
+            new Thread(() =>
+            {
+                res = WaitFor.AckResponse<string>(
+                    cancellationToken,
+                    response => Process(response),
+                    a => model.OnResponseReceived += a,
+                    a => model.OnResponseReceived -= a,
+                    400, () => Comms.com.WriteCommand(GrblConstants.CMD_GETPARSERSTATE));
+            }).Start();
+
+            while (res == null)
+                EventUtils.DoEvents();
+
+            return res == true;
+        }
+
+        public static bool Get()
+        {
+            return Grbl.GrblViewModel != null && Get(Grbl.GrblViewModel);
         }
 
         public static string Tool
@@ -689,12 +708,16 @@ namespace CNC.Core
 
     public class GrblWorkParameters
     {
+        private static Dispatcher dispatcher;
+
         public static bool Loaded { get { return CoordinateSystems.Count > 0; } }
         public static LatheMode LatheMode { get; private set; }
         public static ObservableCollection<CoordinateSystem> CoordinateSystems { get; private set; } = new ObservableCollection<CoordinateSystem>();
         public static ObservableCollection<Tool> Tools { get; private set; } = new ObservableCollection<Tool>();
         public static CoordinateSystem ToolLengtOffset { get; private set; } = new CoordinateSystem("TLO", "");
         public static CoordinateSystem ProbePosition { get; private set; } = new CoordinateSystem("PRB", "");
+
+        private static Action<string> dataReceived;
 
         public static double ConvertX(LatheMode source, LatheMode target, double value)
         {
@@ -712,30 +735,40 @@ namespace CNC.Core
             return value;
         }
 
-#if USE_ASYNC
-        public async static void Load()
-#else
-        public static bool Get()
-#endif
+        public static bool Get(GrblViewModel model)
         {
+            bool? res = null;
+            CancellationToken cancellationToken = new CancellationToken();
+
             if (Tools.Count == 0)
                 Tools.Add(new Tool(GrblConstants.NO_TOOL));
 
             if (!GrblParserState.Loaded)
-                GrblParserState.Get();
+                GrblParserState.Get(model);
 
+            dispatcher = Dispatcher.CurrentDispatcher;
+            dataReceived += process;
             LatheMode = GrblParserState.LatheMode;
 
-            Comms.com.DataReceived += process;
-#if USE_ASYNC
-            var task = Task.Run(() => Comms.com.AwaitAck(GrblConstants.CMD_GETNGCPARAMETERS));
-            await await Task.WhenAny(task, Task.Delay(2500));
-#else
+            model.Silent = true;
+
             Comms.com.PurgeQueue();
-            Comms.com.WriteCommand(GrblConstants.CMD_GETNGCPARAMETERS);
-            Comms.com.AwaitAck();
-#endif
-            Comms.com.DataReceived -= process;
+
+            new Thread(() =>
+            {
+                res = WaitFor.AckResponse<string>(
+                    cancellationToken,
+                    response => dataReceived(response),
+                    a => model.OnResponseReceived += a,
+                    a => model.OnResponseReceived -= a,
+                    400, () => Comms.com.WriteCommand(GrblConstants.CMD_GETNGCPARAMETERS));
+            }).Start();
+
+            while (res == null)
+                EventUtils.DoEvents();
+
+            model.Silent = false;
+            dataReceived -= process;
 
             if (Tools.Count == 1)
             {
@@ -750,7 +783,12 @@ namespace CNC.Core
             // Reeread parser state since work offset and tool lists are now populated
             Comms.com.WriteCommand(GrblConstants.CMD_GETPARSERSTATE);
 
-            return Loaded;
+            return res == true;
+        }
+
+        public static bool Get()
+        {
+            return Grbl.GrblViewModel != null && Get(Grbl.GrblViewModel);
         }
 
         private static string extractValues(string data, out string parameters)
@@ -807,6 +845,13 @@ namespace CNC.Core
 
         private static void process(string data)
         {
+            if (Dispatcher.CurrentDispatcher != dispatcher)
+            {
+                dispatcher.Invoke(dataReceived, data);
+                return;
+            }
+
+
             if (data.StartsWith("["))
             {
                 string parameters, gCode = extractValues(data, out parameters);
@@ -977,24 +1022,30 @@ namespace CNC.Core
             return dbl.Parse(GetString(key));
         }
 
-#if USE_ASYNC
-        public async static void Load()
-#else
-        public static bool Get()
-#endif
+        public static bool Get(GrblViewModel model)
         {
-            settings.Clear();
+            bool? res = null;
+            CancellationToken cancellationToken = new CancellationToken();
 
-            Comms.com.DataReceived += Process;
-#if USE_ASYNC
-            var task = Task.Run(() => Comms.com.AwaitAck(GrblConstants.CMD_GETSETTINGS));
-            await await Task.WhenAny(task, Task.Delay(2500));
-#else
+            settings.Clear();
             Comms.com.PurgeQueue();
-            Comms.com.WriteCommand(GrblConstants.CMD_GETSETTINGS);
-            Comms.com.AwaitAck();
-#endif
-            Comms.com.DataReceived -= Process;
+
+            model.Silent = true;
+
+            new Thread(() =>
+            {
+                res = WaitFor.AckResponse<string>(
+                    cancellationToken,
+                    response => Process(response),
+                    a => model.OnResponseReceived += a,
+                    a => model.OnResponseReceived -= a,
+                    400, () => Comms.com.WriteCommand(GrblConstants.CMD_GETSETTINGS));
+            }).Start();
+
+            while (res == null)
+                EventUtils.DoEvents();
+
+            model.Silent = false;
 
             if (IsGrblHAL && !Resources.ConfigName.StartsWith("hal_"))
                 Resources.ConfigName = "hal_" + Resources.ConfigName;
@@ -1044,6 +1095,11 @@ namespace CNC.Core
             settings.AcceptChanges();
 
             return Loaded;
+        }
+
+        public static bool Get()
+        {
+            return Grbl.GrblViewModel != null && Get(Grbl.GrblViewModel);
         }
 
 #if USE_ASYNC

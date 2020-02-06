@@ -1,7 +1,7 @@
 /*
  * MacroExecuteControl.xaml.cs - part of CNC Controls library
  *
- * v0.01 / 2020-01-27 / Io Engineering (Terje Io)
+ * v0.05 / 2020-02-01 / Io Engineering (Terje Io)
  *
  */
 
@@ -41,11 +41,8 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using CNC.Core;
-using System.Windows.Data;
-using System.Globalization;
-using System;
 using System.ComponentModel;
+using CNC.Core;
 
 namespace CNC.Controls
 {
@@ -96,7 +93,7 @@ namespace CNC.Controls
 
         private static void OnMacrosChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ((MacroExecuteControl)d).OnMacrosChanged();
+            (d as MacroExecuteControl).OnMacrosChanged();
         }
         private void OnMacrosChanged()
         {
@@ -118,7 +115,7 @@ namespace CNC.Controls
         private void button_Click(object sender, RoutedEventArgs e)
         {
             GCode.Macro macro = Macros.FirstOrDefault(o => o.Id == (int)(sender as Button).Tag);
-            (DataContext as GrblViewModel).ExecuteMDI(macro.Code);
+            (DataContext as GrblViewModel).ExecuteCommand(macro.Code);
         }
 
         private void btn_Close(object sender, RoutedEventArgs e)

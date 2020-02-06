@@ -1,7 +1,7 @@
 ﻿/*
  * DROControl.xaml.cs - part of CNC Controls library
  *
- * v0.03 / 2019-12-06 / Io Engineering (Terje Io)
+ * v0.05 / 2020-02-01 / Io Engineering (Terje Io)
  *
  */
 
@@ -81,15 +81,15 @@ namespace CNC.Controls
 
         private void TxtReadout_GotFocus(object sender, RoutedEventArgs e)
         {
-            if (IsFocusable && !((GrblViewModel)DataContext).IsJobRunning)
+            if (IsFocusable && !(DataContext as GrblViewModel).IsJobRunning)
             {
-                ((GrblViewModel)DataContext).SuspendPositionNotifications = true;
+                (DataContext as GrblViewModel).SuspendPositionNotifications = true;
 
-                orgpos = ((GrblViewModel)DataContext).Position.Values[(int)((NumericTextBox)(sender)).Tag];
+                orgpos = (DataContext as GrblViewModel).Position.Values[(int)((NumericTextBox)(sender)).Tag];
 
-                background = ((NumericTextBox)(sender)).Background;
-                ((NumericTextBox)(sender)).IsReadOnly = false;
-                ((NumericTextBox)(sender)).Background = Brushes.White;
+                background = (sender as NumericTextBox).Background;
+                (sender as NumericTextBox).IsReadOnly = false;
+                (sender as NumericTextBox).Background = Brushes.White;
 
                 hasFocus = true;
 
@@ -101,12 +101,12 @@ namespace CNC.Controls
         {
             ((NumericTextBox)(sender)).IsReadOnly = true;
 
-            ((GrblViewModel)DataContext).SuspendPositionNotifications = false;
+            (DataContext as GrblViewModel).SuspendPositionNotifications = false;
 
             if (hasFocus)
             {
-                ((NumericTextBox)(sender)).Background = background;
-                ((GrblViewModel)DataContext).Position.Values[(int)((NumericTextBox)(sender)).Tag] = orgpos;
+                (sender as NumericTextBox).Background = background;
+                (DataContext as GrblViewModel).Position.Values[(int)(sender as NumericTextBox).Tag] = orgpos;
             }
 
             hasFocus = false;
@@ -131,7 +131,7 @@ namespace CNC.Controls
 
         void btnZero_Click(object sender, EventArgs e)
         {
-            AxisPositionChanged(GrblInfo.AxisIndexToLetter((int)((Button)sender).Tag), 0.0d);
+            AxisPositionChanged(GrblInfo.AxisIndexToLetter((int)(sender as Button).Tag), 0.0d);
         }
 
         void btnZeroAll_Click(object sender, EventArgs e)
@@ -146,10 +146,10 @@ namespace CNC.Controls
                 string s = "G90G10L20P0";
                 for (int i = 0; i < GrblInfo.NumAxes; i++)
                     s += GrblInfo.AxisIndexToLetter(i) + "{0}";
-                ((GrblViewModel)DataContext).ExecuteMDI(string.Format(s, position.ToInvariantString("F3")));
+                (DataContext as GrblViewModel).ExecuteCommand(string.Format(s, position.ToInvariantString("F3")));
             }
             else
-                ((GrblViewModel)DataContext).ExecuteMDI(string.Format("G10L20P0{0}{1}", axis, position.ToInvariantString("F3")));
+                (DataContext as GrblViewModel).ExecuteCommand(string.Format("G10L20P0{0}{1}", axis, position.ToInvariantString("F3")));
         }
 
         public void EnableLatheMode()

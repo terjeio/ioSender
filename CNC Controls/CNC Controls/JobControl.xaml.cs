@@ -1,7 +1,7 @@
 /*
  * JobControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.03 / 2020-01-30 / Io Engineering (Terje Io)
+ * v0.05 / 2020-02-06 / Io Engineering (Terje Io)
  *
  */
 
@@ -83,7 +83,7 @@ namespace CNC.Controls
         private Thread polling = null;
         private DataRow currentRow = null, nextRow = null;
 
- //       private delegate void GcodeCallback(string data);
+        //       private delegate void GcodeCallback(string data);
 
         public delegate void StreamingStateChangedHandler(StreamingState state, bool MPGMode);
         public event StreamingStateChangedHandler StreamingStateChanged;
@@ -111,10 +111,10 @@ namespace CNC.Controls
             if (filename == "")
                 ((GrblViewModel)DataContext).ProgramLimits.Clear();
             else for (int i = 0; i < GrblInfo.NumAxes; i++)
-            {
-                ((GrblViewModel)DataContext).ProgramLimits.MinValues[i] = GCode.BoundingBox.Min[i];
-                ((GrblViewModel)DataContext).ProgramLimits.MaxValues[i] = GCode.BoundingBox.Max[i];
-            }
+                {
+                    ((GrblViewModel)DataContext).ProgramLimits.MinValues[i] = GCode.BoundingBox.Min[i];
+                    ((GrblViewModel)DataContext).ProgramLimits.MaxValues[i] = GCode.BoundingBox.Max[i];
+                }
 
             ((GrblViewModel)DataContext).FileName = filename;
         }
@@ -127,43 +127,113 @@ namespace CNC.Controls
             {
                 model = (GrblViewModel)e.NewValue;
                 model.PropertyChanged += OnDataContextPropertyChanged;
+                model.OnRealtimeStatusProcessed += RealtimeStatusProcessed;
+                model.OnCommandResponseReceived += OkReceived;
             }
+        }
+
+        private void OkReceived(string repsonse)
+        {
+            if (ACKPending > 0 && streamingState == StreamingState.Send)
+            {
+                ACKPending--;
+                if ((string)GCode.Data.Rows[PendingLine]["Sent"] == "*")
+                    serialUsed -= (int)GCode.Data.Rows[PendingLine]["Length"];
+                if (serialUsed < 0)
+                    serialUsed = 0;
+                GCode.Data.Rows[PendingLine]["Sent"] = repsonse;
+
+                if (PendingLine > 5)
+                    scroll.ScrollToVerticalOffset(PendingLine - 5);
+
+                if (streamingState == StreamingState.Send)
+                {
+                    if (repsonse.StartsWith("error"))
+                    {
+                        SetStreamingState(StreamingState.Error);
+                        //                          Comms.com.WriteByte(GrblLegacy.ConvertRTCommand(GrblConstants.CMD_RESET));
+                    }
+                    else if ((pgmComplete = PgmEndLine == PendingLine))
+                    {
+                        ACKPending = CurrLine = 0;
+                        if (grblState.State == GrblStates.Idle)
+                            model.SetGRBLState(GrblStates.Idle.ToString(), -1, true);
+                    }
+                    //else
+                    //    SendNextLine();
+                }
+                PendingLine++;
+            }
+
+            switch (streamingState)
+            {
+                case StreamingState.Send:
+                    SendNextLine();
+                    break;
+
+                case StreamingState.SendMDI:
+                    if (GCode.commands.Count > 0)
+                        Comms.com.WriteCommand(GCode.commands.Dequeue());
+                    if (GCode.commands.Count == 0)
+                        streamingState = StreamingState.Idle;
+                    break;
+
+                case StreamingState.Reset:
+                    Comms.com.WriteCommand(GrblConstants.CMD_UNLOCK);
+                    streamingState = StreamingState.AwaitResetAck;
+                    break;
+
+                case StreamingState.AwaitResetAck:
+                    SetStreamingState(GCode.Loaded ? StreamingState.Idle : StreamingState.NoFile);
+                    break;
+            }
+        }
+
+        private void RealtimeStatusProcessed(string response)
+        {
+            if (JobTimer.IsRunning && !JobTimer.IsPaused)
+                lblRunTime.Content = JobTimer.RunTime;
         }
 
         private void OnDataContextPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (sender is GrblViewModel) switch (e.PropertyName)
-            {
-                case nameof(GrblViewModel.GrblState):
-                    GrblStateChanged(((GrblViewModel)sender).GrblState);
-                    break;
+                {
+                    case nameof(GrblViewModel.GrblState):
+                        GrblStateChanged(((GrblViewModel)sender).GrblState);
+                        break;
 
                     case nameof(GrblViewModel.MDI):
-                        SendMDICommand(((GrblViewModel)sender).MDI);
-                        ((GrblViewModel)sender).MDI = string.Empty;
+                        SendCommand(((GrblViewModel)sender).MDI);
                         break;
 
                     case nameof(GrblViewModel.IsMPGActive):
-                    grblState.MPG = ((GrblViewModel)sender).IsMPGActive == true;
-                    SetStreamingState(grblState.MPG ? StreamingState.Disabled : StreamingState.Idle);
-                    break;
+                        grblState.MPG = ((GrblViewModel)sender).IsMPGActive == true;
+                        poller.SetState(grblState.MPG ? 0 : model.PollInterval);
+                        SetStreamingState(grblState.MPG ? StreamingState.Disabled : StreamingState.Idle);
+                        break;
 
-                case nameof(GrblViewModel.Signals):
-                {
-                    var signals = ((GrblViewModel)sender).Signals;
-                    if (JobPending && signals[Signals.CycleStart] && !signals[Signals.Hold] && holdSignal)
-                        CycleStart();
-                    holdSignal = signals[Signals.Hold];
-                }
-                break;
+                    case nameof(GrblViewModel.Signals):
+                        {
+                            var signals = ((GrblViewModel)sender).Signals;
+                            if (JobPending && signals[Signals.CycleStart] && !signals[Signals.Hold] && holdSignal)
+                                CycleStart();
+                            holdSignal = signals[Signals.Hold];
+                        }
+                        break;
 
-                case nameof(GrblViewModel.GrblReset):
-                {
-                    if (model.IsJobRunning || streamingState == StreamingState.Stop)
-                        RewindFile();
+                    case nameof(GrblViewModel.ProgramEnd):
+                        if (!GCode.Loaded)
+                            SetStreamingState(StreamingState.NoFile);
+                        break;
+
+                    case nameof(GrblViewModel.GrblReset):
+                        {
+                            if (model.IsJobRunning || streamingState == StreamingState.Stop)
+                                RewindFile();
+                        }
+                        break;
                 }
-                break;
-            }
         }
 
         public GCodeJob GCode { get; private set; } = new GCodeJob();
@@ -196,7 +266,7 @@ namespace CNC.Controls
             {
                 if (!poller.IsEnabled)
                 {
-                    Comms.com.DataReceived += DataReceived;
+                    //        Comms.com.DataReceived += model.DataReceived;
                     poller.SetState(model.PollInterval);
                 }
             }
@@ -205,7 +275,7 @@ namespace CNC.Controls
                 if (poller.IsEnabled)
                 {
                     poller.SetState(0);
-                    Comms.com.DataReceived -= DataReceived;
+                    //             Comms.com.DataReceived -= model.DataReceived;
                 }
             }
         }
@@ -218,7 +288,7 @@ namespace CNC.Controls
             if (GrblSettings.Loaded)
             {
                 double val;
-                if ((useFirmwareJog = !(val = GrblSettings.GetDouble(GrblSetting.JogStepDistance)).Equals(double.NaN)) )
+                if ((useFirmwareJog = !(val = GrblSettings.GetDouble(GrblSetting.JogStepDistance)).Equals(double.NaN)))
                     jogDistance[(int)JogMode.Step] = val;
                 if (!(val = GrblSettings.GetDouble(GrblSetting.JogSlowDistance)).Equals(double.NaN))
                     jogDistance[(int)JogMode.Slow] = val;
@@ -234,7 +304,7 @@ namespace CNC.Controls
                 model.IsMetric = GrblSettings.GetString(GrblSetting.ReportInches) != "1";
             }
 
-            if(!useFirmwareJog)
+            if (!useFirmwareJog)
             {
                 jogDistance[(int)JogMode.Step] = config.Jog.StepDistance;
                 jogDistance[(int)JogMode.Slow] = config.Jog.SlowDistance;
@@ -370,31 +440,31 @@ namespace CNC.Controls
                         }
                 }
                 else for (int i = 0; i < 3; i++) switch (axisjog[i])
-                {
-                    case Key.PageUp:
-                        command += "Z{0}";
-                        break;
+                        {
+                            case Key.PageUp:
+                                command += "Z{0}";
+                                break;
 
-                    case Key.PageDown:
-                        command += "Z-{0}";
-                        break;
+                            case Key.PageDown:
+                                command += "Z-{0}";
+                                break;
 
-                    case Key.Left:
-                        command += "X-{0}";
-                        break;
+                            case Key.Left:
+                                command += "X-{0}";
+                                break;
 
-                    case Key.Up:
-                        command += "Y{0}";
-                        break;
+                            case Key.Up:
+                                command += "Y{0}";
+                                break;
 
-                    case Key.Right:
-                        command += "X{0}";
-                        break;
+                            case Key.Right:
+                                command += "X{0}";
+                                break;
 
-                    case Key.Down:
-                        command += "Y-{0}";
-                        break;
-                }
+                            case Key.Down:
+                                command += "Y-{0}";
+                                break;
+                        }
 
                 if ((isJogging = command != ""))
                 {
@@ -442,7 +512,7 @@ namespace CNC.Controls
             if (allow && e.Data.GetDataPresent(DataFormats.FileDrop))
             {
                 string[] files = (string[])e.Data.GetData(DataFormats.FileDrop, false);
-                allow = files.Count() == 1 && FileUtils.IsAllowedFile(files[0].ToLower(), allowedTypes + ",txt"); 
+                allow = files.Count() == 1 && FileUtils.IsAllowedFile(files[0].ToLower(), allowedTypes + ",txt");
             }
 
             e.Handled = true;
@@ -475,7 +545,7 @@ namespace CNC.Controls
 
         #endregion
 
-        public void OpenFile ()
+        public void OpenFile()
         {
             OpenFileDialog file = new OpenFileDialog();
 
@@ -487,7 +557,7 @@ namespace CNC.Controls
 
         public void LoadFile(string filename)
         {
-//            if(FileUtils.IsAllowedFile(filename, allowedTypes))
+            //            if(FileUtils.IsAllowedFile(filename, allowedTypes))
             using (new UIUtils.WaitCursor())
             {
                 GCode.LoadFile(filename);
@@ -504,7 +574,7 @@ namespace CNC.Controls
         {
             if (grblState.State == GrblStates.Hold || grblState.State == GrblStates.Tool || (grblState.State == GrblStates.Run && grblState.Substate == 1))
                 Comms.com.WriteByte(GrblLegacy.ConvertRTCommand(GrblConstants.CMD_CYCLE_START));
-            else if(streamingState == StreamingState.Error || streamingState == StreamingState.Stop)
+            else if (streamingState == StreamingState.Error || streamingState == StreamingState.Stop)
             {
                 model.Message = "";
                 JobTimer.Start();
@@ -536,7 +606,7 @@ namespace CNC.Controls
         public void JogCancel()
         {
             streamingState = StreamingState.Idle;
-            while (Comms.com.OutCount != 0);
+            while (Comms.com.OutCount != 0) ;
             //    Application.DoEvents(); //??
             Comms.com.WriteByte(GrblConstants.CMD_JOG_CANCEL); // Cancel jog
             jogMode = JogMode.None;
@@ -546,8 +616,8 @@ namespace CNC.Controls
         {
             if (streamingState == StreamingState.Jogging || grblState.State == GrblStates.Jog)
             {
-                while (Comms.com.OutCount != 0);
-                    //Application.DoEvents(); //??
+                while (Comms.com.OutCount != 0) ;
+                //Application.DoEvents(); //??
                 Comms.com.WriteByte(GrblConstants.CMD_JOG_CANCEL); // Cancel current jog
             }
             streamingState = StreamingState.Jogging;
@@ -559,7 +629,7 @@ namespace CNC.Controls
             Comms.com.WriteByte((byte)command[0]);
         }
 
-        private void SendMDICommand(string command)
+        private void SendCommand(string command)
         {
             model.Message = "";
 
@@ -575,7 +645,7 @@ namespace CNC.Controls
                     if (streamingState != StreamingState.SendMDI)
                     {
                         streamingState = StreamingState.SendMDI;
-                        DataReceived("ok");
+                        OkReceived("ok");
                     }
                 }
                 catch
@@ -597,7 +667,7 @@ namespace CNC.Controls
 
                 grdGCode.DataContext = GCode.Data.DefaultView;
 
-                if(scroll == null)
+                if (scroll == null)
                     scroll = UIUtils.GetScrollViewer(grdGCode);
 
                 scroll.ScrollToTop();
@@ -668,7 +738,7 @@ namespace CNC.Controls
                     model.IsJobRunning = false;
                     if (!grblState.MPG)
                     {
-                        if(GrblSettings.IsGrblHAL)
+                        if (GrblSettings.IsGrblHAL)
                             Comms.com.WriteByte(GrblConstants.CMD_STOP);
                         if (JobTimer.IsRunning)
                             JobTimer.Stop();
@@ -679,7 +749,7 @@ namespace CNC.Controls
             model.StreamingState = streamingState = newState;
 
             if (start)
-                DataReceived("ok");
+                OkReceived("ok");
 
             StreamingStateChanged?.Invoke(streamingState, grblState.MPG);
         }
@@ -710,7 +780,7 @@ namespace CNC.Controls
                 case GrblStates.Run:
                     if (JobTimer.IsPaused)
                         JobTimer.Pause = false;
-                    if(model.StreamingState != StreamingState.Error)
+                    if (model.StreamingState != StreamingState.Error)
                         SetStreamingState(StreamingState.Send);
                     if (newstate.Substate == 1)
                     {
@@ -773,118 +843,8 @@ namespace CNC.Controls
                 }
                 ACKPending++;
 
-                if(!GrblSettings.IsGrblHAL)
+                if (!GrblSettings.IsGrblHAL)
                     break;
-            }
-        }
-
-        void DataReceived(string data)
-        {
-            if (data.Length == 0)
-                return;
-
-            //if (model.ResponseLogEnable)
-            //    model.ResponseLog.Add(data);
-
-            if (data.Substring(0, 1) == "<")
-            {
-                model.ParseStatus(data);
-
-                if (JobTimer.IsRunning && !JobTimer.IsPaused)
-                    lblRunTime.Content = JobTimer.RunTime;
-            }
-            else if (data.StartsWith("ALARM"))
-            {
-                string[] alarm = data.Split(':');
-
-                model.SetGRBLState("Alarm", alarm.Length == 2 ? int.Parse(alarm[1]) : -1, false);
-            }
-            else if (data.StartsWith("[PRB:"))
-                model.ParseProbeStatus(data);
-            else if (data.StartsWith("[GC:"))
-                model.ParseGCStatus(data);
-            else if (data.StartsWith("["))
-            {
-                if (!GCode.Loaded && data == "[MSG:Pgm End]")
-                    SetStreamingState(StreamingState.NoFile);
-
-                model.Message = data;
-            }
-            else if (data.StartsWith("Grbl"))
-            {
-                model.GrblReset = true;
-            }
-            else if (streamingState != StreamingState.Jogging)
-            {
-                if (data != "ok")
-                {
-                    if (data.StartsWith("error:"))
-                    {
-                        try
-                        {
-                            model.SetError(int.Parse(data.Substring(6)));
-                        }
-                        catch
-                        {
-                        }
-                    }
-                    else
-                        model.Message = data;
-                }
-
-                if (ACKPending > 0 && streamingState == StreamingState.Send)
-                {
-                    ACKPending--;
-                    if ((string)GCode.Data.Rows[PendingLine]["Sent"] == "*")
-                        serialUsed -= (int)GCode.Data.Rows[PendingLine]["Length"];
-                    if (serialUsed < 0)
-                        serialUsed = 0;
-                    GCode.Data.Rows[PendingLine]["Sent"] = data;
-
-                    if (PendingLine > 5)
-                        scroll.ScrollToVerticalOffset(PendingLine - 5);
-
-                    if (streamingState == StreamingState.Send)
-                    {
-                        if (data.StartsWith("error"))
-                        {
-                            SetStreamingState(StreamingState.Error);
-//                          Comms.com.WriteByte(GrblLegacy.ConvertRTCommand(GrblConstants.CMD_RESET));
-                        }
-                        else if ((pgmComplete = PgmEndLine == PendingLine))
-                        {
-                            ACKPending = CurrLine = 0;
-                            if (grblState.State == GrblStates.Idle)
-                                model.SetGRBLState(GrblStates.Idle.ToString(), -1, true);
-                        }
-                        //else
-                        //    SendNextLine();
-                    }
-                    PendingLine++;
-                }
-
-                switch (streamingState)
-                {
-                    case StreamingState.Send:
-                        SendNextLine();
-                        break;
-
-                    case StreamingState.SendMDI:
-                        if (GCode.commands.Count > 0)
-                            Comms.com.WriteCommand(GCode.commands.Dequeue());
-                        if (GCode.commands.Count == 0)
-                            streamingState = StreamingState.Idle;
-                        break;
-
-                    case StreamingState.Reset:
-                        Comms.com.WriteCommand(GrblConstants.CMD_UNLOCK);
-                        streamingState = StreamingState.AwaitResetAck;
-                        break;
-
-                    case StreamingState.AwaitResetAck:
-                        SetStreamingState(GCode.Loaded ? StreamingState.Idle : StreamingState.NoFile);
-                        break;
-                }
             }
         }
     }

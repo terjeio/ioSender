@@ -1,7 +1,7 @@
 ﻿/*
  * MainWindow.xaml.cs - part of Grbl Code Sender
  *
- * v0.03 / 2020-01-29 / Io Engineering (Terje Io)
+ * v0.05 / 2020-02-06 / Io Engineering (Terje Io)
  *
  */
 
@@ -64,7 +64,7 @@ namespace GCode_Sender
         public static event GCodePushHandler GCodePush;
 
         public delegate void FileOpenHandler();
-        public static event FileOpenHandler FileOpen; // Issued if File > Open menu cliked
+        public static event FileOpenHandler FileOpen; // Issued if File > Open menu clicked
 
         public delegate void FileLoadHandler(string filename);
         public static event FileLoadHandler FileLoad; // Issued on load of main window if filename provided as command line argument
@@ -87,6 +87,7 @@ namespace GCode_Sender
 
             BaseWindowTitle = Title;
 
+            CNC.Core.Grbl.GrblViewModel = (GrblViewModel)DataContext;
             GrblInfo.LatheModeEnabled = Profile.Config.Lathe.IsEnabled;
 
             turningWizard.ApplySettings(Profile.Config.Lathe);
@@ -176,6 +177,8 @@ namespace GCode_Sender
                     Camera.Close();
                 }
 #endif
+                Comms.com.DataReceived -= (DataContext as GrblViewModel).DataReceived;
+
                 using (new UIUtils.WaitCursor()) // disconnecting from websocket may take some time...
                 {
                     if (Comms.com.StreamType != Comms.StreamType.Serial) // Serial makes fking process hang

@@ -1,13 +1,13 @@
 ﻿/*
  * WorkParametersControl.xaml.cs - part of CNC Controls library
  *
- * v0.03 / 2020-01-25 / Io Engineering (Terje Io)
+ * v0.05 / 2020-02-01 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2019, Io Engineering (Terje Io)
+Copyright (c) 2018-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -68,8 +68,8 @@ namespace CNC.Controls
         }
         private static void IsToolChangingChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ((WorkParametersControl)d).bgTool.Background = ((bool)e.NewValue ? Brushes.Salmon : ((WorkParametersControl)d).Background);
-            ((WorkParametersControl)d).cbxTool.IsEnabled = !(bool)e.NewValue;
+            (d as WorkParametersControl).bgTool.Background = ((bool)e.NewValue ? Brushes.Salmon : ((WorkParametersControl)d).Background);
+            (d as WorkParametersControl).cbxTool.IsEnabled = !(bool)e.NewValue;
         }
 
         #endregion
@@ -92,13 +92,13 @@ namespace CNC.Controls
         private void cbxOffset_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (e.AddedItems.Count == 1 && ((ComboBox)sender).IsDropDownOpen)
-                ((GrblViewModel)DataContext).ExecuteMDI(((CoordinateSystem)e.AddedItems[0]).Code);
+                (DataContext as GrblViewModel).ExecuteCommand(((CoordinateSystem)e.AddedItems[0]).Code);
         }
 
         private void cbxTool_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (e.AddedItems.Count == 1 && ((ComboBox)sender).IsDropDownOpen)
-                ((GrblViewModel)DataContext).ExecuteMDI(string.Format(GrblCommand.ToolChange, ((Tool)e.AddedItems[0]).Code));
+                (DataContext as GrblViewModel).ExecuteCommand(string.Format(GrblCommand.ToolChange, ((Tool)e.AddedItems[0]).Code));
         }
 
         #endregion

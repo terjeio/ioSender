@@ -1,7 +1,7 @@
 ﻿/*
  * HelperClasses.cs - part of CNC Controls library for Grbl
  *
- * v0.02 / 2019-10-31 / Io Engineering (Terje Io)
+ * v0.05 / 2020-02-06 / Io Engineering (Terje Io)
  *
  */
 
@@ -15,6 +15,8 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Diagnostics.Contracts;
 using CNC.GCode;
+using System.Threading;
+using System.Collections.Concurrent;
 
 namespace CNC.Core
 {
@@ -253,6 +255,56 @@ namespace CNC.Core
             //    var targetField = type.GetField(sourceField.Name);
             //    targetField.SetValue(target, sourceField.GetValue(source));
             //}
+        }
+    }
+    public static class WaitFor
+    {
+        // https://stackoverflow.com/questions/17635440/how-to-wait-for-a-single-event-in-c-with-timeout-and-cancellation
+        public static bool SingleEvent<TEvent>(this CancellationToken token, Action<TEvent> handler, Action<Action<TEvent>> subscribe, Action<Action<TEvent>> unsubscribe, int msTimeout, System.Action initializer = null)
+        {
+            var q = new BlockingCollection<TEvent>();
+            Action<TEvent> add = item => q.TryAdd(item);
+            subscribe(add);
+            try
+            {
+                initializer?.Invoke();
+                TEvent eventResult;
+                if (q.TryTake(out eventResult, msTimeout, token))
+                {
+                    handler?.Invoke(eventResult);
+                    return true;
+                }
+                return false;
+            }
+            finally
+            {
+                unsubscribe(add);
+                q.Dispose();
+            }
+        }
+
+        public static bool AckResponse<TEvent>(this CancellationToken token, Action<TEvent> handler, Action<Action<TEvent>> subscribe, Action<Action<TEvent>> unsubscribe, int msTimeout, System.Action initializer = null)
+        {
+            var q = new BlockingCollection<TEvent>();
+            Action<TEvent> add = item => q.TryAdd(item);
+            subscribe(add);
+            try
+            {
+                initializer?.Invoke();
+                TEvent eventResult;
+                while (q.TryTake(out eventResult, msTimeout, token))
+                {
+                    handler?.Invoke(eventResult);
+                    if((string)(object)eventResult == "ok")
+                        return true;
+                }
+                return false;
+            }
+            finally
+            {
+                unsubscribe(add);
+                q.Dispose();
+            }
         }
     }
 }
