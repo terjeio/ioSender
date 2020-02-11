@@ -1,7 +1,7 @@
 ﻿/*
  * MainWindow.xaml.cs - part of Grbl Code Sender
  *
- * v0.05 / 2020-02-06 / Io Engineering (Terje Io)
+ * v0.05 / 2020-02-10 / Io Engineering (Terje Io)
  *
  */
 
@@ -181,8 +181,7 @@ namespace GCode_Sender
 
                 using (new UIUtils.WaitCursor()) // disconnecting from websocket may take some time...
                 {
-                    if (Comms.com.StreamType != Comms.StreamType.Serial) // Serial makes fking process hang
-                        Comms.com.Close();
+                     Comms.com.Close();
                 }
             }
         }
@@ -200,6 +199,7 @@ namespace GCode_Sender
         void aboutMenuItem_Click(object sender, EventArgs e)
         {
             About about = new About(BaseWindowTitle) { Owner = Application.Current.MainWindow };
+            about.DataContext = DataContext;
             about.ShowDialog();
         }
 

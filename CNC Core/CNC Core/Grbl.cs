@@ -1,7 +1,7 @@
 ﻿/*
  * Grbl.cs - part of CNC Controls library
  *
- * v0.05 / 2020-02-06 / Io Engineering (Terje Io)
+ * v0.06 / 2020-02-11 / Io Engineering (Terje Io)
  *
  */
 
@@ -447,6 +447,7 @@ namespace CNC.Core
             get { return GrblParserState.LatheMode != LatheMode.Disabled; }
             set { if(value && GrblParserState.LatheMode == LatheMode.Disabled) GrblParserState.LatheMode = LatheMode.Radius; }
         }
+        public static ObservableCollection<string> SystemInfo { get; private set; } = new ObservableCollection<string>();
         public static bool Loaded { get; private set; }
 
         #endregion
@@ -472,6 +473,7 @@ namespace CNC.Core
             CancellationToken cancellationToken = new CancellationToken();
 
             Comms.com.PurgeQueue();
+            SystemInfo.Clear();
 
             model.Silent = true;
 
@@ -556,6 +558,10 @@ namespace CNC.Core
                                         break;
                                 }
                         }
+                        break;
+
+                    default:
+                        SystemInfo.Add(data);
                         break;
                 }
             }

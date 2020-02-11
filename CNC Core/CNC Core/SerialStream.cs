@@ -1,7 +1,7 @@
 ﻿/*
  * SerialStream.cs - part of CNC Controls library
  *
- * v0.03 / 2020-01-23 / Io Engineering (Terje Io)
+ * v0.05 / 2020-02-11 / Io Engineering (Terje Io)
  *
  */
 
@@ -302,7 +302,7 @@ StreamWriter log = null;
             log.WriteLine(Reply);
 #endif
                     if (Reply.Length != 0 && DataReceived != null)
-                        Dispatcher.Invoke(DataReceived, Reply);
+                        Dispatcher.BeginInvoke(DataReceived, Reply);
 
                     state = Reply == "ok" ? Comms.State.ACK : (Reply.StartsWith("error") ? Comms.State.NAK : Comms.State.DataReceived);
                 }

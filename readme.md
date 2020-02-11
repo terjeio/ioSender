@@ -2,6 +2,14 @@
 
 ---
 
+2020-02-11: Sixt alpha release of binary.
+
+Finally fixed MPG -> Sender swiching. Fixed intermittent hang on close and added system information (from grbl) to About dialog.
+
+---
+
+---
+
 2020-02-06: Fifth alpha release of binary.
 
 Moved main response handler to view model, added timeouts for waiting for controller responses. Improved MPG/Sender switching. 

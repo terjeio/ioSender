@@ -1,7 +1,7 @@
 ﻿/*
  * About.xaml.cs - part of CNC Controls library
  *
- * v2.0 / 2020-01-26 / Io Engineering (Terje Io)
+ * v2.0 / 2020-02-11 / Io Engineering (Terje Io)
  *
  */
 
@@ -54,12 +54,14 @@ namespace CNC.Controls
 
         private void About_Load(object sender, System.EventArgs e)
         {
+            GrblInfo.Get();
             txtGrblVersion.Content = GrblInfo.Version;
             txtGrblOptions.Content = GrblInfo.Options;
             txtGrblNewOpts.Content = GrblInfo.NewOptions;
+            grpGrbl.Header = GrblSettings.IsGrblHAL ? "grblHAL" : "grbl";
 
             if (GrblInfo.Identity != "")
-                grpGrbl.Name += ": " + GrblInfo.Identity;
+                grpGrbl.Header += ": " + GrblInfo.Identity;
         }
 
         private void okButton_Click(object sender, System.EventArgs e)

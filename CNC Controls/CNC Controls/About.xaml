@@ -5,30 +5,38 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CNC.Controls"
         mc:Ignorable="d"
-        Title="About" Height="223" Width="315" ResizeMode="NoResize" ShowInTaskbar="False"
+        Title="About" Height="310" Width="315" ResizeMode="NoResize" ShowInTaskbar="False"
         WindowStartupLocation="CenterOwner"
         Loaded="About_Load" Icon="App.ico">
+    <Window.Resources>
+        <local:StringCollectionToTextConverter x:Key="OcToString" />
+    </Window.Resources>
     <Grid Background="#FFF8F8F8">
         <Grid.RowDefinitions>
-            <RowDefinition Height="25*"/>
-            <RowDefinition Height="25*"/>
-            <RowDefinition Height="105*"/>
-            <RowDefinition Height="25*"/>
+            <RowDefinition Height="28"/>
+            <RowDefinition Height="28"/>
+            <RowDefinition Height="190"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Label x:Name="version" Content="Version 2.0" HorizontalAlignment="Left" Margin="10,0" VerticalAlignment="Top"/>
-        <Label x:Name="copyright" Content="©2015-2019 Io Engineering (Terje Io)" HorizontalAlignment="Left" Margin="10,0" Grid.Row="1" VerticalAlignment="Top"/>
-        <GroupBox x:Name="grpGrbl" Header="grbl" HorizontalAlignment="Left" Margin="10,3,0,0" Grid.Row="2" VerticalAlignment="Top" Height="100" Width="290">
-            <Grid>
-                <Grid.RowDefinitions>
-                <RowDefinition Height="30*"/>
-                <RowDefinition Height="30*"/>
-                <RowDefinition Height="30*"/>
-                </Grid.RowDefinitions>
-                <Label x:Name="txtGrblVersion" Content="-" HorizontalAlignment="Left" Margin="10,0" Grid.Row="0" VerticalAlignment="Center"/>
-                <Label x:Name="txtGrblOptions" Content="-" HorizontalAlignment="Left" Margin="10,0" Grid.Row="1" VerticalAlignment="Center"/>
-                <Label x:Name="txtGrblNewOpts" Content="-" HorizontalAlignment="Left" Margin="10,0" Grid.Row="2" VerticalAlignment="Center"/>
-            </Grid>
+        <Label x:Name="copyright" Content="©2015-2020 Io Engineering (Terje Io)" HorizontalAlignment="Left" Margin="10,0" Grid.Row="1" VerticalAlignment="Top"/>
+        <GroupBox x:Name="grpGrbl" Header="grbl" HorizontalAlignment="Center" Grid.Row="2" VerticalAlignment="Top" Height="185" Width="290">
+            <StackPanel Orientation="Vertical">
+                <Label x:Name="txtGrblVersion" Content="-" HorizontalAlignment="Left" Margin="10,0" VerticalAlignment="Center" Height="26"/>
+                <Label x:Name="txtGrblOptions" Content="-" HorizontalAlignment="Left" Margin="10,0" VerticalAlignment="Center" Height="26"/>
+                <Label x:Name="txtGrblNewOpts" Content="-" HorizontalAlignment="Left" Margin="10,0" VerticalAlignment="Center" Height="26"/>
+                <TextBox IsReadOnly="True" HorizontalAlignment="Center" Height="80" TextWrapping="Wrap" VerticalAlignment="Top" Width="270"
+                     local:TextBoxUtilities.AlwaysScrollToEnd="True" FontSize="10" FontFamily="Verdana"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto">
+                    <TextBox.Text>
+                        <MultiBinding Converter="{StaticResource OcToString}">
+                            <Binding Path="SystemInfo" Mode="OneWay"/>
+                            <Binding Path="SystemInfo.Count" Mode="OneWay" />
+                        </MultiBinding>
+                    </TextBox.Text>
+                </TextBox>
+            </StackPanel>
         </GroupBox>
-        <Button x:Name="btnOk" Content="Ok" HorizontalAlignment="Center" Grid.Row="3" VerticalAlignment="Center" Width="75" Click="okButton_Click"/>
+        <Button x:Name="btnOk" Content="Ok" HorizontalAlignment="Center" Grid.Row="3" VerticalAlignment="Top" Width="75" Click="okButton_Click"/>
     </Grid>
 </Window>

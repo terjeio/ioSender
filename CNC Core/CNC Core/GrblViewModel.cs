@@ -1,7 +1,7 @@
 /*
  * GrblViewModel.cs - part of CNC Controls library
  *
- * v0.05 / 2020-02-06 / Io Engineering (Terje Io)
+ * v0.06 / 2020-02-11 / Io Engineering (Terje Io)
  *
  */
 
@@ -155,6 +155,7 @@ namespace CNC.Core
         public string MDI { get { string cmd = _mdiCommand; _mdiCommand = string.Empty; return cmd; } private set { _mdiCommand = value; OnPropertyChanged(); } }
         public ObservableCollection<CoordinateSystem> CoordinateSystems { get { return GrblWorkParameters.CoordinateSystems; } }
         public ObservableCollection<Tool> Tools { get { return GrblWorkParameters.Tools; } }
+        public ObservableCollection<string> SystemInfo { get { return GrblInfo.SystemInfo; } }
         public string Tool { get { return _tool; } set { _tool = value; OnPropertyChanged(); } }
         public bool GrblReset { get { return _reset; } set { _reset = value; _grblState.Error = 0; OnPropertyChanged(); if(_reset) Message = ""; } }
         public GrblState GrblState { get { return _grblState; } set { _grblState = value; OnPropertyChanged(); } }

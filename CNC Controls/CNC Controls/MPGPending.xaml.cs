@@ -1,7 +1,7 @@
 ﻿/*
  * MPGPending.xaml.cs - part of CNC Controls library
  *
- * v0.05 / 2020-02-06 / Io Engineering (Terje Io)
+ * v0.05 / 2020-02-10 / Io Engineering (Terje Io)
  *
  */
 
@@ -59,13 +59,15 @@ namespace CNC.Controls
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            Comms.com.DataReceived -= model.DataReceived;
-            model.OnRealtimeStatusProcessed -= OnRealtimeStatusProcessed;
-
-            using (new UIUtils.WaitCursor()) // disconnecting from websocket may take some time...
+            if (Cancelled)
             {
-                if (Comms.com.StreamType != Comms.StreamType.Serial) // Serial makes fking process hang
+                Comms.com.DataReceived -= model.DataReceived;
+                model.OnRealtimeStatusProcessed -= OnRealtimeStatusProcessed;
+
+                using (new UIUtils.WaitCursor()) // disconnecting from websocket may take some time...
+                {
                     Comms.com.Close();
+                }
             }
         }
 

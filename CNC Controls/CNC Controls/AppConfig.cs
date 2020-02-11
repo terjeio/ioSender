@@ -1,7 +1,7 @@
 ﻿/*
  * AppConfig.cs - part of Grbl Code Sender
  *
- * v0.05 / 2020-02-06 / Io Engineering (Terje Io)
+ * v0.05 / 2020-02-10 / Io Engineering (Terje Io)
  *
  */
 
@@ -328,7 +328,7 @@ namespace CNC.Controls
                     null,
                     a => model.OnRealtimeStatusProcessed += a,
                     a => model.OnRealtimeStatusProcessed -= a,
-                    400);
+                    500);
                 }).Start();
 
                 while (MPGactive == null)
