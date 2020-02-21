@@ -1,7 +1,7 @@
 ﻿/*
  * PortDialog.xaml.cs - part of CNC Controls library
  *
- * v0.02 / 2020-01-23 / Io Engineering (Terje Io)
+ * v0.07 / 2020-02-21 / Io Engineering (Terje Io)
  *
  */
 
@@ -39,12 +39,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using System.Windows;
 using CNC.Core;
+using System;
 
 namespace CNC.Controls
 {
     public partial class PortDialog : Window
     {
-        private string port = null, orgport = "";
+        private string port = null;
         public PortDialog()
         {
             InitializeComponent();
@@ -57,16 +58,37 @@ namespace CNC.Controls
             ((SerialPorts)DataContext).Refresh();
         }
 
-        private void PortDialog_Loaded(object sender, RoutedEventArgs e)
+        private bool PortAvailable(string port)
         {
-            if (!string.IsNullOrEmpty(orgport) && cbxPorts.Items.Contains(orgport))
-                cbxPorts.SelectedItem = orgport; 
+            bool found = false;
+
+            foreach (string p in ((SerialPorts)DataContext).PortNames)
+                found = found || p == port;
+
+            return found;
         }
 
         public string ShowDialog(string orgport)
         {
-            if (orgport.IndexOf(':') > 0)
-                this.orgport = orgport.Substring(0, orgport.IndexOf(':'));
+            if (!string.IsNullOrEmpty(orgport)) {
+                string portname = orgport.Substring(0, orgport.IndexOf(':'));
+                if (PortAvailable(portname))
+                {
+                    ((SerialPorts)DataContext).SelectedPort = portname;
+                    string[] values = orgport.Split(':')[1].Split(',');
+                    if(values.Length > 5)
+                    {
+                        Comms.ResetMode mode = Comms.ResetMode.None; 
+                        Enum.TryParse(values[5], true, out mode);
+                        if(mode != Comms.ResetMode.None)
+                        {
+                            foreach (ConnectMode m in ((SerialPorts)DataContext).ConnectModes)
+                                if (m.Mode == mode)
+                                    ((SerialPorts)DataContext).SelectedMode = m;
+                        }
+                    }
+                }
+            }
 
             ShowDialog();
 
@@ -76,6 +98,10 @@ namespace CNC.Controls
         private void btnOk_Click(object sender, RoutedEventArgs e)
         {
             port = ((SerialPorts)DataContext).SelectedPort;
+
+            if (((SerialPorts)DataContext).SelectedMode.Mode != Comms.ResetMode.None)
+                port += "!" + ((SerialPorts)DataContext).SelectedMode.Mode.ToString();
+
             Close();
         }
 

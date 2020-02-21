@@ -1,7 +1,7 @@
 ﻿/*
  * AppConfig.cs - part of Grbl Code Sender
  *
- * v0.05 / 2020-02-10 / Io Engineering (Terje Io)
+ * v0.07 / 2020-02-21 / Io Engineering (Terje Io)
  *
  */
 
@@ -214,7 +214,10 @@ namespace CNC.Controls
         {
             Config.PortParams = port;
             if (!(Config.PortParams.ToLower().StartsWith("ws://") || char.IsDigit(Config.PortParams[0])) && Config.PortParams.IndexOf(':') == -1)
-                Config.PortParams += ":115200,N,8,1";
+            {
+                string[] values = Config.PortParams.Split('!');
+                Config.PortParams = values[0] + ":115200,N,8,1" + (values.Length > 1 ? ",," + values[1] : "");
+            }
         }
 
         public int SetupAndOpen(string appname, GrblViewModel model, System.Windows.Threading.Dispatcher dispatcher)
@@ -285,7 +288,7 @@ namespace CNC.Controls
                 if (char.IsDigit(Config.PortParams[0])) // We have an IP address
                     new TelnetStream(Config.PortParams, dispatcher);
                 else
-                    new SerialStream(Config.PortParams, Comms.ResetMode.None, dispatcher);
+                    new SerialStream(Config.PortParams, dispatcher);
             }
 
             if ((Comms.com == null || !Comms.com.IsOpen) && string.IsNullOrEmpty(port))
@@ -307,7 +310,7 @@ namespace CNC.Controls
                     if (char.IsDigit(port[0])) // We have an IP address
                         new TelnetStream(Config.PortParams, dispatcher);
                     else
-                        new SerialStream(Config.PortParams, Comms.ResetMode.None, dispatcher);
+                        new SerialStream(Config.PortParams, dispatcher);
 
                     Save(CNC.Core.Resources.IniFile);
                 }

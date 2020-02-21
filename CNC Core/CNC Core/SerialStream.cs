@@ -1,7 +1,7 @@
 ﻿/*
  * SerialStream.cs - part of CNC Controls library
  *
- * v0.05 / 2020-02-11 / Io Engineering (Terje Io)
+ * v0.07 / 2020-02-21 / Io Engineering (Terje Io)
  *
  */
 
@@ -44,6 +44,7 @@ using System.Windows.Forms;
 using System.IO.Ports;
 using System.Windows.Threading;
 using System.IO;
+using System.Collections.ObjectModel;
 
 namespace CNC.Core
 {
@@ -61,7 +62,7 @@ namespace CNC.Core
 StreamWriter log = null;
 #endif
 
-        public SerialStream(string PortParams, Comms.ResetMode ResetMode, Dispatcher dispatcher)
+        public SerialStream(string PortParams, Dispatcher dispatcher)
         {
             Comms.com = this;
             Dispatcher = dispatcher;
@@ -111,8 +112,13 @@ StreamWriter log = null;
 
             if (serialPort.IsOpen)
             {
+                Comms.ResetMode ResetMode = Comms.ResetMode.None;
+
                 PurgeQueue();
                 serialPort.DataReceived += new SerialDataReceivedEventHandler(SerialPort_DataReceived);
+
+                if (parameter.Count() > 5)
+                    Enum.TryParse(parameter[5], true, out ResetMode);
 
                 switch (ResetMode)
                 {
@@ -309,10 +315,25 @@ StreamWriter log = null;
             }
         }
     }
+
+    public class ConnectMode : ViewModelBase
+    {
+        public ConnectMode(Comms.ResetMode mode, string name)
+        {
+            Mode = mode;
+            Name = name;
+        }
+
+        public Comms.ResetMode Mode { get; private set; }
+
+        public string Name { get; private set; }
+    }
+
     public class SerialPorts : ViewModelBase
     {
         string _selected = string.Empty;
         string[] _portnames;
+        private ConnectMode _mode = null;
 
         public SerialPorts()
         {
@@ -320,6 +341,12 @@ StreamWriter log = null;
 
             if (PortNames.Length > 0)
                 _selected = PortNames[0];
+
+            ConnectModes.Add(new ConnectMode(Comms.ResetMode.None, "No action"));
+            ConnectModes.Add(new ConnectMode(Comms.ResetMode.DTR, "Toggle DTR"));
+            ConnectModes.Add(new ConnectMode(Comms.ResetMode.RTS, "Toggle RTS"));
+
+            SelectedMode = ConnectModes[0];
         }
 
         public void Refresh ()
@@ -339,6 +366,21 @@ StreamWriter log = null;
                 if (_selected != value)
                 {
                     _selected = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public ObservableCollection<ConnectMode> ConnectModes { get; private set; } = new ObservableCollection<ConnectMode>();
+
+        public ConnectMode SelectedMode
+        {
+            get { return _mode; }
+            set
+            {
+                if (_mode != value)
+                {
+                    _mode = value;
                     OnPropertyChanged();
                 }
             }

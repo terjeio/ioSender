@@ -5,15 +5,26 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CNC.Controls"
         mc:Ignorable="d"
-        Loaded="PortDialog_Loaded"
-        Title="Select COM port" Height="120" Width="185" Icon="App.ico" ResizeMode="NoResize">
+        Title="Select COM port" Height="150" Width="250" Icon="App.ico" ResizeMode="NoResize">
     <Grid Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
-        <ComboBox x:Name="cbxPorts" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="150"
-            DropDownOpened="CbxPorts_DropDownOpened"
-            ItemsSource="{Binding Path=PortNames}"
-            SelectedValue="{Binding Path=SelectedPort, Mode=TwoWay}"
+        <StackPanel Orientation="Horizontal" Margin="0,5" Height="25" VerticalAlignment="Top">
+            <Label Content="Port:" HorizontalAlignment="Left" HorizontalContentAlignment="Right" Width="80" VerticalAlignment="Center"/>
+            <ComboBox HorizontalAlignment="Left" VerticalAlignment="Center" Width="150"
+                DropDownOpened="CbxPorts_DropDownOpened"
+                ItemsSource="{Binding Path=PortNames}"
+                SelectedValue="{Binding Path=SelectedPort, Mode=TwoWay}"
+            />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,32" Height="25" VerticalAlignment="Top">
+            <Label Content="On connect:" HorizontalAlignment="Left" HorizontalContentAlignment="Right" Width="80" VerticalAlignment="Center"/>
+            <ComboBox HorizontalAlignment="Left" VerticalAlignment="Center" Width="150"
+            ItemsSource="{Binding Path=ConnectModes}"
+            SelectedItem="{Binding Path=SelectedMode, Mode=TwoWay}"
+            DisplayMemberPath="Name"
+            SelectedValuePath="Mode"
         />
-        <Button x:Name="btnOk" Content="Ok" HorizontalAlignment="Left" Margin="10,49,0,0" VerticalAlignment="Top" Width="70" Click="btnOk_Click"/>
-        <Button x:Name="btnCancel" Content="Cancel" HorizontalAlignment="Left" Margin="90,49,0,0" VerticalAlignment="Top" Width="70" Click="btnCancel_Click"/>
+        </StackPanel>
+        <Button x:Name="btnOk" Content="Ok" HorizontalAlignment="Left" Margin="50,79,0,0" VerticalAlignment="Top" Width="70" Click="btnOk_Click"/>
+        <Button x:Name="btnCancel" Content="Cancel" HorizontalAlignment="Left" Margin="130,79,0,0" VerticalAlignment="Top" Width="70" Click="btnCancel_Click"/>
     </Grid>
 </Window>
