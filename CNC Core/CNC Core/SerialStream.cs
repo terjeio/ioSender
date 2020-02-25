@@ -1,7 +1,7 @@
 ﻿/*
  * SerialStream.cs - part of CNC Controls library
  *
- * v0.07 / 2020-02-21 / Io Engineering (Terje Io)
+ * v0.08 / 2020-02-25 / Io Engineering (Terje Io)
  *
  */
 
@@ -62,7 +62,7 @@ namespace CNC.Core
 StreamWriter log = null;
 #endif
 
-        public SerialStream(string PortParams, Dispatcher dispatcher)
+        public SerialStream(string PortParams, int ResetDelay, Dispatcher dispatcher)
         {
             Comms.com = this;
             Dispatcher = dispatcher;
@@ -112,6 +112,8 @@ StreamWriter log = null;
 
             if (serialPort.IsOpen)
             {
+                serialPort.DtrEnable = true;
+
                 Comms.ResetMode ResetMode = Comms.ResetMode.None;
 
                 PurgeQueue();
@@ -125,15 +127,19 @@ StreamWriter log = null;
                     case Comms.ResetMode.RTS:
                         /* For resetting ESP32 */
                         serialPort.RtsEnable = true;
+                        System.Threading.Thread.Sleep(5);
                         serialPort.RtsEnable = false;
-                        System.Threading.Thread.Sleep(2000);
+                        if(ResetDelay > 0)
+                            System.Threading.Thread.Sleep(ResetDelay);
                         break;
 
                     case Comms.ResetMode.DTR:
                         /* For resetting Arduino */
-                        serialPort.DtrEnable = true;
                         serialPort.DtrEnable = false;
-                        System.Threading.Thread.Sleep(2000);
+                        System.Threading.Thread.Sleep(5);
+                        serialPort.DtrEnable = true;
+                        if (ResetDelay > 0)
+                            System.Threading.Thread.Sleep(ResetDelay);
                         break;
                 }
 

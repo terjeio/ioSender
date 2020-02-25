@@ -54,6 +54,9 @@ namespace CNC.Controls
         public NumericTextBox()
         {
             HorizontalContentAlignment = HorizontalAlignment.Right;
+            VerticalContentAlignment = VerticalAlignment.Bottom;
+            Height = 24;
+            TextWrapping = TextWrapping.NoWrap;
         }
 
         public new string Text { get { return base.Text; } set { base.Text = value; } }

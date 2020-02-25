@@ -1,7 +1,7 @@
 /*
  * GrblViewModel.cs - part of CNC Controls library
  *
- * v0.06 / 2020-02-11 / Io Engineering (Terje Io)
+ * v0.08 / 2020-02-25 / Io Engineering (Terje Io)
  *
  */
 
@@ -634,10 +634,11 @@ namespace CNC.Core
                 data = "";
             else if (data.StartsWith("["))
             {
-                if (data == "[MSG:Pgm End]")
-                    ProgramEnd = true;
-
-                Message = data;
+                if (data.StartsWith("[MSG:")) {
+                    Message = data;
+                    if (data == "[MSG:Pgm End]")
+                        ProgramEnd = true;
+                } // else ignore?
             }
             else if (data.StartsWith("Grbl"))
             {

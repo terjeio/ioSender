@@ -17,7 +17,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;xRESPONSELOG  USEWEBSOCKET xUSEELTIMA</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;RESPONSELOG  USEWEBSOCKET xUSEELTIMA</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>

@@ -127,6 +127,7 @@ namespace CNC.Controls
 
         public int PollInterval { get { return _pollInterval < 100 ? 100 : _pollInterval; } set { _pollInterval = value; OnPropertyChanged(); } }
         public string PortParams { get; set; } = "COMn:115200,N,8,1";
+        public int ResetDelay { get; set; } = 2000;
 
         [XmlIgnore]
         public CommandIgnoreState[] CommandIgnoreStates { get { return (CommandIgnoreState[])Enum.GetValues(typeof(CommandIgnoreState)); } }
@@ -288,7 +289,7 @@ namespace CNC.Controls
                 if (char.IsDigit(Config.PortParams[0])) // We have an IP address
                     new TelnetStream(Config.PortParams, dispatcher);
                 else
-                    new SerialStream(Config.PortParams, dispatcher);
+                    new SerialStream(Config.PortParams, Config.ResetDelay, dispatcher);
             }
 
             if ((Comms.com == null || !Comms.com.IsOpen) && string.IsNullOrEmpty(port))
@@ -310,7 +311,7 @@ namespace CNC.Controls
                     if (char.IsDigit(port[0])) // We have an IP address
                         new TelnetStream(Config.PortParams, dispatcher);
                     else
-                        new SerialStream(Config.PortParams, dispatcher);
+                        new SerialStream(Config.PortParams, Config.ResetDelay, dispatcher);
 
                     Save(CNC.Core.Resources.IniFile);
                 }

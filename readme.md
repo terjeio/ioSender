@@ -1,10 +1,15 @@
 ## GRBL GCode Sender
 
+
+2020-02-25: Eight alpha release of binary.
+
+Improved serial connection, now always asserts DTR on connect (before any toggling). Some layout fixes.
+
 ---
 
 2020-02-21: Seventh alpha release of binary.
 
-Added drop-down for selecting serial connection mode: no action, toggle DTR and toggle RTS. Some processors may need toggling of the DTR or RTS signal to either reset or start grbl. Notably the grblHAL driver for Teensy 4.0 requires toggling of DTR on connect when streaming over native USB, or the system will hang.
+Added drop-down for selecting serial connection mode: no action, toggle DTR and toggle RTS.
 
 ---
 
