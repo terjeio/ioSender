@@ -1,5 +1,10 @@
 ## GRBL GCode Sender
 
+2020-02-29: Ninth alpha release of binary.
+
+Refactored main state machine. Some layout fixes.
+
+---
 
 2020-02-25: Eight alpha release of binary.
 
