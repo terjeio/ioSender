@@ -24,7 +24,7 @@
             <Button x:Name="btnHold" Content="Hold" Width="71" Height="32"  Margin="6,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Click="btnHold_Click"/>
             <Button x:Name="btnStop" Content="Stop" Width="71" Height="32"  Margin="6,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Click="btnStop_Click"/>
             <Button x:Name="btnRewind" Content="Rewind" Width="71" Height="32" Margin="6,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Click="btnRewind_Click"/>
-            <Label x:Name="lblRunTime" Content="00:00:00" Height="28" Width="60" Margin="40,0,0,0" HorizontalAlignment="Right" VerticalAlignment="Top"/>
+            <Label Content="{Binding Path=RunTime, Mode=OneWay}" Height="28" Width="60" Margin="40,0,0,0" HorizontalAlignment="Right" VerticalAlignment="Top"/>
         </StackPanel>
 
     </Grid>

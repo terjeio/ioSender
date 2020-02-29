@@ -12,21 +12,23 @@
              IsVisibleChanged="JobView_IsVisibleChanged">
     <StackPanel Background="Transparent" MouseDown="outside_MouseDown" Width="870">
         <Grid Height="500">
-            <StackPanel Margin="4,5,0,0" Width="220" Height="Auto" HorizontalAlignment="Left">
-                <cnccontrols:DROControl x:Name="DRO" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                <cnccontrols:LimitsControl HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                <cnccontrols:SignalsControl x:Name="signalsControl" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                <cnccontrols:StatusControl x:Name="statusControl" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,8,0,0"/>
-            </StackPanel>
+            <DockPanel Margin="4,5,0,0" Width="220" Height="415" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <StackPanel Height="Auto" HorizontalAlignment="Left" VerticalAlignment="Top" DockPanel.Dock="Top">
+                    <cnccontrols:DROControl x:Name="DRO" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                    <cnccontrols:LimitsControl x:Name="limitsControl" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                    <cnccontrols:SignalsControl x:Name="signalsControl" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                </StackPanel>
+                <cnccontrols:StatusControl x:Name="statusControl" VerticalAlignment="Bottom" DockPanel.Dock="Bottom"/>
+            </DockPanel>
             <cnccontrols:JobControl x:Name="GCodeSender" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="224,3,0,0"/>
             <StackPanel Margin="642,5,0,0" Width="216" Height="Auto">
-                <cnccontrols:WorkParametersControl x:Name="workParametersControl" HorizontalAlignment="Left" Height="60" VerticalAlignment="Top" IsToolChanging="{Binding Path=IsToolChanging}"/>
+                <cnccontrols:WorkParametersControl x:Name="workParametersControl" HorizontalAlignment="Left" Height="60" VerticalAlignment="Top" IsToolChanging="{Binding IsToolChanging}"/>
                 <cnccontrols:CoolantControl HorizontalAlignment="Left" Height="70" VerticalAlignment="Top" x:Name="coolantControl"/>
                 <cnccontrols:SpindleControl x:Name="spindleControl" HorizontalAlignment="Left" Height="130" VerticalAlignment="Top"/>
                 <cnccontrols:FeedControl x:Name="feedControl" HorizontalAlignment="Left" Height="160" VerticalAlignment="Top" />
             </StackPanel>
             <cnccontrols:MDIControl x:Name="mdiControl" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="4,420,0,0"/>
-            <TextBox x:Name="txtStatus" Text="{Binding Path=Message}" HorizontalAlignment="Center" Height="23" Margin="2,4" TextWrapping="Wrap" VerticalAlignment="Bottom" Width="860" IsEnabled="False" UndoLimit="0"/>
+            <TextBox x:Name="txtStatus" Text="{Binding Message}" HorizontalAlignment="Center" Height="23" Margin="2,4" TextWrapping="Wrap" VerticalAlignment="Bottom" Width="860" IsEnabled="False" UndoLimit="0"/>
         </Grid>
     </StackPanel>
 </UserControl>

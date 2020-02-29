@@ -1,7 +1,7 @@
 ﻿/*
  * Grbl.cs - part of CNC Controls library
  *
- * v0.06 / 2020-02-11 / Io Engineering (Terje Io)
+ * v0.09 / 2020-02-28 / Io Engineering (Terje Io)
  *
  */
 
@@ -216,6 +216,8 @@ namespace CNC.Core
         ToolChange,
         Start,
         Stop,
+        Paused,
+        JobFinished,
         Reset,
         AwaitResetAck,
         Jogging,
@@ -435,6 +437,7 @@ namespace CNC.Core
         public static string NewOptions { get; private set; } = string.Empty;
         public static string TrinamicDrivers { get; private set; } = string.Empty;
         public static int SerialBufferSize { get; private set; } = 128;
+        public static int PlanBufferSize { get; private set; } = 16;
         public static int NumAxes { get; private set; } = 3;
         public static int NumTools { get; private set; } = 0;
         public static bool HasATC { get; private set; }
@@ -517,6 +520,8 @@ namespace CNC.Core
                     case "OPT":
                         Options = valuepair[1];
                         string[] s = Options.Split(',');
+                        if (s.Length > 1)
+                            PlanBufferSize = int.Parse(s[1], CultureInfo.InvariantCulture);
                         if (s.Length > 2)
                             SerialBufferSize = int.Parse(s[2], CultureInfo.InvariantCulture);
                         if (s.Length > 3)
@@ -1271,18 +1276,12 @@ namespace CNC.Core
             }
             set
             {
-                if (value)
+                if (IsRunning)
                 {
-                    if (stopWatch.IsRunning)
-                    {
+                    if ((paused = value))
                         stopWatch.Stop();
-                        paused = true;
-                    }
-                }
-                else if (paused)
-                {
-                    stopWatch.Start();
-                    paused = false;
+                    else
+                        stopWatch.Start();
                 }
             }
         }
@@ -1291,8 +1290,8 @@ namespace CNC.Core
         {
             get
             {
-                return string.Format("{0:00}:{1:00}:{2:00}",
-                                        stopWatch.Elapsed.Hours, stopWatch.Elapsed.Minutes, stopWatch.Elapsed.Seconds);
+                return IsRunning ? string.Format("{0:00}:{1:00}:{2:00}", stopWatch.Elapsed.Hours, stopWatch.Elapsed.Minutes, stopWatch.Elapsed.Seconds)
+                                 : "00:00:00";
             }
         }
 

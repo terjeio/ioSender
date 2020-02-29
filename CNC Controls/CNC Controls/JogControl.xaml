@@ -3,10 +3,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:local="clr-namespace:CNC.Controls"
              mc:Ignorable="d" 
-             d:DesignHeight="220" d:DesignWidth="300">
+             d:DesignHeight="220" Width="Auto">
     <UserControl.Resources>
+        <local:IsAxisVisibleConverter x:Key="IsAxisVisibleConverter" />
         <Style x:Key="SmallXButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="Template">
@@ -19,9 +21,65 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <Style x:Key="ZAxisVisibleStyle">
+            <Setter Property="Control.Visibility">
+                <Setter.Value>
+                    <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
+                        <Binding Path="NumAxes" />
+                        <Binding>
+                            <Binding.Source>
+                                <sys:Int32>3</sys:Int32>
+                            </Binding.Source>
+                        </Binding>
+                    </MultiBinding>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="AAxisVisibleStyle">
+            <Setter Property="Control.Visibility">
+                <Setter.Value>
+                    <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
+                        <Binding Path="NumAxes" />
+                        <Binding>
+                            <Binding.Source>
+                                <sys:Int32>4</sys:Int32>
+                            </Binding.Source>
+                        </Binding>
+                    </MultiBinding>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="BAxisVisibleStyle">
+            <Setter Property="Control.Visibility">
+                <Setter.Value>
+                    <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
+                        <Binding Path="NumAxes" />
+                        <Binding>
+                            <Binding.Source>
+                                <sys:Int32>5</sys:Int32>
+                            </Binding.Source>
+                        </Binding>
+                    </MultiBinding>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="CAxisVisibleStyle">
+            <Setter Property="Control.Visibility">
+                <Setter.Value>
+                    <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
+                        <Binding Path="NumAxes" />
+                        <Binding>
+                            <Binding.Source>
+                                <sys:Int32>6</sys:Int32>
+                            </Binding.Source>
+                        </Binding>
+                    </MultiBinding>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </UserControl.Resources>
     <Border BorderBrush="DarkGray" BorderThickness="1" CornerRadius="3" Background="#FFE5E5EA">
-        <Grid Width="300" Height="220">
+        <Grid>
             <GroupBox Header="Distance" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Height="100" Width="80">
                 <StackPanel>
                     <RadioButton x:Name="dx10" Content="10" HorizontalAlignment="Left" Margin="10,5,0,0" VerticalAlignment="Top" Click="dx10_Click"/>
@@ -38,13 +96,35 @@
                     <RadioButton x:Name="f5" Content="5" HorizontalAlignment="Left" Margin="10,3,0,0" VerticalAlignment="Top" Click="f1000_Click"/>
                 </StackPanel>
             </GroupBox>
-            <Button Content="Y+" HorizontalAlignment="Left" Margin="135,45,0,0" VerticalAlignment="Top" Height="40" Width="40" Click="Button_Click"/>
-            <Button Content="Z+" HorizontalAlignment="Left" Margin="240,45,0,0" VerticalAlignment="Top" Height="40" Width="40" Click="Button_Click"/>
-            <Button Content="Y-" HorizontalAlignment="Left" Margin="135,136,0,0" VerticalAlignment="Top" Height="40" Width="40" Click="Button_Click"/>
-            <Button Content="X+" HorizontalAlignment="Left" Margin="180,91,0,0" VerticalAlignment="Top" Height="40" Width="40" Click="Button_Click"/>
-            <Button Content="X-" HorizontalAlignment="Left" Margin="92,91,0,0" VerticalAlignment="Top" Height="40" Width="40" Click="Button_Click"/>
-            <Button Content="Z-" HorizontalAlignment="Left" Margin="240,136,0,0" VerticalAlignment="Top" Height="40" Width="40" Click="Button_Click"/>
-            <Button Content="×" Focusable="False" Style="{StaticResource SmallXButtonStyle}" VerticalContentAlignment="Top" HorizontalAlignment="Left" Margin="282,0,0,0" VerticalAlignment="Top" Width="14" Height="18" Click="btn_Close"/>
+            <StackPanel Orientation="Horizontal" Margin="90,0,2,0" Width="Auto" Height="Auto">
+                <StackPanel>
+                    <Button Content="X+" HorizontalAlignment="Left" Margin="2,90" VerticalAlignment="Center" Height="40" Width="40" Click="Button_Click"/>
+                </StackPanel>
+                <StackPanel>
+                    <Button Content="Y+" HorizontalAlignment="Left" Margin="2,45" VerticalAlignment="Top" Height="40" Width="40" Click="Button_Click"/>
+                    <Button Content="Y-" HorizontalAlignment="Left" Margin="2,5" VerticalAlignment="Top" Height="40" Width="40" Click="Button_Click"/>
+                </StackPanel>
+                <StackPanel>
+                    <Button Content="X-" HorizontalAlignment="Left" Margin="2,90" VerticalAlignment="Top" Height="40" Width="40" Click="Button_Click"/>
+                </StackPanel>
+                <StackPanel Style="{StaticResource ZAxisVisibleStyle}">
+                    <Button Content="Z+" HorizontalAlignment="Left" Margin="2,45" VerticalAlignment="Top" Height="40" Width="40" Click="Button_Click"/>
+                    <Button Content="Z-" HorizontalAlignment="Left" Margin="2,5" VerticalAlignment="Top" Height="40" Width="40" Click="Button_Click"/>
+                </StackPanel>
+                <StackPanel Style="{StaticResource AAxisVisibleStyle}">
+                    <Button Content="A+" HorizontalAlignment="Left" Margin="2,45" VerticalAlignment="Top" Height="40" Width="40" Click="Button_Click"/>
+                    <Button Content="A-" HorizontalAlignment="Left" Margin="2,5" VerticalAlignment="Top" Height="40" Width="40" Click="Button_Click"/>
+                </StackPanel>
+                <StackPanel Style="{StaticResource BAxisVisibleStyle}">
+                    <Button Content="B+" HorizontalAlignment="Left" Margin="2,45" VerticalAlignment="Top" Height="40" Width="40" Click="Button_Click"/>
+                    <Button Content="B-" HorizontalAlignment="Left" Margin="2,5" VerticalAlignment="Top" Height="40" Width="40" Click="Button_Click"/>
+                </StackPanel>
+                <StackPanel Style="{StaticResource CAxisVisibleStyle}">
+                    <Button Content="C+" HorizontalAlignment="Left" Margin="2,45" VerticalAlignment="Top" Height="40" Width="40" Click="Button_Click"/>
+                    <Button Content="C-" HorizontalAlignment="Left" Margin="2,5" VerticalAlignment="Top" Height="40" Width="40" Click="Button_Click"/>
+                </StackPanel>
+            </StackPanel>
+            <Button Content="×" Focusable="False" Style="{StaticResource SmallXButtonStyle}" VerticalContentAlignment="Top" HorizontalAlignment="Right" Margin="0,0,5,0" VerticalAlignment="Top" Width="14" Height="18" Click="btn_Close"/>
         </Grid>
     </Border>
 </UserControl>

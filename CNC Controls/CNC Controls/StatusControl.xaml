@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CNC.Controls"
              mc:Ignorable="d" 
-             d:DesignHeight="66" d:DesignWidth="190">
+             d:DesignHeight="66" d:DesignWidth="216">
     <UserControl.Resources>
         <local:GrblStateToColorConverter x:Key="ToColorConverter" />
         <local:GrblStateToStringConverter x:Key="ToStringConverter" />
@@ -23,13 +23,13 @@
             <RowDefinition Height="30*"/>
             <RowDefinition Height="40*"/>
         </Grid.RowDefinitions>
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Height="30" Margin="3,0" VerticalAlignment="Center" Width="184">
-            <Label x:Name="lblState" Content="State:" HorizontalContentAlignment="Right" HorizontalAlignment="Left" VerticalAlignment="Center" Height="25" Width="40"/>
-            <TextBox x:Name="txtState" HorizontalAlignment="Left" Height="24" Margin="2,0" TextWrapping="NoWrap" IsReadOnly="True" TextAlignment="Center" VerticalAlignment="Center" Width="74"
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="3,0" VerticalAlignment="Center" Width="210">
+            <Label x:Name="lblState" Content="State:" HorizontalContentAlignment="Right" HorizontalAlignment="Left" VerticalAlignment="Center" Height="26" Width="40"/>
+            <TextBox x:Name="txtState" HorizontalAlignment="Left" Height="24" Margin="2,0" TextWrapping="NoWrap" IsReadOnly="True" TextAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center" Width="74"
                      Text="{Binding Path=GrblState, Converter={StaticResource ToStringConverter}}"
                      Background="{Binding Path=GrblState, Converter={StaticResource ToColorConverter}}"
              />
-            <CheckBox x:Name="chkCheckMode" Content="Check" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Center" Height="16" Width="50" Click="btn_Click"
+            <CheckBox x:Name="chkCheckMode" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Center" Click="btn_Click"
                 IsChecked="{Binding Path=IsCheckMode, Mode=OneWay}">
                 <CheckBox.IsEnabled>
                     <MultiBinding Converter="{StaticResource LogicalNorConverter}">
@@ -38,8 +38,9 @@
                     </MultiBinding>
                 </CheckBox.IsEnabled>
             </CheckBox>
+            <Label Content="Check" VerticalAlignment="Center" Height="26"/>
         </StackPanel>
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Height="34" Margin="3,3,0,0" Grid.Row="1" VerticalAlignment="Top" Width="184">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Height="34" Margin="3,3,0,0" Grid.Row="1" VerticalAlignment="Top" Width="210">
             <Button x:Name="btnHome" Content="Home" Background="{Binding Path=HomedState, Converter={StaticResource HomedStateConverter}}" Focusable="False" Width="55" Height="32" Click="btn_Click">
                 <Button.IsEnabled>
                     <MultiBinding Converter="{StaticResource HomingEnabledConverter}">

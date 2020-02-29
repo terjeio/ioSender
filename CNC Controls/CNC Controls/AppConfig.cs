@@ -1,7 +1,7 @@
 ﻿/*
  * AppConfig.cs - part of Grbl Code Sender
  *
- * v0.07 / 2020-02-21 / Io Engineering (Terje Io)
+ * v0.09 / 2020-02-28 / Io Engineering (Terje Io)
  *
  */
 
@@ -128,6 +128,7 @@ namespace CNC.Controls
         public int PollInterval { get { return _pollInterval < 100 ? 100 : _pollInterval; } set { _pollInterval = value; OnPropertyChanged(); } }
         public string PortParams { get; set; } = "COMn:115200,N,8,1";
         public int ResetDelay { get; set; } = 2000;
+        public bool UseBuffering { get; set; } = false;
 
         [XmlIgnore]
         public CommandIgnoreState[] CommandIgnoreStates { get { return (CommandIgnoreState[])Enum.GetValues(typeof(CommandIgnoreState)); } }
@@ -289,7 +290,11 @@ namespace CNC.Controls
                 if (char.IsDigit(Config.PortParams[0])) // We have an IP address
                     new TelnetStream(Config.PortParams, dispatcher);
                 else
+#if USEELTIMA
+                    new EltimaStream(Config.PortParams, Config.ResetDelay, dispatcher);
+#else
                     new SerialStream(Config.PortParams, Config.ResetDelay, dispatcher);
+#endif
             }
 
             if ((Comms.com == null || !Comms.com.IsOpen) && string.IsNullOrEmpty(port))
@@ -311,8 +316,11 @@ namespace CNC.Controls
                     if (char.IsDigit(port[0])) // We have an IP address
                         new TelnetStream(Config.PortParams, dispatcher);
                     else
+#if USEELTIMA
+                        new EltimaStream(Config.PortParams, Config.ResetDelay, dispatcher);
+#else
                         new SerialStream(Config.PortParams, Config.ResetDelay, dispatcher);
-
+#endif
                     Save(CNC.Core.Resources.IniFile);
                 }
             }

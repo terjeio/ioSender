@@ -1,5 +1,5 @@
 ﻿/*
- * SerialStream.cs - part of CNC Controls library
+ * EltimaStream.cs - part of CNC Controls library
  *
  * v0.09 / 2020-02-28 / Io Engineering (Terje Io)
  *
@@ -48,10 +48,11 @@ using System.Collections.ObjectModel;
 
 namespace CNC.Core
 {
-    public class SerialStream : StreamComms
+#if USEELTIMA
+    public class EltimaStream : StreamComms
     {
 
-        private SerialPort serialPort = null;
+        private SPortLib.SPortAx serialPort = null;
         private StringBuilder input = new StringBuilder(400);
         private volatile Comms.State state = Comms.State.ACK;
         private Dispatcher Dispatcher { get; set; }
@@ -59,10 +60,10 @@ namespace CNC.Core
         public event DataReceivedHandler DataReceived;
 
 #if RESPONSELOG
-StreamWriter log = null;
+        StreamWriter log = null;
 #endif
 
-        public SerialStream(string PortParams, int ResetDelay, Dispatcher dispatcher)
+        public EltimaStream(string PortParams, int ResetDelay, Dispatcher dispatcher)
         {
             Comms.com = this;
             Dispatcher = dispatcher;
@@ -79,45 +80,41 @@ StreamWriter log = null;
                 System.Environment.Exit(2);
             }
 
-            serialPort = new SerialPort();
-            serialPort.PortName = PortParams.Substring(0, PortParams.IndexOf(":"));
-            serialPort.BaudRate = int.Parse(parameter[0]);
-            serialPort.Parity = ParseParity(parameter[1]);
-            serialPort.DataBits = int.Parse(parameter[2]);
-            serialPort.StopBits = int.Parse(parameter[3]) == 1 ? StopBits.One : StopBits.Two;
-            serialPort.ReceivedBytesThreshold = 1;
-            serialPort.ReadTimeout = 5000;
-            serialPort.NewLine = "\r\n";
-            serialPort.ReadBufferSize = Comms.RXBUFFERSIZE;
-            serialPort.WriteBufferSize = Comms.TXBUFFERSIZE;
+            try
+            {
+                this.serialPort = new SPortLib.SPortAx();
+            }
+            catch
+            {
+                MessageBox.Show("Failed to load serial port driver.", "GCode Sender");
+                System.Environment.Exit(1);
+            }
 
-            if (parameter.Count() > 4) switch (parameter[4])
-                {
-                    case "P": // Cannot be used With ESP32!
-                        serialPort.Handshake = Handshake.RequestToSend;
-                        break;
+            this.serialPort.InitString(PortParams.Substring(PortParams.IndexOf(":") + 1));
+            //           this.SerialPort.HandShake = 0x08; // Cannot be used with ESP32
+            this.serialPort.FlowReplace = 0x80;
+            this.serialPort.CharEvent = 10;
+            this.serialPort.InBufferSize = Comms.RXBUFFERSIZE;
+            this.serialPort.OutBufferSize = Comms.TXBUFFERSIZE;
+            this.serialPort.BlockMode = false;
 
-                    case "X":
-                        serialPort.Handshake = Handshake.XOnXOff;
-                        break;
-                }
 
             try
             {
-                serialPort.Open();
+                serialPort.Open(PortParams.Substring(0, PortParams.IndexOf(":")));
             }
             catch
             {
             }
 
-            if (serialPort.IsOpen)
+            if (serialPort.IsOpened)
             {
-                serialPort.DtrEnable = true;
+                serialPort.DTR = true;
 
                 Comms.ResetMode ResetMode = Comms.ResetMode.None;
 
                 PurgeQueue();
-                serialPort.DataReceived += new SerialDataReceivedEventHandler(SerialPort_DataReceived);
+                this.serialPort.OnRxFlag += new SPortLib._ISPortAxEvents_OnRxFlagEventHandler(SerialPort_DataReceived);
 
                 if (parameter.Count() > 5)
                     Enum.TryParse(parameter[5], true, out ResetMode);
@@ -126,38 +123,38 @@ StreamWriter log = null;
                 {
                     case Comms.ResetMode.RTS:
                         /* For resetting ESP32 */
-                        serialPort.RtsEnable = true;
+                        serialPort.RTS = true;
                         System.Threading.Thread.Sleep(5);
-                        serialPort.RtsEnable = false;
-                        if(ResetDelay > 0)
+                        serialPort.RTS = false;
+                        if (ResetDelay > 0)
                             System.Threading.Thread.Sleep(ResetDelay);
                         break;
 
                     case Comms.ResetMode.DTR:
                         /* For resetting Arduino */
-                        serialPort.DtrEnable = false;
+                        serialPort.DTR = false;
                         System.Threading.Thread.Sleep(5);
-                        serialPort.DtrEnable = true;
+                        serialPort.DTR = true;
                         if (ResetDelay > 0)
                             System.Threading.Thread.Sleep(ResetDelay);
                         break;
                 }
 
 #if RESPONSELOG
-        log = new StreamWriter(@"D:\grbl.txt");
+                log = new StreamWriter(@"D:\grbl.txt");
 #endif
             }
         }
 
-        ~SerialStream()
+        ~EltimaStream()
         {
 #if RESPONSELOG
-    if(log != null) try
-    {
-        log.Close();
-        log = null;
-    }
-    catch { }
+            if (log != null) try
+                {
+                    log.Close();
+                    log = null;
+                }
+                catch { }
 #endif
             if (!IsClosing && IsOpen)
                 Close();
@@ -166,14 +163,13 @@ StreamWriter log = null;
         public Comms.StreamType StreamType { get { return Comms.StreamType.Serial; } }
         public Comms.State CommandState { get { return state; } set { state = value; } }
         public string Reply { get; private set; }
-        public bool IsOpen { get { return serialPort != null && serialPort.IsOpen; } }
+        public bool IsOpen { get { return serialPort != null && serialPort.IsOpened; } }
         public bool IsClosing { get; private set; }
-        public int OutCount { get { return serialPort.BytesToWrite; } }
+        public int OutCount { get { return serialPort.OutCount; } }
 
         public void PurgeQueue()
         {
-            serialPort.DiscardInBuffer();
-            serialPort.DiscardOutBuffer();
+            serialPort.PurgeQueue();
             Reply = "";
         }
 
@@ -210,11 +206,11 @@ StreamWriter log = null;
                 IsClosing = true;
                 try
                 {
-                    serialPort.DataReceived -= SerialPort_DataReceived;
-                    serialPort.DtrEnable = false;
-                    serialPort.RtsEnable = false;
-                    serialPort.DiscardInBuffer();
-                    serialPort.DiscardOutBuffer();
+                    //serialPort.DataReceived -= SerialPort_DataReceived;
+                    //serialPort.DtrEnable = false;
+                    //serialPort.RtsEnable = false;
+                    //serialPort.DiscardInBuffer();
+                    //serialPort.DiscardOutBuffer();
                     System.Threading.Thread.Sleep(100);
                     serialPort.Close();
                     serialPort = null;
@@ -226,19 +222,21 @@ StreamWriter log = null;
 
         public void WriteByte(byte data)
         {
-            serialPort.BaseStream.Write(new byte[1] { data }, 0, 1);
-            //serialPort.Write(new byte[1] { data }, 0, 1);
+            serialPort.Write(ref data, 1);
         }
 
         public void WriteBytes(byte[] bytes, int len)
         {
-            serialPort.BaseStream.Write(bytes, 0, len);
-            //      serialPort.Write(bytes, 0, len);
+            serialPort.Write(ref bytes[0], len);
         }
 
         public void WriteString(string data)
         {
-            serialPort.Write(data);
+            serialPort.WriteStr(data);
+#if RESPONSELOG
+            log.WriteLine(data);
+            log.Flush();
+#endif
         }
 
         public void WriteCommand(string command)
@@ -250,9 +248,7 @@ StreamWriter log = null;
             else if (command.Length > 0)
             {
                 command += "\r";
-                byte[] bytes = System.Text.Encoding.UTF8.GetBytes(command);
-                serialPort.BaseStream.Write(bytes, 0, bytes.Length);
-                // serialPort.Write(command);
+                serialPort.WriteStr(command);
             }
         }
 
@@ -298,21 +294,21 @@ StreamWriter log = null;
             return Reply;
         }
 
-        private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        private void SerialPort_DataReceived()
         {
             int pos = 0;
 
             lock (input)
             {
-                input.Append(serialPort.ReadExisting());
+                input.Append(serialPort.ReadStr());
 
                 while (input.Length > 0 && (pos = input.ToString().IndexOf('\n')) > 0)
                 {
                     Reply = input.ToString(0, pos - 1);
                     input.Remove(0, pos + 1);
 #if RESPONSELOG
-            log.WriteLine(Reply);
-            log.Flush();
+                    log.WriteLine(Reply);
+                    log.Flush();
 #endif
                     if (Reply.Length != 0 && DataReceived != null)
                         Dispatcher.BeginInvoke(DataReceived, Reply);
@@ -322,75 +318,5 @@ StreamWriter log = null;
             }
         }
     }
-
-    public class ConnectMode : ViewModelBase
-    {
-        public ConnectMode(Comms.ResetMode mode, string name)
-        {
-            Mode = mode;
-            Name = name;
-        }
-
-        public Comms.ResetMode Mode { get; private set; }
-
-        public string Name { get; private set; }
-    }
-
-    public class SerialPorts : ViewModelBase
-    {
-        string _selected = string.Empty;
-        string[] _portnames;
-        private ConnectMode _mode = null;
-
-        public SerialPorts()
-        {
-            Refresh();
-
-            if (PortNames.Length > 0)
-                _selected = PortNames[0];
-
-            ConnectModes.Add(new ConnectMode(Comms.ResetMode.None, "No action"));
-            ConnectModes.Add(new ConnectMode(Comms.ResetMode.DTR, "Toggle DTR"));
-            ConnectModes.Add(new ConnectMode(Comms.ResetMode.RTS, "Toggle RTS"));
-
-            SelectedMode = ConnectModes[0];
-        }
-
-        public void Refresh ()
-        {
-            string[] _portnames = SerialPort.GetPortNames();
-            Array.Sort(_portnames);
-            PortNames = _portnames;
-        }
-
-        public string[] PortNames { get { return _portnames; } private set { _portnames = value; OnPropertyChanged(); } }
-
-        public string SelectedPort
-        {
-            get { return _selected; }
-            set
-            {
-                if (_selected != value)
-                {
-                    _selected = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        public ObservableCollection<ConnectMode> ConnectModes { get; private set; } = new ObservableCollection<ConnectMode>();
-
-        public ConnectMode SelectedMode
-        {
-            get { return _mode; }
-            set
-            {
-                if (_mode != value)
-                {
-                    _mode = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-    }
+#endif
 }

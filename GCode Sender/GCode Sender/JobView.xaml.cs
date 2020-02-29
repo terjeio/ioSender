@@ -1,7 +1,7 @@
 ﻿/*
  * JobView.xaml.cs - part of Grbl Code Sender
  *
- * v0.05 / 2020-02-06 / Io Engineering (Terje Io)
+ * v0.09 / 2020-02-29 / Io Engineering (Terje Io)
  *
  */
 
@@ -143,7 +143,7 @@ namespace GCode_Sender
                     if (((GrblViewModel)sender).GrblReset)
                     {
                         EnableUI(true);
-                        ((GrblViewModel)sender).GrblReset = false;
+                      //  ((GrblViewModel)sender).GrblReset = false;
                     }
                     break;
 
@@ -183,7 +183,7 @@ namespace GCode_Sender
             if (activate)
             {
                 GCodeSender.RewindFile();
-                GCodeSender.SetStreamingState(GCodeSender.GCode.Loaded ? StreamingState.Idle : (sdStream ? StreamingState.Start : StreamingState.NoFile));
+                GCodeSender.CallHandler(GCodeSender.GCode.Loaded ? StreamingState.Idle : (sdStream ? StreamingState.Start : StreamingState.NoFile), false);
                 sdStream = false;
 
                 if (initOK != true)
@@ -305,6 +305,9 @@ namespace GCode_Sender
 
             GCodeSender.Config(MainWindow.Profile.Config);
 
+            if (GrblInfo.NumAxes > 3)
+                limitsControl.Visibility = Visibility.Collapsed;
+
             if (GrblInfo.LatheModeEnabled)
             {
                 DRO.EnableLatheMode();
@@ -367,7 +370,7 @@ namespace GCode_Sender
 
         void JobView_Load(object sender, EventArgs e)
         {
-            GCodeSender.SetStreamingState(StreamingState.Idle);
+            GCodeSender.CallHandler(StreamingState.Idle, true);
         }
 
         private void JobView_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)

@@ -1,7 +1,7 @@
-﻿/*
+/*
  * PipeServer.cs - part of Grbl Code Sender
  *
- * v0.03 / 2020-01-29 / Io Engineering (Terje Io)
+ * v0.09 / 2020-02-28 / Io Engineering (Terje Io)
  *
  */
 
@@ -60,37 +60,43 @@ namespace CNC.Controls
         {
             string filename; int c;
 
-            using (var pipeServer = new NamedPipeServerStream("gcodesender", PipeDirection.InOut))
-            {
-                using (var reader = new StreamReader(pipeServer))
+            try {
+
+                using (var pipeServer = new NamedPipeServerStream("gcodesender", PipeDirection.InOut))
                 {
-                    using (var writer = new StreamWriter(pipeServer))
+                    using (var reader = new StreamReader(pipeServer))
                     {
-                        while (true)
+                        using (var writer = new StreamWriter(pipeServer))
                         {
-                            filename = string.Empty;
-
-                            pipeServer.WaitForConnection();
-
-                            //writer.WriteLine("Hello");
-                            //writer.Flush();
-                            //pipeServer.WaitForPipeDrain();
-
-                            while (pipeServer.IsConnected)
+                            while (true)
                             {
-                                if ((c = reader.Read()) != -1)
+                                filename = string.Empty;
+
+                                pipeServer.WaitForConnection();
+
+                                //writer.WriteLine("Hello");
+                                //writer.Flush();
+                                //pipeServer.WaitForPipeDrain();
+
+                                while (pipeServer.IsConnected)
                                 {
-                                    if (c >= ' ')
-                                        filename += (char)c;
-                                    else if (c == 10 && FileTransfer != null)
-                                        dispatcher.Invoke(FileTransfer, filename);
+                                    if ((c = reader.Read()) != -1)
+                                    {
+                                        if (c >= ' ')
+                                            filename += (char)c;
+                                        else if (c == 10 && FileTransfer != null)
+                                            dispatcher.Invoke(FileTransfer, filename);
+                                    }
                                 }
+                                pipeServer.Disconnect();
                             }
-                            pipeServer.Disconnect();
                         }
                     }
                 }
             }
-        }
+            catch
+            {
+            }
+        } 
     }
 }

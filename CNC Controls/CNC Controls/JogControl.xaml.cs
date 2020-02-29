@@ -1,7 +1,7 @@
 /*
  * JogControl.xaml.cs - part of CNC Controls library
  *
- * v0.05 / 2020-02-01 / Io Engineering (Terje Io)
+ * v0.09 / 2020-02-29 / Io Engineering (Terje Io)
  *
  */
 

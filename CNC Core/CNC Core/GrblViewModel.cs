@@ -1,7 +1,7 @@
 /*
  * GrblViewModel.cs - part of CNC Controls library
  *
- * v0.08 / 2020-02-25 / Io Engineering (Terje Io)
+ * v0.08 / 2020-02-29 / Io Engineering (Terje Io)
  *
  */
 
@@ -60,6 +60,8 @@ namespace CNC.Core
         private double _feedOverride = 100d;
         private double _rapidsOverride = 100d;
         private double _rpmOverride = 100d;
+        private string _pb_avail, _rxb_avail;
+        private int _line;
         private GrblState _grblState;
         private LatheMode _latheMode = LatheMode.Disabled;
         private HomedState _homedState = HomedState.Unknown;
@@ -94,8 +96,9 @@ namespace CNC.Core
             _fileName = _mdiCommand = string.Empty;
             _streamingState = StreamingState.NoFile;
             _isMPos = _reset = _isJobRunning = _probeState = _pgmEnd = false;
+            _pb_avail = _rxb_avail = string.Empty;
             _mpg = null;
-            _pwm = 0;
+            _line = _pwm = 0;
 
             _grblState.Error = 0;
             _grblState.State = GrblStates.Unknown;
@@ -187,9 +190,13 @@ namespace CNC.Core
         public string SDCardStatus { get { return _sd; } private set { _sd = value; OnPropertyChanged(); } }
         public HomedState HomedState { get { return _homedState; } private set { _homedState = value; OnPropertyChanged(); } }
         public LatheMode LatheMode { get { return _latheMode; } private set { _latheMode = value; OnPropertyChanged(); } }
-
+        public int NumAxes { get { return GrblInfo.NumAxes; } }
+        public string RunTime { get { return JobTimer.RunTime; } set { OnPropertyChanged(); } } // Cannot be set...
         // CO2 Laser
         public bool TubeCoolant { get { return _tubeCoolant; }  set { _tubeCoolant = value; OnPropertyChanged(); } }
+        //
+
+        public int LineNumber { get { return _line; } private set { _line = value; OnPropertyChanged(); } }
 
         #region A - Spindle, Coolant and Tool change status
 
@@ -247,6 +254,16 @@ namespace CNC.Core
         public double FeedOverride { get { return _feedOverride; } private set { _feedOverride = value; OnPropertyChanged(); } }
         public double RapidsOverride { get { return _rapidsOverride; } private set { _rapidsOverride = value; OnPropertyChanged(); } }
         public double RPMOverride { get { return _rpmOverride; } private set { _rpmOverride = value; OnPropertyChanged(); } }
+
+        #endregion
+
+        #region Ov - Buffer information
+
+        public int PlanBufferSize { get { return GrblInfo.PlanBufferSize; } }
+        public int PlanBufferAvailable { get { return int.Parse(_pb_avail); } }
+
+        public int RxBufferSize { get { return GrblInfo.SerialBufferSize; } }
+        public int RxBufferAvailable { get { return int.Parse(_rxb_avail); } }
 
         #endregion
 
@@ -493,6 +510,24 @@ namespace CNC.Core
                         WorkCoordinateSystem = GrblParserState.WorkOffset = value;
                     break;
 
+                case "Bf":
+                    string[] buffers = value.Split(',');
+                    if(buffers[0] != _pb_avail)
+                    {
+                        _pb_avail = buffers[0];
+                        OnPropertyChanged(nameof(PlanBufferAvailable));
+                    }
+                    if (buffers[1] != _rxb_avail)
+                    {
+                        _rxb_avail = buffers[1];
+                        OnPropertyChanged(nameof(RxBufferAvailable));
+                    }
+                    break;
+
+                case "Ln":
+                    LineNumber = int.Parse(value);
+                    break;
+
                 case "FS":
                     if (_fs != value)
                     {
@@ -513,6 +548,21 @@ namespace CNC.Core
                             if (values.Length > 2 && _rpmActual != values[2])
                                 ActualRPM = values[2];
                         }
+                    }
+                    break;
+
+                case "F":
+                    if (_fs != value)
+                    {
+                        _fs = value;
+                        if (_fs == "")
+                        {
+                            FeedRate = ProgrammedRPM = 0d;
+                            if (!double.IsNaN(ActualRPM))
+                                ActualRPM = 0d;
+                        }
+                        else
+                            FeedRate = dbl.Parse(_fs);
                     }
                     break;
 
@@ -644,6 +694,7 @@ namespace CNC.Core
             {
                 GrblReset = true;
                 OnGrblReset?.Invoke();
+                _reset = false;
             }
             else if (StreamingState != StreamingState.Jogging)
             {
@@ -662,7 +713,7 @@ namespace CNC.Core
                         }
                         OnCommandResponseReceived?.Invoke(data);
                     }
-                    else if(!data.StartsWith("?"))
+                    else if (!data.StartsWith("?"))
                     {
                         Message = data; //??
                     }

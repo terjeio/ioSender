@@ -9,7 +9,7 @@
     <Grid>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Height="60" VerticalAlignment="Center" Width="180">
             <Label x:Name="lblOverride" HorizontalContentAlignment="Right" Content="Override" VerticalAlignment="Center" Height="24" Width="56"/>
-            <TextBox x:Name="txtOverride" TextWrapping="NoWrap" Text="100%" IsReadOnly="True" Background="#FFF8F8F8" Height="24" Width="40" VerticalAlignment="Center" HorizontalContentAlignment="Right"/>
+            <TextBox x:Name="txtOverride" TextWrapping="NoWrap" Text="100%" IsReadOnly="True" Background="#FFF8F8F8" Height="24" Width="40" VerticalAlignment="Center" HorizontalContentAlignment="Right" VerticalContentAlignment="Center"/>
             <StackPanel Width="30" VerticalAlignment="Center">
                 <Button x:Name="btnOvCoarsePlus" Content="+" Focusable="False" Margin="0,0,0,2" Height="26" Width="26" Click="btnOverrideClick"/>
                 <Button x:Name="btnOvCoarseMinus" Content="-" Focusable="False" Margin="0,2,0,0" Height="26" Width="26" Click="btnOverrideClick"/>

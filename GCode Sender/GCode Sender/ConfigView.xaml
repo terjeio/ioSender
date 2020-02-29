@@ -21,5 +21,6 @@
             <Lathe:ConfigControl/>
         </WrapPanel>
         <Button x:Name="btnSave" Content="Save settings" HorizontalAlignment="Left" Margin="10,5,0,0" Grid.Row="1" VerticalAlignment="Top" Width="100" Click="btnSave_Click"/>
+        <Label x:Name="label" Content="A restart is required after changing settings!" HorizontalAlignment="Left" Margin="126,3,0,0" Grid.Row="1" VerticalAlignment="Top"/>
     </Grid>
 </UserControl>

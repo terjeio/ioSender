@@ -1,7 +1,7 @@
 ﻿/*
  * BasicConfigControl.xaml.cs - part of CNC Controls library
  *
- * v0.01 / 2020-01-22 / Io Engineering (Terje Io)
+ * v0.09 / 2020-02-28 / Io Engineering (Terje Io)
  *
  */
 

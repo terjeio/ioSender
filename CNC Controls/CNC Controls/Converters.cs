@@ -45,6 +45,7 @@ using System.Collections.ObjectModel;
 using System.Text;
 using CNC.Core;
 using CNC.GCode;
+using System.Windows;
 
 namespace CNC.Controls
 {
@@ -59,6 +60,7 @@ namespace CNC.Controls
         public static InvertBooleanConverter InvertBooleanConverter = new InvertBooleanConverter();
         public static LogicalAndConverter LogicalAndConverter = new LogicalAndConverter();
         public static LogicalOrConverter LogicalOrConverter = new LogicalOrConverter();
+        public static IsAxisVisibleConverter HasAxisConverter = new IsAxisVisibleConverter();
     }
 
     // Adapted from: https://stackoverflow.com/questions/4353186/binding-observablecollection-to-a-textbox/8847910#8847910
@@ -232,6 +234,19 @@ namespace CNC.Controls
                 result |= value is bool && (bool)value;
 
             return FinalConverter == null ? result : FinalConverter.Convert(result, targetType, parameter, culture);
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class IsAxisVisibleConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            return values.Length == 2 && values[0] is int && values[1] is int && (int)values[0] >= (int)values[1] ? Visibility.Visible : Visibility.Collapsed;
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, System.Globalization.CultureInfo culture)
