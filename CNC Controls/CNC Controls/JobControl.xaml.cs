@@ -1,7 +1,7 @@
 /*
  * JobControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.09 / 2020-02-29 / Io Engineering (Terje Io)
+ * v0.10 / 2020-03-08 / Io Engineering (Terje Io)
  *
  */
 
@@ -73,7 +73,7 @@ namespace CNC.Controls
             AwaitAction,
             AwaitIdle,
             Previous,
-            Max // only used for array instatiaton
+            Max // only used for array instantiation
         }
 
         private struct StreamingHandlerFn
@@ -86,7 +86,7 @@ namespace CNC.Controls
         private struct JobData
         {
             public int CurrLine, PendingLine, PgmEndLine, ACKPending, serialUsed;
-            public bool Started, Complete;
+            public bool Started, Complete, IsSDFile;
             public DataRow CurrentRow, NextRow;
         }
 
@@ -179,7 +179,7 @@ namespace CNC.Controls
                 model = (GrblViewModel)e.NewValue;
                 model.PropertyChanged += OnDataContextPropertyChanged;
                 model.OnRealtimeStatusProcessed += RealtimeStatusProcessed;
-                model.OnCommandResponseReceived += OkReceived;
+                model.OnCommandResponseReceived += ResponseReceived;
             }
         }
 
@@ -218,7 +218,7 @@ namespace CNC.Controls
 
                     case nameof(GrblViewModel.ProgramEnd):
                         if (!GCode.Loaded)
-                            streamingHandler.Call(StreamingState.NoFile, false);
+                            streamingHandler.Call(job.IsSDFile ? StreamingState.JobFinished : StreamingState.NoFile, job.IsSDFile);
                         else if(JobTimer.IsRunning && !job.Complete)
                             streamingHandler.Call(StreamingState.JobFinished, true);
                         break;
@@ -565,6 +565,7 @@ namespace CNC.Controls
             {
                 GCode.LoadFile(filename);
                 grdGCode.DataContext = GCode.Data.DefaultView;
+                job.IsSDFile = false;
                 job.CurrLine = job.PendingLine = job.ACKPending = 0;
                 job.PgmEndLine = GCode.Data.Rows.Count - 1;
                 scroll = UIUtils.GetScrollViewer(grdGCode);
@@ -648,7 +649,7 @@ namespace CNC.Controls
                     if (streamingState != StreamingState.SendMDI)
                     {
                         streamingState = StreamingState.SendMDI;
-                        OkReceived("go");
+                        ResponseReceived("go");
                     }
                 }
                 catch
@@ -806,7 +807,7 @@ namespace CNC.Controls
                         break;
 
                     case StreamingState.JobFinished:
-                        if (grblState.State == GrblStates.Idle)
+                        if (grblState.State == GrblStates.Idle || grblState.State == GrblStates.Check)
                             newState = StreamingState.Idle;
                         job.Complete = true;
                         job.ACKPending = job.CurrLine = 0;
@@ -964,6 +965,7 @@ namespace CNC.Controls
                         break;
 
                     case StreamingState.Start: // Streaming from SD Card
+                        job.IsSDFile = true;
                         JobTimer.Start();
                         break;
 
@@ -987,6 +989,7 @@ namespace CNC.Controls
                         btnStart.IsEnabled = btnHold.IsEnabled && GCode.Loaded; //!GrblSettings.IsGrblHAL;
                         btnStop.IsEnabled = false;
                         btnRewind.IsEnabled = false;
+                        job.IsSDFile = false;
                         model.IsJobRunning = false;
                         if (!grblState.MPG)
                         {
@@ -1026,6 +1029,10 @@ namespace CNC.Controls
                 case GrblStates.Jog:
                     model.IsJobRunning = true;
                     break;
+
+                //case GrblStates.Check:
+                //    streamingHandler.Call(StreamingState.Send, false);
+                //    break;
 
                 case GrblStates.Run:
                     if (JobTimer.IsPaused)
@@ -1068,24 +1075,31 @@ namespace CNC.Controls
             grblState.MPG = newstate.MPG;
         }
 
-        private void OkReceived(string response)
+        private void ResponseReceived(string response)
         {
             if (streamingHandler.Count)
             {
                 if(job.ACKPending > 0)
                     job.ACKPending--;
 
-                if ((string)GCode.Data.Rows[job.PendingLine]["Sent"] == "*")
+                if (!job.IsSDFile && (string)GCode.Data.Rows[job.PendingLine]["Sent"] == "*")
                     job.serialUsed = Math.Max(0, job.serialUsed - (int)GCode.Data.Rows[job.PendingLine]["Length"]);
 
                 if (streamingState == StreamingState.Send || streamingState == StreamingState.Paused)
                 {
-                    GCode.Data.Rows[job.PendingLine]["Sent"] = response;
+                    bool isError = response.StartsWith("error");
 
-                    if (job.PendingLine > 5)
-                        scroll.ScrollToVerticalOffset(job.PendingLine - 5);
+                    if (!job.IsSDFile)
+                    {
+                        GCode.Data.Rows[job.PendingLine]["Sent"] = response;
 
-                    if (response.StartsWith("error"))
+                        if (job.PendingLine > 5)
+                        {
+                            if(grblState.State != GrblStates.Check || isError || (job.PendingLine % 50) == 0)
+                                scroll.ScrollToVerticalOffset(job.PendingLine - 5);
+                        }
+                    }
+                    if (isError)
                         streamingHandler.Call(StreamingState.Error, true);
                     else if (job.PgmEndLine == job.PendingLine)
                         streamingHandler.Call(StreamingState.JobFinished, true);
@@ -1132,8 +1146,6 @@ namespace CNC.Controls
                 {
                     job.CurrentRow = job.NextRow;
                     string line = (string)job.CurrentRow["Data"]; //  GCodeUtils.StripSpaces((string)currentRow["Data"]);
-
-                    //      if (CurrLine == 15) line = line.Replace("G1", "G5");
 
                     job.CurrentRow["Sent"] = "*";
                     if (line == "%")

@@ -58,7 +58,6 @@
     <Compile Include="Comms.cs" />
     <Compile Include="GCodeJob.cs" />
     <Compile Include="GrblViewModel.cs" />
-    <Compile Include="IView.cs" />
     <Compile Include="MeasureViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SerialStream.cs" />

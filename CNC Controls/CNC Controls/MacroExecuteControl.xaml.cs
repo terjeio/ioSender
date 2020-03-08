@@ -1,7 +1,7 @@
 /*
  * MacroExecuteControl.xaml.cs - part of CNC Controls library
  *
- * v0.05 / 2020-02-01 / Io Engineering (Terje Io)
+ * v0.10 / 2019-03-05 / Io Engineering (Terje Io)
  *
  */
 
@@ -74,11 +74,6 @@ namespace CNC.Controls
             {
                 case nameof(GrblViewModel.StreamingState):
                     if ((sender as GrblViewModel).IsJobRunning)
-                        Visibility = Visibility.Hidden;
-                    break;
-
-                case nameof(GrblViewModel.ActiveView):
-                    if ((sender as GrblViewModel).ActiveView != View.ViewType.GRBL)
                         Visibility = Visibility.Hidden;
                     break;
             }

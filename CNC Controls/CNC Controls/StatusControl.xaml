@@ -11,10 +11,10 @@
         <local:GrblStateToStringConverter x:Key="ToStringConverter" />
         <local:HomedStateToColorConverter x:Key="HomedStateConverter" />
         <local:IsHomingEnabledConverter x:Key="HomingEnabledConverter" />
-        <local:InvertBooleanConverter x:Key="SleepEnabledConverter" />
+        <local:LogicalNotConverter x:Key="SleepEnabledConverter" />
         <local:LogicalOrConverter x:Key="LogicalNorConverter">
             <local:LogicalOrConverter.FinalConverter>
-                <local:InvertBooleanConverter />
+                <local:LogicalNotConverter />
             </local:LogicalOrConverter.FinalConverter>
         </local:LogicalOrConverter>
     </UserControl.Resources>

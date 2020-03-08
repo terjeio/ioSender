@@ -1,13 +1,12 @@
 ﻿/*
- * ConfigControl.xaml.cs - part of Grbl Code Sender
+ * ICamera.cs - part of CNC Controls library for Grbl
  *
  * v0.10 / 2019-03-05 / Io Engineering (Terje Io)
  *
  */
-
 /*
 
-Copyright (c) 2019-2020, Io Engineering (Terje Io)
+Copyright (c) 2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -37,28 +36,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-using System.Windows;
-using System.Windows.Controls;
 using CNC.Core;
 
-namespace CNC.Controls.Camera
+namespace CNC.Controls
 {
-    /// <summary>
-    /// Interaction logic for ConfigControl.xaml
-    /// </summary>
-    public partial class ConfigControl : UserControl, ICameraConfig
+    public delegate void CameraOpenedHandler();
+    public delegate void CameraMoveOffsetHandler(CameraMoveMode Mode, double XOffset, double YOffset);
+
+    public interface ICamera
     {
-        public ConfigControl()
-        {
-            InitializeComponent();
-        }
+        event CameraOpenedHandler Opened;
+        event CameraMoveOffsetHandler MoveOffset;
 
-        private void getPosition_Click(object sender, RoutedEventArgs e)
-        {
-            var model = (GrblViewModel)Application.Current.MainWindow.DataContext;
+        bool HasCamera { get; }
 
-            ((Config)DataContext).Camera.XOffset = -model.Position.X;
-            ((Config)DataContext).Camera.YOffset = -model.Position.Y;
-        }
+        void Open();
+        void Close();
+        void CloseCamera();
+        void Setup(UIViewModel model);
+    }
+    public interface ICameraConfig
+    {
     }
 }

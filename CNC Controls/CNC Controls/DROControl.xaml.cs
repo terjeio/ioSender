@@ -1,7 +1,7 @@
 ﻿/*
  * DROControl.xaml.cs - part of CNC Controls library
  *
- * v0.05 / 2020-02-01 / Io Engineering (Terje Io)
+ * v0.10 / 2020-03-01 / Io Engineering (Terje Io)
  *
  */
 
@@ -150,23 +150,6 @@ namespace CNC.Controls
             }
             else
                 (DataContext as GrblViewModel).ExecuteCommand(string.Format("G10L20P0{0}{1}", axis, position.ToInvariantString("F3")));
-        }
-
-        public void EnableLatheMode()
-        {
-            if (axisY.IsVisible)
-            {
-                lblXMode.Visibility = Visibility.Visible;
-                axisY.Visibility = Visibility.Collapsed;
-            }
-        }
-
-        public void SetNumAxes(int numAxes)
-        {
-            numAxes = Math.Min(numAxes, 6);
-
-            foreach (DROBaseControl axis in UIUtils.FindLogicalChildren<DROBaseControl>(this))
-                axis.Visibility = (int)axis.Tag < numAxes ? Visibility.Visible : Visibility.Collapsed;
         }
     }
 }

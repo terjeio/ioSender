@@ -10,7 +10,7 @@
              x:Name="root"
              d:DesignHeight="125" d:DesignWidth="216">
     <UserControl.Resources>
-        <local:InvertBooleanConverter x:Key="BooleanConverter" />
+        <local:LogicalNotConverter x:Key="BooleanConverter" />
     </UserControl.Resources>
     <UserControl.Style>
         <Style>

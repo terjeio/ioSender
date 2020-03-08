@@ -1,7 +1,7 @@
 /*
  * JogControl.xaml.cs - part of CNC Controls library
  *
- * v0.09 / 2020-02-29 / Io Engineering (Terje Io)
+ * v0.10 / 2020-03-03 / Io Engineering (Terje Io)
  *
  */
 
@@ -41,6 +41,7 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using CNC.Core;
+using System;
 
 namespace CNC.Controls
 {
@@ -49,20 +50,33 @@ namespace CNC.Controls
     /// </summary>
     public partial class JogControl : UserControl
     {
-        private double distance = 1d, feedrate = 500d;
+        private bool metricCommand = true, metricInput = true;
+        private int distance = 2, feedrate = 2;
 
         public JogControl()
         {
             InitializeComponent();
 
-            DataContextChanged += View_DataContextChanged;
+            JogData = new JogViewModel();
+
+            IsVisibleChanged += JogControl_IsVisibleChanged;
         }
-        private void View_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+
+        public JogViewModel JogData { get; private set; }
+
+        private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
-            if (e.OldValue != null && e.OldValue is INotifyPropertyChanged)
-                ((INotifyPropertyChanged)e.OldValue).PropertyChanged -= OnDataContextPropertyChanged;
-            if (e.NewValue != null && e.NewValue is INotifyPropertyChanged)
-                (e.NewValue as GrblViewModel).PropertyChanged += OnDataContextPropertyChanged;
+            JogData.SetMetric((metricInput = (DataContext as GrblViewModel).IsMetric));
+            (DataContext as GrblViewModel).PropertyChanged += OnDataContextPropertyChanged;
+        }
+
+        private void JogControl_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if ((bool)e.NewValue)
+            {
+                GrblParserState.Get();
+                metricCommand = GrblParserState.IsMetric;
+            }
         }
 
         private void OnDataContextPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -74,21 +88,20 @@ namespace CNC.Controls
                         Visibility = Visibility.Hidden;
                     break;
 
-                case nameof(GrblViewModel.ActiveView):
-                    if ((sender as GrblViewModel).ActiveView != View.ViewType.GRBL)
-                        Visibility = Visibility.Hidden;
+                case nameof(GrblViewModel.IsMetric):
+                    JogData.SetMetric((metricInput = (sender as GrblViewModel).IsMetric));
                     break;
-            }
+                }
         }
 
-        private void dx10_Click(object sender, RoutedEventArgs e)
+        private void distance_Click(object sender, RoutedEventArgs e)
         {
-            distance = dbl.Parse((string)(sender as RadioButton).Content);
+            distance = int.Parse((string)(sender as RadioButton).Tag);
         }
 
-        private void f1000_Click(object sender, RoutedEventArgs e)
+        private void feedrate_Click(object sender, RoutedEventArgs e)
         {
-            feedrate = dbl.Parse((string)(sender as RadioButton).Content);
+            feedrate = int.Parse((string)(sender as RadioButton).Tag);
         }
 
         private void btn_Close(object sender, RoutedEventArgs e)
@@ -96,10 +109,91 @@ namespace CNC.Controls
             Visibility = Visibility.Hidden;
         }
 
+        private double convert (double val)
+        {
+            if (metricCommand)
+            {
+                if (!metricInput)
+                    val *= 25.4d;
+            }
+            else if (metricInput)
+                val /= 25.4d;
+
+            return Math.Round(val, (DataContext as GrblViewModel).Precision);
+        }
+
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            string cmd = string.Format("$J=G91{0}{1}F{2}", ((string)(sender as Button).Content).Replace("+", ""), distance.ToInvariantString(), feedrate.ToInvariantString());
+            string cmd = ((string)(sender as Button).Tag) == "stop" ? ((char)GrblConstants.CMD_JOG_CANCEL).ToString() : string.Format("$J =G91{0}{1}F{2}", ((string)(sender as Button).Content).Replace("+", ""), convert(JogData.Distance[distance]).ToInvariantString(), Math.Ceiling(convert(JogData.Feedrate[feedrate])).ToInvariantString());
             (DataContext as GrblViewModel).ExecuteCommand(cmd);
         }
+    }
+
+    internal class ArrayValues<T> : ViewModelBase
+    {
+        private T[] arr = new T[4];
+
+        public int Length { get { return arr.Length; } }
+
+        public T this[int i]
+        {
+            get { return arr[i]; }
+            set
+            {
+                if (!value.Equals(arr[i]))
+                {
+                    arr[i] = value;
+                    OnPropertyChanged(i.ToString());
+                }
+            }
+        }
+    }
+
+    public class JogViewModel : ViewModelBase
+    {
+        // TODO: calculate sensible feedrates from grbl settings
+        int[] feedrate_metric = new int[4] { 5, 100, 500, 1000 };
+        double[] distance_metric = new double[4] { .01d, .1d, 1d, 10d };
+        int[] feedrate_imperial = new int[4] { 5, 10, 50, 100 };
+        double[] distance_imperial = new double[4] { .001d, .01d, .1d, 1d };
+
+        internal ArrayValues<double> Distance { get; } = new ArrayValues<double>();
+        internal ArrayValues<int> Feedrate { get; } = new ArrayValues<int>();
+
+        public JogViewModel()
+        {
+            SetMetric(true);
+
+            Distance.PropertyChanged += Values_PropertyChanged;
+            Feedrate.PropertyChanged += Feedrate_PropertyChanged;
+        }
+
+        private void Feedrate_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            OnPropertyChanged(nameof(Feedrate) + e.PropertyName);
+        }
+
+        private void Values_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            OnPropertyChanged(nameof(Distance) + e.PropertyName);
+        }
+
+        public void SetMetric(bool on)
+        {
+            for (int i = 0; i < Feedrate.Length; i++) {
+                Distance[i] = on ? distance_metric[i] : distance_imperial[i];
+                Feedrate[i] = on ? feedrate_metric[i] : feedrate_imperial[i];
+            }
+        }
+
+        public int Feedrate0 { get { return Feedrate[0]; } }
+        public int Feedrate1 { get { return Feedrate[1]; } }
+        public int Feedrate2 { get { return Feedrate[2]; } }
+        public int Feedrate3 { get { return Feedrate[3]; } }
+
+        public double Distance0 { get { return Distance[0]; } }
+        public double Distance1 { get { return Distance[1]; } }
+        public double Distance2 { get { return Distance[2]; } }
+        public double Distance3 { get { return Distance[3]; } }
     }
 }

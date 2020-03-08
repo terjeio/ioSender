@@ -1,7 +1,7 @@
 /*
  * TurningWizard.xaml.cs - part of CNC Controls library
  *
- * v0.03 / 2020-01-28 / Io Engineering (Terje Io)
+ * v0.10 / 2019-03-05 / Io Engineering (Terje Io)
  *
  */
 
@@ -41,14 +41,13 @@ using System;
 using System.Collections.ObjectModel;
 using System.Windows.Controls;
 using CNC.Core;
-using CNC.View;
 
 namespace CNC.Controls.Lathe
 {
     /// <summary>
     /// Interaction logic for TurningWizard.xaml
     /// </summary>
-    public partial class TurningWizard : UserControl, CNCView
+    public partial class TurningWizard : UserControl, ICNCView
     {
         private bool initOk = false, resetProfileBindings = true;
         private double last_rpm = 0d, last_css = 0d;
@@ -64,11 +63,6 @@ namespace CNC.Controls.Lathe
             DataContext = model = logic.Model;
 
             logic.GCodePush += Logic_GCodePush;
-        }
-
-        public void ApplySettings(LatheConfig config)
-        {
-            model.wz.ApplySettings(config);
         }
 
         private void Logic_GCodePush(string gcode, Core.Action action)
@@ -95,7 +89,7 @@ namespace CNC.Controls.Lathe
 
         #region Methods required by CNCView interface
 
-        public ViewType mode { get { return ViewType.Turning; } }
+        public ViewType ViewType { get { return ViewType.Turning; } }
 
         public void Activate(bool activate, ViewType chgMode)
         {
@@ -122,6 +116,11 @@ namespace CNC.Controls.Lathe
 
         public void CloseFile()
         {
+        }
+        public void Setup(UIViewModel model, AppConfig profile)
+        {
+            this.model.wz.ApplySettings(profile.Config.Lathe);
+            model.ConfigControls.Add(new ConfigControl());
         }
 
         #endregion

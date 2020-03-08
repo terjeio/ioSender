@@ -6,122 +6,107 @@
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:local="clr-namespace:CNC.Controls"
              mc:Ignorable="d" 
-             d:DesignHeight="220" Width="Auto">
+             Loaded="UserControl_Loaded"
+             d:DesignHeight="250" Width="Auto">
     <UserControl.Resources>
-        <local:IsAxisVisibleConverter x:Key="IsAxisVisibleConverter" />
-        <Style x:Key="SmallXButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Grid Background="{TemplateBinding Background}">
-                            <ContentPresenter HorizontalAlignment="Center"/>
-                        </Grid>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <Style x:Key="ZAxisVisibleStyle">
-            <Setter Property="Control.Visibility">
-                <Setter.Value>
-                    <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
-                        <Binding Path="NumAxes" />
-                        <Binding>
-                            <Binding.Source>
-                                <sys:Int32>3</sys:Int32>
-                            </Binding.Source>
-                        </Binding>
-                    </MultiBinding>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <Style x:Key="AAxisVisibleStyle">
-            <Setter Property="Control.Visibility">
-                <Setter.Value>
-                    <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
-                        <Binding Path="NumAxes" />
-                        <Binding>
-                            <Binding.Source>
-                                <sys:Int32>4</sys:Int32>
-                            </Binding.Source>
-                        </Binding>
-                    </MultiBinding>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <Style x:Key="BAxisVisibleStyle">
-            <Setter Property="Control.Visibility">
-                <Setter.Value>
-                    <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
-                        <Binding Path="NumAxes" />
-                        <Binding>
-                            <Binding.Source>
-                                <sys:Int32>5</sys:Int32>
-                            </Binding.Source>
-                        </Binding>
-                    </MultiBinding>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <Style x:Key="CAxisVisibleStyle">
-            <Setter Property="Control.Visibility">
-                <Setter.Value>
-                    <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
-                        <Binding Path="NumAxes" />
-                        <Binding>
-                            <Binding.Source>
-                                <sys:Int32>6</sys:Int32>
-                            </Binding.Source>
-                        </Binding>
-                    </MultiBinding>
-                </Setter.Value>
-            </Setter>
-        </Style>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="SharedStyles.xaml"/>
+                <ResourceDictionary>
+                    <Style x:Key="JogButtonStyle" TargetType="Button">
+                        <Setter Property="Width" Value="40"/>
+                        <Setter Property="Height" Value="40"/>
+                        <Setter Property="Focusable" Value="False"/>
+                    </Style>
+                </ResourceDictionary>
+                <ResourceDictionary>
+                    <local:BoolToVisibleConverter x:Key="IsVisibleConverter" />
+                    <local:LogicalNotConverter x:Key="IsNotVisibleConverter">
+                        <local:LogicalNotConverter.FinalConverter>
+                            <local:BoolToVisibleConverter />
+                        </local:LogicalNotConverter.FinalConverter>
+                    </local:LogicalNotConverter>
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </UserControl.Resources>
     <Border BorderBrush="DarkGray" BorderThickness="1" CornerRadius="3" Background="#FFE5E5EA">
         <Grid>
-            <GroupBox Header="Distance" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Height="100" Width="80">
-                <StackPanel>
-                    <RadioButton x:Name="dx10" Content="10" HorizontalAlignment="Left" Margin="10,5,0,0" VerticalAlignment="Top" Click="dx10_Click"/>
-                    <RadioButton x:Name="dx1" Content="1" IsChecked="True" HorizontalAlignment="Left" Margin="10,3,0,0" VerticalAlignment="Top" Click="dx10_Click"/>
-                    <RadioButton x:Name="dxp1" Content="0.1" HorizontalAlignment="Left" Margin="10,3,0,0" VerticalAlignment="Top" Click="dx10_Click"/>
-                    <RadioButton x:Name="dxp01" Content="0.01" HorizontalAlignment="Left" Margin="10,3,0,0" VerticalAlignment="Top" Click="dx10_Click"/>
+            <StackPanel>
+                <GroupBox Header="Distance" HorizontalAlignment="Left" Margin="5,0,0,0" VerticalAlignment="Top" Height="114" Width="80">
+                    <StackPanel>
+                        <RadioButton Tag="3" Content="{Binding Path=JogData.Distance3, RelativeSource={RelativeSource AncestorType=UserControl}}" HorizontalAlignment="Left" Margin="10,5,0,0" VerticalAlignment="Top" Click="distance_Click"/>
+                        <RadioButton Tag="2" Content="{Binding Path=JogData.Distance2, RelativeSource={RelativeSource AncestorType=UserControl}}" IsChecked="True" HorizontalAlignment="Left" Margin="10,3,0,0" VerticalAlignment="Top" Click="distance_Click"/>
+                        <RadioButton Tag="1" Content="{Binding Path=JogData.Distance1, RelativeSource={RelativeSource AncestorType=UserControl}}" HorizontalAlignment="Left" Margin="10,3,0,0" VerticalAlignment="Top" Click="distance_Click"/>
+                        <RadioButton Tag="0" Content="{Binding Path=JogData.Distance0, RelativeSource={RelativeSource AncestorType=UserControl}}" HorizontalAlignment="Left" Margin="10,3,0,0" VerticalAlignment="Top" Click="distance_Click"/>
+                        <Label Content="{Binding Path=Unit}" Height="20" FontSize="8"/>
+                    </StackPanel>
+                </GroupBox>
+
+                <GroupBox Header="Feed rate" HorizontalAlignment="Left" Margin="5,0,0,4" VerticalAlignment="Top" Height="114" Width="80">
+                    <StackPanel>
+                        <RadioButton Tag="3" Content="{Binding Path=JogData.Feedrate3, RelativeSource={RelativeSource AncestorType=UserControl}}" HorizontalAlignment="Left" Margin="10,5,0,0" VerticalAlignment="Top" Click="feedrate_Click"/>
+                        <RadioButton Tag="2" Content="{Binding Path=JogData.Feedrate2, RelativeSource={RelativeSource AncestorType=UserControl}}" IsChecked="True" HorizontalAlignment="Left" Margin="10,3,0,0" VerticalAlignment="Top" Click="feedrate_Click"/>
+                        <RadioButton Tag="1" Content="{Binding Path=JogData.Feedrate1, RelativeSource={RelativeSource AncestorType=UserControl}}" HorizontalAlignment="Left" Margin="10,3,0,0" VerticalAlignment="Top" Click="feedrate_Click"/>
+                        <RadioButton Tag="0" Content="{Binding Path=JogData.Feedrate0, RelativeSource={RelativeSource AncestorType=UserControl}}" HorizontalAlignment="Left" Margin="10,3,0,0" VerticalAlignment="Top" Click="feedrate_Click"/>
+                        <Label Content="{Binding Path=FeedrateUnit}" Height="20" FontSize="8"/>
+                    </StackPanel>
+                </GroupBox>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="90,10,2,0" Width="Auto" Height="Auto">
+                <StackPanel Orientation="Horizontal" Width="Auto" Height="Auto" Visibility="{Binding Path=LatheModeEnabled, Converter={StaticResource IsNotVisibleConverter}}">
+                    <StackPanel>
+                        <Button Content="X-" Style="{StaticResource JogButtonStyle}" Margin="2,90" VerticalAlignment="Center" Click="Button_Click"/>
+                    </StackPanel>
+                    <StackPanel>
+                        <Button Content="Y+" Style="{StaticResource JogButtonStyle}" Margin="2,45,2,3" VerticalAlignment="Top" Click="Button_Click"/>
+                        <Button Tag="stop" Style="{StaticResource JogButtonStyle}" Margin="2,2" VerticalAlignment="Top" Click="Button_Click">
+                            <Button.Content>
+                                <Image Source="Resources/Symbols_Stop_32xLG.png"/>
+                            </Button.Content>
+                        </Button>
+                        <Button Content="Y-" Style="{StaticResource JogButtonStyle}" Margin="2,5" VerticalAlignment="Top" Click="Button_Click"/>
+                    </StackPanel>
+                    <StackPanel>
+                        <Button Content="X+"  Style="{StaticResource JogButtonStyle}" Margin="2,90" VerticalAlignment="Top" Click="Button_Click"/>
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource ZAxisVisibleStyle}">
+                        <Button Content="Z+" Style="{StaticResource JogButtonStyle}" Margin="2,45" VerticalAlignment="Top" Click="Button_Click"/>
+                        <Button Content="Z-" Style="{StaticResource JogButtonStyle}" Margin="2,5" VerticalAlignment="Top" Click="Button_Click"/>
+                    </StackPanel>
                 </StackPanel>
-            </GroupBox>
-            <GroupBox Header="Feed rate" HorizontalAlignment="Left" Margin="5,110,0,0" VerticalAlignment="Top" Height="100" Width="80">
-                <StackPanel>
-                    <RadioButton x:Name="f1000" Content="1000" HorizontalAlignment="Left" Margin="10,5,0,0" VerticalAlignment="Top" Click="f1000_Click"/>
-                    <RadioButton x:Name="f500" Content="500" IsChecked="True" HorizontalAlignment="Left" Margin="10,3,0,0" VerticalAlignment="Top" Click="f1000_Click"/>
-                    <RadioButton x:Name="f100" Content="100" HorizontalAlignment="Left" Margin="10,3,0,0" VerticalAlignment="Top" Click="f1000_Click"/>
-                    <RadioButton x:Name="f5" Content="5" HorizontalAlignment="Left" Margin="10,3,0,0" VerticalAlignment="Top" Click="f1000_Click"/>
-                </StackPanel>
-            </GroupBox>
-            <StackPanel Orientation="Horizontal" Margin="90,0,2,0" Width="Auto" Height="Auto">
-                <StackPanel>
-                    <Button Content="X+" HorizontalAlignment="Left" Margin="2,90" VerticalAlignment="Center" Height="40" Width="40" Click="Button_Click"/>
-                </StackPanel>
-                <StackPanel>
-                    <Button Content="Y+" HorizontalAlignment="Left" Margin="2,45" VerticalAlignment="Top" Height="40" Width="40" Click="Button_Click"/>
-                    <Button Content="Y-" HorizontalAlignment="Left" Margin="2,5" VerticalAlignment="Top" Height="40" Width="40" Click="Button_Click"/>
-                </StackPanel>
-                <StackPanel>
-                    <Button Content="X-" HorizontalAlignment="Left" Margin="2,90" VerticalAlignment="Top" Height="40" Width="40" Click="Button_Click"/>
-                </StackPanel>
-                <StackPanel Style="{StaticResource ZAxisVisibleStyle}">
-                    <Button Content="Z+" HorizontalAlignment="Left" Margin="2,45" VerticalAlignment="Top" Height="40" Width="40" Click="Button_Click"/>
-                    <Button Content="Z-" HorizontalAlignment="Left" Margin="2,5" VerticalAlignment="Top" Height="40" Width="40" Click="Button_Click"/>
+                <StackPanel Orientation="Horizontal" Width="Auto" Height="Auto" Visibility="{Binding Path=LatheModeEnabled, Converter={StaticResource IsVisibleConverter}}">
+                    <StackPanel>
+                        <Button Content="Z-" Style="{StaticResource JogButtonStyle}" Margin="2,90" VerticalAlignment="Center" Click="Button_Click"/>
+                    </StackPanel>
+                    <StackPanel>
+                        <Button Content="X-" Style="{StaticResource JogButtonStyle}" Margin="2,45,2,3" VerticalAlignment="Top" Click="Button_Click"/>
+                        <Button Tag="stop" Style="{StaticResource JogButtonStyle}" Margin="2,2" VerticalAlignment="Top" Click="Button_Click">
+                            <Button.Content>
+                                <Image Source="Resources/Symbols_Stop_32xLG.png"/>
+                            </Button.Content>
+                        </Button>
+                        <Button Content="X+" Style="{StaticResource JogButtonStyle}" Margin="2,5" VerticalAlignment="Top" Click="Button_Click"/>
+                    </StackPanel>
+                    <StackPanel>
+                        <Button Content="Z+"  Style="{StaticResource JogButtonStyle}" Margin="2,90" VerticalAlignment="Top" Click="Button_Click"/>
+                    </StackPanel>
+                    <StackPanel Style="{StaticResource YAxisVisibleStyle}">
+                        <Button Content="Y+" Style="{StaticResource JogButtonStyle}" Margin="2,45" VerticalAlignment="Top" Click="Button_Click"/>
+                        <Button Content="Y-" Style="{StaticResource JogButtonStyle}" Margin="2,5" VerticalAlignment="Top" Click="Button_Click"/>
+                    </StackPanel>
                 </StackPanel>
                 <StackPanel Style="{StaticResource AAxisVisibleStyle}">
-                    <Button Content="A+" HorizontalAlignment="Left" Margin="2,45" VerticalAlignment="Top" Height="40" Width="40" Click="Button_Click"/>
-                    <Button Content="A-" HorizontalAlignment="Left" Margin="2,5" VerticalAlignment="Top" Height="40" Width="40" Click="Button_Click"/>
+                    <Button Content="A+" Style="{StaticResource JogButtonStyle}" Margin="2,45" VerticalAlignment="Top" Click="Button_Click"/>
+                    <Button Content="A-" Style="{StaticResource JogButtonStyle}" Margin="2,5" VerticalAlignment="Top" Click="Button_Click"/>
                 </StackPanel>
                 <StackPanel Style="{StaticResource BAxisVisibleStyle}">
-                    <Button Content="B+" HorizontalAlignment="Left" Margin="2,45" VerticalAlignment="Top" Height="40" Width="40" Click="Button_Click"/>
-                    <Button Content="B-" HorizontalAlignment="Left" Margin="2,5" VerticalAlignment="Top" Height="40" Width="40" Click="Button_Click"/>
+                    <Button Content="B+" Style="{StaticResource JogButtonStyle}" Margin="2,45" VerticalAlignment="Top" Click="Button_Click"/>
+                    <Button Content="B-" Style="{StaticResource JogButtonStyle}" Margin="2,5" VerticalAlignment="Top" Click="Button_Click"/>
                 </StackPanel>
                 <StackPanel Style="{StaticResource CAxisVisibleStyle}">
-                    <Button Content="C+" HorizontalAlignment="Left" Margin="2,45" VerticalAlignment="Top" Height="40" Width="40" Click="Button_Click"/>
-                    <Button Content="C-" HorizontalAlignment="Left" Margin="2,5" VerticalAlignment="Top" Height="40" Width="40" Click="Button_Click"/>
+                    <Button Content="C+" Style="{StaticResource JogButtonStyle}" Margin="2,45" VerticalAlignment="Top" Click="Button_Click"/>
+                    <Button Content="C-" Style="{StaticResource JogButtonStyle}" Margin="2,5" VerticalAlignment="Top" Click="Button_Click"/>
                 </StackPanel>
             </StackPanel>
             <Button Content="×" Focusable="False" Style="{StaticResource SmallXButtonStyle}" VerticalContentAlignment="Top" HorizontalAlignment="Right" Margin="0,0,5,0" VerticalAlignment="Top" Width="14" Height="18" Click="btn_Close"/>

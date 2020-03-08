@@ -1,7 +1,7 @@
-﻿/*
+/*
  * PIDLogView.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.01 / 2019-10-27 / Io Engineering (Terje Io)
+ * v0.10 / 2019-03-05 / Io Engineering (Terje Io)
  *
  */
 
@@ -45,14 +45,13 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Globalization;
 using CNC.Core;
-using CNC.View;
 
 namespace CNC.Controls
 {
     /// <summary>
     /// Interaction logic for PIDLogView.xaml
     /// </summary>
-    public partial class PIDLogView : UserControl, CNCView
+    public partial class PIDLogView : UserControl, ICNCView
     {
         private double errorScale = 2500d;
 
@@ -65,13 +64,16 @@ namespace CNC.Controls
 
         #region Methods and properties required by CNCView interface
 
-        public ViewType mode { get { return ViewType.PIDTuner; } }
+        public ViewType ViewType { get { return ViewType.PIDTuner; } }
 
         public void Activate(bool activate, ViewType chgMode)
         {
         }
 
         public void CloseFile()
+        {
+        }
+        public void Setup(UIViewModel model, AppConfig profile)
         {
         }
 

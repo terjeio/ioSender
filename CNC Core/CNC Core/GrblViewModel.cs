@@ -1,7 +1,7 @@
 /*
  * GrblViewModel.cs - part of CNC Controls library
  *
- * v0.08 / 2020-02-29 / Io Engineering (Terje Io)
+ * v0.10 / 2020-03-07 / Io Engineering (Terje Io)
  *
  */
 
@@ -43,7 +43,6 @@ using System.Windows.Media;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using CNC.GCode;
-using CNC.View;
 
 namespace CNC.Core
 {
@@ -53,7 +52,7 @@ namespace CNC.Core
         private string _mdiCommand, _fileName;
         private bool _flood, _mist, _tubeCoolant, _toolChange, _reset, _isMPos, _isJobRunning, _probeState, _pgmEnd;
         private bool? _mpg;
-        private int _pwm;
+        private int _pwm, _line;
         private double _feedrate = 0d;
         private double _rpm = 0d;
         private double _rpmActual = double.NaN;
@@ -61,23 +60,14 @@ namespace CNC.Core
         private double _rapidsOverride = 100d;
         private double _rpmOverride = 100d;
         private string _pb_avail, _rxb_avail;
-        private int _line;
         private GrblState _grblState;
         private LatheMode _latheMode = LatheMode.Disabled;
         private HomedState _homedState = HomedState.Unknown;
         private StreamingState _streamingState;
-        private ViewType _activeView = ViewType.Startup;
-
-        public delegate void CommandResponseReceivedHandler(string response);
- //       public event CommandResponseReceivedHandler OnCommandResponseReceived;
 
         public Action<string> OnCommandResponseReceived;
         public Action<string> OnResponseReceived;
         public Action<string> OnRealtimeStatusProcessed;
-
-
-        //public delegate void RealtimeStatusProcessedHandler();
-        //public event RealtimeStatusProcessedHandler OnRealtimeStatusProcessed;
 
         public delegate void GrblResetHandler();
         public event GrblResetHandler OnGrblReset;
@@ -150,7 +140,6 @@ namespace CNC.Core
 
         #region Dependencyproperties
 
-        public ViewType ActiveView { get { return _activeView; } set { _activeView = value; OnPropertyChanged(); } }
         public ObservableCollection<string> ResponseLog { get; private set; } = new ObservableCollection<string>();
         public ObservableCollection<string> CommandLog { get; private set; } = new ObservableCollection<string>();
 
@@ -190,12 +179,13 @@ namespace CNC.Core
         public string SDCardStatus { get { return _sd; } private set { _sd = value; OnPropertyChanged(); } }
         public HomedState HomedState { get { return _homedState; } private set { _homedState = value; OnPropertyChanged(); } }
         public LatheMode LatheMode { get { return _latheMode; } private set { _latheMode = value; OnPropertyChanged(); } }
-        public int NumAxes { get { return GrblInfo.NumAxes; } }
+        public bool LatheModeEnabled { get { return GrblInfo.LatheModeEnabled; } set { OnPropertyChanged(); } }
+        public int NumAxes { get { return GrblInfo.NumAxes; } set { OnPropertyChanged(); } }
+        public int AxisEnabledFlags { get { return GrblInfo.AxisFlags; } set { OnPropertyChanged(); } }
         public string RunTime { get { return JobTimer.RunTime; } set { OnPropertyChanged(); } } // Cannot be set...
         // CO2 Laser
         public bool TubeCoolant { get { return _tubeCoolant; }  set { _tubeCoolant = value; OnPropertyChanged(); } }
         //
-
         public int LineNumber { get { return _line; } private set { _line = value; OnPropertyChanged(); } }
 
         #region A - Spindle, Coolant and Tool change status
@@ -445,11 +435,16 @@ namespace CNC.Core
                             IsMachinePosition = true;
                         _MPos = value;
                         MachinePosition.Parse(_MPos);
-                        for (int i = 0; i < GrblInfo.NumAxes; i++)
+                        int i = 0, axes = GrblInfo.AxisFlags;
+                        while (axes != 0)
                         {
-                            double newpos = MachinePosition.Values[i] - WorkPositionOffset.Values[i];
-                            if (!Position.Values[i].Equals(newpos))
-                                Position.Values[i] = newpos;
+                            if ((axes & 0x01) != 0)
+                            {
+                                double newpos = MachinePosition.Values[i] - WorkPositionOffset.Values[i];
+                                if (!Position.Values[i].Equals(newpos))
+                                    Position.Values[i] = newpos;
+                            }
+                            i++; axes >>= 1;
                         }
                     }
                     break;
@@ -461,10 +456,16 @@ namespace CNC.Core
                             IsMachinePosition = false;
                         _WPos = value;
                         WorkPosition.Parse(_WPos);
-                        for (int i = 0; i < GrblInfo.NumAxes; i++)
-                            if (!Position.Values[i].Equals(WorkPosition.Values[i]))
-                                Position.Values[i] = WorkPosition.Values[i];
-
+                        int i = 0, axes = GrblInfo.AxisFlags;
+                        while (axes != 0)
+                        {
+                            if ((axes & 0x01) != 0)
+                            {
+                                if (!Position.Values[i].Equals(WorkPosition.Values[i]))
+                                    Position.Values[i] = WorkPosition.Values[i];
+                            }
+                            i++; axes >>= 1;
+                        }
                     }
                     break;
 
@@ -495,11 +496,16 @@ namespace CNC.Core
                         WorkPositionOffset.Parse(value);
                         if (_isMPos)
                         {
-                            for (int i = 0; i < GrblInfo.NumAxes; i++)
+                            int i = 0, axes = GrblInfo.AxisFlags;
+                            while (axes != 0)
                             {
-                                double newpos = MachinePosition.Values[i] - WorkPositionOffset.Values[i];
-                                if (!Position.Values[i].Equals(newpos))
-                                    Position.Values[i] = newpos;
+                                if ((axes & 0x01) != 0)
+                                {
+                                    double newpos = MachinePosition.Values[i] - WorkPositionOffset.Values[i];
+                                    if (!Position.Values[i].Equals(newpos))
+                                        Position.Values[i] = newpos;
+                                }
+                                i++; axes >>= 1;
                             }
                         }
                     }

@@ -1,7 +1,7 @@
 /*
  * Converters.cs - part of CNC Controls library for Grbl
  *
- * v0.03 / 2020-01-27 / Io Engineering (Terje Io)
+ * v0.10 / 2020-03-03 / Io Engineering (Terje Io)
  *
  */
 
@@ -57,12 +57,13 @@ namespace CNC.Controls
         public static GrblStateToStringConverter GrblStateToStringConverter = new GrblStateToStringConverter();
         public static HomedStateToColorConverter HomedStateToColorConverter = new HomedStateToColorConverter();
         public static IsHomingEnabledConverter IsHomingEnabledConverter = new IsHomingEnabledConverter();
-        public static InvertBooleanConverter InvertBooleanConverter = new InvertBooleanConverter();
+        public static LogicalNotConverter LogicalNotConverter = new LogicalNotConverter();
         public static LogicalAndConverter LogicalAndConverter = new LogicalAndConverter();
         public static LogicalOrConverter LogicalOrConverter = new LogicalOrConverter();
+        public static BoolToVisibleConverter BoolToVisibleConverter = new BoolToVisibleConverter();
         public static IsAxisVisibleConverter HasAxisConverter = new IsAxisVisibleConverter();
     }
-
+    
     // Adapted from: https://stackoverflow.com/questions/4353186/binding-observablecollection-to-a-textbox/8847910#8847910
     public class StringCollectionToTextConverter : IMultiValueConverter
     {
@@ -190,11 +191,15 @@ namespace CNC.Controls
         }
     }
 
-    public class InvertBooleanConverter : IValueConverter
+    public class LogicalNotConverter : IValueConverter
     {
+        public IValueConverter FinalConverter { get; set; }
+
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return !(bool)value;
+            bool result = value is bool ? !(bool)value : ((value is int) ? (int)value == 0 : false);
+
+            return FinalConverter == null ? result : FinalConverter.Convert(result, targetType, parameter, culture);
         }
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
@@ -242,11 +247,31 @@ namespace CNC.Controls
         }
     }
 
+    public class BoolToVisibleConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value is bool && (bool)value ? Visibility.Visible : Visibility.Collapsed;
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value is Visibility && (Visibility)value == Visibility.Visible;
+        }
+    }
+
     public class IsAxisVisibleConverter : IMultiValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            return values.Length == 2 && values[0] is int && values[1] is int && (int)values[0] >= (int)values[1] ? Visibility.Visible : Visibility.Collapsed;
+            bool enabled = false;
+
+            if(values.Length == 2 && values[0] is int && values[1] is int && (int)values[0] >= (int)values[1])
+                enabled = ((int)values[0] & (int)values[1]) != 0;
+
+            if(values.Length == 2 && values[0] is int && values[1] is AxisFlags)
+                enabled = ((int)values[0] & (int)(AxisFlags)values[1]) != 0;
+
+            return enabled ? Visibility.Visible : Visibility.Collapsed;
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, System.Globalization.CultureInfo culture)

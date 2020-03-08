@@ -1,13 +1,13 @@
-﻿/*
- * ConfigControl.xaml.cs - part of Grbl Code Sender
+/*
+ * SidebarItem.cs - part of CNC Controls library for Grbl
  *
- * v0.10 / 2019-03-05 / Io Engineering (Terje Io)
+ * v0.10 / 2020-03-05 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2020, Io Engineering (Terje Io)
+Copyright (c) 2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -39,26 +39,45 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using System.Windows;
 using System.Windows.Controls;
-using CNC.Core;
+using System.Windows.Media;
 
-namespace CNC.Controls.Camera
+namespace CNC.Controls
 {
-    /// <summary>
-    /// Interaction logic for ConfigControl.xaml
-    /// </summary>
-    public partial class ConfigControl : UserControl, ICameraConfig
+    public class SidebarItem : Button
     {
-        public ConfigControl()
+        private UserControl view { get; }
+        private static UserControl last = null;
+
+        public new Visibility Visibility { get { return view.Visibility; } set { view.Visibility = value; } }
+        public new bool IsEnabled { get { return base.IsEnabled; } set { base.IsEnabled = value; } }
+
+        public SidebarItem(string name, UserControl view) : base()
         {
-            InitializeComponent();
+            Content = name;
+            this.view = view;
+
+            Width = 75;
+            Height = 25;
+            Focusable = false;
+
+            try
+            {
+                Style = Application.Current.FindResource("btnSidebar") as Style;
+            }
+            catch { }
+
+            LayoutTransform = new RotateTransform(90d);
+
+            Click += button_Click;
         }
 
-        private void getPosition_Click(object sender, RoutedEventArgs e)
+        private void button_Click(object sender, RoutedEventArgs e)
         {
-            var model = (GrblViewModel)Application.Current.MainWindow.DataContext;
+            if (last != null && last != view && last.IsVisible)
+                last.Visibility = Visibility.Hidden;
 
-            ((Config)DataContext).Camera.XOffset = -model.Position.X;
-            ((Config)DataContext).Camera.YOffset = -model.Position.Y;
+            view.Visibility = view.IsVisible ? Visibility.Hidden : Visibility.Visible;
+            last = view;
         }
     }
 }

@@ -1,7 +1,7 @@
-﻿/*
+/*
  * Widget.cs - part of CNC Controls library for Grbl
  *
- * v0.03 / 2020-01-10 / Io Engineering (Terje Io)
+ * v0.10 / 2019-03-05 / Io Engineering (Terje Io)
  *
  */
 
@@ -142,7 +142,7 @@ namespace CNC.Controls
         public RadioButton wRadiobutton = null;
         private StackPanel Canvas;
 
-        public Widget(ConfigView View, WidgetProperties widget, StackPanel Canvas)
+        public Widget(GrblConfigView View, WidgetProperties widget, StackPanel Canvas)
         {
             this.Canvas = components = Canvas;
             this.widget = widget;

@@ -1,7 +1,7 @@
-﻿/*
- * ConfigView.xaml.cs - part of CNC Controls library for Grbl
+/*
+ * GrblConfigView.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.03 / 2019-10-21 / Io Engineering (Terje Io)
+ * v0.10 / 2019-03-05 / Io Engineering (Terje Io)
  *
  */
 
@@ -41,14 +41,13 @@ using System.Data;
 using System.Windows;
 using System.Windows.Controls;
 using CNC.Core;
-using CNC.View;
 
 namespace CNC.Controls
 {
-    public partial class ConfigView : UserControl, CNCView
+    public partial class GrblConfigView : UserControl, ICNCView
     {
         private Widget curSetting = null;
-        public ConfigView()
+        public GrblConfigView()
         {
             InitializeComponent();
         }
@@ -62,13 +61,16 @@ namespace CNC.Controls
 
         #region Methods required by CNCView interface
 
-        public ViewType mode { get { return ViewType.GRBLConfig; } }
+        public ViewType ViewType { get { return ViewType.GRBLConfig; } }
 
         public void Activate(bool activate, ViewType chgMode)
         {
         }
 
         public void CloseFile()
+        {
+        }
+        public void Setup(UIViewModel model, AppConfig profile)
         {
         }
 

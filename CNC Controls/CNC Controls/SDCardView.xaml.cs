@@ -1,7 +1,7 @@
-﻿/*
+/*
  * SDCardView.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.05 / 2020-02-06 / Io Engineering (Terje Io)
+ * v0.10 / 2019-03-05 / Io Engineering (Terje Io)
  *
  */
 
@@ -42,7 +42,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using CNC.Core;
-using CNC.View;
 using System.Threading;
 
 namespace CNC.Controls
@@ -50,7 +49,7 @@ namespace CNC.Controls
     /// <summary>
     /// Interaction logic for SDCardView.xaml
     /// </summary>
-    public partial class SDCardView : UserControl, CNCView
+    public partial class SDCardView : UserControl, ICNCView
     {
         public delegate void FileSelectedHandler(string filename);
         public event FileSelectedHandler FileSelected;
@@ -64,7 +63,7 @@ namespace CNC.Controls
 
         #region Methods and properties required by IRenderer interface
 
-        public ViewType mode { get { return ViewType.SDCard; } }
+        public ViewType ViewType { get { return ViewType.SDCard; } }
 
         public void Activate(bool activate, ViewType chgMode)
         {
@@ -73,6 +72,10 @@ namespace CNC.Controls
         }
 
         public void CloseFile()
+        {
+        }
+
+        public void Setup(UIViewModel model, AppConfig profile)
         {
         }
 

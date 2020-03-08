@@ -2,13 +2,13 @@
 /*
  * MainWindow.xaml.cs - part of Grbl Code Sender
  *
- * v0.03 / 2019-10-27 / Io Engineering (Terje Io)
+ * v0.10 / 2020-03-05 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019, Io Engineering (Terje Io)
+Copyright (c) 2019-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -42,7 +42,6 @@ using System;
 using System.Windows;
 using CNC.Core;
 using CNC.Controls;
-using CNC.View;
 
 namespace Grbl_Config_App
 {
@@ -57,8 +56,10 @@ namespace Grbl_Config_App
             InitializeComponent();
 
             int res;
-            if ((res = Profile.SetupAndOpen(Title, App.Current.Dispatcher)) != 0)
-                Environment.Exit(res);            
+            if ((res = Profile.SetupAndOpen(Title, (GrblViewModel)DataContext, App.Current.Dispatcher)) != 0)
+                Environment.Exit(res);
+
+            CNC.Core.Grbl.GrblViewModel = (GrblViewModel)DataContext;
         }
 
         #region UIEvents
@@ -80,6 +81,11 @@ namespace Grbl_Config_App
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             configView.Activate(false, ViewType.Shutdown);
+
+            using (new UIUtils.WaitCursor()) // disconnecting from websocket may take some time...
+            {
+               Comms.com.Close();
+            }
         }
 
         private void exitMenuItem_Click(object sender, RoutedEventArgs e)
@@ -89,7 +95,8 @@ namespace Grbl_Config_App
 
         void aboutMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            About about = new About(this);
+            About about = new About(Title) { Owner = Application.Current.MainWindow };
+            about.DataContext = DataContext;
             about.ShowDialog();
         }
 

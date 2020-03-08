@@ -59,8 +59,11 @@
     <Compile Include="BasicConfigControl.xaml.cs">
       <DependentUpon>BasicConfigControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ConfigView.xaml.cs">
-      <DependentUpon>ConfigView.xaml</DependentUpon>
+    <Compile Include="GrblConfigView.xaml.cs">
+      <DependentUpon>GrblConfigView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AppConfigView.xaml.cs">
+      <DependentUpon>AppConfigView.xaml</DependentUpon>
     </Compile>
     <Compile Include="ConsoleControl.xaml.cs">
       <DependentUpon>ConsoleControl.xaml</DependentUpon>
@@ -81,6 +84,8 @@
     <Compile Include="FeedControl.xaml.cs">
       <DependentUpon>FeedControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ICamera.cs" />
+    <Compile Include="ICNCView.cs" />
     <Compile Include="JobControl.xaml.cs">
       <DependentUpon>JobControl.xaml</DependentUpon>
     </Compile>
@@ -123,6 +128,7 @@
     <Compile Include="SDCardView.xaml.cs">
       <DependentUpon>SDCardView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="SidebarItem.cs" />
     <Compile Include="SignalControl.xaml.cs">
       <DependentUpon>SignalControl.xaml</DependentUpon>
     </Compile>
@@ -145,6 +151,7 @@
       <DependentUpon>TrinamicView.xaml</DependentUpon>
     </Compile>
     <Compile Include="UIUtils.cs" />
+    <Compile Include="UIViewModel.cs" />
     <Compile Include="Widget.cs" />
     <Compile Include="WorkParametersControl.xaml.cs">
       <DependentUpon>WorkParametersControl.xaml</DependentUpon>
@@ -157,7 +164,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ConfigView.xaml">
+    <Page Include="GrblConfigView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AppConfigView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -251,6 +262,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="SharedStyles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="SignalControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -316,6 +331,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="App.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Symbols_Stop_32xLG.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

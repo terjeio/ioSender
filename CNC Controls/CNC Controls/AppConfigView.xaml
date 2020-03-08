@@ -1,10 +1,9 @@
-﻿<UserControl
+﻿<UserControl x:Class="CNC.Controls.AppConfigView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:GCode_Sender"
-             xmlns:Camera="clr-namespace:CNC.Controls.Camera;assembly=CNC.Controls.Camera" xmlns:Viewer="clr-namespace:CNC.Controls.Viewer;assembly=CNC.Controls.Viewer" xmlns:Lathe="clr-namespace:CNC.Controls.Lathe;assembly=CNC.Controls.Lathe" xmlns:Controls="clr-namespace:CNC.Controls;assembly=CNC.Controls.WPF" x:Class="GCode_Sender.ConfigView"
+             xmlns:local="clr-namespace:CNC.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="515" d:DesignWidth="875">
     <Grid>
@@ -12,14 +11,13 @@
             <RowDefinition Height="11*"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <WrapPanel Orientation="Vertical" ItemWidth="255"  Height="460" Margin="10,10,0,5" HorizontalAlignment="Left" VerticalAlignment="Top" Width="850">
-            <Controls:BasicConfigControl/>
-            <Controls:JogConfigControl x:Name="jogConfig"/>
-            <Viewer:ConfigControl/>
-            <Controls:StripGCodeConfigControl/>
-            <Camera:ConfigControl x:Name="cameraConfig"/>
-            <Lathe:ConfigControl/>
-        </WrapPanel>
+        <ItemsControl x:Name="xx">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Vertical" ItemWidth="255"  Height="460" Margin="10,10,0,5" HorizontalAlignment="Left" VerticalAlignment="Top" Width="850"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+        </ItemsControl>
         <Button x:Name="btnSave" Content="Save settings" HorizontalAlignment="Left" Margin="10,5,0,0" Grid.Row="1" VerticalAlignment="Top" Width="100" Click="btnSave_Click"/>
         <Label x:Name="label" Content="A restart is required after changing settings!" HorizontalAlignment="Left" Margin="126,3,0,0" Grid.Row="1" VerticalAlignment="Top"/>
     </Grid>

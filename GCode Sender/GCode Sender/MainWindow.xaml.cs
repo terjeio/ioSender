@@ -1,7 +1,7 @@
 ﻿/*
  * MainWindow.xaml.cs - part of Grbl Code Sender
  *
- * v0.05 / 2020-02-10 / Io Engineering (Terje Io)
+ * v0.10 / 2020-03-05 / Io Engineering (Terje Io)
  *
  */
 
@@ -42,7 +42,6 @@ using System.Windows;
 using System.Windows.Controls;
 using CNC.Core;
 using CNC.Controls;
-using CNC.View;
 #if ADD_CAMERA
 using CNC.Controls.Camera;
 #endif
@@ -52,14 +51,9 @@ namespace GCode_Sender
 
     public partial class MainWindow : Window
     {
-        private CNCView currentView = null;
-
         public static MainWindow ui = null;
         public static CNC.Controls.Viewer.Viewer GCodeViewer = null;
-        public static AppConfig Profile = new AppConfig();
-#if ADD_CAMERA
-        public static Camera Camera = null;
-#endif
+
         public delegate void GCodePushHandler(string gcode, CNC.Core.Action action);
         public static event GCodePushHandler GCodePush;
 
@@ -68,6 +62,8 @@ namespace GCode_Sender
 
         public delegate void FileLoadHandler(string filename);
         public static event FileLoadHandler FileLoad; // Issued on load of main window if filename provided as command line argument
+
+        static public UIViewModel UIViewModel { get; } = new UIViewModel();
 
         public MainWindow()
         {
@@ -79,24 +75,16 @@ namespace GCode_Sender
             GCodeViewer = viewer;
 
             int res;
-            if ((res = Profile.SetupAndOpen(Title, (GrblViewModel)DataContext, App.Current.Dispatcher)) != 0)
+            if ((res = UIViewModel.Profile.SetupAndOpen(Title, (GrblViewModel)DataContext, App.Current.Dispatcher)) != 0)
                 Environment.Exit(res);
 
-            macroControl.Macros = Profile.Config.Macros;
+            macroControl.Macros = UIViewModel.Profile.Config.Macros;
             macroControl.MacrosChanged += MacroControl_MacrosChanged;
 
             BaseWindowTitle = Title;
 
             CNC.Core.Grbl.GrblViewModel = (GrblViewModel)DataContext;
-            GrblInfo.LatheModeEnabled = Profile.Config.Lathe.IsEnabled;
-
-            turningWizard.ApplySettings(Profile.Config.Lathe);
-            threadingWizard.ApplySettings(Profile.Config.Lathe);
-
-            if (Profile.Config.GCodeViewer.IsEnabled)
-                GCodeViewer.ApplySettings(Profile.Config.GCodeViewer);
-            else
-                ShowView(false, ViewType.GCodeViewer);
+            GrblInfo.LatheModeEnabled = UIViewModel.Profile.Config.Lathe.IsEnabled;
 
 #if ADD_CAMERA
             enableCamera(this);
@@ -106,18 +94,9 @@ namespace GCode_Sender
 
             turningWizard.GCodePush += wizard_GCodePush;
             threadingWizard.GCodePush += wizard_GCodePush;
-            //facingWizard.GCodePush += wizard_GCodePush;
-            //SDCardControl.FileSelected += new CNC_Controls.SDCardControl.FileSelectedHandler(SDCardControl_FileSelected);
+      //      facingWizard.GCodePush += wizard_GCodePush;
+     //       SDCardControl.FileSelected += new CNC_Controls.SDCardControl.FileSelectedHandler(SDCardControl_FileSelected);
 
-            tabMode.SelectedIndex = 0;
-
-            foreach (TabItem tab in UIUtils.FindLogicalChildren<TabItem>(ui.tabMode))
-                tab.IsEnabled = getView(tab).mode == ViewType.GRBL || getView(tab).mode == ViewType.AppConfig;
-
-            currentView = getView((TabItem)tabMode.Items[tabMode.SelectedIndex]);
-            ((GrblViewModel)ui.DataContext).ActiveView = currentView.mode;
-
-            getTab(ViewType.AppConfig).DataContext = Profile.Config;
 
             new PipeServer(App.Current.Dispatcher);
             PipeServer.FileTransfer += Pipe_FileTransfer;
@@ -125,7 +104,7 @@ namespace GCode_Sender
 
         private void MacroControl_MacrosChanged()
         {
-            Profile.Save();
+            UIViewModel.Profile.Save();
         }
 
         public string BaseWindowTitle { get; set; }
@@ -143,9 +122,9 @@ namespace GCode_Sender
         {
             get { return menuFile.IsEnabled != true; }
             set {
-                menuFile.IsEnabled = stpRight.IsEnabled = !value;
+                menuFile.IsEnabled = xx.IsEnabled = !value;
                 foreach (TabItem tabitem in UIUtils.FindLogicalChildren<TabItem>(ui.tabMode))
-                    tabitem.IsEnabled = !value || getView(tabitem).mode == ViewType.GRBL;
+                    tabitem.IsEnabled = !value || getView(tabitem).ViewType == ViewType.GRBL;
             }
         }
 
@@ -158,23 +137,39 @@ namespace GCode_Sender
 
         private void Window_Load(object sender, EventArgs e)
         {
+            foreach (TabItem tab in UIUtils.FindLogicalChildren<TabItem>(ui.tabMode))
+            {
+                ICNCView view = getView(tab);
+                view.Setup(UIViewModel, UIViewModel.Profile);
+                tab.IsEnabled = view.ViewType == ViewType.GRBL || view.ViewType == ViewType.AppConfig;
+            }
+
+            if (!UIViewModel.Profile.Config.GCodeViewer.IsEnabled)
+                ShowView(false, ViewType.GCodeViewer);
+
+            xx.ItemsSource = UIViewModel.SidebarItems;
+            UIViewModel.SidebarItems.Add(new SidebarItem("Jog", jogControl));
+            UIViewModel.SidebarItems.Add(new SidebarItem("Macros", macroControl));
+
+            UIViewModel.CurrentView = getView((TabItem)tabMode.Items[tabMode.SelectedIndex = 0]);
             System.Threading.Thread.Sleep(50);
             Comms.com.PurgeQueue();
-            currentView.Activate(true, ViewType.Startup);
-            if (!string.IsNullOrEmpty(Profile.FileName))
-                FileLoad?.Invoke(Profile.FileName);
+            UIViewModel.CurrentView.Activate(true, ViewType.Startup);
+
+            if (!string.IsNullOrEmpty(UIViewModel.Profile.FileName))
+                FileLoad?.Invoke(UIViewModel.Profile.FileName);
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             if (!(e.Cancel = !menuFile.IsEnabled))
             {
-                currentView.Activate(false, ViewType.Shutdown);
+                UIViewModel.CurrentView.Activate(false, ViewType.Shutdown);
 #if ADD_CAMERA
-                if (Camera != null)
+                if (UIViewModel.Camera != null)
                 {
-                    Camera.CloseCamera();
-                    Camera.Close();
+                    UIViewModel.Camera.CloseCamera();
+                    UIViewModel.Camera.Close();
                 }
 #endif
                 Comms.com.DataReceived -= (DataContext as GrblViewModel).DataReceived;
@@ -188,7 +183,7 @@ namespace GCode_Sender
 
         private void Window_Closed(object sender, EventArgs e)
         {
-            //          Comms.com.Close(); // Makes fking process hang
+            //Comms.com.Close(); // Makes fking process hang
         }
 
         private void exitMenuItem_Click(object sender, RoutedEventArgs e)
@@ -220,18 +215,15 @@ namespace GCode_Sender
 
         private void TabMode_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (currentView != null && e.AddedItems.Count > 0)
+            if (UIViewModel.CurrentView != null && e.AddedItems.Count > 0)
             {
-                ViewType prevMode = currentView.mode;
-                CNCView nextView = getView((TabItem)tabMode.Items[tabMode.SelectedIndex]);
-                if (nextView != currentView)
+                ViewType prevMode = UIViewModel.CurrentView.ViewType;
+                ICNCView nextView = getView((TabItem)tabMode.Items[tabMode.SelectedIndex]);
+                if (nextView != UIViewModel.CurrentView)
                 {
-                    currentView.Activate(false, nextView.mode);
-                    currentView = nextView;
-                    ((GrblViewModel)ui.DataContext).ActiveView = currentView.mode;
-                    currentView.Activate(true, prevMode);
-
-                    btnJogPanel.IsEnabled = currentView.mode == ViewType.GRBL;
+                    UIViewModel.CurrentView.Activate(false, nextView.ViewType);
+                    UIViewModel.CurrentView = nextView;
+                    UIViewModel.CurrentView.Activate(true, prevMode);
                 }
             }
         }
@@ -247,7 +239,7 @@ namespace GCode_Sender
 
         private static void closeFile ()
         {
-            CNCView view, grbl = getView(getTab(ViewType.GRBL));
+            ICNCView view, grbl = getView(getTab(ViewType.GRBL));
 
             grbl.CloseFile();
 
@@ -264,7 +256,7 @@ namespace GCode_Sender
 
             foreach (TabItem tabitem in UIUtils.FindLogicalChildren<TabItem>(ui.tabMode))
             {
-                if (getView(tabitem).mode == mode)
+                if (getView(tabitem).ViewType == mode)
                 {
                     tab = tabitem;
                     break;
@@ -300,20 +292,20 @@ namespace GCode_Sender
 #if ADD_CAMERA
         private static bool enableCamera(MainWindow owner)
         {
-            if (Camera == null)
+            if (UIViewModel.Camera == null)
             {
-                Camera = new Camera();
-                Camera.ApplySettings(Profile.Config.Camera);
+                UIViewModel.Camera = new Camera();
+                UIViewModel.Camera.Setup(UIViewModel);
                 //        Camera.Owner = owner;
-                owner.menuCamera.IsEnabled = Camera.HasCamera;
+                owner.menuCamera.IsEnabled = UIViewModel.Camera.HasCamera;
             }
 
-            return Camera != null;
+            return UIViewModel.Camera != null;
         }
 
         private void CameraOpen_Click(object sender, RoutedEventArgs e)
         {
-            Camera.Open();
+            UIViewModel.Camera.Open();
         }
 #else
         private void CameraOpen_Click(object sender, RoutedEventArgs e)
@@ -321,31 +313,19 @@ namespace GCode_Sender
         }
 #endif
 
-        private static CNCView getView(TabItem tab)
+        private static ICNCView getView(TabItem tab)
         {
-            CNCView view = null;
+            ICNCView view = null;
 
             foreach (UserControl uc in UIUtils.FindLogicalChildren<UserControl>(tab))
             {
-                if (uc is CNCView) {
-                    view = (CNCView)uc;
+                if (uc is ICNCView) {
+                    view = (ICNCView)uc;
                     break;
                 }
             }
 
             return view;
-        }
-
-        private void jogbtn_Click(object sender, RoutedEventArgs e)
-        {
-            macroControl.Visibility = Visibility.Hidden;
-            jogControl.Visibility = jogControl.Visibility == Visibility.Visible ? Visibility.Hidden : Visibility.Visible;
-        }
-
-        private void macrobtn_Click(object sender, RoutedEventArgs e)
-        {
-            jogControl.Visibility = Visibility.Hidden;
-            macroControl.Visibility = macroControl.Visibility == Visibility.Visible ? Visibility.Hidden : Visibility.Visible;
         }
     }
 }

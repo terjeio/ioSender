@@ -1,7 +1,7 @@
 ﻿/*
  * Grbl.cs - part of CNC Controls library
  *
- * v0.09 / 2020-02-28 / Io Engineering (Terje Io)
+ * v0.10 / 2020-03-03 / Io Engineering (Terje Io)
  *
  */
 
@@ -316,8 +316,7 @@ namespace CNC.Core
             get { return arr[i]; }
             set
             {
-                //double v = (double)(object)arr[i];
-                //if (dbl.Assign((double)(object)value, ref v))
+                if(!value.Equals(arr[i]))
                 {
                     arr[i] = value;
                     if(!_suspend)
@@ -430,6 +429,13 @@ namespace CNC.Core
     {
         #region Attributes
 
+        private static int _numAxes;
+
+        static GrblInfo()
+        {
+            NumAxes = 3;
+        }
+
         public static string AxisLetters { get; private set; } = "XYZABC";
         public static string Version { get; private set; } = string.Empty;
         public static string Identity { get; private set; } = string.Empty;
@@ -438,7 +444,23 @@ namespace CNC.Core
         public static string TrinamicDrivers { get; private set; } = string.Empty;
         public static int SerialBufferSize { get; private set; } = 128;
         public static int PlanBufferSize { get; private set; } = 16;
-        public static int NumAxes { get; private set; } = 3;
+        public static int NumAxes
+        {
+            get { return _numAxes;  }
+            private set
+            {
+                _numAxes = value;
+                AxisFlags = 0;
+                for (int i = 0; i < _numAxes; i++)
+                    AxisFlags = (AxisFlags << 1) | 0x01;
+                if (LatheModeEnabled)
+                {
+                    AxisFlags &= ~0x02;
+                    _numAxes--;
+                }
+            }
+        }
+        public static int AxisFlags { get; private set; } = 0;
         public static int NumTools { get; private set; } = 0;
         public static bool HasATC { get; private set; }
         public static bool ManualToolChange { get; private set; }
@@ -448,7 +470,7 @@ namespace CNC.Core
         public static bool LatheModeEnabled
         {
             get { return GrblParserState.LatheMode != LatheMode.Disabled; }
-            set { if(value && GrblParserState.LatheMode == LatheMode.Disabled) GrblParserState.LatheMode = LatheMode.Radius; }
+            set { if (value && GrblParserState.LatheMode == LatheMode.Disabled) { GrblParserState.LatheMode = LatheMode.Radius; NumAxes = 3; } }
         }
         public static ObservableCollection<string> SystemInfo { get; private set; } = new ObservableCollection<string>();
         public static bool Loaded { get; private set; }
@@ -494,6 +516,9 @@ namespace CNC.Core
                 EventUtils.DoEvents();
 
             model.Silent = false;
+
+            model.AxisEnabledFlags = AxisFlags;
+            model.LatheModeEnabled = LatheModeEnabled;
 
             return res == true;
         }

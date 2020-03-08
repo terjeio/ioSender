@@ -21,7 +21,7 @@
             </MenuItem>
         </Menu>
         <Grid Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
-            <Controls:ConfigView x:Name="configView" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            <Controls:GrblConfigView x:Name="configView" HorizontalAlignment="Left" VerticalAlignment="Top"/>
         </Grid>
     </DockPanel>
 </Window>

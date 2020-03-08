@@ -7,7 +7,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="33" d:DesignWidth="193">
     <UserControl.Resources>
-        <local:InvertBooleanConverter x:Key="BooleanConverter" />
+        <local:LogicalNotConverter x:Key="BooleanConverter" />
     </UserControl.Resources>
     <Grid>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Height="33" VerticalAlignment="Top" Width="193" RenderTransformOrigin="0.425,0">

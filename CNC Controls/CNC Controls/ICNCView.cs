@@ -1,13 +1,13 @@
 ﻿/*
- * ConfigView.xaml.cs - part of Grbl Code Sender
+ * ICNCView.cs - part of CNC Controls library for Grbl
  *
- * v0.02 / 2020-01-16 / Io Engineering (Terje Io)
+ * v0.10 / 2020-03-05 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2020, Io Engineering (Terje Io)
+Copyright (c) 2018-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -37,46 +37,35 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-using System.Windows;
-using System.Windows.Controls;
-using CNC.View;
-using CNC.Core;
-
-namespace GCode_Sender
+namespace CNC.Controls
 {
-    /// <summary>
-    /// Interaction logic for ConfigView.xaml
-    /// </summary>
-    public partial class ConfigView : UserControl, CNCView
+    public enum ViewType
     {
-        public ConfigView()
-        {
-            InitializeComponent();
-        }
+        Startup = 0,
+        Shutdown,
+        AppConfig,
+        Engraving,
+        Mach3,
+        GRBL,
+        GRBLConfig,
+        Offsets,
+        PIDTuner,
+        SDCard,
+        G76Threading,
+        Turning,
+        Facing,
+        Parting,
+        Tools,
+        TrinamicTuner,
+        GCodeViewer,
+        SpindleLinearizer
+    }
 
-        #region Methods and properties required by CNCView interface
-
-        public ViewType mode { get { return ViewType.AppConfig; } }
-
-        public void Activate(bool activate, ViewType chgMode)
-        {
-            cameraConfig.grblData = (GrblViewModel)MainWindow.ui.DataContext;
-            if(MainWindow.Camera == null || !MainWindow.Camera.HasCamera)
-                cameraConfig.Visibility = Visibility.Collapsed;
-
-            if(GrblSettings.GetString(GrblSetting.JogStepSpeed) != null)
-                jogConfig.Visibility = Visibility.Collapsed;
-        }
-
-        public void CloseFile()
-        {
-        }
-
-        #endregion
-
-        private void btnSave_Click(object sender, RoutedEventArgs e)
-        {
-            MainWindow.Profile.Save();
-        }
+    public interface ICNCView
+    {
+        ViewType ViewType { get; }
+        void Activate(bool activate, ViewType chgMode);
+        void CloseFile();
+        void Setup(UIViewModel model, AppConfig profile);
     }
 }

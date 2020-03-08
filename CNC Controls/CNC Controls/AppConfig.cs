@@ -1,5 +1,5 @@
 ﻿/*
- * AppConfig.cs - part of Grbl Code Sender
+ * AppConfig.cs - part of CNC Controls library for Grbl
  *
  * v0.09 / 2020-02-28 / Io Engineering (Terje Io)
  *

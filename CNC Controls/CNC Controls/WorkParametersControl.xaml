@@ -7,7 +7,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="60" d:DesignWidth="216">
     <UserControl.Resources>
-        <local:InvertBooleanConverter x:Key="BooleanConverter" />
+        <local:LogicalNotConverter x:Key="BooleanConverter" />
     </UserControl.Resources>
     <GroupBox x:Name="grpWorkParams" Header="Work Parameters" IsEnabled="{Binding Path=IsJobRunning, Converter={StaticResource BooleanConverter}}" HorizontalAlignment="Left" VerticalAlignment="Top" Height="60" Width="216">
         <Grid HorizontalAlignment="Left" Height="38" Margin="0,4,0,0" VerticalAlignment="Top" Width="206">

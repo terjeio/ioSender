@@ -7,7 +7,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="50" d:DesignWidth="450">
     <UserControl.Resources>
-        <local:InvertBooleanConverter x:Key="BooleanConverter" />
+        <local:LogicalNotConverter x:Key="BooleanConverter" />
     </UserControl.Resources>
     <Grid>
         <GroupBox x:Name="grpMDI" IsEnabled="{Binding Path=IsJobRunning, Converter={StaticResource BooleanConverter}}" Header="MDI" Margin="0,0" HorizontalAlignment="Center" VerticalAlignment="Top">

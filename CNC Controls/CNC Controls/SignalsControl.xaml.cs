@@ -1,13 +1,13 @@
 ﻿/*
  * SignalsControl.xaml.cs - part of CNC Controls library
  *
- * v0.02 / 2019-10-16 / Io Engineering (Terje Io)
+ * v0.10 / 2020-03-01 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2019, Io Engineering (Terje Io)
+Copyright (c) 2018-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -51,32 +51,6 @@ namespace CNC.Controls
         public SignalsControl()
         {
             InitializeComponent();
-
-            Config("XYZ" + baseSignals);
-        }
-
-        public void SetLatheMode()
-        {
-            Config("XZ" + baseSignals);
-        }
-
-        public void SetNumAxes(int numAxes)
-        {
-            if (numAxes <= 3 || numAxes > 6)
-                return;
-
-            string axes = "XYZ";
-
-            for (int axis = 3; axis < numAxes; axis++)
-                axes += GrblInfo.AxisIndexToLetter(axis);
-
-            Config(axes + baseSignals);
-        }
-
-        public void Config(string signals)
-        {
-            foreach (SignalControl signal in UIUtils.FindLogicalChildren<SignalControl>(this))
-                signal.Visibility = signals.Contains(signal.Label[0]) ? Visibility.Visible : Visibility.Hidden;
         }
     }
 }

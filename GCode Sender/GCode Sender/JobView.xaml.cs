@@ -1,7 +1,7 @@
-﻿/*
+/*
  * JobView.xaml.cs - part of Grbl Code Sender
  *
- * v0.09 / 2020-02-29 / Io Engineering (Terje Io)
+ * v0.10 / 2019-03-05 / Io Engineering (Terje Io)
  *
  */
 
@@ -41,19 +41,18 @@ using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using CNC.View;
-using CNC.Core;
 using System.ComponentModel;
 using System.Threading.Tasks;
-using CNC.Controls;
 using System.Windows.Threading;
+using CNC.Core;
+using CNC.Controls;
 
 namespace GCode_Sender
 {
     /// <summary>
     /// Interaction logic for JobView.xaml
     /// </summary>
-    public partial class JobView : UserControl, CNCView
+    public partial class JobView : UserControl, ICNCView
     {
         private bool? initOK = null;
         private bool sdStream = false;
@@ -176,7 +175,7 @@ namespace GCode_Sender
 
 #region Methods required by CNCView interface
 
-        public ViewType mode { get { return ViewType.GRBL; } }
+        public ViewType ViewType { get { return ViewType.GRBL; } }
 
         public void Activate(bool activate, ViewType chgMode)
         {
@@ -216,10 +215,10 @@ namespace GCode_Sender
                     initOK = false;
 
                 #if ADD_CAMERA
-                if (MainWindow.Camera != null)
+                if (MainWindow.UIViewModel.Camera != null)
                 {
-                    MainWindow.Camera.CameraControl.MoveOffset += Camera_MoveOffset;
-                    MainWindow.Camera.Opened += Camera_Opened;
+                    MainWindow.UIViewModel.Camera.MoveOffset += Camera_MoveOffset;
+                    MainWindow.UIViewModel.Camera.Opened += Camera_Opened;
                 }
                 #endif
                 //if (viewer == null)
@@ -229,12 +228,12 @@ namespace GCode_Sender
                     MainWindow.ui.WindowTitle = ((GrblViewModel)DataContext).FileName;
 
             }
-            else if(mode != ViewType.Shutdown)
+            else if(ViewType != ViewType.Shutdown)
             {
                 DRO.IsFocusable = false;
                 #if ADD_CAMERA
-                if (MainWindow.Camera != null)
-                    MainWindow.Camera.CameraControl.MoveOffset -= Camera_MoveOffset;
+                if (MainWindow.UIViewModel.Camera != null)
+                    MainWindow.UIViewModel.Camera.MoveOffset -= Camera_MoveOffset;
                 #endif
             }
 
@@ -250,6 +249,9 @@ namespace GCode_Sender
         public void CloseFile()
         {
             GCodeSender.CloseFile();
+        }
+        public void Setup(UIViewModel model, AppConfig profile)
+        {
         }
 
 #endregion
@@ -303,23 +305,19 @@ namespace GCode_Sender
 
             GrblCommand.ToolChange = GrblInfo.ManualToolChange ? "M61Q{0}" : "T{0}";
 
-            GCodeSender.Config(MainWindow.Profile.Config);
+            GCodeSender.Config(MainWindow.UIViewModel.Profile.Config);
 
             if (GrblInfo.NumAxes > 3)
                 limitsControl.Visibility = Visibility.Collapsed;
 
             if (GrblInfo.LatheModeEnabled)
             {
-                DRO.EnableLatheMode();
-                signalsControl.SetLatheMode();
                 MainWindow.EnableView(true, ViewType.Turning);
                 MainWindow.EnableView(true, ViewType.Facing);
                 MainWindow.EnableView(true, ViewType.G76Threading);
             }
             else
             {
-                DRO.SetNumAxes(GrblInfo.NumAxes);
-                signalsControl.SetNumAxes(GrblInfo.NumAxes);
                 MainWindow.ShowView(false, ViewType.Turning);
                 MainWindow.ShowView(false, ViewType.Facing);
                 MainWindow.ShowView(false, ViewType.G76Threading);

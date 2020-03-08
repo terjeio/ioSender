@@ -1,13 +1,13 @@
-﻿/*
+/*
  * Viewer.xaml.cs - part of CNC Controls library
  *
- * v0.02 / 2019-10-31 / Io Engineering (Terje Io)
+ * v0.10 / 2019-03-05 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019, Io Engineering (Terje Io)
+Copyright (c) 2019-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -40,14 +40,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using System.Collections.Generic;
 using System.Windows.Controls;
 using CNC.GCode;
-using CNC.View;
 
 namespace CNC.Controls.Viewer
 {
 /// <summary>
 /// Interaction logic for Viewer.xaml
 /// </summary>
-public partial class Viewer : UserControl, CNCView
+public partial class Viewer : UserControl, ICNCView
     {
         public Viewer()
         {
@@ -87,7 +86,7 @@ public partial class Viewer : UserControl, CNCView
             set { gcodeView.viewport.ShowViewCube = value; }
         }
 
-        public ViewType mode { get { return ViewType.GCodeViewer; } }
+        public ViewType ViewType { get { return ViewType.GCodeViewer; } }
 
         public void Activate(bool activate, ViewType chgMode)
         {
@@ -102,14 +101,16 @@ public partial class Viewer : UserControl, CNCView
             gcodeView.ClearViewport();
         }
 
-        public void ApplySettings(GCodeViewerConfig config)
+        public void Setup(UIViewModel model, AppConfig profile)
         {
-            ArcResolution = config.ArcResolution;
-            MinDistance = config.MinDistance;
-            ShowGrid = config.ShowGrid;
-            ShowAxes = config.ShowAxes;
-            ShowBoundingBox = config.ShowBoundingBox;
-            ShowViewCube = config.ShowViewCube;
+            model.ConfigControls.Add(new ConfigControl());
+
+            ArcResolution = profile.Config.GCodeViewer.ArcResolution;
+            MinDistance = profile.Config.GCodeViewer.MinDistance;
+            ShowGrid = profile.Config.GCodeViewer.ShowGrid;
+            ShowAxes = profile.Config.GCodeViewer.ShowAxes;
+            ShowBoundingBox = profile.Config.GCodeViewer.ShowBoundingBox;
+            ShowViewCube = profile.Config.GCodeViewer.ShowViewCube;
         }
 
         public void Open(string title, List<GCodeToken> tokens)

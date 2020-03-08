@@ -1,7 +1,7 @@
-﻿/*
+/*
  * TrinamicView.xaml.cs - part of CNC Controls library
  *
- * v0.01 / 2019-10-27 / Io Engineering (Terje Io)
+ * v0.10 / 2019-03-05 / Io Engineering (Terje Io)
  *
  */
 
@@ -42,7 +42,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using CNC.Core;
-using CNC.View;
 using System.Windows.Shapes;
 using System.Collections.Generic;
 
@@ -51,7 +50,7 @@ namespace CNC.Controls
     /// <summary>
     /// Interaction logic for TrinamicView.xaml
     /// </summary>
-    public partial class TrinamicView : UserControl, CNCView
+    public partial class TrinamicView : UserControl, ICNCView
     {
         private int sg_index = 0;
         private bool plot = false, read_status = false;
@@ -89,7 +88,7 @@ namespace CNC.Controls
 
         #region Methods and properties required by CNCView interface
 
-        public ViewType mode { get { return ViewType.TrinamicTuner; } }
+        public ViewType ViewType { get { return ViewType.TrinamicTuner; } }
 
         public void Activate(bool activate, ViewType chgMode)
         {
@@ -101,6 +100,9 @@ namespace CNC.Controls
         }
 
         public void CloseFile()
+        {
+        }
+        public void Setup(UIViewModel model, AppConfig profile)
         {
         }
 

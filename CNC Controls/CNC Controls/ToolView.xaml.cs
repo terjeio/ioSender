@@ -1,7 +1,7 @@
-﻿/*
+/*
  * ToolView.xaml.cs - part of CNC Controls library
  *
- * v0.05 / 2020-02-06 / Io Engineering (Terje Io)
+ * v0.10 / 2019-03-05 / Io Engineering (Terje Io)
  *
  */
 
@@ -44,12 +44,11 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using CNC.Core;
 using CNC.GCode;
-using CNC.View;
 using System.Threading;
 
 namespace CNC.Controls
 {
-    public partial class ToolView : UserControl, CNCView
+    public partial class ToolView : UserControl, ICNCView
     {
         Tool selectedTool = null;
         private GrblViewModel parameters = new GrblViewModel();
@@ -67,7 +66,7 @@ namespace CNC.Controls
 
         #region Methods and properties required by CNCView interface
 
-        public ViewType mode { get { return ViewType.Tools; } }
+        public ViewType ViewType { get { return ViewType.Tools; } }
 
         public void Activate(bool activate, ViewType chgMode)
         {
@@ -88,6 +87,9 @@ namespace CNC.Controls
         }
 
         public void CloseFile()
+        {
+        }
+        public void Setup(UIViewModel model, AppConfig profile)
         {
         }
 
