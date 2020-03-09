@@ -1,7 +1,7 @@
 /*
  * Renderer.xaml.cs - part of CNC Controls library
  *
- * v0.02 / 2020-01-27 / Io Engineering (Terje Io)
+ * v0.11 / 2019-03-09 / Io Engineering (Terje Io)
  *
  */
 
@@ -14,7 +14,7 @@
 
 /*
 
-Copyright (c) 2019, Io Engineering (Terje Io)
+Copyright (c) 2019-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -49,18 +49,21 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Media.Media3D;
 using HelixToolkit.Wpf;
 using CNC.Core;
 using CNC.GCode;
-using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace CNC.Controls.Viewer
 {
+    public enum MoveType
+    {
+        None,
+        Cut,
+        Rapid,
+        Retract
+    }
 
     public static class ex3d
     {
@@ -76,6 +79,65 @@ namespace CNC.Controls.Viewer
         }
     }
 
+    public class Machine : ViewModelBase
+    {
+        GridLinesVisual3D _grid;
+        BoundingBoxWireFrameVisual3D _bbox;
+        ModelVisual3D _axes = new ModelVisual3D();
+        Point3D _startposition = new Point3D();
+        Point3D _limits = new Point3D();
+        Point3DCollection _toolposition, _cutlines, _rapidlines, _retractlines;
+
+        public void Clear()
+        {
+         //   Grid = null;
+         //   BoundingBox = null;
+            ToolPosition = CutLines = RapidLines = RetractLines = null;
+        }
+
+        public void SetStartPosition(double x, double y, double z)
+        {
+            SetStartPosition(new Point3D(x, y, z));
+        }
+
+        public void SetStartPosition(Point3D position)
+        {
+            if (!position.Equals(_startposition))
+            {
+                _startposition.X = position.X;
+                _startposition.Y = position.Y;
+                _startposition.Z = position.Z;
+                OnPropertyChanged(nameof(StartPosition));
+            }
+        }
+
+        public void SetLimits(double x, double y, double z)
+        {
+            SetLimits(new Point3D(x, y, z));
+        }
+
+        public void SetLimits(Point3D position)
+        {
+            if (!position.Equals(_limits))
+            {
+                _limits.X = position.X;
+                _limits.Y = position.Y;
+                _limits.Z = position.Z;
+                OnPropertyChanged(nameof(Limits));
+            }
+        }
+
+        public GridLinesVisual3D Grid { get { return _grid; } set { _grid = value; OnPropertyChanged(); } }
+        public BoundingBoxWireFrameVisual3D BoundingBox { get { return _bbox; } set { _bbox = value; OnPropertyChanged(); } }
+        public ModelVisual3D Axes { get { return _axes; } }
+        public Point3DCollection ToolPosition { get { return _toolposition; } set { _toolposition = value; OnPropertyChanged(); } }
+        public Point3DCollection CutLines { get { return _cutlines; } set { _cutlines = value; OnPropertyChanged(); } }
+        public Point3DCollection RapidLines { get { return _rapidlines; } set { _rapidlines = value; OnPropertyChanged(); } }
+        public Point3DCollection RetractLines { get { return _retractlines; } set { _retractlines = value; OnPropertyChanged(); } }
+        public Point3D StartPosition { get { return _startposition; } }
+        public Point3D Limits { get { return _limits; } }
+    }
+
     /// <summary>
     /// Interaction logic for UserControl1.xaml
     /// </summary>
@@ -83,10 +145,7 @@ namespace CNC.Controls.Viewer
     {
         private Point3D point0;  // last point
         private Vector3D delta0;  // (dx,dy,dz)
-        private List<LinesVisual3D> trace;
-        private List<LinesVisual3D> position = new List<LinesVisual3D>();
-        private LinesVisual3D path;
-        private double minDistanceSquared;
+        private double minDistanceSquared, _minDistance;
 
         bool isRelative = false;
         double[] offsets = new double[6] { 0d, 0d, 0d, 0d, 0d, 0d };
@@ -98,62 +157,94 @@ namespace CNC.Controls.Viewer
         private List<CoordinateSystem> coordinateSystems = new List<CoordinateSystem>();
         private CoordinateSystem coordinateSystem;
 
+        private int cutCount;
+        private MoveType lastType;
+
+        Point3DCollection linePoints = new Point3DCollection();
+        Point3DCollection rapidPoints = new Point3DCollection();
+        Point3DCollection retractPoints = new Point3DCollection();
+        Point3DCollection positionPoints = new Point3DCollection();
+
+        public Machine Machine { get; set; } = new Machine();
+
         public Renderer()
         {
             InitializeComponent();
 
-            minDistanceSquared = MinDistance * MinDistance;
             AxisBrush = Brushes.Gray;
             TickSize = 10;
+            MinDistance = 0.05d;
+            viewport.DataContext = Machine;
         }
 
         public int ArcResolution { get; set; } = 5;
-        public double MinDistance { get; set; } = 0.05;
+        public double MinDistance { get { return _minDistance; } set { _minDistance = value; minDistanceSquared = _minDistance * _minDistance; } }
         public bool ShowGrid { get; set; } = true;
         public bool ShowAxes { get; set; } = true;
         public bool ShowBoundingBox { get; set; } = true;
 
         public void ClearViewport()
         {
-            viewport.Children.Clear();
+            Machine.Clear();
+            linePoints.Clear();
+            rapidPoints.Clear();
+            retractPoints.Clear();
+
+            if (Machine.BoundingBox != null)
+                viewport.Children.Remove(Machine.BoundingBox);
+
+            if (Machine.Grid != null)
+                viewport.Children.Remove(Machine.Grid);
+
+            viewport.Children.Remove(Machine.Axes);
+            Machine.Axes.Children.Clear();
+        }
+
+        public void ResetView()
+        {
+            refreshCamera(((GrblViewModel)DataContext).ProgramLimits);
         }
 
         public void ShowPosition()
         {
             GrblViewModel model = (GrblViewModel)DataContext;
 
-            foreach (var path in position)
-                viewport.Children.Remove(path);
+            Machine.ToolPosition = null;
 
-            position.Clear();
+            positionPoints.Clear();
 
-            double maxX = GrblSettings.GetDouble(GrblSetting.AxisSetting_XMaxTravel);
-            double maxY = GrblSettings.GetDouble(GrblSetting.AxisSetting_YMaxTravel);
-            double maxZ = GrblSettings.GetDouble(GrblSetting.AxisSetting_ZMaxTravel);
+            if (Machine.Limits.X == 0d)
+                Machine.SetLimits(GrblSettings.GetDouble(GrblSetting.AxisSetting_XMaxTravel),
+                                   GrblSettings.GetDouble(GrblSetting.AxisSetting_YMaxTravel),
+                                    GrblSettings.GetDouble(GrblSetting.AxisSetting_ZMaxTravel));
 
-            var positionX = new LinesVisual3D();
-            positionX.Color = Colors.Green;
-            positionX.Thickness = 1;
-            positionX.Points.Add(new Point3D(model.ProgramLimits.MinX - 5d, model.Position.Y, model.Position.Z));
-            positionX.Points.Add(new Point3D(maxX, model.Position.Y, model.Position.Z));
-            position.Add(positionX);
+            positionPoints.Add(new Point3D(Math.Min(model.Position.X, model.ProgramLimits.MinX) - 5d, model.Position.Y, model.Position.Z));
+            positionPoints.Add(new Point3D(Machine.Limits.X, model.Position.Y, model.Position.Z));
 
-            var positionY = new LinesVisual3D();
-            positionY.Color = Colors.Green;
-            positionY.Thickness = 1;
-            positionY.Points.Add(new Point3D(model.Position.X, model.ProgramLimits.MinY - 5d, model.Position.Z));
-            positionY.Points.Add(new Point3D(model.Position.X, maxY, model.Position.Z));
-            position.Add(positionY);
+            positionPoints.Add(new Point3D(model.Position.X, Math.Min(model.Position.Y, model.ProgramLimits.MinY) - 5d, model.Position.Z));
+            positionPoints.Add(new Point3D(model.Position.X, Machine.Limits.Y, model.Position.Z));
 
-            var positionZ = new LinesVisual3D();
-            positionZ.Color = Colors.Green;
-            positionZ.Thickness = 1;
-            positionZ.Points.Add(new Point3D(model.Position.X, model.Position.Y, model.ProgramLimits.MinZ - 5d));
-            positionZ.Points.Add(new Point3D(model.Position.X, model.Position.Y, maxZ));
-            position.Add(positionZ);
+            positionPoints.Add(new Point3D(model.Position.X, model.Position.Y, Math.Min(model.Position.Z, model.ProgramLimits.MinZ) - 5d));
+            positionPoints.Add(new Point3D(model.Position.X, model.Position.Y, Machine.Limits.Z));
 
-            foreach (var path in position)
-                viewport.Children.Add(path);
+            Machine.ToolPosition = positionPoints;
+            var orgpos = Machine.StartPosition;
+            Machine.SetStartPosition(model.Position.X, model.Position.Y, model.Position.Z);
+
+            if (Machine.RapidLines != null && Machine.RapidLines.Count > 0 && Machine.RapidLines[0].Equals(orgpos))
+            {
+                Machine.RapidLines.RemoveAt(0);
+                Machine.RapidLines.Insert(0, Machine.StartPosition);
+            }
+        }
+
+        public double boffset (double w, double wh, double xs, double xm)
+        {
+            double v, vv = xm - Math.Floor(xm);
+
+            v = xs / 2d + wh;
+
+            return v;
         }
 
         public void Render(List<GCodeToken> tokens)
@@ -165,57 +256,62 @@ namespace CNC.Controls.Viewer
             double labelOffset = lineThickness * 50;
             bool canned = false;
 
-            //trace.Clear();
-            trace = null;
-            viewport.Children.Clear();
+            ClearViewport();
 
             coordinateSystems.Clear();
-
-            distanceMode = GrblParserState.DistanceMode;
-
             foreach (CoordinateSystem c in GrblWorkParameters.CoordinateSystems)
                 coordinateSystems.Add(c);
 
             coordinateSystem = coordinateSystems.Where(x => x.Code == GrblParserState.WorkOffset).FirstOrDefault();
 
+            cutCount = 0;
+            point0 = Machine.StartPosition;
+            lastType = MoveType.None;
+            distanceMode = GrblParserState.DistanceMode;
+
             #region Canvas adorners
 
             if (ShowGrid)
             {
-                viewport.Children.Add(new GridLinesVisual3D()
+                double wm = bbox.SizeX % TickSize, w = Math.Ceiling(bbox.SizeX - bbox.SizeX % TickSize + TickSize * 2d);
+                double wh = bbox.SizeY % TickSize, h = Math.Ceiling(bbox.SizeY - bbox.SizeY % TickSize + TickSize * 2d);
+
+                Machine.Grid = new GridLinesVisual3D()
                 {
-                    Center = new Point3D(bbox.SizeX / 2d - TickSize - bbox.MinX / 2d, bbox.SizeY / 2d - TickSize - bbox.MinY / 2d, 0.0),
-                    MinorDistance = TickSize,
-                    MajorDistance = bbox.MaxSize,
-                    Width = bbox.SizeY + TickSize * 2d,
-                    Length = bbox.SizeX + TickSize * 2d,
-                    Thickness = lineThickness,
+                    Center = new Point3D(boffset(bbox.SizeX, bbox.MinX, w, wm) - TickSize, boffset(bbox.SizeY, bbox.MinY, h, wh) - TickSize, 0d),
+                    MinorDistance = 2.5d,
+                    MajorDistance = TickSize,
+                    Width = h,
+                    Length = w,
+                    Thickness = 0.1d,
                     Fill = AxisBrush
-                });
+                };
+
+                viewport.Children.Add(Machine.Grid);
             }
 
             if (ShowAxes)
             {
-                viewport.Children.Add(new ArrowVisual3D() {
+                Machine.Axes.Children.Add(new ArrowVisual3D() {
                     Point2 = new Point3D(bbox.SizeX + arrowOffset, 0.0, 0.0),
                     Diameter = lineThickness * 5,
                     Fill = AxisBrush
                 });
 
-                viewport.Children.Add(new BillboardTextVisual3D() {
+                Machine.Axes.Children.Add(new BillboardTextVisual3D() {
                     Text = "X",
                     FontWeight = FontWeights.Bold,
                     Foreground = AxisBrush,
                     Position = new Point3D(bbox.SizeX + labelOffset, 0.0, 0.0)
                 });
 
-                viewport.Children.Add(new ArrowVisual3D() {
+                Machine.Axes.Children.Add(new ArrowVisual3D() {
                     Point2 = new Point3D(0.0, bbox.SizeY + arrowOffset, 0.0),
                     Diameter = lineThickness * 5,
                     Fill = AxisBrush
                 });
 
-                viewport.Children.Add(new BillboardTextVisual3D()
+                Machine.Axes.Children.Add(new BillboardTextVisual3D()
                 {
                     Text = "Y",
                     FontWeight = FontWeights.Bold,
@@ -225,14 +321,14 @@ namespace CNC.Controls.Viewer
 
                 if (bbox.SizeZ > 0d)
                 {
-                    viewport.Children.Add(new ArrowVisual3D() {
+                    Machine.Axes.Children.Add(new ArrowVisual3D() {
                         Point1 = new Point3D(0.0, 0.0, bbox.MinZ),
                         Point2 = new Point3D(0.0, 0.0, bbox.MaxZ + arrowOffset),
                         Diameter = lineThickness * 5,
                         Fill = AxisBrush
                     });
 
-                    viewport.Children.Add(new BillboardTextVisual3D()
+                    Machine.Axes.Children.Add(new BillboardTextVisual3D()
                     {
                         Text = "Z",
                         FontWeight = FontWeights.Bold,
@@ -240,16 +336,20 @@ namespace CNC.Controls.Viewer
                         Position = new Point3D(0.0, 0.0, bbox.MaxZ + labelOffset)
                     });
                 }
+
+                viewport.Children.Add(Machine.Axes);
             }
 
             if (ShowBoundingBox && bbox.SizeZ > 0d)
             {
-                viewport.Children.Add(new BoundingBoxWireFrameVisual3D()
+                Machine.BoundingBox = new BoundingBoxWireFrameVisual3D()
                 {
                     BoundingBox = new Rect3D(bbox.MinX, bbox.MinY, bbox.MinZ, bbox.SizeX, bbox.SizeY, bbox.SizeZ),
                     Thickness = 1d,
-                    Color = Colors.Gray
-                });
+                    Color = Colors.LightGreen
+                };
+
+                viewport.Children.Add(Machine.BoundingBox);
             }
 
             #endregion
@@ -266,9 +366,9 @@ namespace CNC.Controls.Viewer
                             var pt = toPoint(motion.Values);
                             if (distanceMode == DistanceMode.Incremental)
                                 pt.Offset(point0.X, point0.Y, point0.Z);
-                            if (last.Command == Commands.G1 && (((GCLinearMotion)last).X != point0.X || ((GCLinearMotion)last).Y != point0.Y))
-                                path.Points.Add(pt);
-                            AddPoint(pt, Colors.Red, 0.5);
+                            //if (last.Command == Commands.G1 && (((GCLinearMotion)last).X != point0.X || ((GCLinearMotion)last).Y != point0.Y))
+                            //    path.Points.Add(pt);
+                            AddRapidMove(pt);
                         }
                         break;
 
@@ -278,10 +378,9 @@ namespace CNC.Controls.Viewer
                             var pt = toPoint(motion.Values);
                             if (distanceMode == DistanceMode.Incremental)
                                 pt.Offset(point0.X, point0.Y, point0.Z);
-                            if (last.Command == Commands.G0 && (((GCLinearMotion)last).X != point0.X || ((GCLinearMotion)last).Y != point0.Y))
-                                path.Points.Add(pt);
-                            AddPoint(point0, Colors.Blue, 1);
-                            AddPoint(pt, Colors.Blue, 1);
+                            //if (last.Command == Commands.G0 && (((GCLinearMotion)last).X != point0.X || ((GCLinearMotion)last).Y != point0.Y))
+                            //    path.Points.Add(pt);
+                            AddCutMove(pt);
                         }
                         break;
 
@@ -374,21 +473,21 @@ namespace CNC.Controls.Viewer
                             {
                                 canned = true;
                                 if (point0.Z < drill.R)
-                                    AddPoint(toPoint(point0.X, point0.Y, drill.R), Colors.Red, 1);
+                                    AddRapidMove(toPoint(point0.X, point0.Y, drill.R));
                             }
 
-                            AddPoint(toPoint(drill.X, drill.Y, Math.Max(drill.Z, drill.R)), Colors.Red, 1);
+                            AddRapidMove(toPoint(drill.X, drill.Y, Math.Max(drill.Z, drill.R)));
 
                             do
                             {
-                                AddPoint(toPoint(values), Colors.Blue, 3d);
-                                AddPoint(toPoint(values[0], values[1], drill.R), Colors.Green, 1);
-                                if(repeats > 1)
+                                AddCutMove(toPoint(values));
+                                AddRetractMove(toPoint(values[0], values[1], drill.R));
+                                if (repeats > 1)
                                 {
-                                    AddPoint(toPoint(values[0], values[1], drill.R), Colors.Red, 1);
+                                    AddRapidMove(toPoint(values[0], values[1], drill.R));
                                     values[0] += drill.X;
                                     values[1] += drill.Y;
-                                    AddPoint(toPoint(values[0], values[1], drill.R), Colors.Red, 1);
+                                    AddRapidMove(toPoint(values[0], values[1], drill.R));
                                 }
                             } while (--repeats > 0);
                         }
@@ -403,35 +502,24 @@ namespace CNC.Controls.Viewer
             }
             last = null;
 
-            if(trace != null) foreach (var path in trace)
-                viewport.Children.Add(path);
+            Machine.RapidLines = rapidPoints;
+            Machine.CutLines = linePoints;
+            Machine.RetractLines = retractPoints;
 
             refreshCamera(bbox);
-
         }
         public void refreshCamera(ProgramLimits bbox)
         {
-            double zpos = Math.Max(bbox.SizeX, bbox.SizeY) / Math.Tan(60 * Math.PI / 360d);
+            double zpos = Math.Max(5d, Math.Max(bbox.SizeX, bbox.SizeY) / Math.Tan(60 * Math.PI / 360d));
 
             // TODO: set a sensible viewing distance dynamically
-            var position = new Point3D(Math.Max(10d, bbox.SizeX) / 2d, Math.Max(10d, bbox.SizeY) / 2d, zpos);
 
-            viewport.Camera.Position = position;
-            viewport.DefaultCamera.Position = position;
-            //                viewport.CameraController.AddRotateForce(0.001, 0.001); // emulate move camera 
+            viewport.Camera.Position = new Point3D((bbox.MaxX + bbox.MinX) / 2d, (bbox.MaxY + bbox.MinY) / 2d, zpos);
+            viewport.Camera.LookDirection = new Vector3D(0, 0, -100);
+            viewport.Camera.UpDirection = new Vector3D(0, 1, 0.5);
+
+ //                viewport.CameraController.AddRotateForce(0.001, 0.001); // emulate move camera 
         }
-
-        //private void DrawLine(LinesVisual3D lines, double x_start, double y_start, double z_start, double x_stop, double y_stop, double z_stop)
-        //{
-        //    lines.Points.Add(new Point3D(x_start, y_start, z_start));
-        //    lines.Points.Add(new Point3D(x_stop, y_stop, z_stop));
-        //}
-
-        //private void DrawLine(LinesVisual3D lines, Point3D start, Point3D end)
-        //{
-        //    lines.Points.Add(start);
-        //    lines.Points.Add(end);
-        //}
 
         private Point3D toPoint(double[] values)
         {
@@ -442,6 +530,7 @@ namespace CNC.Controls.Viewer
 
             return p;
         }
+
         private Point3D toPoint(double X, double Y, double Z)
         {
             Point3D p = new Point3D(X, Y, Z);
@@ -452,55 +541,49 @@ namespace CNC.Controls.Viewer
             return p;
         }
 
-        public void NewTrace(Point3D point, Color color, double thickness = 1)
+        public void AddRapidMove(Point3D point)
         {
-            path = new LinesVisual3D();
-            path.Color = color;
-            //       path.Points.Add(point);
-            path.Thickness = thickness;
-            trace = new List<LinesVisual3D>();
-            trace.Add(path);
-            //    viewport.Children.Add(path);
-            point0 = point;
-            delta0 = new Vector3D();
-
-            /*
-            if (marker != null)
+            if (cutCount > 1)
             {
-                marker.Origin = point;
-                coords.Position = new Point3D(point.X - labelOffset, point.Y - labelOffset, point.Z + labelOffset);
-                coords.Text = string.Format(coordinateFormat, point.X, point.Y, point.Z);
-            } */
-        }
-        public void NewTrace(double x, double y, double z, Color color, double thickness = 1)
-        {
-            NewTrace(new Point3D(x, y, z), color, thickness);
-        }
-
-        public void AddPoint(Point3D point, Color color, double thickness = -1)
-        {
-            if (trace == null)
-            {
-                NewTrace(point, color, (thickness > 0) ? thickness : 1);
-                return;
+                linePoints.Add(linePoints.Last());
+                linePoints.Add(point);
             }
 
+            if (lastType == MoveType.Cut)
+                delta0 = new Vector3D(0d, 0d, 0d);
 
+            rapidPoints.Add(point0);
+            rapidPoints.Add(point);
+
+            cutCount = 0;
+            lastType = MoveType.Rapid;
+            point0 = point;
+        }
+
+        public void AddRetractMove(Point3D point)
+        {
+            if (cutCount > 1)
+            {
+                linePoints.Add(linePoints.Last());
+                linePoints.Add(point);
+            }
+
+            if (lastType == MoveType.Cut)
+                delta0 = new Vector3D(0d, 0d, 0d);
+
+            retractPoints.Add(point0);
+            retractPoints.Add(point);
+
+            cutCount = 0;
+            lastType = MoveType.Retract;
+            point0 = point;
+        }
+
+        public void AddCutMove(Point3D point)
+        {
             bool sameDir = false;
 
-            if (path.Color != color || (thickness > 0.0 && path.Thickness != thickness))
-            {
-                if (thickness <= 0.0)
-                    thickness = path.Thickness;
-
-                path = new LinesVisual3D();
-                path.Color = color;
-                path.Thickness = thickness;
-
-                trace.Add(path);
-                //  viewport.Children.Add(path);
-            }
-            else
+            if (lastType == MoveType.Cut && minDistanceSquared > 0d)
             {
 
                 // If line segments AB and BC have the same direction (small cross product) then remove point B.
@@ -508,18 +591,24 @@ namespace CNC.Controls.Viewer
                 var delta = new Vector3D(point.X - point0.X, point.Y - point0.Y, point.Z - point0.Z);
                 delta.Normalize();  // use unit vectors (magnitude 1) for the cross product calculations
                 Vector3D cp; double xp2;
-                if (path.Points.Count > (trace.Count == 1 ? 1 : 0))
-                {
+                //if (path.Points.Count > (trace.Count == 1 ? 1 : 0))
+                //{
                     cp = Vector3D.CrossProduct(delta, delta0);
                     xp2 = cp.LengthSquared;
                     sameDir = xp2 > 0d && (xp2 < 0.0005d);  // approx 0.001 seems to be a reasonable threshold from logging xp2 values
                                                             //if (!sameDir) Title = string.Format("xp2={0:F6}", xp2);
-                }
+                //}
 
                 if (sameDir)  // extend the current line segment
                 {
-                    path.Points[path.Points.Count - 1] = point;
+                    //var last = linePoints.Last();
+                    //last.X = point.X;
+                    //last.Y = point.Y;
+                    //last.Z = point.Z;
+                    linePoints.RemoveAt(linePoints.Count - 1);
+                    linePoints.Add(point);
                     delta0 += delta;
+                    cutCount++;
                 }
                 else
                 {
@@ -531,18 +620,13 @@ namespace CNC.Controls.Viewer
 
             if (!sameDir)
             {
-                path.Points.Add(point0);
-                path.Points.Add(point);
+                cutCount = 1;
+                linePoints.Add(point0);
+                linePoints.Add(point);
             }
 
+            lastType = MoveType.Cut;
             point0 = point;
-
-            //if (marker != null)
-            //{
-            //    marker.Origin = point;
-            //    coords.Position = new Point3D(point.X - labelOffset, point.Y - labelOffset, point.Z + labelOffset);
-            //    coords.Text = string.Format(coordinateFormat, point.X, point.Y, point.Z);
-            //}
         }
 
         //-------------
@@ -555,10 +639,10 @@ namespace CNC.Controls.Viewer
             Point3D old_point = arcpoints[0];
             arcpoints.RemoveAt(0);
 
-            AddPoint(old_point, Colors.Blue);
+            AddCutMove(old_point);
 
             foreach (Point3D point in arcpoints)
-                AddPoint(point, Colors.Blue);
+                AddCutMove(point);
         }
 
         private void DrawArc(GCPlane plane, double[] start, double[] stop, double[] ijkValues, bool absoluteIJKMode, bool clockwise)
@@ -568,7 +652,7 @@ namespace CNC.Controls.Viewer
             List<Point3D> arcpoints = generatePointsAlongArcBDring(plane, start, stop, center, clockwise, 0d, ArcResolution); // Dynamic resolution
 
             foreach (Point3D point in arcpoints)
-                AddPoint(point, Colors.Blue);
+                AddCutMove(point);
         }
 
         /**

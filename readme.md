@@ -1,12 +1,18 @@
 ## GRBL GCode Sender
 
+2020-03-09: Alpha 11 release of binary.
+
+Improved rendering of 3D model, added Goto sidebar button for G28 and G30.
+
+---
+
 2020-02-29: Ninth alpha release of binary.
 
 Refactored main state machine. Some layout fixes.
 
 ---
 
-2020-02-25: Eight alpha release of binary.
+2020-02-25: Eigth alpha release of binary.
 
 Improved serial connection, now always asserts DTR on connect (before any toggling). Some layout fixes.
 
@@ -24,13 +30,9 @@ Finally fixed MPG -> Sender swiching. Fixed intermittent hang on close and added
 
 ---
 
----
-
 2020-02-06: Fifth alpha release of binary.
 
 Moved main response handler to view model, added timeouts for waiting for controller responses. Improved MPG/Sender switching. 
-
----
 
 ---
 
@@ -38,7 +40,6 @@ Moved main response handler to view model, added timeouts for waiting for contro
 
 Improved button interlocks, added [direct output to machine](https://github.com/terjeio/Grbl-GCode-Sender/wiki/Vectric-Direct-Output) from Vectric applications.
 
----
 
 ---
 
@@ -56,7 +57,7 @@ __NOTE:__ .Net Runtime version 4.5.2 is required, so this sender is for Win7 or 
 
 Some known issues:
 
-* The 3D-viewer will slow down loading of large files, if this is a problem then disable it in app settings. A rewrite is planned, using a faster library.
+* The 3D-viewer will slow down loading of large files, if this is a problem then disable it in app settings. __Fixed.__
 
 * A restart is required after changing most app settings.
 
@@ -82,4 +83,4 @@ Current layout, most likely to change. Since using the MVVM coding pattern this 
 ![Sender](Media/Sender.png)
 
 ---
-2020-01-28
+2020-03-09

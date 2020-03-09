@@ -4,6 +4,6 @@
     <EnableUnmanagedDebugging>true</EnableUnmanagedDebugging>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <StartArguments>-selectport</StartArguments>
+    <StartArguments>-selectports</StartArguments>
   </PropertyGroup>
 </Project>

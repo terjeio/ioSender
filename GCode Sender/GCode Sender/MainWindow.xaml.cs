@@ -1,7 +1,7 @@
 ﻿/*
  * MainWindow.xaml.cs - part of Grbl Code Sender
  *
- * v0.10 / 2020-03-05 / Io Engineering (Terje Io)
+ * v0.11 / 2020-03-09 / Io Engineering (Terje Io)
  *
  */
 
@@ -150,6 +150,7 @@ namespace GCode_Sender
             xx.ItemsSource = UIViewModel.SidebarItems;
             UIViewModel.SidebarItems.Add(new SidebarItem("Jog", jogControl));
             UIViewModel.SidebarItems.Add(new SidebarItem("Macros", macroControl));
+            UIViewModel.SidebarItems.Add(new SidebarItem("Goto", gotoControl));
 
             UIViewModel.CurrentView = getView((TabItem)tabMode.Items[tabMode.SelectedIndex = 0]);
             System.Threading.Thread.Sleep(50);

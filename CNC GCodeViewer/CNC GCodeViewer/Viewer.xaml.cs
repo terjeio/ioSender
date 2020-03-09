@@ -115,7 +115,13 @@ public partial class Viewer : UserControl, ICNCView
 
         public void Open(string title, List<GCodeToken> tokens)
         {
+            gcodeView.ShowPosition();
             gcodeView.Render(tokens);
+        }
+
+        private void button_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            gcodeView.ResetView();
         }
     }
 }

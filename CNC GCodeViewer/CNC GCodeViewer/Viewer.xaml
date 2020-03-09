@@ -10,5 +10,6 @@
     <Grid Height="515" Width="875">
         <local:Renderer x:Name="gcodeView" Width="850" Height="500" HorizontalAlignment="Left" Margin="7,10,0,0" VerticalAlignment="Bottom"/>
         <Controls:LimitsControl HorizontalAlignment="Left" Margin="5,5" VerticalAlignment="Top"/>
+        <Button x:Name="button" Content="Reset view" HorizontalAlignment="Left" Margin="5,471,0,0" VerticalAlignment="Top" Width="75" Click="button_Click"/>
     </Grid>
 </UserControl>
