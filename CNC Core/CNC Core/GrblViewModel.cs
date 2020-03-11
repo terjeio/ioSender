@@ -1,7 +1,7 @@
 /*
  * GrblViewModel.cs - part of CNC Controls library
  *
- * v0.10 / 2020-03-07 / Io Engineering (Terje Io)
+ * v0.12 / 2020-03-11 / Io Engineering (Terje Io)
  *
  */
 
@@ -52,9 +52,9 @@ namespace CNC.Core
         private string _mdiCommand, _fileName;
         private bool _flood, _mist, _tubeCoolant, _toolChange, _reset, _isMPos, _isJobRunning, _probeState, _pgmEnd;
         private bool? _mpg;
-        private int _pwm, _line;
+        private int _pwm, _line, _scrollpos;
         private double _feedrate = 0d;
-        private double _rpm = 0d;
+        private double _rpm = 0d, _rpmInput = 0d, _rpmDisplay = 0d;
         private double _rpmActual = double.NaN;
         private double _feedOverride = 100d;
         private double _rapidsOverride = 100d;
@@ -64,6 +64,7 @@ namespace CNC.Core
         private LatheMode _latheMode = LatheMode.Disabled;
         private HomedState _homedState = HomedState.Unknown;
         private StreamingState _streamingState;
+        public SpindleState _spindleStatePrev = GCode.SpindleState.Off;
 
         public Action<string> OnCommandResponseReceived;
         public Action<string> OnResponseReceived;
@@ -79,6 +80,32 @@ namespace CNC.Core
             Clear();
 
             MDICommand = new ActionCommand<string>(ExecuteMDI);
+
+            Signals.PropertyChanged += Signals_PropertyChanged;
+            SpindleState.PropertyChanged += SpindleState_PropertyChanged;
+            AxisScaled.PropertyChanged += AxisScaled_PropertyChanged;
+
+        }
+
+        private void AxisScaled_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            OnPropertyChanged(nameof(AxisScaled));
+        }
+
+        private void SpindleState_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            _rpmDisplay = _spindleStatePrev == GCode.SpindleState.Off ? _rpmInput : _rpm;
+            if (!(SpindleState.Value.HasFlag(GCode.SpindleState.Off | GCode.SpindleState.CW) || SpindleState.Value.HasFlag(GCode.SpindleState.Off | GCode.SpindleState.CCW)))
+            {
+                OnPropertyChanged(nameof(SpindleState));
+                OnPropertyChanged(nameof(RPM));
+                _spindleStatePrev = SpindleState.Value;
+            }
+        }
+
+        private void Signals_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            OnPropertyChanged(nameof(Signals));
         }
 
         public void Clear()
@@ -88,7 +115,7 @@ namespace CNC.Core
             _isMPos = _reset = _isJobRunning = _probeState = _pgmEnd = false;
             _pb_avail = _rxb_avail = string.Empty;
             _mpg = null;
-            _line = _pwm = 0;
+            _line = _pwm = _scrollpos = 0;
 
             _grblState.Error = 0;
             _grblState.State = GrblStates.Unknown;
@@ -182,6 +209,8 @@ namespace CNC.Core
         public bool LatheModeEnabled { get { return GrblInfo.LatheModeEnabled; } set { OnPropertyChanged(); } }
         public int NumAxes { get { return GrblInfo.NumAxes; } set { OnPropertyChanged(); } }
         public int AxisEnabledFlags { get { return GrblInfo.AxisFlags; } set { OnPropertyChanged(); } }
+        public int ScrollPosition { get { return _scrollpos; } set { _scrollpos = value;  OnPropertyChanged(); } }
+
         public string RunTime { get { return JobTimer.RunTime; } set { OnPropertyChanged(); } } // Cannot be set...
         // CO2 Laser
         public bool TubeCoolant { get { return _tubeCoolant; }  set { _tubeCoolant = value; OnPropertyChanged(); } }
@@ -234,8 +263,48 @@ namespace CNC.Core
         #region FS - Feed and Speed (RPM)
 
         public double FeedRate { get { return _feedrate; } private set { _feedrate = value; OnPropertyChanged(); } }
-        public double ProgrammedRPM { get { return _rpm; } set { _rpm = value; OnPropertyChanged(); } }
-        public double ActualRPM { get { return _rpmActual; } private set { _rpmActual = value; OnPropertyChanged(); } }
+        public double ProgrammedRPM
+        {
+            get { return _rpm; }
+            set {
+                if (_rpm != value)
+                {
+                    _rpm = value;
+                    OnPropertyChanged();
+
+                    if(_rpm != 0d)
+                        _rpmInput = _rpm / (RPMOverride / 100d);
+
+                    if (double.IsNaN(ActualRPM))
+                    {
+                        _rpmDisplay = _rpm == 0d ? _rpmInput : _rpm;
+                        OnPropertyChanged(nameof(RPM));
+                    }
+                }
+            }
+        }
+        public double ActualRPM
+        {
+            get { return _rpmActual; }
+            private set
+            {
+                if (_rpmActual != value)
+                {
+                    _rpmActual = value;
+                    OnPropertyChanged();
+                    if (!double.IsNaN(ActualRPM))
+                    {
+                        _rpmDisplay = _rpmActual == 0d ? _rpmInput : _rpmActual;
+                        OnPropertyChanged(nameof(RPM));
+                    }
+                }
+            }
+        }
+        public double RPM {
+            get { return _rpmDisplay; }
+            set { _rpmDisplay = _rpmInput = value; OnPropertyChanged(); }
+        }
+
         public int PWM { get { return _pwm; } private set { _pwm = value; OnPropertyChanged(); } }
         #endregion
 
@@ -403,25 +472,24 @@ namespace CNC.Core
 
         public void ParseStatus(string data)
         {
-            bool parseState = true;
-
             string[] elements = data.TrimEnd('>').Split('|');
 
-            foreach (string e in elements)
+            if (elements.Length > 1)
             {
-                string[] pair = e.Split(':');
+                string[] pair = elements[0].Split(':');
+                SetGRBLState(pair[0].Substring(1), pair.Count() == 1 ? -1 : int.Parse(pair[1]), false);
 
-                if (parseState)
+                for (int i = elements.Length - 1; i > 0; i--)
                 {
-                    SetGRBLState(pair[0].Substring(1), pair.Count() == 1 ? -1 : int.Parse(pair[1]), false);
-                    parseState = false;
-                }
-                else if (pair.Length == 2)
-                    Set(pair[0], pair[1]);
-            }
+                    pair = elements[i].Split(':');
 
-            if (!data.Contains("|Pn:"))
-                Set("Pn", "");
+                    if (pair.Length == 2)
+                        Set(pair[0], pair[1]);
+                }
+
+                if (!data.Contains("|Pn:"))
+                    Set("Pn", "");
+            }
         }
 
         public void Set(string parameter, string value)

@@ -117,7 +117,7 @@ namespace CNC.Controls
     [Serializable]
     public class Macros : ViewModelBase
     {
-        public ObservableCollection<GCode.Macro> Macro { get; private set; } = new ObservableCollection<GCode.Macro>();
+        public ObservableCollection<CNC.GCode.Macro> Macro { get; private set; } = new ObservableCollection<CNC.GCode.Macro>();
     }
 
     [Serializable]
@@ -136,7 +136,7 @@ namespace CNC.Controls
         public CommandIgnoreState IgnoreM6 { get; set; } = CommandIgnoreState.No;
         public CommandIgnoreState IgnoreM7 { get; set; } = CommandIgnoreState.No;
         public CommandIgnoreState IgnoreM8 { get; set; } = CommandIgnoreState.No;
-        public ObservableCollection<GCode.Macro> Macros { get; set; } = new ObservableCollection<GCode.Macro>();
+        public ObservableCollection<CNC.GCode.Macro> Macros { get; set; } = new ObservableCollection<CNC.GCode.Macro>();
 
         public JogConfig Jog { get; set; } = new JogConfig();
         public LatheConfig Lathe { get; set; } = new LatheConfig();

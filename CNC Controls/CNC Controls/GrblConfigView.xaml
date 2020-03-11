@@ -43,9 +43,11 @@
                 <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
             </DataGrid.Columns>
         </DataGrid>
-        <Button x:Name="btnReload" Content="Reload" HorizontalAlignment="Left" Margin="435,458,0,0" VerticalAlignment="Top" Width="75" Click="btnReload_Click"/>
-        <Button x:Name="btnSave" Content="Save" HorizontalAlignment="Left" Margin="548,458,0,0" VerticalAlignment="Top" Width="74" Click="btnSave_Click"/>
-        <Button x:Name="btnBackup" Content="Backup" HorizontalAlignment="Left" Margin="666,458,0,0" VerticalAlignment="Top" Width="75" Click="btnBackup_Click"/>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Height="Auto" Margin="435,458,0,0" VerticalAlignment="Top" Width="Auto">
+            <Button x:Name="btnReload" Content="Reload" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Click="btnReload_Click"/>
+            <Button x:Name="btnSave" Content="Save" HorizontalAlignment="Left" Margin="5,0,0,0" VerticalAlignment="Top" Width="75" Click="btnSave_Click"/>
+            <Button x:Name="btnBackup" Content="Backup" HorizontalAlignment="Left" Margin="5,0,0,0" VerticalAlignment="Top" Width="75" Click="btnBackup_Click"/>
+        </StackPanel>
         <StackPanel HorizontalAlignment="Left" Height="Auto" Margin="440,30,0,0" VerticalAlignment="Top" Width="400">
             <StackPanel x:Name="canvas" HorizontalAlignment="Left" Height="Auto" VerticalAlignment="Center" Width="400"/>
             <TextBox x:Name="txtDescription" Background="#FFF8F8F8" IsReadOnly="True" HorizontalAlignment="Left" Height="150" TextWrapping="Wrap" VerticalAlignment="Top" Width="400"/>

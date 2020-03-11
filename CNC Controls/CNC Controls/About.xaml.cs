@@ -1,7 +1,7 @@
 ﻿/*
  * About.xaml.cs - part of CNC Controls library
  *
- * v2.0 / 2020-02-11 / Io Engineering (Terje Io)
+ * v0.12 / 2020-03-13 / Io Engineering (Terje Io)
  *
  */
 
@@ -67,6 +67,11 @@ namespace CNC.Controls
         private void okButton_Click(object sender, System.EventArgs e)
         {
             Close();
+        }
+
+        private void clbButton_Click(object sender, System.EventArgs e)
+        {
+            GrblSettings.CopyToClipboard();
         }
     }
 }

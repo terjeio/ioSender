@@ -1,7 +1,7 @@
 /*
  * JobView.xaml.cs - part of Grbl Code Sender
  *
- * v0.10 / 2019-03-05 / Io Engineering (Terje Io)
+ * v0.12 / 2019-03-10 / Io Engineering (Terje Io)
  *
  */
 
@@ -79,12 +79,12 @@ namespace GCode_Sender
 
         private void MainWindow_FileLoad(string filename)
         {
-            GCodeSender.LoadFile(filename);
+            GCode.File.Load(filename);
         }
 
         private void MainWindow_FileOpen()
         {
-            GCodeSender.OpenFile();
+            GCode.File.Open();
         }
 
         private void View_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -166,7 +166,7 @@ namespace GCode_Sender
                     {
                         MainWindow.EnableView(true, ViewType.GCodeViewer);
                         GCodeSender.EnablePolling(false);
-                        MainWindow.GCodeViewer.Open(filename, GCodeSender.GCode.Tokens);
+                        MainWindow.GCodeViewer.Open(filename, GCode.File.Tokens);
                         GCodeSender.EnablePolling(true);
                     }
                     break;
@@ -182,7 +182,7 @@ namespace GCode_Sender
             if (activate)
             {
                 GCodeSender.RewindFile();
-                GCodeSender.CallHandler(GCodeSender.GCode.Loaded ? StreamingState.Idle : (sdStream ? StreamingState.Start : StreamingState.NoFile), false);
+                GCodeSender.CallHandler(GCode.File.IsLoaded ? StreamingState.Idle : (sdStream ? StreamingState.Start : StreamingState.NoFile), false);
                 sdStream = false;
 
                 if (initOK != true)
@@ -224,7 +224,7 @@ namespace GCode_Sender
                 //if (viewer == null)
                 //    viewer = new Viewer();
 
-                if (GCodeSender.GCode.Loaded)
+                if(GCode.File.IsLoaded)
                     MainWindow.ui.WindowTitle = ((GrblViewModel)DataContext).FileName;
 
             }
@@ -346,7 +346,7 @@ namespace GCode_Sender
             else
                 MainWindow.ShowView(false, ViewType.TrinamicTuner);
 
-            MainWindow.GCodePush += UserUI_GCodePush;
+            MainWindow.GCodePush += GCode.File.AddBlock;
         }
 
         void EnableUI(bool enable)
@@ -358,12 +358,6 @@ namespace GCode_Sender
             }
             // disable ui components when in sleep mode
         }
-
-        void UserUI_GCodePush(string gcode, CNC.Core.Action action)
-        {
-            GCodeSender.GCode.AddBlock(gcode, action);
-        }
-
 #region UIevents
 
         void JobView_Load(object sender, EventArgs e)

@@ -1,7 +1,7 @@
 /*
  * JobControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.10 / 2020-03-08 / Io Engineering (Terje Io)
+ * v0.12 / 2020-03-11 / Io Engineering (Terje Io)
  *
  */
 
@@ -90,8 +90,6 @@ namespace CNC.Controls
             public DataRow CurrentRow, NextRow;
         }
 
-        const string allowedTypes = "nc,ncc,gcode,tap";
-
         private int serialSize = 128;
         private bool holdSignal = false, initOK = false, useBuffering = false;
         private volatile Key[] axisjog = new Key[3] { Key.None, Key.None, Key.None };
@@ -101,10 +99,10 @@ namespace CNC.Controls
         private JogMode jogMode = JogMode.None;
         private GrblState grblState;
         private GrblViewModel model;
-        private ScrollViewer scroll = null;
         private PollGrbl poller = null;
         private Thread polling = null;
         private JobData job;
+        private int missed = 0;
 
         private StreamingHandlerFn[] streamingHandlers = new StreamingHandlerFn[(int)StreamingHandler.Max];
         private StreamingHandlerFn streamingHandler;
@@ -149,25 +147,10 @@ namespace CNC.Controls
             for (int i = 0; i < streamingHandlers.Length; i++)
                 streamingHandlers[i].Handler = (StreamingHandler)i;
 
-            GCode.FileChanged += gcode_FileChanged;
-
             poller = new PollGrbl();
             polling = new Thread(new ThreadStart(poller.Run));
             polling.Start();
             Thread.Sleep(100);
-        }
-
-        void gcode_FileChanged(string filename)
-        {
-            if (filename == "")
-                ((GrblViewModel)DataContext).ProgramLimits.Clear();
-            else for (int i = 0; i < GrblInfo.NumAxes; i++)
-                {
-                    ((GrblViewModel)DataContext).ProgramLimits.MinValues[i] = GCode.BoundingBox.Min[i];
-                    ((GrblViewModel)DataContext).ProgramLimits.MaxValues[i] = GCode.BoundingBox.Max[i];
-                }
-
-            ((GrblViewModel)DataContext).FileName = filename;
         }
 
         private void JobControl_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -180,6 +163,7 @@ namespace CNC.Controls
                 model.PropertyChanged += OnDataContextPropertyChanged;
                 model.OnRealtimeStatusProcessed += RealtimeStatusProcessed;
                 model.OnCommandResponseReceived += ResponseReceived;
+                GCode.File.Model = model;
             }
         }
 
@@ -217,11 +201,22 @@ namespace CNC.Controls
                         break;
 
                     case nameof(GrblViewModel.ProgramEnd):
-                        if (!GCode.Loaded)
+                        if (!GCode.File.IsLoaded)
                             streamingHandler.Call(job.IsSDFile ? StreamingState.JobFinished : StreamingState.NoFile, job.IsSDFile);
                         else if(JobTimer.IsRunning && !job.Complete)
                             streamingHandler.Call(StreamingState.JobFinished, true);
                         break;
+
+                    case nameof(GrblViewModel.FileName):
+                        {
+                            if(((GrblViewModel)sender).FileName != "") {
+                                job.IsSDFile = false;
+                                job.CurrLine = job.PendingLine = job.ACKPending = 0;
+                                job.PgmEndLine = GCode.File.Blocks - 1;
+                                streamingHandler.Call(GCode.File.IsLoaded ? StreamingState.Idle : StreamingState.NoFile, false);
+                            }
+                            break;
+                        }
 
                     case nameof(GrblViewModel.GrblReset):
                         {
@@ -232,14 +227,13 @@ namespace CNC.Controls
                 }
         }
 
-        public GCodeJob GCode { get; private set; } = new GCodeJob();
         public bool canJog { get { return grblState.State == GrblStates.Idle || grblState.State == GrblStates.Tool || grblState.State == GrblStates.Jog; } }
-        public bool JobPending { get { return GCode.Loaded && !JobTimer.IsRunning; } }
+        public bool JobPending { get { return GCode.File.IsLoaded && !JobTimer.IsRunning; } }
 
         public void CloseFile()
         {
             job.NextRow = null;
-            GCode.CloseFile();
+            GCode.File.Close();
         }
 
         public bool Activate(bool activate)
@@ -248,7 +242,7 @@ namespace CNC.Controls
             {
                 initOK = true;
                 serialSize = Math.Min(300, (int)(GrblInfo.SerialBufferSize * 0.9f)); // size should be less than hardware handshake HWM
-                GCode.Parser.Dialect = GrblSettings.IsGrblHAL ? Dialect.GrblHAL : Dialect.Grbl;
+                GCode.File.Parser.Dialect = GrblSettings.IsGrblHAL ? Dialect.GrblHAL : Dialect.Grbl;
             }
 
             EnablePolling(activate);
@@ -510,69 +504,15 @@ namespace CNC.Controls
 
         private void grdGCode_Drag(object sender, DragEventArgs e)
         {
-            bool allow = streamingState == StreamingState.Idle || streamingState == StreamingState.NoFile;
-
-            if (allow && e.Data.GetDataPresent(DataFormats.FileDrop))
-            {
-                string[] files = (string[])e.Data.GetData(DataFormats.FileDrop, false);
-                allow = files.Count() == 1 && FileUtils.IsAllowedFile(files[0].ToLower(), allowedTypes + ",txt");
-            }
-
-            e.Handled = true;
-            e.Effects = allow ? DragDropEffects.Copy : DragDropEffects.None;
+            GCode.File.Drag(sender, e);
         }
 
         private void grdGCode_Drop(object sender, DragEventArgs e)
         {
-            string[] files = (string[])e.Data.GetData(DataFormats.FileDrop, false);
-
-            if (files.Count() == 1)
-            {
-                using (new UIUtils.WaitCursor())
-                {
-
-                    GCode.LoadFile(files[0]);
-
-                    //      ppiControl.Speed = file.max_feed;
-
-                    grdGCode.DataContext = GCode.Data.DefaultView;
-                    job.CurrLine = 0;
-                    job.PendingLine = 0;
-                    job.PgmEndLine = GCode.Data.Rows.Count - 1;
-                    scroll = UIUtils.GetScrollViewer(grdGCode);
-
-                    streamingHandler.Call(GCode.Loaded ? StreamingState.Idle : StreamingState.NoFile, false);
-                }
-            }
+            GCode.File.Drop(sender, e);
         }
 
         #endregion
-
-        public void OpenFile()
-        {
-            OpenFileDialog file = new OpenFileDialog();
-
-            file.Filter = string.Format("GCode files ({0})|{0}|Text files (*.txt)|*.txt|All files (*.*)|*.*", FileUtils.ExtensionsToFilter(allowedTypes));
-
-            if (file.ShowDialog() == true)
-                LoadFile(file.FileName);
-        }
-
-        public void LoadFile(string filename)
-        {
-            //            if(FileUtils.IsAllowedFile(filename, allowedTypes))
-            using (new UIUtils.WaitCursor())
-            {
-                GCode.LoadFile(filename);
-                grdGCode.DataContext = GCode.Data.DefaultView;
-                job.IsSDFile = false;
-                job.CurrLine = job.PendingLine = job.ACKPending = 0;
-                job.PgmEndLine = GCode.Data.Rows.Count - 1;
-                scroll = UIUtils.GetScrollViewer(grdGCode);
-
-                streamingHandler.Call(GCode.Loaded ? StreamingState.Idle : StreamingState.NoFile, false);
-            }
-        }
 
         public void CycleStart()
         {
@@ -584,12 +524,12 @@ namespace CNC.Controls
                 JobTimer.Pause = false;
                 streamingHandler.Call(StreamingState.Send, false);
             }
-            else if (GCode.Loaded)
+            else if (GCode.File.IsLoaded)
             {
                 model.RunTime = "";
                 job.ACKPending = job.CurrLine = job.ACKPending = job.serialUsed = 0;
                 job.Started = false;
-                job.NextRow = GCode.Data.Rows[0];
+                job.NextRow = GCode.File.Data.Rows[0];
                 System.Threading.Thread.Sleep(250);
                 Comms.com.PurgeQueue();
                 model.Message = "";
@@ -644,8 +584,8 @@ namespace CNC.Controls
                 //                command = command.ToUpper();
                 try
                 {
-                    GCode.Parser.ParseBlock(ref command, true);
-                    GCode.commands.Enqueue(command);
+                    GCode.File.Parser.ParseBlock(ref command, true);
+                    GCode.File.Commands.Enqueue(command);
                     if (streamingState != StreamingState.SendMDI)
                     {
                         streamingState = StreamingState.SendMDI;
@@ -662,27 +602,20 @@ namespace CNC.Controls
         {
             job.Complete = false;
 
-            if (GCode.Loaded)
+            if (GCode.File.IsLoaded)
             {
                 using (new UIUtils.WaitCursor())
                 {
                     btnStart.IsEnabled = false;
 
-                    grdGCode.DataContext = null;
+   //                 grdGCode.DataContext = null;
 
-                    foreach (DataRow row in GCode.Data.Rows)
-                        if ((string)row["Sent"] != string.Empty)
-                            row["Sent"] = string.Empty;
+                    GCode.File.ClearStatus();
 
-                    grdGCode.DataContext = GCode.Data.DefaultView;
-
-                    if (scroll == null)
-                        scroll = UIUtils.GetScrollViewer(grdGCode);
-
-                    scroll.ScrollToTop();
-
+                    //                  grdGCode.DataContext = GCode.File.Data.DefaultView;
+                    model.ScrollPosition = 0;
                     job.CurrLine = job.PendingLine = job.ACKPending = 0;
-                    job.PgmEndLine = GCode.Data.Rows.Count - 1;
+                    job.PgmEndLine = GCode.File.Blocks - 1;
 
                     btnStart.IsEnabled = true;
                 }
@@ -948,10 +881,10 @@ namespace CNC.Controls
                     case StreamingState.Idle:
                     case StreamingState.NoFile:
                         IsEnabled = !grblState.MPG;
-                        btnStart.IsEnabled = GCode.Loaded;
+                        btnStart.IsEnabled = GCode.File.IsLoaded;
                         btnStop.IsEnabled = false;
                         btnHold.IsEnabled = !grblState.MPG;
-                        btnRewind.IsEnabled = !grblState.MPG && GCode.Loaded && job.CurrLine != 0;
+                        btnRewind.IsEnabled = !grblState.MPG && GCode.File.IsLoaded && job.CurrLine != 0;
                         model.IsJobRunning = false;
                         break;
 
@@ -986,7 +919,7 @@ namespace CNC.Controls
 
                     case StreamingState.Stop:
                         btnHold.IsEnabled = !(grblState.MPG || grblState.State == GrblStates.Alarm);
-                        btnStart.IsEnabled = btnHold.IsEnabled && GCode.Loaded; //!GrblSettings.IsGrblHAL;
+                        btnStart.IsEnabled = btnHold.IsEnabled && GCode.File.IsLoaded; //!GrblSettings.IsGrblHAL;
                         btnStop.IsEnabled = false;
                         btnRewind.IsEnabled = false;
                         job.IsSDFile = false;
@@ -1079,24 +1012,24 @@ namespace CNC.Controls
         {
             if (streamingHandler.Count)
             {
-                if(job.ACKPending > 0)
+                if (job.ACKPending > 0)
                     job.ACKPending--;
 
-                if (!job.IsSDFile && (string)GCode.Data.Rows[job.PendingLine]["Sent"] == "*")
-                    job.serialUsed = Math.Max(0, job.serialUsed - (int)GCode.Data.Rows[job.PendingLine]["Length"]);
+                if (!job.IsSDFile && (string)GCode.File.Data.Rows[job.PendingLine]["Sent"] == "*")
+                    job.serialUsed = Math.Max(0, job.serialUsed - (int)GCode.File.Data.Rows[job.PendingLine]["Length"]);
 
-                if (streamingState == StreamingState.Send || streamingState == StreamingState.Paused)
-                {
+                //if (streamingState == StreamingState.Send || streamingState == StreamingState.Paused)
+                //{
                     bool isError = response.StartsWith("error");
 
                     if (!job.IsSDFile)
                     {
-                        GCode.Data.Rows[job.PendingLine]["Sent"] = response;
+                        GCode.File.Data.Rows[job.PendingLine]["Sent"] = response;
 
                         if (job.PendingLine > 5)
                         {
-                            if(grblState.State != GrblStates.Check || isError || (job.PendingLine % 50) == 0)
-                                scroll.ScrollToVerticalOffset(job.PendingLine - 5);
+                            if (grblState.State != GrblStates.Check || isError || (job.PendingLine % 50) == 0)
+                               model.ScrollPosition = job.PendingLine - 5;
                         }
                     }
                     if (isError)
@@ -1105,11 +1038,13 @@ namespace CNC.Controls
                         streamingHandler.Call(StreamingState.JobFinished, true);
                     else
                         SendNextLine();
-                }
+                //}
 
                 if (!job.Complete)
                     job.PendingLine++;
             }
+            else if (response == "ok")
+                missed++;
 
             switch (streamingState)
             {
@@ -1119,9 +1054,9 @@ namespace CNC.Controls
                     break;
 
                 case StreamingState.SendMDI:
-                    if (GCode.commands.Count > 0)
-                        Comms.com.WriteCommand(GCode.commands.Dequeue());
-                    if (GCode.commands.Count == 0)
+                    if (GCode.File.Commands.Count > 0)
+                        Comms.com.WriteCommand(GCode.File.Commands.Dequeue());
+                    if (GCode.File.Commands.Count == 0)
                         streamingState = StreamingState.Idle;
                     break;
 
@@ -1131,7 +1066,7 @@ namespace CNC.Controls
                     break;
 
                 case StreamingState.AwaitResetAck:
-                    streamingHandler.Call(GCode.Loaded ? StreamingState.Idle : StreamingState.NoFile, false);
+                    streamingHandler.Call(GCode.File.IsLoaded ? StreamingState.Idle : StreamingState.NoFile, false);
                     break;
             }
         }
@@ -1140,8 +1075,8 @@ namespace CNC.Controls
         {
             while (job.NextRow != null && job.serialUsed < (serialSize - (int)job.NextRow["Length"]))
             {
-                if (GCode.commands.Count > 0)
-                    Comms.com.WriteCommand(GCode.commands.Dequeue());
+                if (GCode.File.Commands.Count > 0)
+                    Comms.com.WriteCommand(GCode.File.Commands.Dequeue());
                 else
                 {
                     job.CurrentRow = job.NextRow;
@@ -1155,7 +1090,7 @@ namespace CNC.Controls
                     }
                     else if ((bool)job.CurrentRow["ProgramEnd"])
                         job.PgmEndLine = job.CurrLine;
-                    job.NextRow = job.PgmEndLine == job.CurrLine ? null : GCode.Data.Rows[++job.CurrLine];
+                    job.NextRow = job.PgmEndLine == job.CurrLine ? null : GCode.File.Data.Rows[++job.CurrLine];
                     //            ParseBlock(line + "\r");
                     job.serialUsed += (int)job.CurrentRow["Length"];
                     Comms.com.WriteString(line + '\r');

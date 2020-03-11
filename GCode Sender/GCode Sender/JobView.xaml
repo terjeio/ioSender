@@ -20,7 +20,8 @@
                 </StackPanel>
                 <cnccontrols:StatusControl x:Name="statusControl" VerticalAlignment="Bottom" DockPanel.Dock="Bottom"/>
             </DockPanel>
-            <cnccontrols:JobControl x:Name="GCodeSender" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="224,3,0,0"/>
+            <cnccontrols:GCodeListControl Margin="224,10,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            <cnccontrols:JobControl x:Name="GCodeSender" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="224,355,0,0"/>
             <StackPanel Margin="642,5,0,0" Width="216" Height="Auto">
                 <cnccontrols:WorkParametersControl x:Name="workParametersControl" HorizontalAlignment="Left" Height="60" VerticalAlignment="Top" IsToolChanging="{Binding IsToolChanging}"/>
                 <cnccontrols:CoolantControl HorizontalAlignment="Left" Height="70" VerticalAlignment="Top" x:Name="coolantControl"/>

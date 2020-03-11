@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CNC.Controls"
         mc:Ignorable="d"
-        Title="About" Height="310" Width="315" ResizeMode="NoResize" ShowInTaskbar="False"
+        Title="About" Height="315" Width="315" ResizeMode="NoResize" ShowInTaskbar="False"
         WindowStartupLocation="CenterOwner"
         Loaded="About_Load" Icon="App.ico">
     <Window.Resources>
@@ -37,6 +37,9 @@
                 </TextBox>
             </StackPanel>
         </GroupBox>
-        <Button x:Name="btnOk" Content="Ok" HorizontalAlignment="Center" Grid.Row="3" VerticalAlignment="Top" Width="75" Click="okButton_Click"/>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="3">
+            <Button x:Name="btnOk" Content="Ok" HorizontalAlignment="Center" VerticalAlignment="Top" Width="85" Click="okButton_Click"/>
+            <Button x:Name="btnToClipboard" Content="To Clipboard" ToolTip="Copy grbl version information and settings to clipboard" Margin="5,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Top" Width="85" Click="clbButton_Click"/>
+        </StackPanel>
     </Grid>
 </Window>

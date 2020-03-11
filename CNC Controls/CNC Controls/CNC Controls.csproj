@@ -59,6 +59,9 @@
     <Compile Include="BasicConfigControl.xaml.cs">
       <DependentUpon>BasicConfigControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="GCodeListControl.xaml.cs">
+      <DependentUpon>GCodeListControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="GotoControl.xaml.cs">
       <DependentUpon>GotoControl.xaml</DependentUpon>
     </Compile>
@@ -92,12 +95,14 @@
     <Compile Include="JobControl.xaml.cs">
       <DependentUpon>JobControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="GCode.cs" />
     <Compile Include="JogConfigControl.xaml.cs">
       <DependentUpon>JogConfigControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="JogControl.xaml.cs">
       <DependentUpon>JogControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="KeyboardJog.cs" />
     <Compile Include="LimitsBaseControl.xaml.cs">
       <DependentUpon>LimitsBaseControl.xaml</DependentUpon>
     </Compile>
@@ -164,6 +169,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="BasicConfigControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="GCodeListControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

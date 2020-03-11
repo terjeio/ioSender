@@ -1,5 +1,12 @@
 ## GRBL GCode Sender
 
+2020-03-11: Alpha 12 release of binary.
+
+Some refactoring of code, allows drag&drop of files onto the 3D viewer and is also preparation for using a tab viewer for the GCode list.
+Fixed block counting error when transitioning in/out of Hold mode. Added copy to clipboard of firmware settiongs and options from _File > About_ dialog.
+
+---
+
 2020-03-09: Alpha 11 release of binary.
 
 Improved rendering of 3D model, added Goto sidebar button for G28 and G30.

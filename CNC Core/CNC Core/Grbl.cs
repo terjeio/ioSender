@@ -53,6 +53,7 @@ using CNC.GCode;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Threading;
+using System.Windows;
 
 namespace CNC.Core
 {
@@ -1161,27 +1162,63 @@ namespace CNC.Core
             }
         }
 
+        private static List<string> Export ()
+        {
+            List<string> exp = new List<string>();
+
+            if (IsGrblHAL)
+                exp.Add("%");
+
+            exp.Add("; " + (IsGrblHAL ? "grblHAL" : "grbl") + (GrblInfo.Identity != string.Empty ? ":" + GrblInfo.Identity : ""));
+            exp.Add("; " + GrblInfo.Version);
+            exp.Add("; [OPT:" + GrblInfo.Options + "]");
+
+            if (GrblInfo.NewOptions != string.Empty)
+                exp.Add("; [NEWOPT:" + GrblInfo.NewOptions + "]");
+
+            foreach (string opt in GrblInfo.SystemInfo)
+                exp.Add(" ;" + opt);
+
+            exp.Add(";");
+
+            foreach (DataRow Setting in settings.Rows)
+                exp.Add(string.Format("${0}={1}", (int)Setting["Id"], (string)Setting["Value"]));
+
+            if (IsGrblHAL)
+                exp.Add("%");
+
+            return exp;
+        }
+
+        public static void CopyToClipboard()
+        {
+            if (settings != null) try
+            {
+                Clipboard.SetText(string.Join("\r\n", Export().ToArray()));
+            }
+            catch
+            {
+            }
+        }
+
         public static void Backup(string filename)
         {
             if (settings != null) try
+            {
+                StreamWriter file = new StreamWriter(filename);
+                if (file != null)
                 {
-                    StreamWriter file = new StreamWriter(filename);
-                    if (file != null)
-                    {
-                        if (IsGrblHAL)
-                            file.WriteLine('%');
-                        foreach (DataRow Setting in settings.Rows)
-                        {
-                            file.WriteLine(string.Format("${0}={1}", (int)Setting["Id"], (string)Setting["Value"]));
-                        }
-                        if (IsGrblHAL)
-                            file.WriteLine('%');
-                        file.Close();
-                    }
+                    List<string> settings = Export();
+
+                    foreach (string s in settings)
+                        file.WriteLine(s);
+
+                    file.Close();
                 }
-                catch
-                {
-                }
+            }
+            catch
+            {
+            }
         }
 
         public static string FormatFloat(string value, string format)

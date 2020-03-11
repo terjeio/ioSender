@@ -49,9 +49,9 @@ namespace CNC.Controls
     /// </summary>
     public partial class MacroEditor : Window
     {
-        private GCode.Macro addMacro = null;
+        private CNC.GCode.Macro addMacro = null;
 
-        public MacroEditor(ObservableCollection<GCode.Macro> macros)
+        public MacroEditor(ObservableCollection<CNC.GCode.Macro> macros)
         {
             DataContext = new MacroData();
             (DataContext as MacroData).Macros = macros;
@@ -90,7 +90,7 @@ namespace CNC.Controls
             foreach (var macro in (DataContext as MacroData).Macros)
                 id = Math.Max(id, macro.Id);
 
-            addMacro = new GCode.Macro();
+            addMacro = new CNC.GCode.Macro();
             addMacro.Id = id + 1;
             addMacro.Name = cbxMacro.Text;
 
@@ -108,16 +108,16 @@ namespace CNC.Controls
     public class MacroData : ViewModelBase
     {
         private string _text = string.Empty, _name = string.Empty;
-        private GCode.Macro _macro, _lastMacro = null;
-        private ObservableCollection<GCode.Macro> _macros;
+        private CNC.GCode.Macro _macro, _lastMacro = null;
+        private ObservableCollection<CNC.GCode.Macro> _macros;
 
-        public ObservableCollection<GCode.Macro> Macros
+        public ObservableCollection<CNC.GCode.Macro> Macros
         {
             get { return _macros; }
             set { _macros = value; OnPropertyChanged(); }
         }
 
-        public GCode.Macro Macro
+        public CNC.GCode.Macro Macro
         {
             get { return _macro; }
             set {
@@ -134,7 +134,7 @@ namespace CNC.Controls
             }
         }
 
-        public GCode.Macro LastMacro
+        public CNC.GCode.Macro LastMacro
         {
             get { return _lastMacro; }
         }

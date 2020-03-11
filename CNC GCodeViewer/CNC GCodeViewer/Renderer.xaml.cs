@@ -1,7 +1,7 @@
 /*
  * Renderer.xaml.cs - part of CNC Controls library
  *
- * v0.11 / 2019-03-09 / Io Engineering (Terje Io)
+ * v0.12 / 2019-03-10 / Io Engineering (Terje Io)
  *
  */
 
@@ -182,6 +182,16 @@ namespace CNC.Controls.Viewer
         public bool ShowGrid { get; set; } = true;
         public bool ShowAxes { get; set; } = true;
         public bool ShowBoundingBox { get; set; } = true;
+
+        private void viewport_Drag(object sender, DragEventArgs e)
+        {
+            GCode.File.Drag(sender, e);
+        }
+
+        private void viewport_Drop(object sender, DragEventArgs e)
+        {
+            GCode.File.Drop(sender, e);
+        }
 
         public void ClearViewport()
         {

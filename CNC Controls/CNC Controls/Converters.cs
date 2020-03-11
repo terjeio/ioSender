@@ -1,7 +1,7 @@
 /*
  * Converters.cs - part of CNC Controls library for Grbl
  *
- * v0.10 / 2020-03-03 / Io Engineering (Terje Io)
+ * v0.12 / 2020-03-10 / Io Engineering (Terje Io)
  *
  */
 
@@ -55,6 +55,7 @@ namespace CNC.Controls
         public static LatheModeToStringConverter LatheModeToStringConverter = new LatheModeToStringConverter();
         public static GrblStateToColorConverter GrblStateToColorConverter = new GrblStateToColorConverter();
         public static GrblStateToStringConverter GrblStateToStringConverter = new GrblStateToStringConverter();
+        public static GrblStateToBooleanConverter GrblStateToBooleanConverter = new GrblStateToBooleanConverter();
         public static HomedStateToColorConverter HomedStateToColorConverter = new HomedStateToColorConverter();
         public static IsHomingEnabledConverter IsHomingEnabledConverter = new IsHomingEnabledConverter();
         public static LogicalNotConverter LogicalNotConverter = new LogicalNotConverter();
@@ -186,6 +187,19 @@ namespace CNC.Controls
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class GrblStateToBooleanConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            return values.Length == 2 && values[0] is GrblState && values[1] is GrblStates && ((GrblState)values[0]).State == (GrblStates)values[1];
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, System.Globalization.CultureInfo culture)
         {
             throw new NotImplementedException();
         }
