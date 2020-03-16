@@ -1,7 +1,7 @@
-﻿/*
+/*
  * MainWindow.xaml.cs - part of Grbl Code Sender
  *
- * v0.11 / 2020-03-09 / Io Engineering (Terje Io)
+ * v0.13 / 2020-03-15 / Io Engineering (Terje Io)
  *
  */
 
@@ -124,7 +124,11 @@ namespace GCode_Sender
             set {
                 menuFile.IsEnabled = xx.IsEnabled = !value;
                 foreach (TabItem tabitem in UIUtils.FindLogicalChildren<TabItem>(ui.tabMode))
-                    tabitem.IsEnabled = !value || getView(tabitem).ViewType == ViewType.GRBL;
+                {
+                    var view = getView(tabitem);
+                    if(view != null)
+                        tabitem.IsEnabled = !value || view.ViewType == ViewType.GRBL;
+                }
             }
         }
 
@@ -140,8 +144,11 @@ namespace GCode_Sender
             foreach (TabItem tab in UIUtils.FindLogicalChildren<TabItem>(ui.tabMode))
             {
                 ICNCView view = getView(tab);
-                view.Setup(UIViewModel, UIViewModel.Profile);
-                tab.IsEnabled = view.ViewType == ViewType.GRBL || view.ViewType == ViewType.AppConfig;
+                if (view != null)
+                {
+                    view.Setup(UIViewModel, UIViewModel.Profile);
+                    tab.IsEnabled = view.ViewType == ViewType.GRBL || view.ViewType == ViewType.AppConfig;
+                }
             }
 
             if (!UIViewModel.Profile.Config.GCodeViewer.IsEnabled)
@@ -216,6 +223,9 @@ namespace GCode_Sender
 
         private void TabMode_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if (!(DataContext as GrblViewModel).IsReady)
+                return;
+
             if (UIViewModel.CurrentView != null && e.AddedItems.Count > 0)
             {
                 ViewType prevMode = UIViewModel.CurrentView.ViewType;
@@ -257,7 +267,8 @@ namespace GCode_Sender
 
             foreach (TabItem tabitem in UIUtils.FindLogicalChildren<TabItem>(ui.tabMode))
             {
-                if (getView(tabitem).ViewType == mode)
+                var view = getView(tabitem);
+                if (view != null && view.ViewType == mode)
                 {
                     tab = tabitem;
                     break;

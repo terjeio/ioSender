@@ -1,7 +1,7 @@
 ﻿/*
  * GCodeJob.cs - part of CNC Controls library
  *
- * v0.02 / 2020-01-24 / Io Engineering (Terje Io)
+ * v0.13 / 2020-03-15 / Io Engineering (Terje Io)
  *
  */
 
@@ -44,6 +44,7 @@ using System.IO;
 using System.ComponentModel;
 using System.Windows;
 using CNC.GCode;
+using System.Windows.Media.Media3D;
 
 namespace CNC.Core
 {
@@ -62,6 +63,7 @@ namespace CNC.Core
 
         private string filename = string.Empty;
         private DataTable gcode = new DataTable("GCode");
+        private Point3D point0 = new Point3D();  // last point
 
         public Queue<string> commands = new Queue<string>();
 
@@ -182,17 +184,56 @@ namespace CNC.Core
                 gcode.EndLoadData();
 
         //        GCodeParser.Save(@"d:\tokens.xml", Tokens);
+                GCPlane plane = new GCPlane(Commands.G17, 0);
+                DistanceMode distanceMode = DistanceMode.Absolute;
+                point0 = new Point3D();
 
                 foreach (GCodeToken token in Tokens)
                 {
-                    //min_feed = Math.Min(min_feed, token.f);
-                    //max_feed = Math.Max(max_feed, token.f);
-                    if(token is GCLinearMotion)
-                        BoundingBox.AddPoint(((GCLinearMotion)token).X, ((GCLinearMotion)token).Y, ((GCLinearMotion)token).Z);
-                    else if (token is GCArc)
-                        BoundingBox.AddPoint(((GCArc)token).X, ((GCArc)token).Y, ((GCArc)token).Z); // TODO: Expand...
-                    else if (token is GCCannedDrill)
-                        BoundingBox.AddPoint(((GCCannedDrill)token).X, ((GCCannedDrill)token).Y, ((GCCannedDrill)token).Z);
+                    switch (token.Command)
+                    {
+                        case Commands.G0:
+                            {
+                                GCLinearMotion motion = (GCLinearMotion)token;
+                                BoundingBox.AddPoint(toPoint(motion.Values, distanceMode == DistanceMode.Incremental));
+                            }
+                            break;
+
+                        case Commands.G1:
+                            {
+                                GCLinearMotion motion = (GCLinearMotion)token;
+                                BoundingBox.AddPoint(toPoint(motion.Values, distanceMode == DistanceMode.Incremental));
+                            }
+                            break;
+
+                        case Commands.G2:
+                        case Commands.G3:
+                            GCArc arc = (GCArc)token;
+                            double[] values = { point0.X, point0.Y, point0.Z };
+                            BoundingBox.AddBoundingBox((token as GCArc).GetBoundingBox(plane, values, distanceMode == DistanceMode.Incremental));
+                            toPoint(arc.Values, distanceMode == DistanceMode.Incremental);
+                            break;
+
+                        case Commands.G17:
+                        case Commands.G18:
+                        case Commands.G19:
+                            plane = (GCPlane)token;
+                            break;
+
+                        case Commands.G90:
+                        case Commands.G91:
+                            distanceMode = ((GCDistanceMode)token).DistanceMode;
+                            break;
+
+                            //min_feed = Math.Min(min_feed, token.f);
+                            //max_feed = Math.Max(max_feed, token.f);
+                            //            if (token is GCLinearMotion)
+                            //    BoundingBox.AddPoint(((GCLinearMotion)token).X, ((GCLinearMotion)token).Y, ((GCLinearMotion)token).Z);
+                            //else if (token is GCArc)
+                            //    BoundingBox.AddPoint(((GCArc)token).X, ((GCArc)token).Y, ((GCArc)token).Z); // TODO: Expand...
+                            //else if (token is GCCannedDrill)
+                            //    BoundingBox.AddPoint(((GCCannedDrill)token).X, ((GCCannedDrill)token).Y, ((GCCannedDrill)token).Z);
+                    }
                 }
 
                 if (max_feed == double.MinValue)
@@ -201,10 +242,24 @@ namespace CNC.Core
                     max_feed = 0.0;
                 }
 
-                BoundingBox.Normalize();
+                BoundingBox.Conclude();
 
                 FileChanged?.Invoke(filename);
             }
+        }
+
+        private Point3D toPoint(double[] values, bool isRelative = false)
+        {
+            if (isRelative)
+                point0.Offset(values[0], values[1], values[2]);
+            else
+            {
+                point0.X = values[0];
+                point0.Y = values[1];
+                point0.Z = values[2];
+            }
+
+            return point0;
         }
 
         public void CloseFile()
@@ -295,6 +350,7 @@ namespace CNC.Core
     {
         public double[] Min = new double[6];
         public double[] Max = new double[6];
+        public double[] Size = new double[6];
 
         public GcodeBoundingBox()
         {
@@ -310,7 +366,18 @@ namespace CNC.Core
             }
         }
 
-        public void AddPoint(double x, double y, double z)
+        public void Conclude()
+        {
+            for (int i = 0; i < Min.Length; i++)
+            {
+                if (Max[i] == double.MinValue)
+                    Min[i] = Max[i] = 0.0;
+                Size[i] = Math.Abs(Max[i] - Min[i]);
+            }
+            Size[2] = Math.Max(.2d, Size[2]);
+        }
+
+        private void AddPoint(double x, double y, double z)
         {
             Min[0] = Math.Min(Min[0], x);
             Max[0] = Math.Max(Max[0], x);
@@ -322,16 +389,34 @@ namespace CNC.Core
             Max[2] = Math.Max(Max[2], z);
         }
 
-        public void Normalize()
+        public void AddPoint(GCPlane plane, double x, double y, double z)
         {
-            if (Max[0] == double.MinValue)
-                Min[0] = Max[0] = 0.0;
+            Min[plane.Axis0] = Math.Min(Min[plane.Axis0], x);
+            Max[plane.Axis0] = Math.Max(Max[plane.Axis0], x);
 
-            if (Max[1] == double.MinValue)
-                Min[1] = Max[1] = 0.0;
+            Min[plane.Axis1] = Math.Min(Min[plane.Axis1], y);
+            Max[plane.Axis1] = Math.Max(Max[plane.Axis1], y);
 
-            if (Max[2] == double.MinValue)
-                Min[2] = Max[2] = 0.0;
+            Min[plane.AxisLinear] = Math.Min(Min[plane.AxisLinear], z);
+            Max[plane.AxisLinear] = Math.Max(Max[plane.AxisLinear], z);
+        }
+
+        public void AddPoint(Point3D point)
+        {
+            Min[0] = Math.Min(Min[0], point.X);
+            Max[0] = Math.Max(Max[0], point.X);
+
+            Min[1] = Math.Min(Min[1], point.Y);
+            Max[1] = Math.Max(Max[1], point.Y);
+
+            Min[2] = Math.Min(Min[2], point.Z);
+            Max[2] = Math.Max(Max[2], point.Z);
+        }
+
+        public void AddBoundingBox(GcodeBoundingBox bbox)
+        {
+            AddPoint(bbox.Min[0], bbox.Min[1], bbox.Min[2]);
+            AddPoint(bbox.Max[0], bbox.Max[1], bbox.Max[2]);
         }
     }
 }

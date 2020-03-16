@@ -1,7 +1,7 @@
-/*
- * Viewer.xaml.cs - part of CNC Controls library
+﻿/*
+ * Renderer.xaml.cs - part of CNC Controls library
  *
- * v0.13 / 2019-03-12 / Io Engineering (Terje Io)
+ * v0.13 / 2019-03-15 / Io Engineering (Terje Io)
  *
  */
 
@@ -40,24 +40,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using System.Collections.Generic;
 using System.Windows.Controls;
 using CNC.GCode;
-using CNC.Core;
 
 namespace CNC.Controls.Viewer
 {
-/// <summary>
-/// Interaction logic for Viewer.xaml
-/// </summary>
-public partial class Viewer : UserControl, ICNCView
+    /// <summary>
+    /// Interaction logic for RenderControl.xaml
+    /// </summary>
+    public partial class RenderControl : UserControl
     {
-        private bool isNew = false;
-        public Viewer()
+        public RenderControl()
         {
             InitializeComponent();
-
-            gcodeView.ShowBoundingBox = false;
         }
 
-        public int ArcResolution {
+        public int ArcResolution
+        {
             get { return gcodeView.ArcResolution; }
             set { gcodeView.ArcResolution = value; }
         }
@@ -88,37 +85,14 @@ public partial class Viewer : UserControl, ICNCView
             set { gcodeView.viewport.ShowViewCube = value; }
         }
 
-        public ViewType ViewType { get { return ViewType.GCodeViewer; } }
-
-        public void Activate(bool activate, ViewType chgMode)
+        public bool ShowTool
         {
-            if (activate)
-            {
-                var d = DataContext as GrblViewModel;
-
-                if(GCode.File.Tokens != null && isNew)
-                {
-                    isNew = false;
-                    using (new UIUtils.WaitCursor())
-                    {
-                        gcodeView.ShowPosition();
-                        gcodeView.Render(GCode.File.Tokens);
-                    }
-                }
-
-                gcodeView.ShowPosition();
-            }
+            get { return gcodeView.AnimateTool; }
+            set { gcodeView.AnimateTool = value; }
         }
 
-        public void CloseFile()
+        public void Configure(AppConfig profile)
         {
-            gcodeView.ClearViewport();
-        }
-
-        public void Setup(UIViewModel model, AppConfig profile)
-        {
-            model.ConfigControls.Add(new ConfigControl());
-
             ArcResolution = profile.Config.GCodeViewer.ArcResolution;
             MinDistance = profile.Config.GCodeViewer.MinDistance;
             ShowGrid = profile.Config.GCodeViewer.ShowGrid;
@@ -127,9 +101,15 @@ public partial class Viewer : UserControl, ICNCView
             ShowViewCube = profile.Config.GCodeViewer.ShowViewCube;
         }
 
-        public void Open()
+        public void Close()
         {
-            isNew = true;
+            gcodeView.ClearViewport();
+        }
+
+        public void Open(List<GCodeToken> tokens)
+        {
+            gcodeView.ShowPosition();
+            gcodeView.Render(tokens);
         }
 
         private void button_Click(object sender, System.Windows.RoutedEventArgs e)

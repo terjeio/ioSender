@@ -1,7 +1,7 @@
 /*
  * JobView.xaml.cs - part of Grbl Code Sender
  *
- * v0.12 / 2019-03-10 / Io Engineering (Terje Io)
+ * v0.13 / 2019-03-15 / Io Engineering (Terje Io)
  *
  */
 
@@ -110,27 +110,27 @@ namespace GCode_Sender
             if (sender is GrblViewModel) switch(e.PropertyName)
             {
                 case nameof(GrblViewModel.GrblState):
-                    if (initOK == false && ((GrblViewModel)sender).GrblState.State != GrblStates.Alarm)
+                    if (initOK == false && (sender as GrblViewModel).GrblState.State != GrblStates.Alarm)
                         InitSystem();
                     break;
 
                 case nameof(GrblViewModel.IsSleepMode):
-                    EnableUI(!((GrblViewModel)sender).IsSleepMode);
+                    EnableUI(!(sender as GrblViewModel).IsSleepMode);
                     break;
 
                 case nameof(GrblViewModel.IsJobRunning):
-                    MainWindow.ui.JobRunning = ((GrblViewModel)sender).IsJobRunning;
+                    MainWindow.ui.JobRunning = (sender as GrblViewModel).IsJobRunning;
                     if(GrblInfo.ManualToolChange)
                         GrblCommand.ToolChange = MainWindow.ui.JobRunning ? "T{0}M6" : "M61Q{0}";
                     break;
 
                 case nameof(GrblViewModel.Tool):
-                    if (GrblInfo.ManualToolChange && ((GrblViewModel)sender).Tool != GrblConstants.NO_TOOL)
+                    if (GrblInfo.ManualToolChange && (sender as GrblViewModel).Tool != GrblConstants.NO_TOOL)
                         GrblWorkParameters.RemoveNoTool();
                     break;
 
                 case nameof(GrblViewModel.GrblReset):
-                    if (((GrblViewModel)sender).GrblReset)
+                    if ((sender as GrblViewModel).GrblReset && (sender as GrblViewModel).IsReady)
                         {
                             initOK = null;
                             Activate(true, ViewType.GRBL);
@@ -139,15 +139,15 @@ namespace GCode_Sender
                     break;
 
                 case nameof(GrblViewModel.ParserState):
-                    if (((GrblViewModel)sender).GrblReset)
+                    if ((sender as GrblViewModel).GrblReset)
                     {
                         EnableUI(true);
-                      //  ((GrblViewModel)sender).GrblReset = false;
+                      //  (sender as GrblViewModel).GrblReset = false;
                     }
                     break;
 
                 case nameof(GrblViewModel.FileName):
-                    string filename = ((GrblViewModel)sender).FileName;
+                    string filename = (sender as GrblViewModel).FileName;
                     MainWindow.ui.WindowTitle = filename;
                     if (filename.StartsWith("SDCard:"))
                     {
@@ -162,11 +162,13 @@ namespace GCode_Sender
 // For now - rendering of G76 must be implemented first                                MainWindow.GCodeViewer.Open(filename, GCodeSender.GCode.Tokens);
                         }
                     }
-                    else if (!string.IsNullOrEmpty(filename) && MainWindow.IsViewVisible(ViewType.GCodeViewer))
+                    else if (!string.IsNullOrEmpty(filename) && MainWindow.UIViewModel.Profile.Config.GCodeViewer.IsEnabled)
                     {
+                        MainWindow.GCodeViewer.Open();
                         MainWindow.EnableView(true, ViewType.GCodeViewer);
                         GCodeSender.EnablePolling(false);
-                        MainWindow.GCodeViewer.Open(filename, GCode.File.Tokens);
+                        gcodeRenderer.ShowTool = true;
+                        gcodeRenderer.Open(GCode.File.Tokens);
                         GCodeSender.EnablePolling(true);
                     }
                     break;
@@ -249,6 +251,7 @@ namespace GCode_Sender
         public void CloseFile()
         {
             GCodeSender.CloseFile();
+            gcodeRenderer.Close();
         }
         public void Setup(UIViewModel model, AppConfig profile)
         {
@@ -306,6 +309,10 @@ namespace GCode_Sender
             GrblCommand.ToolChange = GrblInfo.ManualToolChange ? "M61Q{0}" : "T{0}";
 
             GCodeSender.Config(MainWindow.UIViewModel.Profile.Config);
+            gcodeRenderer.Configure(MainWindow.UIViewModel.Profile);
+
+            if(!MainWindow.UIViewModel.Profile.Config.GCodeViewer.IsEnabled)
+                tabGCode.Items.Remove(tab3D);
 
             if (GrblInfo.NumAxes > 3)
                 limitsControl.Visibility = Visibility.Collapsed;

@@ -1,7 +1,7 @@
 ﻿/*
  * AppConfig.cs - part of CNC Controls library for Grbl
  *
- * v0.09 / 2020-02-28 / Io Engineering (Terje Io)
+ * v0.13 / 2020-03-12 / Io Engineering (Terje Io)
  *
  */
 
@@ -89,7 +89,7 @@ namespace CNC.Controls
     [Serializable]
     public class GCodeViewerConfig : ViewModelBase
     {
-        private bool _isEnabled = false;
+        private bool _isEnabled = true;
 
         public bool IsEnabled { get { return _isEnabled; } set { _isEnabled = value; OnPropertyChanged(); } }
         public int ArcResolution { get; set; } = 10;
@@ -358,6 +358,7 @@ namespace CNC.Controls
                     }
                 }
 
+                model.IsReady = true;
                 model.PollInterval = Config.PollInterval;
             }
             else if (status != 2)

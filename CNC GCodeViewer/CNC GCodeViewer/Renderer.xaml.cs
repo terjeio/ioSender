@@ -1,7 +1,7 @@
 /*
  * Renderer.xaml.cs - part of CNC Controls library
  *
- * v0.12 / 2019-03-10 / Io Engineering (Terje Io)
+ * v0.13 / 2019-03-15 / Io Engineering (Terje Io)
  *
  */
 
@@ -43,6 +43,10 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
+
+#if DEBUG
+//#define DEBUG_ARC_BBOXES
+#endif
 
 using System;
 using System.Collections.Generic;
@@ -86,13 +90,14 @@ namespace CNC.Controls.Viewer
         ModelVisual3D _axes = new ModelVisual3D();
         Point3D _startposition = new Point3D();
         Point3D _limits = new Point3D();
-        Point3DCollection _toolposition, _cutlines, _rapidlines, _retractlines;
+        Point3D _toolposition = new Point3D();
+        Point3DCollection _toolorigin, _cutlines, _rapidlines, _retractlines;
 
         public void Clear()
         {
          //   Grid = null;
          //   BoundingBox = null;
-            ToolPosition = CutLines = RapidLines = RetractLines = null;
+            ToolOrigin = CutLines = RapidLines = RetractLines = null;
         }
 
         public void SetStartPosition(double x, double y, double z)
@@ -111,6 +116,13 @@ namespace CNC.Controls.Viewer
             }
         }
 
+        public void SetToolPosition(double x, double y, double z)
+        {
+            _toolposition.X = x;
+            _toolposition.Y = y;
+            _toolposition.Z = z;
+            OnPropertyChanged(nameof(ToolPosition));
+        }
         public void SetLimits(double x, double y, double z)
         {
             SetLimits(new Point3D(x, y, z));
@@ -130,7 +142,8 @@ namespace CNC.Controls.Viewer
         public GridLinesVisual3D Grid { get { return _grid; } set { _grid = value; OnPropertyChanged(); } }
         public BoundingBoxWireFrameVisual3D BoundingBox { get { return _bbox; } set { _bbox = value; OnPropertyChanged(); } }
         public ModelVisual3D Axes { get { return _axes; } }
-        public Point3DCollection ToolPosition { get { return _toolposition; } set { _toolposition = value; OnPropertyChanged(); } }
+        public Point3D ToolPosition { get { return _toolposition; } }
+        public Point3DCollection ToolOrigin { get { return _toolorigin; } set { _toolorigin = value; OnPropertyChanged(); } }
         public Point3DCollection CutLines { get { return _cutlines; } set { _cutlines = value; OnPropertyChanged(); } }
         public Point3DCollection RapidLines { get { return _rapidlines; } set { _rapidlines = value; OnPropertyChanged(); } }
         public Point3DCollection RetractLines { get { return _retractlines; } set { _retractlines = value; OnPropertyChanged(); } }
@@ -147,16 +160,19 @@ namespace CNC.Controls.Viewer
         private Vector3D delta0;  // (dx,dy,dz)
         private double minDistanceSquared, _minDistance;
 
-        bool isRelative = false;
+        bool _animateSubscribed = false;
         double[] offsets = new double[6] { 0d, 0d, 0d, 0d, 0d, 0d };
 
-        public SolidColorBrush AxisBrush { get; set; }
+        public SolidColorBrush ToolBrush { get; set; } = Brushes.Red;
+        public SolidColorBrush AxisBrush { get; set; } = Brushes.Gray;
         public double TickSize { get; set; }
         private GCPlane plane = new GCPlane(Commands.G17, 0);
         DistanceMode distanceMode = DistanceMode.Absolute;
         private List<CoordinateSystem> coordinateSystems = new List<CoordinateSystem>();
         private CoordinateSystem coordinateSystem;
+        private GrblViewModel model;
 
+        private bool _animateTool = false;
         private int cutCount;
         private MoveType lastType;
 
@@ -165,16 +181,53 @@ namespace CNC.Controls.Viewer
         Point3DCollection retractPoints = new Point3DCollection();
         Point3DCollection positionPoints = new Point3DCollection();
 
+        TruncatedConeVisual3D tool;
+
         public Machine Machine { get; set; } = new Machine();
 
         public Renderer()
         {
             InitializeComponent();
 
-            AxisBrush = Brushes.Gray;
             TickSize = 10;
             MinDistance = 0.05d;
             viewport.DataContext = Machine;
+
+            IsVisibleChanged += Renderer_IsVisibleChanged;
+
+        }
+
+        private void Renderer_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (AnimateTool)
+            {
+                if ((bool)e.NewValue)
+                {
+                    if (!_animateSubscribed)
+                        model.PropertyChanged += Model_PropertyChanged;
+                    _animateSubscribed = true;
+                }
+                else if (_animateSubscribed)
+                {
+                    _animateSubscribed = false;
+                    model.PropertyChanged += Model_PropertyChanged;
+                }
+            }
+        }
+
+        private void Renderer_Loaded(object sender, RoutedEventArgs e)
+        {
+            model = DataContext as GrblViewModel;
+        }
+
+        private void Model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if(e.PropertyName == nameof(GrblViewModel.Position))
+            {
+                Machine.SetToolPosition(model.Position.X, model.Position.Y, model.Position.Z);
+                if (tool != null)
+                    tool.Origin = Machine.ToolPosition;
+            }
         }
 
         public int ArcResolution { get; set; } = 5;
@@ -182,6 +235,43 @@ namespace CNC.Controls.Viewer
         public bool ShowGrid { get; set; } = true;
         public bool ShowAxes { get; set; } = true;
         public bool ShowBoundingBox { get; set; } = true;
+        public bool AnimateTool
+        {
+            get { return _animateTool; }
+            set
+            {
+                if(value != _animateTool)
+                {
+                    if ((_animateTool = value))
+                    {
+                        Machine.SetToolPosition(model.Position.X, model.Position.Y, model.Position.Z);
+
+                        tool = new TruncatedConeVisual3D();
+                        tool.Height = 6d;
+                        tool.BaseRadius = 0d;
+                        tool.TopRadius = tool.Height / 5d;
+                        tool.TopCap = true;
+                        tool.Origin = Machine.ToolPosition;
+                        tool.Normal = new Vector3D(0d, 0d, 1d);
+                        tool.Fill = ToolBrush;
+                        viewport.Children.Add(tool);
+
+                        _animateSubscribed = true;
+                        model.PropertyChanged += Model_PropertyChanged;
+                    }
+                    else
+                    {
+                        if (tool != null)
+                        {
+                            viewport.Children.Remove(tool);
+                            tool = null;
+                        }
+                        _animateSubscribed = false;
+                        model.PropertyChanged -= Model_PropertyChanged;
+                    }
+                }
+            }
+        }
 
         private void viewport_Drag(object sender, DragEventArgs e)
         {
@@ -219,7 +309,7 @@ namespace CNC.Controls.Viewer
         {
             GrblViewModel model = (GrblViewModel)DataContext;
 
-            Machine.ToolPosition = null;
+            Machine.ToolOrigin = null;
 
             positionPoints.Clear();
 
@@ -237,7 +327,7 @@ namespace CNC.Controls.Viewer
             positionPoints.Add(new Point3D(model.Position.X, model.Position.Y, Math.Min(model.Position.Z, model.ProgramLimits.MinZ) - 5d));
             positionPoints.Add(new Point3D(model.Position.X, model.Position.Y, Machine.Limits.Z));
 
-            Machine.ToolPosition = positionPoints;
+            Machine.ToolOrigin = positionPoints;
             var orgpos = Machine.StartPosition;
             Machine.SetStartPosition(model.Position.X, model.Position.Y, model.Position.Z);
 
@@ -279,7 +369,7 @@ namespace CNC.Controls.Viewer
             lastType = MoveType.None;
             distanceMode = GrblParserState.DistanceMode;
 
-            #region Canvas adorners
+#region Canvas adorners
 
             if (ShowGrid)
             {
@@ -362,7 +452,7 @@ namespace CNC.Controls.Viewer
                 viewport.Children.Add(Machine.BoundingBox);
             }
 
-            #endregion
+#endregion
 
             GCodeToken last = new GCodeToken();
 
@@ -373,40 +463,31 @@ namespace CNC.Controls.Viewer
                     case Commands.G0:
                         {
                             GCLinearMotion motion = (GCLinearMotion)token;
-                            var pt = toPoint(motion.Values);
-                            if (distanceMode == DistanceMode.Incremental)
-                                pt.Offset(point0.X, point0.Y, point0.Z);
-                            //if (last.Command == Commands.G1 && (((GCLinearMotion)last).X != point0.X || ((GCLinearMotion)last).Y != point0.Y))
-                            //    path.Points.Add(pt);
-                            AddRapidMove(pt);
+                            AddRapidMove(toPoint(motion.Values, distanceMode == DistanceMode.Incremental));
                         }
                         break;
 
                     case Commands.G1:
                         {
                             GCLinearMotion motion = (GCLinearMotion)token;
-                            var pt = toPoint(motion.Values);
-                            if (distanceMode == DistanceMode.Incremental)
-                                pt.Offset(point0.X, point0.Y, point0.Z);
-                            //if (last.Command == Commands.G0 && (((GCLinearMotion)last).X != point0.X || ((GCLinearMotion)last).Y != point0.Y))
-                            //    path.Points.Add(pt);
-                            AddCutMove(pt);
+                            AddCutMove(toPoint(motion.Values, distanceMode == DistanceMode.Incremental));
                         }
                         break;
 
                     case Commands.G2:
                     case Commands.G3:
-                        GCArc arc = (GCArc)token;
-                        if (distanceMode == DistanceMode.Incremental)
+#if DEBUG_ARC_BBOXES
+                        var bb = (token as GCArc).GetBoundingBox(plane, point0.ToArray(), distanceMode == DistanceMode.Incremental);
+
+                        var abb = new BoundingBoxWireFrameVisual3D()
                         {
-                            arc.X += point0.X;
-                            arc.Y += point0.Y;
-                            arc.Z += point0.Z;
-                        }
-                        if (arc.IsRadiusMode)
-                            DrawArc(plane, point0.ToArray(), arc.Values, arc.R, arc.IsClocwise);
-                        else
-                            DrawArc(plane, point0.ToArray(), arc.Values, arc.IJKvalues, arc.IJKMode == IJKMode.Absolute, arc.IsClocwise);
+                            BoundingBox = new Rect3D(bb.Min[0], bb.Min[1], bb.Min[2], bb.Size[0], bb.Size[1], bb.Size[2]),
+                            Thickness = .5d,
+                            Color = Colors.Blue
+                        };
+                        viewport.Children.Add(abb);
+#endif
+                        DrawArc(token as GCArc, point0.ToArray(), plane, distanceMode == DistanceMode.Incremental);
                         break;
 
                     case Commands.G10:
@@ -520,7 +601,7 @@ namespace CNC.Controls.Viewer
         }
         public void refreshCamera(ProgramLimits bbox)
         {
-            double zpos = Math.Max(5d, Math.Max(bbox.SizeX, bbox.SizeY) / Math.Tan(60 * Math.PI / 360d));
+            double zpos = Math.Max(5d, Math.Max(bbox.SizeX, bbox.SizeY) / Math.Tan(camera.FieldOfView * Math.PI / 360d));
 
             // TODO: set a sensible viewing distance dynamically
 
@@ -531,7 +612,7 @@ namespace CNC.Controls.Viewer
  //                viewport.CameraController.AddRotateForce(0.001, 0.001); // emulate move camera 
         }
 
-        private Point3D toPoint(double[] values)
+        private Point3D toPoint(double[] values, bool isRelative = false)
         {
             Point3D p = new Point3D(values[0], values[1], values[2]);
 
@@ -541,7 +622,7 @@ namespace CNC.Controls.Viewer
             return p;
         }
 
-        private Point3D toPoint(double X, double Y, double Z)
+        private Point3D toPoint(double X, double Y, double Z, bool isRelative = false)
         {
             Point3D p = new Point3D(X, Y, Z);
 
@@ -639,245 +720,12 @@ namespace CNC.Controls.Viewer
             point0 = point;
         }
 
-        //-------------
-
-        private void DrawArc(GCPlane plane, double[] start, double[] stop, double radius, bool clockwise)
+        private void DrawArc(GCArc arc, double[] start, GCPlane plane, bool isRelative = false)
         {
-            double[] center = convertRToCenter(plane, start, stop, radius, false, clockwise);
-            List<Point3D> arcpoints = generatePointsAlongArcBDring(plane, start, stop, center, clockwise, 0, ArcResolution); // Dynamic resolution
-
-            Point3D old_point = arcpoints[0];
-            arcpoints.RemoveAt(0);
-
-            AddCutMove(old_point);
+            List<Point3D> arcpoints = arc.GeneratePoints(plane, start, ArcResolution, isRelative); // Dynamic resolution
 
             foreach (Point3D point in arcpoints)
                 AddCutMove(point);
-        }
-
-        private void DrawArc(GCPlane plane, double[] start, double[] stop, double[] ijkValues, bool absoluteIJKMode, bool clockwise)
-        {
-            double[] center = updateCenterWithCommand(plane, start, ijkValues, absoluteIJKMode);
-
-            List<Point3D> arcpoints = generatePointsAlongArcBDring(plane, start, stop, center, clockwise, 0d, ArcResolution); // Dynamic resolution
-
-            foreach (Point3D point in arcpoints)
-                AddCutMove(point);
-        }
-
-        /**
-        * Generates the points along an arc including the start and end points.
-        */
-        public static List<Point3D> generatePointsAlongArcBDring(GCPlane plane, double[] p1, double[] p2, double[] center, bool isCw, double radius, int arcResolution)
-        {
-            double sweep;
-
-            // Calculate radius if necessary.
-            if (radius == 0d)
-                radius = Hypotenuse(p1[plane.Axis0] - center[0], p1[plane.Axis1] - center[1]);
-
-            // Calculate angles from center.
-            double startAngle = getAngle(center, p1[plane.Axis0], p1[plane.Axis1]);
-            double endAngle = getAngle(center, p2[plane.Axis0], p2[plane.Axis1]);
-
-            if (startAngle == endAngle)
-                sweep = Math.PI * 2d;
-
-            else
-            {
-                // Fix semantics, if the angle ends at 0 it really should end at 360.
-                if (endAngle == 0d)
-                    endAngle = Math.PI * 2d;
-
-                // Calculate distance along arc.
-                if (!isCw && endAngle < startAngle)
-                    sweep = ((Math.PI * 2d - startAngle) + endAngle);
-                else if (isCw && endAngle > startAngle)
-                    sweep = ((Math.PI * 2d - endAngle) + startAngle);
-                else
-                    sweep = Math.Abs(endAngle - startAngle);
-            }
-
-            arcResolution = (int)Math.Max(1d, (sweep / (Math.PI * 18d / 180d)));
-
-         //   arcResolution = (int)Math.Ceiling((sweep * radius) / .1d);
-
-            //if (arcDegreeMode && arcPrecision > 0)
-            //{
-            //    numPoints = qMax(1.0, sweep / (M_PI * arcPrecision / 180));
-            //}
-            //else
-            //{
-            //    if (arcPrecision <= 0 && minArcLength > 0)
-            //    {
-            //        arcPrecision = minArcLength;
-            //    }
-            //    numPoints = (int)ceil(arcLength / arcPrecision);
-            //}
-
-            return generatePointsAlongArcBDring(plane, p1, p2, center, isCw, radius, startAngle, sweep, arcResolution);
-        }
-
-        /*
-         * Generates the points along an arc including the start and end points.
-         */
-        public static List<Point3D> generatePointsAlongArcBDring(GCPlane plane, double[] p1,
-                double[] p2, double[] center, bool isCw, double radius,
-                double startAngle, double sweep, int numPoints)
-        {
-
-            Point3D lineEnd = new Point3D();
-            List<Point3D> segments = new List<Point3D>();
-            double angle;
-            double zIncrement = (p2[plane.AxisLinear] - p1[plane.AxisLinear]) / numPoints;
-
-            for (int i = 0; i < numPoints; i++)
-            {
-                if (isCw)
-                    angle = (startAngle - i * sweep / numPoints);
-                else
-                    angle = (startAngle + i * sweep / numPoints);
-
-                if (angle >= Math.PI * 2d)
-                    angle = angle - Math.PI * 2d;
-
-                p1[plane.Axis0] = Math.Cos(angle) * radius + center[0];
-                p1[plane.Axis1] = Math.Sin(angle) * radius + center[1];
-
-                lineEnd.X = p1[0];
-                lineEnd.Y = p1[1];
-                lineEnd.Z = p1[2];
-
-                p1[plane.AxisLinear] += zIncrement;
-
-                segments.Add(lineEnd);
-            }
-
-            lineEnd.X = p2[0];
-            lineEnd.Y = p2[1];
-            lineEnd.Z = p2[2];
-
-            segments.Add(lineEnd);
-
-            return segments;
-        }
-
-        /** 
-        * Return the angle in radians when going from start to end.
-        */
-        public static double getAngle(double[] start, double endX, double endY)
-        {
-            double deltaX = endX - start[0];
-            double deltaY = endY - start[1];
-
-            double angle = 0d;
-
-            if (deltaX != 0d)
-            { // prevent div by 0
-                // it helps to know what quadrant you are in
-                if (deltaX > 0d && deltaY >= 0d)
-                {  // 0 - 90
-                    angle = Math.Atan(deltaY / deltaX);
-                }
-                else if (deltaX < 0d && deltaY >= 0d)
-                { // 90 to 180
-                    angle = Math.PI - Math.Abs(Math.Atan(deltaY / deltaX));
-                }
-                else if (deltaX < 0d && deltaY < 0d)
-                { // 180 - 270
-                    angle = Math.PI + Math.Abs(Math.Atan(deltaY / deltaX));
-                }
-                else if (deltaX > 0d && deltaY < 0d)
-                { // 270 - 360
-                    angle = Math.PI * 2d - Math.Abs(Math.Atan(deltaY / deltaX));
-                }
-            }
-            else
-            {
-                // 90 deg
-                if (deltaY > 0d)
-                {
-                    angle = Math.PI / 2d;
-                }
-                // 270 deg
-                else
-                {
-                    angle = Math.PI * 3d / 2d;
-                }
-            }
-
-            return angle;
-        }
-
-        static public double[] updateCenterWithCommand(GCPlane plane, double[] initial, double[] ijkValues, bool absoluteIJKMode)
-        {
-            double[] newPoint = new double[2];
-
-            if (absoluteIJKMode)
-            {
-                newPoint[0] = ijkValues[plane.Axis0];
-                newPoint[1] = ijkValues[plane.Axis1];
-            }
-            else
-            {
-                newPoint[0] = initial[plane.Axis0] + ijkValues[plane.Axis0];
-                newPoint[1] = initial[plane.Axis1] + ijkValues[plane.Axis1];
-            }
-
-            return newPoint;
-        }
-
-        public static double Hypotenuse(double a, double b)
-        {
-            return Math.Sqrt(a * a + b * b);
-        }
-
-        // Try to create an arc :)
-        public static double[] convertRToCenter(GCPlane plane, double[] start, double[] end, double radius, bool absoluteIJK, bool clockwise)
-        {
-            double[] center = new double[2];
-
-            // This math is copied from GRBL in gcode.c
-            double x = end[plane.Axis0] - start[plane.Axis0];
-            double y = end[plane.Axis1] - start[plane.Axis1];
-
-            double h_x2_div_d = 4d * radius * radius - x * x - y * y;
-            if (h_x2_div_d < 0d)
-            {
-                Console.Write("Error computing arc radius.");
-            }
-
-            h_x2_div_d = (-Math.Sqrt(h_x2_div_d)) / Hypotenuse(x, y);
-
-            if (!clockwise)
-            {
-                h_x2_div_d = -h_x2_div_d;
-            }
-
-            // Special message from gcoder to software for which radius
-            // should be used.
-            if (radius < 0d)
-            {
-                h_x2_div_d = -h_x2_div_d;
-                // TODO: Places that use this need to run ABS on radius.
-                radius = -radius;
-            }
-
-            double offsetX = 0.5d * (x - (y * h_x2_div_d));
-            double offsetY = 0.5d * (y + (x * h_x2_div_d));
-
-            if (!absoluteIJK)
-            {
-                center[0] = start[plane.Axis0] + offsetX;
-                center[1] = start[plane.Axis1] + offsetY;
-            }
-            else
-            {
-                center[0] = offsetX;
-                center[1] = offsetY;
-            }
-
-            return center;
         }
     }
 }

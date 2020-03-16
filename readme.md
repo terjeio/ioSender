@@ -1,58 +1,10 @@
 ## GRBL GCode Sender
 
-2020-03-11: Alpha 12 release of binary.
+2020-03-16: Alpha 13 release of binary.
 
-Some refactoring of code, allows drag&drop of files onto the 3D viewer and is also preparation for using a tab viewer for the GCode list.
-Fixed block counting error when transitioning in/out of Hold mode. Added copy to clipboard of firmware settiongs and options from _File > About_ dialog.
+Program list control has been replaced vith a tab control with easy access to a 3D view and a console (for showing replies from grbl).
 
----
-
-2020-03-09: Alpha 11 release of binary.
-
-Improved rendering of 3D model, added Goto sidebar button for G28 and G30.
-
----
-
-2020-02-29: Ninth alpha release of binary.
-
-Refactored main state machine. Some layout fixes.
-
----
-
-2020-02-25: Eigth alpha release of binary.
-
-Improved serial connection, now always asserts DTR on connect (before any toggling). Some layout fixes.
-
----
-
-2020-02-21: Seventh alpha release of binary.
-
-Added drop-down for selecting serial connection mode: no action, toggle DTR and toggle RTS.
-
----
-
-2020-02-11: Sixth alpha release of binary.
-
-Finally fixed MPG -> Sender swiching. Fixed intermittent hang on close and added system information (from grbl) to About dialog.
-
----
-
-2020-02-06: Fifth alpha release of binary.
-
-Moved main response handler to view model, added timeouts for waiting for controller responses. Improved MPG/Sender switching. 
-
----
-
-2020-01-30: Fourth alpha release of binary. Use with care and please report issues!
-
-Improved button interlocks, added [direct output to machine](https://github.com/terjeio/Grbl-GCode-Sender/wiki/Vectric-Direct-Output) from Vectric applications.
-
-
----
-
-2020-01-28: Third alpha release of binary. Use with care and please report issues!
-
-Added macro support, configurable stripping of M6-M8 G codes, improved handling for non-grblHAL controllers and readied lathe wizards for testing.
+Added bounding box calculation for arcs (G2 & G3), _Program limits_ should now be accurate.
 
 ---
 
@@ -72,7 +24,7 @@ Some known issues:
 
 * There is no UI yet for configuring streaming via telnet or websocket protocols, either the app config file must be edited or the connection parameter has to be supplied on the command line.
 
-* Program limits displayed does not include arcs correctly if outside the bounding box defined by linear moves.
+* Program limits displayed does not include arcs correctly if outside the bounding box defined by linear moves. __Fixed.__
 
 ---
 
@@ -85,9 +37,17 @@ A complete rewrite of my [Grbl CNC Controls library](https://github.com/terjeio/
 ---
 
 
-Current layout, most likely to change. Since using the MVVM coding pattern this is fairly easy to do.
+Current layout, likely to change. Since using the MVVM coding pattern this is fairly easy to do.
 
 ![Sender](Media/Sender.png)
 
+3D view of program, with live update of tool marker.
+
+![3D view](Media/Sender2.png)
+
+Advanced grbl configuration with on-screen documentation. UI is dynamically generated from data in a file.
+
+![Easy configuration](Media/Sender3.png)
+
 ---
-2020-03-09
+2020-03-16

@@ -1,7 +1,7 @@
 ﻿/*
  * GCodeParser.cs - part of CNC Controls library
  *
- * v0.02 / 2020-01-24 / Io Engineering (Terje Io)
+ * v0.13 / 2020-03-15 / Io Engineering (Terje Io)
  *
  */
 
@@ -44,6 +44,7 @@ using System.IO;
 using System.Globalization;
 using System.Windows;
 using CNC.Core;
+using System.Windows.Media.Media3D;
 
 namespace CNC.GCode
 {
@@ -93,7 +94,7 @@ namespace CNC.GCode
                 for (int i = 0; i < XYZ.Length; i++)
                     XYZ[i] = 0d;
                 for (int i = 0; i < IJK.Length; i++)
-                    IJK[i] = double.NaN;
+                    IJK[i] = 0d;
             }
         }
 
@@ -150,7 +151,8 @@ namespace CNC.GCode
         }
 
         // Modal Group G1: Motion modes
-        private enum MotionMode {
+        private enum MotionMode
+        {
             Seek = 0,                    // G0 (Default: Must be zero)
             Linear = 1,                  // G1 (Do not alter value)
             CwArc = 2,                   // G2 (Do not alter value)
@@ -259,11 +261,11 @@ namespace CNC.GCode
                 toolOffsets[i] = 0d;
         }
 
-        private string rewrite_block (string remove, List<string> gcodes)
+        private string rewrite_block(string remove, List<string> gcodes)
         {
             string block = string.Empty;
 
-            foreach(string gcode in gcodes)
+            foreach (string gcode in gcodes)
             {
                 if (gcode != remove)
                     block += gcode;
@@ -272,11 +274,11 @@ namespace CNC.GCode
             return block == string.Empty ? "(line removed)" : block;
         }
 
-        private bool VerifyIgnore (string code, CommandIgnoreState state)
+        private bool VerifyIgnore(string code, CommandIgnoreState state)
         {
             bool strip = state == CommandIgnoreState.Strip;
 
-            if(!strip && state != CommandIgnoreState.No)
+            if (!strip && state != CommandIgnoreState.No)
                 strip = MessageBox.Show(string.Format("{0} command found, strip?", code), "Strip command", MessageBoxButton.YesNo) == MessageBoxResult.Yes;
 
             return strip;
@@ -307,9 +309,9 @@ namespace CNC.GCode
             if (quiet)
                 return true;
 
-            if(block[0] == '%')
+            if (block[0] == '%')
             {
-                if(++demarcCount == 2)
+                if (++demarcCount == 2)
                     ProgramEnd = true;
                 return true;
             }
@@ -514,7 +516,7 @@ namespace CNC.GCode
                         case 84:
                         case 87:
                         case 88:
-                            if(fv == 0) // test to stop compiler complaining 
+                            if (fv == 0) // test to stop compiler complaining 
                                 throw new GCodeException("Unsupported command");
                             break;
 
@@ -589,7 +591,7 @@ namespace CNC.GCode
                             break;
 
                         case 6:
-                            if(VerifyIgnore(code, IgnoreM6))
+                            if (VerifyIgnore(code, IgnoreM6))
                                 line = rewrite_block(code, gcodes);
                             else
                                 modalGroup = ModalGroups.M6;
@@ -774,7 +776,7 @@ namespace CNC.GCode
                                 axisWords |= WordFlags.C;
                                 gcValues.C = value;
                                 break;
-                                
+
                             default:
                                 throw new GCodeException("Command word not recognized");
                         }
@@ -801,7 +803,7 @@ namespace CNC.GCode
             //
             // 1. Comments feedback
             //
-            if(comment != string.Empty)
+            if (comment != string.Empty)
             {
                 Tokens.Add(new GCComment(Commands.Comment, gcValues.N, comment));
                 comment = string.Empty;
@@ -845,7 +847,7 @@ namespace CNC.GCode
             //
             if (wordFlags.HasFlag(WordFlags.T))
             {
-                Tokens.Add(new GCToolSelect (Commands.ToolSelect, gcValues.N, gcValues.T));
+                Tokens.Add(new GCToolSelect(Commands.ToolSelect, gcValues.N, gcValues.T));
 
                 if (!quiet && ToolChanged != null && !ToolChanged(gcValues.T))
                     MessageBox.Show(string.Format("Tool {0} not associated with a profile!", gcValues.T.ToString()), "GCode parser", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -1119,7 +1121,7 @@ namespace CNC.GCode
             //
 
             // Cancel canned cycle mode: G80
-            if(modalGroups.HasFlag(ModalGroups.G1) && axisCommand == AxisCommand.None)
+            if (modalGroups.HasFlag(ModalGroups.G1) && axisCommand == AxisCommand.None)
             {
                 Tokens.Add(new GCodeToken(Commands.G80, gcValues.N));
             }
@@ -1146,15 +1148,19 @@ namespace CNC.GCode
                             if (doScaling)
                                 gcValues.R *= scaleFactors[plane.Axis0] > scaleFactors[plane.Axis1] ? scaleFactors[plane.Axis0] : scaleFactors[plane.Axis1];
                         }
-                        else if (isImperial && ijkWords != 0)
+                        else if (ijkWords != 0)
                         {
-                            for (int i = 0; i < 3; i++) {
+                            for (int i = 0; i < 3; i++)
+                            {
                                 if (ijkWords.HasFlag(IJKFlags[i]))
                                 {
-                                    gcValues.IJK[i] *= 25.4d;
+                                    if (isImperial)
+                                        gcValues.IJK[i] *= 25.4d;
                                     if (doScaling)
                                         gcValues.IJK[i] *= scaleFactors[i];
                                 }
+                                else
+                                    gcValues.IJK[i] = 0d;
                             }
                         }
                         Tokens.Add(new GCArc(motionMode == MotionMode.CwArc ? Commands.G2 : Commands.G3, gcValues.N, gcValues.XYZ, gcValues.IJK, gcValues.R, ijkMode.IJKMode));
@@ -1206,7 +1212,7 @@ namespace CNC.GCode
                         {
                             uint repeats = wordFlags.HasFlag(WordFlags.L) ? (uint)gcValues.L : 1;
                             double dwell = wordFlags.HasFlag(WordFlags.P) ? gcValues.P : 0d;
-                            if(!wordFlags.HasFlag(WordFlags.Q) || gcValues.Q <= 0d)
+                            if (!wordFlags.HasFlag(WordFlags.Q) || gcValues.Q <= 0d)
                                 throw new GCodeException("Q word missing or out of range");
                             Tokens.Add(new GCCannedDrill(Commands.G83, gcValues.N, gcValues.XYZ, gcValues.R, repeats, dwell, gcValues.Q));
                         }
@@ -1355,12 +1361,17 @@ namespace CNC.GCode
 
     public class GCArc : GCAxisCommand3
     {
+        private bool center_ok = false;
+        private double[] center;
+        private double[] end = new double[3];
+
         public GCArc()
         { }
 
         public GCArc(Commands cmd, uint lnr, double[] xyz_values, double[] ijk_values, double r, IJKMode ijkMode) : base(cmd, lnr, xyz_values)
         {
             Array.Copy(ijk_values, IJKvalues, 3);
+            Array.Copy(Values, end, 3);
 
             R = r;
             IJKMode = ijkMode;
@@ -1375,6 +1386,346 @@ namespace CNC.GCode
         public IJKMode IJKMode { get; set; }
         public bool IsRadiusMode { get { return double.IsNaN(I) && double.IsNaN(J) && double.IsNaN(K); } }
         public bool IsClocwise { get { return Command == Commands.G2; } }
+
+        public double[] GetCenter(GCPlane plane, double[] start, bool isRelative = false)
+        {
+            if (!center_ok)
+            {
+                if (isRelative)
+                {
+                    for (int i = 0; i < 3; i++)
+                        end[i] += start[i];
+                }
+
+                if (IsRadiusMode)
+                    center = convertRToCenter(plane, start);
+                else
+                    center = updateCenterWithCommand(plane, start);
+
+                center_ok = true;
+            }
+
+            return center;
+        }
+
+        public GcodeBoundingBox GetBoundingBox(GCPlane plane, double[] start, bool isRelative = false)
+        {
+            GcodeBoundingBox bbox = new GcodeBoundingBox();
+
+            if (!center_ok)
+                GetCenter(plane, start, isRelative);
+
+            double startAngle = GetStartAngle(plane, start, isRelative);
+            double endAngle = GetEndAngle(plane, start, isRelative);
+
+            double z1 = Math.Min(start[plane.AxisLinear], end[plane.AxisLinear]);
+            double z2 = Math.Max(start[plane.AxisLinear], end[plane.AxisLinear]);
+
+            if (startAngle == endAngle)
+            {
+                bbox.AddPoint(plane, center[0] - R, center[1] - R, z1);
+                bbox.AddPoint(plane, center[0] + R, center[1] + R, z2);
+            }
+            else
+            {
+                double sweep;
+                double x1 = Math.Min(start[plane.Axis0], end[plane.Axis0]);
+                double y1 = Math.Min(start[plane.Axis1], end[plane.Axis1]);
+                double x2 = Math.Max(start[plane.Axis0], end[plane.Axis0]);
+                double y2 = Math.Max(start[plane.Axis1], end[plane.Axis1]);
+                int q = 4;
+
+                // Fix semantics, if the angle ends at 0 it really should end at 360.
+                if (endAngle == 0d)
+                    endAngle = Math.PI * 2d;
+
+                // Calculate distance along arc.
+                if (!IsClocwise && endAngle < startAngle)
+                    sweep = ((Math.PI * 2d - startAngle) + endAngle);
+                else if (IsClocwise && endAngle > startAngle)
+                    sweep = ((Math.PI * 2d - endAngle) + startAngle);
+                else
+                    sweep = Math.Abs(endAngle - startAngle);
+
+                bbox.AddPoint(plane, x1, y1, z1);
+                bbox.AddPoint(plane, x2, y2, z2);
+
+                double da = Math.PI * 2d;
+
+                while ((da - Math.PI / 2d) >= startAngle)
+                {
+                    q--;
+                    da -= Math.PI / 2d;
+                }
+
+                sweep -= da - startAngle;
+
+                while (sweep >= 0d)
+                {
+                    switch (q)
+                    {
+                        case 0:
+                            bbox.AddPoint(plane, center[0] + R, y1, z1);
+                            bbox.AddPoint(plane, center[0] + R, y2, z2);
+                            q = IsClocwise ? 3 : 1;
+                            break;
+
+                        case 1:
+                            bbox.AddPoint(plane, x1, center[1] + R, z1);
+                            bbox.AddPoint(plane, x2, center[1] + R, z2);
+                            q = IsClocwise ? 0 : 2;
+                            break;
+
+                        case 2:
+                            bbox.AddPoint(plane, center[0] - R, y1, z1);
+                            bbox.AddPoint(plane, center[0] - R, y2, z2);
+                            q = IsClocwise ? 1 : 3;
+                            break;
+
+
+                        case 3:
+                            bbox.AddPoint(plane, x1, center[1] - R, z1);
+                            bbox.AddPoint(plane, x2, center[1] - R, z2);
+                            q = IsClocwise ? 2 : 0;
+                            break;
+                    }
+                    sweep -= Math.PI / 2d;
+                }
+            }
+
+            bbox.Conclude();
+
+            return bbox;
+        }
+
+        public double GetStartAngle(GCPlane plane, double[] start, bool isRelative = false)
+        {
+            if (!center_ok)
+                GetCenter(plane, start, isRelative);
+
+            return getAngle(center, start[plane.Axis0], start[plane.Axis1]);
+        }
+
+        public double GetEndAngle(GCPlane plane, double[] start, bool isRelative = false)
+        {
+            if (!center_ok)
+                GetCenter(plane, start, isRelative);
+
+            return getAngle(center, end[plane.Axis0], end[plane.Axis1]);
+        }
+
+        /** 
+* Return the angle in radians when going from start to end.
+*/
+        private double getAngle(double[] start, double endX, double endY)
+        {
+            double deltaX = endX - start[0];
+            double deltaY = endY - start[1];
+            double angle = 0d;
+
+            if (deltaX != 0d)
+            { // prevent div by 0
+                // it helps to know what quadrant you are in
+                if (deltaY >= 0d)
+                {
+                    if (deltaX > 0d)
+                    {  // 0 - 90
+                        angle = Math.Atan(deltaY / deltaX);
+                    }
+                    else
+                    { // 90 to 180
+                        angle = Math.PI - Math.Abs(Math.Atan(deltaY / deltaX));
+                    }
+                }
+                else if (deltaX < 0d)
+                { // 180 - 270
+                    angle = Math.PI + Math.Abs(Math.Atan(deltaY / deltaX));
+                }
+                else //if (deltaX > 0d && deltaY < 0d)
+                { // 270 - 360
+                    angle = Math.PI * 2d - Math.Abs(Math.Atan(deltaY / deltaX));
+                }
+            }
+            else
+            {
+                // 90 deg
+                if (deltaY > 0d)
+                {
+                    angle = Math.PI / 2d;
+                }
+                // 270 deg
+                else
+                {
+                    angle = Math.PI * 3d / 2d;
+                }
+            }
+
+            return angle;
+        }
+
+        private double[] updateCenterWithCommand(GCPlane plane, double[] initial)
+        {
+            double[] newPoint = new double[2];
+
+            if (IJKMode == IJKMode.Incremental)
+            {
+                newPoint[0] = initial[plane.Axis0] + IJKvalues[plane.Axis0];
+                newPoint[1] = initial[plane.Axis1] + IJKvalues[plane.Axis1];
+            }
+            else
+            {
+                newPoint[0] = IJKvalues[plane.Axis0];
+                newPoint[1] = IJKvalues[plane.Axis1];
+            }
+
+            if(R == 0d)
+                R = Math.Sqrt(IJKvalues[plane.Axis0] * IJKvalues[plane.Axis0] + IJKvalues[plane.Axis1] * IJKvalues[plane.Axis1]);
+
+            return newPoint;
+        }
+
+        // Try to create an arc :)
+        private double[] convertRToCenter(GCPlane plane, double[] start)
+        {
+            center = new double[2];
+
+            // This math is copied from GRBL in gcode.c
+            double x = end[plane.Axis0] - start[plane.Axis0];
+            double y = end[plane.Axis1] - start[plane.Axis1];
+
+            double h_x2_div_d = 4d * R * R - x * x - y * y;
+            if (h_x2_div_d < 0d)
+            {
+                Console.Write("Error computing arc radius.");
+            }
+
+            h_x2_div_d = (-Math.Sqrt(h_x2_div_d)) / Math.Sqrt(x * x + y * y);
+
+            if (!IsClocwise)
+            {
+                h_x2_div_d = -h_x2_div_d;
+            }
+
+            // Special message from gcoder to software for which radius
+            // should be used.
+            //if (radius < 0d)
+            //{
+            //    h_x2_div_d = -h_x2_div_d;
+            //    // TODO: Places that use this need to run ABS on radius.
+            //    radius = -radius;
+            //}
+
+            double offsetX = 0.5d * (x - (y * h_x2_div_d));
+            double offsetY = 0.5d * (y + (x * h_x2_div_d));
+
+            if (IJKMode == IJKMode.Incremental)
+            {
+                center[0] = start[plane.Axis0] + offsetX;
+                center[1] = start[plane.Axis1] + offsetY;
+            }
+            else
+            {
+                center[0] = offsetX;
+                center[1] = offsetY;
+            }
+
+            return center;
+        }
+
+        /**
+* Generates the points along an arc including the start and end points.
+*/
+        public List<Point3D> GeneratePoints(GCPlane plane, double[] start, int arcResolution, bool isRelative = false)
+        {
+            double sweep;
+
+            // Calculate radius if necessary.
+            //if (radius == 0d)
+            //    radius = Hypotenuse(p1[plane.Axis0] - center[0], p1[plane.Axis1] - center[1]);
+
+            // Calculate angles from center.
+            double startAngle = GetStartAngle(plane, start, isRelative);
+            double endAngle = GetEndAngle(plane, start, isRelative);
+
+            if (startAngle == endAngle)
+                sweep = Math.PI * 2d;
+
+            else
+            {
+                // Fix semantics, if the angle ends at 0 it really should end at 360.
+                if (endAngle == 0d)
+                    endAngle = Math.PI * 2d;
+
+                // Calculate distance along arc.
+                if (!IsClocwise && endAngle < startAngle)
+                    sweep = ((Math.PI * 2d - startAngle) + endAngle);
+                else if (IsClocwise && endAngle > startAngle)
+                    sweep = ((Math.PI * 2d - endAngle) + startAngle);
+                else
+                    sweep = Math.Abs(endAngle - startAngle);
+            }
+
+            arcResolution = (int)Math.Max(1d, (sweep / (Math.PI * 18d / 180d)));
+
+            //   arcResolution = (int)Math.Ceiling((sweep * radius) / .1d);
+
+            //if (arcDegreeMode && arcPrecision > 0)
+            //{
+            //    numPoints = qMax(1.0, sweep / (M_PI * arcPrecision / 180));
+            //}
+            //else
+            //{
+            //    if (arcPrecision <= 0 && minArcLength > 0)
+            //    {
+            //        arcPrecision = minArcLength;
+            //    }
+            //    numPoints = (int)ceil(arcLength / arcPrecision);
+            //}
+
+            return generatePointsAlongArcBDring(plane, start, startAngle, sweep, arcResolution);
+        }
+
+        /*
+         * Generates the points along an arc including the start and end points.
+         */
+        private List<Point3D> generatePointsAlongArcBDring(GCPlane plane, double[] start, double startAngle, double sweep, int numPoints)
+        {
+
+            Point3D lineEnd = new Point3D();
+            List<Point3D> segments = new List<Point3D>();
+            double angle;
+            double zIncrement = (end[plane.AxisLinear] - start[plane.AxisLinear]) / numPoints;
+
+            for (int i = 0; i < numPoints; i++)
+            {
+                if (IsClocwise)
+                    angle = (startAngle - i * sweep / numPoints);
+                else
+                    angle = (startAngle + i * sweep / numPoints);
+
+                if (angle >= Math.PI * 2d)
+                    angle = angle - Math.PI * 2d;
+
+                start[plane.Axis0] = Math.Cos(angle) * R + center[0];
+                start[plane.Axis1] = Math.Sin(angle) * R + center[1];
+
+                lineEnd.X = start[0];
+                lineEnd.Y = start[1];
+                lineEnd.Z = start[2];
+
+                start[plane.AxisLinear] += zIncrement;
+
+                segments.Add(lineEnd);
+            }
+
+            lineEnd.X = end[0];
+            lineEnd.Y = end[1];
+            lineEnd.Z = end[2];
+
+            segments.Add(lineEnd);
+
+            return segments;
+        }
     }
 
     public class GCCannedDrill : GCAxisCommand3
@@ -1548,9 +1899,9 @@ namespace CNC.GCode
         {
         }
 
-        public Plane Plane { get { return Command == Commands.G17 ? Plane.XY : (Command == Commands.G18 ? Plane.XZ : Plane.YZ); }}
-        public int Axis0 { get { return Plane == Plane.XY ? 0 : (Plane == Plane.XZ ? 0 : 1); } }
-        public int Axis1 { get { return Plane == Plane.XY ? 1 : (Plane == Plane.XZ ? 2 : 2); } }
+        public Plane Plane { get { return Command == Commands.G17 ? Plane.XY : (Command == Commands.G18 ? Plane.XZ : Plane.YZ); } }
+        public int Axis0 { get { return Plane == Plane.XY ? 0 : (Plane == Plane.XZ ? 2 : 1); } }
+        public int Axis1 { get { return Plane == Plane.XY ? 1 : (Plane == Plane.XZ ? 0 : 2); } }
         public int AxisLinear { get { return Plane == Plane.XY ? 2 : (Plane == Plane.XZ ? 1 : 0); } }
 
     }

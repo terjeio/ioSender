@@ -1,7 +1,7 @@
 ﻿/*
  * MDIControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.05 / 2020-02-01 / Io Engineering (Terje Io)
+ * v0.13 / 2020-03-12 / Io Engineering (Terje Io)
  *
  */
 
@@ -41,6 +41,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using CNC.Core;
+using System.Collections.ObjectModel;
 
 namespace CNC.Controls
 {
@@ -49,9 +50,11 @@ namespace CNC.Controls
         public MDIControl()
         {
             InitializeComponent();
+
+            Commands = new ObservableCollection<string>();
         }
 
-        public new bool IsFocused { get { return txtMDI.IsFocused; } }
+        public new bool IsFocused { get { return txtMDI.IsKeyboardFocusWithin; } }
 
         public static readonly DependencyProperty CommandProperty = DependencyProperty.Register(nameof(Command), typeof(string), typeof(MDIControl), new PropertyMetadata(""));
         public string Command
@@ -60,10 +63,28 @@ namespace CNC.Controls
             set { SetValue(CommandProperty, value); }
         }
 
+        public static readonly DependencyProperty CommandsProperty = DependencyProperty.Register(nameof(Commands), typeof(ObservableCollection<string>), typeof(MDIControl));
+        public ObservableCollection<string> Commands
+        {
+            get { return (ObservableCollection<string>)GetValue(CommandsProperty); }
+            set { SetValue(CommandsProperty, value); }
+        }
+
         private void txtMDI_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Return && (DataContext as GrblViewModel).MDICommand.CanExecute(null))
-                (DataContext as GrblViewModel).MDICommand.Execute((sender as TextBox).Text);
+            {
+                string cmd = (sender as ComboBox).Text;
+                if (!string.IsNullOrEmpty(cmd) && !Commands.Contains(cmd))
+                    Commands.Insert(0, cmd);
+                (DataContext as GrblViewModel).MDICommand.Execute(cmd);
+            }
+        }
+
+        private void Send_Click(object sender, RoutedEventArgs e)
+        {
+            if (!string.IsNullOrEmpty(Command) && !Commands.Contains(Command))
+                Commands.Insert(0, Command);
         }
     }
 }

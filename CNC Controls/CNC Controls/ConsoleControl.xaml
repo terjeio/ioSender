@@ -5,17 +5,18 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CNC.Controls"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
+             d:DesignHeight="331" d:DesignWidth="400">
     <UserControl.Resources>
         <local:StringCollectionToTextConverter x:Key="OcToString" />
     </UserControl.Resources>
-    <GroupBox Header="Console" HorizontalAlignment="Left" VerticalAlignment="Top" Width="300">
-        <Grid>
-            <CheckBox Content="Enable" IsChecked="{Binding Path=ResponseLogEnable}" HorizontalAlignment="Left" Margin="10,8,0,0" VerticalAlignment="Top"/>
-            <Button Content="Clear" HorizontalAlignment="Left" Margin="203,5,0,0" VerticalAlignment="Top" Width="75" Click="btn_Clear"/>
-            <TextBox IsReadOnly="True" HorizontalAlignment="Left" Height="239" Margin="5,33,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="280"
+    <!--> <GroupBox Header="Console" HorizontalAlignment="Center" VerticalAlignment="Top" Width="394" Height="328"> <\!-->
+    <Grid>
+            <CheckBox Content="Verbose" IsChecked="{Binding Path=ResponseLogVerbose}" HorizontalAlignment="Left" Margin="10,8,0,0" VerticalAlignment="Top"/>
+            <Button Content="Clear" HorizontalAlignment="Right" Margin="0,5,5,0" VerticalAlignment="Top" Width="75" Click="btn_Clear"/>
+            <TextBox IsReadOnly="True" HorizontalAlignment="Center" Height="290" Margin="0,33,0,0" TextWrapping="NoWrap" VerticalAlignment="Top" Width="385" 
                      local:TextBoxUtilities.AlwaysScrollToEnd="True" FontSize="10" FontFamily="Verdana"
-                     ScrollViewer.VerticalScrollBarVisibility="Auto">
+                     ScrollViewer.VerticalScrollBarVisibility="Auto"
+                     ScrollViewer.HorizontalScrollBarVisibility="Visible">
                 <TextBox.Text>
                     <MultiBinding Converter="{StaticResource OcToString}">
                         <Binding Path="ResponseLog" Mode="OneWay"/>
@@ -24,5 +25,5 @@
                 </TextBox.Text>
             </TextBox>
         </Grid>
-    </GroupBox>
+    <!--> </GroupBox> </!-->
 </UserControl>

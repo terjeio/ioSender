@@ -6,7 +6,8 @@
              xmlns:helix="clr-namespace:HelixToolkit.Wpf;assembly=HelixToolkit.Wpf"
              xmlns:local="clr-namespace:CNC.Controls.Viewer"
              mc:Ignorable="d" 
-             d:DesignHeight="500" d:DesignWidth="500">
+             d:DesignHeight="500" d:DesignWidth="500"
+             Loaded="Renderer_Loaded" IsVisibleChanged="Renderer_IsVisibleChanged">
     <Grid>
         <helix:HelixViewport3D x:Name="viewport" Panel.ZIndex="0" ZoomExtentsWhenLoaded="False" RotateAroundMouseDownPoint="true" ZoomAroundMouseDownPoint="true" AllowDrop="True" DragEnter="viewport_Drag" DragOver="viewport_Drag" DragLeave="viewport_Drag" Drop="viewport_Drop">
             <helix:HelixViewport3D.Camera>
@@ -19,10 +20,13 @@
                 </PerspectiveCamera>
             </helix:HelixViewport3D.Camera>
             <helix:DefaultLights/>
+            <!-->            <helix:TruncatedConeVisual3D Height="5" BaseRadius="0" >
+
+            </helix:TruncatedConeVisual3D> <!-->
             <helix:LinesVisual3D Thickness="1" Color="Black" Points="{Binding Path=CutLines}"/>
             <helix:LinesVisual3D Thickness="0.5" Color="LightPink" Points="{Binding Path=RapidLines}"/>
             <helix:LinesVisual3D Thickness="0.5" Color="Green" Points="{Binding Path=RetractLines}"/>
-            <helix:LinesVisual3D Thickness="1.5" Color="Green" Points="{Binding Path=ToolPosition}"/>
+            <helix:LinesVisual3D Thickness="1.5" Color="Green" Points="{Binding Path=ToolOrigin}"/>
 <!-->            <helix:GridLinesVisual3D binding?/> <!-->
         </helix:HelixViewport3D>
     </Grid>

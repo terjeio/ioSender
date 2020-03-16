@@ -1,7 +1,7 @@
 /*
  * GrblViewModel.cs - part of CNC Controls library
  *
- * v0.12 / 2020-03-11 / Io Engineering (Terje Io)
+ * v0.13 / 2020-03-12 / Io Engineering (Terje Io)
  *
  */
 
@@ -84,7 +84,13 @@ namespace CNC.Core
             Signals.PropertyChanged += Signals_PropertyChanged;
             SpindleState.PropertyChanged += SpindleState_PropertyChanged;
             AxisScaled.PropertyChanged += AxisScaled_PropertyChanged;
+            Position.PropertyChanged += Position_PropertyChanged;
 
+        }
+
+        private void Position_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            OnPropertyChanged(nameof(Position));
         }
 
         private void AxisScaled_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -163,7 +169,9 @@ namespace CNC.Core
         }
 
         public int PollInterval { get; set; } = 200; // ms
-        public bool ResponseLogEnable { get; set; } = false;
+        public bool ResponseLogVerbose { get; set; } = false;
+        public bool IsReady { get; set; } = false;
+
 
         #region Dependencyproperties
 
@@ -735,10 +743,14 @@ namespace CNC.Core
             if (data.Length == 0)
                 return;
 
-            //if (ResponseLogEnable)
-            //    ResponseLog.Add(data);
+            if (ResponseLogVerbose || !(data.First() == '<' || data.First() == '$' || data.First() == 'o') || data.StartsWith("error"))
+            {
+                ResponseLog.Add(data);
+                if (ResponseLog.Count > 100)
+                    ResponseLog.RemoveAt(0);
+            }
 
-            if (data.Substring(0, 1) == "<")
+            if (data.First() == '<')
             {
                 ParseStatus(data);
 

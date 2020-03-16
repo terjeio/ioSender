@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:GCode_Sender"
              xmlns:cnccontrols="clr-namespace:CNC.Controls;assembly=CNC.Controls.WPF"
+             xmlns:cncviewer="clr-namespace:CNC.Controls.Viewer;assembly=CNC.Controls.Viewer"
              mc:Ignorable="d" 
              d:DesignHeight="500" d:DesignWidth="875"
              Focusable="True"
@@ -20,8 +21,18 @@
                 </StackPanel>
                 <cnccontrols:StatusControl x:Name="statusControl" VerticalAlignment="Bottom" DockPanel.Dock="Bottom"/>
             </DockPanel>
-            <cnccontrols:GCodeListControl Margin="224,10,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-            <cnccontrols:JobControl x:Name="GCodeSender" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="224,355,0,0"/>
+            <TabControl x:Name="tabGCode" TabStripPlacement="Bottom" Margin="224,10,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" >
+                <TabItem Header="Program">
+                    <cnccontrols:GCodeListControl HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                </TabItem>
+                <TabItem x:Name="tab3D" Header="3D View">
+                    <cncviewer:RenderControl x:Name="gcodeRenderer" HorizontalAlignment="Left" Width="400" Height="332" VerticalAlignment="Top"/>
+                </TabItem>
+                <TabItem x:Name="tabConsole" Header="Console">
+                    <cnccontrols:ConsoleControl HorizontalAlignment="Left" Width="400" Height="332" VerticalAlignment="Top"/>
+                </TabItem>
+            </TabControl>
+            <cnccontrols:JobControl x:Name="GCodeSender" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="224,385,0,0"/>
             <StackPanel Margin="642,5,0,0" Width="216" Height="Auto">
                 <cnccontrols:WorkParametersControl x:Name="workParametersControl" HorizontalAlignment="Left" Height="60" VerticalAlignment="Top" IsToolChanging="{Binding IsToolChanging}"/>
                 <cnccontrols:CoolantControl HorizontalAlignment="Left" Height="70" VerticalAlignment="Top" x:Name="coolantControl"/>

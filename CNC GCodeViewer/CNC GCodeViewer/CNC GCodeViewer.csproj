@@ -54,6 +54,9 @@
     <Compile Include="ConfigControl.xaml.cs">
       <DependentUpon>ConfigControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="RenderControl.xaml.cs">
+      <DependentUpon>RenderControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Renderer.xaml.cs">
       <DependentUpon>Renderer.xaml</DependentUpon>
     </Compile>
@@ -61,6 +64,10 @@
       <DependentUpon>Viewer.xaml</DependentUpon>
     </Compile>
     <Page Include="ConfigControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="RenderControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

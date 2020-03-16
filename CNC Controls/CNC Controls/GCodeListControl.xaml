@@ -5,10 +5,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CNC.Controls"
              mc:Ignorable="d" 
-             d:DesignHeight="350" d:DesignWidth="410"
+             d:DesignHeight="335" d:DesignWidth="400"
              Loaded="UserControl_Loaded">
     <Grid>
-        <DataGrid x:Name="grdGCode" Grid.Row="0" ItemsSource="{Binding}" AllowDrop="True" Width="410" Height="340" AutoGenerateColumns="False" HorizontalAlignment="Left" Margin="3,3,0,0" VerticalAlignment="Top"
+        <DataGrid x:Name="grdGCode" Grid.Row="0" ItemsSource="{Binding}" AllowDrop="True" Width="400" Height="332" AutoGenerateColumns="False" HorizontalAlignment="Left" VerticalAlignment="Top"
                    CanUserSortColumns="false" IsReadOnly="true" DragEnter="grdGCode_Drag" DragOver="grdGCode_Drag" DragLeave="grdGCode_Drag" Drop="grdGCode_Drop">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Line" Binding="{Binding LineNum}" Width="50"/>
