@@ -1,7 +1,7 @@
 ﻿/*
  * GCodeJob.cs - part of CNC Controls library
  *
- * v0.13 / 2020-03-15 / Io Engineering (Terje Io)
+ * v0.14 / 2020-03-28 / Io Engineering (Terje Io)
  *
  */
 
@@ -96,6 +96,8 @@ namespace CNC.Core
 
         public DataTable Data { get { return gcode; } }
         public bool Loaded { get { return gcode.Rows.Count > 0; } }
+        public bool HeightMapApplied { get; set; }
+
         public List<GCodeToken> Tokens { get { return Parser.Tokens; } }
         public GcodeBoundingBox BoundingBox { get; private set; } = new GcodeBoundingBox();
         public GCodeParser Parser { get; private set; } = new GCodeParser();
@@ -145,7 +147,9 @@ namespace CNC.Core
             else
                 CloseFile();
 
-//            GCodeParser.Save(@"d:\tokens.xml", Parser.Tokens);
+            //GCodeParser.Save(@"d:\tokens.xml", Parser.Tokens);
+
+            //GCodeParser.Save(@"d:\file.nc", GCodeParser.TokensToGCode(Parser.Tokens));
 
             return ok;
         }
@@ -208,16 +212,33 @@ namespace CNC.Core
 
                         case Commands.G2:
                         case Commands.G3:
-                            GCArc arc = (GCArc)token;
-                            double[] values = { point0.X, point0.Y, point0.Z };
-                            BoundingBox.AddBoundingBox((token as GCArc).GetBoundingBox(plane, values, distanceMode == DistanceMode.Incremental));
-                            toPoint(arc.Values, distanceMode == DistanceMode.Incremental);
+                            {
+                                GCArc arc = (GCArc)token;
+                                double[] values = { point0.X, point0.Y, point0.Z };
+                                BoundingBox.AddBoundingBox(arc.GetBoundingBox(plane, values, distanceMode == DistanceMode.Incremental));
+                                toPoint(arc.Values, distanceMode == DistanceMode.Incremental);
+                            }
+                            break;
+
+                        case Commands.G5:
+                            {
+                                GCSpline spline = (GCSpline)token;
+                                double[] values = { point0.X, point0.Y, point0.Z };
+                                BoundingBox.AddBoundingBox(spline.GetBoundingBox(plane, values, distanceMode == DistanceMode.Incremental));
+                                toPoint(spline.Values, distanceMode == DistanceMode.Incremental);
+                            }
                             break;
 
                         case Commands.G17:
                         case Commands.G18:
                         case Commands.G19:
                             plane = (GCPlane)token;
+                            break;
+
+                        case Commands.G81:
+                        case Commands.G82:
+                            var canned = token as GCCannedDrill;
+                            BoundingBox.AddPoint(toPoint(canned.Values, distanceMode == DistanceMode.Incremental));
                             break;
 
                         case Commands.G90:
@@ -282,6 +303,7 @@ namespace CNC.Core
             max_feed = double.MinValue;
             BoundingBox.Reset();
             LineNumber = 1;
+            HeightMapApplied = false;
             Parser.Reset();
         }
     }
@@ -374,7 +396,6 @@ namespace CNC.Core
                     Min[i] = Max[i] = 0.0;
                 Size[i] = Math.Abs(Max[i] - Min[i]);
             }
-            Size[2] = Math.Max(.2d, Size[2]);
         }
 
         private void AddPoint(double x, double y, double z)

@@ -1,13 +1,13 @@
 ﻿/*
- * ICNCView.cs - part of CNC Controls library for Grbl
+ * CsSelectControl.xaml.cs - part of CNC Probing library
  *
- * v0.10 / 2020-03-05 / Io Engineering (Terje Io)
+ * v0.14 / 2020-03-25 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2020, Io Engineering (Terje Io)
+Copyright (c) 2019-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -37,36 +37,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-namespace CNC.Controls
-{
-    public enum ViewType
-    {
-        Startup = 0,
-        Shutdown,
-        AppConfig,
-        Engraving,
-        Mach3,
-        GRBL,
-        GRBLConfig,
-        Offsets,
-        PIDTuner,
-        SDCard,
-        G76Threading,
-        Turning,
-        Facing,
-        Parting,
-        Tools,
-        TrinamicTuner,
-        GCodeViewer,
-        SpindleLinearizer,
-        Probing
-    }
+using System.Windows;
+using System.Windows.Controls;
 
-    public interface ICNCView
+namespace CNC.Controls.Probing
+{
+    /// <summary>
+    /// Interaction logic for CsSelectControl.xaml
+    /// </summary>
+    public partial class CsSelectControl : UserControl
     {
-        ViewType ViewType { get; }
-        void Activate(bool activate, ViewType chgMode);
-        void CloseFile();
-        void Setup(UIViewModel model, AppConfig profile);
+        public CsSelectControl()
+        {
+            InitializeComponent();
+        }
+
+        private void ClearG92_Click(object sender, RoutedEventArgs e)
+        {
+            (DataContext as ProbingViewModel).Grbl.ExecuteCommand("G92.1");
+        }
     }
 }

@@ -1,5 +1,15 @@
 ## GRBL GCode Sender
 
+2020-03-29: Alpha 14 release of binary.
+
+Added probing tab with tool length, edge finder, center finder and height map options. __NOTE:__ This has NOT been extensively tested! G20 (inches) mode not tested at all! Do not use unless you understand the risks.
+
+Disabled keyboard jogging when firmware is not [grblHAL](https://github.com/terjeio/grblHAL). May add setup option to reeanble later.
+
+Many internal changes.
+
+---
+
 2020-03-16: Alpha 13 release of binary.
 
 Program list control has been replaced vith a tab control with easy access to a 3D view and a console (for showing replies from grbl).

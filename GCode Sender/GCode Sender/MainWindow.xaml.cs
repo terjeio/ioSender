@@ -1,7 +1,7 @@
 /*
  * MainWindow.xaml.cs - part of Grbl Code Sender
  *
- * v0.13 / 2020-03-15 / Io Engineering (Terje Io)
+ * v0.14 / 2020-03-28 / Io Engineering (Terje Io)
  *
  */
 
@@ -127,7 +127,7 @@ namespace GCode_Sender
                 {
                     var view = getView(tabitem);
                     if(view != null)
-                        tabitem.IsEnabled = !value || view.ViewType == ViewType.GRBL;
+                        tabitem.IsEnabled = !value || tabitem == ui.tabMode.SelectedItem;
                 }
             }
         }

@@ -118,6 +118,10 @@
       <Project>{9d8754ae-bc40-45ec-b308-2ee7ed579439}</Project>
       <Name>CNC Controls Lathe</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\CNC Controls Probing\CNC Controls Probing\CNC Controls Probing.csproj">
+      <Project>{e8a9b2cd-988a-4dae-8dda-bebccb99bf9c}</Project>
+      <Name>CNC Controls Probing</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\CNC Controls\CNC Controls\CNC Controls.csproj">
       <Project>{fa7fef55-aa80-4b20-b345-e3ca7204dd18}</Project>
       <Name>CNC Controls</Name>

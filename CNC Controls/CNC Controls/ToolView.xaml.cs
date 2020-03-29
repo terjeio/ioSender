@@ -1,7 +1,7 @@
 /*
  * ToolView.xaml.cs - part of CNC Controls library
  *
- * v0.10 / 2019-03-05 / Io Engineering (Terje Io)
+ * v0.14 / 2020-03-28 / Io Engineering (Terje Io)
  *
  */
 
@@ -59,7 +59,7 @@ namespace CNC.Controls
         {
             InitializeComponent();
 
-            parameters.WorkPositionOffset.PropertyChanged += Parameters_PropertyChanged;
+            parameters.PropertyChanged += Parameters_PropertyChanged;
         }
 
         public Position offset { get; private set; } = new Position();
@@ -99,19 +99,13 @@ namespace CNC.Controls
         {
             switch (e.PropertyName)
             {
-                case "Z":
-                    if (!(awaitCoord = double.IsNaN(parameters.WorkPositionOffset.Values[0])))
+                case nameof(GrblViewModel.MachinePosition):
+                    if (!(awaitCoord = double.IsNaN(parameters.MachinePosition.Values[0])))
                     {
-                        if (parameters.IsMachinePosition)
-                            for (int i = 0; i < offset.Values.Length; i++)
-                                offset.Values[i] = parameters.MachinePosition.Values[i];
-                        else
-                            for (int i = 0; i < offset.Values.Length; i++)
-                                offset.Values[i] = parameters.WorkPosition.Values[i] + parameters.WorkPositionOffset.Values[i];
+                        offset.Set(parameters.MachinePosition);
                         parameters.Position.SuspendNotifications = parameters.WorkPositionOffset.SuspendNotifications = true;
                         parameters.Clear();
                         parameters.WorkPositionOffset.SuspendNotifications = parameters.Position.SuspendNotifications = false;
-
                     }
                     break;
             }
@@ -146,14 +140,6 @@ namespace CNC.Controls
                 selectedTool = null;
         }
 
-        void btnClear_Click(object sender, RoutedEventArgs e)
-        {
-            cvXOffset.Value = 0.0d;
-            cvYOffset.Value = 0.0d;
-            cvZOffset.Value = 0.0d;
-    //          cvTipRadius.Value = 0.0d;
-        }
-
         // G10 L1 P- axes <R- I- J- Q-> Set Tool Table
         // L10 - ref G5x + G92 - useful for probe (G38)
         // L11 - ref g59.3 only
@@ -161,8 +147,10 @@ namespace CNC.Controls
 
         void saveOffset(string axis)
         {
-            string s, axes;
-            string xOffset = GrblWorkParameters.ConvertX(GrblWorkParameters.LatheMode, GrblParserState.LatheMode, selectedTool.X).ToInvariantString();
+            string axes;
+            Position newpos = new Position(offset);
+
+            newpos.X = GrblWorkParameters.ConvertX(GrblWorkParameters.LatheMode, GrblParserState.LatheMode, selectedTool.X);
 
             switch (axis)
             {
@@ -171,17 +159,15 @@ namespace CNC.Controls
                     break;
 
                 case "All":
-                    axes = "X{1}Y{2}Z{3}R{4}";
+                    axes = newpos.ToString(GrblInfo.AxisFlags);
                     break;
 
-                default:
-                    axes = (axis + "{" + (GrblInfo.AxisLetterToIndex(axis) + 1).ToString() + "}");
+                default:                    
+                    axes = newpos.ToString(GrblInfo.AxisLetterToFlag(axis));
                     break;
             }
 
-            s = string.Format("G10L1P{0}" + axes, selectedTool.Code, xOffset, selectedTool.Y.ToInvariantString(), selectedTool.Z.ToInvariantString(), selectedTool.R.ToInvariantString());
-
-            Comms.com.WriteCommand(s);
+            Comms.com.WriteCommand(string.Format("G10L1P{0}{1}", selectedTool.Code, axes));
         }
 
         void cvOffset_Click(object sender, RoutedEventArgs e)
@@ -204,10 +190,7 @@ namespace CNC.Controls
                     selectedTool.Values[i] = offset.Values[i];
             }
 
-            string xOffset = GrblWorkParameters.ConvertX(GrblWorkParameters.LatheMode, GrblParserState.LatheMode, cvXOffset.Value).ToInvariantString();
-
-            string s = string.Format("G10L1P{0}X{1}Y{2}Z{3}R{4}", selectedTool.Code, xOffset, cvYOffset.Text, cvZOffset.Text, cvTipRadius.Text);
-            Comms.com.WriteCommand(s);
+            saveOffset("All");
         }
 
         private void btnClearAll_Click(object sender, RoutedEventArgs e)
@@ -217,16 +200,13 @@ namespace CNC.Controls
                 for (var i = 0; i < offset.Values.Length; i++)
                     offset.Values[i] = selectedTool.Values[i] = 0d;
 
-                string xOffset = GrblWorkParameters.ConvertX(GrblWorkParameters.LatheMode, GrblParserState.LatheMode, cvXOffset.Value).ToInvariantString();
-
-                string s = string.Format("G10L1P{0}X{1}Y{2}Z{3}R{4}", selectedTool.Code, xOffset, cvYOffset.Text, cvZOffset.Text, cvTipRadius.Text);
-                Comms.com.WriteCommand(s);
+                saveOffset("All");
             }
         }
 
         private void RequestStatus()
         {
-            parameters.WorkPositionOffset.Z = double.NaN;
+            parameters.Clear();
             if (double.IsNaN(parameters.WorkPosition.X) || true) // If not NaN then MPG is polling
                 Comms.com.WriteByte(GrblLegacy.ConvertRTCommand(GrblConstants.CMD_STATUS_REPORT_ALL));
         }

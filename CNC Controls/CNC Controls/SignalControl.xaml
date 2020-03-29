@@ -7,10 +7,26 @@
              mc:Ignorable="d" 
              d:DesignHeight="30" d:DesignWidth="16"
              MaxHeight="30" MaxWidth="16">
-    <Grid>
-        <StackPanel HorizontalAlignment="Left" Height="30" Margin="0,0,0,0" VerticalAlignment="Top" Width="16">
-            <Button x:Name="btnLED" HorizontalAlignment="Left" Margin="3,2,0,0" VerticalAlignment="Top" Width="12" Height="12" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"/>
-            <Button x:Name="btnLabel" Content="{Binding Label, RelativeSource={RelativeSource AncestorType=UserControl}}" Padding="0"  HorizontalAlignment="Left" Margin="1,2,0,0" VerticalAlignment="Top" Width="16" Height="12" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" FontSize="10" FontFamily="Global User Interface"/>
-         </StackPanel>
-    </Grid>
+    <UserControl.Resources>
+        <Style x:Key="ButtonStyleNoHighlighting" TargetType="Button" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid Background="{TemplateBinding Background}">
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal"/>
+                                    <VisualState x:Name="MouseOver"/>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+    <StackPanel HorizontalAlignment="Left" Height="30" VerticalAlignment="Top">
+        <Button x:Name="btnLED" Focusable="False" HorizontalAlignment="Center" Margin="0,2,0,0" VerticalAlignment="Top" Width="10" Height="10" Style="{StaticResource ButtonStyleNoHighlighting}"/>
+        <Button x:Name="btnLabel" Focusable="False" Content="{Binding Label, RelativeSource={RelativeSource AncestorType=UserControl}}" Padding="0" HorizontalAlignment="Center" Margin="0,3,0,0" VerticalAlignment="Top" Width="16" Height="12" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" FontSize="10" FontFamily="Global User Interface"/>
+    </StackPanel>
 </UserControl>

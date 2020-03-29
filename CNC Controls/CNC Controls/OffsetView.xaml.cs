@@ -1,7 +1,7 @@
 /*
  * OffsetView.xaml.cs - part of CNC Controls library
  *
- * v0.10 / 2019-03-05 / Io Engineering (Terje Io)
+ * v0.14 / 2020-03-28 / Io Engineering (Terje Io)
  *
  */
 
@@ -62,10 +62,10 @@ namespace CNC.Controls
 
             parameters.WorkPositionOffset.PropertyChanged += Parameters_PropertyChanged;
             if(!GrblSettings.IsGrblHAL)
-                parameters.Position.PropertyChanged += Parameters_PropertyChanged;
+                parameters.PropertyChanged += Parameters_PropertyChanged;
         }
 
-        public int AxisEnabledFlags { get { return GrblInfo.AxisFlags; } }
+        public AxisFlags AxisEnabledFlags { get { return GrblInfo.AxisFlags; } }
         public Position offset { get; private set; } = new Position();
 
         #region Methods and properties required by CNCView interface
@@ -107,19 +107,13 @@ namespace CNC.Controls
         {
             switch (e.PropertyName)
             {
-                case "Z":
-                    if (!(awaitCoord = double.IsNaN(parameters.WorkPositionOffset.Values[0])))
+                case nameof(GrblViewModel.MachinePosition):
+                    if (!(awaitCoord = double.IsNaN(parameters.MachinePosition.Values[0])))
                     {
-                        if (parameters.IsMachinePosition)
-                            for (int i = 0; i < offset.Values.Length; i++)
-                                offset.Values[i] = parameters.MachinePosition.Values[i];
-                        else
-                            for (int i = 0; i < offset.Values.Length; i++)
-                                offset.Values[i] = parameters.WorkPosition.Values[i] + parameters.WorkPositionOffset.Values[i];
+                        offset.Set(parameters.MachinePosition);
                         parameters.Position.SuspendNotifications = parameters.WorkPositionOffset.SuspendNotifications = true;
                         parameters.Clear();
                         parameters.WorkPositionOffset.SuspendNotifications = parameters.Position.SuspendNotifications = false;
-
                     }
                     break;
             }
@@ -160,40 +154,20 @@ namespace CNC.Controls
 
         void saveOffset(string axis)
         {
-            string s, axes = string.Empty;
-            string[] soffset = new string[6];
+            string cmd;
 
-            if(axis == "All")
-            {
-                int i = 0, axisflags = GrblInfo.AxisFlags;
-                while (axisflags != 0)
-                {
+            Position newpos = new Position(offset);
 
-                    if ((axisflags & 0x01) != 0)
-                        axes += string.Format("{0}{{{1}}}", GrblInfo.AxisIndexToLetter(i), i + 1);
-                    i++; axisflags >>= 1;
-                }
-            } else
-                axes = axis + "{" + (GrblInfo.AxisLetterToIndex(axis) + 1).ToString() + "}";
-
-            for (int i = 0; i < selectedOffset.Values.Length; i++)
-            {
-                if(i == 0)
-                    soffset[i] = GrblWorkParameters.ConvertX(GrblWorkParameters.LatheMode, GrblParserState.LatheMode, selectedOffset.X).ToInvariantString();
-                else
-                    soffset[i] = selectedOffset.Values[i].ToInvariantString();
-            }
-
-            string xOffset = GrblWorkParameters.ConvertX(GrblWorkParameters.LatheMode, GrblParserState.LatheMode, selectedOffset.X).ToInvariantString();
+            newpos.X = GrblWorkParameters.ConvertX(GrblWorkParameters.LatheMode, GrblParserState.LatheMode, selectedOffset.X);
 
             if (selectedOffset.Id == 0)
             {
                 string code = selectedOffset.Code == "G28" || selectedOffset.Code == "G30" ? selectedOffset.Code + ".1" : selectedOffset.Code;
-                s = string.Format("G90{0}" + axes, code, soffset[0], soffset[1], soffset[2], soffset[3], soffset[4], soffset[5]);
+                cmd = string.Format("G90{0}{1}", code, newpos.ToString(axis == "All" ? GrblInfo.AxisFlags : GrblInfo.AxisLetterToFlag(axis)));
             } else
-                s = string.Format("G90G10L2P{0}" + axes, selectedOffset.Id, soffset[0], soffset[1], soffset[2], soffset[3], soffset[4], soffset[5]);
+                cmd = string.Format("G90G10L2P{0}{1}", selectedOffset.Id, newpos.ToString(axis == "All" ? GrblInfo.AxisFlags : GrblInfo.AxisLetterToFlag(axis)));
 
-            Comms.com.WriteCommand(s);
+            Comms.com.WriteCommand(cmd);
         }
 
         private void cvOffset_Click(object sender, RoutedEventArgs e)

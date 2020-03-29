@@ -1,7 +1,7 @@
 ﻿/*
  * Grbl.cs - part of CNC Controls library
  *
- * v0.10 / 2020-03-03 / Io Engineering (Terje Io)
+ * v0.14 / 2020-03-28 / Io Engineering (Terje Io)
  *
  */
 
@@ -340,10 +340,25 @@ namespace CNC.Core
             Parse(values);
         }
 
+        public Position(double x, double y, double z)
+        {
+            init();
+            X = x;
+            Y = y;
+            Z = z;
+        }
+
+        public Position(Position pos)
+        {
+            init();
+            for (var i = 0; i < Values.Length; i++)
+                Values[i] = pos.Values[i];
+        }
+
         private void init()
         {
             Clear();
-
+            Name = this.GetType().Name;
             Values.PropertyChanged += Values_PropertyChanged;
         }
 
@@ -352,6 +367,67 @@ namespace CNC.Core
             for (var i = 0; i < Values.Length; i++)
                 Values[i] = double.NaN;
         }
+
+        public static Position operator +(Position b, Position c)
+        {
+            Position a = new Position();
+
+            for (var i = 0; i < a.Values.Length; i++)
+                a.Values[i] = b.Values[i] + c.Values[i];
+
+            return a;
+        }
+
+        public static Position operator -(Position b, Position c)
+        {
+            Position a = new Position();
+
+            for (var i = 0; i < a.Values.Length; i++)
+                a.Values[i] = b.Values[i] - c.Values[i];
+
+            return a;
+        }
+
+        public void Add (Position pos)
+        {
+            foreach(int i in GrblInfo.AxisFlags.ToIndices())
+                Values[i] += pos.Values[i];
+
+            OnPropertyChanged(nameof(Position));
+        }
+
+        public void Subtract(Position pos)
+        {
+            foreach (int i in GrblInfo.AxisFlags.ToIndices())
+                Values[i] -= pos.Values[i];
+
+            OnPropertyChanged(nameof(Position));
+        }
+
+        public void Set(Position pos)
+        {
+            foreach (int i in GrblInfo.AxisFlags.ToIndices())
+            {
+                if (!Values[i].Equals(pos.Values[i]))
+                    Values[i] = pos.Values[i];
+            }
+            OnPropertyChanged(nameof(Position));
+        }
+
+        public bool Equals(Position pos)
+        {
+            bool equal = true;
+
+            foreach (int i in GrblInfo.AxisFlags.ToIndices())
+            {
+                if (!(equal = Values[i].Equals(pos.Values[i])))
+                    break;
+            }
+
+            return equal;
+        }
+
+        public string Name { get; private set; }
 
         public bool SuspendNotifications
         {
@@ -366,11 +442,36 @@ namespace CNC.Core
 
         public void Parse(string values)
         {
+            bool changed = false;
             double[] position = dbl.ParseList(values); 
             for (var i = 0; i < position.Length; i++) {
-                if(double.IsNaN(Values[i]) ? !double.IsNaN(position[i]) : Values[i] != position[i])
+                if (double.IsNaN(Values[i]) ? !double.IsNaN(position[i]) : Values[i] != position[i])
+                {
                     Values[i] = position[i];
+                    changed = true;
+                }
             }
+            if(changed)
+                OnPropertyChanged("Position");
+        }
+
+        public string ToString(AxisFlags axisflags, int precision = 3)
+        {
+            string parameters = string.Empty;
+
+            foreach (int i in axisflags.ToIndices())
+                parameters += GrblInfo.AxisIndexToLetter(i) + (Math.Round(Values[i], precision).ToInvariantString());
+
+            return parameters;
+        }
+        public string ToString(AxisFlags axisflags, bool toNegative, int precision = 3)
+        {
+            string parameters = string.Empty;
+
+            foreach (int i in axisflags.ToIndices())
+                parameters += GrblInfo.AxisIndexToLetter(i) + (Math.Round(toNegative ? -Values[i] : Values[i], precision).ToInvariantString());
+
+            return parameters;
         }
 
         public CoordinateValues<double> Values { get; private set; } = new CoordinateValues<double>();
@@ -417,6 +518,11 @@ namespace CNC.Core
         double _r;
 
         public double R { get { return R; } set { _r = value; OnPropertyChanged(); } }
+
+        public new string ToString(AxisFlags axisflags, int precision = 3)
+        {
+            return "P" + Code + base.ToString(axisflags, precision);
+        }
     }
 
     public static class GrblCommand
@@ -451,17 +557,18 @@ namespace CNC.Core
             private set
             {
                 _numAxes = value;
-                AxisFlags = 0;
+                int flags = 0;
                 for (int i = 0; i < _numAxes; i++)
-                    AxisFlags = (AxisFlags << 1) | 0x01;
+                    flags = (flags << 1) | 0x01;
                 if (LatheModeEnabled)
                 {
-                    AxisFlags &= ~0x02;
+                    flags &= ~0x02;
                     _numAxes--;
                 }
+                AxisFlags = (AxisFlags)flags;
             }
         }
-        public static int AxisFlags { get; private set; } = 0;
+        public static AxisFlags AxisFlags { get; private set; } = AxisFlags.None;
         public static int NumTools { get; private set; } = 0;
         public static bool HasATC { get; private set; }
         public static bool ManualToolChange { get; private set; }
@@ -491,6 +598,15 @@ namespace CNC.Core
         public static int AxisLetterToIndex(char letter)
         {
             return AxisLetters.IndexOf(letter);
+        }
+
+        public static AxisFlags AxisLetterToFlag(string letter)
+        {
+            return (AxisFlags)(1 << AxisLetters.IndexOf(letter));
+        }
+        public static AxisFlags AxisLetterToFlag(char letter)
+        {
+            return (AxisFlags)(1 << AxisLetters.IndexOf(letter));
         }
 
         public static bool Get(GrblViewModel model)
@@ -671,7 +787,7 @@ namespace CNC.Core
                 {
                     if (val.StartsWith("G51"))
                         state.Add(val.Substring(0, 3), val.Substring(4));
-                    else if (val.StartsWith("G5") && "G54G55G56G57G58G59".Contains(val.Substring(0, 3)))
+                    else if (val.StartsWith("G5") && val.Length > 2 && "G54G55G56G57G58G59".Contains(val.Substring(0, 3)))
                         WorkOffset = val;
                     else if ("FST".Contains(val.Substring(0, 1)))
                     {
@@ -755,6 +871,11 @@ namespace CNC.Core
         public static CoordinateSystem ProbePosition { get; private set; } = new CoordinateSystem("PRB", "");
 
         private static Action<string> dataReceived;
+
+        public static CoordinateSystem GetCoordinateSystem(string gCode)
+        {
+            return CoordinateSystems.Where(x => x.Code == gCode).FirstOrDefault();
+        }
 
         public static double ConvertX(LatheMode source, LatheMode target, double value)
         {

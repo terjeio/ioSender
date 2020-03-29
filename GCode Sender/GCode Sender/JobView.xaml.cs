@@ -1,7 +1,7 @@
 /*
  * JobView.xaml.cs - part of Grbl Code Sender
  *
- * v0.13 / 2019-03-15 / Io Engineering (Terje Io)
+ * v0.14 / 2019-03-29 / Io Engineering (Terje Io)
  *
  */
 
@@ -97,12 +97,6 @@ namespace GCode_Sender
                 model.PropertyChanged += OnDataContextPropertyChanged;
       //          model.OnGrblReset += Model_OnGrblReset;
             }
-        }
-
-        private void Model_OnGrblReset()
-        {
-            initOK = null;
-            Activate(true, ViewType.GRBL);
         }
 
         private void OnDataContextPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -345,6 +339,7 @@ namespace GCode_Sender
             else
                 MainWindow.ShowView(false, ViewType.Tools);
 
+            MainWindow.EnableView(true, ViewType.Probing);
             MainWindow.EnableView(true, ViewType.Offsets);
             MainWindow.EnableView(true, ViewType.GRBLConfig);
 
@@ -406,7 +401,7 @@ namespace GCode_Sender
         }
         protected bool ProcessKeyPreview(System.Windows.Input.KeyEventArgs e)
         {
-            if (mdiControl.IsFocused || DRO.IsFocused || spindleControl.IsFocused || workParametersControl.IsFocused)
+            if (!GrblSettings.IsGrblHAL || mdiControl.IsFocused || DRO.IsFocused || spindleControl.IsFocused || workParametersControl.IsFocused)
                 return false;
 
             return GCodeSender.ProcessKeypress(e);

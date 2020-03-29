@@ -1,7 +1,7 @@
 ﻿/*
  * GCode.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.12 / 2020-03-10 / Io Engineering (Terje Io)
+ * v0.14 / 2020-03-18 / Io Engineering (Terje Io)
  *
  */
 
@@ -50,7 +50,7 @@ namespace CNC.Controls
 {
     public class GCode
     {
-        const string allowedTypes = "cnc,nc,ncc,gcode,tap";
+        const string allowedTypes = "cnc,nc,ncc,ngc,gcode,tap";
 
         private GCodeJob Program { get; set; } = new GCodeJob();
 
@@ -79,6 +79,8 @@ namespace CNC.Controls
 
         public static GCode File { get { return file.Value; } }
         public bool IsLoaded { get { return Program.Loaded; } }
+        public bool HeightMapApplied { get { return Program.HeightMapApplied; } set { Program.HeightMapApplied = value; } }
+
         public DataTable Data { get { return Program.Data; } }
         public int Blocks { get { return Program.Data.Rows.Count; } }
         public List<GCodeToken> Tokens { get { return Program.Tokens; } }

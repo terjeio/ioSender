@@ -5,24 +5,83 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CNC.Controls.Probing"
              xmlns:Controls="clr-namespace:CNC.Controls;assembly=CNC.Controls.WPF" x:Class="CNC.Controls.Probing.HeightMapControl"
-             mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
-    <Grid>
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Height="28" VerticalAlignment="Top" Width="240">
-            <Label Content="X:"/>
-            <Controls:NumericTextBox Value="{Binding Path=MinX}" HorizontalAlignment="Left" Margin="5,0,0,0" Format="###0.0##" VerticalAlignment="Top"/>
-            <Label Content="-"/>
-            <Controls:NumericTextBox Value="{Binding Path=MaxX}" HorizontalAlignment="Left" Margin="5,0,0,0" Format="###0.0##" VerticalAlignment="Top"/>
+             xmlns:helix="clr-namespace:HelixToolkit.Wpf;assembly=HelixToolkit.Wpf"
+             mc:Ignorable="d" Height="350"
+             d:DesignHeight="300" d:DesignWidth="600">
+    <UserControl.Resources>
+        <Controls:LogicalNotConverter x:Key="IsNotRunningConverter" />
+    </UserControl.Resources>
+        <Grid>
+        <StackPanel Margin="5,10,0,0" Width="250" HorizontalAlignment="Left" VerticalAlignment="Top">
+            <GroupBox Header="Area to probe" Height="Auto" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <StackPanel Margin="5,5,0,0">
+                    <StackPanel Orientation="Horizontal">
+                        <Label Content="Lower left:" Width="80" HorizontalContentAlignment="Right"/>
+                        <Controls:NumericTextBox Value="{Binding Path=HeightMap.MinX, Mode=TwoWay}" Format="-###0.0##"/>
+                        <Label Content="-"/>
+                        <Controls:NumericTextBox Value="{Binding Path=HeightMap.MinY, Mode=TwoWay}" Format="-###0.0##"/>
+                    </StackPanel>
+                    <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
+                        <Label Content="Upper right:" Width="80" HorizontalContentAlignment="Right"/>
+                        <Controls:NumericTextBox Value="{Binding Path=HeightMap.MaxX, Mode=TwoWay}" Format="-###0.0##"/>
+                        <Label Content="-"/>
+                        <Controls:NumericTextBox Value="{Binding Path=HeightMap.MaxY, Mode=TwoWay}" Format="-###0.0##"/>
+                    </StackPanel>
+                    <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
+                        <Label Content="Size (W×H):" Width="80" HorizontalContentAlignment="Right"/>
+                        <Controls:NumericTextBox Value="{Binding Path=HeightMap.Width, Mode=TwoWay}" Format="-###0.0##"/>
+                        <Label Content="-"/>
+                        <Controls:NumericTextBox Value="{Binding Path=HeightMap.Height, Mode=TwoWay}" Format="-###0.0##"/>
+                    </StackPanel>
+                    <Button Content="Set from program limits" IsEnabled="{Binding Path=Grbl.IsFileLoaded}" Margin="5,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Click="limits_Click"/>
+                </StackPanel>
+            </GroupBox>
+            <StackPanel Orientation="Horizontal">
+                <Label Content="Gridsize:"/>
+                <Controls:NumericTextBox Value="{Binding Path=HeightMap.GridSize, Mode=TwoWay}" Format="###0.0##" HorizontalAlignment="Left" Margin="0,5,0,0" VerticalAlignment="Top"/>
+            </StackPanel>
         </StackPanel>
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Height="28" VerticalAlignment="Top" Width="240" Margin="0,30,0,0">
-            <Label Content="Y:"/>
-            <Controls:NumericTextBox Value="{Binding Path=MinY}" HorizontalAlignment="Left" Margin="5,0,0,0" Format="###0.0##" VerticalAlignment="Top"/>
-            <Label Content="-"/>
-            <Controls:NumericTextBox Value="{Binding Path=MaxY}" HorizontalAlignment="Left" Margin="5,0,0,0" Format="###0.0##" VerticalAlignment="Top"/>
-        </StackPanel>
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Height="28" VerticalAlignment="Top" Width="240" Margin="0,60,0,0">
-            <Label Content="Gridsize:"/>
-            <Controls:NumericTextBox Value="{Binding Path=GridSize}" HorizontalAlignment="Left" Margin="5,0,0,0" Format="###0.0##" VerticalAlignment="Top"/>
+        <helix:HelixViewport3D BorderBrush="DarkGray" BorderThickness="1" Width="300" Height="300" Margin="280,10,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" x:Name="viewport" Panel.ZIndex="0" ZoomExtentsWhenLoaded="False" RotateAroundMouseDownPoint="true" ZoomAroundMouseDownPoint="true"
+                                AllowDrop="True" DragEnter="viewport_Drag" DragOver="viewport_Drag" DragLeave="viewport_Drag" Drop="viewport_Drop">
+            <helix:HelixViewport3D.Camera>
+                <PerspectiveCamera x:Name="camera"
+                    Position="0,0,100"
+                    LookDirection="0,0,-100" 
+                    UpDirection="0,1,0.5" 
+                    FieldOfView="61" 
+                    NearPlaneDistance="0.001">
+                </PerspectiveCamera>
+            </helix:HelixViewport3D.Camera>
+            <helix:DefaultLights/>
+            <helix:MeshGeometryVisual3D MeshGeometry="{Binding Path=HeightMap.MeshGeometry}">
+                <helix:MeshGeometryVisual3D.Material>
+                    <MaterialGroup>
+                        <DiffuseMaterial>
+                            <DiffuseMaterial.Brush>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1" Opacity="0.5">
+                                    <LinearGradientBrush.GradientStops>
+                                        <GradientStop Color="Blue" Offset="0"/>
+                                        <GradientStop Color="Cyan" Offset="0.2"/>
+                                        <GradientStop Color="Green" Offset="0.4"/>
+                                        <GradientStop Color="Yellow" Offset="0.6"/>
+                                        <GradientStop Color="Red" Offset="0.8"/>
+                                        <GradientStop Color="Purple" Offset="1"/>
+                                    </LinearGradientBrush.GradientStops>
+                                </LinearGradientBrush>
+                            </DiffuseMaterial.Brush>
+                        </DiffuseMaterial>
+                    </MaterialGroup>
+                </helix:MeshGeometryVisual3D.Material>
+            </helix:MeshGeometryVisual3D>
+            <helix:LinesVisual3D Thickness="1" Color="Lime" Points="{Binding Path=HeightMap.BoundaryPoints}"/>
+            <helix:PointsVisual3D Size="4" Color="Red" Points="{Binding Path=HeightMap.MapPoints}"/>
+        </helix:HelixViewport3D>
+        <StackPanel Margin="5,0,0,5" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Height="Auto" Width="Auto">
+            <Button Content="Start" IsEnabled="{Binding Path=Grbl.IsJobRunning, Converter={StaticResource IsNotRunningConverter}}" Margin="2,0" Width="75" Click="start_Click"/>
+            <Button Content="Stop" IsEnabled="{Binding Path=Grbl.IsJobRunning}" Margin="2,0" Width="75" Click="stop_Click"/>
+            <Button Content="Load" IsEnabled="{Binding Path=Grbl.IsJobRunning, Converter={StaticResource IsNotRunningConverter}}" Margin="2,0" Width="75" Click="load_Click"/>
+            <Button Content="Save" IsEnabled="{Binding Path=Grbl.IsJobRunning, Converter={StaticResource IsNotRunningConverter}}" Margin="2,0" Width="75" Click="save_Click"/>
+            <Button Content="Apply" IsEnabled="{Binding Path=HeightMap.CanApply}" Margin="2,0" Width="75" Click="apply_Click"/>
         </StackPanel>
     </Grid>
 </UserControl>

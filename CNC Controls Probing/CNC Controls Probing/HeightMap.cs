@@ -24,9 +24,13 @@ SOFTWARE.
 
 */
 
+// Sourced from https://github.com/martin2250/OpenCNCPilot
+
+using HelixToolkit.Wpf;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Windows;
 using System.Windows.Media.Media3D;
 using System.Xml;
 
@@ -249,7 +253,7 @@ namespace CNC.Controls.Probing
             w.WriteEndElement();
             w.Close();
         }
-        /*
+
         public void GetModel(MeshGeometryVisual3D mesh)
         {
             MeshBuilder mb = new MeshBuilder(false, true);
@@ -283,7 +287,7 @@ namespace CNC.Controls.Probing
         {
             GetPreviewModel(Min, Max, SizeX, SizeY, border, pointv);
         }
-
+/*
         public void FillWithTestPattern(string pattern)
         {
             martin2250.Calculator.Expression expr = martin2250.Calculator.Expression.Parse(pattern);
@@ -301,7 +305,7 @@ namespace CNC.Controls.Probing
                 }
             }
         }
-
+*/
         public static void GetPreviewModel(Vector2 min, Vector2 max, double gridSize, LinesVisual3D border, PointsVisual3D pointv)
         {
             Vector2 min_temp = new Vector2(Math.Min(min.X, max.X), Math.Min(min.Y, max.Y));
@@ -360,8 +364,8 @@ namespace CNC.Controls.Probing
             border.Points.Clear();
             border.Points = b;
         }
-        */
     }
+
     public struct Vector2 : IEquatable<Vector2>
     {
 

@@ -1,7 +1,7 @@
 ﻿/*
  * NumericTextBox.cs - part of CNC Controls library
  *
- * v0.03 / 2020-01-27 / Io Engineering (Terje Io)
+ * v0.14 / 2020-03-20 / Io Engineering (Terje Io)
  *
  */
 
@@ -64,7 +64,7 @@ namespace CNC.Controls
         public string DisplayFormat { get { return np.DisplayFormat; } }
 
         public static readonly DependencyProperty ValueProperty =
-            DependencyProperty.Register(nameof(Value), typeof(double), typeof(NumericTextBox), new PropertyMetadata(0.0d, new PropertyChangedCallback(OnValueChanged)));
+            DependencyProperty.Register(nameof(Value), typeof(double), typeof(NumericTextBox), new PropertyMetadata(double.NaN, new PropertyChangedCallback(OnValueChanged)));
         public double Value
         {
             get { return (double)GetValue(ValueProperty); }

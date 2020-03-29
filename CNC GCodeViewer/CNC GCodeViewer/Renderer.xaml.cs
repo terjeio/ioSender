@@ -1,7 +1,7 @@
 /*
  * Renderer.xaml.cs - part of CNC Controls library
  *
- * v0.13 / 2019-03-15 / Io Engineering (Terje Io)
+ * v0.14 / 2020-03-18 / Io Engineering (Terje Io)
  *
  */
 
@@ -490,6 +490,10 @@ namespace CNC.Controls.Viewer
                         DrawArc(token as GCArc, point0.ToArray(), plane, distanceMode == DistanceMode.Incremental);
                         break;
 
+                    case Commands.G5:
+                        DrawSpline(token as GCSpline, point0.ToArray());
+                        break;
+
                     case Commands.G10:
                     case Commands.G92:
                         {
@@ -722,9 +726,17 @@ namespace CNC.Controls.Viewer
 
         private void DrawArc(GCArc arc, double[] start, GCPlane plane, bool isRelative = false)
         {
-            List<Point3D> arcpoints = arc.GeneratePoints(plane, start, ArcResolution, isRelative); // Dynamic resolution
+            List<Point3D> points = arc.GeneratePoints(plane, start, ArcResolution, isRelative); // Dynamic resolution
 
-            foreach (Point3D point in arcpoints)
+            foreach (Point3D point in points)
+                AddCutMove(point);
+        }
+
+        private void DrawSpline(GCSpline spline, double[] start, bool isRelative = false)
+        {
+            List<Point3D> points = spline.GeneratePoints(start, ArcResolution, isRelative); // Dynamic resolution
+
+            foreach (Point3D point in points)
                 AddCutMove(point);
         }
     }

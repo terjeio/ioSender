@@ -1,0 +1,56 @@
+﻿<UserControl x:Class="CNC.Controls.Probing.ProbingView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:Controls="clr-namespace:CNC.Controls;assembly=CNC.Controls.WPF"
+             xmlns:local="clr-namespace:CNC.Controls.Probing"
+             mc:Ignorable="d" 
+             d:DesignHeight="500" d:DesignWidth="875"
+             Loaded="UserControl_Loaded">
+    <UserControl.Resources>
+        <Controls:EnumValueToBooleanConverter x:Key="EnumToEnabledConverter" />
+        <Controls:LogicalNotConverter x:Key="IsNotRunningConverter" />
+    </UserControl.Resources>
+    <Grid>
+        <StackPanel Orientation="Vertical" Width="200" HorizontalAlignment="Left" Margin="10,10,0,0" IsEnabled="{Binding Path=Grbl.IsJobRunning, Converter={StaticResource IsNotRunningConverter}}">
+            <Controls:NumericField Label="Feed rate" Value="{Binding Path=ProbeFeedRate, Mode=TwoWay}" HorizontalAlignment="Left" Margin="5,2,0,0" VerticalAlignment="Top"/>
+            <GroupBox Header="Probe/tool">
+                <Controls:NumericField Label="Diameter" Value="{Binding Path=ProbeDiameter, Mode=TwoWay}" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
+            </GroupBox>
+            <GroupBox Header="Touch plate">
+                <Controls:NumericField Label="Offset" Value="{Binding Path=TouchplateHeight, Mode=TwoWay}"  HorizontalAlignment="Left" Margin="0,7,0,0" VerticalAlignment="Top"/>
+            </GroupBox>
+            <GroupBox Header="Max. probing distance">
+                <StackPanel Orientation="Vertical">
+                    <Controls:NumericField Label="X" Value="{Binding Path=Distance.X, Mode=TwoWay}" HorizontalAlignment="Left" Margin="0,7,0,0" VerticalAlignment="Top"/>
+                    <Controls:NumericField Label="Y" Value="{Binding Path=Distance.Y, Mode=TwoWay}" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
+                    <Controls:NumericField Label="Z" Value="{Binding Path=Distance.Z, Mode=TwoWay}" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Header="Probing offset (safe distance)" ToolTip="Distance probe will back off after triggering. Must be less than max. probing distance.">
+                <StackPanel Orientation="Vertical">
+                    <Controls:NumericField Label="X" Value="{Binding Path=Offset.X, Mode=TwoWay}" HorizontalAlignment="Left" Margin="0,7,0,0" VerticalAlignment="Top"/>
+                    <Controls:NumericField Label="Y" Value="{Binding Path=Offset.Y, Mode=TwoWay}" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
+                    <Controls:NumericField Label="Z" Value="{Binding Path=Offset.Z, Mode=TwoWay}" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
+                </StackPanel>
+            </GroupBox>
+        </StackPanel>
+        <TabControl x:Name="tab" Margin="224,10,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="630" Height="400">
+            <TabItem Header="Tool length">
+                <local:ToolLengthControl HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            </TabItem>
+            <TabItem Header="Edge finder">
+                <local:EdgeFinderControl HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            </TabItem>
+            <TabItem Header="Center finder">
+                <local:CenterFinderControl HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            </TabItem>
+            <TabItem Header="Height map">
+                <local:HeightMapControl HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            </TabItem>
+        </TabControl>
+        <Label Height="33" Margin="25,430,0,0"  VerticalAlignment="Top" Content="Warning! - use with extreme care - probing is in a pre alpha state!!" FontSize="16" Foreground="#FFEE0C0C"/>
+        <TextBox HorizontalAlignment="Left" IsReadOnly="True" Height="23" Margin="25,465,0,0" TextWrapping="NoWrap" Text="{Binding Path=Message}" VerticalAlignment="Top" Width="822"/>
+    </Grid>
+</UserControl>

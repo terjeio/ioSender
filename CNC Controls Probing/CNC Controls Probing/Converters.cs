@@ -1,13 +1,13 @@
 ﻿/*
- * ICNCView.cs - part of CNC Controls library for Grbl
+ * Converters.cs - part of CNC Probing library
  *
- * v0.10 / 2020-03-05 / Io Engineering (Terje Io)
+ * v0.14 / 2020-03-29 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2020, Io Engineering (Terje Io)
+Copyright (c) 2019-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -37,36 +37,32 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-namespace CNC.Controls
+using System;
+using System.Globalization;
+using System.Windows;
+using System.Windows.Data;
+
+namespace CNC.Controls.Probing
 {
-    public enum ViewType
+    public static class Converters
     {
-        Startup = 0,
-        Shutdown,
-        AppConfig,
-        Engraving,
-        Mach3,
-        GRBL,
-        GRBLConfig,
-        Offsets,
-        PIDTuner,
-        SDCard,
-        G76Threading,
-        Turning,
-        Facing,
-        Parting,
-        Tools,
-        TrinamicTuner,
-        GCodeViewer,
-        SpindleLinearizer,
-        Probing
+        public static EnumValueToVisibleConverter EnumValueToVisibleConverter = new EnumValueToVisibleConverter();
     }
 
-    public interface ICNCView
+    public class EnumValueToVisibleConverter : IMultiValueConverter
     {
-        ViewType ViewType { get; }
-        void Activate(bool activate, ViewType chgMode);
-        void CloseFile();
-        void Setup(UIViewModel model, AppConfig profile);
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (values[0] == null || parameter == null)
+                return Visibility.Hidden;
+
+            return values[0].ToString().Equals(parameter.ToString(), StringComparison.InvariantCultureIgnoreCase) &&
+                   (values.Length == 2 ? values[1] is bool && (bool)values[1] : true) ? Visibility.Visible : Visibility.Hidden;
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

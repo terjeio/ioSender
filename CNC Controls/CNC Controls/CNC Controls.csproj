@@ -92,6 +92,7 @@
     </Compile>
     <Compile Include="ICamera.cs" />
     <Compile Include="ICNCView.cs" />
+    <Compile Include="IKeyboard.cs" />
     <Compile Include="JobControl.xaml.cs">
       <DependentUpon>JobControl.xaml</DependentUpon>
     </Compile>

@@ -1,7 +1,7 @@
 /*
  * JobControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.12 / 2020-03-11 / Io Engineering (Terje Io)
+ * v0.14 / 2020-03-21 / Io Engineering (Terje Io)
  *
  */
 
@@ -579,7 +579,7 @@ namespace CNC.Controls
 
             if (command.Length == 1)
                 SendRTCommand(command);
-            else if (streamingState == StreamingState.Idle || streamingState == StreamingState.NoFile || streamingState == StreamingState.ToolChange || command == GrblConstants.CMD_UNLOCK)
+            else if (streamingState == StreamingState.Idle || streamingState == StreamingState.NoFile || streamingState == StreamingState.ToolChange || streamingState == StreamingState.Stop || command == GrblConstants.CMD_UNLOCK)
             {
                 //                command = command.ToUpper();
                 try

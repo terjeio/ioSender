@@ -1,7 +1,7 @@
 /*
  * Converters.cs - part of CNC Controls library for Grbl
  *
- * v0.12 / 2020-03-10 / Io Engineering (Terje Io)
+ * v0.14 / 2020-03-28 / Io Engineering (Terje Io)
  *
  */
 
@@ -63,8 +63,9 @@ namespace CNC.Controls
         public static LogicalOrConverter LogicalOrConverter = new LogicalOrConverter();
         public static BoolToVisibleConverter BoolToVisibleConverter = new BoolToVisibleConverter();
         public static IsAxisVisibleConverter HasAxisConverter = new IsAxisVisibleConverter();
+        public static EnumValueToBooleanConverter EnumValueToBooleanConverter = new EnumValueToBooleanConverter();
     }
-    
+
     // Adapted from: https://stackoverflow.com/questions/4353186/binding-observablecollection-to-a-textbox/8847910#8847910
     public class StringCollectionToTextConverter : IMultiValueConverter
     {
@@ -282,8 +283,8 @@ namespace CNC.Controls
             if(values.Length == 2 && values[0] is int && values[1] is int && (int)values[0] >= (int)values[1])
                 enabled = ((int)values[0] & (int)values[1]) != 0;
 
-            if(values.Length == 2 && values[0] is int && values[1] is AxisFlags)
-                enabled = ((int)values[0] & (int)(AxisFlags)values[1]) != 0;
+            if(values.Length == 2 && values[0] is AxisFlags && values[1] is AxisFlags)
+                enabled = ((AxisFlags)values[0]).HasFlag((AxisFlags)values[1]);
 
             return enabled ? Visibility.Visible : Visibility.Collapsed;
         }
@@ -291,6 +292,32 @@ namespace CNC.Controls
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, System.Globalization.CultureInfo culture)
         {
             throw new NotImplementedException();
+        }
+    }
+    public class EnumValueToBooleanConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value == null || parameter == null)
+                return false;
+
+            string checkValue = value.ToString();
+            string targetValue = parameter.ToString();
+            return checkValue.Equals(targetValue,
+                     StringComparison.InvariantCultureIgnoreCase);
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value == null || parameter == null)
+                return null;
+
+            bool useValue = (bool)value;
+            string targetValue = parameter.ToString();
+            if (useValue)
+                return Enum.Parse(targetType, targetValue);
+
+            return null;
         }
     }
 }

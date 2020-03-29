@@ -1,7 +1,7 @@
 /*
  * GrblViewModel.cs - part of CNC Controls library
  *
- * v0.13 / 2020-03-12 / Io Engineering (Terje Io)
+ * v0.14 / 2020-03-28 / Io Engineering (Terje Io)
  *
  */
 
@@ -50,7 +50,7 @@ namespace CNC.Core
     {
         private string _tool, _message, _WPos, _MPos, _wco, _wcs, _a, _fs, _ov, _pn, _sc, _sd, _ex, _d, _gc, _h;
         private string _mdiCommand, _fileName;
-        private bool _flood, _mist, _tubeCoolant, _toolChange, _reset, _isMPos, _isJobRunning, _probeState, _pgmEnd;
+        private bool _flood, _mist, _tubeCoolant, _toolChange, _reset, _isMPos, _isJobRunning, _isProbeSuccess, _pgmEnd;
         private bool? _mpg;
         private int _pwm, _line, _scrollpos;
         private double _feedrate = 0d;
@@ -85,12 +85,26 @@ namespace CNC.Core
             SpindleState.PropertyChanged += SpindleState_PropertyChanged;
             AxisScaled.PropertyChanged += AxisScaled_PropertyChanged;
             Position.PropertyChanged += Position_PropertyChanged;
+            MachinePosition.PropertyChanged += MachinePosition_PropertyChanged;
+            ProbePosition.PropertyChanged += ProbePosition_PropertyChanged;
+        }
 
+        private void ProbePosition_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if(e.PropertyName == nameof(Core.Position))
+                OnPropertyChanged(nameof(ProbePosition));
         }
 
         private void Position_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            OnPropertyChanged(nameof(Position));
+            if (e.PropertyName == nameof(Core.Position))
+                OnPropertyChanged(nameof(Position));
+        }
+
+        private void MachinePosition_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(Core.Position))
+                OnPropertyChanged(nameof(MachinePosition));
         }
 
         private void AxisScaled_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -118,7 +132,7 @@ namespace CNC.Core
         {
             _fileName = _mdiCommand = string.Empty;
             _streamingState = StreamingState.NoFile;
-            _isMPos = _reset = _isJobRunning = _probeState = _pgmEnd = false;
+            _isMPos = _reset = _isJobRunning = _isProbeSuccess = _pgmEnd = false;
             _pb_avail = _rxb_avail = string.Empty;
             _mpg = null;
             _line = _pwm = _scrollpos = 0;
@@ -165,7 +179,11 @@ namespace CNC.Core
         public void ExecuteCommand(string command)
         {
             if (!string.IsNullOrEmpty(command))
+            {
                 MDI = command;
+                if (ResponseLogVerbose)
+                    ResponseLog.Add(command);
+            }
         }
 
         public int PollInterval { get; set; } = 200; // ms
@@ -204,11 +222,12 @@ namespace CNC.Core
         }
         public Position WorkPositionOffset { get; private set; } = new Position();
         public Position ProbePosition { get; private set; } = new Position();
-        public bool ProbeState { get { return _probeState; } private set { _probeState = value; OnPropertyChanged(); } }
+        public bool IsProbeSuccess { get { return _isProbeSuccess; } private set { _isProbeSuccess = value; OnPropertyChanged(); } }
         public EnumFlags<SpindleState> SpindleState { get; private set; } = new EnumFlags<SpindleState>(GCode.SpindleState.Off);
         public EnumFlags<Signals> Signals { get; private set; } = new EnumFlags<Signals>(Core.Signals.Off);
         public EnumFlags<AxisFlags> AxisScaled { get; private set; } = new EnumFlags<AxisFlags>(AxisFlags.None);
-        public string FileName { get { return _fileName; } set { _fileName = value; OnPropertyChanged(); } }
+        public string FileName { get { return _fileName; } set { _fileName = value; OnPropertyChanged(); OnPropertyChanged(nameof(IsFileLoaded)); } }
+        public bool IsFileLoaded { get { return _fileName != string.Empty; } }
         public bool? IsMPGActive { get { return _mpg; } private set { if (_mpg != value) { _mpg = value; OnPropertyChanged(); } } }
         public string Scaling { get { return _sc; } private set { _sc = value; OnPropertyChanged(); } }
         public string SDCardStatus { get { return _sd; } private set { _sd = value; OnPropertyChanged(); } }
@@ -216,7 +235,7 @@ namespace CNC.Core
         public LatheMode LatheMode { get { return _latheMode; } private set { _latheMode = value; OnPropertyChanged(); } }
         public bool LatheModeEnabled { get { return GrblInfo.LatheModeEnabled; } set { OnPropertyChanged(); } }
         public int NumAxes { get { return GrblInfo.NumAxes; } set { OnPropertyChanged(); } }
-        public int AxisEnabledFlags { get { return GrblInfo.AxisFlags; } set { OnPropertyChanged(); } }
+        public AxisFlags AxisEnabledFlags { get { return GrblInfo.AxisFlags; } set { OnPropertyChanged(); } }
         public int ScrollPosition { get { return _scrollpos; } set { _scrollpos = value;  OnPropertyChanged(); } }
 
         public string RunTime { get { return JobTimer.RunTime; } set { OnPropertyChanged(); } } // Cannot be set...
@@ -470,12 +489,12 @@ namespace CNC.Core
             if (values.Length == 3)
             {
                 ProbePosition.Parse(values[1]);
-                ProbeState = values[2] == "1";
+                IsProbeSuccess = values[2] == "1";
                 for (int i = 0; i < GrblInfo.NumAxes; i++)
                     GrblWorkParameters.ProbePosition.Values[i] = ProbePosition.Values[i];
             }
 
-            return ProbeState && values.Length == 3;
+            return IsProbeSuccess && values.Length == 3;
         }
 
         public void ParseStatus(string data)
@@ -511,17 +530,7 @@ namespace CNC.Core
                             IsMachinePosition = true;
                         _MPos = value;
                         MachinePosition.Parse(_MPos);
-                        int i = 0, axes = GrblInfo.AxisFlags;
-                        while (axes != 0)
-                        {
-                            if ((axes & 0x01) != 0)
-                            {
-                                double newpos = MachinePosition.Values[i] - WorkPositionOffset.Values[i];
-                                if (!Position.Values[i].Equals(newpos))
-                                    Position.Values[i] = newpos;
-                            }
-                            i++; axes >>= 1;
-                        }
+                        Position.Set(MachinePosition - WorkPositionOffset);
                     }
                     break;
 
@@ -532,16 +541,8 @@ namespace CNC.Core
                             IsMachinePosition = false;
                         _WPos = value;
                         WorkPosition.Parse(_WPos);
-                        int i = 0, axes = GrblInfo.AxisFlags;
-                        while (axes != 0)
-                        {
-                            if ((axes & 0x01) != 0)
-                            {
-                                if (!Position.Values[i].Equals(WorkPosition.Values[i]))
-                                    Position.Values[i] = WorkPosition.Values[i];
-                            }
-                            i++; axes >>= 1;
-                        }
+                        MachinePosition.Set(WorkPosition + WorkPositionOffset);
+                        Position.Set(WorkPosition);
                     }
                     break;
 
@@ -571,19 +572,9 @@ namespace CNC.Core
                         _wco = value;
                         WorkPositionOffset.Parse(value);
                         if (_isMPos)
-                        {
-                            int i = 0, axes = GrblInfo.AxisFlags;
-                            while (axes != 0)
-                            {
-                                if ((axes & 0x01) != 0)
-                                {
-                                    double newpos = MachinePosition.Values[i] - WorkPositionOffset.Values[i];
-                                    if (!Position.Values[i].Equals(newpos))
-                                        Position.Values[i] = newpos;
-                                }
-                                i++; axes >>= 1;
-                            }
-                        }
+                            Position.Set(MachinePosition - WorkPositionOffset);
+                        else
+                            MachinePosition.Set(WorkPosition + WorkPositionOffset);
                     }
                     break;
 
@@ -746,7 +737,7 @@ namespace CNC.Core
             if (ResponseLogVerbose || !(data.First() == '<' || data.First() == '$' || data.First() == 'o') || data.StartsWith("error"))
             {
                 ResponseLog.Add(data);
-                if (ResponseLog.Count > 100)
+                if (ResponseLog.Count > 200)
                     ResponseLog.RemoveAt(0);
             }
 
@@ -779,6 +770,7 @@ namespace CNC.Core
             else if (data.StartsWith("Grbl"))
             {
                 GrblReset = true;
+                _grblState.State = GrblStates.Unknown;
                 OnGrblReset?.Invoke();
                 _reset = false;
             }
@@ -801,7 +793,7 @@ namespace CNC.Core
                     }
                     else if (!data.StartsWith("?"))
                     {
-                        Message = data; //??
+       //                 Message = data; //??
                     }
                 }
             }

@@ -1,0 +1,54 @@
+﻿<UserControl x:Class="CNC.Controls.Probing.CenterFinderControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:Controls="clr-namespace:CNC.Controls;assembly=CNC.Controls.WPF"
+             xmlns:local="clr-namespace:CNC.Controls.Probing"
+             mc:Ignorable="d" Height="350"
+             d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <Controls:LogicalNotConverter x:Key="IsNotRunningConverter" />
+        <Controls:EnumValueToBooleanConverter x:Key="EnumToEdgeConverter" />
+    </UserControl.Resources>
+    <Grid>
+        <StackPanel Orientation="Vertical" Margin="10">
+            <local:CsSelectControl Margin="5,0,0,0"/>
+            <GroupBox Header="Workpiece">
+                <Controls:NumericField Label="Diameter" Value="{Binding Path=WorkpieceDiameter, Mode=TwoWay}" Margin="0,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            </GroupBox>
+            <StackPanel Orientation="Horizontal" Margin="10,5,0,0" Width="240" ToolTip="Click to select probing action.">
+                <StackPanel.Resources>
+                    <Style x:Key="RadioImage" TargetType="RadioButton">
+                        <Style.Triggers>
+                            <Trigger Property="IsChecked" Value="False">
+                                <Setter Property="Opacity" Value="0.5"/>
+                            </Trigger>
+                        </Style.Triggers>
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="Width" Value="120"/>
+                        <Setter Property="Height" Value="120"/>
+                        <Setter Property="GroupName" Value="edge"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="RadioButton">
+                                    <Border BorderThickness="{TemplateBinding BorderThickness}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                Background="Transparent">
+                                        <Image Source="{Binding Path=Content, RelativeSource={RelativeSource TemplatedParent}}"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </StackPanel.Resources>
+                <RadioButton Content="Resources/centerI.png" Style="{StaticResource RadioImage}" GroupName="edge" IsChecked="{Binding Path=ProbeCenter, Mode=TwoWay, Converter={StaticResource EnumToEdgeConverter}, ConverterParameter=Inside}" />
+                <RadioButton Content="Resources/centerO.png" Style="{StaticResource RadioImage}" GroupName="edge" IsChecked="{Binding Path=ProbeCenter, Mode=TwoWay, Converter={StaticResource EnumToEdgeConverter}, ConverterParameter=Outside}" />
+            </StackPanel>
+        </StackPanel>
+        <StackPanel Margin="5,0,0,5" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Height="Auto" Width="Auto">
+            <Button Content="Start" IsEnabled="{Binding Path=Grbl.IsJobRunning, Converter={StaticResource IsNotRunningConverter}}" Margin="2,0" Width="75" Click="start_Click"/>
+            <Button Content="Stop" IsEnabled="{Binding Path=Grbl.IsJobRunning}" Margin="2,0" Width="75" Click="stop_Click"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

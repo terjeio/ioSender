@@ -1,7 +1,7 @@
 ﻿/*
  * GCode.cs - part of CNC Controls library
  *
- * v0.03 / 2020-01-26 / Io Engineering (Terje Io)
+ * v0.14 / 2020-03-28 / Io Engineering (Terje Io)
  *
  */
 
@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using System;
 using System.Xml.Serialization;
+using System.Collections.Generic;
 using CNC.Core;
 
 namespace CNC.GCode
@@ -61,6 +62,15 @@ namespace CNC.GCode
         A = 1 << 3,
         B = 1 << 4,
         C = 1 << 5
+    }
+
+    [Flags]
+    public enum IJKFlags : int
+    {
+        None = 0,
+        I = 1 << 0,
+        J = 1 << 1,
+        K = 1 << 2
     }
 
     public enum Plane
@@ -133,6 +143,8 @@ namespace CNC.GCode
         G1,
         G2,
         G3,
+        G4,
+        G5,
         G7,
         G8,
         G10,
@@ -216,11 +228,38 @@ namespace CNC.GCode
         Feedrate,
         SpindleRPM,
         ToolSelect,
-        Dwell,
         Coolant,
         Comment,
         UserMCommand,
         Undefined
+    }
+
+    public static class AxisExtensions
+    {
+        public static IEnumerable<int> ToIndices(this AxisFlags axes)
+        {
+            int i = 0, j = (int)axes;
+            while (j != 0)
+            {
+                if ((j & 0x01) != 0)
+                    yield return i;
+                i++; j >>= 1;
+            }
+        }
+    }
+
+    public static class IJKExtenstions
+    {
+        public static IEnumerable<int> ToIndices(this IJKFlags ijkFlags)
+        {
+            int i = 0, j = (int)ijkFlags;
+            while (j != 0)
+            {
+                if ((j & 0x01) != 0)
+                    yield return i;
+                i++; j >>= 1;
+            }
+        }
     }
 
     public static class GCodeUtils
