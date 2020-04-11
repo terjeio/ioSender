@@ -1,7 +1,7 @@
 /*
  * AppConfigView.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.10 / 2019-03-04 / Io Engineering (Terje Io)
+ * v0.15 / 2020-04-05 / Io Engineering (Terje Io)
  *
  */
 /*
@@ -36,10 +36,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-using CNC.Core;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
+using CNC.Core;
 
 namespace CNC.Controls
 {
@@ -60,11 +60,14 @@ namespace CNC.Controls
 
         public void Activate(bool activate, ViewType chgMode)
         {
-            foreach(var control in model.ConfigControls) // TODO: use callback!
+            if(activate) foreach(var control in model.ConfigControls) // TODO: use callback!
             {
-                if (control is JogConfigControl && GrblSettings.GetString(GrblSetting.JogStepSpeed) != null)
-                    control.Visibility = Visibility.Collapsed;
-                else if(control is ICameraConfig && model.Camera != null && !model.Camera.HasCamera)
+                if (control is JogConfigControl) {
+                    if (GrblSettings.GetString(GrblSetting.JogStepSpeed) != null)
+                        control.Visibility = Visibility.Hidden;
+                    else
+                        (control as JogConfigControl).IsGrbl = !GrblSettings.IsGrblHAL;
+                } else if (control is ICameraConfig && model.Camera != null && !model.Camera.HasCamera)
                     control.Visibility = Visibility.Collapsed;
             }
         }

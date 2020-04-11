@@ -1,7 +1,7 @@
 /*
  * PipeServer.cs - part of Grbl Code Sender
  *
- * v0.09 / 2020-02-28 / Io Engineering (Terje Io)
+ * v0.15 / 2020-04-10 / Io Engineering (Terje Io)
  *
  */
 
@@ -84,7 +84,7 @@ namespace CNC.Controls
                                     {
                                         if (c >= ' ')
                                             filename += (char)c;
-                                        else if (c == 10 && FileTransfer != null)
+                                        else if (c == 10 && FileTransfer != null && File.Exists(filename))
                                             dispatcher.Invoke(FileTransfer, filename);
                                     }
                                 }

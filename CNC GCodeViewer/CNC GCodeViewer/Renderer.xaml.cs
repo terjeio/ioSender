@@ -1,7 +1,7 @@
 /*
  * Renderer.xaml.cs - part of CNC Controls library
  *
- * v0.14 / 2020-03-18 / Io Engineering (Terje Io)
+ * v0.15 / 2020-04-06 / Io Engineering (Terje Io)
  *
  */
 
@@ -166,13 +166,11 @@ namespace CNC.Controls.Viewer
         public SolidColorBrush ToolBrush { get; set; } = Brushes.Red;
         public SolidColorBrush AxisBrush { get; set; } = Brushes.Gray;
         public double TickSize { get; set; }
-        private GCPlane plane = new GCPlane(Commands.G17, 0);
-        DistanceMode distanceMode = DistanceMode.Absolute;
-        private List<CoordinateSystem> coordinateSystems = new List<CoordinateSystem>();
-        private CoordinateSystem coordinateSystem;
-        private GrblViewModel model;
 
+        private GrblViewModel model;
         private bool _animateTool = false;
+        private bool? isLatheMode = null;
+        private bool isDiameterMode = false;
         private int cutCount;
         private MoveType lastType;
 
@@ -189,12 +187,11 @@ namespace CNC.Controls.Viewer
         {
             InitializeComponent();
 
-            TickSize = 10;
+            TickSize = 10d;
             MinDistance = 0.05d;
             viewport.DataContext = Machine;
 
             IsVisibleChanged += Renderer_IsVisibleChanged;
-
         }
 
         private void Renderer_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -222,12 +219,14 @@ namespace CNC.Controls.Viewer
 
         private void Model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if(e.PropertyName == nameof(GrblViewModel.Position))
+            if (e.PropertyName == nameof(GrblViewModel.Position))
             {
-                Machine.SetToolPosition(model.Position.X, model.Position.Y, model.Position.Z);
+                Machine.SetToolPosition(model.Position.X / (isDiameterMode ? 2d : 1d), model.Position.Y, model.Position.Z);
                 if (tool != null)
                     tool.Origin = Machine.ToolPosition;
             }
+            else if (e.PropertyName == nameof(GrblViewModel.LatheMode))
+                isDiameterMode = model.LatheMode == LatheMode.Diameter;
         }
 
         public int ArcResolution { get; set; } = 5;
@@ -247,7 +246,7 @@ namespace CNC.Controls.Viewer
                         Machine.SetToolPosition(model.Position.X, model.Position.Y, model.Position.Z);
 
                         tool = new TruncatedConeVisual3D();
-                        tool.Height = 6d;
+                        tool.Height = 3d;
                         tool.BaseRadius = 0d;
                         tool.TopRadius = tool.Height / 5d;
                         tool.TopCap = true;
@@ -349,51 +348,84 @@ namespace CNC.Controls.Viewer
 
         public void Render(List<GCodeToken> tokens)
         {
-            var bbox = ((GrblViewModel)DataContext).ProgramLimits;
+            var bbox = (DataContext as GrblViewModel).ProgramLimits;
 
-            double lineThickness = bbox.MaxSize / 1000;
-            double arrowOffset = lineThickness * 30;
-            double labelOffset = lineThickness * 50;
-            bool canned = false;
+            double lineThickness = bbox.MaxSize / 1000d;
+            double arrowOffset = lineThickness * 30d;
+            double labelOffset = lineThickness * 50d;
 
             ClearViewport();
 
-            coordinateSystems.Clear();
-            foreach (CoordinateSystem c in GrblWorkParameters.CoordinateSystems)
-                coordinateSystems.Add(c);
+            if (isLatheMode == null)
+            {
+                if ((isLatheMode = model.LatheMode != LatheMode.Disabled) == true)
+                {
+                    viewport.ModelUpDirection = new Vector3D(0d, -1d, 0d);
+                    if (tool != null)
+                        tool.Normal = new Vector3D(1d, 0d, 0d);
+                }
+                isDiameterMode = model.LatheMode == LatheMode.Diameter;
+            }
 
-            coordinateSystem = coordinateSystems.Where(x => x.Code == GrblParserState.WorkOffset).FirstOrDefault();
+            bool latheMode = isLatheMode == true;
 
             cutCount = 0;
             point0 = Machine.StartPosition;
             lastType = MoveType.None;
-            distanceMode = GrblParserState.DistanceMode;
+            if (tool != null)
+            {
+                tool.Height = Math.Min(6d, lineThickness * 100d);
+                tool.TopRadius = tool.Height / 5d;
+            }
 
-#region Canvas adorners
+            #region Canvas adorners
 
             if (ShowGrid)
             {
-                double wm = bbox.SizeX % TickSize, w = Math.Ceiling(bbox.SizeX - bbox.SizeX % TickSize + TickSize * 2d);
-                double wh = bbox.SizeY % TickSize, h = Math.Ceiling(bbox.SizeY - bbox.SizeY % TickSize + TickSize * 2d);
+                double wh, h, wm = bbox.SizeX % TickSize, w = Math.Ceiling(bbox.SizeX - bbox.SizeX % TickSize + TickSize * 2d);
 
-                Machine.Grid = new GridLinesVisual3D()
+                if (model.LatheMode == LatheMode.Disabled)
                 {
-                    Center = new Point3D(boffset(bbox.SizeX, bbox.MinX, w, wm) - TickSize, boffset(bbox.SizeY, bbox.MinY, h, wh) - TickSize, 0d),
-                    MinorDistance = 2.5d,
-                    MajorDistance = TickSize,
-                    Width = h,
-                    Length = w,
-                    Thickness = 0.1d,
-                    Fill = AxisBrush
-                };
 
+                    wh = bbox.SizeY % TickSize;
+                    h = Math.Ceiling(bbox.SizeY - bbox.SizeY % TickSize + TickSize * 2d);
+
+                    Machine.Grid = new GridLinesVisual3D()
+                    {
+                        Center = new Point3D(boffset(bbox.SizeX, bbox.MinX, w, wm) - TickSize, boffset(bbox.SizeY, bbox.MinY, h, wh) - TickSize, 0d),
+                        MinorDistance = 2.5d,
+                        MajorDistance = TickSize,
+                        Width = h,
+                        Length = w,
+                        Thickness = 0.1d,
+                        Fill = AxisBrush
+                    };
+                }
+                else
+                {
+                    wh = bbox.SizeZ % TickSize;
+                    h = Math.Ceiling(bbox.SizeZ - bbox.SizeZ % TickSize + TickSize * 2d);
+
+                    Machine.Grid = new GridLinesVisual3D()
+                    {
+                        Center = new Point3D(boffset(bbox.SizeX, bbox.MinX, w, wm) - TickSize, 0d, boffset(bbox.SizeZ, bbox.MinZ, h, wh) - TickSize),
+                        MinorDistance = 2.5d,
+                        MajorDistance = TickSize,
+                        Width = w,
+                        Length = h,
+                        Thickness = lineThickness,
+                        Fill = AxisBrush,
+                        LengthDirection = new Vector3D(0d, 0d, 1d),
+                        Normal = new Vector3D(0d, 1d, 0d)
+                    };
+                }
                 viewport.Children.Add(Machine.Grid);
             }
 
             if (ShowAxes)
             {
                 Machine.Axes.Children.Add(new ArrowVisual3D() {
-                    Point2 = new Point3D(bbox.SizeX + arrowOffset, 0.0, 0.0),
+                    Point2 = new Point3D(bbox.SizeX + arrowOffset, 0d, 0d),
                     Diameter = lineThickness * 5,
                     Fill = AxisBrush
                 });
@@ -402,30 +434,34 @@ namespace CNC.Controls.Viewer
                     Text = "X",
                     FontWeight = FontWeights.Bold,
                     Foreground = AxisBrush,
-                    Position = new Point3D(bbox.SizeX + labelOffset, 0.0, 0.0)
+                    Position = new Point3D(bbox.SizeX + labelOffset, 0d, 0d)
                 });
 
-                Machine.Axes.Children.Add(new ArrowVisual3D() {
-                    Point2 = new Point3D(0.0, bbox.SizeY + arrowOffset, 0.0),
-                    Diameter = lineThickness * 5,
-                    Fill = AxisBrush
-                });
-
-                Machine.Axes.Children.Add(new BillboardTextVisual3D()
+                if (bbox.SizeY > 0d)
                 {
-                    Text = "Y",
-                    FontWeight = FontWeights.Bold,
-                    Foreground = AxisBrush,
-                    Position = new Point3D(0.0, bbox.SizeY + labelOffset, 0.0)
-                });
+                    Machine.Axes.Children.Add(new ArrowVisual3D()
+                    {
+                        Point2 = new Point3D(0d, bbox.SizeY + arrowOffset, 0d),
+                        Diameter = lineThickness * 5d,
+                        Fill = AxisBrush
+                    });
+
+                    Machine.Axes.Children.Add(new BillboardTextVisual3D()
+                    {
+                        Text = "Y",
+                        FontWeight = FontWeights.Bold,
+                        Foreground = AxisBrush,
+                        Position = new Point3D(0d, bbox.SizeY + labelOffset, 0d)
+                    });
+                }
 
                 if (bbox.SizeZ > 0d)
                 {
                     Machine.Axes.Children.Add(new ArrowVisual3D() {
-                        Point1 = new Point3D(0.0, 0.0, bbox.MinZ),
-                        Point2 = new Point3D(0.0, 0.0, bbox.MaxZ + arrowOffset),
-                        Diameter = lineThickness * 5,
-                        Fill = AxisBrush
+                        Point1 = latheMode ? new Point3D(0d, 0d, bbox.MaxZ + arrowOffset) : new Point3D(0d, 0d, bbox.MinZ - arrowOffset),
+                        Point2 = latheMode ? new Point3D(0d, 0d, bbox.MinZ - arrowOffset) : new Point3D(0d, 0d, bbox.MaxZ + arrowOffset),
+                        Diameter = lineThickness * 5d,
+                        Fill = AxisBrush,
                     });
 
                     Machine.Axes.Children.Add(new BillboardTextVisual3D()
@@ -433,7 +469,7 @@ namespace CNC.Controls.Viewer
                         Text = "Z",
                         FontWeight = FontWeights.Bold,
                         Foreground = AxisBrush,
-                        Position = new Point3D(0.0, 0.0, bbox.MaxZ + labelOffset)
+                        Position = new Point3D(0d, 0d, latheMode ? bbox.MinZ - labelOffset : bbox.MaxZ + labelOffset)
                     });
                 }
 
@@ -444,7 +480,7 @@ namespace CNC.Controls.Viewer
             {
                 Machine.BoundingBox = new BoundingBoxWireFrameVisual3D()
                 {
-                    BoundingBox = new Rect3D(bbox.MinX, bbox.MinY, bbox.MinZ, bbox.SizeX, bbox.SizeY, bbox.SizeZ),
+                    BoundingBox = new Rect3D(bbox.MinX, bbox.MinY, bbox.MinZ, bbox.SizeX, Math.Max(0.001d, bbox.SizeY), bbox.SizeZ),
                     Thickness = 1d,
                     Color = Colors.LightGreen
                 };
@@ -452,32 +488,33 @@ namespace CNC.Controls.Viewer
                 viewport.Children.Add(Machine.BoundingBox);
             }
 
-#endregion
+            #endregion
 
-            GCodeToken last = new GCodeToken();
+            GCodeEmulator emu = new GCodeEmulator();
 
-            foreach (GCodeToken token in tokens)
+            emu.SetStartPosition(Machine.StartPosition);
+
+            foreach (var cmd in emu.Execute(tokens))
             {
-                switch (token.Command)
+                point0 = cmd.Start;
+
+                switch (cmd.Token.Command)
                 {
                     case Commands.G0:
-                        {
-                            GCLinearMotion motion = (GCLinearMotion)token;
-                            AddRapidMove(toPoint(motion.Values, distanceMode == DistanceMode.Incremental));
-                        }
+                        if(cmd.IsRetract)
+                            AddRetractMove(cmd.End);
+                        else
+                            AddRapidMove(cmd.End);
                         break;
 
                     case Commands.G1:
-                        {
-                            GCLinearMotion motion = (GCLinearMotion)token;
-                            AddCutMove(toPoint(motion.Values, distanceMode == DistanceMode.Incremental));
-                        }
+                        AddCutMove(cmd.End);
                         break;
 
                     case Commands.G2:
                     case Commands.G3:
 #if DEBUG_ARC_BBOXES
-                        var bb = (token as GCArc).GetBoundingBox(plane, point0.ToArray(), distanceMode == DistanceMode.Incremental);
+                        var bb = (cmd.Token as GCArc).GetBoundingBox(emu.Plane, point0.ToArray(), emu.DistanceMode == DistanceMode.Incremental);
 
                         var abb = new BoundingBoxWireFrameVisual3D()
                         {
@@ -487,115 +524,14 @@ namespace CNC.Controls.Viewer
                         };
                         viewport.Children.Add(abb);
 #endif
-                        DrawArc(token as GCArc, point0.ToArray(), plane, distanceMode == DistanceMode.Incremental);
+                        DrawArc(cmd.Token as GCArc, point0.ToArray(), emu.Plane, emu.DistanceMode == DistanceMode.Incremental);
                         break;
 
                     case Commands.G5:
-                        DrawSpline(token as GCSpline, point0.ToArray());
-                        break;
-
-                    case Commands.G10:
-                    case Commands.G92:
-                        {
-                            if (token is GCCoordinateSystem)
-                            {
-                                CoordinateSystem csys;
-                                GCCoordinateSystem gcsys = (GCCoordinateSystem)token;
-                                if (gcsys.P == 0)
-                                    csys = coordinateSystem;
-                                else
-                                    csys = coordinateSystems.Where(x => x.Code == gcsys.Code).FirstOrDefault();
-                                for (int i = 0; i < 3; i++)
-                                {
-                                    csys.Values[i] = gcsys.Values[i];
-                                    if (gcsys.P == 0)
-                                        offsets[i] = coordinateSystem.Values[i];
-                                }
-                            }
-                        }
-                        break;
-
-                    case Commands.G17:
-                    case Commands.G18:
-                    case Commands.G19:
-                        plane = (GCPlane)token;
-                        break;
-
-                    //case Commands.G20:
-                    //case Commands.G21:
-                    //case Commands.G50:
-                    //case Commands.G51:
-                    //    !! Scaling is taken care of in the parser
-                    //    break;
-
-                    case Commands.G28_1:
-                    case Commands.G30_1:
-                    case Commands.G54:
-                    case Commands.G55:
-                    case Commands.G56:
-                    case Commands.G57:
-                    case Commands.G58:
-                    case Commands.G59:
-                    case Commands.G59_1:
-                    case Commands.G59_2:
-                    case Commands.G59_3:
-                    case Commands.G92_1:
-                        {
-                            string cs = token.Command.ToString().Replace('_', '.');
-                            coordinateSystem = coordinateSystems.Where(x => x.Code == cs).FirstOrDefault();
-                            for (int i = 0; i < 3; i++)
-                                offsets[i] = coordinateSystem.Values[i];
-                            //    CoordinateSystem = GrblWorkParameters.CoordinateSystems();
-                            //GCCoordinateSystem cs = (GCCoordinateSystem)token;
-                            // TODO: handle offsets... Need to read current from grbl
-                        }
-                        break;
-
-                    case Commands.G80:
-                        canned = false;
-                        break;
-
-                    case Commands.G81: // TODO: add plane handling
-                        {
-                            GCCannedDrill drill = (GCCannedDrill)token;
-                            uint repeats = distanceMode == DistanceMode.Incremental ? drill.L : 1; // no need to draw absolute repeats(?)
-                            double[] values = new double[3];
-
-                            for (var i = 0; i < values.Length; i++)
-                                values[i] = distanceMode == DistanceMode.Incremental && i < 2 ? 0d : drill.Values[i];
-
-                            if (!canned)
-                            {
-                                canned = true;
-                                if (point0.Z < drill.R)
-                                    AddRapidMove(toPoint(point0.X, point0.Y, drill.R));
-                            }
-
-                            AddRapidMove(toPoint(drill.X, drill.Y, Math.Max(drill.Z, drill.R)));
-
-                            do
-                            {
-                                AddCutMove(toPoint(values));
-                                AddRetractMove(toPoint(values[0], values[1], drill.R));
-                                if (repeats > 1)
-                                {
-                                    AddRapidMove(toPoint(values[0], values[1], drill.R));
-                                    values[0] += drill.X;
-                                    values[1] += drill.Y;
-                                    AddRapidMove(toPoint(values[0], values[1], drill.R));
-                                }
-                            } while (--repeats > 0);
-                        }
-                        break;
-
-                    case Commands.G90:
-                    case Commands.G91:
-                        distanceMode = ((GCDistanceMode)token).DistanceMode;
+                        DrawSpline(cmd.Token as GCSpline, point0.ToArray());
                         break;
                 }
-                last = token;
             }
-            last = null;
 
             Machine.RapidLines = rapidPoints;
             Machine.CutLines = linePoints;
@@ -605,30 +541,33 @@ namespace CNC.Controls.Viewer
         }
         public void refreshCamera(ProgramLimits bbox)
         {
-            double zpos = Math.Max(5d, Math.Max(bbox.SizeX, bbox.SizeY) / Math.Tan(camera.FieldOfView * Math.PI / 360d));
 
-            // TODO: set a sensible viewing distance dynamically
+            if (model.LatheMode == LatheMode.Disabled)
+            {
 
-            viewport.Camera.Position = new Point3D((bbox.MaxX + bbox.MinX) / 2d, (bbox.MaxY + bbox.MinY) / 2d, zpos);
-            viewport.Camera.LookDirection = new Vector3D(0, 0, -100);
-            viewport.Camera.UpDirection = new Vector3D(0, 1, 0.5);
+                double zpos = Math.Max(5d, Math.Max(bbox.SizeX, bbox.SizeY) / Math.Tan(camera.FieldOfView * Math.PI / 360d));
 
- //                viewport.CameraController.AddRotateForce(0.001, 0.001); // emulate move camera 
+                // TODO: set a sensible viewing distance dynamically
+
+                viewport.Camera.Position = new Point3D((bbox.MaxX + bbox.MinX) / 2d, (bbox.MaxY + bbox.MinY) / 2d, zpos);
+                viewport.Camera.LookDirection = new Vector3D(0d, 0d, -100d);
+                viewport.Camera.UpDirection = new Vector3D(0d, 1d, 0.5d);
+            }
+            else
+            {
+                double ypos = Math.Max(5d, Math.Max(bbox.SizeX, bbox.SizeZ) / Math.Tan(camera.FieldOfView * Math.PI / 360d));
+
+                // TODO: set a sensible viewing distance dynamically
+
+                viewport.Camera.Position = new Point3D((bbox.MaxX + bbox.MinX) / 2d, -ypos, (bbox.MaxZ + bbox.MinZ) / 2d);
+                viewport.Camera.LookDirection = new Vector3D(0d, 100d, 0d);
+                viewport.Camera.UpDirection = new Vector3D(-1d, 0d, 0d);
+            }
+            //                viewport.CameraController.AddRotateForce(0.001, 0.001); // emulate move camera 
         }
-
         private Point3D toPoint(double[] values, bool isRelative = false)
         {
             Point3D p = new Point3D(values[0], values[1], values[2]);
-
-            if (isRelative)
-                p.Offset(point0.X, point0.Y, point0.Z);
-
-            return p;
-        }
-
-        private Point3D toPoint(double X, double Y, double Z, bool isRelative = false)
-        {
-            Point3D p = new Point3D(X, Y, Z);
 
             if (isRelative)
                 p.Offset(point0.X, point0.Y, point0.Z);

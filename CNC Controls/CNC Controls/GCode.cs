@@ -1,7 +1,7 @@
 ﻿/*
  * GCode.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.14 / 2020-03-18 / Io Engineering (Terje Io)
+ * v0.15 / 2020-04-10 / Io Engineering (Terje Io)
  *
  */
 
@@ -42,17 +42,33 @@ using CNC.GCode;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace CNC.Controls
 {
     public class GCode
     {
-        const string allowedTypes = "cnc,nc,ncc,ngc,gcode,tap";
+        private struct GCodeConverter
+        {
+            public Type Type;
+            public string FileType;
+        }
+        private struct GCodeTransformer
+        {
+            public Type Type;
+            public string Name;
+        }
+
+        private string allowedTypes = "cnc,nc,ncc,ngc,gcode,tap";
 
         private GCodeJob Program { get; set; } = new GCodeJob();
+        private List<GCodeConverter> Converters = new List<GCodeConverter>();
+        private List<GCodeTransformer> Transformers = new List<GCodeTransformer>();
 
         private static readonly Lazy<GCode> file = new Lazy<GCode>(() => new GCode());
 
@@ -67,11 +83,11 @@ namespace CNC.Controls
             {
                 if (filename == "")
                     Model.ProgramLimits.Clear();
-                else for (int i = 0; i < GrblInfo.NumAxes; i++)
-                    {
-                        Model.ProgramLimits.MinValues[i] = Program.BoundingBox.Min[i];
-                        Model.ProgramLimits.MaxValues[i] = Program.BoundingBox.Max[i];
-                    }
+                else foreach (int i in AxisFlags.All.ToIndices())
+                {
+                    Model.ProgramLimits.MinValues[i] = Program.BoundingBox.Min[i];
+                    Model.ProgramLimits.MaxValues[i] = Program.BoundingBox.Max[i];
+                }
 
                 Model.FileName = filename;
             }
@@ -89,9 +105,61 @@ namespace CNC.Controls
 
         public GrblViewModel Model { get; set; }
 
+        public bool AddConverter(Type converter, string filetype)
+        {
+            bool ok = converter.GetInterface("CNC.Controls.IGCodeConverter") != null;
+            if (ok)
+            {
+                Converters.Add(new GCodeConverter { Type = converter, FileType = "." + filetype });
+                allowedTypes += "," + filetype;
+            }
+
+            return ok;
+        }
+
+        public bool AddTransformer(Type converter, string name, ObservableCollection<MenuItem> menu)
+        {
+            bool ok = converter.GetInterface("CNC.Controls.IGCodeTransformer") != null;
+            if (ok)
+            {
+                Transformers.Add(new GCodeTransformer { Type = converter, Name = name });
+
+                MenuItem item = new MenuItem()
+                {
+                    Header = name,
+                    Tag = menu.Count
+                };
+
+                item.Click += TransformMenu_Click;
+
+                menu.Add(item);
+            }
+
+            return ok;
+        }
+
+        private void TransformMenu_Click(object sender, RoutedEventArgs e)
+        {
+            Transform((int)(sender as MenuItem).Tag);
+        }
+
+        public void Transform(int id)
+        {
+            if (Transformers.Count > id)
+            {
+                var loader = (IGCodeTransformer)Activator.CreateInstance(Transformers[id].Type);
+                loader.Apply();
+            }
+        }
+
         public void AddBlock(string block, Core.Action action)
         {
             Program.AddBlock(block, action);
+        }
+
+        public void AddBlock(string block)
+        {
+            Program.AddBlock(block);
         }
 
         public void ClearStatus()
@@ -132,20 +200,69 @@ namespace CNC.Controls
 
         public void Open()
         {
+            string filename = string.Empty;
             OpenFileDialog file = new OpenFileDialog();
 
             file.Filter = string.Format("GCode files ({0})|{0}|Text files (*.txt)|*.txt|All files (*.*)|*.*", FileUtils.ExtensionsToFilter(allowedTypes));
 
             if (file.ShowDialog() == true)
-                Load(file.FileName);
+            {
+                filename = file.FileName;
+            }
+
+            if(filename != string.Empty)
+                Load(filename);
         }
 
         public void Load(string filename)
         {
-            //            if(FileUtils.IsAllowedFile(filename, allowedTypes))
+            foreach (var converter in Converters)
+            {
+                if (filename.EndsWith(converter.FileType))
+                {
+                    var loader = (IGCodeConverter)Activator.CreateInstance(converter.Type);
+                    loader.LoadFile(File, filename);
+                    return;
+                }
+            }
+
             using (new UIUtils.WaitCursor())
             {
                 Program.LoadFile(filename);
+            }
+        }
+
+        public void Save()
+        {
+            SaveFileDialog saveDialog = new SaveFileDialog()
+            {
+                Filter = "GCode file (*.nc)|*.nc",
+                AddExtension = true,
+                DefaultExt = ".nc",
+            };
+
+            if (saveDialog.ShowDialog() == true)
+            {
+                try
+                {
+                    //using (new UIUtils.WaitCursor())
+                    //{
+                    //    GCodeParser.Save(saveDialog.FileName, GCodeParser.TokensToGCode(File.Tokens));
+                    //}
+
+                    using (StreamWriter stream = new StreamWriter(saveDialog.FileName))
+                    {
+                        using (new UIUtils.WaitCursor())
+                        {
+                            foreach (DataRow line in Program.Data.Rows)
+                                stream.WriteLine((string)line["Data"]);
+
+                        }
+                    }
+                }
+                catch (IOException)
+                {
+                }
             }
         }
     }

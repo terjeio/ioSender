@@ -1,7 +1,7 @@
 /*
  * GrblViewModel.cs - part of CNC Controls library
  *
- * v0.14 / 2020-03-28 / Io Engineering (Terje Io)
+ * v0.15 / 2020-04-03 / Io Engineering (Terje Io)
  *
  */
 
@@ -87,6 +87,13 @@ namespace CNC.Core
             Position.PropertyChanged += Position_PropertyChanged;
             MachinePosition.PropertyChanged += MachinePosition_PropertyChanged;
             ProbePosition.PropertyChanged += ProbePosition_PropertyChanged;
+            ToolOffset.PropertyChanged += ToolOffset_PropertyChanged;
+        }
+
+        private void ToolOffset_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(Core.Position))
+                OnPropertyChanged(nameof(ToolOffset));
         }
 
         private void ProbePosition_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -221,6 +228,7 @@ namespace CNC.Core
             set { Position.SuspendNotifications = value; }
         }
         public Position WorkPositionOffset { get; private set; } = new Position();
+        public Position ToolOffset { get; private set; } = new Position();
         public Position ProbePosition { get; private set; } = new Position();
         public bool IsProbeSuccess { get { return _isProbeSuccess; } private set { _isProbeSuccess = value; OnPropertyChanged(); } }
         public EnumFlags<SpindleState> SpindleState { get; private set; } = new EnumFlags<SpindleState>(GCode.SpindleState.Off);
@@ -232,7 +240,22 @@ namespace CNC.Core
         public string Scaling { get { return _sc; } private set { _sc = value; OnPropertyChanged(); } }
         public string SDCardStatus { get { return _sd; } private set { _sd = value; OnPropertyChanged(); } }
         public HomedState HomedState { get { return _homedState; } private set { _homedState = value; OnPropertyChanged(); } }
-        public LatheMode LatheMode { get { return _latheMode; } private set { _latheMode = value; OnPropertyChanged(); } }
+        public LatheMode LatheMode
+        {
+            get { return _latheMode; }
+            private set
+            {
+                if (_latheMode != value)
+                {
+                    _latheMode = value;
+                    if(_latheMode != LatheMode.Disabled)
+                    {
+                        Position.Y = MachinePosition.Y = WorkPosition.Y = WorkPositionOffset.Y = 0d;
+                    }
+                    OnPropertyChanged();
+                }
+            }
+        }
         public bool LatheModeEnabled { get { return GrblInfo.LatheModeEnabled; } set { OnPropertyChanged(); } }
         public int NumAxes { get { return GrblInfo.NumAxes; } set { OnPropertyChanged(); } }
         public AxisFlags AxisEnabledFlags { get { return GrblInfo.AxisFlags; } set { OnPropertyChanged(); } }
@@ -758,7 +781,7 @@ namespace CNC.Core
             else if (data.StartsWith("[GC:"))
                 ParseGCStatus(data);
             else if (data.StartsWith("[TLO:"))
-                data = "";
+                ToolOffset.Parse(data);
             else if (data.StartsWith("["))
             {
                 if (data.StartsWith("[MSG:")) {

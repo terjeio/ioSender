@@ -15,6 +15,7 @@
                     <FrameworkElement x:Key="ProxyElement" DataContext="{Binding}"/>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
+            <local:LogicalNotConverter x:Key="IsNotPredefined" />
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
@@ -90,30 +91,36 @@
                 </DataGridTextColumn>
             </DataGrid.Columns>
         </DataGrid>
-        <Label x:Name="lblOffset" Content="Offset:" Grid.Column="1" HorizontalAlignment="Left" Margin="102,60,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="txtOffset" Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="147,60,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="50" IsReadOnly="True"/>
+        <Label Content="Offset:" Grid.Column="1" HorizontalAlignment="Left" Margin="102,60,0,0" VerticalAlignment="Top"/>
+        <TextBox Text="{Binding Path=Offset.Code, RelativeSource={RelativeSource AncestorType=UserControl}}" Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="147,60,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="50" IsReadOnly="True"/>
         <StackPanel Grid.Column="1" HorizontalAlignment="Left" Margin="74,90,0,0" VerticalAlignment="Top" Width="219">
             <local:CoordValueSetControl x:Name="cvXOffset" Label="X axis:" Tag="X" Click="cvOffset_Click"
-                Value="{Binding Path=offset.X, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
+                Value="{Binding Path=Offset.X, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
+                IsEnabled="{Binding Path=CanEdit, RelativeSource={RelativeSource AncestorType=UserControl}}"
             />
             <local:CoordValueSetControl x:Name="cvYOffset" Label="Y axis:" Tag="Y" Style="{StaticResource YAxisVisibleStyle}" Click="cvOffset_Click"
-                Value="{Binding Path=offset.Y, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
+                Value="{Binding Path=Offset.Y, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
+                IsEnabled="{Binding Path=CanEdit, RelativeSource={RelativeSource AncestorType=UserControl}}"
             />
             <local:CoordValueSetControl x:Name="cvZOffset" Label="Z axis:" Tag="Z"  Click="cvOffset_Click"
-                Value="{Binding Path=offset.Z, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
+                Value="{Binding Path=Offset.Z, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
+                IsEnabled="{Binding Path=CanEdit, RelativeSource={RelativeSource AncestorType=UserControl}}"
             />
             <local:CoordValueSetControl x:Name="cvAOffset" Label="A axis:" Tag="A" Style="{StaticResource AAxisVisibleStyle}"  Click="cvOffset_Click"
-                Value="{Binding Path=offset.A, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
+                Value="{Binding Path=Offset.A, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
+                IsEnabled="{Binding Path=CanEdit, RelativeSource={RelativeSource AncestorType=UserControl}}"
             />
             <local:CoordValueSetControl x:Name="cvBOffset" Label="B axis:" Tag="B" Style="{StaticResource BAxisVisibleStyle}"  Click="cvOffset_Click"
-                Value="{Binding Path=offset.B, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
+                Value="{Binding Path=Offset.B, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
+                IsEnabled="{Binding Path=CanEdit, RelativeSource={RelativeSource AncestorType=UserControl}}"
             />
             <local:CoordValueSetControl x:Name="cvCOffset" Label="C axis:" Tag="C" Style="{StaticResource CAxisVisibleStyle}"  Click="cvOffset_Click"
-                Value="{Binding Path=offset.C, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
+                Value="{Binding Path=Offset.C, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
+                IsEnabled="{Binding Path=CanEdit, RelativeSource={RelativeSource AncestorType=UserControl}}"
             />
             <StackPanel Orientation="Horizontal" Height="28" Margin="0,5">
-                <Button x:Name="btnCurrPos" Content="Get current position" Margin="3,0" Click="btnCurrPos_Click"/>
-                <Button x:Name="btnClear" Content="Clear all" Click="btnClearAll_Click"/>
+                <Button x:Name="btnCurrPos" Content="Get current position" IsEnabled="{Binding Path=IsPredefined, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource IsNotPredefined}}" Margin="3,0" Click="btnCurrPos_Click"/>
+                <Button x:Name="btnClear" Content="Clear all" IsEnabled="{Binding Path=CanEdit, RelativeSource={RelativeSource AncestorType=UserControl}}" Click="btnClearAll_Click"/>
                 <Button x:Name="btnSetAll" Content="Set all" Margin="3,0" Click="btnSetAll_Click"/>
             </StackPanel>
         </StackPanel>

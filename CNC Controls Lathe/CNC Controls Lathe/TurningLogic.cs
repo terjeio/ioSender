@@ -1,7 +1,7 @@
 ﻿/*
  * TurningLogic.cs - part of CNC Controls Lathe library
  *
- * v0.03 / 2020-01-28 / Io Engineering (Terje Io)
+ * v0.15 / 2020-04-04 / Io Engineering (Terje Io)
  *
  */
 
@@ -47,8 +47,6 @@ namespace CNC.Controls.Lathe
     {
         private double last_rpm = 0d, last_css = 0d;
         private BaseViewModel model;
-
-        public event GCodePushHandler GCodePush;
 
         public TurningLogic()
         {
@@ -231,20 +229,18 @@ namespace CNC.Controls.Lathe
 
             } while (++pass <= cut.passes);
 
-            if (GCodePush != null)
-            {
-                GCodePush("Wizard: Turning", Core.Action.New);
-                GCodePush(string.Format("({0}, Start: {1}, Target: {2}, Length: {3})",
-                                          boring ? "Boring" : "Turning",
-                                          model.FormatValue(diameter), model.FormatValue(xtarget), model.FormatValue(zlength)), Core.Action.Add);
-                GCodePush(string.Format("(Passdepth: {0}, Feedrate: {1}, {2}: {3})",
-                                          model.FormatValue(passdepth), model.FormatValue(model.FeedRate),
-                                          (css ? "CSS" : "RPM"), model.FormatValue((double)model.CssSpeed)), Core.Action.Add);
+            GCode.File.AddBlock("Wizard: Turning", Core.Action.New);
+            GCode.File.AddBlock(string.Format("({0}, Start: {1}, Target: {2}, Length: {3})",
+                                        boring ? "Boring" : "Turning",
+                                         model.FormatValue(diameter), model.FormatValue(xtarget), model.FormatValue(zlength)), Core.Action.Add);
+            GCode.File.AddBlock(string.Format("(Passdepth: {0}, Feedrate: {1}, {2}: {3})",
+                                        model.FormatValue(passdepth), model.FormatValue(model.FeedRate),
+                                         (css ? "CSS" : "RPM"), model.FormatValue((double)model.CssSpeed)), Core.Action.Add);
 
-                foreach (string s in model.gCode)
-                    GCodePush(s, Core.Action.Add);
-                GCodePush("M30", Core.Action.End);
-            }
+            foreach (string s in model.gCode)
+                GCode.File.AddBlock(s, Core.Action.Add);
+
+            GCode.File.AddBlock("M30", Core.Action.End);
         }
     }
 }

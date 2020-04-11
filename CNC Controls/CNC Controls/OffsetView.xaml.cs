@@ -1,7 +1,7 @@
 /*
  * OffsetView.xaml.cs - part of CNC Controls library
  *
- * v0.14 / 2020-03-28 / Io Engineering (Terje Io)
+ * v0.15 / 2020-03-29 / Io Engineering (Terje Io)
  *
  */
 
@@ -66,7 +66,21 @@ namespace CNC.Controls
         }
 
         public AxisFlags AxisEnabledFlags { get { return GrblInfo.AxisFlags; } }
-        public Position offset { get; private set; } = new Position();
+        public CoordinateSystem Offset { get; private set; } = new CoordinateSystem();
+
+        public static readonly DependencyProperty CanEditProperty = DependencyProperty.Register(nameof(CanEdit), typeof(bool), typeof(OffsetView), new PropertyMetadata(false));
+        public bool CanEdit
+        {
+            get { return (bool)GetValue(CanEditProperty); }
+            set { SetValue(CanEditProperty, value); }
+        }
+
+        public static readonly DependencyProperty IsPredefinedProperty = DependencyProperty.Register(nameof(IsPredefined), typeof(bool), typeof(OffsetView), new PropertyMetadata(false));
+        public bool IsPredefined
+        {
+            get { return (bool)GetValue(IsPredefinedProperty); }
+            set { SetValue(IsPredefinedProperty, value); }
+        }
 
         #region Methods and properties required by CNCView interface
 
@@ -110,7 +124,7 @@ namespace CNC.Controls
                 case nameof(GrblViewModel.MachinePosition):
                     if (!(awaitCoord = double.IsNaN(parameters.MachinePosition.Values[0])))
                     {
-                        offset.Set(parameters.MachinePosition);
+                        Offset.Set(parameters.MachinePosition);
                         parameters.Position.SuspendNotifications = parameters.WorkPositionOffset.SuspendNotifications = true;
                         parameters.Clear();
                         parameters.WorkPositionOffset.SuspendNotifications = parameters.Position.SuspendNotifications = false;
@@ -134,14 +148,20 @@ namespace CNC.Controls
             if (e.AddedItems.Count == 1)
             {
                 selectedOffset = (CoordinateSystem)e.AddedItems[0];
+                IsPredefined = selectedOffset.Code == "G28" || selectedOffset.Code == "G30";
 
-                for (var i = 0; i < offset.Values.Length; i++)
+                for (var i = 0; i < Offset.Values.Length; i++)
                 {
-                    if (double.IsNaN(offset.Values[i])) offset.Values[i] = 120; // workaround for binding not propagating
+                    if (double.IsNaN(Offset.Values[i])) Offset.Values[i] = 120; // workaround for binding not propagating
 
-                    offset.Values[i] = selectedOffset.Values[i];
+                    Offset.Values[i] = selectedOffset.Values[i];
                 }
-                txtOffset.Text = selectedOffset.Code;
+                Offset.Code = selectedOffset.Code;
+
+                if (IsPredefined)
+                    btnCurrPos_Click(null, null);
+
+                CanEdit = !IsPredefined;
             }
             else
                 selectedOffset = null;
@@ -156,16 +176,21 @@ namespace CNC.Controls
         {
             string cmd;
 
-            Position newpos = new Position(offset);
+            Position newpos = new Position(Offset);
 
             newpos.X = GrblWorkParameters.ConvertX(GrblWorkParameters.LatheMode, GrblParserState.LatheMode, selectedOffset.X);
 
             if (selectedOffset.Id == 0)
             {
                 string code = selectedOffset.Code == "G28" || selectedOffset.Code == "G30" ? selectedOffset.Code + ".1" : selectedOffset.Code;
-                cmd = string.Format("G90{0}{1}", code, newpos.ToString(axis == "All" ? GrblInfo.AxisFlags : GrblInfo.AxisLetterToFlag(axis)));
+
+                if (axis == "ClearAll" || IsPredefined)
+                {
+                    cmd = selectedOffset.Code + ".1";
+                } else
+                    cmd = string.Format("G90{0}{1}", code, newpos.ToString(axis == "All" ? GrblInfo.AxisFlags : GrblInfo.AxisLetterToFlag(axis)));
             } else
-                cmd = string.Format("G90G10L2P{0}{1}", selectedOffset.Id, newpos.ToString(axis == "All" ? GrblInfo.AxisFlags : GrblInfo.AxisLetterToFlag(axis)));
+                cmd = string.Format("G90G10L2P{0}{1}", selectedOffset.Id, newpos.ToString(axis == "All" || axis == "ClearAll" ? GrblInfo.AxisFlags : GrblInfo.AxisLetterToFlag(axis)));
 
             Comms.com.WriteCommand(cmd);
         }
@@ -177,7 +202,7 @@ namespace CNC.Controls
                 string axisletter = (string)((CoordValueSetControl)sender).Tag;
                 int axis = GrblInfo.AxisLetterToIndex(axisletter);
 
-                selectedOffset.Values[axis] = offset.Values[axis];
+                selectedOffset.Values[axis] = Offset.Values[axis];
                 saveOffset(axisletter);
             }
         }
@@ -186,8 +211,8 @@ namespace CNC.Controls
         {
             if (selectedOffset != null)
             {
-                for (var i = 0; i < offset.Values.Length; i++)
-                    selectedOffset.Values[i] = offset.Values[i];
+                for (var i = 0; i < Offset.Values.Length; i++)
+                    selectedOffset.Values[i] = Offset.Values[i];
 
                 saveOffset("All");
             }
@@ -197,10 +222,10 @@ namespace CNC.Controls
         {
             if (selectedOffset != null)
             {
-                for (var i = 0; i < offset.Values.Length; i++)
-                    offset.Values[i] = selectedOffset.Values[i] = 0d;
+                for (var i = 0; i < Offset.Values.Length; i++)
+                    Offset.Values[i] = selectedOffset.Values[i] = 0d;
 
-                saveOffset("All");
+                saveOffset("ClearAll");
             }
         }
 

@@ -1,7 +1,7 @@
 /*
  * MainWindow.xaml.cs - part of Grbl Code Sender
  *
- * v0.14 / 2020-03-28 / Io Engineering (Terje Io)
+ * v0.15 / 2020-04-10 / Io Engineering (Terje Io)
  *
  */
 
@@ -42,6 +42,8 @@ using System.Windows;
 using System.Windows.Controls;
 using CNC.Core;
 using CNC.Controls;
+using CNC.Converters;
+using System.Windows.Threading;
 #if ADD_CAMERA
 using CNC.Controls.Camera;
 #endif
@@ -53,15 +55,6 @@ namespace GCode_Sender
     {
         public static MainWindow ui = null;
         public static CNC.Controls.Viewer.Viewer GCodeViewer = null;
-
-        public delegate void GCodePushHandler(string gcode, CNC.Core.Action action);
-        public static event GCodePushHandler GCodePush;
-
-        public delegate void FileOpenHandler();
-        public static event FileOpenHandler FileOpen; // Issued if File > Open menu clicked
-
-        public delegate void FileLoadHandler(string filename);
-        public static event FileLoadHandler FileLoad; // Issued on load of main window if filename provided as command line argument
 
         static public UIViewModel UIViewModel { get; } = new UIViewModel();
 
@@ -92,11 +85,7 @@ namespace GCode_Sender
             menuCamera.Visibility = Visibility.Hidden;
 #endif
 
-            turningWizard.GCodePush += wizard_GCodePush;
-            threadingWizard.GCodePush += wizard_GCodePush;
-      //      facingWizard.GCodePush += wizard_GCodePush;
-     //       SDCardControl.FileSelected += new CNC_Controls.SDCardControl.FileSelectedHandler(SDCardControl_FileSelected);
-
+            //       SDCardControl.FileSelected += new CNC_Controls.SDCardControl.FileSelectedHandler(SDCardControl_FileSelected);
 
             new PipeServer(App.Current.Dispatcher);
             PipeServer.FileTransfer += Pipe_FileTransfer;
@@ -114,7 +103,8 @@ namespace GCode_Sender
             set
             {
                 ui.Title = BaseWindowTitle + (string.IsNullOrEmpty(value) ? "" : " - " + value);
-                ui.menuCloseFile.IsEnabled = !(string.IsNullOrEmpty(value) || value.StartsWith("SDCard:"));
+                ui.menuCloseFile.IsEnabled = ui.menuSaveFile.IsEnabled = !(string.IsNullOrEmpty(value) || value.StartsWith("SDCard:"));
+                ui.menuTransform.IsEnabled = ui.menuCloseFile.IsEnabled && UIViewModel.TransformMenuItems.Count > 0;
             }
         }
 
@@ -130,11 +120,6 @@ namespace GCode_Sender
                         tabitem.IsEnabled = !value || tabitem == ui.tabMode.SelectedItem;
                 }
             }
-        }
-
-        void wizard_GCodePush(string gcode, CNC.Core.Action action)
-        {
-            GCodePush?.Invoke(gcode, action);
         }
 
         #region UIEvents
@@ -165,7 +150,21 @@ namespace GCode_Sender
             UIViewModel.CurrentView.Activate(true, ViewType.Startup);
 
             if (!string.IsNullOrEmpty(UIViewModel.Profile.FileName))
-                FileLoad?.Invoke(UIViewModel.Profile.FileName);
+            {
+                // Delay loading until app is ready
+                Dispatcher.BeginInvoke(DispatcherPriority.ContextIdle, new System.Action(() =>
+                {
+                    GCode.File.Load(UIViewModel.Profile.FileName);
+                }));
+            }
+
+            IGCodeConverter c = new Excellon2GCode();
+            GCode.File.AddConverter(c.GetType(), c.FileType);
+            c = new HpglToGCode();
+            GCode.File.AddConverter(c.GetType(), c.FileType);
+
+            GCode.File.AddTransformer(typeof(CNC.Controls.ArcsToLines), "Arcs to lines", UIViewModel.TransformMenuItems);
+            GCode.File.AddTransformer(typeof(CNC.Controls.DragKnife.DragKnifeViewModel), "Add drag knife moves", UIViewModel.TransformMenuItems);
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -208,12 +207,17 @@ namespace GCode_Sender
 
         private void Pipe_FileTransfer(string filename)
         {
-            FileLoad?.Invoke(filename);
+            GCode.File.Load(filename);
+        }
+
+        private void fileSaveMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            GCode.File.Save();
         }
 
         private void fileOpenMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            FileOpen?.Invoke();
+            GCode.File.Open();
         }
 
         private void fileCloseMenuItem_Click(object sender, RoutedEventArgs e)

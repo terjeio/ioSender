@@ -1,7 +1,7 @@
 /*
  * TurningWizard.xaml.cs - part of CNC Controls library
  *
- * v0.10 / 2019-03-05 / Io Engineering (Terje Io)
+ * v0.15 / 2020-04-04 / Io Engineering (Terje Io)
  *
  */
 
@@ -54,20 +54,11 @@ namespace CNC.Controls.Lathe
         private BaseViewModel model;
         private TurningLogic logic = new TurningLogic();
 
-        public event GCodePushHandler GCodePush;
-
         public TurningWizard()
         {
             InitializeComponent();
 
             DataContext = model = logic.Model;
-
-            logic.GCodePush += Logic_GCodePush;
-        }
-
-        private void Logic_GCodePush(string gcode, Core.Action action)
-        {
-            GCodePush?.Invoke(gcode, action); // Forward
         }
 
         void TurningWizard_Load(object sender, EventArgs e)

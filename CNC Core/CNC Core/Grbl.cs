@@ -1,7 +1,7 @@
 ﻿/*
  * Grbl.cs - part of CNC Controls library
  *
- * v0.14 / 2020-03-28 / Io Engineering (Terje Io)
+ * v0.15 / 2020-04-03 / Io Engineering (Terje Io)
  *
  */
 
@@ -312,6 +312,8 @@ namespace CNC.Core
             }
         }
 
+        public T[] Array { get { return arr; } }
+
         public T this[int i]
         {
             get { return arr[i]; }
@@ -485,6 +487,11 @@ namespace CNC.Core
 
     public class CoordinateSystem : Position
     {
+        string _code = string.Empty;
+
+        public CoordinateSystem() : base()
+        { }
+
         public CoordinateSystem(string code, string data) : base(data)
         {
             Code = code;
@@ -498,7 +505,7 @@ namespace CNC.Core
         }
 
         public int Id { get; private set; }
-        public string Code { get; set; }
+        public string Code { get { return _code; } set { _code = value; OnPropertyChanged(); } }
     }
 
     public class Tool : Position
@@ -805,11 +812,11 @@ namespace CNC.Core
                         switch (val)
                         {
                             case "G7":
-                                LatheMode = LatheMode.Radius;
+                                LatheMode = LatheMode.Diameter;
                                 break;
 
                             case "G8":
-                                LatheMode = LatheMode.Diameter;
+                                LatheMode = LatheMode.Radius;
                                 break;
 
                             case "G17":

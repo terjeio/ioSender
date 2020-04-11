@@ -1,7 +1,7 @@
 /*
  * JobView.xaml.cs - part of Grbl Code Sender
  *
- * v0.14 / 2019-03-29 / Io Engineering (Terje Io)
+ * v0.15 / 2020-04-10 / Io Engineering (Terje Io)
  *
  */
 
@@ -55,7 +55,7 @@ namespace GCode_Sender
     public partial class JobView : UserControl, ICNCView
     {
         private bool? initOK = null;
-        private bool sdStream = false;
+        private bool sdStream = false, kbJog = false;
         private GrblViewModel model;
 
      //   private Viewer viewer = null;
@@ -67,24 +67,12 @@ namespace GCode_Sender
 
             //            MainWindow.ui.DataContext = model = GCodeSender.Parameters;
 
-            MainWindow.FileOpen += MainWindow_FileOpen;
-            MainWindow.FileLoad += MainWindow_FileLoad;
             DRO.DROEnabledChanged += DRO_DROEnabledChanged;
 
             DataContextChanged += View_DataContextChanged;
             //    GCodeSender.GotFocus += GCodeSender_GotFocus;
 
           //  ((INotifyPropertyChanged)DataContext).PropertyChanged += OnDataContextPropertyChanged;
-        }
-
-        private void MainWindow_FileLoad(string filename)
-        {
-            GCode.File.Load(filename);
-        }
-
-        private void MainWindow_FileOpen()
-        {
-            GCode.File.Open();
         }
 
         private void View_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -152,10 +140,11 @@ namespace GCode_Sender
                     {
                         if (MainWindow.IsViewVisible(ViewType.GCodeViewer))
                         {
-                            MainWindow.EnableView(false, ViewType.GCodeViewer);
-// For now - rendering of G76 must be implemented first                                MainWindow.GCodeViewer.Open(filename, GCodeSender.GCode.Tokens);
+                            MainWindow.EnableView(true, ViewType.GCodeViewer);
+                            gcodeRenderer.ShowTool = true;
+                            gcodeRenderer.Open(GCode.File.Tokens);
+                            }
                         }
-                    }
                     else if (!string.IsNullOrEmpty(filename) && MainWindow.UIViewModel.Profile.Config.GCodeViewer.IsEnabled)
                     {
                         MainWindow.GCodeViewer.Open();
@@ -184,6 +173,8 @@ namespace GCode_Sender
                 if (initOK != true)
                 {
                     model.Message = "Waiting for controller...";
+
+                    kbJog = MainWindow.UIViewModel.Profile.Config.Jog.KeyboardEnable;
 
                     Comms.com.PurgeQueue();
                     Comms.com.WriteByte(GrblLegacy.ConvertRTCommand(GrblConstants.CMD_STATUS_REPORT));
@@ -298,6 +289,7 @@ namespace GCode_Sender
                 GCodeSender.EnablePolling(true);
             }
 
+            kbJog |= GrblSettings.IsGrblHAL;
             model.Message = "";
 
             GrblCommand.ToolChange = GrblInfo.ManualToolChange ? "M61Q{0}" : "T{0}";
@@ -347,8 +339,6 @@ namespace GCode_Sender
                 MainWindow.EnableView(true, ViewType.TrinamicTuner);
             else
                 MainWindow.ShowView(false, ViewType.TrinamicTuner);
-
-            MainWindow.GCodePush += GCode.File.AddBlock;
         }
 
         void EnableUI(bool enable)
@@ -401,7 +391,7 @@ namespace GCode_Sender
         }
         protected bool ProcessKeyPreview(System.Windows.Input.KeyEventArgs e)
         {
-            if (!GrblSettings.IsGrblHAL || mdiControl.IsFocused || DRO.IsFocused || spindleControl.IsFocused || workParametersControl.IsFocused)
+            if (!kbJog || mdiControl.IsFocused || DRO.IsFocused || spindleControl.IsFocused || workParametersControl.IsFocused)
                 return false;
 
             return GCodeSender.ProcessKeypress(e);

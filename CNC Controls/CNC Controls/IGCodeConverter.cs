@@ -1,13 +1,13 @@
 ﻿/*
- * JogConfigControl.xaml.cs - part of CNC Controls library
+ * IGCodeConverter.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.15 / 2020-04-05 / Io Engineering (Terje Io)
+ * v0.15 / 2020-04-08 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020, Io Engineering (Terje Io)
+Copyright (c) 2018-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -37,26 +37,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-using System.Windows;
-using System.Windows.Controls;
-
 namespace CNC.Controls
 {
-    /// <summary>
-    /// Interaction logic for JogSetupControl.xaml
-    /// </summary>
-    public partial class JogConfigControl : UserControl
+    public interface IGCodeConverter
     {
-        public JogConfigControl()
-        {
-            InitializeComponent();
-        }
-
-        public static readonly DependencyProperty IsGrblProperty = DependencyProperty.Register(nameof(IsGrbl), typeof(bool), typeof(JogConfigControl), new PropertyMetadata(false));
-        public bool IsGrbl
-        {
-            get { return (bool)GetValue(IsGrblProperty); }
-            set { SetValue(IsGrblProperty, value); }
-        }
+        string FileType { get; }
+        bool LoadFile(CNC.Controls.GCode job, string filename);
     }
 }

@@ -1,7 +1,7 @@
 ﻿/*
  * ThreadLogic.cs - part of CNC Controls Lathe library
  *
- * v0.03 / 2020-01-28 / Io Engineering (Terje Io)
+ * v0.15 / 2020-04-04 / Io Engineering (Terje Io)
  *
  */
 
@@ -59,8 +59,6 @@ namespace CNC.Controls.Lathe
     {
         private ThreadModel model = new ThreadModel();
         private bool suspendFractionInput = false;
-
-        public event GCodePushHandler GCodePush;
 
         public ThreadLogic()
         {
@@ -1169,16 +1167,16 @@ namespace CNC.Controls.Lathe
                 model.gCode.Add(code);
             }
 
-            if (thread.push && GCodePush != null)
+            if (thread.push)
             {
                 string threadSize = (string)model.Thread.ThreadSize["Name"];
 
-                GCodePush(string.Format("Wizard: {0}{1}", model.Thread.Type.ToString(), threadSize == "" ? "" : ", " + threadSize.Trim()), Core.Action.New);
+                GCode.File.AddBlock(string.Format("Wizard: {0}{1}", model.Thread.Type.ToString(), threadSize == "" ? "" : ", " + threadSize.Trim()), Core.Action.New);
                 if (threadSize != "")
-                    GCodePush(string.Format("({0})", Uncomment(threadSize)), Core.Action.Add);
+                    GCode.File.AddBlock(string.Format("({0})", Uncomment(threadSize)), Core.Action.Add);
                 foreach (string s in model.gCode)
-                    GCodePush(s, Core.Action.Add);
-                GCodePush("M30", Core.Action.End);
+                    GCode.File.AddBlock(s, Core.Action.Add);
+                GCode.File.AddBlock("M30", Core.Action.End);
             }
         }
 

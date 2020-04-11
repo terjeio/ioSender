@@ -56,6 +56,7 @@
       <DependentUpon>About.xaml</DependentUpon>
     </Compile>
     <Compile Include="AppConfig.cs" />
+    <Compile Include="ArcsToLines.cs" />
     <Compile Include="BasicConfigControl.xaml.cs">
       <DependentUpon>BasicConfigControl.xaml</DependentUpon>
     </Compile>
@@ -92,7 +93,8 @@
     </Compile>
     <Compile Include="ICamera.cs" />
     <Compile Include="ICNCView.cs" />
-    <Compile Include="IKeyboard.cs" />
+    <Compile Include="IGCodeConverter.cs" />
+    <Compile Include="IGCodeTransformer.cs" />
     <Compile Include="JobControl.xaml.cs">
       <DependentUpon>JobControl.xaml</DependentUpon>
     </Compile>
@@ -103,7 +105,6 @@
     <Compile Include="JogControl.xaml.cs">
       <DependentUpon>JogControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="KeyboardJog.cs" />
     <Compile Include="LimitsBaseControl.xaml.cs">
       <DependentUpon>LimitsBaseControl.xaml</DependentUpon>
     </Compile>

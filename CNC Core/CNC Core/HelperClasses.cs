@@ -1,7 +1,7 @@
 ﻿/*
  * HelperClasses.cs - part of CNC Controls library for Grbl
  *
- * v0.05 / 2020-02-06 / Io Engineering (Terje Io)
+ * v0.15 / 2020-04-08 / Io Engineering (Terje Io)
  *
  */
 
@@ -247,8 +247,12 @@ namespace CNC.Core
             var type = typeof(T);
             foreach (var sourceProperty in type.GetProperties())
             {
-                var targetProperty = type.GetProperty(sourceProperty.Name);
-                targetProperty.SetValue(target, sourceProperty.GetValue(source, null), null);
+                if (sourceProperty.CanRead)
+                {
+                    var targetProperty = type.GetProperty(sourceProperty.Name);
+                    if (targetProperty.CanWrite)
+                        targetProperty.SetValue(target, sourceProperty.GetValue(source, null), null);
+                }
             }
             //foreach (var sourceField in type.GetFields())
             //{

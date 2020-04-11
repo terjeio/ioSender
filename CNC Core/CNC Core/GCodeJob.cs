@@ -1,7 +1,7 @@
 ﻿/*
  * GCodeJob.cs - part of CNC Controls library
  *
- * v0.14 / 2020-03-28 / Io Engineering (Terje Io)
+ * v0.15 / 2020-04-07 / Io Engineering (Terje Io)
  *
  */
 
@@ -63,7 +63,6 @@ namespace CNC.Core
 
         private string filename = string.Empty;
         private DataTable gcode = new DataTable("GCode");
-        private Point3D point0 = new Point3D();  // last point
 
         public Queue<string> commands = new Queue<string>();
 
@@ -133,7 +132,7 @@ namespace CNC.Core
                 }
                 catch (Exception e)
                 {
-                    if ((ok = MessageBox.Show(string.Format("Line: {0}\rBlock: \"{1}\"\r\rContinue loading?", LineNumber, s), e.Message, MessageBoxButton.YesNo ) == MessageBoxResult.Yes))
+                    if ((ok = MessageBox.Show(string.Format("Line: {0}\rBlock: \"{1}\"\r\rContinue loading?", LineNumber, s), e.Message, MessageBoxButton.YesNo) == MessageBoxResult.Yes))
                         s = sr.ReadLine();
                     else
                         s = null;
@@ -146,10 +145,6 @@ namespace CNC.Core
                 AddBlock("", Action.End);
             else
                 CloseFile();
-
-            //GCodeParser.Save(@"d:\tokens.xml", Parser.Tokens);
-
-            //GCodeParser.Save(@"d:\file.nc", GCodeParser.TokensToGCode(Parser.Tokens));
 
             return ok;
         }
@@ -187,100 +182,41 @@ namespace CNC.Core
             {
                 gcode.EndLoadData();
 
-        //        GCodeParser.Save(@"d:\tokens.xml", Tokens);
-                GCPlane plane = new GCPlane(Commands.G17, 0);
-                DistanceMode distanceMode = DistanceMode.Absolute;
-                point0 = new Point3D();
+#if DEBUG
+                System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
+                stopWatch.Start();
+#endif
 
-                foreach (GCodeToken token in Tokens)
+                // Calculate program limits (bounding box)
+
+                GCodeEmulator emu = new GCodeEmulator();
+
+                foreach (var cmd in emu.Execute(Tokens))
                 {
-                    switch (token.Command)
-                    {
-                        case Commands.G0:
-                            {
-                                GCLinearMotion motion = (GCLinearMotion)token;
-                                BoundingBox.AddPoint(toPoint(motion.Values, distanceMode == DistanceMode.Incremental));
-                            }
-                            break;
-
-                        case Commands.G1:
-                            {
-                                GCLinearMotion motion = (GCLinearMotion)token;
-                                BoundingBox.AddPoint(toPoint(motion.Values, distanceMode == DistanceMode.Incremental));
-                            }
-                            break;
-
-                        case Commands.G2:
-                        case Commands.G3:
-                            {
-                                GCArc arc = (GCArc)token;
-                                double[] values = { point0.X, point0.Y, point0.Z };
-                                BoundingBox.AddBoundingBox(arc.GetBoundingBox(plane, values, distanceMode == DistanceMode.Incremental));
-                                toPoint(arc.Values, distanceMode == DistanceMode.Incremental);
-                            }
-                            break;
-
-                        case Commands.G5:
-                            {
-                                GCSpline spline = (GCSpline)token;
-                                double[] values = { point0.X, point0.Y, point0.Z };
-                                BoundingBox.AddBoundingBox(spline.GetBoundingBox(plane, values, distanceMode == DistanceMode.Incremental));
-                                toPoint(spline.Values, distanceMode == DistanceMode.Incremental);
-                            }
-                            break;
-
-                        case Commands.G17:
-                        case Commands.G18:
-                        case Commands.G19:
-                            plane = (GCPlane)token;
-                            break;
-
-                        case Commands.G81:
-                        case Commands.G82:
-                            var canned = token as GCCannedDrill;
-                            BoundingBox.AddPoint(toPoint(canned.Values, distanceMode == DistanceMode.Incremental));
-                            break;
-
-                        case Commands.G90:
-                        case Commands.G91:
-                            distanceMode = ((GCDistanceMode)token).DistanceMode;
-                            break;
-
-                            //min_feed = Math.Min(min_feed, token.f);
-                            //max_feed = Math.Max(max_feed, token.f);
-                            //            if (token is GCLinearMotion)
-                            //    BoundingBox.AddPoint(((GCLinearMotion)token).X, ((GCLinearMotion)token).Y, ((GCLinearMotion)token).Z);
-                            //else if (token is GCArc)
-                            //    BoundingBox.AddPoint(((GCArc)token).X, ((GCArc)token).Y, ((GCArc)token).Z); // TODO: Expand...
-                            //else if (token is GCCannedDrill)
-                            //    BoundingBox.AddPoint(((GCCannedDrill)token).X, ((GCCannedDrill)token).Y, ((GCCannedDrill)token).Z);
-                    }
-                }
-
-                if (max_feed == double.MinValue)
-                {
-                    min_feed = 0.0;
-                    max_feed = 0.0;
+                    if(cmd.Token is GCArc)
+                        BoundingBox.AddBoundingBox((cmd.Token as GCArc).GetBoundingBox(emu.Plane, new double[]{ cmd.Start.X, cmd.Start.Y, cmd.Start.Z }, emu.DistanceMode == DistanceMode.Incremental));
+                    else if (cmd.Token is GCSpline)
+                        BoundingBox.AddBoundingBox((cmd.Token as GCSpline).GetBoundingBox(emu.Plane, new double[] { cmd.Start.X, cmd.Start.Y, cmd.Start.Z }, emu.DistanceMode == DistanceMode.Incremental));
+                    else
+                        BoundingBox.AddPoint(cmd.End);
                 }
 
                 BoundingBox.Conclude();
+
+#if DEBUG
+                stopWatch.Stop();
+#endif
+
+                //GCodeParser.Save(@"d:\tokens.xml", Parser.Tokens);
+                //GCodeParser.Save(@"d:\file.nc", GCodeParser.TokensToGCode(Parser.Tokens));
 
                 FileChanged?.Invoke(filename);
             }
         }
 
-        private Point3D toPoint(double[] values, bool isRelative = false)
+        public void AddBlock(string block)
         {
-            if (isRelative)
-                point0.Offset(values[0], values[1], values[2]);
-            else
-            {
-                point0.X = values[0];
-                point0.Y = values[1];
-                point0.Z = values[2];
-            }
-
-            return point0;
+            AddBlock(block, Action.Add);
         }
 
         public void CloseFile()
@@ -420,6 +356,17 @@ namespace CNC.Core
 
             Min[plane.AxisLinear] = Math.Min(Min[plane.AxisLinear], z);
             Max[plane.AxisLinear] = Math.Max(Max[plane.AxisLinear], z);
+        }
+        public void AddPoint(GCPlane plane, Point3D point)
+        {
+            Min[plane.Axis0] = Math.Min(Min[plane.Axis0], point.X);
+            Max[plane.Axis0] = Math.Max(Max[plane.Axis0], point.X);
+
+            Min[plane.Axis1] = Math.Min(Min[plane.Axis1], point.Y);
+            Max[plane.Axis1] = Math.Max(Max[plane.Axis1], point.Y);
+
+            Min[plane.AxisLinear] = Math.Min(Min[plane.AxisLinear], point.Z);
+            Max[plane.AxisLinear] = Math.Max(Max[plane.AxisLinear], point.Z);
         }
 
         public void AddPoint(Point3D point)

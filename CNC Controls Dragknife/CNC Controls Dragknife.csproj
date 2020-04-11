@@ -4,44 +4,40 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{9492A88B-066D-42AE-9244-3369BE99F37F}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <ProjectGuid>{9F3AAD0C-0B47-4B55-9725-F8A50B7CA6B0}</ProjectGuid>
+    <OutputType>library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>GCode_Sender</RootNamespace>
-    <AssemblyName>GCode Sender</AssemblyName>
+    <RootNamespace>CNC.Controls.DragKnife</RootNamespace>
+    <AssemblyName>CNC.Controls.DragKnife</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;ADD_CAMERA</DefineConstants>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;ADD_CAMERA</DefineConstants>
+    <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup>
-    <ApplicationIcon>App.ico</ApplicationIcon>
-  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="RP.Math.Vector3">
+      <HintPath>..\Vector-master\RP.Math.Vector3\bin\Release\RP.Math.Vector3.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -56,31 +52,17 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <ApplicationDefinition Include="App.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </ApplicationDefinition>
-    <Page Include="JobView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="MainWindow.xaml">
+    <Page Include="DragKnifeDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="App.xaml.cs">
-      <DependentUpon>App.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="JobView.xaml.cs">
-      <DependentUpon>JobView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
+    <Compile Include="DragKnifeDialog.xaml.cs">
+      <DependentUpon>DragKnifeDialog.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DragknifeViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -105,42 +87,13 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config">
-      <SubType>Designer</SubType>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\CNC Controls Camera\CNC Controls Camera\CNC Controls Camera.csproj">
-      <Project>{17a9ab9b-71eb-4b09-aebe-eebbd9cd2071}</Project>
-      <Name>CNC Controls Camera</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\CNC Controls Dragknife\CNC Controls Dragknife.csproj">
-      <Project>{9f3aad0c-0b47-4b55-9725-f8a50b7ca6b0}</Project>
-      <Name>CNC Controls Dragknife</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\CNC Controls Lathe\CNC Controls Lathe\CNC Controls Lathe.csproj">
-      <Project>{9d8754ae-bc40-45ec-b308-2ee7ed579439}</Project>
-      <Name>CNC Controls Lathe</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\CNC Controls Probing\CNC Controls Probing\CNC Controls Probing.csproj">
-      <Project>{e8a9b2cd-988a-4dae-8dda-bebccb99bf9c}</Project>
-      <Name>CNC Controls Probing</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\CNC Controls\CNC Controls\CNC Controls.csproj">
-      <Project>{fa7fef55-aa80-4b20-b345-e3ca7204dd18}</Project>
+    <ProjectReference Include="..\CNC Controls\CNC Controls\CNC Controls.csproj">
+      <Project>{FA7FEF55-AA80-4B20-B345-E3CA7204DD18}</Project>
       <Name>CNC Controls</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\CNC Converters\CNC Converters.csproj">
-      <Project>{8F9C264C-D9A5-418A-A1BE-84052059387F}</Project>
-      <Name>CNC Converters</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\CNC Core\CNC Core\CNC Core.csproj">
-      <Project>{f245ff89-a838-4d6e-aa40-92cfd3d072d3}</Project>
+    <ProjectReference Include="..\CNC Core\CNC Core\CNC Core.csproj">
+      <Project>{F245FF89-A838-4D6E-AA40-92CFD3D072D3}</Project>
       <Name>CNC Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\CNC GCodeViewer\CNC GCodeViewer\CNC GCodeViewer.csproj">
-      <Project>{f1f1e439-a3ee-462c-b8bf-bfd08c0b3d9e}</Project>
-      <Name>CNC GCodeViewer</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

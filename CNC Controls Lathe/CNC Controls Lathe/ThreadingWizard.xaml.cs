@@ -1,7 +1,7 @@
 /*
  * ThreadingWizard.xaml.cs - part of CNC Controls Lathe library
  *
- * v0.10 / 2019-03-05 / Io Engineering (Terje Io)
+ * v0.15 / 2020-04-04 / Io Engineering (Terje Io)
  *
  */
 
@@ -81,7 +81,6 @@ namespace CNC.Controls.Lathe
 
             DataContext = model = logic.Model;
 
-            logic.GCodePush += Logic_GCodePush;
             logic.Model.ErrorsChanged += Model_ErrorsChanged;
         }
 

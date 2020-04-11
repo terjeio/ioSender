@@ -1,10 +1,39 @@
 ## GRBL GCode Sender
 
+2020-04-11: Alpha 15 release of binary.
+
+Added interfaces for GCode conversion \(from other file formats\) and transformation.
+
+Initially I have added two converters that I need for drilling, milling board outlines and making solder paste stencils from [KiCad](https://www.kicad-pcb.org/) PCB designs:
+
+* Excellon to G81 drill commands. Has support for slots (Excellon G85). `.drl` filename extension required. Only for [grblHAL](https://github.com/terjeio/grblHAL) firmware.
+
+* HPGL to edge cuts or solder paste stencil \(when firmware is in laser mode\). `.plt` filename extension required.
+
+Two transformers added \(available from _File>Transform_ menu\):
+
+* Arc to lines. Replaces Arcs \(G2, G3\) and splines \(G5\) with line segments. Arc tolerance from grbl firmware setting.
+
+* Add drag knife moves.
+
+__Note:__ these conversions and transformations has not yet been tested in a machine! Use with care.
+
+Added _File>Save_ menu option for saving converted/transformed GCode.  
+__NOTE:__ Only metric output for now. Blocks will be reorganized to comply with NIST ordering. Again, use with care! 
+
+Lathe mode extensions: 3D viewer switched to XZ plane. G33 and G76 rendering implemented.
+
+Added setup option to to enable keyboard jogging when firmware is not grblHAL. [Understand the risks involved](https://github.com/terjeio/Grbl-GCode-Sender/wiki/Known-limitations) before doing so!
+
+Many internal changes - perhaps the most important is a GCode emulator that is used by functions such as 3D rendering and transformations. Some bug fixes.
+
+---
+
 2020-03-29: Alpha 14 release of binary.
 
 Added probing tab with tool length, edge finder, center finder and height map options. __NOTE:__ This has NOT been extensively tested! G20 (inches) mode not tested at all! Do not use unless you understand the risks.
 
-Disabled keyboard jogging when firmware is not [grblHAL](https://github.com/terjeio/grblHAL). May add setup option to reeanble later.
+Disabled keyboard jogging when firmware is not grblHAL](https://github.com/terjeio/grblHAL). May add setup option to reenable later.
 
 Many internal changes.
 

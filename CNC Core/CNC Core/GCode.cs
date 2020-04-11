@@ -1,7 +1,7 @@
 ﻿/*
  * GCode.cs - part of CNC Controls library
  *
- * v0.14 / 2020-03-28 / Io Engineering (Terje Io)
+ * v0.15 / 2020-04-04 / Io Engineering (Terje Io)
  *
  */
 
@@ -41,6 +41,7 @@ using System;
 using System.Xml.Serialization;
 using System.Collections.Generic;
 using CNC.Core;
+using System.Windows.Media.Media3D;
 
 namespace CNC.GCode
 {
@@ -61,7 +62,11 @@ namespace CNC.GCode
         Z = 1 << 2,
         A = 1 << 3,
         B = 1 << 4,
-        C = 1 << 5
+        C = 1 << 5,
+        XY = 0x03,
+        XZ = 0x05,
+        XYZ = 0x07,
+        All = 0x3F
     }
 
     [Flags]
@@ -70,7 +75,21 @@ namespace CNC.GCode
         None = 0,
         I = 1 << 0,
         J = 1 << 1,
-        K = 1 << 2
+        K = 1 << 2,
+        All = 0x07
+    }
+
+    [Flags]
+
+    public enum ThreadingFlags : int
+    {
+        None = 0,
+        R = 1 << 0,
+        Q = 1 << 1,
+        H = 1 << 2,
+        E = 1 << 3,
+        L = 1 << 4,
+        All = 0x1F
     }
 
     public enum Plane
@@ -115,12 +134,13 @@ namespace CNC.GCode
         Shower = 1 << 2
     }
 
-    public enum ThreadTaper
+    [Flags]
+    public enum ThreadTaper : int
     {
-        None,
-        Entry,
-        Exit,
-        Both
+        None = 0,
+        Entry = 1 << 0,
+        Exit = 1 << 1,
+        Both = Entry | Exit
     }
 
     [Flags]
@@ -228,13 +248,12 @@ namespace CNC.GCode
         Feedrate,
         SpindleRPM,
         ToolSelect,
-        Coolant,
         Comment,
         UserMCommand,
         Undefined
     }
 
-    public static class AxisExtensions
+    public static class FlagsExtensions
     {
         public static IEnumerable<int> ToIndices(this AxisFlags axes)
         {
@@ -246,13 +265,19 @@ namespace CNC.GCode
                 i++; j >>= 1;
             }
         }
-    }
-
-    public static class IJKExtenstions
-    {
         public static IEnumerable<int> ToIndices(this IJKFlags ijkFlags)
         {
             int i = 0, j = (int)ijkFlags;
+            while (j != 0)
+            {
+                if ((j & 0x01) != 0)
+                    yield return i;
+                i++; j >>= 1;
+            }
+        }
+        public static IEnumerable<int> ToIndices(this ThreadingFlags flags)
+        {
+            int i = 0, j = (int)flags;
             while (j != 0)
             {
                 if ((j & 0x01) != 0)
@@ -314,5 +339,125 @@ namespace CNC.GCode
         public int Id { get;  set; }
         public string Name { get { return _name; } set { _name = value;  OnPropertyChanged(); } }
         public string Code { get; set; }
+    }
+
+    public struct Point6D
+    {
+        public double X;
+        public double Y;
+        public double Z;
+        public double A;
+        public double B;
+        public double C;
+
+        public double this [int i]
+        {
+            get
+            {
+                switch(i)
+                {
+                    case 0:
+                        return X;
+                    case 1:
+                        return Y;
+                    case 2:
+                        return Z;
+                    case 3:
+                        return A;
+                    case 4:
+                        return B;
+                    case 5:
+                        return C;
+                    default:
+                        throw new ArgumentException("zyz!", "index");
+                }
+            }
+            set
+            {
+                switch (i)
+                {
+                    case 0:
+                        X = value;
+                        break;
+                    case 1:
+                        Y = value;
+                        break;
+                    case 2:
+                        Z = value;
+                        break;
+                    case 3:
+                        A = value;
+                        break;
+                    case 4:
+                        B = value;
+                        break;
+                    case 5:
+                        C = value;
+                        break;
+                }
+            }
+        }
+
+        public double[] Array  { get { return new[] { X, Y, Z, A, B, C }; } }
+
+        public Point3D Point3D { get { return new Point3D(X, Y, Z); } }
+
+        public void Set (double[] values, AxisFlags axisFlags, bool relative = false)
+        {
+            if (relative)
+                Add(values, axisFlags);
+            else foreach (int i in axisFlags.ToIndices())
+            {
+                switch (i)
+                {
+                    case 0:
+                        X = values[0];
+                        break;
+                    case 1:
+                        Y = values[1];
+                        break;
+                    case 2:
+                        Z = values[2];
+                        break;
+                    case 3:
+                        A = values[3];
+                        break;
+                    case 4:
+                        B = values[4];
+                        break;
+                    case 5:
+                        C = values[5];
+                        break;
+                }
+            }
+        }
+
+        public void Add(double[] values, AxisFlags axisFlags)
+        {
+            foreach (int i in axisFlags.ToIndices())
+            {
+                switch (i)
+                {
+                    case 0:
+                        X += values[0];
+                        break;
+                    case 1:
+                        Y += values[1];
+                        break;
+                    case 2:
+                        Z += values[2];
+                        break;
+                    case 3:
+                        A += values[3];
+                        break;
+                    case 4:
+                        B += values[4];
+                        break;
+                    case 5:
+                        C += values[5];
+                        break;
+                }
+            }
+        }
     }
 }

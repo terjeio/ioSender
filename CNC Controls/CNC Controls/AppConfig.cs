@@ -1,7 +1,7 @@
 ﻿/*
  * AppConfig.cs - part of CNC Controls library for Grbl
  *
- * v0.13 / 2020-03-12 / Io Engineering (Terje Io)
+ * v0.13 / 2020-04-05 / Io Engineering (Terje Io)
  *
  */
 
@@ -40,12 +40,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using System;
 using System.IO;
 using System.Xml.Serialization;
-using CNC.Core;
 using System.Windows;
+using System.Collections.ObjectModel;
+using CNC.Core;
+using System.Threading;
 using CNC.GCode;
 using static CNC.GCode.GCodeParser;
-using System.Collections.ObjectModel;
-using System.Threading;
 
 namespace CNC.Controls
 {
@@ -103,9 +103,11 @@ namespace CNC.Controls
     [Serializable]
     public class JogConfig : ViewModelBase
     {
+        private bool _kbEnable;
         private double _fastFeedrate = 500d, _slowFeedrate = 200d, _stepFeedrate = 100d;
         private double _fastDistance = 500d, _slowDistance = 500d, _stepDistance = 0.05d;
 
+        public bool KeyboardEnable { get { return _kbEnable; } set { _kbEnable = value; OnPropertyChanged(); } }
         public double FastFeedrate { get { return _fastFeedrate; } set { _fastFeedrate = value; OnPropertyChanged(); } }
         public double SlowFeedrate { get { return _slowFeedrate; } set { _slowFeedrate = value; OnPropertyChanged(); } }
         public double StepFeedrate { get { return _stepFeedrate; } set { _stepFeedrate = value; OnPropertyChanged(); } }

@@ -24,6 +24,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CNC AppLaunch", "..\CNC App
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CNC Controls Probing", "..\CNC Controls Probing\CNC Controls Probing\CNC Controls Probing.csproj", "{E8A9B2CD-988A-4DAE-8DDA-BEBCCB99BF9C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CNC Controls Dragknife", "..\CNC Controls Dragknife\CNC Controls Dragknife.csproj", "{9F3AAD0C-0B47-4B55-9725-F8A50B7CA6B0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CNC Converters", "..\CNC Converters\CNC Converters.csproj", "{8F9C264C-D9A5-418A-A1BE-84052059387F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -96,6 +100,22 @@ Global
 		{E8A9B2CD-988A-4DAE-8DDA-BEBCCB99BF9C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E8A9B2CD-988A-4DAE-8DDA-BEBCCB99BF9C}.Release|x86.ActiveCfg = Release|Any CPU
 		{E8A9B2CD-988A-4DAE-8DDA-BEBCCB99BF9C}.Release|x86.Build.0 = Release|Any CPU
+		{9F3AAD0C-0B47-4B55-9725-F8A50B7CA6B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F3AAD0C-0B47-4B55-9725-F8A50B7CA6B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F3AAD0C-0B47-4B55-9725-F8A50B7CA6B0}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9F3AAD0C-0B47-4B55-9725-F8A50B7CA6B0}.Debug|x86.Build.0 = Debug|Any CPU
+		{9F3AAD0C-0B47-4B55-9725-F8A50B7CA6B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F3AAD0C-0B47-4B55-9725-F8A50B7CA6B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F3AAD0C-0B47-4B55-9725-F8A50B7CA6B0}.Release|x86.ActiveCfg = Release|Any CPU
+		{9F3AAD0C-0B47-4B55-9725-F8A50B7CA6B0}.Release|x86.Build.0 = Release|Any CPU
+		{8F9C264C-D9A5-418A-A1BE-84052059387F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F9C264C-D9A5-418A-A1BE-84052059387F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F9C264C-D9A5-418A-A1BE-84052059387F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8F9C264C-D9A5-418A-A1BE-84052059387F}.Debug|x86.Build.0 = Debug|Any CPU
+		{8F9C264C-D9A5-418A-A1BE-84052059387F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F9C264C-D9A5-418A-A1BE-84052059387F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8F9C264C-D9A5-418A-A1BE-84052059387F}.Release|x86.ActiveCfg = Release|Any CPU
+		{8F9C264C-D9A5-418A-A1BE-84052059387F}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

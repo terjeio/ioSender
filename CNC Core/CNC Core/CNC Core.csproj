@@ -53,6 +53,7 @@
     <Compile Include="ActionCommand.cs" />
     <Compile Include="EltimaStream.cs" />
     <Compile Include="GCode.cs" />
+    <Compile Include="GCodeEmulator.cs" />
     <Compile Include="GCodeParser.cs" />
     <Compile Include="Grbl.cs" />
     <Compile Include="Comms.cs" />
