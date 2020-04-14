@@ -1,7 +1,7 @@
 ﻿/*
  * Grbl.cs - part of CNC Controls library
  *
- * v0.15 / 2020-04-03 / Io Engineering (Terje Io)
+ * v0.16 / 2020-04-13 / Io Engineering (Terje Io)
  *
  */
 
@@ -49,11 +49,10 @@ using System.Diagnostics;
 using System.Windows.Media;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using CNC.GCode;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Threading;
 using System.Windows;
+using CNC.GCode;
 
 namespace CNC.Core
 {
@@ -142,6 +141,13 @@ namespace CNC.Core
         Sleep
     }
 
+    public enum GrblMode
+    {
+        Normal = 0,
+        Laser,
+        Lathe
+    }
+
     public enum GrblSetting
     {
         PulseMicroseconds = 0,
@@ -173,7 +179,7 @@ namespace CNC.Core
         PulseDelayMicroseconds = 29,
         RpmMax = 30,
         RpmMin = 31,
-        LaserMode = 32,
+        Mode = 32, // enum GrblMode
         PWMFreq = 33,
         PWMOffValue = 34,
         PWMMinValue = 35,
@@ -575,6 +581,7 @@ namespace CNC.Core
                 AxisFlags = (AxisFlags)flags;
             }
         }
+        public static Signals OptionalSignals { get; private set; } = Signals.Off;
         public static AxisFlags AxisFlags { get; private set; } = AxisFlags.None;
         public static int NumTools { get; private set; } = 0;
         public static bool HasATC { get; private set; }
@@ -643,6 +650,7 @@ namespace CNC.Core
 
             model.AxisEnabledFlags = AxisFlags;
             model.LatheModeEnabled = LatheModeEnabled;
+            model.OptionalSignals.Value = OptionalSignals;
 
             return res == true;
         }
@@ -669,6 +677,8 @@ namespace CNC.Core
                     case "OPT":
                         Options = valuepair[1];
                         string[] s = Options.Split(',');
+                        if (s[0].Contains('+'))
+                            OptionalSignals |= Signals.SafetyDoor;
                         if (s.Length > 1)
                             PlanBufferSize = int.Parse(s[1], CultureInfo.InvariantCulture);
                         if (s.Length > 2)
@@ -709,6 +719,18 @@ namespace CNC.Core
 
                                     case "LATHE":
                                         LatheModeEnabled = true;
+                                        break;
+
+                                    case "BD":
+                                        OptionalSignals |= Signals.BlockDelete;
+                                        break;
+
+                                    case "ES":
+                                        OptionalSignals |= Signals.EStop;
+                                        break;
+
+                                    case "OS":
+                                        OptionalSignals |= Signals.OptionalStop;
                                         break;
                                 }
                         }

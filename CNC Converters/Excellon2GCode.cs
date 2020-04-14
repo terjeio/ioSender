@@ -1,7 +1,7 @@
 ﻿/*
  * Excellon2GCode.cs - part of CNC Converters library
  *
- * v0.15 / 2020-04-11 / Io Engineering (Terje Io)
+ * v0.16 / 2020-04-11 / Io Engineering (Terje Io)
  *
  */
 
@@ -41,10 +41,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Windows;
 using System.Windows.Media.Media3D;
 using CNC.Core;
 using CNC.Controls;
-using System.Windows;
 
 namespace CNC.Converters
 {
@@ -101,75 +101,79 @@ namespace CNC.Converters
             FileInfo file = new FileInfo(filename);
             StreamReader sr = file.OpenText();
 
-            string s = sr.ReadLine();
-
-            while (s != null)
+            using (new UIUtils.WaitCursor())
             {
-                try
+
+                string s = sr.ReadLine();
+
+                while (s != null)
                 {
-                    s = s.Trim();
-
-                    if (isHeader == null)
-                        isHeader = s == "M48";
-
-                    else if (isHeader == true)
+                    try
                     {
-                        switch (s)
+                        s = s.Trim();
+
+                        if (isHeader == null)
+                            isHeader = s == "M48";
+
+                        else if (isHeader == true)
                         {
-                            case "METRIC":
-                                isMetric = true;
-                                leadingZeros = false;
-                                break;
+                            switch (s)
+                            {
+                                case "METRIC":
+                                    isMetric = true;
+                                    leadingZeros = false;
+                                    break;
 
-                            case "METRIC,TZ":
-                                isMetric = true;
-                                leadingZeros = true;
-                                break;
+                                case "METRIC,TZ":
+                                    isMetric = true;
+                                    leadingZeros = true;
+                                    break;
 
-                            case "INCH":
-                                isMetric = false;
-                                leadingZeros = false;
-                                break;
+                                case "INCH":
+                                    isMetric = false;
+                                    leadingZeros = false;
+                                    break;
 
-                            case "INCH,TZ":
-                                isMetric = false;
-                                leadingZeros = true;
-                                break;
+                                case "INCH,TZ":
+                                    isMetric = false;
+                                    leadingZeros = true;
+                                    break;
 
-                            case "%":
-                            case "M95":
-                                isHeader = false;
-                                break;
+                                case "%":
+                                case "M95":
+                                    isHeader = false;
+                                    break;
+                            }
+
+                            if (s[0] == 'T')
+                            {
+                                int cpos = s.IndexOf('C');
+                                tools.Add(new JobParametersViewModel.Tool { Id = int.Parse(s.Substring(1, cpos - 1)), Diameter = dbl.Parse(s.Substring(cpos + 1)) });
+                            }
                         }
-
-                        if (s[0] == 'T')
+                        else
                         {
-                            int cpos = s.IndexOf('C');
-                            tools.Add(new JobParametersViewModel.Tool { Id = int.Parse(s.Substring(1, cpos - 1)), Diameter = dbl.Parse(s.Substring(cpos + 1)) });
-                        }
-                    }
-                    else
-                    {
-                        switch (s[0])
-                        {
-                            case 'G':
-                                switch (s)
-                                {
-                                    case "G00":
-                                    case "G01":
-                                    case "G02":
-                                    case "G03":
-                                        isDrillMode = false;
-                                        break;
+                            switch (s[0])
+                            {
+                                case 'G':
+                                    switch (s)
+                                    {
+                                        case "G00":
+                                        case "G01":
+                                        case "G02":
+                                        case "G03":
+                                            isDrillMode = false;
+                                            break;
 
-                                    case "G05":
-                                        isDrillMode = true;
-                                        break;
-                                }
-                                break;
+                                        case "G05":
+                                            isDrillMode = true;
+                                            break;
+                                    }
+                                    break;
 
                                 case 'X':
-                                    if(isDrillMode) {
+                                    if (isDrillMode)
+                                    {
                                         int g85pos = s.IndexOf("G85");
                                         string args = g85pos >= 0 ? s.Substring(0, g85pos) : s;
                                         int ypos = args.IndexOf('Y');
@@ -195,76 +199,77 @@ namespace CNC.Converters
                                     tool = tools.Where(x => x.Id == int.Parse(s.Substring(1))).FirstOrDefault();
                                     break;
                             }
+                        }
                     }
-                }
-                catch
-                {
-                }
-                s = sr.ReadLine();
-            }
-
-            sr.Close();
-
-            job.AddBlock(filename, CNC.Core.Action.New);
-            job.AddBlock("(Translated by Excellon to GCode converter)");
-            job.AddBlock("G90G17G21G50");
-
-            if (settings.ScaleX != 1d || settings.ScaleY != 1d)
-                job.AddBlock(string.Format("G51X{0}Y{1}", settings.ScaleX.ToInvariantString(), settings.ScaleY.ToInvariantString()));
-
-            job.AddBlock("G0Z" + settings.ZRapids.ToInvariantString());
-            job.AddBlock("X0Y0");
-
-            var target = new Point3D(0d, 0d, settings.ZRapids);
-
-            foreach (var t in tools)
-            {
-                job.AddBlock("M5");
-                target.X = 0d;
-                target.Y = 0d;
-                target.Z = settings.ZHome;
-                job.AddBlock("G0" + PosToParams(target));
-                job.AddBlock(string.Format("M6 (MSG, {0} mm {1})", (t.Diameter < settings.ToolDiameter ? t.Diameter : settings.ToolDiameter).ToInvariantString(), t.Diameter < settings.ToolDiameter ? "drill" : "mill"));
-                job.AddBlock("M3S" + settings.RPM.ToInvariantString());
-                job.AddBlock("G4P1");
-                target.Z = settings.ZRapids;
-                job.AddBlock("G0" + PosToParams(target));
-                job.AddBlock("F" + settings.PlungeRate.ToInvariantString());
-
-                foreach (var cmd in commands)
-                {
-                    if(cmd.tool == t.Id)
+                    catch
                     {
-                        switch(cmd.Command)
+                    }
+                    s = sr.ReadLine();
+                }
+
+                sr.Close();
+
+                job.AddBlock(filename, CNC.Core.Action.New);
+                job.AddBlock("(Translated by Excellon to GCode converter)");
+                job.AddBlock("G90G17G21G50");
+
+                if (settings.ScaleX != 1d || settings.ScaleY != 1d)
+                    job.AddBlock(string.Format("G51X{0}Y{1}", settings.ScaleX.ToInvariantString(), settings.ScaleY.ToInvariantString()));
+
+                job.AddBlock("G0Z" + settings.ZRapids.ToInvariantString());
+                job.AddBlock("X0Y0");
+
+                var target = new Point3D(0d, 0d, settings.ZRapids);
+
+                foreach (var t in tools)
+                {
+                    job.AddBlock("M5");
+                    target.X = 0d;
+                    target.Y = 0d;
+                    target.Z = settings.ZHome;
+                    job.AddBlock("G0" + PosToParams(target));
+                    job.AddBlock(string.Format("M6 (MSG, {0} mm {1})", (t.Diameter < settings.ToolDiameter ? t.Diameter : settings.ToolDiameter).ToInvariantString(), t.Diameter < settings.ToolDiameter ? "drill" : "mill"));
+                    job.AddBlock("M3S" + settings.RPM.ToInvariantString());
+                    job.AddBlock("G4P1");
+                    target.Z = settings.ZRapids;
+                    job.AddBlock("G0" + PosToParams(target));
+                    job.AddBlock("F" + settings.PlungeRate.ToInvariantString());
+
+                    foreach (var cmd in commands)
+                    {
+                        if (cmd.tool == t.Id)
                         {
-                            case "Drill":
-                                if (t.Diameter > settings.ToolDiameter)
-                                {
-                                    double r = (t.Diameter - settings.ToolDiameter) / 2d;
-                                    target.X = cmd.Start.X + r;
-                                    target.Y = cmd.Start.Y;
-                                    string p = PosToParams(target);
-                                    if (p.Length > 0)
-                                        job.AddBlock("G0" + p);
-                                    target.Z = settings.ZMin;
-                                    job.AddBlock("G1" + PosToParams(target));
-                                    job.AddBlock(string.Format("G{0}X{1}I-{2}", "2", target.X.ToInvariantString(), r.ToInvariantString()));
-                                    target.Z = settings.ZRapids;
-                                    job.AddBlock("G0" + PosToParams(target));
-                                }
-                                else
-                                    OutputG81(new Point3D(cmd.Start.X, cmd.Start.Y, settings.ZMin));
-                                break;
-                            case "Slot":
-                                OutputSlot(cmd, t.Diameter);
-                                break;
+                            switch (cmd.Command)
+                            {
+                                case "Drill":
+                                    if (t.Diameter > settings.ToolDiameter)
+                                    {
+                                        double r = (t.Diameter - settings.ToolDiameter) / 2d;
+                                        target.X = cmd.Start.X + r;
+                                        target.Y = cmd.Start.Y;
+                                        string p = PosToParams(target);
+                                        if (p.Length > 0)
+                                            job.AddBlock("G0" + p);
+                                        target.Z = settings.ZMin;
+                                        job.AddBlock("G1" + PosToParams(target));
+                                        job.AddBlock(string.Format("G{0}X{1}I-{2}", "2", target.X.ToInvariantString(), r.ToInvariantString()));
+                                        target.Z = settings.ZRapids;
+                                        job.AddBlock("G0" + PosToParams(target));
+                                    }
+                                    else
+                                        OutputG81(new Point3D(cmd.Start.X, cmd.Start.Y, settings.ZMin));
+                                    break;
+                                case "Slot":
+                                    OutputSlot(cmd, t.Diameter);
+                                    break;
+                            }
                         }
                     }
                 }
-            }
 
-            job.AddBlock("G0X0Y0Z" + settings.ZHome.ToInvariantString());
-            job.AddBlock("M30", CNC.Core.Action.End);
+                job.AddBlock("G0X0Y0Z" + settings.ZHome.ToInvariantString());
+                job.AddBlock("M30", CNC.Core.Action.End);
+            }
 
             return ok;
         }

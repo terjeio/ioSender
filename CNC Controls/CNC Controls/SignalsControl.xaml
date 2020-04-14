@@ -18,6 +18,63 @@
                         <Setter Property="VerticalAlignment" Value="Center"/>
                         <Setter Property="Padding" Value="0"/>
                     </Style>
+                    <local:IsSignalVisibleConverter x:Key="IsSignalVisibleConverter" />
+                    <Style x:Key="DoorOpenVisibleStyle">
+                        <Setter Property="Control.Visibility">
+                            <Setter.Value>
+                                <MultiBinding Converter="{StaticResource IsSignalVisibleConverter}">
+                                    <Binding Path="OptionalSignals" />
+                                    <Binding>
+                                        <Binding.Source>
+                                            <core:Signals>SafetyDoor</core:Signals>
+                                        </Binding.Source>
+                                    </Binding>
+                                </MultiBinding>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                    <Style x:Key="EStopVisibleStyle">
+                        <Setter Property="Control.Visibility">
+                            <Setter.Value>
+                                <MultiBinding Converter="{StaticResource IsSignalVisibleConverter}">
+                                    <Binding Path="OptionalSignals" />
+                                    <Binding>
+                                        <Binding.Source>
+                                            <core:Signals>EStop</core:Signals>
+                                        </Binding.Source>
+                                    </Binding>
+                                </MultiBinding>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                    <Style x:Key="BlockDeleteVisibleStyle">
+                        <Setter Property="Control.Visibility">
+                            <Setter.Value>
+                                <MultiBinding Converter="{StaticResource IsSignalVisibleConverter}">
+                                    <Binding Path="OptionalSignals" />
+                                    <Binding>
+                                        <Binding.Source>
+                                            <core:Signals>BlockDelete</core:Signals>
+                                        </Binding.Source>
+                                    </Binding>
+                                </MultiBinding>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                    <Style x:Key="OptionalStopVisibleStyle">
+                        <Setter Property="Control.Visibility">
+                            <Setter.Value>
+                                <MultiBinding Converter="{StaticResource IsSignalVisibleConverter}">
+                                    <Binding Path="OptionalSignals" />
+                                    <Binding>
+                                        <Binding.Source>
+                                            <core:Signals>OptionalStop</core:Signals>
+                                        </Binding.Source>
+                                    </Binding>
+                                </MultiBinding>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
@@ -33,11 +90,14 @@
                 <local:SignalControl Label="C" IsSet="{Binding Path=Signals[(core:Signals)LimitC], Mode=OneWay}" Style="{StaticResource CAxisVisibleStyle}"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,3,0" VerticalAlignment="Center" DockPanel.Dock="Right">
-                <local:SignalControl Label="H" IsSet="{Binding Path=Signals[(core:Signals)Hold], Mode=OneWay}"/>
-                <local:SignalControl Label="S" IsSet="{Binding Path=Signals[(core:Signals)CycleStart], Mode=OneWay}"/>
-                <local:SignalControl Label="R" IsSet="{Binding Path=Signals[(core:Signals)Reset], Mode=OneWay}"/>
-                <local:SignalControl Label="D" IsSet="{Binding Path=Signals[(core:Signals)SafetyDoor], Mode=OneWay}"/>
-                <local:SignalControl Label="P" IsSet="{Binding Path=Signals[(core:Signals)Probe], Mode=OneWay}"/>
+                <local:SignalControl Label="B" ToolTip="Block delete" IsSet="{Binding Path=Signals[(core:Signals)BlockDelete], Mode=OneWay}" Style="{StaticResource BlockDeleteVisibleStyle}"/>
+                <local:SignalControl Label="O" ToolTip="Optional stop" IsSet="{Binding Path=Signals[(core:Signals)OptionalStop], Mode=OneWay}" Style="{StaticResource OptionalStopVisibleStyle}"/>
+                <local:SignalControl Label="H" ToolTip="Feed hold" IsSet="{Binding Path=Signals[(core:Signals)Hold], Mode=OneWay}"/>
+                <local:SignalControl Label="S" ToolTip="Cycle start" IsSet="{Binding Path=Signals[(core:Signals)CycleStart], Mode=OneWay}"/>
+                <local:SignalControl Label="R" ToolTip="Reset" IsSet="{Binding Path=Signals[(core:Signals)Reset], Mode=OneWay}"/>
+                <local:SignalControl Label="E" ToolTip="E-Stop" IsSet="{Binding Path=Signals[(core:Signals)EStop], Mode=OneWay}" Style="{StaticResource EStopVisibleStyle}"/>
+                <local:SignalControl Label="D" ToolTip="Safety door" IsSet="{Binding Path=Signals[(core:Signals)SafetyDoor], Mode=OneWay}" Style="{StaticResource DoorOpenVisibleStyle}"/>
+                <local:SignalControl Label="P" ToolTip="Probe" IsSet="{Binding Path=Signals[(core:Signals)Probe], Mode=OneWay}"/>
             </StackPanel>
         </DockPanel>
     </GroupBox>

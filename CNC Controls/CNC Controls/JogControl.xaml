@@ -20,6 +20,7 @@
                     </Style>
                 </ResourceDictionary>
                 <ResourceDictionary>
+                    <local:EnumValueToBooleanConverter x:Key="EnumToCheckedConverter" />
                     <local:BoolToVisibleConverter x:Key="IsVisibleConverter" />
                     <local:LogicalNotConverter x:Key="IsNotVisibleConverter">
                         <local:LogicalNotConverter.FinalConverter>
@@ -35,20 +36,20 @@
             <StackPanel>
                 <GroupBox Header="Distance" HorizontalAlignment="Left" Margin="5,0,0,0" VerticalAlignment="Top" Height="114" Width="80">
                     <StackPanel>
-                        <RadioButton Tag="3" Content="{Binding Path=JogData.Distance3, RelativeSource={RelativeSource AncestorType=UserControl}}" HorizontalAlignment="Left" Margin="10,5,0,0" VerticalAlignment="Top" Click="distance_Click"/>
-                        <RadioButton Tag="2" Content="{Binding Path=JogData.Distance2, RelativeSource={RelativeSource AncestorType=UserControl}}" IsChecked="True" HorizontalAlignment="Left" Margin="10,3,0,0" VerticalAlignment="Top" Click="distance_Click"/>
-                        <RadioButton Tag="1" Content="{Binding Path=JogData.Distance1, RelativeSource={RelativeSource AncestorType=UserControl}}" HorizontalAlignment="Left" Margin="10,3,0,0" VerticalAlignment="Top" Click="distance_Click"/>
-                        <RadioButton Tag="0" Content="{Binding Path=JogData.Distance0, RelativeSource={RelativeSource AncestorType=UserControl}}" HorizontalAlignment="Left" Margin="10,3,0,0" VerticalAlignment="Top" Click="distance_Click"/>
+                        <RadioButton Tag="3" Content="{Binding Path=JogData.Distance3, RelativeSource={RelativeSource AncestorType=UserControl}}" IsChecked="{Binding Path=JogData.StepSize, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource EnumToCheckedConverter}, ConverterParameter=Step3}" HorizontalAlignment="Left" Margin="10,5,0,0" VerticalAlignment="Top" Click="distance_Click"/>
+                        <RadioButton Tag="2" Content="{Binding Path=JogData.Distance2, RelativeSource={RelativeSource AncestorType=UserControl}}" IsChecked="{Binding Path=JogData.StepSize, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource EnumToCheckedConverter}, ConverterParameter=Step2}" HorizontalAlignment="Left" Margin="10,3,0,0" VerticalAlignment="Top" Click="distance_Click"/>
+                        <RadioButton Tag="1" Content="{Binding Path=JogData.Distance1, RelativeSource={RelativeSource AncestorType=UserControl}}" IsChecked="{Binding Path=JogData.StepSize, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource EnumToCheckedConverter}, ConverterParameter=Step1}" HorizontalAlignment="Left" Margin="10,3,0,0" VerticalAlignment="Top" Click="distance_Click"/>
+                        <RadioButton Tag="0" Content="{Binding Path=JogData.Distance0, RelativeSource={RelativeSource AncestorType=UserControl}}" IsChecked="{Binding Path=JogData.StepSize, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource EnumToCheckedConverter}, ConverterParameter=Step0}" HorizontalAlignment="Left" Margin="10,3,0,0" VerticalAlignment="Top" Click="distance_Click"/>
                         <Label Content="{Binding Path=Unit}" Height="20" FontSize="8"/>
                     </StackPanel>
                 </GroupBox>
 
                 <GroupBox Header="Feed rate" HorizontalAlignment="Left" Margin="5,0,0,4" VerticalAlignment="Top" Height="114" Width="80">
                     <StackPanel>
-                        <RadioButton Tag="3" Content="{Binding Path=JogData.Feedrate3, RelativeSource={RelativeSource AncestorType=UserControl}}" HorizontalAlignment="Left" Margin="10,5,0,0" VerticalAlignment="Top" Click="feedrate_Click"/>
-                        <RadioButton Tag="2" Content="{Binding Path=JogData.Feedrate2, RelativeSource={RelativeSource AncestorType=UserControl}}" IsChecked="True" HorizontalAlignment="Left" Margin="10,3,0,0" VerticalAlignment="Top" Click="feedrate_Click"/>
-                        <RadioButton Tag="1" Content="{Binding Path=JogData.Feedrate1, RelativeSource={RelativeSource AncestorType=UserControl}}" HorizontalAlignment="Left" Margin="10,3,0,0" VerticalAlignment="Top" Click="feedrate_Click"/>
-                        <RadioButton Tag="0" Content="{Binding Path=JogData.Feedrate0, RelativeSource={RelativeSource AncestorType=UserControl}}" HorizontalAlignment="Left" Margin="10,3,0,0" VerticalAlignment="Top" Click="feedrate_Click"/>
+                        <RadioButton Tag="3" Content="{Binding Path=JogData.Feedrate3, RelativeSource={RelativeSource AncestorType=UserControl}}" IsChecked="{Binding Path=JogData.Feed, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource EnumToCheckedConverter}, ConverterParameter=Feed3}"  HorizontalAlignment="Left" Margin="10,5,0,0" VerticalAlignment="Top" Click="feedrate_Click"/>
+                        <RadioButton Tag="2" Content="{Binding Path=JogData.Feedrate2, RelativeSource={RelativeSource AncestorType=UserControl}}" IsChecked="{Binding Path=JogData.Feed, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource EnumToCheckedConverter}, ConverterParameter=Feed2}" HorizontalAlignment="Left" Margin="10,3,0,0" VerticalAlignment="Top" Click="feedrate_Click"/>
+                        <RadioButton Tag="1" Content="{Binding Path=JogData.Feedrate1, RelativeSource={RelativeSource AncestorType=UserControl}}" IsChecked="{Binding Path=JogData.Feed, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource EnumToCheckedConverter}, ConverterParameter=Feed1}" HorizontalAlignment="Left" Margin="10,3,0,0" VerticalAlignment="Top" Click="feedrate_Click"/>
+                        <RadioButton Tag="0" Content="{Binding Path=JogData.Feedrate0, RelativeSource={RelativeSource AncestorType=UserControl}}" IsChecked="{Binding Path=JogData.Feed, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource EnumToCheckedConverter}, ConverterParameter=Feed0}" HorizontalAlignment="Left" Margin="10,3,0,0" VerticalAlignment="Top" Click="feedrate_Click"/>
                         <Label Content="{Binding Path=FeedrateUnit}" Height="20" FontSize="8"/>
                     </StackPanel>
                 </GroupBox>

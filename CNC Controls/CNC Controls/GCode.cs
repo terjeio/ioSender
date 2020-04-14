@@ -1,7 +1,7 @@
 ﻿/*
  * GCode.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.15 / 2020-04-10 / Io Engineering (Terje Io)
+ * v0.16 / 2020-04-12 / Io Engineering (Terje Io)
  *
  */
 
@@ -65,6 +65,7 @@ namespace CNC.Controls
         }
 
         private string allowedTypes = "cnc,nc,ncc,ngc,gcode,tap";
+        private string conversionTypes = string.Empty;
 
         private GCodeJob Program { get; set; } = new GCodeJob();
         private List<GCodeConverter> Converters = new List<GCodeConverter>();
@@ -95,6 +96,8 @@ namespace CNC.Controls
 
         public static GCode File { get { return file.Value; } }
         public bool IsLoaded { get { return Program.Loaded; } }
+        public string FileName { get { return Model == null ? string.Empty : Model.FileName; } }
+
         public bool HeightMapApplied { get { return Program.HeightMapApplied; } set { Program.HeightMapApplied = value; } }
 
         public DataTable Data { get { return Program.Data; } }
@@ -111,7 +114,7 @@ namespace CNC.Controls
             if (ok)
             {
                 Converters.Add(new GCodeConverter { Type = converter, FileType = "." + filetype });
-                allowedTypes += "," + filetype;
+                conversionTypes += (conversionTypes == string.Empty ? "" : ",") + filetype;
             }
 
             return ok;
@@ -176,7 +179,7 @@ namespace CNC.Controls
             if (allow && e.Data.GetDataPresent(DataFormats.FileDrop))
             {
                 string[] files = (string[])e.Data.GetData(DataFormats.FileDrop, false);
-                allow = files.Count() == 1 && FileUtils.IsAllowedFile(files[0].ToLower(), allowedTypes + ",txt");
+                allow = files.Count() == 1 && FileUtils.IsAllowedFile(files[0].ToLower(), allowedTypes + (conversionTypes == string.Empty ? "" : "," + conversionTypes) + ",txt");
             }
 
             e.Handled = true;
@@ -203,7 +206,9 @@ namespace CNC.Controls
             string filename = string.Empty;
             OpenFileDialog file = new OpenFileDialog();
 
-            file.Filter = string.Format("GCode files ({0})|{0}|Text files (*.txt)|*.txt|All files (*.*)|*.*", FileUtils.ExtensionsToFilter(allowedTypes));
+            string conversionFilter = conversionTypes == string.Empty ? string.Empty : string.Format("Other files ({0})|{0}|", FileUtils.ExtensionsToFilter(conversionTypes));
+
+            file.Filter = string.Format("GCode files ({0})|{0}|{1}Text files (*.txt)|*.txt|All files (*.*)|*.*", FileUtils.ExtensionsToFilter(allowedTypes), conversionFilter);
 
             if (file.ShowDialog() == true)
             {
@@ -263,6 +268,8 @@ namespace CNC.Controls
                 catch (IOException)
                 {
                 }
+
+                Model.FileName = saveDialog.FileName;
             }
         }
     }

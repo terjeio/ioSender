@@ -1,7 +1,7 @@
 /*
  * GrblViewModel.cs - part of CNC Controls library
  *
- * v0.15 / 2020-04-03 / Io Engineering (Terje Io)
+ * v0.16 / 2020-04-14 / Io Engineering (Terje Io)
  *
  */
 
@@ -54,7 +54,7 @@ namespace CNC.Core
         private bool? _mpg;
         private int _pwm, _line, _scrollpos;
         private double _feedrate = 0d;
-        private double _rpm = 0d, _rpmInput = 0d, _rpmDisplay = 0d;
+        private double _rpm = 0d, _rpmInput = 0d, _rpmDisplay = 0d, _jogStep = 0.1d;
         private double _rpmActual = double.NaN;
         private double _feedOverride = 100d;
         private double _rapidsOverride = 100d;
@@ -82,6 +82,7 @@ namespace CNC.Core
             MDICommand = new ActionCommand<string>(ExecuteMDI);
 
             Signals.PropertyChanged += Signals_PropertyChanged;
+            OptionalSignals.PropertyChanged += OptionalSignals_PropertyChanged;
             SpindleState.PropertyChanged += SpindleState_PropertyChanged;
             AxisScaled.PropertyChanged += AxisScaled_PropertyChanged;
             Position.PropertyChanged += Position_PropertyChanged;
@@ -133,6 +134,11 @@ namespace CNC.Core
         private void Signals_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             OnPropertyChanged(nameof(Signals));
+        }
+
+        private void OptionalSignals_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            OnPropertyChanged(nameof(OptionalSignals));
         }
 
         public void Clear()
@@ -233,9 +239,11 @@ namespace CNC.Core
         public bool IsProbeSuccess { get { return _isProbeSuccess; } private set { _isProbeSuccess = value; OnPropertyChanged(); } }
         public EnumFlags<SpindleState> SpindleState { get; private set; } = new EnumFlags<SpindleState>(GCode.SpindleState.Off);
         public EnumFlags<Signals> Signals { get; private set; } = new EnumFlags<Signals>(Core.Signals.Off);
+        public EnumFlags<Signals> OptionalSignals { get; set; } = new EnumFlags<Signals>(Core.Signals.Off);
         public EnumFlags<AxisFlags> AxisScaled { get; private set; } = new EnumFlags<AxisFlags>(AxisFlags.None);
-        public string FileName { get { return _fileName; } set { _fileName = value; OnPropertyChanged(); OnPropertyChanged(nameof(IsFileLoaded)); } }
+        public string FileName { get { return _fileName; } set { _fileName = value; OnPropertyChanged(); OnPropertyChanged(nameof(IsFileLoaded)); OnPropertyChanged(nameof(IsPhysicalFileLoaded)); } }
         public bool IsFileLoaded { get { return _fileName != string.Empty; } }
+        public bool IsPhysicalFileLoaded { get { return _fileName != string.Empty && (_fileName.StartsWith(@"\\") || _fileName[1] == ':'); } }
         public bool? IsMPGActive { get { return _mpg; } private set { if (_mpg != value) { _mpg = value; OnPropertyChanged(); } } }
         public string Scaling { get { return _sc; } private set { _sc = value; OnPropertyChanged(); } }
         public string SDCardStatus { get { return _sd; } private set { _sd = value; OnPropertyChanged(); } }
@@ -260,6 +268,7 @@ namespace CNC.Core
         public int NumAxes { get { return GrblInfo.NumAxes; } set { OnPropertyChanged(); } }
         public AxisFlags AxisEnabledFlags { get { return GrblInfo.AxisFlags; } set { OnPropertyChanged(); } }
         public int ScrollPosition { get { return _scrollpos; } set { _scrollpos = value;  OnPropertyChanged(); } }
+        public double JogStep { get { return _jogStep; } set { _jogStep = value; OnPropertyChanged(); } }
 
         public string RunTime { get { return JobTimer.RunTime; } set { OnPropertyChanged(); } } // Cannot be set...
         // CO2 Laser

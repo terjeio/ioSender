@@ -1,7 +1,7 @@
 ﻿/*
  * SignalsControl.xaml.cs - part of CNC Controls library
  *
- * v0.10 / 2020-03-01 / Io Engineering (Terje Io)
+ * v0.16 / 2020-04-13 / Io Engineering (Terje Io)
  *
  */
 
@@ -37,17 +37,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-using System.Linq;
-using System.Windows;
 using System.Windows.Controls;
-using CNC.Core;
 
 namespace CNC.Controls
 {
     public partial class SignalsControl : UserControl
     {
-        private const string baseSignals = "HSRDP";
-
         public SignalsControl()
         {
             InitializeComponent();

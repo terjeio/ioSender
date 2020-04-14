@@ -1,7 +1,7 @@
 /*
  * JobView.xaml.cs - part of Grbl Code Sender
  *
- * v0.15 / 2020-04-10 / Io Engineering (Terje Io)
+ * v0.16 / 2020-04-13 / Io Engineering (Terje Io)
  *
  */
 
@@ -131,7 +131,10 @@ namespace GCode_Sender
                 case nameof(GrblViewModel.FileName):
                     string filename = (sender as GrblViewModel).FileName;
                     MainWindow.ui.WindowTitle = filename;
-                    if (filename.StartsWith("SDCard:"))
+
+                    if(string.IsNullOrEmpty(filename))
+                        MainWindow.CloseFile();
+                    else if (filename.StartsWith("SDCard:"))
                     {
                         sdStream = true;
                         MainWindow.EnableView(false, ViewType.GCodeViewer);
@@ -235,9 +238,9 @@ namespace GCode_Sender
 
         public void CloseFile()
         {
-            GCodeSender.CloseFile();
             gcodeRenderer.Close();
         }
+
         public void Setup(UIViewModel model, AppConfig profile)
         {
         }

@@ -10,10 +10,10 @@
         xmlns:cncprobingcontrols="clr-namespace:CNC.Controls.Probing;assembly=CNC.Controls.Probing"
         xmlns:local="clr-namespace:GCode_Sender"
         mc:Ignorable="d"
-        Title="GCode Sender (alpha-15)" Height="600" Width="923"
+        Title="GCode Sender (alpha-16)" Height="600" Width="923"
         Loaded="Window_Load"
         Closing="Window_Closing"
-        Closed="Window_Closed" Icon="App.ico" ResizeMode="NoResize">
+        Closed="Window_Closed" Icon="App.ico" ResizeMode="CanMinimize">
     <Window.DataContext>
         <cnccore:GrblViewModel />
     </Window.DataContext>

@@ -1,7 +1,7 @@
 /*
  * JogControl.xaml.cs - part of CNC Controls library
  *
- * v0.10 / 2020-03-03 / Io Engineering (Terje Io)
+ * v0.16 / 2020-04-14 / Io Engineering (Terje Io)
  *
  */
 
@@ -38,10 +38,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 using System.ComponentModel;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using CNC.Core;
-using System;
 
 namespace CNC.Controls
 {
@@ -50,7 +50,7 @@ namespace CNC.Controls
     /// </summary>
     public partial class JogControl : UserControl
     {
-        private bool metricCommand = true, metricInput = true;
+        private bool metricCommand = true, metricInput = true, silent = false;
         private int distance = 2, feedrate = 2;
 
         public JogControl()
@@ -59,7 +59,21 @@ namespace CNC.Controls
 
             JogData = new JogViewModel();
 
+            JogData.PropertyChanged += JogData_PropertyChanged;
+
             IsVisibleChanged += JogControl_IsVisibleChanged;
+        }
+
+        private void JogData_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch(e.PropertyName)
+            {
+                case nameof(JogViewModel.Distance):
+                    silent = true;
+                    (DataContext as GrblViewModel).JogStep = JogData.Distance;
+                    silent = false;
+                    break;
+            }                
         }
 
         public JogViewModel JogData { get; private set; }
@@ -91,7 +105,25 @@ namespace CNC.Controls
                 case nameof(GrblViewModel.IsMetric):
                     JogData.SetMetric((metricInput = (sender as GrblViewModel).IsMetric));
                     break;
-                }
+
+                case nameof(GrblViewModel.JogStep):
+                    if(!silent) switch ((int)((sender as GrblViewModel).JogStep * (metricCommand ? 100d : 1000d)))
+                    {
+                        case 1:
+                            JogData.StepSize = JogViewModel.JogStep.Step0;
+                            break;
+                        case 10:
+                            JogData.StepSize = JogViewModel.JogStep.Step1;
+                            break;
+                        case 100:
+                            JogData.StepSize = JogViewModel.JogStep.Step2;
+                            break;
+                        case 1000:
+                            JogData.StepSize = JogViewModel.JogStep.Step3;
+                            break;
+                    }
+                    break;
+            }
         }
 
         private void distance_Click(object sender, RoutedEventArgs e)
@@ -124,7 +156,7 @@ namespace CNC.Controls
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            string cmd = ((string)(sender as Button).Tag) == "stop" ? ((char)GrblConstants.CMD_JOG_CANCEL).ToString() : string.Format("$J =G91{0}{1}F{2}", ((string)(sender as Button).Content).Replace("+", ""), convert(JogData.Distance[distance]).ToInvariantString(), Math.Ceiling(convert(JogData.Feedrate[feedrate])).ToInvariantString());
+            string cmd = ((string)(sender as Button).Tag) == "stop" ? ((char)GrblConstants.CMD_JOG_CANCEL).ToString() : string.Format("$J =G91{0}{1}F{2}", ((string)(sender as Button).Content).Replace("+", ""), convert(JogData.Distance).ToInvariantString(), Math.Ceiling(convert(JogData.FeedRate)).ToInvariantString());
             (DataContext as GrblViewModel).ExecuteCommand(cmd);
         }
     }
@@ -151,49 +183,57 @@ namespace CNC.Controls
 
     public class JogViewModel : ViewModelBase
     {
+        public enum JogStep
+        {
+            Step0 = 0,
+            Step1,
+            Step2,
+            Step3
+        }
+        public enum JogFeed
+        {
+            Feed0 = 0,
+            Feed1,
+            Feed2,
+            Feed3
+        }
+
         // TODO: calculate sensible feedrates from grbl settings
         int[] feedrate_metric = new int[4] { 5, 100, 500, 1000 };
         double[] distance_metric = new double[4] { .01d, .1d, 1d, 10d };
         int[] feedrate_imperial = new int[4] { 5, 10, 50, 100 };
         double[] distance_imperial = new double[4] { .001d, .01d, .1d, 1d };
-
-        internal ArrayValues<double> Distance { get; } = new ArrayValues<double>();
-        internal ArrayValues<int> Feedrate { get; } = new ArrayValues<int>();
+        JogStep _jogStep = JogStep.Step1;
+        JogFeed _jogFeed = JogFeed.Feed1;
+        private double[] _distance = new double[4];
+        private int[] _feedRate = new int[4];
 
         public JogViewModel()
         {
             SetMetric(true);
-
-            Distance.PropertyChanged += Values_PropertyChanged;
-            Feedrate.PropertyChanged += Feedrate_PropertyChanged;
-        }
-
-        private void Feedrate_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            OnPropertyChanged(nameof(Feedrate) + e.PropertyName);
-        }
-
-        private void Values_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            OnPropertyChanged(nameof(Distance) + e.PropertyName);
         }
 
         public void SetMetric(bool on)
         {
-            for (int i = 0; i < Feedrate.Length; i++) {
-                Distance[i] = on ? distance_metric[i] : distance_imperial[i];
-                Feedrate[i] = on ? feedrate_metric[i] : feedrate_imperial[i];
+            for (int i = 0; i < _feedRate.Length; i++) {
+                _distance[i] = on ? distance_metric[i] : distance_imperial[i];
+                _feedRate[i] = on ? feedrate_metric[i] : feedrate_imperial[i];
             }
         }
 
-        public int Feedrate0 { get { return Feedrate[0]; } }
-        public int Feedrate1 { get { return Feedrate[1]; } }
-        public int Feedrate2 { get { return Feedrate[2]; } }
-        public int Feedrate3 { get { return Feedrate[3]; } }
+        public JogStep StepSize { get { return _jogStep; } set { _jogStep = value; OnPropertyChanged(); OnPropertyChanged(nameof(Distance)); } }
+        public double Distance { get { return _distance[(int)_jogStep]; } }
+        public JogFeed Feed { get { return _jogFeed; } set { _jogFeed = value; OnPropertyChanged(); OnPropertyChanged(nameof(FeedRate)); } }
+        public double FeedRate { get { return _feedRate[(int)_jogFeed]; } }
 
-        public double Distance0 { get { return Distance[0]; } }
-        public double Distance1 { get { return Distance[1]; } }
-        public double Distance2 { get { return Distance[2]; } }
-        public double Distance3 { get { return Distance[3]; } }
+        public int Feedrate0 { get { return _feedRate[0]; } }
+        public int Feedrate1 { get { return _feedRate[1]; } }
+        public int Feedrate2 { get { return _feedRate[2]; } }
+        public int Feedrate3 { get { return _feedRate[3]; } }
+
+        public double Distance0 { get { return _distance[0]; } }
+        public double Distance1 { get { return _distance[1]; } }
+        public double Distance2 { get { return _distance[2]; } }
+        public double Distance3 { get { return _distance[3]; } }
     }
 }

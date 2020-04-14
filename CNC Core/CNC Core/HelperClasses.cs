@@ -1,7 +1,7 @@
 ﻿/*
  * HelperClasses.cs - part of CNC Controls library for Grbl
  *
- * v0.15 / 2020-04-08 / Io Engineering (Terje Io)
+ * v0.15 / 2020-04-12 / Io Engineering (Terje Io)
  *
  */
 
@@ -17,6 +17,8 @@ using System.Diagnostics.Contracts;
 using CNC.GCode;
 using System.Threading;
 using System.Collections.Concurrent;
+using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace CNC.Core
 {
@@ -309,6 +311,19 @@ namespace CNC.Core
                 unsubscribe(add);
                 q.Dispose();
             }
+        }
+
+        // https://stackoverflow.com/questions/470256/process-waitforexit-asynchronously
+
+        public static Task WaitForExitAsync(this Process process, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var tcs = new TaskCompletionSource<object>();
+            process.EnableRaisingEvents = true;
+            process.Exited += (sender, args) => tcs.TrySetResult(null);
+            if (cancellationToken != default(CancellationToken))
+                cancellationToken.Register(() => { tcs.TrySetCanceled(); });
+
+            return tcs.Task;
         }
     }
 }

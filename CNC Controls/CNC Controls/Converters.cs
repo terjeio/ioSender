@@ -1,7 +1,7 @@
 /*
  * Converters.cs - part of CNC Controls library for Grbl
  *
- * v0.14 / 2020-03-28 / Io Engineering (Terje Io)
+ * v0.16 / 2020-04-13 / Io Engineering (Terje Io)
  *
  */
 
@@ -63,6 +63,7 @@ namespace CNC.Controls
         public static LogicalOrConverter LogicalOrConverter = new LogicalOrConverter();
         public static BoolToVisibleConverter BoolToVisibleConverter = new BoolToVisibleConverter();
         public static IsAxisVisibleConverter HasAxisConverter = new IsAxisVisibleConverter();
+        public static IsSignalVisibleConverter IsSignalVisibleConverter = new IsSignalVisibleConverter();
         public static EnumValueToBooleanConverter EnumValueToBooleanConverter = new EnumValueToBooleanConverter();
     }
 
@@ -294,6 +295,28 @@ namespace CNC.Controls
             throw new NotImplementedException();
         }
     }
+
+    public class IsSignalVisibleConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            bool enabled = false;
+
+            if (values.Length == 2 && values[0] is int && values[1] is int && (int)values[0] >= (int)values[1])
+                enabled = ((int)values[0] & (int)values[1]) != 0;
+
+            if (values.Length == 2 && values[0] is EnumFlags<Signals> && values[1] is Signals)
+                enabled = ((EnumFlags<Signals>)values[0]).Value.HasFlag((Signals)values[1]);
+
+            return enabled ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class EnumValueToBooleanConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

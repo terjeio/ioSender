@@ -40,7 +40,10 @@
                 <cnccontrols:FeedControl x:Name="feedControl" HorizontalAlignment="Left" Height="160" VerticalAlignment="Top" />
             </StackPanel>
             <cnccontrols:MDIControl x:Name="mdiControl" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="4,420,0,0"/>
-            <TextBox x:Name="txtStatus" Text="{Binding Message}" HorizontalAlignment="Center" Height="23" Margin="2,4" TextWrapping="Wrap" VerticalAlignment="Bottom" Width="860" IsEnabled="False" UndoLimit="0"/>
+            <cnccontrols:FileActionControl HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,430,10,0"/>
+            <TextBox Text="{Binding Message}" HorizontalAlignment="Left" Margin="05,0,0,4" TextWrapping="NoWrap" VerticalAlignment="Bottom" Width="750" IsEnabled="False" UndoLimit="0"/>
+            <Label Content="Jog step:" HorizontalAlignment="Right" Margin="0,0,45,4" VerticalAlignment="Bottom" Width="58"/>
+            <TextBox Text="{Binding JogStep}" HorizontalAlignment="Right" Margin="0,0,10,4" TextWrapping="Wrap" VerticalAlignment="Bottom" Width="35" IsEnabled="False" UndoLimit="0"/>
         </Grid>
     </StackPanel>
 </UserControl>

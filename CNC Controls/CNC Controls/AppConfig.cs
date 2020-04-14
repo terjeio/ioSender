@@ -1,7 +1,7 @@
 ﻿/*
  * AppConfig.cs - part of CNC Controls library for Grbl
  *
- * v0.13 / 2020-04-05 / Io Engineering (Terje Io)
+ * v0.16 / 2020-04-12 / Io Engineering (Terje Io)
  *
  */
 
@@ -131,15 +131,14 @@ namespace CNC.Controls
         public string PortParams { get; set; } = "COMn:115200,N,8,1";
         public int ResetDelay { get; set; } = 2000;
         public bool UseBuffering { get; set; } = false;
+        public string Editor { get; set; } = "notepad.exe";
 
         [XmlIgnore]
         public CommandIgnoreState[] CommandIgnoreStates { get { return (CommandIgnoreState[])Enum.GetValues(typeof(CommandIgnoreState)); } }
-
         public CommandIgnoreState IgnoreM6 { get; set; } = CommandIgnoreState.No;
         public CommandIgnoreState IgnoreM7 { get; set; } = CommandIgnoreState.No;
         public CommandIgnoreState IgnoreM8 { get; set; } = CommandIgnoreState.No;
         public ObservableCollection<CNC.GCode.Macro> Macros { get; set; } = new ObservableCollection<CNC.GCode.Macro>();
-
         public JogConfig Jog { get; set; } = new JogConfig();
         public LatheConfig Lathe { get; set; } = new LatheConfig();
         public CameraConfig Camera { get; set; } = new CameraConfig();

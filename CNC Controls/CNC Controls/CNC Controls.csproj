@@ -60,6 +60,9 @@
     <Compile Include="BasicConfigControl.xaml.cs">
       <DependentUpon>BasicConfigControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="FileActionControl.xaml.cs">
+      <DependentUpon>FileActionControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="GCodeListControl.xaml.cs">
       <DependentUpon>GCodeListControl.xaml</DependentUpon>
     </Compile>
@@ -171,6 +174,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="BasicConfigControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FileActionControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -352,6 +359,18 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Symbols_Stop_32xLG.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\close.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\reload.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\edit.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\open.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -1,7 +1,7 @@
 ﻿/*
  * Hpgl2GCode.cs - part of CNC Converters library
  *
- * v0.15 / 2020-04-08 / Io Engineering (Terje Io)
+ * v0.16 / 2020-04-11 / Io Engineering (Terje Io)
  *
  */
 
@@ -41,10 +41,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Windows;
 using System.Windows.Media.Media3D;
 using CNC.Controls;
 using CNC.Core;
-using System.Windows;
 
 namespace CNC.Converters
 {
@@ -102,8 +102,10 @@ namespace CNC.Converters
 
             this.job = job;
 
-            // TODO: set from grbl laser mode instead?
-            isCut = filename.EndsWith("Edge_Cuts.plt") || filename.EndsWith("Edge.Cuts.plt");
+            if (filename.EndsWith("Edge_Cuts.plt") || filename.EndsWith("Paste.plt"))
+                isCut = !filename.EndsWith("Paste.plt");
+            else
+                isCut = (GrblMode)GrblSettings.GetDouble(GrblSetting.Mode) != GrblMode.Laser;
 
             settings.EnableToolSelection = true;
             settings.Profile = "HPGL" + (isCut ? "" : "Laser");
@@ -114,183 +116,186 @@ namespace CNC.Converters
             FileInfo file = new FileInfo(filename);
             StreamReader sr = file.OpenText();
 
-            string s = sr.ReadLine();
+            using (new UIUtils.WaitCursor()) {
 
-            while (s != null)
-            {
-                foreach (string cmd in s.Split(';'))
+                string s = sr.ReadLine();
+
+                while (s != null)
                 {
-                    try
+                    foreach (string cmd in s.Split(';'))
                     {
-                        switch (cmd.Substring(0, 2))
+                        try
                         {
-                            case "PT":
-                                scaleFix = 0.025d;
-                                break;
+                            switch (cmd.Substring(0, 2))
+                            {
+                                case "PT":
+                                    scaleFix = 0.025d;
+                                    break;
 
-                            case "PA":
-                                {
-                                    var args = cmd.Substring(2).Split(',');
-                                    if (args.Length > 1)
+                                case "PA":
+                                    {
+                                        var args = cmd.Substring(2).Split(',');
+                                        if (args.Length > 1)
+                                        {
+                                            HPGLCommand hpgl = new HPGLCommand();
+                                            hpgl.Command = cmd.Substring(0, 2);
+                                            hpgl.Pos.X = dbl.Parse(args[0]) * scaleFix;
+                                            hpgl.Pos.Y = dbl.Parse(args[1]) * scaleFix;
+                                            offset.X = Math.Min(offset.X, hpgl.Pos.X);
+                                            offset.Y = Math.Min(offset.Y, hpgl.Pos.Y);
+                                            commands.Add(hpgl);
+                                        }
+                                    }
+                                    break;
+
+                                case "AA":
+                                    {
+                                        var args = cmd.Substring(2).Split(',');
+                                        if (args.Length > 2)
+                                        {
+                                            HPGLCommand hpgl = new HPGLCommand();
+                                            hpgl.Command = cmd.Substring(0, 2);
+                                            hpgl.Pos.X = dbl.Parse(args[0]) * scaleFix;
+                                            hpgl.Pos.Y = dbl.Parse(args[1]) * scaleFix;
+                                            hpgl.R = dbl.Parse(args[2]) * scaleFix;
+                                            offset.X = Math.Min(offset.X, hpgl.Pos.X);
+                                            offset.Y = Math.Min(offset.Y, hpgl.Pos.Y);
+                                            commands.Add(hpgl);
+                                        }
+                                    }
+                                    break;
+
+                                default:
                                     {
                                         HPGLCommand hpgl = new HPGLCommand();
                                         hpgl.Command = cmd.Substring(0, 2);
-                                        hpgl.Pos.X = dbl.Parse(args[0]) * scaleFix;
-                                        hpgl.Pos.Y = dbl.Parse(args[1]) * scaleFix;
-                                        offset.X = Math.Min(offset.X, hpgl.Pos.X);
-                                        offset.Y = Math.Min(offset.Y, hpgl.Pos.Y);
                                         commands.Add(hpgl);
                                     }
+                                    break;
+                            }
+                        }
+                        catch
+                        {
+                        }
+                    }
+
+                    s = sr.ReadLine();
+                }
+
+                sr.Close();
+
+                for (int i = 0; i < commands.Count; i++)
+                {
+                    var cmd = commands[i];
+
+                    try {
+                        switch (cmd.Command)
+                        {
+                            case "IN":
+                                pos.X = cmd.Pos.X = 0d;
+                                pos.Y = cmd.Pos.Y = 0d;
+                                isDown = cmd.isDown = false;
+                                break;
+
+                            case "PU":
+                                if (isDown)
+                                {
+                                    cmd.Pos.X = pos.X;
+                                    cmd.Pos.Y = pos.Y;
+                                    isDown = false;
+                                }
+                                break;
+
+                            case "PD":
+                                if (!isDown)
+                                {
+                                    cmd.Pos.X = pos.X;
+                                    cmd.Pos.Y = pos.Y;
+                                    isDown = true;
+                                }
+                                break;
+
+                            case "PA":
+                                cmd.Pos.X -= offset.X;
+                                cmd.Pos.Y -= offset.Y;
+                                if ((cmd.isDown = isDown))
+                                {
+                                    var v = new Vector();
+                                    v.IsArc = false;
+                                    v.Start = pos;
+                                    v.End.X = cmd.Pos.X;
+                                    v.End.Y = cmd.Pos.Y;
+                                    vectors.Add(v);
                                 }
                                 break;
 
                             case "AA":
                                 {
-                                    var args = cmd.Substring(2).Split(',');
-                                    if (args.Length > 2)
+                                    cmd.Pos.X = cmd.Pos.X - offset.X;
+                                    cmd.Pos.Y = cmd.Pos.Y - offset.X;
+                                    if ((cmd.isDown = isDown))
                                     {
-                                        HPGLCommand hpgl = new HPGLCommand();
-                                        hpgl.Command = cmd.Substring(0, 2);
-                                        hpgl.Pos.X = dbl.Parse(args[0]) * scaleFix;
-                                        hpgl.Pos.Y = dbl.Parse(args[1]) * scaleFix;
-                                        hpgl.R = dbl.Parse(args[2]) * scaleFix;
-                                        offset.X = Math.Min(offset.X, hpgl.Pos.X);
-                                        offset.Y = Math.Min(offset.Y, hpgl.Pos.Y);
-                                        commands.Add(hpgl);
+                                        var v = new Vector();
+                                        v.IsArc = true;
+                                        v.Start = pos;
+                                        v.End.X = cmd.Pos.X + (cmd.Pos.X - pos.X);
+                                        v.End.Y = cmd.Pos.Y + (cmd.Pos.Y - pos.Y);
+                                        vectors.Add(v);
                                     }
                                 }
                                 break;
-
-                            default:
-                                {
-                                    HPGLCommand hpgl = new HPGLCommand();
-                                    hpgl.Command = cmd.Substring(0, 2);
-                                    commands.Add(hpgl);
-                                }
-                                break;
                         }
+                        pos.X = cmd.Pos.X;
+                        pos.Y = cmd.Pos.Y;
                     }
                     catch
                     {
                     }
-                } 
-
-                s = sr.ReadLine();
-            }
-
-            sr.Close();
-
-            for(int i = 0; i < commands.Count; i++)
-            {
-                var cmd = commands[i];
-
-                try {
-                    switch (cmd.Command)
-                    {
-                        case "IN":
-                            pos.X = cmd.Pos.X = 0d;
-                            pos.Y = cmd.Pos.Y = 0d;
-                            isDown = cmd.isDown = false;
-                            break;
-
-                        case "PU":
-                            if (isDown)
-                            {
-                                cmd.Pos.X = pos.X;
-                                cmd.Pos.Y = pos.Y;
-                                isDown = false;
-                            }
-                            break;
-
-                        case "PD":
-                            if (!isDown)
-                            {
-                                cmd.Pos.X = pos.X;
-                                cmd.Pos.Y = pos.Y;
-                                isDown = true;
-                            }
-                            break;
-
-                        case "PA":
-                            cmd.Pos.X -= offset.X;
-                            cmd.Pos.Y -= offset.Y;
-                            if ((cmd.isDown = isDown))
-                            {
-                                var v = new Vector();
-                                v.IsArc = false;
-                                v.Start = pos;
-                                v.End.X = cmd.Pos.X;
-                                v.End.Y = cmd.Pos.Y;
-                                vectors.Add(v);
-                            }
-                            break;
-
-                        case "AA":
-                            {
-                                cmd.Pos.X = cmd.Pos.X - offset.X;
-                                cmd.Pos.Y = cmd.Pos.Y - offset.X;
-                                if ((cmd.isDown = isDown))
-                                {
-                                    var v = new Vector();
-                                    v.IsArc = true;
-                                    v.Start = pos;
-                                    v.End.X = cmd.Pos.X + (cmd.Pos.X - pos.X);
-                                    v.End.Y = cmd.Pos.Y + (cmd.Pos.Y - pos.Y);
-                                    vectors.Add(v);
-                                }
-                            }
-                            break;
-                    }
-                    pos.X = cmd.Pos.X;
-                    pos.Y = cmd.Pos.Y;
                 }
-                catch
+
                 {
+                    Polygon polygon;
+
+                    while ((polygon = Polygon.findPolygon(vectors, tolerance)) != null)
+                        polygons.Add(polygon);
                 }
+
+                job.AddBlock(filename, CNC.Core.Action.New);
+                job.AddBlock("(Translated by HPGL to GCode converter)");
+                job.AddBlock(string.Format("(Tool diameter: {0} mm)", settings.ToolDiameter.ToInvariantString()));
+                job.AddBlock("G90G91.1G17G21G50");
+
+                if (settings.ScaleX != 1d || settings.ScaleY != 1d)
+                    job.AddBlock(string.Format("G51X{0}Y{1}", settings.ScaleX.ToInvariantString(), settings.ScaleY.ToInvariantString()));
+
+                job.AddBlock("G0Z" + settings.ZRapids.ToInvariantString());
+                job.AddBlock("X0Y0");
+
+                if (isCut)
+                {
+                    job.AddBlock(string.Format("M3S{0}", settings.RPM.ToInvariantString()));
+                    job.AddBlock("G4P2");
+                }
+                else
+                {
+                    job.AddBlock("M122P1");     // Enable laser
+                    job.AddBlock("M123P800");   // PPI
+                    job.AddBlock("M124P1500");  // Pulse width
+                    job.AddBlock("M125Q1P2");   // Enable tube coolant
+                    job.AddBlock("M4S90");
+                    job.AddBlock("M7");
+                    job.AddBlock("M8");
+                }
+
+                foreach (var polygon in polygons)
+                {
+                    polygon.Offset((isCut ? -settings.ToolDiameter : settings.ToolDiameter) / 2d);
+                    cutPolygon(polygon);
+                }
+
+                job.AddBlock("G0X0Y0Z" + settings.ZHome.ToInvariantString());
+                job.AddBlock("M30", CNC.Core.Action.End);
             }
-
-            {
-                Polygon polygon;
-
-                while ((polygon = Polygon.findPolygon(vectors, tolerance)) != null)
-                    polygons.Add(polygon);
-            }
-
-            job.AddBlock(filename, CNC.Core.Action.New);
-            job.AddBlock("(Translated by HPGL to GCode converter)");
-            job.AddBlock(string.Format("(Tool diameter: {0} mm)", settings.ToolDiameter.ToInvariantString()));
-            job.AddBlock("G90G91.1G17G21G50");
-
-            if (settings.ScaleX != 1d || settings.ScaleY != 1d)
-                job.AddBlock(string.Format("G51X{0}Y{1}", settings.ScaleX.ToInvariantString(), settings.ScaleY.ToInvariantString()));
-
-            job.AddBlock("G0Z" + settings.ZRapids.ToInvariantString());
-            job.AddBlock("X0Y0");
-
-            if(isCut)
-            {
-                job.AddBlock(string.Format("M3S{0}", settings.RPM.ToInvariantString()));
-                job.AddBlock("G4P2");
-            }
-            else
-            {
-                job.AddBlock("M122P1");     // Enable laser
-                job.AddBlock("M123P800");   // PPI
-                job.AddBlock("M124P1500");  // Pulse width
-                job.AddBlock("M125Q1P2");   // Enable tube coolant
-                job.AddBlock("M4S90");
-                job.AddBlock("M7");
-                job.AddBlock("M8");
-            }
-
-            foreach (var polygon in polygons)
-            {
-                polygon.Offset((isCut ? -settings.ToolDiameter : settings.ToolDiameter) / 2d);
-                cutPolygon(polygon);
-            }
-
-            job.AddBlock("G0X0Y0Z" + settings.ZHome.ToInvariantString());
-            job.AddBlock("M30", CNC.Core.Action.End);
 
             return ok;
         }

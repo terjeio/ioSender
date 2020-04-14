@@ -1,7 +1,7 @@
 /*
  * MainWindow.xaml.cs - part of Grbl Code Sender
  *
- * v0.15 / 2020-04-10 / Io Engineering (Terje Io)
+ * v0.16 / 2020-04-13 / Io Engineering (Terje Io)
  *
  */
 
@@ -222,7 +222,7 @@ namespace GCode_Sender
 
         private void fileCloseMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            closeFile();
+            GCode.File.Close();
         }
 
         private void TabMode_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -245,14 +245,14 @@ namespace GCode_Sender
 
         private void SDCardView_FileSelected(string filename)
         {
-            closeFile();
+            GCode.File.Close();
             ((GrblViewModel)ui.DataContext).FileName = filename;
             Dispatcher.BeginInvoke((System.Action)(() => ui.tabMode.SelectedItem = getTab(ViewType.GRBL)));
         }
 
         #endregion
 
-        private static void closeFile ()
+        public static void CloseFile ()
         {
             ICNCView view, grbl = getView(getTab(ViewType.GRBL));
 

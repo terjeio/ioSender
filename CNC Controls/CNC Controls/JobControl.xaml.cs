@@ -1,7 +1,7 @@
 /*
  * JobControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.14 / 2020-03-21 / Io Engineering (Terje Io)
+ * v0.16 / 2020-04-14 / Io Engineering (Terje Io)
  *
  */
 
@@ -176,65 +176,62 @@ namespace CNC.Controls
         private void OnDataContextPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (sender is GrblViewModel) switch (e.PropertyName)
-                {
-                    case nameof(GrblViewModel.GrblState):
-                        GrblStateChanged(((GrblViewModel)sender).GrblState);
-                        break;
+            {
+                case nameof(GrblViewModel.GrblState):
+                    GrblStateChanged(((GrblViewModel)sender).GrblState);
+                    break;
 
-                    case nameof(GrblViewModel.MDI):
-                        SendCommand(((GrblViewModel)sender).MDI);
-                        break;
+                case nameof(GrblViewModel.MDI):
+                    SendCommand(((GrblViewModel)sender).MDI);
+                    break;
 
-                    case nameof(GrblViewModel.IsMPGActive):
-                        grblState.MPG = ((GrblViewModel)sender).IsMPGActive == true;
-                        poller.SetState(grblState.MPG ? 0 : model.PollInterval);
-                        streamingHandler.Call(grblState.MPG ? StreamingState.Disabled : StreamingState.Idle, false);
-                        break;
+                case nameof(GrblViewModel.IsMPGActive):
+                    grblState.MPG = ((GrblViewModel)sender).IsMPGActive == true;
+                    poller.SetState(grblState.MPG ? 0 : model.PollInterval);
+                    streamingHandler.Call(grblState.MPG ? StreamingState.Disabled : StreamingState.Idle, false);
+                    break;
 
-                    case nameof(GrblViewModel.Signals):
+                case nameof(GrblViewModel.Signals):
+                    {
+                        var signals = ((GrblViewModel)sender).Signals;
+                        if (JobPending && signals[Signals.CycleStart] && !signals[Signals.Hold] && holdSignal)
+                            CycleStart();
+                        holdSignal = signals[Signals.Hold];
+                    }
+                    break;
+
+                case nameof(GrblViewModel.ProgramEnd):
+                    if (!GCode.File.IsLoaded)
+                        streamingHandler.Call(job.IsSDFile ? StreamingState.JobFinished : StreamingState.NoFile, job.IsSDFile);
+                    else if(JobTimer.IsRunning && !job.Complete)
+                        streamingHandler.Call(StreamingState.JobFinished, true);
+                    break;
+
+                case nameof(GrblViewModel.FileName):
+                    {
+                        if(string.IsNullOrEmpty(((GrblViewModel)sender).FileName))
+                            job.NextRow = null;
+                        else
                         {
-                            var signals = ((GrblViewModel)sender).Signals;
-                            if (JobPending && signals[Signals.CycleStart] && !signals[Signals.Hold] && holdSignal)
-                                CycleStart();
-                            holdSignal = signals[Signals.Hold];
+                            job.IsSDFile = false;
+                            job.CurrLine = job.PendingLine = job.ACKPending = 0;
+                            job.PgmEndLine = GCode.File.Blocks - 1;
+                            streamingHandler.Call(GCode.File.IsLoaded ? StreamingState.Idle : StreamingState.NoFile, false);
                         }
                         break;
+                    }
 
-                    case nameof(GrblViewModel.ProgramEnd):
-                        if (!GCode.File.IsLoaded)
-                            streamingHandler.Call(job.IsSDFile ? StreamingState.JobFinished : StreamingState.NoFile, job.IsSDFile);
-                        else if(JobTimer.IsRunning && !job.Complete)
-                            streamingHandler.Call(StreamingState.JobFinished, true);
-                        break;
-
-                    case nameof(GrblViewModel.FileName):
-                        {
-                            if(((GrblViewModel)sender).FileName != "") {
-                                job.IsSDFile = false;
-                                job.CurrLine = job.PendingLine = job.ACKPending = 0;
-                                job.PgmEndLine = GCode.File.Blocks - 1;
-                                streamingHandler.Call(GCode.File.IsLoaded ? StreamingState.Idle : StreamingState.NoFile, false);
-                            }
-                            break;
-                        }
-
-                    case nameof(GrblViewModel.GrblReset):
-                        {
-                            JobTimer.Stop();
-                            streamingHandler.Call(StreamingState.Stop, true);
-                        }
-                        break;
-                }
+                case nameof(GrblViewModel.GrblReset):
+                    {
+                        JobTimer.Stop();
+                        streamingHandler.Call(StreamingState.Stop, true);
+                    }
+                    break;
+            }
         }
 
         public bool canJog { get { return grblState.State == GrblStates.Idle || grblState.State == GrblStates.Tool || grblState.State == GrblStates.Jog; } }
         public bool JobPending { get { return GCode.File.IsLoaded && !JobTimer.IsRunning; } }
-
-        public void CloseFile()
-        {
-            job.NextRow = null;
-            GCode.File.Close();
-        }
 
         public bool Activate(bool activate)
         {
@@ -296,7 +293,7 @@ namespace CNC.Controls
 
             if (!useFirmwareJog)
             {
-                jogDistance[(int)JogMode.Step] = config.Jog.StepDistance;
+                model.JogStep = jogDistance[(int)JogMode.Step] = config.Jog.StepDistance;
                 jogDistance[(int)JogMode.Slow] = config.Jog.SlowDistance;
                 jogDistance[(int)JogMode.Fast] = config.Jog.SlowDistance;
                 jogSpeed[(int)JogMode.Step] = config.Jog.StepFeedrate;
@@ -476,6 +473,23 @@ namespace CNC.Controls
                                                     jogDistance[(int)jogMode].ToInvariantString(),
                                                      jogSpeed[(int)jogMode].ToInvariantString()));
                 }
+            }
+            else if(e.IsUp) switch(e.Key)
+            {
+                case Key.NumPad4:
+                    {
+                        var step = model.JogStep / 10d;
+                        model.JogStep = model.IsMetric ? (step < 0.01d ? 10d : step) : (step < 0.001d ? 1d : step);
+                        jogDistance[(int)JogMode.Step] = model.JogStep;
+                    }
+                    break;
+                case Key.NumPad6:
+                    {
+                        var step = model.JogStep * 10d;
+                        model.JogStep = model.IsMetric ? (step > 10d ? 0.01d : step) : (step > 1d ? 0.001d : step);
+                        jogDistance[(int)JogMode.Step] = model.JogStep;
+                    }
+                    break;
             }
 
             return isJogging;
