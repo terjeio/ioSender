@@ -1,7 +1,7 @@
 /*
  * Converters.cs - part of CNC Controls library for Grbl
  *
- * v0.16 / 2020-04-13 / Io Engineering (Terje Io)
+ * v0.17 / 2020-04-15 / Io Engineering (Terje Io)
  *
  */
 
@@ -65,6 +65,7 @@ namespace CNC.Controls
         public static IsAxisVisibleConverter HasAxisConverter = new IsAxisVisibleConverter();
         public static IsSignalVisibleConverter IsSignalVisibleConverter = new IsSignalVisibleConverter();
         public static EnumValueToBooleanConverter EnumValueToBooleanConverter = new EnumValueToBooleanConverter();
+        public static StringAddToConverter StringAddToConverter = new StringAddToConverter();
     }
 
     // Adapted from: https://stackoverflow.com/questions/4353186/binding-observablecollection-to-a-textbox/8847910#8847910
@@ -309,6 +310,19 @@ namespace CNC.Controls
                 enabled = ((EnumFlags<Signals>)values[0]).Value.HasFlag((Signals)values[1]);
 
             return enabled ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class StringAddToConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            return values.Length == 2 ? values[0].ToString() + string.Format((string)parameter, values[1].ToString()) : string.Empty;
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, System.Globalization.CultureInfo culture)

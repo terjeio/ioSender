@@ -1,7 +1,7 @@
 /*
  * JogControl.xaml.cs - part of CNC Controls library
  *
- * v0.16 / 2020-04-14 / Io Engineering (Terje Io)
+ * v0.17 / 2020-04-17 / Io Engineering (Terje Io)
  *
  */
 
@@ -42,6 +42,7 @@ using System;
 using System.Windows;
 using System.Windows.Controls;
 using CNC.Core;
+using System.Windows.Input;
 
 namespace CNC.Controls
 {
@@ -61,7 +62,7 @@ namespace CNC.Controls
 
             JogData.PropertyChanged += JogData_PropertyChanged;
 
-            IsVisibleChanged += JogControl_IsVisibleChanged;
+            Focusable = true;
         }
 
         private void JogData_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -69,9 +70,12 @@ namespace CNC.Controls
             switch(e.PropertyName)
             {
                 case nameof(JogViewModel.Distance):
-                    silent = true;
-                    (DataContext as GrblViewModel).JogStep = JogData.Distance;
-                    silent = false;
+                    if (JogData.StepSize != JogViewModel.JogStep.Step3)
+                    {
+                        silent = true;
+                        (DataContext as GrblViewModel).JogStep = JogData.Distance;
+                        silent = false;
+                    }
                     break;
             }                
         }
@@ -80,8 +84,11 @@ namespace CNC.Controls
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
-            JogData.SetMetric((metricInput = (DataContext as GrblViewModel).IsMetric));
-            (DataContext as GrblViewModel).PropertyChanged += OnDataContextPropertyChanged;
+            if (DataContext != null)
+            {
+                JogData.SetMetric((metricInput = (DataContext as GrblViewModel).IsMetric));
+                (DataContext as GrblViewModel).PropertyChanged += OnDataContextPropertyChanged;
+            }
         }
 
         private void JogControl_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -90,15 +97,16 @@ namespace CNC.Controls
             {
                 GrblParserState.Get();
                 metricCommand = GrblParserState.IsMetric;
+                Focus();
             }
         }
 
         private void OnDataContextPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (sender is GrblViewModel && Visibility == Visibility.Visible) switch (e.PropertyName)
+            if (sender is GrblViewModel) switch (e.PropertyName)
             {
                 case nameof(GrblViewModel.StreamingState):
-                    if ((sender as GrblViewModel).IsJobRunning)
+                    if (Visibility == Visibility.Visible && (sender as GrblViewModel).IsJobRunning)
                         Visibility = Visibility.Hidden;
                     break;
 
@@ -152,12 +160,76 @@ namespace CNC.Controls
                 val /= 25.4d;
 
             return Math.Round(val, (DataContext as GrblViewModel).Precision);
+
+        }
+
+        protected override void OnPreviewKeyDown(KeyEventArgs e)
+        {
+            bool handled = Visibility == Visibility.Visible;
+
+            if (handled && !e.IsRepeat) switch (e.Key)
+            {
+                case Key.PageUp:
+                    if(!GrblInfo.LatheModeEnabled)
+                        JogCommand("Z+");
+                    break;
+
+                case Key.PageDown:
+                    if (!GrblInfo.LatheModeEnabled)
+                        JogCommand("Z-");
+                    break;
+
+                case Key.Left:
+                    JogCommand(GrblInfo.LatheModeEnabled ? "Z-" : "X-");
+                    break;
+
+                case Key.Up:
+                    JogCommand(GrblInfo.LatheModeEnabled ? "X-" : "Y+");
+                    break;
+
+                case Key.Right:
+                    JogCommand(GrblInfo.LatheModeEnabled ? "Z+" : "X+");
+                    break;
+
+                case Key.Down:
+                    JogCommand(GrblInfo.LatheModeEnabled ? "X+" : "Y-");
+                    break;
+
+                case Key.NumPad2:
+                    JogData.Feed = (JogData.Feed == JogViewModel.JogFeed.Feed0 ? JogViewModel.JogFeed.Feed0 : JogData.Feed - 1);
+                    break;
+
+               case Key.NumPad4:
+                    JogData.StepSize = (JogData.StepSize == JogViewModel.JogStep.Step0 ? JogViewModel.JogStep.Step0 : JogData.StepSize - 1);
+                    break;
+
+                case Key.NumPad6:
+                    JogData.StepSize = (JogData.StepSize == JogViewModel.JogStep.Step3 ? JogViewModel.JogStep.Step3 : JogData.StepSize + 1);
+                    break;
+
+                case Key.NumPad8:
+                    JogData.Feed = (JogData.Feed == JogViewModel.JogFeed.Feed3 ? JogViewModel.JogFeed.Feed3 : JogData.Feed + 1);
+                    break;
+
+                default:
+                    handled = false;
+                    break;
+            }
+
+            if ((e.Handled = handled))
+                Focus();
+        }
+
+        private void JogCommand(string cmd)
+        {
+            cmd = cmd == "stop" ? ((char)GrblConstants.CMD_JOG_CANCEL).ToString() : string.Format("$J=G91{0}{1}F{2}", cmd.Replace("+", ""), convert(JogData.Distance).ToInvariantString(), Math.Ceiling(convert(JogData.FeedRate)).ToInvariantString());
+            (DataContext as GrblViewModel).ExecuteCommand(cmd);
+
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            string cmd = ((string)(sender as Button).Tag) == "stop" ? ((char)GrblConstants.CMD_JOG_CANCEL).ToString() : string.Format("$J =G91{0}{1}F{2}", ((string)(sender as Button).Content).Replace("+", ""), convert(JogData.Distance).ToInvariantString(), Math.Ceiling(convert(JogData.FeedRate)).ToInvariantString());
-            (DataContext as GrblViewModel).ExecuteCommand(cmd);
+            JogCommand((string)(sender as Button).Tag == "stop" ? "stop" : (string)(sender as Button).Content);
         }
     }
 

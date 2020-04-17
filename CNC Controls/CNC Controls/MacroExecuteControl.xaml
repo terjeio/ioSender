@@ -5,7 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CNC.Controls"
              mc:Ignorable="d" 
-             d:DesignHeight="220" d:DesignWidth="300">
+             d:DesignHeight="220" d:DesignWidth="300"
+             Loaded="macroExecuteControl_Loaded">
     <UserControl.Resources>
         <Style x:Key="SmallXButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="Transparent" />

@@ -102,7 +102,13 @@
             </Grid>
             </Grid>
         </GroupBox>
-        <TextBox x:Name="txtPasses" HorizontalAlignment="Left" Height="120" Margin="10,260,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="350">
+        <Grid Margin="10,260,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <TextBox x:Name="txtPasses" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Stretch" Width="350">
             <TextBox.Text>
                 <MultiBinding Converter="{StaticResource GCodeConverter}">
                     <Binding Path="PassData" Mode="OneWay"/>
@@ -110,7 +116,7 @@
                 </MultiBinding>
             </TextBox.Text>
         </TextBox>
-        <TextBox x:Name="txtGCode" HorizontalAlignment="Left" Height="85" Margin="10,387,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="450">
+        <TextBox x:Name="txtGCode" HorizontalAlignment="Left" Height="85" Margin="0,5" TextWrapping="Wrap" VerticalAlignment="Top" Width="450" Grid.Row="1">
             <TextBox.Text>
                 <MultiBinding Converter="{StaticResource GCodeConverter}">
                     <Binding Path="gCode" Mode="OneWay"/>
@@ -118,9 +124,19 @@
                 </MultiBinding>
             </TextBox.Text>
         </TextBox>
-        <Button x:Name="btnCalculate" Content="Calculate" HorizontalAlignment="Left" Margin="10,480,0,0" VerticalAlignment="Top" Width="75" Click="btnCalculate_Click"/>
-        <GroupBox Header="Thread values" HorizontalAlignment="Left" Margin="364,115,0,0" VerticalAlignment="Top" Height="210" Width="200">
-            <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top">
+        <Button x:Name="btnCalculate" Content="Calculate" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Grid.Row="2" Click="btnCalculate_Click"/>
+        </Grid>
+        <Grid Margin="364,115,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <GroupBox Header="Thread values" HorizontalAlignment="Left" VerticalAlignment="Top" Width="200" Margin="0,0,5,0" Grid.RowSpan="2">
+            <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" >
                 <Label x:Name="lblDiameter" Content="{Binding Path=Thread.Side, Converter={StaticResource SideToStringConverter}}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" Height="25"/>
                 <StackPanel Orientation="Horizontal">
                     <Controls:NumericTextBox x:Name="txtOutsideDia" Format="{Binding Path=Format, Mode=OneWay}" Margin="10,0,0,0" TextWrapping="NoWrap" VerticalAlignment="Center" IsReadOnly="True">
@@ -175,11 +191,10 @@
                         </MultiBinding>
                     </Controls:NumericField.Value>
                 </Controls:NumericField>
-                <Controls:NumericField Name="cvTaper" Value="{Binding Path=Thread.Taper, Mode=OneWay}" Visibility="{Binding Path=Thread.TaperControlsVisibility}" Label="Taper:" Format="##0.##" Unit="deg" Margin="4,0,0,0" ColonAt="90" IsReadOnly="True"/>
-
-            </StackPanel>
+                    <Controls:NumericField Name="cvTaper" Value="{Binding Path=Thread.Taper, Mode=OneWay}" Visibility="{Binding Path=Thread.TaperControlsVisibility}" Label="Taper:" Format="##0.##" Unit="deg" Margin="4,0,0,0" ColonAt="90" IsReadOnly="True"/>
+                </StackPanel>
         </GroupBox>
-        <GroupBox x:Name="grpOptionsLinuxCNC" Header="Options: linuxCNC" HorizontalAlignment="Right" Margin="0,115,10,0" VerticalAlignment="Top" Height="105" Width="290">
+            <GroupBox x:Name="grpOptionsLinuxCNC" Header="Options: linuxCNC" Grid.Column="1" Margin="0,0,10,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="290">
             <Grid HorizontalAlignment="Left" Height="78" Margin="0,5,0,0" VerticalAlignment="Top" Width="280">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="35*"/>
@@ -202,7 +217,7 @@
                 <Controls:NumericComboBox x:Name="cbxDepthDegression" Format="#0.0" Width="55" ItemsSource="{Binding Path=Thread.DepthDegressions}" SelectedItem="{Binding Path=Thread.DepthDegression, Mode=TwoWay}" Grid.Column="1" HorizontalAlignment="Left" Margin="10,0,0,0" Grid.Row="2" VerticalAlignment="Top" Height="22"/>
             </Grid>
         </GroupBox>
-        <GroupBox Header="Cut" HorizontalAlignment="Right" Margin="0,220,10,0" VerticalAlignment="Top" Height="105" Width="290">
+        <GroupBox Header="Cut" Grid.Column="1" Grid.Row="2" HorizontalAlignment="Left" Margin="0,0,10,0" VerticalAlignment="Top" Width="290">
             <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top">
                 <Controls:NumericField Name="cvCutDepth" Style="{StaticResource CNCValue}" Label="Cut depth:" ColonAt="90" IsReadOnly="True">
                     <Controls:NumericField.Value>
@@ -213,9 +228,10 @@
                     </Controls:NumericField.Value>
                 </Controls:NumericField>
                 <Controls:NumericField Name="cvSpindleRPM" Label="Spindle:" Format="####0" Value="{Binding Path=RPM, Mode=TwoWay}" Unit="RPM" ColonAt="90" Style="{StaticResource ErrorStyle}"/>
-                <local:SpringPassControl x:Name="springPasses" IsPassesEnabled="{Binding Path=IsSpringPassesEnabled, Mode=TwoWay}" Value="{Binding Path=SpringPasses, Mode=TwoWay}" Margin="37,0,0,0"/>
+                <local:SpringPassControl x:Name="springPasses" IsPassesEnabled="{Binding Path=IsSpringPassesEnabled, Mode=TwoWay}" Value="{Binding Path=SpringPasses, Mode=TwoWay}" Margin="37,0,0,2"/>
             </StackPanel>
         </GroupBox>
+        </Grid>
         <GroupBox Header="Tool" HorizontalAlignment="Left" Margin="540,360,0,0" VerticalAlignment="Top" Height="140" Width="325">
             <Grid HorizontalAlignment="Left" Height="110" Margin="0,5,0,0" VerticalAlignment="Top" Width="315">
                 <Grid.ColumnDefinitions>

@@ -10,40 +10,39 @@
              d:DesignHeight="500" d:DesignWidth="875"
              Focusable="True"
              Loaded="JobView_Load"
-             IsVisibleChanged="JobView_IsVisibleChanged">
-    <StackPanel Background="Transparent" MouseDown="outside_MouseDown" Width="870">
-        <Grid Height="500">
-            <DockPanel Margin="4,5,0,0" Width="220" Height="415" HorizontalAlignment="Left" VerticalAlignment="Top">
-                <StackPanel Height="Auto" HorizontalAlignment="Left" VerticalAlignment="Top" DockPanel.Dock="Top">
-                    <cnccontrols:DROControl x:Name="DRO" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                    <cnccontrols:LimitsControl x:Name="limitsControl" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                    <cnccontrols:SignalsControl x:Name="signalsControl" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                </StackPanel>
-                <cnccontrols:StatusControl x:Name="statusControl" VerticalAlignment="Bottom" DockPanel.Dock="Bottom"/>
-            </DockPanel>
-            <TabControl x:Name="tabGCode" TabStripPlacement="Bottom" Margin="224,10,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" >
+             IsVisibleChanged="JobView_IsVisibleChanged"
+             SizeChanged="JobView_SizeChanged">
+    <DockPanel Background="Transparent" MouseDown="outside_MouseDown" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+        <cnccontrols:MDIControl x:Name="mdiControl" DockPanel.Dock="Bottom" HorizontalAlignment="Left"/>
+        <DockPanel x:Name="dp" DockPanel.Dock="Left" Margin="5,5,5,0" Width="220" HorizontalAlignment="Left" VerticalAlignment="Stretch">
+            <StackPanel x:Name="t1" Height="Auto" HorizontalAlignment="Left" VerticalAlignment="Top" DockPanel.Dock="Top">
+                <cnccontrols:DROControl x:Name="DRO" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <cnccontrols:LimitsControl x:Name="limitsControl" HorizontalAlignment="Left" VerticalAlignment="Top" Visibility="Collapsed"/>
+            </StackPanel>
+            <StackPanel x:Name="t2" Height="Auto" HorizontalAlignment="Left" VerticalAlignment="Bottom" DockPanel.Dock="Bottom">
+                <cnccontrols:SignalsControl x:Name="signalsControl" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <cnccontrols:StatusControl x:Name="statusControl" Margin="0,5,0,0" VerticalAlignment="Bottom"/>
+            </StackPanel>
+        </DockPanel>
+        <StackPanel DockPanel.Dock="Right" Margin="5,5,5,0" Width="216" VerticalAlignment="Stretch">
+            <cnccontrols:WorkParametersControl x:Name="workParametersControl" HorizontalAlignment="Left" VerticalAlignment="Top" IsToolChanging="{Binding IsToolChanging}"/>
+            <cnccontrols:CoolantControl HorizontalAlignment="Left" VerticalAlignment="Top" x:Name="coolantControl"/>
+            <cnccontrols:SpindleControl x:Name="spindleControl" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            <cnccontrols:FeedControl x:Name="feedControl" HorizontalAlignment="Left" VerticalAlignment="Top" />
+        </StackPanel>
+        <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,5">
+            <cnccontrols:JobControl x:Name="GCodeSender" DockPanel.Dock="Bottom"/>
+            <TabControl x:Name="tabGCode" TabStripPlacement="Bottom" DockPanel.Dock="Top" >
                 <TabItem Header="Program">
-                    <cnccontrols:GCodeListControl HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                    <cnccontrols:GCodeListControl/>
                 </TabItem>
                 <TabItem x:Name="tab3D" Header="3D View">
-                    <cncviewer:RenderControl x:Name="gcodeRenderer" HorizontalAlignment="Left" Width="400" Height="332" VerticalAlignment="Top"/>
+                    <cncviewer:RenderControl x:Name="gcodeRenderer"/>
                 </TabItem>
                 <TabItem x:Name="tabConsole" Header="Console">
-                    <cnccontrols:ConsoleControl HorizontalAlignment="Left" Width="400" Height="332" VerticalAlignment="Top"/>
+                    <cnccontrols:ConsoleControl/>
                 </TabItem>
             </TabControl>
-            <cnccontrols:JobControl x:Name="GCodeSender" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="224,385,0,0"/>
-            <StackPanel Margin="642,5,0,0" Width="216" Height="Auto">
-                <cnccontrols:WorkParametersControl x:Name="workParametersControl" HorizontalAlignment="Left" Height="60" VerticalAlignment="Top" IsToolChanging="{Binding IsToolChanging}"/>
-                <cnccontrols:CoolantControl HorizontalAlignment="Left" Height="70" VerticalAlignment="Top" x:Name="coolantControl"/>
-                <cnccontrols:SpindleControl x:Name="spindleControl" HorizontalAlignment="Left" Height="130" VerticalAlignment="Top"/>
-                <cnccontrols:FeedControl x:Name="feedControl" HorizontalAlignment="Left" Height="160" VerticalAlignment="Top" />
-            </StackPanel>
-            <cnccontrols:MDIControl x:Name="mdiControl" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="4,420,0,0"/>
-            <cnccontrols:FileActionControl HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,430,10,0"/>
-            <TextBox Text="{Binding Message}" HorizontalAlignment="Left" Margin="05,0,0,4" TextWrapping="NoWrap" VerticalAlignment="Bottom" Width="750" IsEnabled="False" UndoLimit="0"/>
-            <Label Content="Jog step:" HorizontalAlignment="Right" Margin="0,0,45,4" VerticalAlignment="Bottom" Width="58"/>
-            <TextBox Text="{Binding JogStep}" HorizontalAlignment="Right" Margin="0,0,10,4" TextWrapping="Wrap" VerticalAlignment="Bottom" Width="35" IsEnabled="False" UndoLimit="0"/>
-        </Grid>
-    </StackPanel>
+        </DockPanel>
+    </DockPanel>
 </UserControl>

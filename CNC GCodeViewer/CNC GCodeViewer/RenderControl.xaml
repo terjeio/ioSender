@@ -6,8 +6,8 @@
              xmlns:local="clr-namespace:CNC.Controls.Viewer"
              mc:Ignorable="d"
              d:DesignHeight="335" d:DesignWidth="400">
-    <Grid>
-        <local:Renderer x:Name="gcodeView" Width="400" Height="335" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
-        <Button x:Name="button" Content="Reset view" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="75" Click="button_Click"/>
-    </Grid>
+    <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <Button x:Name="button" DockPanel.Dock="Bottom" Content="Reset view" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="75" Click="button_Click"/>
+        <local:Renderer DockPanel.Dock="Top" x:Name="gcodeView"/>
+    </DockPanel>
 </UserControl>

@@ -1,7 +1,7 @@
 ﻿/*
  * AppLaunch.cs - part of CNC Library
  *
- * v0.03 / 2020-01-29 / Io Engineering (Terje Io)
+ * v0.17 / 2020-04-14 / Io Engineering (Terje Io)
  *
  */
 
@@ -77,7 +77,7 @@ namespace CNC.AppLaunch
                                 ProcessStartInfo startInfo = new ProcessStartInfo()
                                 {
                                     FileName = cmd,
-                                    Arguments = filename
+                                    Arguments = '"' + filename + '"'
                                 };
                                 Process.Start(startInfo);
                             }

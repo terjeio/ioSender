@@ -1,7 +1,7 @@
 ﻿/*
  * AppConfig.cs - part of CNC Controls library for Grbl
  *
- * v0.16 / 2020-04-12 / Io Engineering (Terje Io)
+ * v0.17 / 2020-04-15 / Io Engineering (Terje Io)
  *
  */
 
@@ -147,19 +147,31 @@ namespace CNC.Controls
 
     public class AppConfig
     {
-        public Config Config = null;
-
         private string configfile = null;
         private bool? MPGactive = null;
 
         public string FileName { get; private set; }
 
+        private static readonly Lazy<AppConfig> settings = new Lazy<AppConfig>(() => new AppConfig());
+
+        private AppConfig()
+        { }
+
+        public static AppConfig Settings { get { return settings.Value; } }
+
+        public Config Base { get; private set; } = null;
+        public ObservableCollection<CNC.GCode.Macro> Macros { get { return Base == null ? null : Base.Macros; } }
+        public JogConfig Jog { get { return Base == null ? null : Base.Jog; } }
+        public CameraConfig Camera { get { return Base == null ? null : Base.Camera; } }
+        public LatheConfig Lathe { get { return Base == null ? null : Base.Lathe; } }
+        public GCodeViewerConfig GCodeViewer { get { return Base == null ? null : Base.GCodeViewer; } }
+
         public bool Save(string filename)
         {
             bool ok = false;
 
-            if (Config == null)
-                Config = new Config();
+            if (Base == null)
+                Base = new Config();
 
             XmlSerializer xs = new XmlSerializer(typeof(Config));
 
@@ -168,7 +180,7 @@ namespace CNC.Controls
                 FileStream fsout = new FileStream(filename, FileMode.Create, FileAccess.Write, FileShare.None);
                 using (fsout)
                 {
-                    xs.Serialize(fsout, Config);
+                    xs.Serialize(fsout, Base);
                     configfile = filename;
                     ok = true;
                 }
@@ -193,15 +205,15 @@ namespace CNC.Controls
             try
             {
                 StreamReader reader = new StreamReader(filename);
-                Config = (Config)xs.Deserialize(reader);
+                Base = (Config)xs.Deserialize(reader);
                 reader.Close();
                 configfile = filename;
 
                 // temp hack...
-                foreach (var macro in Config.Macros)
+                foreach (var macro in Base.Macros)
                 {
                     if (macro.IsSession)
-                        Config.Macros.Remove(macro);
+                        Base.Macros.Remove(macro);
                 }
 
                 ok = true;
@@ -215,11 +227,11 @@ namespace CNC.Controls
 
         private void setPort(string port)
         {
-            Config.PortParams = port;
-            if (!(Config.PortParams.ToLower().StartsWith("ws://") || char.IsDigit(Config.PortParams[0])) && Config.PortParams.IndexOf(':') == -1)
+            Base.PortParams = port;
+            if (!(Base.PortParams.ToLower().StartsWith("ws://") || char.IsDigit(Base.PortParams[0])) && Base.PortParams.IndexOf(':') == -1)
             {
-                string[] values = Config.PortParams.Split('!');
-                Config.PortParams = values[0] + ":115200,N,8,1" + (values.Length > 1 ? ",," + values[1] : "");
+                string[] values = Base.PortParams.Split('!');
+                Base.PortParams = values[0] + ":115200,N,8,1" + (values.Length > 1 ? ",," + values[1] : "");
             }
         }
 
@@ -284,17 +296,17 @@ namespace CNC.Controls
                 if (!string.IsNullOrEmpty(port))
                     setPort(port);
 #if USEWEBSOCKET
-                if (Config.PortParams.ToLower().StartsWith("ws://"))
-                    new WebsocketStream(Config.PortParams, dispatcher);
+                if (Base.PortParams.ToLower().StartsWith("ws://"))
+                    new WebsocketStream(Base.PortParams, dispatcher);
                 else
 #endif
-                if (char.IsDigit(Config.PortParams[0])) // We have an IP address
-                    new TelnetStream(Config.PortParams, dispatcher);
+                if (char.IsDigit(Base.PortParams[0])) // We have an IP address
+                    new TelnetStream(Base.PortParams, dispatcher);
                 else
 #if USEELTIMA
                     new EltimaStream(Config.PortParams, Config.ResetDelay, dispatcher);
 #else
-                    new SerialStream(Config.PortParams, Config.ResetDelay, dispatcher);
+                    new SerialStream(Base.PortParams, Base.ResetDelay, dispatcher);
 #endif
             }
 
@@ -302,7 +314,7 @@ namespace CNC.Controls
             {
                 PortDialog portsel = new PortDialog();
 
-                port = portsel.ShowDialog(Config.PortParams);
+                port = portsel.ShowDialog(Base.PortParams);
                 if (string.IsNullOrEmpty(port))
                     status = 2;
 
@@ -311,16 +323,16 @@ namespace CNC.Controls
                     setPort(port);
 #if USEWEBSOCKET
                     if (port.ToLower().StartsWith("ws://"))
-                        new WebsocketStream(Config.PortParams, dispatcher);
+                        new WebsocketStream(Base.PortParams, dispatcher);
                     else
 #endif
                     if (char.IsDigit(port[0])) // We have an IP address
-                        new TelnetStream(Config.PortParams, dispatcher);
+                        new TelnetStream(Base.PortParams, dispatcher);
                     else
 #if USEELTIMA
                         new EltimaStream(Config.PortParams, Config.ResetDelay, dispatcher);
 #else
-                        new SerialStream(Config.PortParams, Config.ResetDelay, dispatcher);
+                        new SerialStream(Base.PortParams, Base.ResetDelay, dispatcher);
 #endif
                     Save(CNC.Core.Resources.IniFile);
                 }
@@ -360,11 +372,11 @@ namespace CNC.Controls
                 }
 
                 model.IsReady = true;
-                model.PollInterval = Config.PollInterval;
+                model.PollInterval = Base.PollInterval;
             }
             else if (status != 2)
             {
-                MessageBox.Show(string.Format("Unable to open connection ({0})", Config.PortParams), appname, MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(string.Format("Unable to open connection ({0})", Base.PortParams), appname, MessageBoxButton.OK, MessageBoxImage.Error);
                 status = 2;
             }
 

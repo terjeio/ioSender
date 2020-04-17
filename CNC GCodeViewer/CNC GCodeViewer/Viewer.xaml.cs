@@ -1,7 +1,7 @@
 /*
  * Viewer.xaml.cs - part of CNC Controls library
  *
- * v0.13 / 2019-03-12 / Io Engineering (Terje Io)
+ * v0.17 / 2020-04-15 / Io Engineering (Terje Io)
  *
  */
 
@@ -119,12 +119,12 @@ public partial class Viewer : UserControl, ICNCView
         {
             model.ConfigControls.Add(new ConfigControl());
 
-            ArcResolution = profile.Config.GCodeViewer.ArcResolution;
-            MinDistance = profile.Config.GCodeViewer.MinDistance;
-            ShowGrid = profile.Config.GCodeViewer.ShowGrid;
-            ShowAxes = profile.Config.GCodeViewer.ShowAxes;
-            ShowBoundingBox = profile.Config.GCodeViewer.ShowBoundingBox;
-            ShowViewCube = profile.Config.GCodeViewer.ShowViewCube;
+            ArcResolution = AppConfig.Settings.GCodeViewer.ArcResolution;
+            MinDistance = AppConfig.Settings.GCodeViewer.MinDistance;
+            ShowGrid = AppConfig.Settings.GCodeViewer.ShowGrid;
+            ShowAxes = AppConfig.Settings.GCodeViewer.ShowAxes;
+            ShowBoundingBox = AppConfig.Settings.GCodeViewer.ShowBoundingBox;
+            ShowViewCube = AppConfig.Settings.GCodeViewer.ShowViewCube;
         }
 
         public void Open()

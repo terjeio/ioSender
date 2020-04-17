@@ -1,7 +1,7 @@
 /*
  * MainWindow.xaml.cs - part of Grbl Code Sender
  *
- * v0.16 / 2020-04-13 / Io Engineering (Terje Io)
+ * v0.17 / 2020-04-17 / Io Engineering (Terje Io)
  *
  */
 
@@ -44,6 +44,7 @@ using CNC.Core;
 using CNC.Controls;
 using CNC.Converters;
 using System.Windows.Threading;
+using System.Collections.ObjectModel;
 #if ADD_CAMERA
 using CNC.Controls.Camera;
 #endif
@@ -68,16 +69,13 @@ namespace GCode_Sender
             GCodeViewer = viewer;
 
             int res;
-            if ((res = UIViewModel.Profile.SetupAndOpen(Title, (GrblViewModel)DataContext, App.Current.Dispatcher)) != 0)
+            if ((res = AppConfig.Settings.SetupAndOpen(Title, (GrblViewModel)DataContext, App.Current.Dispatcher)) != 0)
                 Environment.Exit(res);
-
-            macroControl.Macros = UIViewModel.Profile.Config.Macros;
-            macroControl.MacrosChanged += MacroControl_MacrosChanged;
 
             BaseWindowTitle = Title;
 
             CNC.Core.Grbl.GrblViewModel = (GrblViewModel)DataContext;
-            GrblInfo.LatheModeEnabled = UIViewModel.Profile.Config.Lathe.IsEnabled;
+            GrblInfo.LatheModeEnabled = AppConfig.Settings.Lathe.IsEnabled;
 
 #if ADD_CAMERA
             enableCamera(this);
@@ -89,11 +87,6 @@ namespace GCode_Sender
 
             new PipeServer(App.Current.Dispatcher);
             PipeServer.FileTransfer += Pipe_FileTransfer;
-        }
-
-        private void MacroControl_MacrosChanged()
-        {
-            UIViewModel.Profile.Save();
         }
 
         public string BaseWindowTitle { get; set; }
@@ -112,11 +105,11 @@ namespace GCode_Sender
         {
             get { return menuFile.IsEnabled != true; }
             set {
-                menuFile.IsEnabled = xx.IsEnabled = !value;
+       //         menuFile.IsEnabled = xx.IsEnabled = !value;
                 foreach (TabItem tabitem in UIUtils.FindLogicalChildren<TabItem>(ui.tabMode))
                 {
                     var view = getView(tabitem);
-                    if(view != null)
+                    if (view != null)
                         tabitem.IsEnabled = !value || tabitem == ui.tabMode.SelectedItem;
                 }
             }
@@ -131,30 +124,30 @@ namespace GCode_Sender
                 ICNCView view = getView(tab);
                 if (view != null)
                 {
-                    view.Setup(UIViewModel, UIViewModel.Profile);
+                    view.Setup(UIViewModel, AppConfig.Settings);
                     tab.IsEnabled = view.ViewType == ViewType.GRBL || view.ViewType == ViewType.AppConfig;
                 }
             }
 
-            if (!UIViewModel.Profile.Config.GCodeViewer.IsEnabled)
+            if (!AppConfig.Settings.GCodeViewer.IsEnabled)
                 ShowView(false, ViewType.GCodeViewer);
 
             xx.ItemsSource = UIViewModel.SidebarItems;
-            UIViewModel.SidebarItems.Add(new SidebarItem("Jog", jogControl));
-            UIViewModel.SidebarItems.Add(new SidebarItem("Macros", macroControl));
-            UIViewModel.SidebarItems.Add(new SidebarItem("Goto", gotoControl));
+            UIViewModel.SidebarItems.Add(new SidebarItem("_Jog", jogControl));
+            UIViewModel.SidebarItems.Add(new SidebarItem("_Macros", macroControl));
+            UIViewModel.SidebarItems.Add(new SidebarItem("_Goto", gotoControl));
 
             UIViewModel.CurrentView = getView((TabItem)tabMode.Items[tabMode.SelectedIndex = 0]);
             System.Threading.Thread.Sleep(50);
             Comms.com.PurgeQueue();
             UIViewModel.CurrentView.Activate(true, ViewType.Startup);
 
-            if (!string.IsNullOrEmpty(UIViewModel.Profile.FileName))
+            if (!string.IsNullOrEmpty(AppConfig.Settings.FileName))
             {
                 // Delay loading until app is ready
                 Dispatcher.BeginInvoke(DispatcherPriority.ContextIdle, new System.Action(() =>
                 {
-                    GCode.File.Load(UIViewModel.Profile.FileName);
+                    GCode.File.Load(AppConfig.Settings.FileName);
                 }));
             }
 
@@ -207,7 +200,8 @@ namespace GCode_Sender
 
         private void Pipe_FileTransfer(string filename)
         {
-            GCode.File.Load(filename);
+            if(!JobRunning)
+                GCode.File.Load(filename);
         }
 
         private void fileSaveMenuItem_Click(object sender, RoutedEventArgs e)

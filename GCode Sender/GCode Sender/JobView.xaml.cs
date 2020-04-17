@@ -1,7 +1,7 @@
 /*
  * JobView.xaml.cs - part of Grbl Code Sender
  *
- * v0.16 / 2020-04-13 / Io Engineering (Terje Io)
+ * v0.17 / 2020-04-16 / Io Engineering (Terje Io)
  *
  */
 
@@ -55,24 +55,17 @@ namespace GCode_Sender
     public partial class JobView : UserControl, ICNCView
     {
         private bool? initOK = null;
-        private bool sdStream = false, kbJog = false;
+        private bool sdStream = false;
         private GrblViewModel model;
+        private KeypressHandler keyboard = null;
 
-     //   private Viewer viewer = null;
-
-    //    private delegate void GcodeCallback(string data);
         public JobView()
         {
             InitializeComponent();
 
-            //            MainWindow.ui.DataContext = model = GCodeSender.Parameters;
-
             DRO.DROEnabledChanged += DRO_DROEnabledChanged;
 
             DataContextChanged += View_DataContextChanged;
-            //    GCodeSender.GotFocus += GCodeSender_GotFocus;
-
-          //  ((INotifyPropertyChanged)DataContext).PropertyChanged += OnDataContextPropertyChanged;
         }
 
         private void View_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -146,9 +139,9 @@ namespace GCode_Sender
                             MainWindow.EnableView(true, ViewType.GCodeViewer);
                             gcodeRenderer.ShowTool = true;
                             gcodeRenderer.Open(GCode.File.Tokens);
-                            }
                         }
-                    else if (!string.IsNullOrEmpty(filename) && MainWindow.UIViewModel.Profile.Config.GCodeViewer.IsEnabled)
+                    }
+                    else if (!string.IsNullOrEmpty(filename) && AppConfig.Settings.GCodeViewer.IsEnabled)
                     {
                         MainWindow.GCodeViewer.Open();
                         MainWindow.EnableView(true, ViewType.GCodeViewer);
@@ -176,8 +169,6 @@ namespace GCode_Sender
                 if (initOK != true)
                 {
                     model.Message = "Waiting for controller...";
-
-                    kbJog = MainWindow.UIViewModel.Profile.Config.Jog.KeyboardEnable;
 
                     Comms.com.PurgeQueue();
                     Comms.com.WriteByte(GrblLegacy.ConvertRTCommand(GrblConstants.CMD_STATUS_REPORT));
@@ -245,7 +236,25 @@ namespace GCode_Sender
         {
         }
 
-#endregion
+        #endregion
+
+        // https://stackoverflow.com/questions/5707143/how-to-get-the-width-height-of-a-collapsed-control-in-wpf
+        private void showProgramLimits()
+        {
+            double height;
+
+            if (limitsControl.Visibility == Visibility.Collapsed)
+            {
+                limitsControl.Visibility = Visibility.Hidden;
+                limitsControl.Measure(new Size(Double.PositiveInfinity, Double.PositiveInfinity));
+                height = limitsControl.DesiredSize.Height;
+                limitsControl.Visibility = Visibility.Collapsed;
+            }
+            else
+                height = limitsControl.ActualHeight;
+
+            limitsControl.Visibility = (dp.ActualHeight - t1.ActualHeight - t2.ActualHeight + limitsControl.ActualHeight) > height ? Visibility.Visible : Visibility.Collapsed;
+        }
 
 #if ADD_CAMERA
         void Camera_Opened()
@@ -292,15 +301,20 @@ namespace GCode_Sender
                 GCodeSender.EnablePolling(true);
             }
 
-            kbJog |= GrblSettings.IsGrblHAL;
-            model.Message = "";
+            model.Message = string.Empty;
 
             GrblCommand.ToolChange = GrblInfo.ManualToolChange ? "M61Q{0}" : "T{0}";
 
-            GCodeSender.Config(MainWindow.UIViewModel.Profile.Config);
-            gcodeRenderer.Configure(MainWindow.UIViewModel.Profile);
+            if (keyboard == null)
+            {
+                keyboard = new KeypressHandler(model);
+                GCodeSender.Configure(keyboard);
+                gcodeRenderer.Configure();
+            }
 
-            if(!MainWindow.UIViewModel.Profile.Config.GCodeViewer.IsEnabled)
+            showProgramLimits();
+
+            if (!AppConfig.Settings.GCodeViewer.IsEnabled)
                 tabGCode.Items.Remove(tab3D);
 
             if (GrblInfo.NumAxes > 3)
@@ -366,9 +380,10 @@ namespace GCode_Sender
                 GCodeSender.Focus();
         }
 
-        private void GCodeSender_GotFocus(object sender, EventArgs e)
+        private void JobView_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-          //  Focus();
+            if (GrblInfo.IsLoaded)
+                showProgramLimits();
         }
 
         private void outside_MouseDown(object sender, MouseButtonEventArgs e)
@@ -394,10 +409,10 @@ namespace GCode_Sender
         }
         protected bool ProcessKeyPreview(System.Windows.Input.KeyEventArgs e)
         {
-            if (!kbJog || mdiControl.IsFocused || DRO.IsFocused || spindleControl.IsFocused || workParametersControl.IsFocused)
+            if (keyboard == null || mdiControl.IsFocused || DRO.IsFocused || spindleControl.IsFocused || workParametersControl.IsFocused)
                 return false;
 
-            return GCodeSender.ProcessKeypress(e);
+            return keyboard.ProcessKeypress(e);
         }
 
 #endregion

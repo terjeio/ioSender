@@ -10,15 +10,18 @@
         xmlns:cncprobingcontrols="clr-namespace:CNC.Controls.Probing;assembly=CNC.Controls.Probing"
         xmlns:local="clr-namespace:GCode_Sender"
         mc:Ignorable="d"
-        Title="GCode Sender (alpha-16)" Height="600" Width="923"
+        Title="GCode Sender (alpha-17)" Height="640" Width="923" MinHeight="660" MinWidth="925"
         Loaded="Window_Load"
         Closing="Window_Closing"
-        Closed="Window_Closed" Icon="App.ico" ResizeMode="CanMinimize">
+        Closed="Window_Closed" Icon="App.ico">
+    <Window.Resources>
+        <cnccontrols:LogicalNotConverter x:Key="BooleanConverter" />
+    </Window.Resources>
     <Window.DataContext>
         <cnccore:GrblViewModel />
     </Window.DataContext>
-    <DockPanel>
-        <Menu DockPanel.Dock="Top">
+    <DockPanel VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+        <Menu IsEnabled="{Binding Path=IsJobRunning, Converter={StaticResource BooleanConverter}}" DockPanel.Dock="Top">
             <MenuItem x:Name="menuFile" Header="_File">
                 <MenuItem Header="_Open" Click="fileOpenMenuItem_Click"/>
                 <MenuItem x:Name="menuSaveFile" Header="_Save" IsEnabled="false" Click="fileSaveMenuItem_Click"/>
@@ -31,79 +34,105 @@
                 <MenuItem Header="_Open" Click="CameraOpen_Click"/>
             </MenuItem>
         </Menu>
-        <Grid x:Name="grd">
-            <TabControl x:Name="tabMode" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" SelectionChanged="TabMode_SelectionChanged">
-                <TabItem x:Name="tabGrbl" Header="Grbl">
-                    <Grid x:Name="Grbl" Background="#FFE5E5E5">
-                        <local:JobView HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top"/>
+        <ToolBar IsEnabled="{Binding Path=IsJobRunning, Converter={StaticResource BooleanConverter}}" DockPanel.Dock="Top" Height="42" VerticalAlignment="Top" HorizontalAlignment="Stretch">
+            <cnccontrols:FileActionControl HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            <Separator Margin="4,0"></Separator>
+            <cnccontrols:MacroToolbarControl x:Name="toolbarMacros"/>
+        </ToolBar>
+        <StatusBar DockPanel.Dock="Bottom">
+            <StatusBar.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="100" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
                     </Grid>
-                </TabItem>
-                <TabItem x:Name="tabViewer" Header="3D View">
-                    <Grid x:Name="GCodeView" Background="#FFE5E5E5">
-                        <cncviewer:Viewer x:Name="viewer" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top"/>
-                    </Grid>
-                </TabItem>
-                <TabItem x:Name="tabProbing" Header="Probing">
-                    <Grid Background="#FFE5E5E5">
-                        <cncprobingcontrols:ProbingView x:Name="probingView" HorizontalAlignment="Left" Height="515" VerticalAlignment="Top" Width="875"/>
-                    </Grid>
-                </TabItem>
-                <TabItem x:Name="tabSDCard" Header="SD Card">
-                    <Grid Background="#FFE5E5E5">
-                        <cnccontrols:SDCardView x:Name="SDCardView" FileSelected="SDCardView_FileSelected" HorizontalAlignment="Left" Height="515" VerticalAlignment="Top" Width="875"/>
-                    </Grid>
-                </TabItem>
-                <TabItem x:Name="tabTurning" Header="Turning">
-                    <Grid Background="#FFE5E5E5">
-                        <cnclathecontrols:TurningWizard x:Name="turningWizard" HorizontalAlignment="Left" Height="515" VerticalAlignment="Top" Width="875"/>
-                    </Grid>
-                </TabItem>
-                <!--
+                </ItemsPanelTemplate>
+            </StatusBar.ItemsPanel>
+            <StatusBarItem>
+                <TextBlock Name="lblCursorPosition" />
+            </StatusBarItem>
+            <Separator Grid.Column="1" />
+            <StatusBarItem Grid.Column="2">
+                <TextBlock Text="{Binding Message}" TextWrapping="NoWrap" VerticalAlignment="Top" IsEnabled="False"/>
+            </StatusBarItem>
+            <Separator Grid.Column="3" />
+            <StatusBarItem Grid.Column="4">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <TextBlock Text="Run time:" VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding RunTime}" TextWrapping="NoWrap" Margin="5,0" VerticalAlignment="Center" Width="45"/>
+                </StackPanel>
+            </StatusBarItem>
+            <Separator Grid.Column="5" />
+            <StatusBarItem Grid.Column="6">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <TextBlock Text="Jog step:" VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding JogStep}" TextWrapping="NoWrap" Margin="5,0" VerticalAlignment="Center" Width="35"/>
+                </StackPanel>
+            </StatusBarItem>
+        </StatusBar>
+        <Canvas DockPanel.Dock="Right" Width="22" VerticalAlignment="Stretch" HorizontalAlignment="Right" ClipToBounds="False" Panel.ZIndex="1">
+            <ItemsControl x:Name="xx" Width="22" VerticalAlignment="Stretch">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel IsEnabled="{Binding Path=IsJobRunning, Converter={StaticResource BooleanConverter}}" Orientation="Vertical" HorizontalAlignment="Left" Margin="0,25,0,0" VerticalAlignment="Top" Width="22"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+            <cnccontrols:JogControl x:Name="jogControl" Visibility="Hidden" Canvas.Right="22" Canvas.Top="25"/>
+            <cnccontrols:MacroExecuteControl x:Name="macroControl" Visibility="Hidden" Canvas.Right="22" Canvas.Top="100"/>
+            <cnccontrols:GotoControl x:Name="gotoControl" Visibility="Hidden" Canvas.Right="22" Canvas.Top="175"/>
+        </Canvas>
+        <TabControl Background="#FFE5E5E5" DockPanel.Dock="Left" x:Name="tabMode" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SelectionChanged="TabMode_SelectionChanged">
+            <TabItem x:Name="tabGrbl" Header="Grbl" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <local:JobView x:Name="Grbl"/>
+            </TabItem>
+            <TabItem x:Name="tabViewer" Header="3D View">
+                <cncviewer:Viewer x:Name="viewer"/>
+            </TabItem>
+            <TabItem x:Name="tabProbing" Header="Probing">
+                <cncprobingcontrols:ProbingView x:Name="probingView"/>
+            </TabItem>
+            <TabItem x:Name="tabSDCard" Header="SD Card">
+                <cnccontrols:SDCardView x:Name="SDCardView" FileSelected="SDCardView_FileSelected"/>
+            </TabItem>
+            <TabItem x:Name="tabTurning" Header="Turning">
+                <cnclathecontrols:TurningWizard x:Name="turningWizard"/>
+            </TabItem>
+            <!--
                 <TabItem x:Name="tabTurning" Header="Turning">
                     <Grid Background="#FFE5E5E5">
                         <cnclathecontrols:TurningWizard x:Name="turningWizard" HorizontalAlignment="Left" Height="515" VerticalAlignment="Top" Width="875"/>
                     </Grid>
                 </TabItem> -->
-                <TabItem x:Name="tabThreading" Header="Threading">
-                    <Grid Background="#FFE5E5E5">
-                        <cnclathecontrols:ThreadingWizard x:Name="threadingWizard" HorizontalAlignment="Left" Height="515" VerticalAlignment="Top" Width="875"/>
-                    </Grid>
-                </TabItem>
-                <TabItem x:Name="tabOffsets" Header="Offsets">
-                    <Grid Background="#FFE5E5E5">
-                        <cnccontrols:OffsetView x:Name="offsetControl" HorizontalAlignment="Left" Height="515" VerticalAlignment="Top" Width="875"/>
-                    </Grid>
-                </TabItem>
-                <TabItem x:Name="tabTools" Header="Tools">
-                    <Grid Background="#FFE5E5E5">
-                        <cnccontrols:ToolView x:Name="toolControl" HorizontalAlignment="Left" Height="515" VerticalAlignment="Top" Width="875"/>
-                    </Grid>
-                </TabItem>
-                <TabItem x:Name="tabTrinamic" Header="Trinamic tuner">
-                    <Grid Background="#FFE5E5E5">
-                        <cnccontrols:TrinamicView x:Name="toolTrinamic" HorizontalAlignment="Left" Height="515" VerticalAlignment="Top" Width="875"/>
-                    </Grid>
-                </TabItem>
-                <TabItem x:Name="tabConfig" Header="Settings: Grbl" Height="23" VerticalAlignment="Top">
-                    <Grid Background="#FFE5E5E5">
-                        <cnccontrols:GrblConfigView x:Name="configControl" HorizontalAlignment="Left" Height="515" VerticalAlignment="Top" Width="875"/>
-                    </Grid>
-                </TabItem>
-                <TabItem x:Name="tabAppConfig" Header="Settings: App" Height="23" VerticalAlignment="Top">
-                    <Grid Background="#FFE5E5E5">
-                        <cnccontrols:AppConfigView x:Name="appConfigControl" HorizontalAlignment="Left" Height="515" VerticalAlignment="Top" Width="875"/>
-                    </Grid>
-                </TabItem>
-                <TabItem x:Name="tabPIDTuner" Header="PID Tuner">
-                    <Grid Background="#FFE5E5E5">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="125*"/>
-                            <ColumnDefinition Width="751*"/>
-                        </Grid.ColumnDefinitions>
-                        <cnccontrols:PIDLogView x:Name="toolPIDTuner" HorizontalAlignment="Left" Height="515" VerticalAlignment="Top" Width="875" Grid.ColumnSpan="2" Margin="0,0,0,-1"/>
-                    </Grid>
-                </TabItem>
-                <!--
+            <TabItem x:Name="tabThreading" Header="Threading">
+                <cnclathecontrols:ThreadingWizard x:Name="threadingWizard"/>
+            </TabItem>
+            <TabItem x:Name="tabOffsets" Header="Offsets">
+                <cnccontrols:OffsetView x:Name="offsetControl"/>
+            </TabItem>
+            <TabItem x:Name="tabTools" Header="Tools">
+                <cnccontrols:ToolView x:Name="toolControl"/>
+            </TabItem>
+            <TabItem x:Name="tabTrinamic" Header="Trinamic tuner">
+                <cnccontrols:TrinamicView x:Name="toolTrinamic"/>
+            </TabItem>
+            <TabItem x:Name="tabConfig" Header="Settings: Grbl">
+                <cnccontrols:GrblConfigView x:Name="configControl"/>
+            </TabItem>
+            <TabItem x:Name="tabAppConfig" Header="Settings: App">
+                <cnccontrols:AppConfigView x:Name="appConfigControl"/>
+            </TabItem>
+            <TabItem x:Name="tabPIDTuner" Header="PID Tuner">
+                <cnccontrols:PIDLogView x:Name="toolPIDTuner"/>
+            </TabItem>
+            <!--
                 <TabItem x:Name="tabTurning" Header="Turning">
                     <Grid Background="#FFE5E5E5">
                         <cnc:TurningWizard x:Name="toolTurning" HorizontalAlignment="Left" Height="515" VerticalAlignment="Top" Width="875"/>
@@ -116,31 +145,7 @@
                         </WindowsFormsHost>
                     </Grid>
                 </TabItem>
-
-
-                <TabItem x:Name="tabConfig" Header="Settings">
-                    <Grid Background="#FFE5E5E5">
-                        <cnccontrols:ConfigView x:Name="configControl" HorizontalAlignment="Left" Height="515" VerticalAlignment="Top" Width="875"/>
-                    </Grid>
-                </TabItem>
-                <TabItem x:Name="tabPIDTuner" Header="PID Tuner">
-                    <Grid Background="#FFE5E5E5">
-                        <cnccontrols:PIDLogView x:Name="toolPIDTuner" HorizontalAlignment="Left" Height="515" VerticalAlignment="Top" Width="875"/>
-                    </Grid>
-                </TabItem>
-
-                -->
-            </TabControl>
-            <ItemsControl x:Name="xx">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <StackPanel x:Name="stpRight" Orientation="Vertical" HorizontalAlignment="Right" Height="510" Margin="0,25,-3,0" VerticalAlignment="Top" Width="22"/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-            </ItemsControl>
-            <cnccontrols:JogControl x:Name="jogControl" HorizontalAlignment="Right" Margin="0,25,22,0" VerticalAlignment="Top" Visibility="Hidden"/>
-            <cnccontrols:MacroExecuteControl x:Name="macroControl" HorizontalAlignment="Right" Margin="0,100,22,0" VerticalAlignment="Top" Visibility="Hidden"/>
-            <cnccontrols:GotoControl x:Name="gotoControl" HorizontalAlignment="Right" Margin="0,175,22,0" VerticalAlignment="Top" Visibility="Hidden"/>
-        </Grid>
+-->
+        </TabControl>
     </DockPanel>
 </Window>

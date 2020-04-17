@@ -1,7 +1,7 @@
 /*
  * JobControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.16 / 2020-04-14 / Io Engineering (Terje Io)
+ * v0.17 / 2020-04-16 / Io Engineering (Terje Io)
  *
  */
 
@@ -47,7 +47,6 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using CNC.Core;
 using CNC.GCode;
-using Microsoft.Win32;
 
 namespace CNC.Controls
 {
@@ -56,14 +55,6 @@ namespace CNC.Controls
     /// </summary>
     public partial class JobControl : UserControl
     {
-        private enum JogMode
-        {
-            Step = 0,
-            Slow,
-            Fast,
-            None // must be last!
-        }
-
         private enum StreamingHandler
         {
             Idle = 0,
@@ -92,11 +83,7 @@ namespace CNC.Controls
 
         private int serialSize = 128;
         private bool holdSignal = false, initOK = false, useBuffering = false;
-        private volatile Key[] axisjog = new Key[3] { Key.None, Key.None, Key.None };
-        private double[] jogDistance = new double[3] { 0.05, 500.0, 500.0 };
-        private double[] jogSpeed = new double[3] { 100.0, 200.0, 500.0 };
         private volatile StreamingState streamingState = StreamingState.NoFile;
-        private JogMode jogMode = JogMode.None;
         private GrblState grblState;
         private GrblViewModel model;
         private PollGrbl poller = null;
@@ -268,47 +255,70 @@ namespace CNC.Controls
         }
 
         // Configure to match Grbl settings (if loaded)
-        public bool Config(Config config)
+        public bool Configure(KeypressHandler keypress)
         {
-            bool useFirmwareJog = false;
+            keypress.AddHandler(Key.R, ModifierKeys.Alt, StartJob);
+            keypress.AddHandler(Key.S, ModifierKeys.Alt, StopJob);
+            keypress.AddHandler(Key.Space, ModifierKeys.None, FeedHold);
+            keypress.AddHandler(Key.F1, ModifierKeys.None, FnKeyHandler);
+            keypress.AddHandler(Key.F2, ModifierKeys.None, FnKeyHandler);
+            keypress.AddHandler(Key.F3, ModifierKeys.None, FnKeyHandler);
+            keypress.AddHandler(Key.F4, ModifierKeys.None, FnKeyHandler);
+            keypress.AddHandler(Key.F5, ModifierKeys.None, FnKeyHandler);
+            keypress.AddHandler(Key.F6, ModifierKeys.None, FnKeyHandler);
+            keypress.AddHandler(Key.F7, ModifierKeys.None, FnKeyHandler);
+            keypress.AddHandler(Key.F8, ModifierKeys.None, FnKeyHandler);
+            keypress.AddHandler(Key.F9, ModifierKeys.None, FnKeyHandler);
+            keypress.AddHandler(Key.F10, ModifierKeys.None, FnKeyHandler);
+            keypress.AddHandler(Key.F11, ModifierKeys.None, FnKeyHandler);
+            keypress.AddHandler(Key.F12, ModifierKeys.None, FnKeyHandler);
 
-            if (GrblSettings.Loaded)
-            {
-                double val;
-                if ((useFirmwareJog = !(val = GrblSettings.GetDouble(GrblSetting.JogStepDistance)).Equals(double.NaN)))
-                    jogDistance[(int)JogMode.Step] = val;
-                if (!(val = GrblSettings.GetDouble(GrblSetting.JogSlowDistance)).Equals(double.NaN))
-                    jogDistance[(int)JogMode.Slow] = val;
-                if (!(val = GrblSettings.GetDouble(GrblSetting.JogFastDistance)).Equals(double.NaN))
-                    jogDistance[(int)JogMode.Fast] = val;
-                if (!(val = GrblSettings.GetDouble(GrblSetting.JogStepSpeed)).Equals(double.NaN))
-                    jogSpeed[(int)JogMode.Step] = val;
-                if (!(val = GrblSettings.GetDouble(GrblSetting.JogSlowSpeed)).Equals(double.NaN))
-                    jogSpeed[(int)JogMode.Slow] = val;
-                if (!(val = GrblSettings.GetDouble(GrblSetting.JogFastSpeed)).Equals(double.NaN))
-                    jogSpeed[(int)JogMode.Fast] = val;
+            GCodeParser.IgnoreM6 = AppConfig.Settings.Base.IgnoreM6;
+            GCodeParser.IgnoreM7 = AppConfig.Settings.Base.IgnoreM7;
+            GCodeParser.IgnoreM8 = AppConfig.Settings.Base.IgnoreM8;
 
-                model.IsMetric = GrblSettings.GetString(GrblSetting.ReportInches) != "1";
-            }
+            useBuffering = AppConfig.Settings.Base.UseBuffering && GrblSettings.IsGrblHAL;
 
-            if (!useFirmwareJog)
-            {
-                model.JogStep = jogDistance[(int)JogMode.Step] = config.Jog.StepDistance;
-                jogDistance[(int)JogMode.Slow] = config.Jog.SlowDistance;
-                jogDistance[(int)JogMode.Fast] = config.Jog.SlowDistance;
-                jogSpeed[(int)JogMode.Step] = config.Jog.StepFeedrate;
-                jogSpeed[(int)JogMode.Slow] = config.Jog.SlowFeedrate;
-                jogSpeed[(int)JogMode.Fast] = config.Jog.FastFeedrate;
-            }
-
-            GCodeParser.IgnoreM6 = config.IgnoreM6;
-            GCodeParser.IgnoreM7 = config.IgnoreM7;
-            GCodeParser.IgnoreM8 = config.IgnoreM8;
-
-            useBuffering = config.UseBuffering && GrblSettings.IsGrblHAL;
-
-            return GrblSettings.Loaded;
+            return GrblSettings.IsLoaded;
         }
+
+        #region Keyboard shortcut handlers
+
+        private bool StopJob(Key key)
+        {
+            streamingHandler.Call(StreamingState.Stop, false);
+            return true;
+        }
+
+        private bool StartJob(Key key)
+        {
+            CycleStart();
+            return true;
+        }
+
+        private bool FeedHold(Key key)
+        {
+            if (grblState.State != GrblStates.Idle)
+                btnHold_Click(null, null);
+            return grblState.State != GrblStates.Idle;
+        }
+
+        private bool FnKeyHandler(Key key)
+        {
+            if(!model.IsJobRunning)
+            {
+                int id = int.Parse(key.ToString().Substring(1));
+                var macro = AppConfig.Settings.Macros.FirstOrDefault(o => o.Id == id);
+                if (macro != null && MessageBox.Show(string.Format("Run {0} macro?", macro.Name), "Run macro", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                {
+                    model.ExecuteCommand(macro.Code);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        #endregion
 
         public bool CallHandler (StreamingState state, bool always)
         {
@@ -316,184 +326,6 @@ namespace CNC.Controls
         }
 
         #region UIevents
-        public bool ProcessKeypress(KeyEventArgs e)
-        {
-            string command = "";
-
-            if (e.Key == Key.Space && grblState.State != GrblStates.Idle)
-            {
-                btnHold_Click(null, null);
-                return true;
-            }
-
-            if (Keyboard.Modifiers == ModifierKeys.Alt)
-            {
-                if (e.SystemKey == Key.S)
-                {
-                    streamingHandler.Call(StreamingState.Stop, false);
-                    return true;
-                }
-
-                if (e.SystemKey == Key.R)
-                {
-                    CycleStart();
-                    return true;
-                }
-            }
-
-            bool isJogging = jogMode != JogMode.None;
-
-            if (e.IsUp && (isJogging || grblState.State == GrblStates.Jog))
-            {
-                bool cancel = false;
-
-                isJogging = false;
-
-                for (int i = 0; i < 3; i++)
-                {
-                    if (axisjog[i] == e.Key)
-                    {
-                        axisjog[i] = Key.None;
-                        cancel = true;
-                    }
-                    else
-                        isJogging = isJogging || (axisjog[i] != Key.None);
-                }
-
-                if (cancel && !isJogging && jogMode != JogMode.Step)
-                    JogCancel();
-            }
-
-            if (!isJogging && Comms.com.OutCount != 0)
-                return true;
-
-            //            if ((keycode == Keys.ShiftKey || keycode == Keys.ControlKey) && !isJogging)
-            //                return false;
-
-            if (e.IsDown && canJog)
-            {
-                // Do not respond to autorepeats!
-                if (e.IsRepeat)
-                    return true;
-
-                switch (e.Key)
-                {
-                    case Key.PageUp:
-                        isJogging = axisjog[2] != Key.PageUp;
-                        axisjog[2] = Key.PageUp;
-                        break;
-
-                    case Key.PageDown:
-                        isJogging = axisjog[2] != Key.PageDown;
-                        axisjog[2] = Key.PageDown;
-                        break;
-
-                    case Key.Left:
-                        isJogging = axisjog[0] != Key.Left;
-                        axisjog[0] = Key.Left;
-                        break;
-
-                    case Key.Up:
-                        isJogging = axisjog[1] != Key.Up;
-                        axisjog[1] = Key.Up;
-                        break;
-
-                    case Key.Right:
-                        isJogging = axisjog[0] != Key.Right;
-                        axisjog[0] = Key.Right;
-                        break;
-
-                    case Key.Down:
-                        isJogging = axisjog[1] != Key.Down;
-                        axisjog[1] = Key.Down;
-                        break;
-                }
-            }
-
-            if (isJogging)
-            {
-                if (GrblInfo.LatheModeEnabled)
-                {
-                    for (int i = 0; i < 2; i++) switch (axisjog[i])
-                        {
-                            case Key.Left:
-                                command += "Z-{0}";
-                                break;
-
-                            case Key.Up:
-                                command += "X-{0}";
-                                break;
-
-                            case Key.Right:
-                                command += "Z{0}";
-                                break;
-
-                            case Key.Down:
-                                command += "X{0}";
-                                break;
-                        }
-                }
-                else for (int i = 0; i < 3; i++) switch (axisjog[i])
-                        {
-                            case Key.PageUp:
-                                command += "Z{0}";
-                                break;
-
-                            case Key.PageDown:
-                                command += "Z-{0}";
-                                break;
-
-                            case Key.Left:
-                                command += "X-{0}";
-                                break;
-
-                            case Key.Up:
-                                command += "Y{0}";
-                                break;
-
-                            case Key.Right:
-                                command += "X{0}";
-                                break;
-
-                            case Key.Down:
-                                command += "Y-{0}";
-                                break;
-                        }
-
-                if ((isJogging = command != ""))
-                {
-                    if ((Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
-                        jogMode = JogMode.Step;
-                    else if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
-                        jogMode = JogMode.Fast;
-                    else
-                        jogMode = JogMode.Slow;
-
-                    SendJogCommand("$J=G91" + string.Format(command + "F{1}",
-                                                    jogDistance[(int)jogMode].ToInvariantString(),
-                                                     jogSpeed[(int)jogMode].ToInvariantString()));
-                }
-            }
-            else if(e.IsUp) switch(e.Key)
-            {
-                case Key.NumPad4:
-                    {
-                        var step = model.JogStep / 10d;
-                        model.JogStep = model.IsMetric ? (step < 0.01d ? 10d : step) : (step < 0.001d ? 1d : step);
-                        jogDistance[(int)JogMode.Step] = model.JogStep;
-                    }
-                    break;
-                case Key.NumPad6:
-                    {
-                        var step = model.JogStep * 10d;
-                        model.JogStep = model.IsMetric ? (step > 10d ? 0.01d : step) : (step > 1d ? 0.001d : step);
-                        jogDistance[(int)JogMode.Step] = model.JogStep;
-                    }
-                    break;
-            }
-
-            return isJogging;
-        }
 
         void btnRewind_Click(object sender, RoutedEventArgs e)
         {
@@ -514,16 +346,6 @@ namespace CNC.Controls
         void btnStart_Click(object sender, RoutedEventArgs e)
         {
             CycleStart();
-        }
-
-        private void grdGCode_Drag(object sender, DragEventArgs e)
-        {
-            GCode.File.Drag(sender, e);
-        }
-
-        private void grdGCode_Drop(object sender, DragEventArgs e)
-        {
-            GCode.File.Drop(sender, e);
         }
 
         #endregion
@@ -551,35 +373,6 @@ namespace CNC.Controls
                 streamingHandler.Call(StreamingState.Send, false);
                 SendNextLine();
             }
-        }
-
-        public void SendReset()
-        {
-            Comms.com.WriteByte(GrblConstants.CMD_RESET);
-            System.Threading.Thread.Sleep(20);
-            grblState.State = GrblStates.Unknown;
-            grblState.Substate = 0;
-        }
-
-        public void JogCancel()
-        {
-            streamingState = StreamingState.Idle;
-            while (Comms.com.OutCount != 0) ;
-            //    Application.DoEvents(); //??
-            Comms.com.WriteByte(GrblConstants.CMD_JOG_CANCEL); // Cancel jog
-            jogMode = JogMode.None;
-        }
-
-        public void SendJogCommand(string command)
-        {
-            if (streamingState == StreamingState.Jogging || grblState.State == GrblStates.Jog)
-            {
-                while (Comms.com.OutCount != 0) ;
-                //Application.DoEvents(); //??
-                Comms.com.WriteByte(GrblConstants.CMD_JOG_CANCEL); // Cancel current jog
-            }
-            streamingState = StreamingState.Jogging;
-            Comms.com.WriteCommand(command);
         }
 
         public void SendRTCommand(string command)

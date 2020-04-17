@@ -1,7 +1,7 @@
 ﻿/*
  * ProbingViewModel.cs - part of CNC Probing library
  *
- * v0.14 / 2020-03-29 / Io Engineering (Terje Io)
+ * v0.17 / 2020-04-15 / Io Engineering (Terje Io)
  *
  */
 
@@ -47,6 +47,7 @@ using System.Collections.ObjectModel;
 
 namespace CNC.Controls.Probing
 {
+
     class Probing
     {
         public const string Command = "G38.3";
@@ -63,7 +64,7 @@ namespace CNC.Controls.Probing
         private string _message = string.Empty, _tool = string.Empty;
         private double _feedRate = 100d, _tpHeight = 0.1, _ProbeDiameter = 3, _workpieceDiameter = 20;
         private bool _canProbe = false, _isComplete = false, _isSuccess = false, _probeZ = false, _useFixture = false, _hasToolTable = false, _hasCs9 = false;
-        private bool isCancelled = false, isRunning = false, wasZselected = false;
+        private bool isCancelled = false, isRunning = false, wasZselected = false, silent = false;
         private GrblViewModel _grblmodel = null;
         private List<string> _program = new List<string>();
         private List<Position> _positions = new List<Position>();
@@ -107,7 +108,8 @@ namespace CNC.Controls.Probing
                     break;
 
                 case nameof(GrblViewModel.Message):
-                    Message = Grbl.Message;
+                    if(!silent)
+                        Message = Grbl.Message;
                     break;
             }
         }
@@ -298,6 +300,9 @@ namespace CNC.Controls.Probing
                 _message = value; OnPropertyChanged();
                 if (!string.IsNullOrEmpty(_message) && Grbl.ResponseLogVerbose)
                     Grbl.ResponseLog.Add(_message);
+                silent = true;
+                Grbl.Message = _message;
+                silent = false;
             }
         }
         public CoordMode CoordinateMode { get { return _cmode; } set { _cmode = value; OnPropertyChanged(); } }

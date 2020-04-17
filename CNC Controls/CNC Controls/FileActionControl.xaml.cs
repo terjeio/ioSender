@@ -1,7 +1,7 @@
 ﻿/*
  * FileActionControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.16 / 2020-04-12 / Io Engineering (Terje Io)
+ * v0.17 / 2020-04-15 / Io Engineering (Terje Io)
  *
  */
 
@@ -88,7 +88,7 @@ namespace CNC.Controls
                 {
                     //FileName = @"D:\Notepad++\notepad++.exe",
                     //Arguments = '"' + fileName + '"'+ " -multiInst"
-                    FileName = "notepad.exe",
+                    FileName = AppConfig.Settings.Base.Editor,
                     Arguments = '"' + fileName + '"'
                 }
             };

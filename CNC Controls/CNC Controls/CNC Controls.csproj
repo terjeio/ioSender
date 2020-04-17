@@ -108,6 +108,7 @@
     <Compile Include="JogControl.xaml.cs">
       <DependentUpon>JogControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="KeypressHandler.cs" />
     <Compile Include="LimitsBaseControl.xaml.cs">
       <DependentUpon>LimitsBaseControl.xaml</DependentUpon>
     </Compile>
@@ -119,6 +120,9 @@
     </Compile>
     <Compile Include="MacroExecuteControl.xaml.cs">
       <DependentUpon>MacroExecuteControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MacroToolbarControl.xaml.cs">
+      <DependentUpon>MacroToolbarControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="MDIControl.xaml.cs">
       <DependentUpon>MDIControl.xaml</DependentUpon>
@@ -226,6 +230,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="MacroExecuteControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MacroToolbarControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

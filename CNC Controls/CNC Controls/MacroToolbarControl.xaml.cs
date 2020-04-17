@@ -1,7 +1,7 @@
-/*
- * SidebarItem.cs - part of CNC Controls library for Grbl
+﻿/*
+ * MacroExecuteControl.xaml.cs - part of CNC Controls library
  *
- * v0.17 / 2020-04-16 / Io Engineering (Terje Io)
+ * v0.17 / 2020-04-15 / Io Engineering (Terje Io)
  *
  */
 
@@ -37,59 +37,41 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
+using CNC.Core;
 
 namespace CNC.Controls
 {
-    public class SidebarItem : Button
+    /// <summary>
+    /// Interaction logic for MacroToolbarControl.xaml
+    /// </summary>
+    public partial class MacroToolbarControl : UserControl
     {
-        private UserControl view { get; }
-        private static UserControl last = null;
-
-        public new Visibility Visibility { get { return view.Visibility; } set { view.Visibility = value; } }
-        public new bool IsEnabled { get { return base.IsEnabled; } set { base.IsEnabled = value; } }
-
-        public SidebarItem(string name, UserControl view) : base()
+        public MacroToolbarControl()
         {
-            if (name.Contains("_"))
-                Content = new AccessText()
-                {
-                    Text = name
-                };
-            else
-                Content = name;
-
-            this.view = view;
-
-            Width = 75;
-            Height = 25;
-            Focusable = false;
-
-            try
-            {
-                Style = Application.Current.FindResource("btnSidebar") as Style;
-            }
-            catch { }
-
-            LayoutTransform = new RotateTransform(90d);
-
-            Click += button_Click;
+            InitializeComponent();
         }
 
-        public void PerformClick()
+        private void macroToolbarControl_Loaded(object sender, RoutedEventArgs e)
         {
-            button_Click(this, null);
+            Macros = AppConfig.Settings.Macros;
         }
 
-        private void button_Click(object sender, RoutedEventArgs e)
+        public static readonly DependencyProperty MacrosProperty = DependencyProperty.Register(nameof(MacroToolbarControl.Macros), typeof(ObservableCollection<CNC.GCode.Macro>), typeof(MacroToolbarControl));
+        public ObservableCollection<CNC.GCode.Macro> Macros
         {
-            if (last != null && last != view && last.IsVisible)
-                last.Visibility = Visibility.Hidden;
+            get { return (ObservableCollection<CNC.GCode.Macro>)GetValue(MacrosProperty); }
+            set { SetValue(MacrosProperty, value); }
+        }
 
-            view.Visibility = view.IsVisible ? Visibility.Hidden : Visibility.Visible;
-            last = view;
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            var macro = Macros.FirstOrDefault(o => o.Id == (int)(sender as Button).Tag);
+            if (macro != null && MessageBox.Show(string.Format("Run {0} macro?", macro.Name), "Run macro", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                (DataContext as GrblViewModel).ExecuteCommand(macro.Code);
         }
     }
 }

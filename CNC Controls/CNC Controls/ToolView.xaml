@@ -19,8 +19,8 @@
     </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="507*"/>
-            <ColumnDefinition Width="368*"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
         <ContentControl Visibility="Collapsed" Content="{StaticResource ProxyElement}"/>
         <DataGrid x:Name="dgrTools" Grid.Row="0" ItemsSource="{Binding}" Width="Auto" IsReadOnly="True" SelectionMode="Single" SelectionUnit="FullRow" AutoGenerateColumns="False" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"
@@ -43,14 +43,16 @@
                 <DataGridTextColumn Header="Z" Binding="{Binding Z}" Width="70"/>
             </DataGrid.Columns>
         </DataGrid>
-        <Label x:Name="lblTool" Content="Tool:" Grid.Column="1" HorizontalAlignment="Left" Margin="111,60,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="txtTool" Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="147,60,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="25" IsReadOnly="True"/>
-        <StackPanel Grid.Column="1" HorizontalAlignment="Left" Margin="74,90,0,0" VerticalAlignment="Top" Width="219">
+        <StackPanel Grid.Column="1" HorizontalAlignment="Left" Margin="20,15,0,0" VerticalAlignment="Top">
+            <StackPanel Orientation="Horizontal">
+                <Label x:Name="lblTool" Content="Tool:" HorizontalContentAlignment="Right" HorizontalAlignment="Right" Margin="37,0,0,0" VerticalAlignment="Top"/>
+                <TextBox x:Name="txtTool" HorizontalAlignment="Left" Height="23" TextWrapping="NoWrap" VerticalAlignment="Top" Width="25" IsReadOnly="True"/>
+            </StackPanel>
             <local:CoordValueSetControl x:Name="cvXOffset" Label="X axis:" Tag="X" Value="{Binding Path=offset.X, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" Click="cvOffset_Click"/>
             <local:CoordValueSetControl x:Name="cvYOffset" Label="Y axis:" Tag="Y" Value="{Binding Path=offset.Y, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" Style="{StaticResource YAxisVisibleStyle}" Click="cvOffset_Click"/>
             <local:CoordValueSetControl x:Name="cvZOffset" Label="Z axis:" Tag="Z" Value="{Binding Path=offset.Z, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" Click="cvOffset_Click"/>
             <local:CoordValueSetControl x:Name="cvTipRadius" Label="Tip radius:" Tag="R" Click="cvOffset_Click"/>
-            <StackPanel Orientation="Horizontal" Margin="5,0">
+            <StackPanel Orientation="Horizontal" Margin="5,5">
                 <Button x:Name="btnCurrPos" Content="Get current position" Margin="3,0" Click="btnCurrPos_Click"/>
                 <Button x:Name="btnClear" Content="Clear all" Click="btnClearAll_Click"/>
                 <Button x:Name="btnSetAll" Content="Set all" Margin="3,0" Click="btnSetAll_Click"/>

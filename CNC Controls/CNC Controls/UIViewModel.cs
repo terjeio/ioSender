@@ -1,7 +1,7 @@
 ﻿/*
  * UIViewModel.cs - part of CNC Controls library for Grbl
  *
- * v0.15 / 2020-04-09 / Io Engineering (Terje Io)
+ * v0.17 / 2020-04-15 / Io Engineering (Terje Io)
  *
  */
 
@@ -63,7 +63,6 @@ namespace CNC.Controls
         }
 
         public ICamera Camera { get; set; }
-        public AppConfig Profile { get; } = new AppConfig();
         //public ObservableCollection<CNCView> CNCViews { get;  }
         public ObservableCollection<SidebarItem> SidebarItems { get; }
         public ObservableCollection<UserControl> ConfigControls { get; }

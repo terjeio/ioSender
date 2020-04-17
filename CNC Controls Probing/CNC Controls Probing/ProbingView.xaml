@@ -51,6 +51,5 @@
             </TabItem>
         </TabControl>
         <Label Height="33" Margin="25,430,0,0"  VerticalAlignment="Top" Content="Warning! - use with extreme care - probing is in a pre alpha state!!" FontSize="16" Foreground="#FFEE0C0C"/>
-        <TextBox HorizontalAlignment="Left" IsReadOnly="True" Height="23" Margin="25,465,0,0" TextWrapping="NoWrap" Text="{Binding Path=Message}" VerticalAlignment="Top" Width="822"/>
     </Grid>
 </UserControl>

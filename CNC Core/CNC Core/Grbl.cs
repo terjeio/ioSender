@@ -1,7 +1,7 @@
 ﻿/*
  * Grbl.cs - part of CNC Controls library
  *
- * v0.16 / 2020-04-13 / Io Engineering (Terje Io)
+ * v0.17 / 2020-04-15 / Io Engineering (Terje Io)
  *
  */
 
@@ -595,7 +595,7 @@ namespace CNC.Core
             set { if (value && GrblParserState.LatheMode == LatheMode.Disabled) { GrblParserState.LatheMode = LatheMode.Radius; NumAxes = 3; } }
         }
         public static ObservableCollection<string> SystemInfo { get; private set; } = new ObservableCollection<string>();
-        public static bool Loaded { get; private set; }
+        public static bool IsLoaded { get; private set; }
 
         #endregion
 
@@ -651,6 +651,8 @@ namespace CNC.Core
             model.AxisEnabledFlags = AxisFlags;
             model.LatheModeEnabled = LatheModeEnabled;
             model.OptionalSignals.Value = OptionalSignals;
+
+            IsLoaded = res == true;
 
             return res == true;
         }
@@ -788,7 +790,7 @@ namespace CNC.Core
             }
         }
         public static string WorkOffset { get; set; }
-        public static bool Loaded { get { return state.Count > 0; } }
+        public static bool IsLoaded { get { return state.Count > 0; } }
         public static DistanceMode DistanceMode { get; private set; } = DistanceMode.Absolute;
         public static LatheMode LatheMode { get; set; } = LatheMode.Disabled;
         public static IJKMode IJKMode { get; private set; } = IJKMode.Incremental;
@@ -892,7 +894,7 @@ namespace CNC.Core
     {
         private static Dispatcher dispatcher;
 
-        public static bool Loaded { get { return CoordinateSystems.Count > 0; } }
+        public static bool IsLoaded { get { return CoordinateSystems.Count > 0; } }
         public static LatheMode LatheMode { get; private set; }
         public static ObservableCollection<CoordinateSystem> CoordinateSystems { get; private set; } = new ObservableCollection<CoordinateSystem>();
         public static ObservableCollection<Tool> Tools { get; private set; } = new ObservableCollection<Tool>();
@@ -930,7 +932,7 @@ namespace CNC.Core
             if (Tools.Count == 0)
                 Tools.Add(new Tool(GrblConstants.NO_TOOL));
 
-            if (!GrblParserState.Loaded)
+            if (!GrblParserState.IsLoaded)
                 GrblParserState.Get(model);
 
             dispatcher = Dispatcher.CurrentDispatcher;
@@ -1192,7 +1194,7 @@ namespace CNC.Core
         }
 
         public static DataView Settings { get { return settings.DefaultView; } }
-        public static bool Loaded { get { return settings.Rows.Count > 0; } }
+        public static bool IsLoaded { get { return settings.Rows.Count > 0; } }
         public static bool HomingEnabled { get; private set; }
         public static bool UseLegacyRTCommands { get; private set; }
         public static bool IsGrblHAL { get; private set; }
@@ -1281,7 +1283,7 @@ namespace CNC.Core
 
             settings.AcceptChanges();
 
-            return Loaded;
+            return IsLoaded;
         }
 
         public static bool Get()

@@ -1,7 +1,7 @@
 /*
  * GrblViewModel.cs - part of CNC Controls library
  *
- * v0.16 / 2020-04-14 / Io Engineering (Terje Io)
+ * v0.17 / 2020-04-15 / Io Engineering (Terje Io)
  *
  */
 
@@ -509,10 +509,10 @@ namespace CNC.Core
         public bool ParseGCStatus(string data)
         {
             GrblParserState.Process(data);
-            if (GrblParserState.Loaded)
+            if (GrblParserState.IsLoaded)
                 ParserState = data;
 
-            return GrblParserState.Loaded;
+            return GrblParserState.IsLoaded;
         }
 
         public bool ParseProbeStatus(string data)

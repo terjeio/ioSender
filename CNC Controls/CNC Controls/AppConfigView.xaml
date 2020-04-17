@@ -6,19 +6,14 @@
              xmlns:local="clr-namespace:CNC.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="515" d:DesignWidth="875">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="11*"/>
-            <RowDefinition/>
-        </Grid.RowDefinitions>
-        <ItemsControl x:Name="xx">
+    <DockPanel>
+        <Button x:Name="btnSave" DockPanel.Dock="Bottom" Content="Save settings" HorizontalAlignment="Left" VerticalAlignment="Top" Width="100" Click="btnSave_Click"/>
+        <ItemsControl x:Name="xx" DockPanel.Dock="Top">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <WrapPanel Orientation="Vertical" ItemWidth="255"  Height="460" Margin="10,10,0,5" HorizontalAlignment="Left" VerticalAlignment="Top" Width="850"/>
+                    <WrapPanel Orientation="Vertical" ItemWidth="255" Margin="10,10,0,5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
         </ItemsControl>
-        <Button x:Name="btnSave" Content="Save settings" HorizontalAlignment="Left" Margin="10,5,0,0" Grid.Row="1" VerticalAlignment="Top" Width="100" Click="btnSave_Click"/>
-        <Label x:Name="label" Content="A restart is required after changing settings!" HorizontalAlignment="Left" Margin="126,3,0,0" Grid.Row="1" VerticalAlignment="Top"/>
-    </Grid>
+    </DockPanel>
 </UserControl>

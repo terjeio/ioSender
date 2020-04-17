@@ -1,7 +1,7 @@
 /*
  * MacroExecuteControl.xaml.cs - part of CNC Controls library
  *
- * v0.10 / 2019-03-05 / Io Engineering (Terje Io)
+ * v0.17 / 2020-04-15 / Io Engineering (Terje Io)
  *
  */
 
@@ -52,14 +52,17 @@ namespace CNC.Controls
     public partial class MacroExecuteControl : UserControl
     {
 
-        public delegate void MacrosChangedHandler();
-        public event MacrosChangedHandler MacrosChanged;
-
         public MacroExecuteControl()
         {
             InitializeComponent();
             DataContextChanged += View_DataContextChanged;
         }
+
+        private void macroExecuteControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            Macros = AppConfig.Settings.Macros;
+        }
+
         private void View_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             if (e.OldValue != null && e.OldValue is INotifyPropertyChanged)
@@ -122,7 +125,7 @@ namespace CNC.Controls
         {
             MacroEditor editor = new MacroEditor(Macros) {Owner = Application.Current.MainWindow};
             editor.ShowDialog();
-            MacrosChanged?.Invoke();
+            AppConfig.Settings.Save();
         }
     }
 }

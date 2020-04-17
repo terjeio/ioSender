@@ -1,7 +1,7 @@
 ﻿/*
  * Renderer.xaml.cs - part of CNC Controls library
  *
- * v0.13 / 2019-03-15 / Io Engineering (Terje Io)
+ * v0.17 / 2020-04-15 / Io Engineering (Terje Io)
  *
  */
 
@@ -91,14 +91,14 @@ namespace CNC.Controls.Viewer
             set { gcodeView.AnimateTool = value; }
         }
 
-        public void Configure(AppConfig profile)
+        public void Configure()
         {
-            ArcResolution = profile.Config.GCodeViewer.ArcResolution;
-            MinDistance = profile.Config.GCodeViewer.MinDistance;
-            ShowGrid = profile.Config.GCodeViewer.ShowGrid;
-            ShowAxes = profile.Config.GCodeViewer.ShowAxes;
-            ShowBoundingBox = profile.Config.GCodeViewer.ShowBoundingBox;
-            ShowViewCube = profile.Config.GCodeViewer.ShowViewCube;
+            ArcResolution = AppConfig.Settings.GCodeViewer.ArcResolution;
+            MinDistance = AppConfig.Settings.GCodeViewer.MinDistance;
+            ShowGrid = AppConfig.Settings.GCodeViewer.ShowGrid;
+            ShowAxes = AppConfig.Settings.GCodeViewer.ShowAxes;
+            ShowBoundingBox = AppConfig.Settings.GCodeViewer.ShowBoundingBox;
+            ShowViewCube = AppConfig.Settings.GCodeViewer.ShowViewCube;
         }
 
         public void Close()

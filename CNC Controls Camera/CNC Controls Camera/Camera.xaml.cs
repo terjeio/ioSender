@@ -1,7 +1,7 @@
 ﻿/*
  * Camera.xaml.cs - part of CNC Controls library
  *
- * v0.03 / 2019-12-03 / Io Engineering (Terje Io)
+ * v0.17 / 2020-04-15 / Io Engineering (Terje Io)
  *
  */
 
@@ -68,7 +68,7 @@ namespace CNC.Controls.Camera
 
         public void Setup(UIViewModel model)
         {
-            CameraConfig config = model.Profile.Config.Camera;
+            CameraConfig config = AppConfig.Settings.Camera;
             CameraControl.XOffset = config.XOffset;
             CameraControl.YOffset = config.YOffset;
             CameraControl.Mode = config.MoveMode;
@@ -78,7 +78,6 @@ namespace CNC.Controls.Camera
 
         public void Open()
         {
-
             if (initialOpen)
             {
                 initialOpen = false;

@@ -1,5 +1,22 @@
 ## GRBL GCode Sender
 
+2020-04-17: Alpha 17 release of binary.
+
+Changes:
+
+* Resizable UI.
+* Toolbar with file handling tools, display of user defined macros with keyboard shortcuts.
+* Status bar for messages, run time and keyboard jog step size \(jogging with \<CTRL\>+cursor keys\).
+* Keyboard step jogging made available for non-grblHAL firmware. Change beetwen step sizes on the fly with numeric keypad `4` and `6`. Feed rate is fixed to setting in _Settings: App_ tab. 
+* Shortcuts for sidebar flyouts \(use Alt+underscored letter\).
+* Cursor key jogging when jog flyout is active, even for non grblHAL firmware. _No_ autorepeat!.
+* Change step size and feedrate with keyboard shortcuts when jog flyout is active. Bound to numeric keypad `2`, `4`, `6` and `8`.
+* [Manually](https://github.com/terjeio/Grbl-GCode-Sender/wiki/Usage-tips) associate GCode filetypes with sender.
+
+[Spring](https://www.yr.no/place/Norway/Vestland/Alver/Io~105904/long.html?spr=eng) has finally arrived after a long wet and windy period :-), development will continue at a much slower pace from now...
+
+---
+
 2020-04-11: Alpha 15 release of binary.
 
 Added interfaces for GCode conversion \(from other file formats\) and transformation.

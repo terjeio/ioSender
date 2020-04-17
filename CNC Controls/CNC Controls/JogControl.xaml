@@ -6,7 +6,7 @@
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:local="clr-namespace:CNC.Controls"
              mc:Ignorable="d" 
-             Loaded="UserControl_Loaded"
+             Loaded="UserControl_Loaded" IsVisibleChanged="JogControl_IsVisibleChanged"
              d:DesignHeight="250" Width="Auto">
     <UserControl.Resources>
         <ResourceDictionary>

@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CNC.Controls"
              mc:Ignorable="d" 
-             d:DesignHeight="40" d:DesignWidth="145">
+             d:DesignHeight="36" d:DesignWidth="145">
     <UserControl.Resources>
         <local:LogicalNotConverter x:Key="BooleanConverter" />
         <Style x:Key="ActionButtonStyle" TargetType="Button">
@@ -32,7 +32,7 @@
             </Setter>
         </Style>
     </UserControl.Resources>
-    <StackPanel IsEnabled="{Binding Path=IsJobRunning, Mode=OneWay, Converter={StaticResource BooleanConverter}}" Orientation="Horizontal" HorizontalAlignment="Left" Height="40" VerticalAlignment="Top">
+    <StackPanel IsEnabled="{Binding Path=IsJobRunning, Mode=OneWay, Converter={StaticResource BooleanConverter}}" Orientation="Horizontal" HorizontalAlignment="Left" Height="36" VerticalAlignment="Top">
         <Button Content="Resources\open.png" ToolTip="Open file" Width="37" Style="{StaticResource ActionButtonStyle}" Click="btnOpen_Click"/>
         <Button Content="Resources\reload.png" ToolTip="Reload file" Width="23" IsEnabled="{Binding Path=IsPhysicalFileLoaded}"  Style="{StaticResource ActionButtonStyle}" Click="btnReload_Click"/>
         <Button Content="Resources\edit.png" ToolTip="Edit file" Width="31" IsEnabled="{Binding Path=IsPhysicalFileLoaded}" Style="{StaticResource ActionButtonStyle}" Click="btnEdit_Click"/>

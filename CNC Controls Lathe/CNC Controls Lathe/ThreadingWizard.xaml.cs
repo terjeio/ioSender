@@ -1,7 +1,7 @@
 /*
  * ThreadingWizard.xaml.cs - part of CNC Controls Lathe library
  *
- * v0.15 / 2020-04-04 / Io Engineering (Terje Io)
+ * v0.17 / 2020-04-15 / Io Engineering (Terje Io)
  *
  */
 
@@ -117,7 +117,7 @@ namespace CNC.Controls.Lathe
 
         public void Activate(bool activate, ViewType chgMode)
         {
-            if (activate && GrblSettings.Loaded)
+            if (activate && GrblSettings.IsLoaded)
             {
                 if (!initOk)
                 {
@@ -146,7 +146,7 @@ namespace CNC.Controls.Lathe
 
         public void Setup(UIViewModel model, AppConfig profile)
         {
-            this.model.wz.ApplySettings(profile.Config.Lathe);
+            this.model.wz.ApplySettings(profile.Lathe);
         }
 
         #endregion

@@ -94,6 +94,9 @@ namespace CNC.Controls
         {
             if (curSetting != null)
                 curSetting.Assign();
+
+            model.Message = string.Empty;
+
             GrblSettings.Save();
         }
 

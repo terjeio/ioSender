@@ -1,7 +1,7 @@
 /*
  * WizardConfig.cs - part of CNC Controls library for Grbl
  *
- * v0.01 / 2020-01-27 / Io Engineering (Terje Io)
+ * v0.17 / 2020-04-15 / Io Engineering (Terje Io)
  *
  */
 
@@ -95,7 +95,7 @@ namespace CNC.Controls.Lathe
 
         private void SetLimits()
         {
-            if (IsLoaded && GrblSettings.Loaded)
+            if (IsLoaded && GrblSettings.IsLoaded)
             {
                 if (!CSS)
                     active.RPM = Math.Min(Math.Max(RPM, RpmMin), RpmMax);
@@ -106,7 +106,7 @@ namespace CNC.Controls.Lathe
 
         public bool Update()
         {
-            if (GrblSettings.Loaded)
+            if (GrblSettings.IsLoaded)
             {
                 XMaxFeedRate = GrblSettings.GetDouble(GrblSetting.AxisSetting_XMaxRate);
                 XAcceleration = GrblSettings.GetDouble(GrblSetting.AxisSetting_XAcceleration);
@@ -123,7 +123,7 @@ namespace CNC.Controls.Lathe
                 SetLimits();
             }
 
-            return GrblSettings.Loaded;
+            return GrblSettings.IsLoaded;
         }
     }
 

@@ -20,8 +20,8 @@
     </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="507*"/>
-            <ColumnDefinition Width="368*"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
         <ContentControl Visibility="Collapsed" Content="{StaticResource ProxyElement}"/>
         <DataGrid x:Name="dgrOffsets" Grid.Row="0" ItemsSource="{Binding}" Width="Auto" IsReadOnly="True" SelectionMode="Single" SelectionUnit="FullRow" AutoGenerateColumns="False" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"
@@ -91,9 +91,11 @@
                 </DataGridTextColumn>
             </DataGrid.Columns>
         </DataGrid>
-        <Label Content="Offset:" Grid.Column="1" HorizontalAlignment="Left" Margin="102,60,0,0" VerticalAlignment="Top"/>
-        <TextBox Text="{Binding Path=Offset.Code, RelativeSource={RelativeSource AncestorType=UserControl}}" Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="147,60,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="50" IsReadOnly="True"/>
-        <StackPanel Grid.Column="1" HorizontalAlignment="Left" Margin="74,90,0,0" VerticalAlignment="Top" Width="219">
+        <StackPanel Grid.Column="1" HorizontalAlignment="Left" Margin="20,15,0,0" VerticalAlignment="Top">
+            <StackPanel Orientation="Horizontal">
+                <Label Content="Offset:" HorizontalContentAlignment="Right" HorizontalAlignment="Right" Margin="29,0,0,0" VerticalAlignment="Top"/>
+                <TextBox Text="{Binding Path=Offset.Code, RelativeSource={RelativeSource AncestorType=UserControl}}" HorizontalAlignment="Left" Height="23" TextWrapping="NoWrap" VerticalAlignment="Top" Width="40" IsReadOnly="True"/>
+            </StackPanel>
             <local:CoordValueSetControl x:Name="cvXOffset" Label="X axis:" Tag="X" Click="cvOffset_Click"
                 Value="{Binding Path=Offset.X, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
                 IsEnabled="{Binding Path=CanEdit, RelativeSource={RelativeSource AncestorType=UserControl}}"

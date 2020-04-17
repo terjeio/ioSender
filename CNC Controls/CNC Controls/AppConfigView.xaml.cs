@@ -1,7 +1,7 @@
 /*
  * AppConfigView.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.15 / 2020-04-05 / Io Engineering (Terje Io)
+ * v0.17 / 2020-04-15 / Io Engineering (Terje Io)
  *
  */
 /*
@@ -46,6 +46,7 @@ namespace CNC.Controls
     public partial class AppConfigView : UserControl, ICNCView
     {
         private UIViewModel model;
+        private GrblViewModel grblmodel;
 
         public AppConfigView()
         {
@@ -70,6 +71,7 @@ namespace CNC.Controls
                 } else if (control is ICameraConfig && model.Camera != null && !model.Camera.HasCamera)
                     control.Visibility = Visibility.Collapsed;
             }
+            grblmodel.Message = activate ? "A restart is required after changing settings!" : string.Empty;
         }
 
         public void CloseFile()
@@ -79,7 +81,8 @@ namespace CNC.Controls
         public void Setup(UIViewModel model, AppConfig profile)
         {
             this.model = model;
-            DataContext = profile.Config;
+            grblmodel = DataContext as GrblViewModel;
+            DataContext = profile.Base;
             xx.ItemsSource = model.ConfigControls;
             model.ConfigControls.Add(new BasicConfigControl());
             model.ConfigControls.Add(new StripGCodeConfigControl());
@@ -90,7 +93,7 @@ namespace CNC.Controls
 
         private void btnSave_Click(object sender, RoutedEventArgs e)
         {
-            model.Profile.Save();
+            AppConfig.Settings.Save();
         }
     }
 }
