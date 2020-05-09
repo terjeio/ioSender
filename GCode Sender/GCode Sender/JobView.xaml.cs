@@ -1,7 +1,7 @@
 /*
  * JobView.xaml.cs - part of Grbl Code Sender
  *
- * v0.17 / 2020-04-16 / Io Engineering (Terje Io)
+ * v0.18 / 2020-05-06 / Io Engineering (Terje Io)
  *
  */
 
@@ -64,19 +64,17 @@ namespace GCode_Sender
             InitializeComponent();
 
             DRO.DROEnabledChanged += DRO_DROEnabledChanged;
-
             DataContextChanged += View_DataContextChanged;
         }
 
         private void View_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            if (e.OldValue != null && e.OldValue is INotifyPropertyChanged)
-                ((INotifyPropertyChanged)e.OldValue).PropertyChanged -= OnDataContextPropertyChanged;
-            if (e.NewValue != null && e.NewValue is INotifyPropertyChanged)
+            if (e.NewValue is GrblViewModel)
             {
                 model = (GrblViewModel)e.NewValue;
                 model.PropertyChanged += OnDataContextPropertyChanged;
-      //          model.OnGrblReset += Model_OnGrblReset;
+                DataContextChanged -= View_DataContextChanged;
+                //          model.OnGrblReset += Model_OnGrblReset;
             }
         }
 
@@ -96,7 +94,7 @@ namespace GCode_Sender
                 case nameof(GrblViewModel.IsJobRunning):
                     MainWindow.ui.JobRunning = (sender as GrblViewModel).IsJobRunning;
                     if(GrblInfo.ManualToolChange)
-                        GrblCommand.ToolChange = MainWindow.ui.JobRunning ? "T{0}M6" : "M61Q{0}";
+                        GrblCommand.ToolChange = (sender as GrblViewModel).IsJobRunning ? "T{0}M6" : "M61Q{0}";
                     break;
 
                 case nameof(GrblViewModel.Tool):
@@ -105,19 +103,18 @@ namespace GCode_Sender
                     break;
 
                 case nameof(GrblViewModel.GrblReset):
-                    if ((sender as GrblViewModel).GrblReset && (sender as GrblViewModel).IsReady)
-                        {
-                            initOK = null;
-                            Activate(true, ViewType.GRBL);
-                        }
-               //         Comms.com.WriteCommand(GrblConstants.CMD_GETPARSERSTATE);
+                    if ((sender as GrblViewModel).IsReady)
+                    {
+                        initOK = null;
+                        Activate(true, ViewType.GRBL);
+                    }
                     break;
 
                 case nameof(GrblViewModel.ParserState):
                     if ((sender as GrblViewModel).GrblReset)
                     {
                         EnableUI(true);
-                      //  (sender as GrblViewModel).GrblReset = false;
+                        (sender as GrblViewModel).GrblReset = false;
                     }
                     break;
 
@@ -407,7 +404,7 @@ namespace GCode_Sender
             if (!(e.Handled = ProcessKeyPreview(e)))
                 base.OnPreviewKeyDown(e);
         }
-        protected bool ProcessKeyPreview(System.Windows.Input.KeyEventArgs e)
+        protected bool ProcessKeyPreview(KeyEventArgs e)
         {
             if (keyboard == null || mdiControl.IsFocused || DRO.IsFocused || spindleControl.IsFocused || workParametersControl.IsFocused)
                 return false;

@@ -103,6 +103,20 @@ namespace CNC.Controls
             Text = "";
         }
 
+        protected override void OnPreviewKeyUp(KeyEventArgs e)
+        {
+            base.OnPreviewKeyUp(e);
+
+            if (e.Key == Key.Delete || e.Key == Key.Back)
+            {
+                string text = SelectionLength > 0 ? Text.Remove(SelectionStart, SelectionLength) : Text;
+
+                updateText = false;
+                Value = double.Parse(text == "" || text == "." || text == "-" || text == "-." ? "0" : text, np.Styles, CultureInfo.InvariantCulture);
+                updateText = true;
+            }
+        }
+
         protected override void OnPreviewTextInput(TextCompositionEventArgs e)
         {
             TextBox textBox = (TextBox)e.OriginalSource;

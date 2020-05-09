@@ -158,6 +158,9 @@ namespace CNC.Controls
         public void AddBlock(string block, Core.Action action)
         {
             Program.AddBlock(block, action);
+
+            if(action == Core.Action.End)
+                Model.Blocks = Blocks;
         }
 
         public void AddBlock(string block)
@@ -199,6 +202,7 @@ namespace CNC.Controls
         public void Close()
         {
             Program.CloseFile();
+            Model.Blocks = Blocks;
         }
 
         public void Open()
@@ -217,6 +221,8 @@ namespace CNC.Controls
 
             if(filename != string.Empty)
                 Load(filename);
+
+            Model.Blocks = Blocks;
         }
 
         public void Load(string filename)
@@ -235,6 +241,8 @@ namespace CNC.Controls
             {
                 Program.LoadFile(filename);
             }
+
+            Model.Blocks = Blocks;
         }
 
         public void Save()

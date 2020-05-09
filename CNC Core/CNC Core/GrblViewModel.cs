@@ -1,7 +1,7 @@
 /*
  * GrblViewModel.cs - part of CNC Controls library
  *
- * v0.17 / 2020-04-15 / Io Engineering (Terje Io)
+ * v0.18 / 2020-05-09 / Io Engineering (Terje Io)
  *
  */
 
@@ -43,6 +43,7 @@ using System.Windows.Media;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using CNC.GCode;
+using System.Threading;
 
 namespace CNC.Core
 {
@@ -50,9 +51,9 @@ namespace CNC.Core
     {
         private string _tool, _message, _WPos, _MPos, _wco, _wcs, _a, _fs, _ov, _pn, _sc, _sd, _ex, _d, _gc, _h;
         private string _mdiCommand, _fileName;
-        private bool _flood, _mist, _tubeCoolant, _toolChange, _reset, _isMPos, _isJobRunning, _isProbeSuccess, _pgmEnd;
+        private bool _flood, _mist, _tubeCoolant, _toolChange, _reset, _isMPos, _isJobRunning, _isProbeSuccess, _pgmEnd, _isParserStateLive;
         private bool? _mpg;
-        private int _pwm, _line, _scrollpos;
+        private int _pwm, _line, _scrollpos, _blocks = 0;
         private double _feedrate = 0d;
         private double _rpm = 0d, _rpmInput = 0d, _rpmDisplay = 0d, _jogStep = 0.1d;
         private double _rpmActual = double.NaN;
@@ -65,6 +66,8 @@ namespace CNC.Core
         private HomedState _homedState = HomedState.Unknown;
         private StreamingState _streamingState;
         public SpindleState _spindleStatePrev = GCode.SpindleState.Off;
+
+        private Thread pollThread = null;
 
         public Action<string> OnCommandResponseReceived;
         public Action<string> OnResponseReceived;
@@ -81,6 +84,9 @@ namespace CNC.Core
 
             MDICommand = new ActionCommand<string>(ExecuteMDI);
 
+            pollThread = new Thread(new ThreadStart(Poller.Run));
+            pollThread.Start();
+
             Signals.PropertyChanged += Signals_PropertyChanged;
             OptionalSignals.PropertyChanged += OptionalSignals_PropertyChanged;
             SpindleState.PropertyChanged += SpindleState_PropertyChanged;
@@ -89,6 +95,11 @@ namespace CNC.Core
             MachinePosition.PropertyChanged += MachinePosition_PropertyChanged;
             ProbePosition.PropertyChanged += ProbePosition_PropertyChanged;
             ToolOffset.PropertyChanged += ToolOffset_PropertyChanged;
+        }
+
+        ~GrblViewModel()
+        {
+            pollThread.Abort();
         }
 
         private void ToolOffset_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -157,7 +168,7 @@ namespace CNC.Core
             GrblState = _grblState;
             IsMPGActive = null; //??
 
-            _MPos = _WPos = _wco = string.Empty;
+            _MPos = _WPos = _wco = _h = string.Empty;
             Position.Clear();
             MachinePosition.Clear();
             WorkPosition.Clear();
@@ -177,6 +188,8 @@ namespace CNC.Core
                 LatheMode = LatheMode.Radius;
         }
 
+        public PollGrbl Poller { get; } = new PollGrbl();
+
         public ICommand MDICommand { get; private set; }
 
         private void ExecuteMDI(string command)
@@ -191,18 +204,20 @@ namespace CNC.Core
 
         public void ExecuteCommand(string command)
         {
-            if (!string.IsNullOrEmpty(command))
+            if (command != null)
             {
                 MDI = command;
-                if (ResponseLogVerbose)
+
+                if (command == string.Empty)
+                    SetGrblError(0);
+
+                if (ResponseLogVerbose && !string.IsNullOrEmpty(command))
                     ResponseLog.Add(command);
             }
         }
 
-        public int PollInterval { get; set; } = 200; // ms
         public bool ResponseLogVerbose { get; set; } = false;
         public bool IsReady { get; set; } = false;
-
 
         #region Dependencyproperties
 
@@ -215,7 +230,7 @@ namespace CNC.Core
         public ObservableCollection<Tool> Tools { get { return GrblWorkParameters.Tools; } }
         public ObservableCollection<string> SystemInfo { get { return GrblInfo.SystemInfo; } }
         public string Tool { get { return _tool; } set { _tool = value; OnPropertyChanged(); } }
-        public bool GrblReset { get { return _reset; } set { _reset = value; _grblState.Error = 0; OnPropertyChanged(); if(_reset) Message = ""; } }
+        public bool GrblReset { get { return _reset; } set { if ((_reset = value)) { _grblState.Error = 0; OnPropertyChanged(); Message = ""; } } }
         public GrblState GrblState { get { return _grblState; } set { _grblState = value; OnPropertyChanged(); } }
         public bool IsCheckMode { get { return _grblState.State == GrblStates.Check; } }
         public bool IsSleepMode { get { return _grblState.State == GrblStates.Sleep; } }
@@ -243,6 +258,7 @@ namespace CNC.Core
         public EnumFlags<AxisFlags> AxisScaled { get; private set; } = new EnumFlags<AxisFlags>(AxisFlags.None);
         public string FileName { get { return _fileName; } set { _fileName = value; OnPropertyChanged(); OnPropertyChanged(nameof(IsFileLoaded)); OnPropertyChanged(nameof(IsPhysicalFileLoaded)); } }
         public bool IsFileLoaded { get { return _fileName != string.Empty; } }
+        public int Blocks { get { return _blocks; } set { _blocks = value; OnPropertyChanged(); } }
         public bool IsPhysicalFileLoaded { get { return _fileName != string.Empty && (_fileName.StartsWith(@"\\") || _fileName[1] == ':'); } }
         public bool? IsMPGActive { get { return _mpg; } private set { if (_mpg != value) { _mpg = value; OnPropertyChanged(); } } }
         public string Scaling { get { return _sc; } private set { _sc = value; OnPropertyChanged(); } }
@@ -418,6 +434,8 @@ namespace CNC.Core
             }
         }
 
+        public bool IsParserStateLive { get { return _isParserStateLive; } set { _isParserStateLive = value; OnPropertyChanged(); } }
+
         #endregion
 
         public bool SetGRBLState(string newState, int substate, bool force)
@@ -500,17 +518,17 @@ namespace CNC.Core
             return force;
         }
 
-        public void SetError(int error)
+        public void SetGrblError(int error)
         {
             GrblError = error;
-            Message = error == 0 ? "" : GrblErrors.GetMessage(error.ToString());
+            Message = error == 0 ? String.Empty : GrblErrors.GetMessage(error.ToString());
         }
 
         public bool ParseGCStatus(string data)
         {
             GrblParserState.Process(data);
             if (GrblParserState.IsLoaded)
-                ParserState = data;
+                ParserState = data.Substring(4).TrimEnd(']');
 
             return GrblParserState.IsLoaded;
         }
@@ -750,7 +768,8 @@ namespace CNC.Core
                     if (_h != value)
                     {
                         _h = value;
-                        HomedState = value == "1" ? HomedState.Homed : (GrblState.State == GrblStates.Alarm && GrblState.Substate == 11 ? HomedState.NotHomed : HomedState.Unknown);
+                        var hs = _h.Split(',');
+                        HomedState = hs[0] == "1" ? HomedState.Homed : (GrblState.State == GrblStates.Alarm && GrblState.Substate == 11 ? HomedState.NotHomed : HomedState.Unknown);
                     }
                     break;
 
@@ -794,7 +813,7 @@ namespace CNC.Core
             else if (data.StartsWith("["))
             {
                 if (data.StartsWith("[MSG:")) {
-                    Message = data;
+                    Message = data == "[MSG:]" ? string.Empty : data;
                     if (data == "[MSG:Pgm End]")
                         ProgramEnd = true;
                 } // else ignore?
@@ -806,7 +825,7 @@ namespace CNC.Core
                 OnGrblReset?.Invoke();
                 _reset = false;
             }
-            else if (StreamingState != StreamingState.Jogging)
+            else if (_grblState.State != GrblStates.Jog)
             {
                 if (data == "ok")
                     OnCommandResponseReceived?.Invoke(data);
@@ -816,7 +835,7 @@ namespace CNC.Core
                     {
                         try
                         {
-                            SetError(int.Parse(data.Substring(6)));
+                            SetGrblError(int.Parse(data.Substring(6)));
                         }
                         catch
                         {

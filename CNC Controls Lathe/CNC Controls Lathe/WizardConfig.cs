@@ -1,7 +1,7 @@
 /*
  * WizardConfig.cs - part of CNC Controls library for Grbl
  *
- * v0.17 / 2020-04-15 / Io Engineering (Terje Io)
+ * v0.18 / 2020-05-01 / Io Engineering (Terje Io)
  *
  */
 
@@ -340,64 +340,66 @@ namespace CNC.Controls.Lathe
     public class PassCalc
     {
         private int _passes = 1;
+        private double _distance;
 
         public PassCalc(double distance, double passdepth, double passdepth_last, int precision)
         {
-            this.passdepth = passdepth;
-            this.passdepth_last = passdepth_last;
-            this.distance = Math.Round(Math.Abs(distance), precision);
+            Passdepth = passdepth;
+            PassdepthLast = passdepth_last;
+            _distance = Math.Round(Math.Abs(distance), precision);
 
-            if (this.distance < this.passdepth_last)
-                this.passdepth_last = this.distance;
-
-            else if (this.distance < this.passdepth)
+            if (_distance < PassdepthLast)
             {
-                if (this.passdepth_last > 0.0d)
-                    this._passes++;
-                this.passdepth = this.distance - this.passdepth_last;
+                PassdepthLast = _distance;
+                _distance = 0d;
+            }
+            else if (_distance < (Passdepth + PassdepthLast))
+            {
+                if (PassdepthLast > 0d)
+                    _passes++;
+                Passdepth = _distance = _distance - PassdepthLast;
             }
             else
             {
-                this.distance -= this.passdepth_last;
-                this._passes = (int)Math.Floor(this.distance / this.passdepth);
+                _distance -= PassdepthLast;
+                _passes = (int)Math.Floor(_distance / Passdepth);
 
-                if (this.passdepth * (double)this._passes < this.distance)
+                if (Passdepth * (double)_passes < _distance)
                 {
-                    this._passes++;
-                    this.passdepth = Math.Round(this.distance / (double)this._passes, precision);
+                    _passes++;
+                    Passdepth = Math.Round(_distance / (double)_passes, precision);
                 }
-                this._passes++; // Add last pass
+                _passes++; // Add last pass
             }
 
-            this.DOC = this.passdepth;
+            DOC = Passdepth;
         }
 
-        public int passes { get { return _passes + springpasses; } }
-        public int springpasses { get; set; }
-        public double passdepth { get; private set; }
-        public double passdepth_last { get; private set; }
-        public double distance { get; private set; }
-        public bool IsLastPass { get; private set; }
-        public bool dir { get; private set; }
-        public double DOC { get; private set; }
+        public int Passes { get { return _passes + Springpasses; } }
+        public int Springpasses { get; set; }
+        public double Passdepth { get; private set; }
+        public double PassdepthLast { get; private set; }
         public double Distance { get; private set; }
+        public bool IsLastPass { get; private set; }
+        public bool Dir { get; private set; }
+        public double DOC { get; private set; }
 
         public double GetPassTarget(uint pass, double start, bool negative)
         {
-            if (pass <= passes)
+            if (pass <= Passes)
             {
                 if ((IsLastPass = pass >= _passes))
                 {
-                    this.Distance = distance + passdepth_last;
-                    this.DOC = pass > _passes ? 0.0d : passdepth_last;
+                    Distance = _distance + PassdepthLast;
+                    DOC = pass > _passes ? 0.0d : PassdepthLast;
                 }
                 else if (pass == _passes - 1)
-                    this.Distance = distance;
+                    Distance = _distance;
                 else
-                    this.Distance = Math.Min(passdepth * (double)pass, distance);
+                    Distance = Math.Min(Passdepth * (double)pass, _distance);
             }
 
-            return pass > passes ? double.NaN : (negative ? -this.Distance : this.Distance) + start;
+            return pass > Passes ? double.NaN : (negative ? -Distance : Distance) + start;
         }
     }
 }

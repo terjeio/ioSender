@@ -1,5 +1,18 @@
 ## GRBL GCode Sender
 
+2020-05-09: Alpha 18 release of binary.
+
+Changes:
+
+* `<Ctrl>+<H>` shortcut for homing added.
+* Keyboard jogging can be enabled when probing tab is active. Jog flyout always active in probing tab.
+* Number of blocks (lines) in loaded program shown in status bar.
+* Option for real time display of parser state in grbl tab (requires latest grblHAL build)
+* Some semantic changes, e.g. _File > Open_ is now _File > Load_.
+* Bug fixes, internal changes.
+
+---
+
 2020-04-17: Alpha 17 release of binary.
 
 Changes:
@@ -12,8 +25,6 @@ Changes:
 * Cursor key jogging when jog flyout is active, even for non grblHAL firmware. _No_ autorepeat!.
 * Change step size and feedrate with keyboard shortcuts when jog flyout is active. Bound to numeric keypad `2`, `4`, `6` and `8`.
 * [Manually](https://github.com/terjeio/Grbl-GCode-Sender/wiki/Usage-tips) associate GCode filetypes with sender.
-
-[Spring](https://www.yr.no/place/Norway/Vestland/Alver/Io~105904/long.html?spr=eng) has finally arrived after a long wet and windy period :-), development will continue at a much slower pace from now...
 
 ---
 

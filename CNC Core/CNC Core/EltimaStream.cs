@@ -1,7 +1,7 @@
 ﻿/*
  * EltimaStream.cs - part of CNC Controls library
  *
- * v0.09 / 2020-02-28 / Io Engineering (Terje Io)
+ * v0.18 / 2020-05-09 / Io Engineering (Terje Io)
  *
  */
 
@@ -245,7 +245,7 @@ namespace CNC.Core
 
             if (command.Length == 1 && command != GrblConstants.CMD_PROGRAM_DEMARCATION)
                 WriteByte((byte)command.ToCharArray()[0]);
-            else if (command.Length > 0)
+            else
             {
                 command += "\r";
                 serialPort.WriteStr(command);

@@ -8,11 +8,11 @@
              d:DesignHeight="335" d:DesignWidth="400"
              Loaded="UserControl_Loaded">
     <DataGrid x:Name="grdGCode" Grid.Row="0" ItemsSource="{Binding}" AllowDrop="True" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" AutoGenerateColumns="False"
-                   CanUserSortColumns="false" IsReadOnly="true" DragEnter="grdGCode_Drag" DragOver="grdGCode_Drag" DragLeave="grdGCode_Drag" Drop="grdGCode_Drop">
+                   CanUserSortColumns="false" CanUserResizeRows="False" IsReadOnly="true" DragEnter="grdGCode_Drag" DragOver="grdGCode_Drag" DragLeave="grdGCode_Drag" Drop="grdGCode_Drop">
         <DataGrid.Columns>
-            <DataGridTextColumn Header="Line" Binding="{Binding LineNum}" Width="50"/>
-            <DataGridTextColumn Header="" Binding="{Binding Sent}" Width="20"/>
-            <DataGridTextColumn Header="Data" Binding="{Binding Data}" Width="*"/>
+            <DataGridTextColumn Header="Block" Binding="{Binding LineNum}" Width="50" MinWidth="50" MaxWidth="60"/>
+            <DataGridTextColumn Header="" Binding="{Binding Sent}" Width="*" MinWidth="30" MaxWidth="60"/>
+            <DataGridTextColumn Header="Data" Binding="{Binding Data}" Width="*" MinWidth="280"/>
         </DataGrid.Columns>
     </DataGrid>
 </UserControl>

@@ -1,7 +1,7 @@
 ﻿/*
  * GCodeJob.cs - part of CNC Controls library
  *
- * v0.15 / 2020-04-07 / Io Engineering (Terje Io)
+ * v0.18 / 2020-04-21 / Io Engineering (Terje Io)
  *
  */
 
@@ -106,7 +106,7 @@ namespace CNC.Core
 
         public bool LoadFile(string filename)
         {
-            bool ok = true, end;
+            bool ok = true;
 
             FileInfo file = new FileInfo(filename);
 
@@ -123,8 +123,7 @@ namespace CNC.Core
                     s = s.Trim();
                     if (Parser.ParseBlock(ref s, false))
                     {
-                        end = s == "M30" || s == "M2" || s == "M02";
-                        gcode.Rows.Add(new object[] { LineNumber++, s, s.Length + 1, true, end, "", false });
+                        gcode.Rows.Add(new object[] { LineNumber++, s, s.Length + 1, true, Parser.ProgramEnd, "", false });
                         while (commands.Count > 0)
                             gcode.Rows.Add(new object[] { LineNumber++, commands.Dequeue(), 20, true, false, "", false });
                     }
@@ -189,7 +188,7 @@ namespace CNC.Core
 
                 // Calculate program limits (bounding box)
 
-                GCodeEmulator emu = new GCodeEmulator();
+                GCodeEmulator emu = new GCodeEmulator(true);
 
                 foreach (var cmd in emu.Execute(Tokens))
                 {

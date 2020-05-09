@@ -1,7 +1,7 @@
 ﻿/*
  * HeightMapControl.xaml.cs - part of CNC Probing library
  *
- * v0.14 / 2020-03-28 / Io Engineering (Terje Io)
+ * v0.18 / 2020-05-09 / Io Engineering (Terje Io)
  *
  */
 
@@ -64,19 +64,23 @@ namespace CNC.Controls.Probing
         {
             double dir = 1d;
             var probing = DataContext as ProbingViewModel;
+
+            if(!probing.Init())
+                return;
+
             probing.PropertyChanged += Probing_PropertyChanged;
 
-            origin = new Position(probing.Grbl.MachinePosition);
             probing.HeightMap.BoundaryPoints = null;
             probing.HeightMap.MapPoints = null;
             probing.HeightMap.MeshGeometry = null;
 
-            probing.Program.Clear();
             probing.Program.Add(string.Format("G91F{0}", probing.ProbeFeedRate.ToInvariantString()));
             probing.Message = string.Empty;
 
             probing.HeightMap.HasHeightMap = false;
             probing.HeightMap.Map = new HeightMap(probing.HeightMap.GridSize, new Vector2(probing.HeightMap.MinX, probing.HeightMap.MinY), new Vector2(probing.HeightMap.MaxX, probing.HeightMap.MaxY));
+
+            origin = new Position(probing.Grbl.MachinePosition);
 
             for (x = 0; x < probing.HeightMap.Map.SizeX; x++)
             {

@@ -1,7 +1,7 @@
 ﻿/*
  * EdgeFinderControl.xaml.cs - part of CNC Probing library
  *
- * v0.14 / 2020-03-28 / Io Engineering (Terje Io)
+ * v0.18 / 2020-05-09 / Io Engineering (Terje Io)
  *
  */
 
@@ -85,9 +85,11 @@ namespace CNC.Controls.Probing
                 return;
             }
 
+            if (!probing.Init())
+                return;
+
             probing.PropertyChanged += Probing_PropertyChanged;
 
-            probing.Program.Clear();
             probing.Program.Add(string.Format("G91F{0}", probing.ProbeFeedRate.ToInvariantString()));
             probing.Message = string.Empty;
 

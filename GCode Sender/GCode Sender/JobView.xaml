@@ -12,8 +12,14 @@
              Loaded="JobView_Load"
              IsVisibleChanged="JobView_IsVisibleChanged"
              SizeChanged="JobView_SizeChanged">
+    <UserControl.Resources>
+        <cnccontrols:BoolToVisibleConverter x:Key="IsVisibleConverter" />
+    </UserControl.Resources>
     <DockPanel Background="Transparent" MouseDown="outside_MouseDown" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-        <cnccontrols:MDIControl x:Name="mdiControl" DockPanel.Dock="Bottom" HorizontalAlignment="Left"/>
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal">
+            <cnccontrols:MDIControl x:Name="mdiControl" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            <TextBlock Text="{Binding Path=ParserState}" Visibility="{Binding Path=IsParserStateLive, Converter={StaticResource IsVisibleConverter}}" TextWrapping="NoWrap" Margin="5,0,0,2" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="23"/>
+        </StackPanel>
         <DockPanel x:Name="dp" DockPanel.Dock="Left" Margin="5,5,5,0" Width="220" HorizontalAlignment="Left" VerticalAlignment="Stretch">
             <StackPanel x:Name="t1" Height="Auto" HorizontalAlignment="Left" VerticalAlignment="Top" DockPanel.Dock="Top">
                 <cnccontrols:DROControl x:Name="DRO" HorizontalAlignment="Left" VerticalAlignment="Top"/>

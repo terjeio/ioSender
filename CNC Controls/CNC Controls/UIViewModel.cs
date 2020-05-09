@@ -1,7 +1,7 @@
 ﻿/*
  * UIViewModel.cs - part of CNC Controls library for Grbl
  *
- * v0.17 / 2020-04-15 / Io Engineering (Terje Io)
+ * v0.18 / 2020-05-08 / Io Engineering (Terje Io)
  *
  */
 
@@ -78,7 +78,7 @@ namespace CNC.Controls
                     _currentView = value;
                     foreach (SidebarItem cmd in SidebarItems)
                     {
-                        cmd.IsEnabled = _currentView.ViewType == ViewType.GRBL;
+                        cmd.IsEnabled = _currentView.ViewType == ViewType.GRBL || _currentView.ViewType == ViewType.Probing;
                         cmd.Visibility = Visibility.Hidden;
                     }
                     OnPropertyChanged();

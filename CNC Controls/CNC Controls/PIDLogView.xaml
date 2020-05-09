@@ -5,15 +5,28 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CNC.Controls"
              mc:Ignorable="d" 
-             d:DesignHeight="515" d:DesignWidth="875">
+             d:DesignHeight="515" d:DesignWidth="875"
+             Loaded="PIDLogView_Loaded">
     <Grid>
         <Border BorderThickness="1" BorderBrush="DarkGray" Height="442" Width="642" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10">
             <Canvas x:Name="PIDPlot" Background="WhiteSmoke" Height="440" Width="640" HorizontalAlignment="Left" VerticalAlignment="Top"/>
         </Border>
-        <Label x:Name="lblTarget" Content="Target" Foreground="Green" HorizontalAlignment="Left" Margin="660,20,0,0" VerticalAlignment="Top" Width="100"/>
-        <Label x:Name="lblError" Content="Error" Foreground="Red" HorizontalAlignment="Left" Margin="660,40,0,0" VerticalAlignment="Top" Width="100"/>
-        <Label x:Name="lblActual" Content="Actual" Foreground="Blue" HorizontalAlignment="Left" Margin="660,60,0,0" VerticalAlignment="Top" Width="100"/>
+        <StackPanel Margin="660,23,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="50">
+            <TextBlock Text="{Binding Path=GridLabel4, StringFormat=\{0\} µm}" Width="50" Margin="0,00,0,0" Height="20" Foreground="Red"/>
+            <TextBlock Text="{Binding Path=GridLabel3, StringFormat=\{0\} µm}" Width="50" Margin="0,30,0,0" Height="20" Foreground="Red"/>
+            <TextBlock Text="{Binding Path=GridLabel2, StringFormat=\{0\} µm}" Width="50" Margin="0,30,0,0" Height="20" Foreground="Red"/>
+            <TextBlock Text="{Binding Path=GridLabel1, StringFormat=\{0\} µm}" Width="50" Margin="0,30,0,0" Height="20" Foreground="Red"/>
+            <TextBlock Text="0" Width="50" Margin="0,30,0,0" Height="20" Foreground="Red"/>
+            <TextBlock Text="{Binding Path=GridLabel1, StringFormat=-\{0\} µm}" Width="50" Margin="0,30,0,0" Height="20" Foreground="Red"/>
+            <TextBlock Text="{Binding Path=GridLabel2, StringFormat=-\{0\} µm}" Width="50" Margin="0,30,0,0" Height="20" Foreground="Red"/>
+            <TextBlock Text="{Binding Path=GridLabel3, StringFormat=-\{0\} µm}" Width="50" Margin="0,30,0,0" Height="20" Foreground="Red"/>
+            <TextBlock Text="{Binding Path=GridLabel4, StringFormat=-\{0\} µm}" Width="50" Margin="0,30,0,0" Height="20" Foreground="Red"/>
+
+        </StackPanel>
+        <Label x:Name="lblTarget" Content="Target" Foreground="Green" HorizontalAlignment="Left" Margin="492,457,0,0" VerticalAlignment="Top" Width="50"/>
+        <Label x:Name="lblError" Content="Error" Foreground="Red" HorizontalAlignment="Left" Margin="602,457,0,0" VerticalAlignment="Top" Width="50"/>
+        <Label x:Name="lblActual" Content="Actual" Foreground="Blue" HorizontalAlignment="Left" Margin="547,457,0,0" VerticalAlignment="Top" Width="50"/>
         <Button x:Name="btnGetPIDData" Content="Get data" HorizontalAlignment="Left" Height="34" Margin="10,462,0,0" VerticalAlignment="Top" Width="75" Click="btnGetPIDData_Click"/>
-        <Slider x:Name="sldError" HorizontalAlignment="Left" Margin="676,430,0,0" VerticalAlignment="Top" Width="169" Minimum="1" Maximum="3000" Value="2500" ValueChanged="sldError_ValueChanged"/>
+        <Slider x:Name="sldError" Value="{Binding Path=ErrorScale}" HorizontalAlignment="Left" Margin="674,474,0,0" VerticalAlignment="Top" Width="169" Minimum="0" Maximum="5" TickPlacement="BottomRight" IsSnapToTickEnabled="True" ValueChanged="sldError_ValueChanged"/>
     </Grid>
 </UserControl>

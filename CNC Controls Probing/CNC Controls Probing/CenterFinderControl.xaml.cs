@@ -1,7 +1,7 @@
 ﻿/*
  * CenterFinderControl.xaml.cs - part of CNC Probing library
  *
- * v0.14 / 2020-03-29 / Io Engineering (Terje Io)
+ * v0.18 / 2020-05-09 / Io Engineering (Terje Io)
  *
  */
 
@@ -76,8 +76,6 @@ namespace CNC.Controls.Probing
 
             double diameter_2 = probing.WorkpieceDiameter / 2d;
 
-            probing.Program.Clear();
-
             if (pass == passes)
                 probing.Program.Add(string.Format("G91F{0}", probing.ProbeFeedRate.ToInvariantString()));
 
@@ -137,14 +135,17 @@ namespace CNC.Controls.Probing
         {
             var probing = DataContext as ProbingViewModel;
 
+            if (!probing.Init())
+                return;
+
             pass = passes;
+
             center = new Position(probing.Grbl.MachinePosition);
 
             probing.PropertyChanged += Probing_PropertyChanged;
 
             Execute();
             probing.Execute.Execute(true);
-
         }
 
         private void Probing_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)

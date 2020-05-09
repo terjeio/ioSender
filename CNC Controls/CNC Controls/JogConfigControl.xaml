@@ -11,7 +11,10 @@
     </UserControl.Resources>
     <GroupBox x:Name="grpJog" Header="Keyboard jogging" HorizontalAlignment="Left" VerticalAlignment="Top" Height="Auto" Width="250">
         <StackPanel HorizontalAlignment="Left" Height="Auto" Margin="0,3,0,0" VerticalAlignment="Top" Width="235">
-            <CheckBox Content="Enable /!\" IsChecked="{Binding Path=Jog.KeyboardEnable, Mode=TwoWay}" Visibility="{Binding Path=IsGrbl, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource IsVisibleConverter}}" Margin="90,3,0,3" ToolTip="Warning! - Grbl has outstanding bug(s) in jog cancel (on key up)."/>
+            <StackPanel Orientation="Horizontal" Visibility="{Binding Path=IsGrbl, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource IsVisibleConverter}}" ToolTip="Warning! - Grbl has outstanding bug(s) in jog cancel (on key up).">
+                <CheckBox Content="Enable" IsChecked="{Binding Path=Jog.KeyboardEnable, Mode=TwoWay}" Margin="90,3,0,3"/>
+                <Image HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,0,0,0" Source="Resources/StatusAnnotations_Warning_16xLG_color.png"/>
+            </StackPanel>
             <local:NumericField Label="Fast feedrate:" ColonAt="90" Unit="mm/min" Format="###0" Value="{Binding Path=Jog.FastFeedrate, Mode=TwoWay}"/>
             <local:NumericField Label="Fast distance:" ColonAt="90" Value="{Binding Path=Jog.FastDistance, Mode=TwoWay}" />
             <local:NumericField Label="Slow feedrate:" ColonAt="90" Unit="mm/min" Format="###0" Value="{Binding Path=Jog.SlowFeedrate, Mode=TwoWay}"/>

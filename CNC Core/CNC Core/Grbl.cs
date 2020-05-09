@@ -1,7 +1,7 @@
 ﻿/*
  * Grbl.cs - part of CNC Controls library
  *
- * v0.17 / 2020-04-15 / Io Engineering (Terje Io)
+ * v0.18 / 2020-05-09 / Io Engineering (Terje Io)
  *
  */
 
@@ -227,7 +227,6 @@ namespace CNC.Core
         JobFinished,
         Reset,
         AwaitResetAck,
-        Jogging,
         Disabled,
         Error
     }
@@ -296,6 +295,9 @@ namespace CNC.Core
         }
 
         public static GrblViewModel GrblViewModel { get; set; } = null;
+
+ //       public static GrblInfo Info { get; private set; };
+
     }
 
     public class CoordinateValues<T> : ViewModelBase
@@ -1283,6 +1285,8 @@ namespace CNC.Core
 
             settings.AcceptChanges();
 
+            model.GrblState = model.GrblState; // Temporary hack to enable the Home button when homing is enabled
+
             return IsLoaded;
         }
 
@@ -1329,7 +1333,7 @@ namespace CNC.Core
                 exp.Add("; [NEWOPT:" + GrblInfo.NewOptions + "]");
 
             foreach (string opt in GrblInfo.SystemInfo)
-                exp.Add(" ;" + opt);
+                exp.Add("; " + opt);
 
             exp.Add(";");
 
@@ -1399,6 +1403,10 @@ namespace CNC.Core
                             UseLegacyRTCommands = valuepair[1] != "0";
                             break;
 
+                        case GrblSetting.StatusReportMask:
+                            Grbl.GrblViewModel.IsParserStateLive = (int.Parse(valuepair[1]) & (1 << 10)) != 0;
+                            break;
+
                         case GrblSetting.ControlInvertMask:
                             IsGrblHAL = true;
                             break;
@@ -1429,6 +1437,8 @@ namespace CNC.Core
         {
             if (PollInterval != 0)
             {
+                if(pollTimer.Enabled)
+                    pollTimer.Stop();
                 pollTimer.Interval = PollInterval;
                 pollTimer.Start();
                 RTCommand = GrblConstants.CMD_STATUS_REPORT_ALL;

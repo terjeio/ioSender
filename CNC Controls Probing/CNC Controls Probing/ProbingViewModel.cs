@@ -1,7 +1,7 @@
 ﻿/*
  * ProbingViewModel.cs - part of CNC Probing library
  *
- * v0.17 / 2020-04-15 / Io Engineering (Terje Io)
+ * v0.18 / 2020-05-09 / Io Engineering (Terje Io)
  *
  */
 
@@ -114,6 +114,75 @@ namespace CNC.Controls.Probing
             }
         }
 
+        public bool Init()
+        {
+            bool? res = null;
+
+            Message = String.Empty;
+
+            Grbl.Poller.SetState(0);  // Disable status polling during probing
+
+            // Clear error status if set
+            if (Grbl.GrblError != 0)
+            {
+                new Thread(() =>
+                {
+                    res = WaitFor.AckResponse<string>(
+                    cancellationToken,
+                    null,
+                    a => Grbl.OnResponseReceived += a,
+                    a => Grbl.OnResponseReceived -= a,
+                    1000, () => Grbl.ExecuteCommand(""));
+                }).Start();
+
+                while (res == null)
+                    EventUtils.DoEvents();
+
+                res = null;
+            }
+
+            // Get a status report in order to establish current machine position
+            new Thread(() =>
+            {
+                res = WaitFor.SingleEvent<string>(
+                cancellationToken,
+                null,
+                a => Grbl.OnResponseReceived += a,
+                a => Grbl.OnResponseReceived -= a,
+                1000, () => Comms.com.WriteByte(GrblLegacy.ConvertRTCommand(GrblConstants.CMD_STATUS_REPORT)));
+            }).Start();
+
+            while (res == null)
+                EventUtils.DoEvents();
+
+            Grbl.Poller.SetState(AppConfig.Settings.Base.PollInterval);
+
+            if (Grbl.GrblState.State == GrblStates.Alarm)
+            {
+                Message = GrblAlarms.GetMessage(Grbl.GrblState.Substate.ToString());
+                res = false;
+            }
+
+            if (res == true && Grbl.Signals.Value.HasFlag(Signals.Probe))
+            {
+                Message = "Probing failed, probe signal is asserted";
+                res = false;
+            }
+
+            if (res == true && Grbl.GrblState.State != GrblStates.Idle)
+            {
+                Message = "Probing failed, Grbl is not in idle state";
+                res = false;
+            }
+
+            Program.Clear();
+
+            if(res != true) // Reenable status polling if int fails 
+                Grbl.Poller.SetState(AppConfig.Settings.Base.PollInterval);
+
+            return res == true;
+        }
+
         public ICommand Execute { get; private set; }
 
         private void ExecuteProgram(bool go)
@@ -130,6 +199,7 @@ namespace CNC.Controls.Probing
                 if (!isRunning)
                 {
                     isRunning = true;
+
                     Grbl.OnCommandResponseReceived += ResponseReceived;
                     Grbl.PropertyChanged += Grbl_PropertyChanged;
                 }
@@ -161,6 +231,7 @@ namespace CNC.Controls.Probing
                 if (!IsSuccess)
                     End("Probing cancelled/failed");
                 IsCompleted = true;
+                Grbl.Poller.SetState(AppConfig.Settings.Base.PollInterval);
             }
         }
 
@@ -306,6 +377,9 @@ namespace CNC.Controls.Probing
             }
         }
         public CoordMode CoordinateMode { get { return _cmode; } set { _cmode = value; OnPropertyChanged(); } }
+
+        public bool IsCoordinateModeG92 { get { return _cmode == CoordMode.G92; } set { _cmode = value ? CoordMode.G92 : CoordMode.G10; OnPropertyChanged(); OnPropertyChanged(nameof(CoordinateMode)); } }
+
         public Edge ProbeEdge
         {
             get { return _edge; }

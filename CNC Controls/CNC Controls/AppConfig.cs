@@ -1,7 +1,7 @@
 ﻿/*
  * AppConfig.cs - part of CNC Controls library for Grbl
  *
- * v0.17 / 2020-04-15 / Io Engineering (Terje Io)
+ * v0.18 / 2020-04-18 / Io Engineering (Terje Io)
  *
  */
 
@@ -76,28 +76,32 @@ namespace CNC.Controls
     [Serializable]
     public class CameraConfig : ViewModelBase
     {
-        double _xoffset = 0d, _yoffset = 0d;
+        private double _xoffset = 0d, _yoffset = 0d;
+        private CameraMoveMode _moveMode = CameraMoveMode.BothAxes;
 
         [XmlIgnore]
         public CameraMoveMode[] MoveModes { get { return (CameraMoveMode[])Enum.GetValues(typeof(CameraMoveMode)); } }
 
         public double XOffset { get { return _xoffset; } set { _xoffset = value; OnPropertyChanged(); } }
         public double YOffset { get { return _yoffset; } set { _yoffset = value; OnPropertyChanged(); } }
-        public CameraMoveMode MoveMode { get; set; } = CameraMoveMode.BothAxes;
+        public CameraMoveMode MoveMode { get { return _moveMode; } set { _moveMode = value; OnPropertyChanged(); } }
     }
 
     [Serializable]
     public class GCodeViewerConfig : ViewModelBase
     {
         private bool _isEnabled = true;
+        private int _arcResolution = 10;
+        private double _minDistance = 0.05d;
+        private bool _showGrid = true, _showAxes = true, _showBoundingBox = false, _showViewCube = true;
 
         public bool IsEnabled { get { return _isEnabled; } set { _isEnabled = value; OnPropertyChanged(); } }
-        public int ArcResolution { get; set; } = 10;
-        public double MinDistance { get; set; } = 0.05d;
-        public bool ShowGrid { get; set; } = true;
-        public bool ShowAxes { get; set; } = true;
-        public bool ShowBoundingBox { get; set; } = false;
-        public bool ShowViewCube { get; set; } = true;
+        public int ArcResolution { get { return _arcResolution; } set { _arcResolution = value; OnPropertyChanged(); } }
+        public double MinDistance { get { return _minDistance; } set { _minDistance = value; OnPropertyChanged(); } }
+        public bool ShowGrid { get { return _showGrid; } set { _showGrid = value; OnPropertyChanged(); } }
+        public bool ShowAxes { get { return _showAxes; } set { _showAxes = value; OnPropertyChanged(); } }
+        public bool ShowBoundingBox { get { return _showBoundingBox; } set { _showBoundingBox = value; OnPropertyChanged(); } }
+        public bool ShowViewCube { get { return _showViewCube; } set { _showViewCube = value; OnPropertyChanged(); } }
     }
 
     [Serializable]
@@ -126,18 +130,20 @@ namespace CNC.Controls
     public class Config : ViewModelBase
     {
         private int _pollInterval = 200; // ms
+        private bool _useBuffering = false;
+        private CommandIgnoreState _ignoreM6 = CommandIgnoreState.No, _ignoreM7 = CommandIgnoreState.No, _ignoreM8 = CommandIgnoreState.No;
 
         public int PollInterval { get { return _pollInterval < 100 ? 100 : _pollInterval; } set { _pollInterval = value; OnPropertyChanged(); } }
         public string PortParams { get; set; } = "COMn:115200,N,8,1";
         public int ResetDelay { get; set; } = 2000;
-        public bool UseBuffering { get; set; } = false;
+        public bool UseBuffering { get { return _useBuffering; } set { _useBuffering = value; OnPropertyChanged(); } }
         public string Editor { get; set; } = "notepad.exe";
 
         [XmlIgnore]
         public CommandIgnoreState[] CommandIgnoreStates { get { return (CommandIgnoreState[])Enum.GetValues(typeof(CommandIgnoreState)); } }
-        public CommandIgnoreState IgnoreM6 { get; set; } = CommandIgnoreState.No;
-        public CommandIgnoreState IgnoreM7 { get; set; } = CommandIgnoreState.No;
-        public CommandIgnoreState IgnoreM8 { get; set; } = CommandIgnoreState.No;
+        public CommandIgnoreState IgnoreM6 { get { return _ignoreM6; } set { _ignoreM6 = value; OnPropertyChanged(); } }
+        public CommandIgnoreState IgnoreM7 { get { return _ignoreM7; } set { _ignoreM7 = value; OnPropertyChanged(); } }
+        public CommandIgnoreState IgnoreM8 { get { return _ignoreM8; } set { _ignoreM8 = value; OnPropertyChanged(); } }
         public ObservableCollection<CNC.GCode.Macro> Macros { get; set; } = new ObservableCollection<CNC.GCode.Macro>();
         public JogConfig Jog { get; set; } = new JogConfig();
         public LatheConfig Lathe { get; set; } = new LatheConfig();
@@ -372,7 +378,6 @@ namespace CNC.Controls
                 }
 
                 model.IsReady = true;
-                model.PollInterval = Base.PollInterval;
             }
             else if (status != 2)
             {

@@ -1,7 +1,7 @@
 ﻿/*
  * GCodeEmulator.cs - part of CNC Controls library
  *
- * v0.15 / 2020-04-11 / Io Engineering (Terje Io)
+ * v0.18 / 2020-04-29 / Io Engineering (Terje Io)
  *
  */
 
@@ -52,70 +52,21 @@ namespace CNC.Core
         public GCodeToken Token;
         public bool IsRetract;
         public bool IsSpindleSynced;
+        public bool IsScaled;
+        public Point3D ScaleFactors;
         public bool IsInMachineCoord;
         public uint LineNumber;
     }
 
-    public class GCodeEmulator
+    public class GCodeEmulator : Machine
     {
-        private List<CoordinateSystem> coordinateSystems = new List<CoordinateSystem>();
-        private CoordinateSystem coordinateSystem, g28, g30, g92;
-        private double[] offsets = new double[6] { 0d, 0d, 0d, 0d, 0d, 0d };
-        private double[] origin = new double[6] { 0d, 0d, 0d, 0d, 0d, 0d };
-        private bool canned;
+        private bool canned, translate;
         private RunAction action;
-        private bool isRelative = false;
-        Point6D machinePos = new Point6D();
-        Point6D absPos = new Point6D();
 
-        private double _rpm = 0d;
-
-        public GCodeEmulator()
+        public GCodeEmulator(bool translate = false) : base()
         {
-            coordinateSystems.Clear();
-            foreach (CoordinateSystem c in GrblWorkParameters.CoordinateSystems)
-                coordinateSystems.Add(c);
-
-            coordinateSystem = coordinateSystems.Where(x => x.Code == GrblParserState.WorkOffset).FirstOrDefault();
-            g28 = coordinateSystems.Where(x => x.Code == "G28").FirstOrDefault();
-            g30 = coordinateSystems.Where(x => x.Code == "G30").FirstOrDefault();
-            g92 = coordinateSystems.Where(x => x.Code == "G92").FirstOrDefault();
-
-
-            LatheMode = GrblParserState.LatheMode;
-            isRelative = GrblParserState.DistanceMode == DistanceMode.Incremental;
-
-            foreach (int i in AxisFlags.All.ToIndices())
-            {
-                offsets[i] = coordinateSystem.Values[i];
-                origin[i] = g92.Values[i];
-            }
-
-            switch (GrblParserState.Plane)
-            {
-                case GCode.Plane.XY:
-                    Plane = new GCPlane(Commands.G17, 0);
-                    break;
-
-                case GCode.Plane.XZ:
-                    Plane = new GCPlane(Commands.G18, 0);
-                    break;
-
-                case GCode.Plane.YZ:
-                    Plane = new GCPlane(Commands.G19, 0);
-                    break;
-            }
+            this.translate = translate;
         }
-
-        public GCPlane Plane { get; private set; }
-        public DistanceMode DistanceMode { get { return isRelative ? DistanceMode.Incremental : DistanceMode.Absolute; } }
-        public LatheMode LatheMode { get; private set; }
-        public CoolantState CoolantState { get; private set; } = CoolantState.Off;
-        public SpindleState SpindleState { get; private set; } = SpindleState.Off;
-        public double SpindleRPM { get { return SpindleState == SpindleState.Off ? 0d : _rpm; } }
-        public double Feedrate { get; private set; } = 0d;
-        public int Tool { get; private set; } = 0;
-        public bool IsMetric { get; private set; } = true;
 
         public void SetStartPosition(Point3D pos)
         {
@@ -124,6 +75,8 @@ namespace CNC.Core
 
         public IEnumerable<RunAction> Execute(List<GCodeToken> Tokens)
         {
+            Reset();
+
             foreach (GCodeToken token in Tokens)
             {
                 if (action.LineNumber != token.LineNumber)
@@ -135,6 +88,7 @@ namespace CNC.Core
 
                 switch (token.Command)
                 {
+                    // G0, G1: Linear Move
                     case Commands.G0:
                     case Commands.G1:
                         {
@@ -143,6 +97,7 @@ namespace CNC.Core
                         }
                         break;
 
+                    // G2, G3: Arc Move
                     case Commands.G2:
                     case Commands.G3:
                         {
@@ -151,6 +106,7 @@ namespace CNC.Core
                         }
                         break;
 
+                    // G5: Cubic Spline
                     case Commands.G5:
                         {
                             var spline = token as GCSpline;
@@ -158,14 +114,17 @@ namespace CNC.Core
                         }
                         break;
 
+                    // G7: Lathe Diameter Mode
                     case Commands.G7:
                         LatheMode = LatheMode.Diameter;
                         break;
 
+                    // G8: Lathe Radius Mode
                     case Commands.G8:
                         LatheMode = LatheMode.Radius;
                         break;
 
+                    // G10: Set Coordinate System
                     case Commands.G10:
                         {
                             if (token is GCCoordinateSystem)
@@ -186,22 +145,32 @@ namespace CNC.Core
                         }
                         break;
 
+                    // G17: XY Plane Select
                     case Commands.G17:
+                    // G18: ZX Plane Select
                     case Commands.G18:
+                    // G19: YZ Plane Select
                     case Commands.G19:
                         Plane = (GCPlane)token;
                         break;
 
+                    // G21: Metric Units
                     case Commands.G20:
                         // Strip G20 for now - Tokens are metric and needs to be transformed back...
-                        //IsMetric = false;
-                        action.Token.Command = Commands.Undefined;
+                        IsImperial = true;
+                        //for (int i = 0; i < scaleFactors.Length; i++)
+                        //    scaleFactors[i] = 25.4d;
+                        action.Token.Command = Commands.Undefined; // Strip G20 - need to implement unscale...
                         break;
 
+                    // G21 Imperial (inches) Units
                     case Commands.G21:
-                        IsMetric = true;
+                        IsImperial = false;
+                        //for (int i = 0; i < scaleFactors.Length; i++)
+                        //    scaleFactors[i] = 1d;
                         break;
 
+                    // G28: Set Predefined Position
                     case Commands.G28:
                         {
                             var motion = token as GCLinearMotion;
@@ -223,8 +192,9 @@ namespace CNC.Core
                             yield return action;
                             action.Start = action.End;
                         }
-                        break;      
+                        break;
 
+                    // G28.1: Set Predefined Position
                     case Commands.G28_1:
                         {
                             for (int i = 0; i < g28.Values.Length; i++)
@@ -232,6 +202,7 @@ namespace CNC.Core
                         }
                         break;
 
+                    // G30: Go Predefined Position
                     case Commands.G30:
                         {
                             var motion = token as GCLinearMotion;
@@ -256,6 +227,7 @@ namespace CNC.Core
                         }
                         break;
 
+                    // G30.1: Set Predefined Position
                     case Commands.G30_1:
                         {
                             for (int i = 0; i < g30.Values.Length; i++)
@@ -263,6 +235,7 @@ namespace CNC.Core
                         }
                         break;
 
+                    // G33: Spindle Synchronized Motion
                     case Commands.G33:
                         {
                             var motion = token as GCSyncMotion;
@@ -275,6 +248,54 @@ namespace CNC.Core
                         }
                         break;
 
+                    // G43: Tool Length Offset
+                    case Commands.G43:
+                        SetToolOffset(token as GCToolOffset);
+                        break;
+
+                    // G43.1: Dynamic Tool Length Offset
+                    case Commands.G43_1:
+                        DynamicToolOffset(token as GCToolOffsets);
+                        break;
+
+                    // G43.2: Apply additional Tool Length Offset
+                    case Commands.G43_2:
+                        AddToolOffset(token as GCToolOffset);
+                        break;
+
+                    // G49: Cancel Tool Length Compensation
+                    case Commands.G49:
+                        CancelToolCompensation();
+                        break;
+
+                    // G50: Cancel Scaling
+                    case Commands.G50:
+                        {
+                            IsScaled = false;
+                            //for (int i = 0; i < scaleFactors.Length; i++)
+                            //    scaleFactors[i] = IsImperial ? 25.4d : 1d;
+                            for (int i = 0; i < scaleFactors.Length; i++)
+                                scaleFactors[i] = 1d;
+                        }
+                        break;
+
+                    case Commands.G51:
+                        {
+                            IsScaled = false;
+                            //var scale = token as GCScaling;
+                            ////foreach (int i in scale.AxisFlags.ToIndices())
+                            ////    scaleFactors[i] = scale.Values[i] * (IsImperial ? 25.4d : 1d);
+                            //foreach (int i in scale.AxisFlags.ToIndices())
+                            //    scaleFactors[i] = scale.Values[i];
+                            //for (int i = 0; i < scaleFactors.Length; i++)
+                            //    IsScaled |= scaleFactors[i] != 1d;
+
+                            // Strip G20 for now - Tokens are already scaled and needs to be transformed back...
+                            action.Token.Command = Commands.Undefined; // Strip G51 - need to implement unscale...
+                        }
+                        break;
+
+                    // G53: Move in Machine Coordinates
                     case Commands.G53:
                         {
                             var motion = token as GCAbsLinearMotion;
@@ -291,6 +312,7 @@ namespace CNC.Core
                         }
                         break;
 
+                    // G54-G59.3: Select Coordinate System
                     case Commands.G54:
                     case Commands.G55:
                     case Commands.G56:
@@ -311,8 +333,9 @@ namespace CNC.Core
                         }
                         break;
 
+                    // G76: Threading Cycle
                     case Commands.G76:
-                        {
+                        if(translate) {
                             var thread = token as GCThreadingMotion;
                             uint pass = 1, passes = 0;
                             double doc = thread.InitialDepth, thread_length, main_taper_height = 0d;
@@ -443,18 +466,27 @@ namespace CNC.Core
                         }
                         break;
 
+                    // G80: Cancel Canned Cycle
                     case Commands.G80:
                         canned = false;
                         break;
 
+                    // G73: Drilling Cycle with Chip Breaking
                     case Commands.G73:
+                    // G81: Drilling Cycle
                     case Commands.G81:
+                    // G82: Drilling Cycle, Dwell
                     case Commands.G82:
+                    // G83: Peck Drilling Cycle
                     case Commands.G83:
+                    // G85: Boring Cycle, Feed Out
                     case Commands.G85:
+                    // G86: Boring Cycle, Spindle Stop, Rapid Move Out
                     case Commands.G86:
-                    case Commands.G89: // TODO: add plane handling
-                        {
+                    // G89: Boring Cycle, Dwell, Feed Out
+                    case Commands.G89:
+                        // TODO: add plane handling
+                        if(translate) {
                             bool wasRelative = isRelative;
                             GCCannedDrill drill = (token as GCCannedDrill);
                             double r = isRelative ? action.End.Z + drill.R : drill.R;
@@ -517,11 +549,13 @@ namespace CNC.Core
                         }
                         break;
 
-                    case Commands.G90:
-                    case Commands.G91:
+                    // G90.1, G91.1: Arc Distance Mode
+                    case Commands.G90: // Absolute
+                    case Commands.G91: // Incremental
                         isRelative = (token as GCDistanceMode).DistanceMode == DistanceMode.Incremental;
                         break;
 
+                    // G92: Coordinate System Offset
                     case Commands.G92:
                         {
                             var cs = token as GCCoordinateSystem;
@@ -530,6 +564,7 @@ namespace CNC.Core
                         }
                         break;
 
+                    // G92.1: Reset G92 Offsets - Clear Parameters
                     case Commands.G92_1:
                         {
                             for (int i = 0; i < origin.Length; i++)
@@ -537,6 +572,7 @@ namespace CNC.Core
                         }
                         break;
 
+                    // G92.1: Reset G92 Offsets - Keep Parameters
                     case Commands.G92_2:
                         {
                             for (int i = 0; i < origin.Length; i++)
@@ -544,15 +580,17 @@ namespace CNC.Core
                         }
                         break;
 
-                    case Commands.M3:
-                    case Commands.M4:
-                    case Commands.M5:
+                    //M3, M4, M5: Spindle Control
+                    case Commands.M3: // CW
+                    case Commands.M4: // CCW
+                    case Commands.M5: // Off
                         SpindleState = (token as GCSpindleState).SpindleState;
                         break;
 
-                    case Commands.M7:
-                    case Commands.M8:
-                    case Commands.M9:
+                    // M7, M8, M9: Coolant Control
+                    case Commands.M7: // Mist
+                    case Commands.M8: // Flood
+                    case Commands.M9: // Off
                         CoolantState = (token as GCCoolantState).CoolantState;
                         break;
 
@@ -564,6 +602,7 @@ namespace CNC.Core
                         _rpm = (token as GCSpindleRPM).SpindleRPM;
                         break;
 
+                    // M61, T: Set Current Tool
                     case Commands.M61:
                     case Commands.ToolSelect:
                         Tool = (token as GCToolSelect).Tool;
@@ -577,9 +616,9 @@ namespace CNC.Core
             }
         }
 
-        private Point3D setEndP(double[] values, AxisFlags axisFlags)
+        private new Point3D setEndP(double[] values, AxisFlags axisFlags)
         {
-            machinePos.Set(values, axisFlags, isRelative);
+            base.setEndP(values, axisFlags);
 
             action.End = machinePos.Point3D;
 

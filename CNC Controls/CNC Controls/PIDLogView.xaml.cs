@@ -62,6 +62,13 @@ namespace CNC.Controls
             sldError.Value = errorScale;
         }
 
+        private void PIDLogView_Loaded(object sender, RoutedEventArgs e)
+        {
+            DataContext = new PIDLogViewModel();
+            (DataContext as PIDLogViewModel).ErrorScale = 3;
+            errorScale = (DataContext as PIDLogViewModel).ScaleFactors[3];
+        }
+
         #region Methods and properties required by CNCView interface
 
         public ViewType ViewType { get { return ViewType.PIDTuner; } }
@@ -81,13 +88,16 @@ namespace CNC.Controls
 
         private void sldError_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            errorScale = sldError.Value;
-            PlotData(); // TODO: only plot on mouse up!
+            if (DataContext is PIDLogViewModel)
+            {
+                errorScale = (DataContext as PIDLogViewModel).ScaleFactors[(DataContext as PIDLogViewModel).ErrorScale];
+                if (GrblPIDData.data.Rows.Count > 0)
+                    PlotData(); // TODO: only plot on mouse up!
+            }
         }
 
         private void btnGetPIDData_Click(object sender, RoutedEventArgs e)
         {
- 
             btnGetPIDData.IsEnabled = false;
             GrblPIDData.Load();
             btnGetPIDData.IsEnabled = true;
@@ -123,7 +133,7 @@ namespace CNC.Controls
                 foreach (DataRow sample in GrblPIDData.data.Rows)
                 {
 
-                    b.Y = center + (int)((double)sample["Target"] * 5.0);
+                    b.Y = center - (int)((double)sample["Target"] * 5.0);
 
                     PIDPlot.Children.Add(new Line()
                     {
@@ -139,8 +149,7 @@ namespace CNC.Controls
                     a.Y = b.Y;
                     b.X = (int)Math.Floor(Xpos);
 
-
-                    d.Y = center + (int)((double)sample["Actual"] * 5.0);
+                    d.Y = center - (int)((double)sample["Actual"] * 5.0);
 
                     PIDPlot.Children.Add(new Line()
                     {
@@ -156,8 +165,7 @@ namespace CNC.Controls
                     c.Y = d.Y;
                     d.X = (int)Math.Floor(Xpos);
 
-
-                    h.Y = center + (int)((double)sample["Error"] * errorScale);
+                    h.Y = center - (int)((double)sample["Error"] * errorScale);
 
                     PIDPlot.Children.Add(new Line()
                     {
@@ -200,6 +208,8 @@ namespace CNC.Controls
             RawData = "";
             data.Clear();
 
+            //data.ReadXml(CNC.Core.Resources.Path + "PIDLog.xml");
+
             Comms.com.DataReceived += Process;
             Comms.com.AwaitAck(((char)GrblConstants.CMD_PID_REPORT).ToString(CultureInfo.InvariantCulture));
             Comms.com.DataReceived -= Process;
@@ -226,7 +236,7 @@ namespace CNC.Controls
                     }
                 }
             }
-            data.WriteXml(CNC.Core.Resources.Path + "PIDLog.xml"); // For now...
+            //data.WriteXml(CNC.Core.Resources.Path + "PIDLog.xml");
         }
 
         private static void Process(string data)
@@ -236,5 +246,34 @@ namespace CNC.Controls
                 RawData = data.Substring(0, data.Length - 1).Substring(5);
             }
         }
+    }
+
+    public class PIDLogViewModel : ViewModelBase
+    {
+        private int _errorScale;
+        private double[] _grdLabels = new double[4];
+        private double[] _scaleFactors = new double[]{ 100d, 200d, 1000d, 2000d, 5000d, 10000d };
+
+        public int ErrorScale
+        {
+            get { return _errorScale; }
+            set
+            {
+                _errorScale = value;
+                double f = _scaleFactors[_errorScale];
+                OnPropertyChanged();
+                GridLabel4 = 200000d / f;
+                GridLabel3 = 200000d / f * .75d;
+                GridLabel2 = 200000d / f * .5d;
+                GridLabel1 = 200000d / f * .25d;
+            }
+        }
+
+        public double GridLabel4 { get { return _grdLabels[3]; } private set { _grdLabels[3] = value; OnPropertyChanged(); } }
+        public double GridLabel3 { get { return _grdLabels[2]; } private set { _grdLabels[2] = value; OnPropertyChanged(); } }
+        public double GridLabel2 { get { return _grdLabels[1]; } private set { _grdLabels[1] = value; OnPropertyChanged(); } }
+        public double GridLabel1 { get { return _grdLabels[0]; } private set { _grdLabels[0] = value; OnPropertyChanged(); } }
+
+        public double[] ScaleFactors { get { return _scaleFactors; } }
     }
 }

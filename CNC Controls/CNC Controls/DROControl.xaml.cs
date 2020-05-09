@@ -1,13 +1,13 @@
 ﻿/*
  * DROControl.xaml.cs - part of CNC Controls library
  *
- * v0.10 / 2020-03-01 / Io Engineering (Terje Io)
+ * v0.18 / 2020-05-01 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2019, Io Engineering (Terje Io)
+Copyright (c) 2018-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -43,6 +43,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using CNC.Core;
+using CNC.GCode;
 
 namespace CNC.Controls
 {
@@ -144,7 +145,7 @@ namespace CNC.Controls
             if (axis == "ALL")
             {
                 string s = "G90G10L20P0";
-                for (int i = 0; i < GrblInfo.NumAxes; i++)
+                foreach (int i in GrblInfo.AxisFlags.ToIndices())
                     s += GrblInfo.AxisIndexToLetter(i) + "{0}";
                 (DataContext as GrblViewModel).ExecuteCommand(string.Format(s, position.ToInvariantString("F3")));
             }

@@ -1,7 +1,7 @@
 /*
  * Renderer.xaml.cs - part of CNC Controls library
  *
- * v0.15 / 2020-04-06 / Io Engineering (Terje Io)
+ * v0.18 / 2020-04-21 / Io Engineering (Terje Io)
  *
  */
 
@@ -49,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
@@ -57,7 +58,6 @@ using System.Windows.Media.Media3D;
 using HelixToolkit.Wpf;
 using CNC.Core;
 using CNC.GCode;
-using System.Linq;
 
 namespace CNC.Controls.Viewer
 {
@@ -86,6 +86,7 @@ namespace CNC.Controls.Viewer
     public class Machine : ViewModelBase
     {
         GridLinesVisual3D _grid;
+        bool _showViewCube = true;
         BoundingBoxWireFrameVisual3D _bbox;
         ModelVisual3D _axes = new ModelVisual3D();
         Point3D _startposition = new Point3D();
@@ -139,6 +140,7 @@ namespace CNC.Controls.Viewer
             }
         }
 
+        public bool ShowViewCube { get { return _showViewCube; } set { _showViewCube = value; OnPropertyChanged(); } }
         public GridLinesVisual3D Grid { get { return _grid; } set { _grid = value; OnPropertyChanged(); } }
         public BoundingBoxWireFrameVisual3D BoundingBox { get { return _bbox; } set { _bbox = value; OnPropertyChanged(); } }
         public ModelVisual3D Axes { get { return _axes; } }
@@ -215,6 +217,19 @@ namespace CNC.Controls.Viewer
         private void Renderer_Loaded(object sender, RoutedEventArgs e)
         {
             model = DataContext as GrblViewModel;
+
+            if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
+                AppConfig.Settings.GCodeViewer.PropertyChanged += GCodeViewer_PropertyChanged;
+        }
+
+        private void GCodeViewer_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            ArcResolution = AppConfig.Settings.GCodeViewer.ArcResolution;
+            MinDistance = AppConfig.Settings.GCodeViewer.MinDistance;
+            ShowGrid = AppConfig.Settings.GCodeViewer.ShowGrid;
+            ShowAxes = AppConfig.Settings.GCodeViewer.ShowAxes;
+            ShowBoundingBox = AppConfig.Settings.GCodeViewer.ShowBoundingBox;
+            Machine.ShowViewCube = AppConfig.Settings.GCodeViewer.ShowViewCube;
         }
 
         private void Model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -234,6 +249,8 @@ namespace CNC.Controls.Viewer
         public bool ShowGrid { get; set; } = true;
         public bool ShowAxes { get; set; } = true;
         public bool ShowBoundingBox { get; set; } = true;
+        public bool ShowViewCube { get { return Machine.ShowViewCube; } set { Machine.ShowViewCube = value; } }
+
         public bool AnimateTool
         {
             get { return _animateTool; }
@@ -490,7 +507,7 @@ namespace CNC.Controls.Viewer
 
             #endregion
 
-            GCodeEmulator emu = new GCodeEmulator();
+            GCodeEmulator emu = new GCodeEmulator(true);
 
             emu.SetStartPosition(Machine.StartPosition);
 

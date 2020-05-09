@@ -1,7 +1,7 @@
 /*
  * MainWindow.xaml.cs - part of Grbl Code Sender
  *
- * v0.17 / 2020-04-17 / Io Engineering (Terje Io)
+ * v0.20 / 2020-04-20 / Io Engineering (Terje Io)
  *
  */
 
@@ -189,6 +189,11 @@ namespace GCode_Sender
         private void exitMenuItem_Click(object sender, RoutedEventArgs e)
         {
             Close();
+        }
+
+        void aboutWikiItem_Click(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start("https://github.com/terjeio/Grbl-GCode-Sender/wiki");
         }
 
         void aboutMenuItem_Click(object sender, EventArgs e)

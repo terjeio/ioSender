@@ -7,9 +7,9 @@
              mc:Ignorable="d" 
              d:DesignHeight="40" d:DesignWidth="340">
     <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Height="36" VerticalAlignment="Center">
-        <Button x:Name="btnStart" Content="Start (Alt-R)" Width="80" Height="32" HorizontalAlignment="Left" VerticalAlignment="Center" Click="btnStart_Click"/>
-        <Button x:Name="btnHold" Content="Hold (Space)" Width="80" Height="32" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Click="btnHold_Click"/>
-        <Button x:Name="btnStop" Content="Stop (Alt-S)" Width="80" Height="32" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Click="btnStop_Click"/>
+        <Button x:Name="btnStart" Content="Cycle Start" ToolTip="Alt+R" Width="80" Height="32" HorizontalAlignment="Left" VerticalAlignment="Center" Click="btnStart_Click"/>
+        <Button x:Name="btnHold" Content="Feed Hold" ToolTip="Space" Width="80" Height="32" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Click="btnHold_Click"/>
+        <Button x:Name="btnStop" Content="Stop" ToolTip="Alt+S" Width="80" Height="32" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Click="btnStop_Click"/>
         <Button x:Name="btnRewind" Content="Rewind" Width="80" Height="32" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Click="btnRewind_Click"/>
     </StackPanel>
 </UserControl>

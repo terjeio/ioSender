@@ -1,7 +1,7 @@
 /*
  * Widget.cs - part of CNC Controls library for Grbl
  *
- * v0.10 / 2019-03-05 / Io Engineering (Terje Io)
+ * v0.18 / 2020-05-01 / Io Engineering (Terje Io)
  *
  */
 
@@ -185,7 +185,7 @@ namespace CNC.Controls
                             IsEnabled = false,
                             Tag = 1 << i
                         };
-                        grid = AddGrid(200);
+                        grid = AddGrid(300);
                         if (i == 0)
                         {
                             labelGrid = grid;
@@ -213,7 +213,7 @@ namespace CNC.Controls
                             IsEnabled = false,
                             Tag = i
                         };
-                        grid = AddGrid(200);
+                        grid = AddGrid(300);
                         if (i == 0)
                         {
                             labelGrid = grid;
@@ -349,13 +349,13 @@ namespace CNC.Controls
             };
 
             ColumnDefinition c = new ColumnDefinition();
-            c.Width = new GridLength(180);
+            c.Width = new GridLength(180d);
             grid.ColumnDefinitions.Add(c);
             c = new ColumnDefinition();
             c.Width = new GridLength(width);
             grid.ColumnDefinitions.Add(c);
             c = new ColumnDefinition();
-            c.Width = new GridLength(grid.Width - 180 - width);
+            c.Width = new GridLength(Math.Max(1d, grid.Width - 180d - width));
             grid.ColumnDefinitions.Add(c);
 
             return grid;

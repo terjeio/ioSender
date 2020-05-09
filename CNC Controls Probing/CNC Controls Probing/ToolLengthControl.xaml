@@ -14,11 +14,11 @@
     <Grid>
         <StackPanel Margin="10,10,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
             <StackPanel Orientation="Horizontal" Margin="10,10,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
-                <CheckBox Content="Probe fixture @ G59.3" IsEnabled="{Binding Path=HasCoordinateSystem9}" IsChecked="{Binding Path=ProbeFixture}" VerticalAlignment="Center"/>
+                <CheckBox Content="Probe fixture @ G59.3" IsEnabled="{Binding Path=HasCoordinateSystem9}" IsChecked="{Binding Path=ProbeFixture, Mode=TwoWay}" VerticalAlignment="Center"/>
                 <Label Content="with tool:"></Label>
                 <Controls:NumericComboBox Margin="2,2" DisplayMemberPath="Code" SelectedValuePath="Code" ItemsSource="{Binding Path=Grbl.Tools}" SelectedValue="{Binding Path=Tool, Mode=TwoWay}" IsEnabled="{Binding Path=HasToolTable}" Format="##0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="56" Height="22"/>
             </StackPanel>
-            <CheckBox Margin="10,0,0,0" Content="Set Z offset (G92)" IsChecked="{Binding Path=CoordinateMode, Mode=TwoWay, Converter={StaticResource EnumToCheckedConverter}, ConverterParameter=G92}" IsEnabled="{Binding Path=ProbeFixture, Converter={StaticResource IsNotRunningConverter}}"/>
+            <CheckBox Margin="10,0,0,0" Content="Set Z offset (G92)" IsChecked="{Binding Path=IsCoordinateModeG92, Mode=TwoWay}" IsEnabled="{Binding Path=ProbeFixture, Converter={StaticResource IsNotRunningConverter}}"/>
             <!-->
             <local:CsSelectControl Margin="5,0,0,0" IsEnabled="{Binding Path=ProbeFixture, Converter={StaticResource IsNotRunningConverter}}"/>
             </!-->

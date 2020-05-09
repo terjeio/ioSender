@@ -48,9 +48,9 @@
                 <Button x:Name="btnSave" Content="Save" HorizontalAlignment="Left" Margin="5,0,0,0" VerticalAlignment="Top" Width="75" Click="btnSave_Click"/>
                 <Button x:Name="btnBackup" Content="Backup" HorizontalAlignment="Left" Margin="5,0,0,0" VerticalAlignment="Top" Width="75" Click="btnBackup_Click"/>
             </StackPanel>
-            <StackPanel DockPanel.Dock="Top" HorizontalAlignment="Left" Height="Auto" Margin="10,15,0,0" VerticalAlignment="Top" Width="400">
-                <StackPanel x:Name="canvas" HorizontalAlignment="Left" Height="Auto" VerticalAlignment="Center" Width="400"/>
-                <TextBox x:Name="txtDescription" Background="#FFF8F8F8" IsReadOnly="True" HorizontalAlignment="Left" Height="150" TextWrapping="Wrap" VerticalAlignment="Top" Width="400"/>
+            <StackPanel DockPanel.Dock="Top" HorizontalAlignment="Left" Height="Auto" Margin="5,15,0,0" VerticalAlignment="Top">
+                <StackPanel x:Name="canvas" HorizontalAlignment="Left" Height="Auto" VerticalAlignment="Center" Width="455"/>
+                <TextBox x:Name="txtDescription" Background="#FFF8F8F8" IsReadOnly="True" HorizontalAlignment="Left" Height="150" TextWrapping="Wrap" VerticalAlignment="Top" Width="450"/>
             </StackPanel>
         </DockPanel>
     </DockPanel>

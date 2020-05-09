@@ -41,7 +41,7 @@
             <Label Content="Check" VerticalAlignment="Center" Height="26"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Height="34" Margin="3,3,0,0" Grid.Row="1" VerticalAlignment="Top" Width="210">
-            <Button x:Name="btnHome" Content="Home" Background="{Binding Path=HomedState, Converter={StaticResource HomedStateConverter}}" Focusable="False" Width="55" Height="32" Click="btn_Click">
+            <Button x:Name="btnHome" Content="Home" ToolTip="Ctrl+H" Background="{Binding Path=HomedState, Converter={StaticResource HomedStateConverter}}" Focusable="False" Width="55" Height="32" Click="btn_Click">
                 <Button.IsEnabled>
                     <MultiBinding Converter="{StaticResource HomingEnabledConverter}">
                         <Binding Path="GrblState" Mode="OneWay"/>

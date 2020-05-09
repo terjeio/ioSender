@@ -1,7 +1,7 @@
 ﻿/*
  * ArcsToLines.cs - part of CNC Controls library for Grbl
  *
- * v0.15 / 2020-04-11 / Io Engineering (Terje Io)
+ * v0.15 / 2020-04-20 / Io Engineering (Terje Io)
  *
  */
 
@@ -68,9 +68,9 @@ namespace CNC.Controls
                                 var lnr = arc.LineNumber;
                                 toolPath.Add(new GCComment(Commands.Comment, lnr++, "Arc to lines start: " + arc.ToString()));
 
-                                List<Point3D> points = arc.GeneratePoints(emu.Plane, ToPos(cmd.Start, emu.IsMetric), arcTolerance, emu.DistanceMode == DistanceMode.Incremental); // Dynamic resolution
+                                List<Point3D> points = arc.GeneratePoints(emu.Plane, ToPos(cmd.Start, emu.IsImperial), arcTolerance, emu.DistanceMode == DistanceMode.Incremental); // Dynamic resolution
                                 foreach (Point3D point in points)
-                                    toolPath.Add(new GCLinearMotion(Commands.G1, lnr++, ToPos(point, emu.IsMetric), AxisFlags.XYZ));
+                                    toolPath.Add(new GCLinearMotion(Commands.G1, lnr++, ToPos(point, emu.IsImperial), AxisFlags.XYZ));
 
                                 toolPath.Add(new GCComment(Commands.Comment, lnr, "Arc to lines end"));
                             }
@@ -82,9 +82,9 @@ namespace CNC.Controls
                                 var lnr = spline.LineNumber;
                                 toolPath.Add(new GCComment(Commands.Comment, lnr++, "Spline to lines start: " + spline.ToString()));
 
-                                List<Point3D> points = spline.GeneratePoints(ToPos(cmd.Start, emu.IsMetric), arcTolerance, emu.DistanceMode == DistanceMode.Incremental); // Dynamic resolution
+                                List<Point3D> points = spline.GeneratePoints(ToPos(cmd.Start, emu.IsImperial), arcTolerance, emu.DistanceMode == DistanceMode.Incremental); // Dynamic resolution
                                 foreach (Point3D point in points)
-                                    toolPath.Add(new GCLinearMotion(Commands.G1, lnr++, ToPos(point, emu.IsMetric), AxisFlags.XYZ));
+                                    toolPath.Add(new GCLinearMotion(Commands.G1, lnr++, ToPos(point, emu.IsImperial), AxisFlags.XYZ));
 
                                 toolPath.Add(new GCComment(Commands.Comment, lnr, "Spline to lines end"));
                             }
@@ -107,9 +107,9 @@ namespace CNC.Controls
             }
         }
 
-        double[] ToPos(Point3D pos, bool metric)
+        double[] ToPos(Point3D pos, bool imperial)
         {
-            int res = metric ? 3 : 4;
+            int res = imperial ? 4 : 3;
             return new double[] { Math.Round(pos.X, res), Math.Round(pos.Y, res), Math.Round(pos.Z, res) };
         }
     }

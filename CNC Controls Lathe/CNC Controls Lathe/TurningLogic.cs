@@ -1,7 +1,7 @@
 ﻿/*
  * TurningLogic.cs - part of CNC Controls Lathe library
  *
- * v0.15 / 2020-04-04 / Io Engineering (Terje Io)
+ * v0.18 / 2020-05-01 / Io Engineering (Terje Io)
  *
  */
 
@@ -183,14 +183,14 @@ namespace CNC.Controls.Lathe
 
             //  error.Clear();
 
-            if (cut.passes < 1)
+            if (cut.Passes < 1)
             {
                 model.SetError("Diameter", "Starting diameter must be larger than target.");
                 return;
             }
 
             if (model.IsSpringPassesEnabled)
-                cut.springpasses = (int)model.SpringPasses;
+                cut.Springpasses = (int)model.SpringPasses;
 
             if (boring)
                 xclearance = -xclearance;
@@ -227,7 +227,7 @@ namespace CNC.Controls.Lathe
                 model.gCode.Add(string.Format("G0 X{0}", model.FormatValue(xtarget + xclearance)));
                 model.gCode.Add(string.Format("G0 Z{0}", model.FormatValue(zstart + model.config.ZClearance / model.UnitFactor)));
 
-            } while (++pass <= cut.passes);
+            } while (++pass <= cut.Passes);
 
             GCode.File.AddBlock("Wizard: Turning", Core.Action.New);
             GCode.File.AddBlock(string.Format("({0}, Start: {1}, Target: {2}, Length: {3})",

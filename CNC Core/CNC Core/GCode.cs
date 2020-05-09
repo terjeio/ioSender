@@ -1,7 +1,7 @@
 ﻿/*
  * GCode.cs - part of CNC Controls library
  *
- * v0.15 / 2020-04-04 / Io Engineering (Terje Io)
+ * v0.18 / 2020-04-21 / Io Engineering (Terje Io)
  *
  */
 
@@ -134,6 +134,14 @@ namespace CNC.GCode
         Shower = 1 << 2
     }
 
+    public enum ToolLengthOffset
+    {
+        Cancel = 0,         // G49 (Default: Must be zero)
+        Enable = 1,         // G43
+        EnableDynamic = 2,  // G43.1
+        ApplyAdditional = 3 // G43.2
+    }
+
     [Flags]
     public enum ThreadTaper : int
     {
@@ -155,6 +163,15 @@ namespace CNC.GCode
     {
         Positive = 0,
         Negative
+    }
+
+    public enum InputWaitMode
+    {
+        Immediate = 0,
+        Rise,
+        Fall,
+        High,
+        Low
     }
 
     public enum Commands
@@ -245,6 +262,13 @@ namespace CNC.GCode
         M53,
         M56,
         M61,
+        M62,
+        M63,
+        M64,
+        M65,
+        M66,
+        M67,
+        M68,
         Feedrate,
         SpindleRPM,
         ToolSelect,

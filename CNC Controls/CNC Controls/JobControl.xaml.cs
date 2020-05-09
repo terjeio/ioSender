@@ -1,7 +1,7 @@
 /*
  * JobControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.17 / 2020-04-16 / Io Engineering (Terje Io)
+ * v0.18 / 2020-05-09 / Io Engineering (Terje Io)
  *
  */
 
@@ -82,12 +82,10 @@ namespace CNC.Controls
         }
 
         private int serialSize = 128;
-        private bool holdSignal = false, initOK = false, useBuffering = false;
+        private bool holdSignal = false, cycleStartSignal = false, initOK = false, isActive = false, useBuffering = false;
         private volatile StreamingState streamingState = StreamingState.NoFile;
         private GrblState grblState;
         private GrblViewModel model;
-        private PollGrbl poller = null;
-        private Thread polling = null;
         private JobData job;
         private int missed = 0;
 
@@ -134,10 +132,24 @@ namespace CNC.Controls
             for (int i = 0; i < streamingHandlers.Length; i++)
                 streamingHandlers[i].Handler = (StreamingHandler)i;
 
-            poller = new PollGrbl();
-            polling = new Thread(new ThreadStart(poller.Run));
-            polling.Start();
-            Thread.Sleep(100);
+//            Thread.Sleep(100);
+
+            Loaded += JobControl_Loaded;
+        }
+
+        private void JobControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
+                AppConfig.Settings.Base.PropertyChanged += Base_PropertyChanged;
+        }
+
+        private void Base_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            GCodeParser.IgnoreM6 = AppConfig.Settings.Base.IgnoreM6;
+            GCodeParser.IgnoreM7 = AppConfig.Settings.Base.IgnoreM7;
+            GCodeParser.IgnoreM8 = AppConfig.Settings.Base.IgnoreM8;
+
+            useBuffering = AppConfig.Settings.Base.UseBuffering && GrblSettings.IsGrblHAL;
         }
 
         private void JobControl_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -174,16 +186,17 @@ namespace CNC.Controls
 
                 case nameof(GrblViewModel.IsMPGActive):
                     grblState.MPG = ((GrblViewModel)sender).IsMPGActive == true;
-                    poller.SetState(grblState.MPG ? 0 : model.PollInterval);
+                    ((GrblViewModel)sender).Poller.SetState(grblState.MPG ? 0 : AppConfig.Settings.Base.PollInterval);
                     streamingHandler.Call(grblState.MPG ? StreamingState.Disabled : StreamingState.Idle, false);
                     break;
 
                 case nameof(GrblViewModel.Signals):
                     {
-                        var signals = ((GrblViewModel)sender).Signals;
-                        if (JobPending && signals[Signals.CycleStart] && !signals[Signals.Hold] && holdSignal)
+                        var signals = ((GrblViewModel)sender).Signals.Value;
+                        if (JobPending && signals.HasFlag(Signals.CycleStart) && !signals.HasFlag(Signals.Hold) && !cycleStartSignal)
                             CycleStart();
-                        holdSignal = signals[Signals.Hold];
+                        holdSignal = signals.HasFlag(Signals.Hold);
+                        cycleStartSignal = signals.HasFlag(Signals.CycleStart);
                     }
                     break;
 
@@ -231,27 +244,17 @@ namespace CNC.Controls
 
             EnablePolling(activate);
 
-            return activate;
+            isActive = activate;
+
+            return isActive;
         }
 
         public void EnablePolling(bool enable)
         {
             if (enable)
-            {
-                if (!poller.IsEnabled)
-                {
-                    //        Comms.com.DataReceived += model.DataReceived;
-                    poller.SetState(model.PollInterval);
-                }
-            }
-            else
-            {
-                if (poller.IsEnabled)
-                {
-                    poller.SetState(0);
-                    //             Comms.com.DataReceived -= model.DataReceived;
-                }
-            }
+                model.Poller.SetState(AppConfig.Settings.Base.PollInterval);
+            else if (model.Poller.IsEnabled)
+                model.Poller.SetState(0);
         }
 
         // Configure to match Grbl settings (if loaded)
@@ -259,6 +262,7 @@ namespace CNC.Controls
         {
             keypress.AddHandler(Key.R, ModifierKeys.Alt, StartJob);
             keypress.AddHandler(Key.S, ModifierKeys.Alt, StopJob);
+            keypress.AddHandler(Key.H, ModifierKeys.Control, Home);
             keypress.AddHandler(Key.Space, ModifierKeys.None, FeedHold);
             keypress.AddHandler(Key.F1, ModifierKeys.None, FnKeyHandler);
             keypress.AddHandler(Key.F2, ModifierKeys.None, FnKeyHandler);
@@ -293,6 +297,12 @@ namespace CNC.Controls
         private bool StartJob(Key key)
         {
             CycleStart();
+            return true;
+        }
+
+        private bool Home(Key key)
+        {
+            model.ExecuteCommand(GrblConstants.CMD_HOMING);
             return true;
         }
 
@@ -391,7 +401,8 @@ namespace CNC.Controls
                 //                command = command.ToUpper();
                 try
                 {
-                    GCode.File.Parser.ParseBlock(ref command, true);
+                    string c = command;
+                    GCode.File.Parser.ParseBlock(ref c, true);
                     GCode.File.Commands.Enqueue(command);
                     if (streamingState != StreamingState.SendMDI)
                     {
@@ -701,7 +712,10 @@ namespace CNC.Controls
                         if (JobTimer.IsRunning)
                             SetStreamingHandler(StreamingHandler.SendFile);
                         else
+                        {
                             btnStop.IsEnabled = true;
+                            btnHold.IsEnabled = !grblState.MPG;
+                        }
                         break;
 
                     case StreamingState.Start: // Streaming from SD Card
@@ -760,7 +774,7 @@ namespace CNC.Controls
 
         void GrblStateChanged(GrblState newstate)
         {
-            switch (newstate.State)
+            if(isActive) switch(newstate.State)
             {
                 case GrblStates.Idle:
                     streamingHandler.Call(StreamingState.Idle, false);
@@ -807,6 +821,10 @@ namespace CNC.Controls
                         if (streamingState == StreamingState.Send)
                             streamingHandler.Call(StreamingState.FeedHold, false);
                     }
+                    break;
+
+                case GrblStates.Alarm:
+                    streamingHandler.Call(StreamingState.Stop, false);
                     break;
             }
 

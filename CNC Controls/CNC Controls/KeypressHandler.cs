@@ -1,7 +1,7 @@
 ﻿/*
  * KeypressHandler.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.17 / 2020-04-17 / Io Engineering (Terje Io)
+ * v0.18 / 2020-05-09 / Io Engineering (Terje Io)
  *
  */
 
@@ -97,29 +97,43 @@ namespace CNC.Controls
                 if (!(val = GrblSettings.GetDouble(GrblSetting.JogFastSpeed)).Equals(double.NaN))
                     jogSpeed[(int)JogMode.Fast] = val;
 
+                fullJog = GrblSettings.IsGrblHAL;
                 model.IsMetric = GrblSettings.GetString(GrblSetting.ReportInches) != "1";
             }
 
             if (!useFirmwareJog)
             {
-                model.JogStep = jogDistance[(int)JogMode.Step] = AppConfig.Settings.Jog.StepDistance;
-                jogDistance[(int)JogMode.Slow] = AppConfig.Settings.Jog.SlowDistance;
-                jogDistance[(int)JogMode.Fast] = AppConfig.Settings.Jog.SlowDistance;
-                jogSpeed[(int)JogMode.Step] = AppConfig.Settings.Jog.StepFeedrate;
-                jogSpeed[(int)JogMode.Slow] = AppConfig.Settings.Jog.SlowFeedrate;
-                jogSpeed[(int)JogMode.Fast] = AppConfig.Settings.Jog.FastFeedrate;
+                AppConfig.Settings.Jog.PropertyChanged += Jog_PropertyChanged;
+                updateConfig();
             }
-
-            fullJog = AppConfig.Settings.Jog.KeyboardEnable || GrblSettings.IsGrblHAL;
         }
 
-        public bool canJog { get { return grbl.GrblState.State == GrblStates.Idle || grbl.GrblState.State == GrblStates.Tool || grbl.GrblState.State == GrblStates.Jog; } }
+        private void Jog_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            updateConfig();
+        }
+
+        public bool CanJog { get { return grbl.GrblState.State == GrblStates.Idle || grbl.GrblState.State == GrblStates.Tool || grbl.GrblState.State == GrblStates.Jog; } }
+        public bool IsJogging {  get { return jogMode != JogMode.None || grbl.GrblState.State == GrblStates.Jog; } }
+
+        private void updateConfig()
+        {
+            grbl.JogStep = jogDistance[(int)JogMode.Step] = AppConfig.Settings.Jog.StepDistance;
+            jogDistance[(int)JogMode.Slow] = AppConfig.Settings.Jog.SlowDistance;
+            jogDistance[(int)JogMode.Fast] = AppConfig.Settings.Jog.SlowDistance;
+            jogSpeed[(int)JogMode.Step] = AppConfig.Settings.Jog.StepFeedrate;
+            jogSpeed[(int)JogMode.Slow] = AppConfig.Settings.Jog.SlowFeedrate;
+            jogSpeed[(int)JogMode.Fast] = AppConfig.Settings.Jog.FastFeedrate;
+
+            if(!GrblSettings.IsGrblHAL)
+                fullJog = AppConfig.Settings.Jog.KeyboardEnable;
+        }
 
         public bool ProcessKeypress(KeyEventArgs e)
         {
-            bool isJogging = jogMode != JogMode.None;
+            bool isJogging = IsJogging;
 
-            if (e.IsUp && (isJogging || grbl.GrblState.State == GrblStates.Jog))
+            if (e.IsUp && isJogging)
             {
                 bool cancel = false;
 
@@ -143,10 +157,7 @@ namespace CNC.Controls
             if (!isJogging && Comms.com.OutCount != 0)
                 return true;
 
-            //            if ((keycode == Keys.ShiftKey || keycode == Keys.ControlKey) && !isJogging)
-            //                return false;
-
-            if (e.IsDown && canJog)
+            if (e.IsDown && CanJog)
             {
                 // Do not respond to autorepeats!
                 if (e.IsRepeat)
@@ -280,7 +291,7 @@ namespace CNC.Controls
                     if (handler != null)
                         return handler.Call(e.SystemKey);
                 }
-                else if (Keyboard.Modifiers == ModifierKeys.None)
+                else if (Keyboard.Modifiers == ModifierKeys.None || Keyboard.Modifiers == ModifierKeys.Control)
                 {
                     var handler = handlers.Where(k => k.modifiers == Keyboard.Modifiers && k.key == e.Key).FirstOrDefault();
                     if (handler != null)
@@ -319,7 +330,7 @@ namespace CNC.Controls
 
         public void SendJogCommand(string command)
         {
-            if (grbl.StreamingState == StreamingState.Jogging || grbl.GrblState.State == GrblStates.Jog)
+            if (IsJogging)
             {
                 while (Comms.com.OutCount != 0) ;
                 if(preCancel)

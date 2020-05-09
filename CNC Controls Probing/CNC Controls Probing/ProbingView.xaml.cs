@@ -1,7 +1,7 @@
 ﻿/*
  * ProbingView.xaml.cs - part of CNC Probing library
  *
- * v0.14 / 2020-03-29 / Io Engineering (Terje Io)
+ * v0.18 / 2020-05-09 / Io Engineering (Terje Io)
  *
  */
 
@@ -41,16 +41,20 @@ using System.Windows;
 using System.Windows.Controls;
 using CNC.Core;
 using CNC.GCode;
+using System.Windows.Input;
 
 namespace CNC.Controls.Probing
 {
+
     /// <summary>
     /// Interaction logic for ProbingView.xaml
     /// </summary>
     public partial class ProbingView : UserControl, ICNCView
     {
+        private bool jogEnabled = false;
         private DistanceMode mode = DistanceMode.Absolute;
         private ProbingViewModel model = null;
+        private KeypressHandler keyboard = null;
 
         public ProbingView()
         {
@@ -59,8 +63,13 @@ namespace CNC.Controls.Probing
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
-            if (DataContext is GrblViewModel)
+            if (DataContext is GrblViewModel) {
+
+                if (keyboard == null)
+                    keyboard = new KeypressHandler(DataContext as GrblViewModel);
+
                 DataContext = model = new ProbingViewModel(DataContext as GrblViewModel);
+            }
         }
 
         private void Grbl_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -103,13 +112,16 @@ namespace CNC.Controls.Probing
                 model.CoordinateSystem = csid == 0 || csid >= 9 ? 1 : csid;
 
                 model.Grbl.PropertyChanged += Grbl_PropertyChanged;
-
             }
             else
             {
                 model.Grbl.PropertyChanged -= Grbl_PropertyChanged;
+                if (model.Grbl.GrblError != 0)
+                    model.Grbl.ExecuteCommand("");  // Clear error
                 model.Grbl.ExecuteCommand(mode == DistanceMode.Absolute ? "G90" : "G91");
             }
+
+            model.Grbl.Poller.SetState(activate ? AppConfig.Settings.Base.PollInterval : 0);
         }
 
         public void CloseFile()
@@ -121,5 +133,32 @@ namespace CNC.Controls.Probing
         }
 
         #endregion
+
+        protected override void OnPreviewKeyDown(KeyEventArgs e)
+        {
+            if (!(e.Handled = ProcessKeyPreview(e)))
+                base.OnPreviewKeyDown(e);
+        }
+        protected override void OnPreviewKeyUp(KeyEventArgs e)
+        {
+            if (!(e.Handled = ProcessKeyPreview(e)))
+                base.OnPreviewKeyDown(e);
+        }
+        protected bool ProcessKeyPreview(KeyEventArgs e)
+        {
+            if (keyboard == null || !jogEnabled)
+                return false;
+
+            return keyboard.ProcessKeypress(e);
+        }
+
+        private void Jog_FocusedChanged(object sender, RoutedEventArgs e)
+        {
+            var btn = sender as Button;
+            if (keyboard.IsJogging)
+                keyboard.JogCancel();
+            jogEnabled = btn.IsFocused && keyboard.CanJog;
+            btn.Content = jogEnabled ? "Keyboard jogging active" : "Keyboard jogging disabled";
+        }
     }
 }

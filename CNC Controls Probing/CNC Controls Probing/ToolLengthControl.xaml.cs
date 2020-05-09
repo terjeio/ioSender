@@ -1,7 +1,7 @@
 ﻿/*
  * ToolLengthControl.cs - part of CNC Probing library
  *
- * v0.14 / 2020-03-28 / Io Engineering (Terje Io)
+ * v0.18 / 2020-05-09 / Io Engineering (Terje Io)
  *
  */
 
@@ -59,13 +59,15 @@ namespace CNC.Controls.Probing
         private void start_Click(object sender, RoutedEventArgs e)
         {
             var probing = DataContext as ProbingViewModel;
+
+            if (!probing.Init())
+                return;
+
             probing.PropertyChanged += Probing_PropertyChanged;
 
-            origin = new Position(probing.Grbl.MachinePosition);
-
-            probing.Message = string.Empty;
-            probing.Program.Clear();
             probing.Program.Add(string.Format("G91F{0}", probing.ProbeFeedRate.ToInvariantString()));
+
+            origin = new Position(probing.Grbl.MachinePosition);
 
             if (probing.ProbeFixture)
             {

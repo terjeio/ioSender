@@ -1,7 +1,7 @@
 /*
  * Viewer.xaml.cs - part of CNC Controls library
  *
- * v0.17 / 2020-04-15 / Io Engineering (Terje Io)
+ * v0.18 / 2020-04-18 / Io Engineering (Terje Io)
  *
  */
 
@@ -57,37 +57,6 @@ public partial class Viewer : UserControl, ICNCView
             gcodeView.ShowBoundingBox = false;
         }
 
-        public int ArcResolution {
-            get { return gcodeView.ArcResolution; }
-            set { gcodeView.ArcResolution = value; }
-        }
-        public double MinDistance
-        {
-            get { return gcodeView.MinDistance; }
-            set { gcodeView.MinDistance = value; }
-        }
-        public bool ShowGrid
-        {
-            get { return gcodeView.ShowGrid; }
-            set { gcodeView.ShowGrid = value; }
-        }
-        public bool ShowAxes
-        {
-            get { return gcodeView.ShowAxes; }
-            set { gcodeView.ShowAxes = value; }
-        }
-        public bool ShowBoundingBox
-        {
-            get { return gcodeView.ShowBoundingBox; }
-            set { gcodeView.ShowBoundingBox = value; }
-        }
-
-        public bool ShowViewCube
-        {
-            get { return gcodeView.viewport.ShowViewCube; }
-            set { gcodeView.viewport.ShowViewCube = value; }
-        }
-
         public ViewType ViewType { get { return ViewType.GCodeViewer; } }
 
         public void Activate(bool activate, ViewType chgMode)
@@ -119,12 +88,12 @@ public partial class Viewer : UserControl, ICNCView
         {
             model.ConfigControls.Add(new ConfigControl());
 
-            ArcResolution = AppConfig.Settings.GCodeViewer.ArcResolution;
-            MinDistance = AppConfig.Settings.GCodeViewer.MinDistance;
-            ShowGrid = AppConfig.Settings.GCodeViewer.ShowGrid;
-            ShowAxes = AppConfig.Settings.GCodeViewer.ShowAxes;
-            ShowBoundingBox = AppConfig.Settings.GCodeViewer.ShowBoundingBox;
-            ShowViewCube = AppConfig.Settings.GCodeViewer.ShowViewCube;
+            gcodeView.ArcResolution = AppConfig.Settings.GCodeViewer.ArcResolution;
+            gcodeView.MinDistance = AppConfig.Settings.GCodeViewer.MinDistance;
+            gcodeView.ShowGrid = AppConfig.Settings.GCodeViewer.ShowGrid;
+            gcodeView.ShowAxes = AppConfig.Settings.GCodeViewer.ShowAxes;
+            gcodeView.ShowBoundingBox = AppConfig.Settings.GCodeViewer.ShowBoundingBox;
+            gcodeView.ShowViewCube = AppConfig.Settings.GCodeViewer.ShowViewCube;
         }
 
         public void Open()

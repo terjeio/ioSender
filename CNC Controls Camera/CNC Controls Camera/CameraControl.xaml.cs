@@ -1,13 +1,13 @@
 ﻿/*
  * CNCCameraControl.xaml.cs - part of CNC Controls library
  *
- * v0.01 / 2019-10-13 / Io Engineering (Terje Io)
+ * v0.18 / 2020-04-17 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2019, Io Engineering (Terje Io) - parts derived from AForge example code
+Copyright (c) 2018-2020, Io Engineering (Terje Io) - parts derived from AForge example code
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -37,7 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -66,17 +65,22 @@ namespace CNC.Controls.Camera
         private RenderTargetBitmap overlay = null;
         private DrawingVisual visual = null;
         private System.Windows.Media.Pen pen = null;
+        private double _xOffset = 0d, _yOffset = 0d;
 
         public CameraControl()
         {
-            InitializeComponent();
+            DataContext = this;
 
-            XOffset = YOffset = 0.0;
-            Mode = CameraMoveMode.BothAxes;
+            InitializeComponent();
+        }
+
+        private void CameraControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
+                AppConfig.Settings.Camera.PropertyChanged += Base_PropertyChanged;
 
             pen = new System.Windows.Media.Pen(System.Windows.Media.Brushes.Red, 1);
 
-            DataContext = this;
             if (Cameras.Count > 0)
             {
                 Camera = Cameras[0];
@@ -84,9 +88,42 @@ namespace CNC.Controls.Camera
             }
         }
 
-        public double XOffset { get; set; }
-        public double YOffset { get; set; }
-        public CameraMoveMode Mode { get; set; }
+        private void Base_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            switch(e.PropertyName)
+            {
+                case nameof(AppConfig.Settings.Camera.XOffset):
+                    XOffset = (sender as CameraConfig).XOffset;
+                    break;
+
+                case nameof(AppConfig.Settings.Camera.YOffset):
+                    YOffset = (sender as CameraConfig).YOffset;
+                    break;
+
+                case nameof(AppConfig.Settings.Camera.MoveMode):
+                    Mode = (sender as CameraConfig).MoveMode;
+                    break;
+            }
+        }
+
+        public static readonly DependencyProperty IsMoveEnabledProperty = DependencyProperty.Register(nameof(IsMoveEnabled), typeof(bool), typeof(CameraControl), new PropertyMetadata(false));
+        public bool IsMoveEnabled
+        {
+            get { return (bool)GetValue(IsMoveEnabledProperty); }
+            set { SetValue(IsMoveEnabledProperty, value); }
+        }
+
+        public double XOffset
+        {
+            get { return _xOffset; }
+            set { _xOffset = value; IsMoveEnabled = _xOffset != 0d || _yOffset != 0d; }
+        }
+        public double YOffset
+        {
+            get { return _yOffset; }
+            set { _yOffset = value; IsMoveEnabled = _xOffset != 0d || _yOffset != 0d; }
+        }
+        public CameraMoveMode Mode { get; set; } = CameraMoveMode.BothAxes;
         public bool HasCamera { get { return Cameras.Count > 0; } }
         public bool IsCameraOpen { get { return videoSource != null; } }
         public FilterInfoCollection Cameras { get; private set; } = new FilterInfoCollection(FilterCategory.VideoInputDevice);
@@ -97,8 +134,8 @@ namespace CNC.Controls.Camera
             if (Camera != null)
             {
                 videoSource = new VideoCaptureDevice(Camera.MonikerString);
-                videoSource.NewFrame += videoSource_NewFrame;
                 videoSource.Start();
+                videoSource.NewFrame += videoSource_NewFrame;
             }
 
             return videoSource != null && videoSource.IsRunning;
