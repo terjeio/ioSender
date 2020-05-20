@@ -16,30 +16,18 @@
             <GroupBox Header="Area to probe" Height="Auto" HorizontalAlignment="Left" VerticalAlignment="Top">
                 <StackPanel Margin="5,5,0,0">
                     <StackPanel Orientation="Horizontal">
-                        <Label Content="Lower left:" Width="80" HorizontalContentAlignment="Right"/>
-                        <Controls:NumericTextBox Value="{Binding Path=HeightMap.MinX, Mode=TwoWay}" Format="-###0.0##"/>
-                        <Label Content="-"/>
-                        <Controls:NumericTextBox Value="{Binding Path=HeightMap.MinY, Mode=TwoWay}" Format="-###0.0##"/>
+                        <Controls:NumericField Label="X:" ColonAt="20" Value="{Binding Path=HeightMap.MinX, Mode=TwoWay}" Format="-###0.0##"/>
+                        <Controls:NumericField Label="W:" ColonAt="25" Value="{Binding Path=HeightMap.Width, Mode=TwoWay}" Format="-###0.0##"/>
                     </StackPanel>
                     <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
-                        <Label Content="Upper right:" Width="80" HorizontalContentAlignment="Right"/>
-                        <Controls:NumericTextBox Value="{Binding Path=HeightMap.MaxX, Mode=TwoWay}" Format="-###0.0##"/>
-                        <Label Content="-"/>
-                        <Controls:NumericTextBox Value="{Binding Path=HeightMap.MaxY, Mode=TwoWay}" Format="-###0.0##"/>
-                    </StackPanel>
-                    <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
-                        <Label Content="Size (W×H):" Width="80" HorizontalContentAlignment="Right"/>
-                        <Controls:NumericTextBox Value="{Binding Path=HeightMap.Width, Mode=TwoWay}" Format="-###0.0##"/>
-                        <Label Content="-"/>
-                        <Controls:NumericTextBox Value="{Binding Path=HeightMap.Height, Mode=TwoWay}" Format="-###0.0##"/>
+                        <Controls:NumericField Label="Y:" ColonAt="20" Value="{Binding Path=HeightMap.MinY, Mode=TwoWay}" Format="-###0.0##"/>
+                        <Controls:NumericField Label="H:" ColonAt="25" Value="{Binding Path=HeightMap.Height, Mode=TwoWay}" Format="-###0.0##"/>
                     </StackPanel>
                     <Button Content="Set from program limits" IsEnabled="{Binding Path=Grbl.IsFileLoaded}" Margin="5,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Click="limits_Click"/>
                 </StackPanel>
             </GroupBox>
-            <StackPanel Orientation="Horizontal">
-                <Label Content="Gridsize:"/>
-                <Controls:NumericTextBox Value="{Binding Path=HeightMap.GridSize, Mode=TwoWay}" Format="###0.0##" HorizontalAlignment="Left" Margin="0,5,0,0" VerticalAlignment="Top"/>
-            </StackPanel>
+            <Controls:NumericField Label="Gridsize:" Value="{Binding Path=HeightMap.GridSize, Mode=TwoWay}" Format="###0.0##" HorizontalAlignment="Left" Margin="0,5,0,0" VerticalAlignment="Top"/>
+            <CheckBox Content="Set tool offset (G92) at X,Y" Margin="70,3,0,0" IsChecked="{Binding Path=.HeightMap.SetToolOffset, Mode=TwoWay}"/>
         </StackPanel>
         <helix:HelixViewport3D BorderBrush="DarkGray" BorderThickness="1" Width="300" Height="300" Margin="280,10,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" x:Name="viewport" Panel.ZIndex="0" ZoomExtentsWhenLoaded="False" RotateAroundMouseDownPoint="true" ZoomAroundMouseDownPoint="true"
                                 AllowDrop="True" DragEnter="viewport_Drag" DragOver="viewport_Drag" DragLeave="viewport_Drag" Drop="viewport_Drop">

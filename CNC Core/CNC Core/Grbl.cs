@@ -1,7 +1,7 @@
 ﻿/*
  * Grbl.cs - part of CNC Controls library
  *
- * v0.18 / 2020-05-09 / Io Engineering (Terje Io)
+ * v0.19 / 2020-05-19 / Io Engineering (Terje Io)
  *
  */
 
@@ -474,12 +474,21 @@ namespace CNC.Core
 
             return parameters;
         }
-        public string ToString(AxisFlags axisflags, bool toNegative, int precision = 3)
+        public string ToString(AxisFlags axisflags, Direction direction, int precision = 3)
         {
             string parameters = string.Empty;
 
             foreach (int i in axisflags.ToIndices())
-                parameters += GrblInfo.AxisIndexToLetter(i) + (Math.Round(toNegative ? -Values[i] : Values[i], precision).ToInvariantString());
+                parameters += GrblInfo.AxisIndexToLetter(i) + (Math.Round(direction == Direction.Negative ? -Values[i] : Values[i], precision).ToInvariantString());
+
+            return parameters;
+        }
+        public string ToString(AxisFlags axisflags, AxisFlags toNegative, int precision = 3)
+        {
+            string parameters = string.Empty;
+
+            foreach (int i in axisflags.ToIndices())
+                parameters += GrblInfo.AxisIndexToLetter(i) + (Math.Round(toNegative.HasFlag(GCodeParser.AxisFlag[i]) ? -Values[i] : Values[i], precision).ToInvariantString());
 
             return parameters;
         }

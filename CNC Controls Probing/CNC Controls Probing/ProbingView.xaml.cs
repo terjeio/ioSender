@@ -1,13 +1,13 @@
 ﻿/*
  * ProbingView.xaml.cs - part of CNC Probing library
  *
- * v0.18 / 2020-05-09 / Io Engineering (Terje Io)
+ * v0.19 / 2020-05-20 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2020, Io Engineering (Terje Io)
+Copyright (c) 2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -54,22 +54,39 @@ namespace CNC.Controls.Probing
         private bool jogEnabled = false;
         private DistanceMode mode = DistanceMode.Absolute;
         private ProbingViewModel model = null;
+        private ProbingProfiles profiles = new ProbingProfiles();
         private KeypressHandler keyboard = null;
 
         public ProbingView()
         {
             InitializeComponent();
+
+            DataContextChanged += ProbingView_DataContextChanged;
+
+            profiles.Load();
+        }
+
+        private void ProbingView_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+
         }
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
-            if (DataContext is GrblViewModel) {
+            if (DataContext is GrblViewModel)
+            {
 
-                if (keyboard == null)
+                if (keyboard == null) {
                     keyboard = new KeypressHandler(DataContext as GrblViewModel);
-
-                DataContext = model = new ProbingViewModel(DataContext as GrblViewModel);
+                    keyboard.AddHandler(Key.None, ModifierKeys.Shift, EnableJog);
+                }
+                DataContext = model = new ProbingViewModel(DataContext as GrblViewModel, profiles);
             }
+        }
+
+        private bool EnableJog(Key key)
+        {
+            return true;
         }
 
         private void Grbl_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -134,10 +151,54 @@ namespace CNC.Controls.Probing
 
         #endregion
 
+        private void mnu_Click(object sender, RoutedEventArgs e)
+        {
+            switch ((string)((MenuItem)sender).Header)
+            {
+                case "Add":
+                    profiles.Add(cbxProfile.Text, model);
+                    break;
+
+                case "Update":
+                    if(model.Profile != null)
+                        profiles.Update(model.Profile.Id, cbxProfile.Text, model);
+                    break;
+
+                case "Delete":
+                    if (model.Profile != null && profiles.Delete(model.Profile.Id))
+                        model.Profile = profiles.Profiles[0];
+                    break;
+            }
+
+            profiles.Save();
+        }
+
+        private void btnAddProfile_Click(object sender, RoutedEventArgs e)
+        {
+            if (model.Profile == null)
+            {
+                mnuAdd.IsEnabled = true;
+                mnuUpdate.IsEnabled = false;
+                mnuDelete.IsEnabled = false;
+            }
+            else
+            {
+                mnuAdd.IsEnabled = false;
+                mnuUpdate.IsEnabled = true;
+                mnuDelete.IsEnabled = model.Profiles.Count > 1;
+            }
+            cm.PlacementTarget = sender as Button;
+            cm.IsOpen = true;
+        }
+
         protected override void OnPreviewKeyDown(KeyEventArgs e)
         {
             if (!(e.Handled = ProcessKeyPreview(e)))
+            {
+                if (Keyboard.Modifiers == (ModifierKeys.Control|ModifierKeys.Shift))
+                    Jog.Focus();
                 base.OnPreviewKeyDown(e);
+            }
         }
         protected override void OnPreviewKeyUp(KeyEventArgs e)
         {
@@ -146,10 +207,10 @@ namespace CNC.Controls.Probing
         }
         protected bool ProcessKeyPreview(KeyEventArgs e)
         {
-            if (keyboard == null || !jogEnabled)
+            if (keyboard == null)
                 return false;
 
-            return keyboard.ProcessKeypress(e);
+            return keyboard.ProcessKeypress(e, jogEnabled);
         }
 
         private void Jog_FocusedChanged(object sender, RoutedEventArgs e)
@@ -159,6 +220,33 @@ namespace CNC.Controls.Probing
                 keyboard.JogCancel();
             jogEnabled = btn.IsFocused && keyboard.CanJog;
             btn.Content = jogEnabled ? "Keyboard jogging active" : "Keyboard jogging disabled";
+        }
+
+        private void tab_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if((sender as TabControl).SelectedItem != null)
+                switch (((sender as TabControl).SelectedItem as TabItem).Header.ToString())
+                {
+                    case "Tool length":
+                        model.Instructions = string.Empty;
+                        break;
+
+                    case "Center finder":
+                        model.Instructions = "Click image above to select probing action.\nPlace the probe above the approximate center of the workpiece before start.";
+                        break;
+
+                    case "Edge finder":
+                        model.Instructions = "Click edge, corner or center in image above to select probing action.\nMove the probe to above the position indicated by green dot before start.";
+                        break;
+
+                    case "Height map":
+                        model.Instructions = "A rapid motion to X,Y will be performed before probing the height map starts.";
+                        break;
+
+                    default:
+                        model.Instructions = string.Empty;
+                        break;
+                }
         }
     }
 }

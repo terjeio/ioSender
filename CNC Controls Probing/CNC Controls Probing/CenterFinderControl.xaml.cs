@@ -1,13 +1,13 @@
 ﻿/*
  * CenterFinderControl.xaml.cs - part of CNC Probing library
  *
- * v0.18 / 2020-05-09 / Io Engineering (Terje Io)
+ * v0.19 / 2020-05-09 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2020, Io Engineering (Terje Io)
+Copyright (c) 2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -44,7 +44,7 @@ using CNC.GCode;
 
 namespace CNC.Controls.Probing
 {
-    enum Center
+    public enum Center
     {
         None = 0,
         Inside,
@@ -70,7 +70,7 @@ namespace CNC.Controls.Probing
 
             if (probing.ProbeCenter == Center.None)
             {
-                MessageBox.Show("Select type of probe.", "Center finder", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                MessageBox.Show("Select type of probe by clicking on one of the images above.", "Center finder", MessageBoxButton.OK, MessageBoxImage.Exclamation);
                 return;
             }
 
@@ -85,45 +85,53 @@ namespace CNC.Controls.Probing
             {
                 case Center.Inside:
                     {
-                        Position rapid = new Position(diameter_2 - probing.Offset.X, diameter_2 - probing.Offset.Y, 0d);
+                        Position rapid = new Position(diameter_2 - probing.Offset, diameter_2 - probing.Offset, 0d);
+
+                        probing.Program.Add("G0Z-" + probing.Depth.ToInvariantString());
                         if (rapid.X > 1d)
-                            probing.Program.Add("G0" + rapid.ToString(AxisFlags.X, true));
-                        probing.Program.Add(Probing.Command + probing.Distance.ToString(AxisFlags.X, true));
+                            probing.Program.Add("G0" + rapid.ToString(AxisFlags.X, Direction.Negative));
+                        probing.Program.AddProbingAction(AxisFlags.X, true);
                         probing.Program.Add(gotoCenter);
                         if (rapid.X > 1d)
                             probing.Program.Add("G0" + rapid.ToString(AxisFlags.X));
-                        probing.Program.Add(Probing.Command + probing.Distance.ToString(AxisFlags.X));
+                        probing.Program.AddProbingAction(AxisFlags.X, false);
                         probing.Program.Add(gotoCenter);
                         if (rapid.Y > 1d)
-                            probing.Program.Add("G0" + rapid.ToString(AxisFlags.Y, true));
-                        probing.Program.Add(Probing.Command + probing.Distance.ToString(AxisFlags.Y, true));
+                            probing.Program.Add("G0" + rapid.ToString(AxisFlags.Y, Direction.Negative));
+                        probing.Program.AddProbingAction(AxisFlags.Y, true);
                         probing.Program.Add(gotoCenter);
                         if (rapid.Y > 1d)
                             probing.Program.Add("G0" + rapid.ToString(AxisFlags.Y));
-                        probing.Program.Add(Probing.Command + probing.Distance.ToString(AxisFlags.Y));
+                        probing.Program.AddProbingAction(AxisFlags.Y, false);
                     }
                     break;
 
                 case Center.Outside:
                     {
-                        Position rapid = new Position(diameter_2 + probing.Offset.X, diameter_2 + probing.Offset.Y, 0d);
-                        Position rapid2 = new Position(probing.WorkpieceDiameter + probing.Offset.X * 2d, probing.WorkpieceDiameter + probing.Offset.Y * 2d, 0d);
-                        probing.Program.Add(Probing.Command + probing.Distance.ToString(AxisFlags.X));
-                        probing.Program.Add("G0" + probing.Offset.ToString(AxisFlags.X, true));
-                        probing.Program.Add("G0" + rapid.ToString(AxisFlags.Y, true));
-                        probing.Program.Add("G0" + rapid2.ToString(AxisFlags.X));
-                        probing.Program.Add("G0" + rapid.ToString(AxisFlags.Y));
-                        probing.Program.Add(Probing.Command + probing.Distance.ToString(AxisFlags.X, true));
-                        probing.Program.Add("G0" + probing.Offset.ToString(AxisFlags.X));
-                        probing.Program.Add("G0" + rapid.ToString(AxisFlags.Y));
-                        probing.Program.Add("G0" + rapid.ToString(AxisFlags.X, true));
-                        probing.Program.Add(Probing.Command + probing.Distance.ToString(AxisFlags.Y, true));
-                        probing.Program.Add("G0" + probing.Offset.ToString(AxisFlags.Y));
-                        probing.Program.Add("G0" + rapid.ToString(AxisFlags.X, true));
-                        probing.Program.Add("G0" + rapid2.ToString(AxisFlags.Y, true));
-                        probing.Program.Add("G0" + rapid.ToString(AxisFlags.X));
-                        probing.Program.Add(Probing.Command + probing.Distance.ToString(AxisFlags.Y));
-                        probing.Program.Add("G0" + probing.Offset.ToString(AxisFlags.Y, true));
+                        Position rapid = new Position(diameter_2 + probing.XYClearance, diameter_2 + probing.XYClearance, 0d);
+
+                        probing.Program.Add("G0" + rapid.ToString(AxisFlags.X, Direction.Negative));
+                        probing.Program.Add("G0Z-" + probing.Depth.ToInvariantString());
+                        probing.Program.AddProbingAction(AxisFlags.X, false);
+                        probing.Program.Add("G0Z" + probing.Depth.ToInvariantString());
+                        probing.Program.Add("G53G0" + center.ToString(AxisFlags.X));
+
+                        probing.Program.Add("G0" + rapid.ToString(AxisFlags.X, Direction.Positive));
+                        probing.Program.Add("G0Z-" + probing.Depth.ToInvariantString());
+                        probing.Program.AddProbingAction(AxisFlags.X, true);
+                        probing.Program.Add("G0Z" + probing.Depth.ToInvariantString());
+                        probing.Program.Add("G53G0" + center.ToString(AxisFlags.X));
+
+                        probing.Program.Add("G0" + rapid.ToString(AxisFlags.Y, Direction.Negative));
+                        probing.Program.Add("G0Z-" + probing.Depth.ToInvariantString());
+                        probing.Program.AddProbingAction(AxisFlags.Y, false);
+                        probing.Program.Add("G0Z" + probing.Depth.ToInvariantString());
+                        probing.Program.Add("G53G0" + center.ToString(AxisFlags.Y));
+
+                        probing.Program.Add("G0" + rapid.ToString(AxisFlags.Y, Direction.Positive));
+                        probing.Program.Add("G0Z-" + probing.Depth.ToInvariantString());
+                        probing.Program.AddProbingAction(AxisFlags.Y, true);
+                        probing.Program.Add("G0Z" + probing.Depth.ToInvariantString());
                     }
                     break;
             }
@@ -135,7 +143,22 @@ namespace CNC.Controls.Probing
         {
             var probing = DataContext as ProbingViewModel;
 
-            if (!probing.Init())
+            if(!probing.ValidateInput())
+                return;
+
+            if (probing.WorkpieceDiameter <= 0d)
+            {
+                probing.SetError(nameof(probing.WorkpieceDiameter), "Workpiece diameter cannot be 0.");
+                return;
+            }
+
+            if (probing.ProbeCenter == Center.Inside && probing.WorkpieceDiameter < probing.Offset * 2d)
+            {
+                probing.SetError(nameof(probing.WorkpieceDiameter), "Probing offset too large for workpiece diameter.");
+                return;
+            }
+
+            if (!probing.Program.Init())
                 return;
 
             pass = passes;
@@ -145,7 +168,7 @@ namespace CNC.Controls.Probing
             probing.PropertyChanged += Probing_PropertyChanged;
 
             Execute();
-            probing.Execute.Execute(true);
+            probing.Program.Execute(true);
         }
 
         private void Probing_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -161,7 +184,7 @@ namespace CNC.Controls.Probing
                     {
                         probing.PropertyChanged -= Probing_PropertyChanged;
                         probing.IsSuccess = false;
-                        probing.End("Probing failed");
+                        probing.Program.End("Probing failed");
                         return;
                     }
 
@@ -174,13 +197,14 @@ namespace CNC.Controls.Probing
                         {
                             case Center.Inside:
                                 ok = probing.GotoMachinePosition(center, AxisFlags.X | AxisFlags.Y);
+                                probing.GotoMachinePosition(center, AxisFlags.Z);
                                 break;
 
                             case Center.Outside:
                                 if (pass > 1)
                                 {
                                     Position start = new Position(center);
-                                    start.X -= probing.WorkpieceDiameter / 2d + probing.Offset.X;
+                                    start.X -= probing.WorkpieceDiameter / 2d + probing.XYClearance;
                                     ok = probing.GotoMachinePosition(start, AxisFlags.X);
                                     probing.GotoMachinePosition(start, AxisFlags.Y);
                                 }
@@ -195,7 +219,7 @@ namespace CNC.Controls.Probing
                             {
                                 if (probing.ProbeCenter == Center.Outside)
                                 {
-                                    center.Z = probing.Grbl.MachinePosition.Z + probing.Distance.Z;
+//                                    center.Z = probing.Grbl.MachinePosition.Z + probing.Depth;
                                     probing.GotoMachinePosition(center, AxisFlags.Z);
                                     probing.GotoMachinePosition(center, AxisFlags.X | AxisFlags.Y);
                                 }
@@ -208,9 +232,9 @@ namespace CNC.Controls.Probing
                         if (!ok || pass == 0)
                         {
                             probing.PropertyChanged -= Probing_PropertyChanged;
-                            probing.End(ok ? "Probing completed" : "Probing failed");
+                            probing.Program.End(ok ? "Probing completed" : "Probing failed");
                         } else
-                            probing.Execute.Execute(true);
+                            probing.Program.Execute(true);
                     } else
                         probing.PropertyChanged -= Probing_PropertyChanged;
                     break;
@@ -219,7 +243,7 @@ namespace CNC.Controls.Probing
 
         private void stop_Click(object sender, RoutedEventArgs e)
         {
-            (DataContext as ProbingViewModel).Cancel();
+            (DataContext as ProbingViewModel).Program.Cancel();
         }
     }
 }

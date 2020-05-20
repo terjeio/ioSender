@@ -1,7 +1,7 @@
 ﻿/*
  * GCode.cs - part of CNC Controls library
  *
- * v0.18 / 2020-04-21 / Io Engineering (Terje Io)
+ * v0.19 / 2020-05-19 / Io Engineering (Terje Io)
  *
  */
 
@@ -159,7 +159,7 @@ namespace CNC.GCode
         Radius = 2    // Do not change
     }
 
-    public enum ZDirection
+    public enum Direction
     {
         Positive = 0,
         Negative

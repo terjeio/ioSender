@@ -1,13 +1,13 @@
 ﻿/*
  * ToolLengthControl.cs - part of CNC Probing library
  *
- * v0.18 / 2020-05-09 / Io Engineering (Terje Io)
+ * v0.19 / 2020-05-09 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2020, Io Engineering (Terje Io)
+Copyright (c) 2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -49,7 +49,7 @@ namespace CNC.Controls.Probing
     /// </summary>
     public partial class ToolLengthControl : UserControl
     {
-        Position origin = null;
+        Position origin = null, g59_3 = null;
 
         public ToolLengthControl()
         {
@@ -60,7 +60,16 @@ namespace CNC.Controls.Probing
         {
             var probing = DataContext as ProbingViewModel;
 
-            if (!probing.Init())
+            if (!probing.ValidateInput())
+                return;
+
+            if (probing.ProbeFixture && probing.Grbl.HomedState != HomedState.Homed)
+            {
+                MessageBox.Show("Axes must be homed before probing the fixture!", "Probing");
+                return;
+            }
+
+            if (!probing.Program.Init())
                 return;
 
             probing.PropertyChanged += Probing_PropertyChanged;
@@ -71,14 +80,16 @@ namespace CNC.Controls.Probing
 
             if (probing.ProbeFixture)
             {
-                var g59_3 = GrblWorkParameters.GetCoordinateSystem("G59.3");
-                g59_3.Z += probing.Offset.Z;
+                g59_3 = new Position(GrblWorkParameters.GetCoordinateSystem("G59.3"));
+                var safeZ = System.Math.Max(g59_3.Z, origin.Z) + probing.Depth;
+                g59_3.Z += probing.Depth;
+                probing.Program.Add("G53G0Z" + safeZ.ToInvariantString());
                 probing.Program.Add("G53G0" + g59_3.ToString(AxisFlags.X | AxisFlags.Y));
                 probing.Program.Add("G53G0" + g59_3.ToString(AxisFlags.Z));
+                g59_3.Z -= probing.Depth;
             }
-            probing.Program.Add(Probing.Command + probing.Distance.ToString(AxisFlags.Z, true));
-            probing.Execute.Execute(true);
-
+            probing.Program.AddProbingAction(AxisFlags.Z, true);
+            probing.Program.Execute(true);
         }
 
         private void Probing_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -93,24 +104,41 @@ namespace CNC.Controls.Probing
 
                     if (probing.IsSuccess)
                     {
-                        if (probing.ProbeFixture)
-                            probing.Grbl.ExecuteCommand(string.Format("G10L11P{0}{1}", probing.Tool, probing.Positions[0].ToString(AxisFlags.Z)));
+                        probing.GotoMachinePosition(probing.Positions[0], AxisFlags.Z);
+
+                        if (probing.CoordinateMode == ProbingViewModel.CoordMode.G92)
+                        {
+                            var touchOffset = probing.ProbeFixture ? probing.FixtureHeight : (probing.WorkpieceHeight + probing.TouchPlateHeight);
+                            probing.Grbl.ExecuteCommand(string.Format("G92Z{0}", (touchOffset).ToInvariantString()));
+                        }
                         else
                         {
-                            if(probing.HasToolTable)
-                                probing.Grbl.ExecuteCommand(string.Format("G43H{0}{1}", probing.Tool, probing.Positions[0].ToString(AxisFlags.Z)));
-                            else    
-                                probing.Grbl.ExecuteCommand("G43.1" + probing.Positions[0].ToString(AxisFlags.Z));
-                            if (probing.CoordinateMode == ProbingViewModel.CoordMode.G92)
+                            if (probing.ProbeFixture)
                             {
+                                //if (probing.HasToolTable)
+                                //    probing.Grbl.ExecuteCommand(string.Format("G43H{0}{1}", probing.Tool, probing.Positions[0].ToString(AxisFlags.Z)));
+                                //else
+                                var tofs = new Position(probing.Positions[0]);
+                                tofs.Z = - (probing.Positions[0].Z -= g59_3.Z);
+                                probing.Grbl.ExecuteCommand("G43.1" + tofs.ToString(AxisFlags.Z));
+                                //if (probing.Tool != "0")
+                                //    probing.Grbl.ExecuteCommand(string.Format("G10L11P{0}{1}", probing.Tool, probing.Positions[0].ToString(AxisFlags.Z)));
+                                probing.Positions[0].Z += g59_3.Z + probing.Depth;
                                 probing.GotoMachinePosition(probing.Positions[0], AxisFlags.Z);
-                                probing.Grbl.ExecuteCommand(string.Format("G92Z{0}", 0)); //??
                             }
                         }
-                        probing.Positions[0].Z += probing.Offset.Z;
-                        probing.GotoMachinePosition(origin, AxisFlags.Z);
-                        probing.GotoMachinePosition(origin, AxisFlags.X | AxisFlags.Y);
-                        probing.End(ok ? "Probing completed" : "Probing failed");
+
+                        if (origin.Z > probing.Positions[0].Z)
+                        {
+                            probing.GotoMachinePosition(origin, AxisFlags.Z);
+                            probing.GotoMachinePosition(origin, AxisFlags.X | AxisFlags.Y);
+                        }
+                        else
+                        {
+                            probing.GotoMachinePosition(origin, AxisFlags.X | AxisFlags.Y);
+                            probing.GotoMachinePosition(origin, AxisFlags.Z);
+                        }
+                        probing.Program.End(ok ? "Probing completed" : "Probing failed");
                     }
                     origin = null;
                     break;
@@ -119,7 +147,7 @@ namespace CNC.Controls.Probing
 
         private void stop_Click(object sender, RoutedEventArgs e)
         {
-            (DataContext as ProbingViewModel).Cancel();
+            (DataContext as ProbingViewModel).Program.Cancel();
         }
     }
 }

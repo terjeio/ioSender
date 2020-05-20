@@ -1,13 +1,13 @@
 ﻿/*
  * EdgeFinderControl.xaml.cs - part of CNC Probing library
  *
- * v0.18 / 2020-05-09 / Io Engineering (Terje Io)
+ * v0.19 / 2020-05-20 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2020, Io Engineering (Terje Io)
+Copyright (c) 2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -44,7 +44,7 @@ using CNC.GCode;
 
 namespace CNC.Controls.Probing
 {
-    enum Edge
+    public enum Edge
     {
         None = 0,
         A,
@@ -79,13 +79,16 @@ namespace CNC.Controls.Probing
         {
             var probing = DataContext as ProbingViewModel;
 
-            if(probing.ProbeEdge == Edge.None)
+            if (!probing.ValidateInput())
+                return;
+
+            if (probing.ProbeEdge == Edge.None)
             {
-                MessageBox.Show("Select edge or corner to probe.", "Edge finder", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                MessageBox.Show("Select edge or corner to probe by clicking on the relevant part of the image above.", "Edge finder", MessageBoxButton.OK, MessageBoxImage.Exclamation);
                 return;
             }
 
-            if (!probing.Init())
+            if (!probing.Program.Init())
                 return;
 
             probing.PropertyChanged += Probing_PropertyChanged;
@@ -93,91 +96,146 @@ namespace CNC.Controls.Probing
             probing.Program.Add(string.Format("G91F{0}", probing.ProbeFeedRate.ToInvariantString()));
             probing.Message = string.Empty;
 
-            Position offset_2 = new Position(probing.Offset.X * 2d, probing.Offset.X * 2d, 0d);
+            Position offset_2 = new Position(probing.XYClearance * 2d, probing.XYClearance * 2d, 0d);
 
             switch (probing.ProbeEdge)
             {
                 case Edge.A:
                     axisflags = AxisFlags.X | AxisFlags.Y;
                     af[GrblConstants.X_AXIS] = af[GrblConstants.Y_AXIS] = 1d;
-                    probing.Program.Add(Probing.Command + probing.Distance.ToString(AxisFlags.X));
-                    probing.Program.Add("G0" + probing.Offset.ToString(AxisFlags.X, true));
-                    probing.Program.Add("G0" + offset_2.ToString(AxisFlags.Y, true));
-                    probing.Program.Add("G0" + offset_2.ToString(AxisFlags.X));
-                    probing.Program.Add(Probing.Command + probing.Distance.ToString(AxisFlags.Y));
-                    probing.Program.Add("G0" + probing.Offset.ToString(AxisFlags.Y, true));
+                    probing.Program.Add("G0Y" + probing.Offset.ToInvariantString());
+                    probing.Program.Add("G0X-" + probing.XYClearance.ToInvariantString());
+                    probing.Program.Add("G0Z-" + probing.Depth.ToInvariantString());
+
+                    probing.Program.AddProbingAction(AxisFlags.X, false);
+
+                    probing.Program.Add("G0X-" + probing.XYClearance.ToInvariantString());
+                    probing.Program.Add("G0Z" + probing.Depth.ToInvariantString());
+                    probing.Program.Add("G0X" + probing.XYClearance.ToInvariantString());
+                    probing.Program.Add("G0X" + probing.XYClearance.ToInvariantString() + "Y-" + probing.XYClearance.ToInvariantString());
+                    probing.Program.Add("G0Y-" + probing.XYClearance.ToInvariantString());
+                    probing.Program.Add("G0Z-" + probing.Depth.ToInvariantString());
+
+                    probing.Program.AddProbingAction(AxisFlags.Y, false);
+
+                    probing.Program.Add("G0Y-" + probing.XYClearance.ToInvariantString());
+                    probing.Program.Add("G0Z" + probing.Depth.ToInvariantString());
+                    probing.Program.Add("G0Y" + probing.XYClearance.ToInvariantString());
                     break;
 
                 case Edge.B:
                     axisflags = AxisFlags.X | AxisFlags.Y;
                     af[GrblConstants.X_AXIS] = -1d; af[GrblConstants.Y_AXIS] = 1d;
-                    probing.Program.Add(Probing.Command + probing.Distance.ToString(AxisFlags.X, true));
-                    probing.Program.Add("G0" + probing.Offset.ToString(AxisFlags.X));
-                    probing.Program.Add("G0" + offset_2.ToString(AxisFlags.Y, true));
-                    probing.Program.Add("G0" + offset_2.ToString(AxisFlags.X, true));
-                    probing.Program.Add(Probing.Command + probing.Distance.ToString(AxisFlags.Y));
-                    probing.Program.Add("G0" + probing.Offset.ToString(AxisFlags.Y, true));
+                    probing.Program.Add("G0Y" + probing.Offset.ToInvariantString());
+                    probing.Program.Add("G0X" + probing.XYClearance.ToInvariantString());
+                    probing.Program.Add("G0Z-" + probing.Depth.ToInvariantString());
+
+                    probing.Program.AddProbingAction(AxisFlags.X, true);
+
+                    probing.Program.Add("G0X" + probing.XYClearance.ToInvariantString());
+                    probing.Program.Add("G0Z" + probing.Depth.ToInvariantString());
+                    probing.Program.Add("G0X-" + probing.XYClearance.ToInvariantString());
+                    probing.Program.Add("G0X-" + probing.XYClearance.ToInvariantString() + "Y-" + probing.XYClearance.ToInvariantString());
+                    probing.Program.Add("G0Y-" + probing.XYClearance.ToInvariantString());
+                    probing.Program.Add("G0Z-" + probing.Depth.ToInvariantString());
+
+                    probing.Program.AddProbingAction(AxisFlags.Y, false);
+
+                    probing.Program.Add("G0Y-" + probing.XYClearance.ToInvariantString());
+                    probing.Program.Add("G0Z" + probing.Depth.ToInvariantString());
+                    probing.Program.Add("G0Y" + probing.XYClearance.ToInvariantString());
                     break;
 
                 case Edge.C:
                     axisflags = AxisFlags.X | AxisFlags.Y;
                     af[GrblConstants.X_AXIS] = af[GrblConstants.Y_AXIS] = -1d;
-                    probing.Program.Add(Probing.Command + probing.Distance.ToString(AxisFlags.X, true));
-                    probing.Program.Add("G0" + probing.Offset.ToString(AxisFlags.X));
-                    probing.Program.Add("G0" + offset_2.ToString(AxisFlags.Y));
-                    probing.Program.Add("G0" + offset_2.ToString(AxisFlags.X, true));
-                    probing.Program.Add(Probing.Command + probing.Distance.ToString(AxisFlags.Y, true));
-                    probing.Program.Add("G0" + probing.Offset.ToString(AxisFlags.Y));
+                    probing.Program.Add("G0Y-" + probing.Offset.ToInvariantString());
+                    probing.Program.Add("G0X" + probing.XYClearance.ToInvariantString());
+                    probing.Program.Add("G0Z-" + probing.Depth.ToInvariantString());
+
+                    probing.Program.AddProbingAction(AxisFlags.X, true);
+
+                    probing.Program.Add("G0X" + probing.XYClearance.ToInvariantString());
+                    probing.Program.Add("G0Z" + probing.Depth.ToInvariantString());
+                    probing.Program.Add("G0X-" + probing.XYClearance.ToInvariantString());
+                    probing.Program.Add("G0X-" + probing.XYClearance.ToInvariantString() + "Y" + probing.XYClearance.ToInvariantString());
+                    probing.Program.Add("G0Y" + probing.XYClearance.ToInvariantString());
+                    probing.Program.Add("G0Z-" + probing.Depth.ToInvariantString());
+
+                    probing.Program.AddProbingAction(AxisFlags.Y, true);
+
+                    probing.Program.Add("G0Y" + probing.XYClearance.ToInvariantString());
+                    probing.Program.Add("G0Z" + probing.Depth.ToInvariantString());
+                    probing.Program.Add("G0Y-" + probing.XYClearance.ToInvariantString());
                     break;
 
                 case Edge.D:
                     axisflags = AxisFlags.X | AxisFlags.Y;
                     af[GrblConstants.X_AXIS] = 1d; af[GrblConstants.Y_AXIS] = -1d;
-                    probing.Program.Add(Probing.Command + probing.Distance.ToString(AxisFlags.X));
-                    probing.Program.Add("G0" + probing.Offset.ToString(AxisFlags.X, true));
-                    probing.Program.Add("G0" + offset_2.ToString(AxisFlags.Y));
-                    probing.Program.Add("G0" + offset_2.ToString(AxisFlags.X));
-                    probing.Program.Add(Probing.Command + probing.Distance.ToString(AxisFlags.Y, true));
-                    probing.Program.Add("G0" + probing.Offset.ToString(AxisFlags.Y));
+                    probing.Program.Add("G0Y-" + probing.Offset.ToInvariantString());
+                    probing.Program.Add("G0X-" + probing.XYClearance.ToInvariantString());
+                    probing.Program.Add("G0Z-" + probing.Depth.ToInvariantString());
+
+                    probing.Program.AddProbingAction(AxisFlags.X, false);
+
+                    probing.Program.Add("G0X-" + probing.XYClearance.ToInvariantString());
+                    probing.Program.Add("G0Z" + probing.Depth.ToInvariantString());
+                    probing.Program.Add("G0X" + probing.XYClearance.ToInvariantString());
+                    probing.Program.Add("G0X" + probing.XYClearance.ToInvariantString() + "Y" + probing.XYClearance.ToInvariantString());
+                    probing.Program.Add("G0Y" + probing.XYClearance.ToInvariantString());
+                    probing.Program.Add("G0Z-" + probing.Depth.ToInvariantString());
+
+                    probing.Program.AddProbingAction(AxisFlags.Y, true);
+
+                    probing.Program.Add("G0Y" + probing.XYClearance.ToInvariantString());
+                    probing.Program.Add("G0Z" + probing.Depth.ToInvariantString());
+                    probing.Program.Add("G0Y-" + probing.XYClearance.ToInvariantString());
                     break;
 
                 case Edge.Z:
                     axisflags = AxisFlags.Z;
                     af[GrblConstants.Z_AXIS] = 1d;
-                    probing.Program.Add(Probing.Command + probing.Distance.ToString(AxisFlags.Z, true));
+                    probing.Program.AddProbingAction(AxisFlags.Z, true);
                     break;
 
                 case Edge.AD:
                     axisflags = AxisFlags.X;
                     af[GrblConstants.X_AXIS] = 1d;
-                    probing.Program.Add(Probing.Command + probing.Distance.ToString(AxisFlags.X));
-                    probing.Program.Add("G0" + probing.Offset.ToString(AxisFlags.X, true));
+                    probing.Program.Add("G0X-" + probing.XYClearance.ToInvariantString());
+                    probing.Program.Add("G0Z-" + probing.Depth.ToInvariantString());
+                    probing.Program.AddProbingAction(AxisFlags.X, false);
+                    probing.Program.Add("G0X-" + probing.XYClearance.ToInvariantString());
                     break;
 
                 case Edge.AB:
                     axisflags = AxisFlags.Y;
                     af[GrblConstants.Y_AXIS] = 1d;
-                    probing.Program.Add(Probing.Command + probing.Distance.ToString(AxisFlags.Y));
-                    probing.Program.Add("G0" + probing.Offset.ToString(AxisFlags.Y, true));
+                    probing.Program.Add("G0Y-" + probing.XYClearance.ToInvariantString());
+                    probing.Program.Add("G0Z-" + probing.Depth.ToInvariantString());
+                    probing.Program.AddProbingAction(AxisFlags.Y, false);
+                    probing.Program.Add("G0Y-" + probing.XYClearance.ToInvariantString());
                     break;
 
                 case Edge.CB:
                     axisflags = AxisFlags.X;
                     af[GrblConstants.X_AXIS] = -1d;
-                    probing.Program.Add(Probing.Command + probing.Distance.ToString(AxisFlags.X, true));
-                    probing.Program.Add("G0" + probing.Offset.ToString(AxisFlags.X));
-
+                    probing.Program.Add("G0X" + probing.XYClearance.ToInvariantString());
+                    probing.Program.Add("G0Z-" + probing.Depth.ToInvariantString());
+                    probing.Program.AddProbingAction(AxisFlags.X, true);
+                    probing.Program.Add("G0X" + probing.XYClearance.ToInvariantString());
                     break;
 
                 case Edge.CD:
                     axisflags = AxisFlags.Y;
                     af[GrblConstants.Y_AXIS] = -1d;
-                    probing.Program.Add(Probing.Command + probing.Distance.ToString(AxisFlags.Y, true));
-                    probing.Program.Add("G0" + probing.Offset.ToString(AxisFlags.Y));
+                    probing.Program.Add("G0Y" + probing.XYClearance.ToInvariantString());
+                    probing.Program.Add("G0Z-" + probing.Depth.ToInvariantString());
+                    probing.Program.AddProbingAction(AxisFlags.Y, true);
+                    probing.Program.Add("G0Y" + probing.XYClearance.ToInvariantString());
                     break;
             }
 
-            probing.Execute.Execute(true);
+            probing.Program.Execute(true);
         }
 
         private void Probing_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -199,7 +257,7 @@ namespace CNC.Controls.Probing
                             pos.Values[i] = probing.Positions[p++].Values[i] + (i == GrblConstants.Z_AXIS ? 0d : probing.ProbeDiameter / 2d * af[i]);
 
                         Position pz = new Position(pos);
-                        pos.Z += probing.Offset.Z; // Sometimes NaN...?
+                        pos.Z += probing.Depth; // Sometimes NaN...?
 
                         if (probing.ProbeZ && axisflags != AxisFlags.Z)
                         {
@@ -208,11 +266,14 @@ namespace CNC.Controls.Probing
                             pz.Y += probing.ProbeDiameter / 2d * af[GrblConstants.Y_AXIS];
                             if ((ok = (ok && probing.GotoMachinePosition(pz, axisflags))))
                             {
-                                if ((ok = probing.WaitForResponse(string.Format(Probing.Command + "{0}F{1}", probing.Distance.ToString(AxisFlags.Z, true), probing.ProbeFeedRate.ToInvariantString()))))
+                                ok = probing.WaitForResponse(probing.FastProbe + "Z-" + probing.Depth.ToInvariantString());
+                                ok = ok && probing.WaitForResponse("G0Z" + probing.LatchDistance.ToInvariantString());
+                                ok = ok && probing.RemoveLastPosition();
+                                if ((ok = ok && probing.WaitForResponse(probing.SlowProbe + "Z-" + probing.Depth.ToInvariantString())))
                                 {
                                     axisflags |= AxisFlags.Z;
                                     pos.Z = probing.Grbl.ProbePosition.Z;
-                                    pz.Z = pos.Z + probing.Offset.Z;
+                                    pz.Z = pos.Z + probing.Depth;
                                     ok = probing.GotoMachinePosition(pz, AxisFlags.Z);
                                 }
                             }
@@ -223,7 +284,7 @@ namespace CNC.Controls.Probing
                             if (axisflags.HasFlag(AxisFlags.Z))
                             {
                                 pos.Z = probing.Positions[0].Z;
-                                pz.Z += probing.Offset.Z;
+                                pz.Z += probing.Depth;
                             }
                         }
 
@@ -239,7 +300,7 @@ namespace CNC.Controls.Probing
                         } else
                             probing.Grbl.ExecuteCommand(string.Format("G10L2P{0}{1}", probing.CoordinateSystem, pos.ToString(axisflags)));
 
-                        probing.End(ok ? "Probing completed" : "Probing failed");
+                        probing.Program.End(ok ? "Probing completed" : "Probing failed");
                     }
                     probing.Grbl.IsJobRunning = false;
                     break;
@@ -248,7 +309,7 @@ namespace CNC.Controls.Probing
 
         private void stop_Click(object sender, RoutedEventArgs e)
         {
-            (DataContext as ProbingViewModel).Cancel();
+            (DataContext as ProbingViewModel).Program.Cancel();
         }
     }
 }

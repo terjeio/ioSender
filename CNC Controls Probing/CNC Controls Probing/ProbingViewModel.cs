@@ -1,13 +1,13 @@
 ﻿/*
  * ProbingViewModel.cs - part of CNC Probing library
  *
- * v0.18 / 2020-05-09 / Io Engineering (Terje Io)
+ * v0.19 / 2020-05-20 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2020, Io Engineering (Terje Io)
+Copyright (c) 2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -40,10 +40,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using System.Windows.Input;
+using System.Collections.ObjectModel;
 using CNC.Core;
 using CNC.GCode;
-using System.Collections.ObjectModel;
 
 namespace CNC.Controls.Probing
 {
@@ -53,7 +52,7 @@ namespace CNC.Controls.Probing
         public const string Command = "G38.3";
     }
 
-    class ProbingViewModel : ViewModelBase
+    public class ProbingViewModel : ViewModelBase
     {
         public enum CoordMode
         {
@@ -61,31 +60,38 @@ namespace CNC.Controls.Probing
             G92
         }
 
-        private string _message = string.Empty, _tool = string.Empty;
-        private double _feedRate = 100d, _tpHeight = 0.1, _ProbeDiameter = 3, _workpieceDiameter = 20;
+        private string _message = string.Empty, _tool = string.Empty, _instructions = string.Empty;
+        private double _tpHeight, _fHeight, _ProbeDiameter, _workpieceDiameter = 0d, _workpieceHeight = 0d;
+        private double _latchDistance, _latchFeedRate;
+        private double _probeDistance, _probeFeedRate;
+        private double _offset, _xyClearance, _depth;
+
         private bool _canProbe = false, _isComplete = false, _isSuccess = false, _probeZ = false, _useFixture = false, _hasToolTable = false, _hasCs9 = false;
-        private bool isCancelled = false, isRunning = false, wasZselected = false, silent = false;
+        private bool isCancelled = false, wasZselected = false;
         private GrblViewModel _grblmodel = null;
         private List<string> _program = new List<string>();
         private List<Position> _positions = new List<Position>();
         private List<Position> _machine = new List<Position>();
-        private Position _distance = new Position();
-        private Position _offset = new Position();
         private CoordMode _cmode = CoordMode.G92;
         private Edge _edge = Edge.None;
         private Center _center = Center.None;
         private int _coordinateSystem = 0;
+        private ProbingProfile _profile;
 
-        private int step = 0;
         private CancellationToken cancellationToken = new CancellationToken();
 
-        public ProbingViewModel (GrblViewModel grblmodel)
+        public Program Program;
+
+        public ProbingViewModel (GrblViewModel grblmodel, ProbingProfiles profile)
         {
             Grbl = grblmodel;
-            Distance.X = Distance.Y = Distance.Z = 10d;
-            Offset.X = Offset.Y = Offset.Z = 5d;
 
-            Execute = new ActionCommand<bool>(ExecuteProgram);
+//            Execute = new ActionCommand<bool>(ExecuteProgram);
+
+            Program = new Program(this);
+
+            Profiles = profile.Profiles;
+            Profile = profile.Profiles[0];
 
             HeightMap.PropertyChanged += HeightMap_PropertyChanged;
         }
@@ -96,158 +102,15 @@ namespace CNC.Controls.Probing
                 HeightMap.CanApply = HeightMap.HasHeightMap && !HeightMapApplied && Grbl.IsFileLoaded;
         }
 
-        private void Grbl_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+//        private ICommand Execute { get;  set; }
+
+        public bool RemoveLastPosition()
         {
-            switch (e.PropertyName)
-            {
-                case nameof(GrblViewModel.IsProbeSuccess):
-                    if (Grbl.IsProbeSuccess)
-                        _positions.Add(new Position(Grbl.ProbePosition));
-                    else
-                        ResponseReceived("fail");
-                    break;
+            bool ok;
+            if ((ok = _positions.Count > 0))
+                _positions.RemoveAt(_positions.Count - 1);
 
-                case nameof(GrblViewModel.Message):
-                    if(!silent)
-                        Message = Grbl.Message;
-                    break;
-            }
-        }
-
-        public bool Init()
-        {
-            bool? res = null;
-
-            Message = String.Empty;
-
-            Grbl.Poller.SetState(0);  // Disable status polling during probing
-
-            // Clear error status if set
-            if (Grbl.GrblError != 0)
-            {
-                new Thread(() =>
-                {
-                    res = WaitFor.AckResponse<string>(
-                    cancellationToken,
-                    null,
-                    a => Grbl.OnResponseReceived += a,
-                    a => Grbl.OnResponseReceived -= a,
-                    1000, () => Grbl.ExecuteCommand(""));
-                }).Start();
-
-                while (res == null)
-                    EventUtils.DoEvents();
-
-                res = null;
-            }
-
-            // Get a status report in order to establish current machine position
-            new Thread(() =>
-            {
-                res = WaitFor.SingleEvent<string>(
-                cancellationToken,
-                null,
-                a => Grbl.OnResponseReceived += a,
-                a => Grbl.OnResponseReceived -= a,
-                1000, () => Comms.com.WriteByte(GrblLegacy.ConvertRTCommand(GrblConstants.CMD_STATUS_REPORT)));
-            }).Start();
-
-            while (res == null)
-                EventUtils.DoEvents();
-
-            Grbl.Poller.SetState(AppConfig.Settings.Base.PollInterval);
-
-            if (Grbl.GrblState.State == GrblStates.Alarm)
-            {
-                Message = GrblAlarms.GetMessage(Grbl.GrblState.Substate.ToString());
-                res = false;
-            }
-
-            if (res == true && Grbl.Signals.Value.HasFlag(Signals.Probe))
-            {
-                Message = "Probing failed, probe signal is asserted";
-                res = false;
-            }
-
-            if (res == true && Grbl.GrblState.State != GrblStates.Idle)
-            {
-                Message = "Probing failed, Grbl is not in idle state";
-                res = false;
-            }
-
-            Program.Clear();
-
-            if(res != true) // Reenable status polling if int fails 
-                Grbl.Poller.SetState(AppConfig.Settings.Base.PollInterval);
-
-            return res == true;
-        }
-
-        public ICommand Execute { get; private set; }
-
-        private void ExecuteProgram(bool go)
-        {
-            if(_program.Count > 0)
-            {
-                step = 0;
-                _isComplete = _isSuccess = isCancelled = false;
-                _positions.Clear();
-                _machine.Clear();
-
-                Comms.com.PurgeQueue();
-
-                if (!isRunning)
-                {
-                    isRunning = true;
-
-                    Grbl.OnCommandResponseReceived += ResponseReceived;
-                    Grbl.PropertyChanged += Grbl_PropertyChanged;
-                }
-
-                Grbl.IsJobRunning = true;
-
-                if(Message == string.Empty)
-                    Message = "Probing...";
-
-                Grbl.ExecuteCommand(_program[step]);
-            }
-        }
-
-        private void ResponseReceived(string response)
-        {
-            if (Grbl.ResponseLogVerbose)
-                Grbl.ResponseLog.Add("PM:" + response);
-
-            if (response == "ok")
-            {
-                step++;
-                if (step < _program.Count)
-                    Grbl.ExecuteCommand(_program[step]);
-            }
-
-            if (step == _program.Count || response != "ok")
-            {
-                IsSuccess = step == _program.Count && response == "ok";
-                if (!IsSuccess)
-                    End("Probing cancelled/failed");
-                IsCompleted = true;
-                Grbl.Poller.SetState(AppConfig.Settings.Base.PollInterval);
-            }
-        }
-
-        public void Cancel ()
-        {
-            isCancelled = true;
-            Comms.com.WriteByte(GrblConstants.CMD_STOP);
-            ResponseReceived("cancel");
-        }
-
-        public void End(string message)
-        {
-            Grbl.PropertyChanged -= Grbl_PropertyChanged;
-            Grbl.OnCommandResponseReceived -= ResponseReceived;
-            isRunning = Grbl.IsJobRunning = false;
-            Message = message;
+            return ok;
         }
 
         public bool WaitForResponse(string command)
@@ -269,6 +132,35 @@ namespace CNC.Controls.Probing
 
             while (res == null)
                 EventUtils.DoEvents();
+
+            return res == true;
+        }
+
+        public bool WaitForIdle(string command)
+        {
+            bool? res = null;
+
+            if (Grbl.ResponseLogVerbose)
+                Grbl.ResponseLog.Add(command);
+
+            while (res == null)
+            {
+                new Thread(() =>
+                {
+                    res = WaitFor.SingleEvent<string>(
+                    cancellationToken,
+                    null,
+                    a => Grbl.OnResponseReceived += a,
+                    a => Grbl.OnResponseReceived -= a,
+                    5000, () => Grbl.ExecuteCommand(command));
+                }).Start();
+
+                while (res == null)
+                    EventUtils.DoEvents();
+
+                if (Grbl.GrblState.State != GrblStates.Idle)
+                    res = null;
+            }
 
             return res == true;
         }
@@ -332,13 +224,54 @@ namespace CNC.Controls.Probing
             return isCancelled ? false : !wait;
         }
 
+        public bool ValidateInput ()
+        {
+            ClearErrors();
+
+            if(XYClearance > ProbeDistance)
+            {
+                SetError(nameof(XYClearance), "Probing distance must be larger than XY Clearance.");
+                SetError(nameof(ProbeDistance), "Probing distance must be larger than XY Clearance.");
+            }
+
+            return !HasErrors;
+        }
+
         public GrblViewModel Grbl { get { return _grblmodel; } private set { _grblmodel = value; OnPropertyChanged(); } }
         public HeightMapViewModel HeightMap { get; private set; } = new HeightMapViewModel();
         public ObservableCollection<CoordinateSystem> CoordinateSystems { get; private set; } = new ObservableCollection<CoordinateSystem>();
+        public ObservableCollection<ProbingProfile> Profiles { get; private set; }
+        public ProbingProfile Profile
+        {
+            get { return _profile; }
+            set
+            {
+                _profile = value;
+                ProbeFeedRate = _profile.ProbeFeedRate;
+                LatchFeedRate = _profile.LatchFeedRate;
+                ProbeDistance = _profile.ProbeDistance;
+                LatchDistance = _profile.LatchDistance;
+                ProbeDiameter = _profile.ProbeDiameter;
+                Offset = _profile.Offset;
+                XYClearance = _profile.XYClearance;
+                Depth = _profile.Depth;
+                TouchPlateHeight = _profile.TouchPlateHeight;
+                FixtureHeight = _profile.FixtureHeight;
+            }
+        }
+
+        public string FastProbe { get { return string.Format(Probing.Command + "F{0}", ProbeFeedRate.ToInvariantString()); } }
+        public string SlowProbe { get { return string.Format(Probing.Command + "F{0}", LatchFeedRate.ToInvariantString()); } }
+        public string Instructions { get { return _instructions; } set { _instructions = value; OnPropertyChanged(); } }
+
         public int CoordinateSystem { get { return _coordinateSystem; } set { _coordinateSystem = value; OnPropertyChanged(); } }
-        public double ProbeFeedRate { get { return _feedRate; } set { _feedRate = value; OnPropertyChanged(); } }
+        public double ProbeFeedRate { get { return _probeFeedRate; } set { _probeFeedRate = value; OnPropertyChanged(); } }
+        public double ProbeDistance { get { return _probeDistance; } set { _probeDistance = value; OnPropertyChanged(); } }
         public double ProbeDiameter { get { return _ProbeDiameter; } set { _ProbeDiameter = value; OnPropertyChanged(); } }
-        public double TouchplateHeight { get { return _tpHeight; } set { _tpHeight = value; OnPropertyChanged(); } }
+        public double LatchDistance { get { return _latchDistance; } set { _latchDistance = value; OnPropertyChanged(); } }
+        public double LatchFeedRate { get { return _latchFeedRate; } set { _latchFeedRate = value; OnPropertyChanged(); } }
+        public double TouchPlateHeight { get { return _tpHeight; } set { _tpHeight = value; OnPropertyChanged(); } }
+        public double FixtureHeight { get { return _fHeight; } set { _fHeight = value; OnPropertyChanged(); } }
         public bool CanProbe { get { return _canProbe; } set { _canProbe = value; OnPropertyChanged(); } }
         public bool IsCompleted { get { return _isComplete; } set { _isComplete = value; OnPropertyChanged(); } }
         public bool IsSuccess { get { return _isSuccess; } set { _isSuccess = value; OnPropertyChanged(); } }
@@ -358,11 +291,13 @@ namespace CNC.Controls.Probing
                 HeightMap.CanApply = !GCode.File.HeightMapApplied;
             }
         }
-        public List<string> Program { get { return _program;  } }
+//        public List<string> Program { get { return _program;  } }
         public List<Position> Positions { get { return _positions; } }
         public List<Position> Machine { get { return _machine; } }
-        public Position Distance { get { return _distance; } }
-        public Position Offset { get { return _offset; } }
+        public double XYClearance { get { return _xyClearance; } set { _xyClearance = value; OnPropertyChanged(); } }
+        public double Offset { get { return _offset; } set { _offset = value; OnPropertyChanged(); } }
+        public double Depth { get { return _depth; } set { _depth = value; OnPropertyChanged(); } }
+
         public string Message
         {
             get { return _message; }
@@ -371,9 +306,9 @@ namespace CNC.Controls.Probing
                 _message = value; OnPropertyChanged();
                 if (!string.IsNullOrEmpty(_message) && Grbl.ResponseLogVerbose)
                     Grbl.ResponseLog.Add(_message);
-                silent = true;
+                Program.Silent = true;
                 Grbl.Message = _message;
-                silent = false;
+                Program.Silent = false;
             }
         }
         public CoordMode CoordinateMode { get { return _cmode; } set { _cmode = value; OnPropertyChanged(); } }
@@ -406,6 +341,7 @@ namespace CNC.Controls.Probing
         }
         public Center ProbeCenter { get { return _center; } set { _center = value; OnPropertyChanged(); } }
         public double WorkpieceDiameter { get { return _workpieceDiameter; } set { _workpieceDiameter = value; OnPropertyChanged(); } }
+        public double WorkpieceHeight { get { return _workpieceHeight; } set { _workpieceHeight = value; OnPropertyChanged(); } }
 
     }
 }

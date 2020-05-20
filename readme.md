@@ -1,5 +1,21 @@
 ## GRBL GCode Sender
 
+2020-05-20: Alpha 19 release of binary.
+
+Changes:
+ * Major refactoring of probing tab:  
+  Inspired by probing [plugin for LinuxCNC](https://vers.by/en/blog/useful-articles/probe-screen) \(IMO a good reference\).  
+  Allows definition of probing profiles.  
+  Shortcut for enabling keyboard jogging: `<CRTL>+<SHIFT>`  
+  Tool length probing now honors toolplate/fixture height, new input field for workpiece height.  
+  Center finder workpiece diameter defaults to 0.  
+  Option to automatically set G92 offset (tool zero) at heightmap origin.  
+  Some sanity checks performed on data input.  
+  Note: tool length probing is not yet complete, fixture probing and tool table/tool length options remains. 
+  USE WITH CARE!
+* Sidebar flyouts can be activated with `Alt` shortcuts.  
+* Bug fixes.
+
 2020-05-09: Alpha 18 release of binary.
 
 Changes:
@@ -117,4 +133,4 @@ Advanced grbl configuration with on-screen documentation. UI is dynamically gene
 ![Easy configuration](Media/Sender3.png)
 
 ---
-2020-03-16
+2020-05-20

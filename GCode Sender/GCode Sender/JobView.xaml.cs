@@ -1,7 +1,7 @@
 /*
  * JobView.xaml.cs - part of Grbl Code Sender
  *
- * v0.18 / 2020-05-06 / Io Engineering (Terje Io)
+ * v0.19 / 2020-05-10 / Io Engineering (Terje Io)
  *
  */
 
@@ -406,10 +406,10 @@ namespace GCode_Sender
         }
         protected bool ProcessKeyPreview(KeyEventArgs e)
         {
-            if (keyboard == null || mdiControl.IsFocused || DRO.IsFocused || spindleControl.IsFocused || workParametersControl.IsFocused)
+            if (keyboard == null)
                 return false;
 
-            return keyboard.ProcessKeypress(e);
+            return keyboard.ProcessKeypress(e, !(mdiControl.IsFocused || DRO.IsFocused || spindleControl.IsFocused || workParametersControl.IsFocused));
         }
 
 #endregion

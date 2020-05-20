@@ -1,7 +1,7 @@
 /*
  * Widget.cs - part of CNC Controls library for Grbl
  *
- * v0.18 / 2020-05-01 / Io Engineering (Terje Io)
+ * v0.19 / 2020-05-18 / Io Engineering (Terje Io)
  *
  */
 
@@ -44,6 +44,7 @@ using System.Windows.Controls;
 using CNC.Core;
 using System.Windows.Data;
 using static CNC.Controls.WidgetProperties;
+using CNC.GCode;
 
 namespace CNC.Controls
 {
@@ -175,8 +176,11 @@ namespace CNC.Controls
                     has_unit = false;
                     bool axes = widget.Format == "axes";
                     string[] format = (axes ? "X-Axis,Y-Axis,Z-Axis,A-Axis,B-Axis,C-Axis" : widget.Format).Split(',');
-                    for (int i = 0; i < (axes ? 3 : format.Length); i++)
+                    for (int i = 0; i < (axes ? 6 : format.Length); i++)
                     {
+                        if (axes && !GrblInfo.AxisFlags.HasFlag(GCodeParser.AxisFlag[i]))
+                            continue;
+
                         wCheckBox = new CheckBox
                         {
                             Name = string.Format("_bitmask{0}", i),

@@ -11,46 +11,88 @@
     <UserControl.Resources>
         <Controls:EnumValueToBooleanConverter x:Key="EnumToEnabledConverter" />
         <Controls:LogicalNotConverter x:Key="IsNotRunningConverter" />
+        <Controls:MultiLineConverter x:Key="ErrorMessageConverter" />
+        <Style x:Key="ErrorStyle" TargetType="Controls:NumericField">
+            <Style.Triggers>
+                <Trigger Property="Validation.HasError" Value="true">
+                    <Setter Property="Controls:NumericField.ToolTip">
+                        <Setter.Value>
+                            <MultiBinding Converter="{StaticResource ErrorMessageConverter}">
+                                <Binding RelativeSource="{RelativeSource Self}" Path="(Validation.Errors)" />
+                                <Binding RelativeSource="{RelativeSource Self}" Path="(Validation.Errors).Count" />
+                            </MultiBinding>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
     </UserControl.Resources>
     <Grid>
-        <StackPanel Orientation="Vertical" Width="200" HorizontalAlignment="Left" Margin="10,10,0,0" IsEnabled="{Binding Path=Grbl.IsJobRunning, Converter={StaticResource IsNotRunningConverter}}">
-            <Controls:NumericField Label="Feed rate" Value="{Binding Path=ProbeFeedRate, Mode=TwoWay}" HorizontalAlignment="Left" Margin="5,2,0,0" VerticalAlignment="Top"/>
-            <GroupBox Header="Probe/tool">
-                <Controls:NumericField Label="Diameter" Value="{Binding Path=ProbeDiameter, Mode=TwoWay}" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
+        <StackPanel Orientation="Vertical" Width="235" HorizontalAlignment="Left" Margin="5,10,0,0" IsEnabled="{Binding Path=Grbl.IsJobRunning, Converter={StaticResource IsNotRunningConverter}}">
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,5" HorizontalAlignment="Stretch">
+                <Label x:Name="lblProfile" Content="Profile:" HorizontalContentAlignment="Right" HorizontalAlignment="Right" VerticalAlignment="Center" Height="25" Width="48"/>
+                <ComboBox x:Name="cbxProfile" IsEditable="True" HorizontalAlignment="Left" VerticalAlignment="Center" Width="155" Height="22"
+                    ItemsSource="{Binding Path=Profiles}"    
+                    SelectedItem="{Binding Path=Profile, Mode=TwoWay}"
+                    DisplayMemberPath="Name"
+                    SelectedValuePath="Id" 
+                />
+                <Button x:Name="btnAddProfile" Content="..." HorizontalAlignment="Right" VerticalAlignment="Center" Width="22" Height="22" Focusable="False" Click="btnAddProfile_Click" Margin="4,0,0,0">
+                    <Button.ContextMenu>
+                        <ContextMenu x:Name="cm">
+                            <MenuItem x:Name="mnuAdd" Header="Add" Click="mnu_Click"/>
+                            <MenuItem x:Name="mnuUpdate" Header="Update" Click="mnu_Click"/>
+                            <MenuItem x:Name="mnuDelete" Header="Delete" Click="mnu_Click"/>
+                        </ContextMenu>
+                    </Button.ContextMenu>
+                </Button>
+            </StackPanel>
+            <GroupBox Header="Probe tip/tool">
+                <Controls:NumericField Label="Diameter:" Value="{Binding Path=ProbeDiameter, Mode=TwoWay}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
             </GroupBox>
-            <GroupBox Header="Touch plate">
-                <Controls:NumericField Label="Offset" Value="{Binding Path=TouchplateHeight, Mode=TwoWay}"  HorizontalAlignment="Left" Margin="0,7,0,0" VerticalAlignment="Top"/>
-            </GroupBox>
-            <GroupBox Header="Max. probing distance">
+            <GroupBox Header="Touch plate/fixture heights">
                 <StackPanel Orientation="Vertical">
-                    <Controls:NumericField Label="X" Value="{Binding Path=Distance.X, Mode=TwoWay}" HorizontalAlignment="Left" Margin="0,7,0,0" VerticalAlignment="Top"/>
-                    <Controls:NumericField Label="Y" Value="{Binding Path=Distance.Y, Mode=TwoWay}" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
-                    <Controls:NumericField Label="Z" Value="{Binding Path=Distance.Z, Mode=TwoWay}" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
+                    <Controls:NumericField Label="Touch plate:" Value="{Binding Path=TouchPlateHeight, Mode=TwoWay}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
+                    <Controls:NumericField Label="Fixture:" Value="{Binding Path=FixtureHeight, Mode=TwoWay}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
                 </StackPanel>
             </GroupBox>
-            <GroupBox Header="Probing offset (safe distance)" ToolTip="Distance probe will back off after triggering. Must be less than max. probing distance.">
+            <GroupBox Header="Probing distances and speed">
                 <StackPanel Orientation="Vertical">
-                    <Controls:NumericField Label="X" Value="{Binding Path=Offset.X, Mode=TwoWay}" HorizontalAlignment="Left" Margin="0,7,0,0" VerticalAlignment="Top"/>
-                    <Controls:NumericField Label="Y" Value="{Binding Path=Offset.Y, Mode=TwoWay}" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
-                    <Controls:NumericField Label="Z" Value="{Binding Path=Offset.Z, Mode=TwoWay}" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
+                    <Controls:NumericField Label="Search feed rate:" ToolTip="Feed rate for initial probing move" Unit="mm/min" Value="{Binding Path=ProbeFeedRate, Mode=TwoWay}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
+                    <Controls:NumericField Label="Latch feed rate:" ToolTip="Feed rate for second slow probing move" Unit="mm/min" Value="{Binding Path=LatchFeedRate, Mode=TwoWay}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
+                    <Controls:NumericField Label="Probing distance:" ToolTip="Max. distance for probing moves" Value="{Binding Path=ProbeDistance, Mode=TwoWay}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top" Style="{StaticResource ErrorStyle}"/>
+                    <Controls:NumericField Label="Latch distance:" ToolTip="Distance to retract for second slow probing move, set to 0 to skip" Value="{Binding Path=LatchDistance, Mode=TwoWay}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
                 </StackPanel>
             </GroupBox>
-            <Button x:Name="Jog" Content="Click to activate keyboard jogging" Margin="0,5,0,0" Focusable="True" GotFocus="Jog_FocusedChanged" LostFocus="Jog_FocusedChanged"/>
+            <GroupBox Header="Probing clearances">
+                <StackPanel Orientation="Vertical">
+                    <Controls:NumericField Label="XY Clearance:" ToolTip="Initial distance away from from face to probe" Value="{Binding Path=XYClearance, Mode=TwoWay}" ColonAt="102" HorizontalAlignment="Left" Margin="0,7,0,0" VerticalAlignment="Top" Style="{StaticResource ErrorStyle}"/>
+                    <Controls:NumericField Label="Offset:" ToolTip="Distance from corner or radius to probe" Value="{Binding Path=Offset, Mode=TwoWay}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
+                    <Controls:NumericField Label="Depth:" ToolTip="Z offset from current position where probing will take place" Value="{Binding Path=Depth, Mode=TwoWay}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
+                </StackPanel>
+            </GroupBox>
+            <Button x:Name="Jog" Content="Click to activate keyboard jogging" ToolTip="Ctrl+Shift to activate" Margin="0,5,0,0" Focusable="True" GotFocus="Jog_FocusedChanged" LostFocus="Jog_FocusedChanged"/>
         </StackPanel>
-        <TabControl x:Name="tab" Margin="224,10,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="630" Height="400">
-            <TabItem Header="Tool length">
-                <local:ToolLengthControl HorizontalAlignment="Left" VerticalAlignment="Top"/>
-            </TabItem>
-            <TabItem Header="Edge finder">
-                <local:EdgeFinderControl HorizontalAlignment="Left" VerticalAlignment="Top"/>
-            </TabItem>
-            <TabItem Header="Center finder">
-                <local:CenterFinderControl HorizontalAlignment="Left" VerticalAlignment="Top"/>
-            </TabItem>
-            <TabItem Header="Height map">
-                <local:HeightMapControl HorizontalAlignment="Left" VerticalAlignment="Top"/>
-            </TabItem>
-        </TabControl>
-        <Label Height="33" Margin="25,430,0,0"  VerticalAlignment="Top" Content="Warning! - use with extreme care - probing is in a pre alpha state!!" FontSize="16" Foreground="#FFEE0C0C"/>
+        <StackPanel Margin="248,10,0,0" Width="615" HorizontalAlignment="Left" VerticalAlignment="Top">
+            <TabControl x:Name="tab" HorizontalAlignment="Stretch" VerticalAlignment="Top" Width="Auto" Height="400" SelectionChanged="tab_SelectionChanged">
+                <TabItem Header="Tool length">
+                    <local:ToolLengthControl HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                </TabItem>
+                <TabItem Header="Edge finder">
+                    <local:EdgeFinderControl HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                </TabItem>
+                <TabItem Header="Center finder">
+                    <local:CenterFinderControl HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                </TabItem>
+                <TabItem Header="Height map">
+                    <local:HeightMapControl HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                </TabItem>
+            </TabControl>
+            <TextBlock TextWrapping="Wrap" Height="70" Margin="0,2,0,0" Width="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+            <Run Text="{Binding Path=Instructions, Mode=OneWay}"/>
+            <LineBreak/>
+            <Run Text="Warning! Use with care - incorrect parameters may damage your probe! (NOTE: only lightly tested)" Foreground="Red" FontWeight="Bold"/>
+            </TextBlock>
+        </StackPanel>
     </Grid>
 </UserControl>

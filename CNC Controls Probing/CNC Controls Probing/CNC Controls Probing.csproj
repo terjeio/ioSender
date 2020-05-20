@@ -71,10 +71,12 @@
       <DependentUpon>HeightMapControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="HeightMapViewModel.cs" />
+    <Compile Include="ProbingConfig.cs" />
     <Compile Include="ProbingView.xaml.cs">
       <DependentUpon>ProbingView.xaml</DependentUpon>
     </Compile>
     <Compile Include="ProbingViewModel.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ToolLengthControl.xaml.cs">
       <DependentUpon>ToolLengthControl.xaml</DependentUpon>

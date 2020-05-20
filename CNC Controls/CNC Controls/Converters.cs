@@ -1,7 +1,7 @@
 /*
  * Converters.cs - part of CNC Controls library for Grbl
  *
- * v0.18 / 2020-05-07 / Io Engineering (Terje Io)
+ * v0.19 / 2020-05-20 / Io Engineering (Terje Io)
  *
  */
 
@@ -43,9 +43,11 @@ using System.Windows.Data;
 using System.Windows.Media;
 using System.Collections.ObjectModel;
 using System.Text;
+using System.Windows;
+using System.Collections.Generic;
+using System.Windows.Controls;
 using CNC.Core;
 using CNC.GCode;
-using System.Windows;
 
 namespace CNC.Controls
 {
@@ -66,6 +68,7 @@ namespace CNC.Controls
         public static IsSignalVisibleConverter IsSignalVisibleConverter = new IsSignalVisibleConverter();
         public static EnumValueToBooleanConverter EnumValueToBooleanConverter = new EnumValueToBooleanConverter();
         public static StringAddToConverter StringAddToConverter = new StringAddToConverter();
+        public static MultiLineConverter MultiLineConverter = new MultiLineConverter();
     }
 
     // Adapted from: https://stackoverflow.com/questions/4353186/binding-observablecollection-to-a-textbox/8847910#8847910
@@ -355,6 +358,36 @@ namespace CNC.Controls
                 return Enum.Parse(targetType, targetValue);
 
             return null;
+        }
+    }
+
+    // by  D4rth B4n3 - https://stackoverflow.com/questions/30627368/how-to-create-a-tooltip-to-display-multiple-validation-errors-for-a-single-contr
+    public class MultiLineConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (!(values[0] is IEnumerable<ValidationError>))
+                return null;
+
+            //string.Join(",", (List<string>)logic.Model.GetErrors(e.PropertyName)));
+
+            var val = values[0] as IEnumerable<ValidationError>;
+
+            string retVal = "";
+
+            foreach (var itm in val)
+            {
+                if (retVal.Length > 0)
+                    retVal += "\n";
+                retVal += itm.ErrorContent;
+
+            }
+            return retVal;
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
         }
     }
 }

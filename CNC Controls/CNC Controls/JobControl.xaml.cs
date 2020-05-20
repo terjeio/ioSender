@@ -1,7 +1,7 @@
 /*
  * JobControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.18 / 2020-05-09 / Io Engineering (Terje Io)
+ * v0.18 / 2020-05-10 / Io Engineering (Terje Io)
  *
  */
 
@@ -41,7 +41,6 @@ using System;
 using System.ComponentModel;
 using System.Data;
 using System.Linq;
-using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -451,6 +450,8 @@ namespace CNC.Controls
                 else {
                     streamingHandlers[(int)StreamingHandler.Previous] = streamingHandler;
                     streamingHandler = streamingHandlers[(int)handler];
+                    if (handler == StreamingHandler.AwaitAction)
+                        streamingHandler.Count = true;
                 }
             }
         }
@@ -488,6 +489,7 @@ namespace CNC.Controls
             {
                 switch (newState)
                 {
+                    case StreamingState.Halted:
                     case StreamingState.FeedHold:
                         btnStart.IsEnabled = true;
                         btnHold.IsEnabled = false;
@@ -601,15 +603,21 @@ namespace CNC.Controls
                         break;
 
                     case StreamingState.Stop:
-                        if (GrblSettings.IsGrblHAL && !model.GrblReset)
-                            Comms.com.WriteByte(GrblConstants.CMD_STOP);
+                        if (GrblSettings.IsGrblHAL) {
+                            if(!model.GrblReset)
+                                Comms.com.WriteByte(GrblConstants.CMD_STOP);
+                        } else if(grblState.State == GrblStates.Run)
+                            Comms.com.WriteByte(GrblConstants.CMD_RESET);
                         newState = StreamingState.Idle;
                         SetStreamingHandler(StreamingHandler.AwaitIdle);
                         break;
 
                     case StreamingState.Paused:
+                        btnStart.IsEnabled = false;
                         btnHold.IsEnabled = false;
                         btnStop.IsEnabled = true;
+                        if (job.ACKPending == 0)
+                            streamingHandler.Count = false;
                         break;
 
                     case StreamingState.Send:
@@ -747,8 +755,13 @@ namespace CNC.Controls
                         model.IsJobRunning = false;
                         if (!grblState.MPG)
                         {
-                            if (GrblSettings.IsGrblHAL && !model.GrblReset)
-                                Comms.com.WriteByte(GrblConstants.CMD_STOP);
+                            if (GrblSettings.IsGrblHAL)
+                            {
+                                if (!model.GrblReset)
+                                    Comms.com.WriteByte(GrblConstants.CMD_STOP);
+                            }
+                            else if (grblState.State == GrblStates.Hold)
+                                Comms.com.WriteByte(GrblConstants.CMD_RESET);
                         }
                         if (JobTimer.IsRunning)
                         {
@@ -856,12 +869,18 @@ namespace CNC.Controls
                             if (grblState.State != GrblStates.Check || isError || (job.PendingLine % 50) == 0)
                                model.ScrollPosition = job.PendingLine - 5;
                         }
+
+                        if(streamingHandler.Call == StreamingAwaitAction)
+                        {
+                        streamingHandler.Count = false;
+                        }
+
                     }
                     if (isError)
                         streamingHandler.Call(StreamingState.Error, true);
                     else if (job.PgmEndLine == job.PendingLine)
                         streamingHandler.Call(StreamingState.JobFinished, true);
-                    else
+                else if(streamingHandler.Count)
                         SendNextLine();
                 //}
 

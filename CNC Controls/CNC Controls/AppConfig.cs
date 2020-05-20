@@ -1,7 +1,7 @@
 ﻿/*
  * AppConfig.cs - part of CNC Controls library for Grbl
  *
- * v0.18 / 2020-04-18 / Io Engineering (Terje Io)
+ * v0.18 / 2020-05-19 / Io Engineering (Terje Io)
  *
  */
 
@@ -56,19 +56,19 @@ namespace CNC.Controls
         private LatheMode _latheMode = LatheMode.Disabled;
 
         [XmlIgnore]
-        public double ZDirFactor { get { return ZDirection == ZDirection.Negative ? -1d : 1d; } }
+        public double ZDirFactor { get { return ZDirection == Direction.Negative ? -1d : 1d; } }
 
         [XmlIgnore]
         public LatheMode[] LatheModes { get { return (LatheMode[])Enum.GetValues(typeof(LatheMode)); } }
 
         [XmlIgnore]
-        public ZDirection[] ZDirections { get { return (ZDirection[])Enum.GetValues(typeof(ZDirection)); } }
+        public Direction[] ZDirections { get { return (Direction[])Enum.GetValues(typeof(Direction)); } }
 
         [XmlIgnore]
         public bool IsEnabled { get { return _isEnabled; } set { _isEnabled = value; OnPropertyChanged(); } }
 
         public LatheMode XMode { get { return _latheMode; } set { _latheMode = value; IsEnabled = value != LatheMode.Disabled; } }
-        public ZDirection ZDirection { get; set; } = ZDirection.Negative;
+        public Direction ZDirection { get; set; } = Direction.Negative;
         public double PassDepthLast { get; set; } = 0.02d;
         public double FeedRate { get; set; } = 300d;
     }

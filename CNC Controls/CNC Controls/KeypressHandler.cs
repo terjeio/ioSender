@@ -1,7 +1,7 @@
 ﻿/*
  * KeypressHandler.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.18 / 2020-05-09 / Io Engineering (Terje Io)
+ * v0.19 / 2020-05-10 / Io Engineering (Terje Io)
  *
  */
 
@@ -129,13 +129,13 @@ namespace CNC.Controls
                 fullJog = AppConfig.Settings.Jog.KeyboardEnable;
         }
 
-        public bool ProcessKeypress(KeyEventArgs e)
+        public bool ProcessKeypress(KeyEventArgs e, bool allowJog)
         {
             bool isJogging = IsJogging;
 
             if (e.IsUp && isJogging)
             {
-                bool cancel = false;
+                bool cancel = !allowJog;
 
                 isJogging = false;
 
@@ -150,14 +150,16 @@ namespace CNC.Controls
                         isJogging = isJogging || (axisjog[i] != Key.None);
                 }
 
+                isJogging &= allowJog;
+
                 if (cancel && !isJogging && jogMode != JogMode.Step)
                     JogCancel();
             }
 
-            if (!isJogging && Comms.com.OutCount != 0)
+            if (!isJogging && allowJog && Comms.com.OutCount != 0)
                 return true;
 
-            if (e.IsDown && CanJog)
+            if (e.IsDown && CanJog && allowJog)
             {
                 // Do not respond to autorepeats!
                 if (e.IsRepeat)

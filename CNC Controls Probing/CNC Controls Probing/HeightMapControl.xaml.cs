@@ -1,13 +1,13 @@
 ﻿/*
  * HeightMapControl.xaml.cs - part of CNC Probing library
  *
- * v0.18 / 2020-05-09 / Io Engineering (Terje Io)
+ * v0.19 / 2020-05-20 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2020, Io Engineering (Terje Io)
+Copyright (c) 2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -65,7 +65,12 @@ namespace CNC.Controls.Probing
             double dir = 1d;
             var probing = DataContext as ProbingViewModel;
 
-            if(!probing.Init())
+            if (!probing.ValidateInput())
+                return;
+
+            probing.WaitForIdle(string.Format("G90G0X{0}Y{1}", probing.HeightMap.MinX.ToInvariantString(), probing.HeightMap.MinY.ToInvariantString()));
+
+            if (!probing.Program.Init())
                 return;
 
             probing.PropertyChanged += Probing_PropertyChanged;
@@ -86,8 +91,8 @@ namespace CNC.Controls.Probing
             {
                 for (y = 0; y < probing.HeightMap.Map.SizeY; y++)
                 {
-                    probing.Program.Add(Probing.Command + probing.Distance.ToString(AxisFlags.Z, true));
-                    probing.Program.Add(string.Format("G0Z{0}", probing.ProbeDiameter.ToInvariantString()));
+                    probing.Program.AddProbingAction(AxisFlags.Z, true);
+                    probing.Program.Add("G0Z" + probing.ProbeDiameter.ToInvariantString());
                     if(y < (probing.HeightMap.Map.SizeY - 1))
                         probing.Program.Add(string.Format("G0Y{0}", (probing.HeightMap.GridSize * dir).ToInvariantString()));
                 }
@@ -97,7 +102,7 @@ namespace CNC.Controls.Probing
                 dir *= -1d;
             }
 
-            probing.Execute.Execute(true);
+            probing.Program.Execute(true);
         }
 
         private int toIndex(double val)
@@ -121,6 +126,15 @@ namespace CNC.Controls.Probing
                         probing.GotoMachinePosition(origin, AxisFlags.Z);
                         probing.GotoMachinePosition(origin, AxisFlags.X | AxisFlags.Y);
 
+                        if(probing.HeightMap.SetToolOffset)
+                        {
+                            if ((ok == probing.GotoMachinePosition(probing.Positions[0], AxisFlags.Z)))
+                            {
+                                probing.Grbl.ExecuteCommand("G92Z0");
+                                probing.GotoMachinePosition(origin, AxisFlags.Z);
+                            }
+                        }
+
                         double Z0 = probing.Positions[0].Z;
 
                         foreach (var pos in probing.Positions)
@@ -139,7 +153,7 @@ namespace CNC.Controls.Probing
                         probing.HeightMap.MapPoints = mapPoints.Points;
                         probing.HeightMap.HasHeightMap = true;
 
-                        probing.End(ok ? "Probing completed" : "Probing failed");
+                        probing.Program.End(ok ? "Probing completed" : "Probing failed");
                     }
                     origin = null;
                     break;
@@ -174,7 +188,7 @@ namespace CNC.Controls.Probing
 
         private void stop_Click(object sender, RoutedEventArgs e)
         {
-            (DataContext as ProbingViewModel).Cancel();
+            (DataContext as ProbingViewModel).Program.Cancel();
         }
 
         private void load_Click(object sender, RoutedEventArgs e)
