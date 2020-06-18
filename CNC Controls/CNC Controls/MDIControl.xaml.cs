@@ -45,6 +45,7 @@ using System.Collections.ObjectModel;
 
 namespace CNC.Controls
 {
+
     public partial class MDIControl : UserControl
     {
         public MDIControl()
@@ -75,9 +76,10 @@ namespace CNC.Controls
             if (e.Key == Key.Return && (DataContext as GrblViewModel).MDICommand.CanExecute(null))
             {
                 string cmd = (sender as ComboBox).Text;
-                if (!string.IsNullOrEmpty(cmd) && !Commands.Contains(cmd))
+                if (!string.IsNullOrEmpty(cmd) )
                     Commands.Insert(0, cmd);
                 (DataContext as GrblViewModel).MDICommand.Execute(cmd);
+                (sender as ComboBox).SelectedIndex = -1;
             }
         }
 
@@ -86,5 +88,21 @@ namespace CNC.Controls
             if (!string.IsNullOrEmpty(Command) && !Commands.Contains(Command))
                 Commands.Insert(0, Command);
         }
+        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ComboBox cmb = sender as ComboBox;
+            if(cmb != null)
+            {
+                var cmbTextBox = (TextBox)cmb.Template.FindName("PART_EditableTextBox", cmb);
+                if(cmbTextBox != null)
+                {
+                    cmbTextBox.Focus();
+                    cmbTextBox.CaretIndex = cmbTextBox.Text.Length;
+                }
+                
+            }
+            
+        }
+
     }
 }
