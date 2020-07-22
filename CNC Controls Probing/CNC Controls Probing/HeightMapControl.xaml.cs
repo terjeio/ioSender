@@ -1,7 +1,7 @@
 ﻿/*
  * HeightMapControl.xaml.cs - part of CNC Probing library
  *
- * v0.19 / 2020-05-20 / Io Engineering (Terje Io)
+ * v0.20 / 2020-06-03 / Io Engineering (Terje Io)
  *
  */
 
@@ -37,13 +37,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+using System;
 using System.Windows;
 using System.Windows.Controls;
+using Microsoft.Win32;
 using CNC.Core;
-using System;
 using CNC.GCode;
 using HelixToolkit.Wpf;
-using Microsoft.Win32;
 
 namespace CNC.Controls.Probing
 {
@@ -128,7 +128,9 @@ namespace CNC.Controls.Probing
 
                         if(probing.HeightMap.SetToolOffset)
                         {
-                            if ((ok == probing.GotoMachinePosition(probing.Positions[0], AxisFlags.Z)))
+                            if(probing.CoordinateMode == ProbingViewModel.CoordMode.G10)
+                                probing.Grbl.ExecuteCommand(string.Format("G10L2P{0}Z{1}", probing.CoordinateSystem, (probing.Positions[0].Z - probing.Grbl.ToolOffset.Z).ToInvariantString()));
+                            else if ((ok == probing.GotoMachinePosition(probing.Positions[0], AxisFlags.Z)))
                             {
                                 probing.Grbl.ExecuteCommand("G92Z0");
                                 probing.GotoMachinePosition(origin, AxisFlags.Z);

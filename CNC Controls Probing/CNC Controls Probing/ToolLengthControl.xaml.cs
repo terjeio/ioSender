@@ -1,7 +1,7 @@
 ﻿/*
  * ToolLengthControl.cs - part of CNC Probing library
  *
- * v0.19 / 2020-05-09 / Io Engineering (Terje Io)
+ * v0.20 / 2020-06-03 / Io Engineering (Terje Io)
  *
  */
 
@@ -49,7 +49,7 @@ namespace CNC.Controls.Probing
     /// </summary>
     public partial class ToolLengthControl : UserControl
     {
-        Position origin = null, g59_3 = null;
+        Position origin = null, g59_3 = null, baseline = null;
 
         public ToolLengthControl()
         {
@@ -83,7 +83,8 @@ namespace CNC.Controls.Probing
                 g59_3 = new Position(GrblWorkParameters.GetCoordinateSystem("G59.3"));
                 var safeZ = System.Math.Max(g59_3.Z, origin.Z) + probing.Depth;
                 g59_3.Z += probing.Depth;
-                probing.Program.Add("G53G0Z" + safeZ.ToInvariantString());
+                if(safeZ < 0d)
+                    probing.Program.Add("G53G0Z" + safeZ.ToInvariantString());
                 probing.Program.Add("G53G0" + g59_3.ToString(AxisFlags.X | AxisFlags.Y));
                 probing.Program.Add("G53G0" + g59_3.ToString(AxisFlags.Z));
                 g59_3.Z -= probing.Depth;
@@ -102,31 +103,27 @@ namespace CNC.Controls.Probing
 
                     probing.PropertyChanged -= Probing_PropertyChanged;
 
-                    if (probing.IsSuccess)
+                    if ((ok = probing.IsSuccess && probing.Positions.Count == 1))
                     {
-                        probing.GotoMachinePosition(probing.Positions[0], AxisFlags.Z);
-
-                        if (probing.CoordinateMode == ProbingViewModel.CoordMode.G92)
+                        //if (probing.HasToolTable)
+                        //    probing.Grbl.ExecuteCommand(string.Format("G43H{0}{1}", probing.Tool, probing.Positions[0].ToString(AxisFlags.Z)));
+                        //else
+                        if (probing.ReferenceToolOffset)
                         {
-                            var touchOffset = probing.ProbeFixture ? probing.FixtureHeight : (probing.WorkpieceHeight + probing.TouchPlateHeight);
-                            probing.Grbl.ExecuteCommand(string.Format("G92Z{0}", (touchOffset).ToInvariantString()));
+                            probing.ReferenceToolOffset = false;
+                            baseline = new Position(probing.Positions[0]);
+                            probing.Grbl.ExecuteCommand("G49");
                         }
                         else
                         {
-                            if (probing.ProbeFixture)
-                            {
-                                //if (probing.HasToolTable)
-                                //    probing.Grbl.ExecuteCommand(string.Format("G43H{0}{1}", probing.Tool, probing.Positions[0].ToString(AxisFlags.Z)));
-                                //else
-                                var tofs = new Position(probing.Positions[0]);
-                                tofs.Z = - (probing.Positions[0].Z -= g59_3.Z);
-                                probing.Grbl.ExecuteCommand("G43.1" + tofs.ToString(AxisFlags.Z));
-                                //if (probing.Tool != "0")
-                                //    probing.Grbl.ExecuteCommand(string.Format("G10L11P{0}{1}", probing.Tool, probing.Positions[0].ToString(AxisFlags.Z)));
-                                probing.Positions[0].Z += g59_3.Z + probing.Depth;
-                                probing.GotoMachinePosition(probing.Positions[0], AxisFlags.Z);
-                            }
+                            var tofs = new Position(probing.Positions[0]);
+                            tofs.Z = probing.Positions[0].Z - (baseline == null ? 0d : baseline.Z);
+                            probing.Grbl.ExecuteCommand("G43.1" + tofs.ToString(AxisFlags.Z));
                         }
+                        //if (probing.Tool != "0")
+                        //    probing.Grbl.ExecuteCommand(string.Format("G10L11P{0}{1}", probing.Tool, probing.Positions[0].ToString(AxisFlags.Z)));
+                        probing.Positions[0].Z += probing.Depth;
+                        probing.GotoMachinePosition(probing.Positions[0], AxisFlags.Z);
 
                         if (origin.Z > probing.Positions[0].Z)
                         {
@@ -138,11 +135,16 @@ namespace CNC.Controls.Probing
                             probing.GotoMachinePosition(origin, AxisFlags.X | AxisFlags.Y);
                             probing.GotoMachinePosition(origin, AxisFlags.Z);
                         }
-                        probing.Program.End(ok ? "Probing completed" : "Probing failed");
                     }
                     origin = null;
+                    probing.Program.End(ok ? "Probing completed" : "Probing failed");
                     break;
             }
+        }
+        private void clearToolOffset_Click(object sender, RoutedEventArgs e)
+        {
+            (DataContext as ProbingViewModel).ReferenceToolOffset = true;
+            (DataContext as ProbingViewModel).Grbl.ExecuteCommand("G49");
         }
 
         private void stop_Click(object sender, RoutedEventArgs e)

@@ -1,7 +1,7 @@
 /*
  * GrblViewModel.cs - part of CNC Controls library
  *
- * v0.18 / 2020-05-09 / Io Engineering (Terje Io)
+ * v0.20 / 2020-07-19 / Io Engineering (Terje Io)
  *
  */
 
@@ -64,6 +64,7 @@ namespace CNC.Core
         private GrblState _grblState;
         private LatheMode _latheMode = LatheMode.Disabled;
         private HomedState _homedState = HomedState.Unknown;
+        private GrblEncoderMode _encoder_ovr = GrblEncoderMode.Unknown;
         private StreamingState _streamingState;
         public SpindleState _spindleStatePrev = GCode.SpindleState.Off;
 
@@ -234,6 +235,8 @@ namespace CNC.Core
         public GrblState GrblState { get { return _grblState; } set { _grblState = value; OnPropertyChanged(); } }
         public bool IsCheckMode { get { return _grblState.State == GrblStates.Check; } }
         public bool IsSleepMode { get { return _grblState.State == GrblStates.Sleep; } }
+        public bool IsG92Active { get { return GrblParserState.IsActive("G92") != null; } }
+        public bool IsToolOffsetActive { get { return GrblParserState.IsActive("G49") == null; } }
         public bool IsJobRunning { get { return _isJobRunning; } set { if (_isJobRunning != value) { _isJobRunning = value; OnPropertyChanged(); } } }
         public bool ProgramEnd { get { return _pgmEnd; } set { _pgmEnd = value; if(_pgmEnd) OnPropertyChanged(); } }
         public int GrblError { get { return _grblState.Error; } set { _grblState.Error = value; OnPropertyChanged(); } }
@@ -285,6 +288,7 @@ namespace CNC.Core
         public AxisFlags AxisEnabledFlags { get { return GrblInfo.AxisFlags; } set { OnPropertyChanged(); } }
         public int ScrollPosition { get { return _scrollpos; } set { _scrollpos = value;  OnPropertyChanged(); } }
         public double JogStep { get { return _jogStep; } set { _jogStep = value; OnPropertyChanged(); } }
+        public GrblEncoderMode OverrideEncoderMode { get { return _encoder_ovr; } set { _encoder_ovr = value; OnPropertyChanged(); } }
 
         public string RunTime { get { return JobTimer.RunTime; } set { OnPropertyChanged(); } } // Cannot be set...
         // CO2 Laser
@@ -431,6 +435,8 @@ namespace CNC.Core
                 if (GrblParserState.IsActive("G51") != null)
                     Set("Sc", GrblParserState.IsActive("G51"));
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(IsG92Active));
+                OnPropertyChanged(nameof(IsToolOffsetActive));
             }
         }
 
@@ -453,7 +459,7 @@ namespace CNC.Core
                 _grblState.State = newstate;
                 _grblState.Substate = substate;
 
-                force = true;
+//                force = true;
 
                 switch (_grblState.State)
                 {
@@ -777,6 +783,13 @@ namespace CNC.Core
                     _d = value;
                     LatheMode = GrblParserState.LatheMode = value == "0" ? LatheMode.Radius : LatheMode.Diameter;
                     break;
+
+                case "Enc":
+                    {
+                        var enc = value.Split(',');
+                        OverrideEncoderMode = (GrblEncoderMode)int.Parse(enc[0]);
+                    }
+                    break;
             }
         }
 
@@ -809,7 +822,7 @@ namespace CNC.Core
             else if (data.StartsWith("[GC:"))
                 ParseGCStatus(data);
             else if (data.StartsWith("[TLO:"))
-                ToolOffset.Parse(data);
+                ToolOffset.Parse(data.Substring(5).TrimEnd(']'));
             else if (data.StartsWith("["))
             {
                 if (data.StartsWith("[MSG:")) {

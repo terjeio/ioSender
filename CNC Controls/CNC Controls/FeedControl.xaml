@@ -16,9 +16,9 @@
                 </Grid.RowDefinitions>
                 <local:NumericTextBox x:Name="cvFeedRate" Value="{Binding Path=FeedRate, Mode=OneWay}" Format="###0" Background="#FFF8F8F8" HorizontalContentAlignment="Right" HorizontalAlignment="Left" Height="23" Margin="10,0,0,0" TextWrapping="NoWrap"  IsReadOnly="True" Focusable="False" VerticalAlignment="Center" Width="50"/>
                 <Label x:Name="lblFeedRrate" Content="mm/min" HorizontalAlignment="Left" Margin="60,00,0,0" VerticalAlignment="Center"/>
-                <local:OverrideControl x:Name="feedOverrideControl" Value="{Binding Path=FeedOverride, Mode=OneWay}" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,3,0" Grid.Row="1" CommandGenerated="override_CommandGenerated"/>
+                <local:OverrideControl x:Name="feedOverrideControl" Value="{Binding Path=FeedOverride, Mode=OneWay}" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,3,0" Grid.Row="1" CommandGenerated="override_CommandGenerated" EncoderMode="FeedRate"/>
                 <Label x:Name="lblRapids" Content="Rapids:" HorizontalAlignment="Left" Margin="5,20,0,2" Grid.Row="1" VerticalAlignment="Center" Grid.RowSpan="2" Height="26"/>
-                <local:OverrideControl x:Name="rapidsOverrideControl" Value="{Binding Path=RapidsOverride, Mode=OneWay}" MinusOnly="True" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,3,0" Grid.Row="3" CommandGenerated="override_CommandGenerated"/>
+                <local:OverrideControl x:Name="rapidsOverrideControl" Value="{Binding Path=RapidsOverride, Mode=OneWay}" MinusOnly="True" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,3,0" Grid.Row="3" CommandGenerated="override_CommandGenerated" EncoderMode="RapidRate"/>
             </Grid>
         </GroupBox>
 

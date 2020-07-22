@@ -1,7 +1,7 @@
 ﻿/*
  * Program.cs - part of CNC Probing library
  *
- * v0.19 / 2020-05-20 / Io Engineering (Terje Io)
+ * v0.20 / 2020-06-03 / Io Engineering (Terje Io)
  *
  */
 
@@ -73,6 +73,11 @@ namespace CNC.Controls.Probing
                         ResponseReceived("fail");
                     break;
 
+                case nameof(GrblViewModel.GrblState):
+                    if (Grbl.GrblState.State == GrblStates.Alarm)
+                        ResponseReceived("fail");
+                    break;
+
                 case nameof(GrblViewModel.Message):
                     if (!Silent)
                         probing.Message = Grbl.Message;
@@ -129,15 +134,21 @@ namespace CNC.Controls.Probing
                 res = false;
             }
 
+            if (res == true && Grbl.Signals.Value.HasFlag(Signals.ProbeDisconnected))
+            {
+                probing.Message = "Probing failed, probe is not connected";
+                res = false;
+            }
+
             if (res == true && Grbl.Signals.Value.HasFlag(Signals.Probe))
             {
                 probing.Message = "Probing failed, probe signal is asserted";
                 res = false;
             }
 
-            if (res == true && Grbl.GrblState.State != GrblStates.Idle)
+            if (res == true && !(Grbl.GrblState.State == GrblStates.Idle || Grbl.GrblState.State == GrblStates.Tool))
             {
-                probing.Message = "Probing failed, Grbl is not in idle state";
+                probing.Message = "Probing failed, Grbl is not in idle or tool state";
                 res = false;
             }
 
@@ -238,7 +249,7 @@ namespace CNC.Controls.Probing
             {
                 probing.IsSuccess = step == _program.Count && response == "ok";
                 if (!probing.IsSuccess)
-                    End("Probing cancelled/failed");
+                    End("Probing cancelled/failed" + (Grbl.GrblState.State == GrblStates.Alarm ? " (ALARM)" : ""));
                 probing.IsCompleted = true;
                 Grbl.Poller.SetState(AppConfig.Settings.Base.PollInterval);
             }

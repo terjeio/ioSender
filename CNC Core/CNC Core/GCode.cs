@@ -1,7 +1,7 @@
 ﻿/*
  * GCode.cs - part of CNC Controls library
  *
- * v0.19 / 2020-05-19 / Io Engineering (Terje Io)
+ * v0.20 / 2020-05-25 / Io Engineering (Terje Io)
  *
  */
 
@@ -40,8 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using System;
 using System.Xml.Serialization;
 using System.Collections.Generic;
-using CNC.Core;
 using System.Windows.Media.Media3D;
+using CNC.Core;
 
 namespace CNC.GCode
 {
@@ -229,8 +229,8 @@ namespace CNC.GCode
         G86,
         G89,
         G90,
-        G91,
         G90_1,
+        G91,
         G91_1,
         G92,
         G92_1,

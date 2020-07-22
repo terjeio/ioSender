@@ -1,7 +1,7 @@
 ﻿/*
  * SerialStream.cs - part of CNC Controls library
  *
- * v0.18 / 2020-05-08 / Io Engineering (Terje Io)
+ * v0.20 / 2020-06-10 / Io Engineering (Terje Io)
  *
  */
 
@@ -298,6 +298,16 @@ StreamWriter log = null;
             return Reply;
         }
 
+        private int gp()
+        {
+            int pos = 0; bool found = false;
+
+            while (!found && pos < input.Length)
+                found = input[pos++] == '\n';
+
+            return found ? pos - 1 : 0;
+        }
+
         private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
             int pos = 0;
@@ -306,9 +316,9 @@ StreamWriter log = null;
             {
                 input.Append(serialPort.ReadExisting());
 
-                while (input.Length > 0 && (pos = input.ToString().IndexOf('\n')) > 0)
+                while (input.Length > 0 && (pos = gp()) > 0)
                 {
-                    Reply = input.ToString(0, pos - 1);
+                    Reply = pos == 0 ? "" : input.ToString(0, pos - 1);
                     input.Remove(0, pos + 1);
 #if RESPONSELOG
             log.WriteLine(Reply);

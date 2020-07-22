@@ -1,7 +1,7 @@
 ﻿/*
  * GCodeEmulator.cs - part of CNC Controls library
  *
- * v0.18 / 2020-04-29 / Io Engineering (Terje Io)
+ * v0.20 / 2020-05-28 / Io Engineering (Terje Io)
  *
  */
 
@@ -37,11 +37,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Media.Media3D;
 using CNC.GCode;
-using System;
 
 namespace CNC.Core
 {
@@ -126,21 +126,19 @@ namespace CNC.Core
 
                     // G10: Set Coordinate System
                     case Commands.G10:
+                        if (token is GCCoordinateSystem)
                         {
-                            if (token is GCCoordinateSystem)
+                            CoordinateSystem csys;
+                            GCCoordinateSystem gcsys = token as GCCoordinateSystem;
+                            if (gcsys.P == 0)
+                                csys = coordinateSystem;
+                            else
+                                csys = coordinateSystems.Where(x => x.Code == gcsys.Code).FirstOrDefault();
+                            foreach (int i in gcsys.AxisFlags.ToIndices())
                             {
-                                CoordinateSystem csys;
-                                GCCoordinateSystem gcsys = token as GCCoordinateSystem;
+                                csys.Values[i] = gcsys.Values[i];
                                 if (gcsys.P == 0)
-                                    csys = coordinateSystem;
-                                else
-                                    csys = coordinateSystems.Where(x => x.Code == gcsys.Code).FirstOrDefault();
-                                foreach (int i in gcsys.AxisFlags.ToIndices())
-                                {
-                                    csys.Values[i] = gcsys.Values[i];
-                                    if (gcsys.P == 0)
-                                        offsets[i] = csys.Values[i];
-                                }
+                                    offsets[i] = csys.Values[i];
                             }
                         }
                         break;
@@ -248,6 +246,19 @@ namespace CNC.Core
                         }
                         break;
 
+                    // G38.x: Probing motion
+                    case Commands.G38_2:
+                    case Commands.G38_3:
+                    case Commands.G38_4:
+                    case Commands.G38_5:
+                        if (translate)
+                        {
+                            var motion = token as GCLinearMotion;
+                            setEndP(motion.Values, motion.AxisFlags);
+                            action.Token = new GCLinearMotion(Commands.G1, token.LineNumber, machinePos.Array, motion.AxisFlags);
+                        }
+                        break;
+
                     // G43: Tool Length Offset
                     case Commands.G43:
                         SetToolOffset(token as GCToolOffset);
@@ -342,7 +353,7 @@ namespace CNC.Core
                             double t_end_taper_length = thread.TaperLength;
                             double end_tapers = thread.ThreadTaper == ThreadTaper.None ? 0d : (thread.ThreadTaper == ThreadTaper.Both ? 2d : 1d);
                             double infeed_factor = Math.Tan(thread.InfeedAngle * Math.PI / 180d), infeed_offset = 0d;
-                            double target_z = thread.Z + thread.Depth * infeed_factor, start_z = action.Start.Z;
+                            double target_z = thread.Z + thread.Depth * infeed_factor, start_z = action.Start.Z + thread.Depth * infeed_factor;
 
                             if (thread.Z > action.Start.Z)
                                 infeed_factor = -infeed_factor;
@@ -368,7 +379,7 @@ namespace CNC.Core
                             {
                                 infeed_offset = doc * infeed_factor;
                                 action.End.X = origin.X + (doc - thread.Depth) * thread.CutDirection;
-                                action.End.Z -= infeed_offset;
+                                action.End.Z = start_z - infeed_offset;
                                 action.Token = new GCLinearMotion(Commands.G0, token.LineNumber, machinePos.Array, AxisFlags.XZ);
                                 yield return action;
                                 action.Start = action.End;
@@ -390,7 +401,7 @@ namespace CNC.Core
 
                                     // TODO: move this segment outside of synced motion?
                                     action.End.X = origin.X + (thread.Peak + doc - thread.Depth) * thread.CutDirection;
-                                    action.Token = new GCLinearMotion(Commands.G1, token.LineNumber, machinePos.Array, AxisFlags.X);
+                                    action.Token = new GCLinearMotion(Commands.G0, token.LineNumber, machinePos.Array, AxisFlags.X);
                                     yield return action;
                                     action.Start = action.End;
 
@@ -448,7 +459,7 @@ namespace CNC.Core
 
                                     // 5. Back to start, add compound slide angle offset when commanded.
                                     infeed_offset = infeed_factor != 0d ? doc * infeed_factor : 0d;
-                                    action.End.Z = origin.Z - infeed_offset;
+                                    action.End.Z = start_z - infeed_offset;
                                     action.Token = new GCLinearMotion(Commands.G0, token.LineNumber, machinePos.Array, AxisFlags.Z);
                                     yield return action;
                                     action.Start = action.End;

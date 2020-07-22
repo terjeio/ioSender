@@ -1,7 +1,7 @@
 /*
  * Converters.cs - part of CNC Controls library for Grbl
  *
- * v0.19 / 2020-05-20 / Io Engineering (Terje Io)
+ * v0.20 / 2020-07-19 / Io Engineering (Terje Io)
  *
  */
 
@@ -56,6 +56,7 @@ namespace CNC.Controls
         public static StringCollectionToTextConverter StringCollectionToTextConverter = new StringCollectionToTextConverter();
         public static LatheModeToStringConverter LatheModeToStringConverter = new LatheModeToStringConverter();
         public static GrblStateToColorConverter GrblStateToColorConverter = new GrblStateToColorConverter();
+        public static EncoderModeToColorConverter EncoderModeToColorConverter = new EncoderModeToColorConverter();
         public static GrblStateToStringConverter GrblStateToStringConverter = new GrblStateToStringConverter();
         public static GrblStateToBooleanConverter GrblStateToBooleanConverter = new GrblStateToBooleanConverter();
         public static HomedStateToColorConverter HomedStateToColorConverter = new HomedStateToColorConverter();
@@ -175,6 +176,26 @@ namespace CNC.Controls
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class EncoderModeToColorConverter : IMultiValueConverter
+    {
+        public static SolidColorBrush ReadOnlyBackGround { get; } = (SolidColorBrush)(new BrushConverter().ConvertFrom("#FFF8F8F8"));
+
+        public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            bool result = true;
+
+            foreach (var value in values)
+                result &= value is bool && (bool)value;
+
+            return values.Length == 2 && values[0] is GrblEncoderMode && !values[0].Equals(GrblEncoderMode.Unknown) && values[1] is GrblEncoderMode && values[0].Equals(values[1]) ? Brushes.Salmon : ReadOnlyBackGround;
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, System.Globalization.CultureInfo culture)
         {
             throw new NotImplementedException();
         }

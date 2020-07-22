@@ -1,7 +1,7 @@
 /*
  * JobView.xaml.cs - part of Grbl Code Sender
  *
- * v0.19 / 2020-05-10 / Io Engineering (Terje Io)
+ * v0.20 / 2020-06-03 / Io Engineering (Terje Io)
  *
  */
 
@@ -140,7 +140,7 @@ namespace GCode_Sender
                     }
                     else if (!string.IsNullOrEmpty(filename) && AppConfig.Settings.GCodeViewer.IsEnabled)
                     {
-                        MainWindow.GCodeViewer.Open();
+                        MainWindow.GCodeViewer.Open(GCode.File.Tokens);
                         MainWindow.EnableView(true, ViewType.GCodeViewer);
                         GCodeSender.EnablePolling(false);
                         gcodeRenderer.ShowTool = true;
@@ -165,7 +165,7 @@ namespace GCode_Sender
 
                 if (initOK != true)
                 {
-                    model.Message = "Waiting for controller...";
+                    model.Message = string.Format("Waiting for controller ({0})...", AppConfig.Settings.Base.PortParams);
 
                     Comms.com.PurgeQueue();
                     Comms.com.WriteByte(GrblLegacy.ConvertRTCommand(GrblConstants.CMD_STATUS_REPORT));
@@ -320,12 +320,14 @@ namespace GCode_Sender
             if (GrblInfo.LatheModeEnabled)
             {
                 MainWindow.EnableView(true, ViewType.Turning);
-                MainWindow.EnableView(true, ViewType.Facing);
+          //      MainWindow.EnableView(true, ViewType.Parting);
+          //      MainWindow.EnableView(true, ViewType.Facing);
                 MainWindow.EnableView(true, ViewType.G76Threading);
             }
             else
             {
                 MainWindow.ShowView(false, ViewType.Turning);
+                MainWindow.ShowView(false, ViewType.Parting);
                 MainWindow.ShowView(false, ViewType.Facing);
                 MainWindow.ShowView(false, ViewType.G76Threading);
             }
@@ -345,7 +347,8 @@ namespace GCode_Sender
             else
                 MainWindow.ShowView(false, ViewType.Tools);
 
-            MainWindow.EnableView(true, ViewType.Probing);
+            if(GrblSettings.ReportProbeCoordinates)
+                MainWindow.EnableView(true, ViewType.Probing);
             MainWindow.EnableView(true, ViewType.Offsets);
             MainWindow.EnableView(true, ViewType.GRBLConfig);
 

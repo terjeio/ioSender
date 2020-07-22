@@ -1,7 +1,7 @@
 ﻿/*
  * GCodeParser.cs - part of CNC Controls library
  *
- * v0.18 / 2020-04-21 / Io Engineering (Terje Io)
+ * v0.20 / 2020-05-27 / Io Engineering (Terje Io)
  *
  */
 
@@ -43,9 +43,9 @@ using System.Linq;
 using System.IO;
 using System.Globalization;
 using System.Windows;
-using CNC.Core;
 using System.Windows.Media.Media3D;
 using System.Xml.Serialization;
+using CNC.Core;
 
 namespace CNC.GCode
 {
@@ -443,7 +443,7 @@ namespace CNC.GCode
                             if (Dialect != Dialect.GrblHAL)
                                 throw new GCodeException("Unsupported command");
                             // NOTE: not NIST
-                            if (axisCommand != AxisCommand.None)
+                            if (iv == 51 && axisCommand != AxisCommand.None)
                                 throw new GCodeException("Axis command conflict");
                             modalGroup = ModalGroups.G11;
                             axisCommand = AxisCommand.Scaling;
@@ -509,19 +509,15 @@ namespace CNC.GCode
                             break;
 
                         case 90:
+                            //if (Dialect != Dialect.LinuxCNC && fv == 1)
+                            //    throw new GCodeException("Unsupported command");
+                            cmdDistMode = Commands.G90 + fv;
+                            modalGroup = fv == 0 ? ModalGroups.G3 : ModalGroups.G4;
+                            break;
+
                         case 91:
-                            if (fv == 0)
-                            {
-                                cmdDistMode = Commands.G90 + (iv - 90);
-                                modalGroup = ModalGroups.G3;
-                            }
-                            else
-                            {
-                                if (Dialect != Dialect.LinuxCNC && iv == 90)
-                                    throw new GCodeException("Unsupported command");
-                                cmdDistMode = Commands.G90_1 + fv;
-                                modalGroup = ModalGroups.G4;
-                            }
+                            cmdDistMode = Commands.G91 + fv;
+                            modalGroup = fv == 0 ? ModalGroups.G3 : ModalGroups.G4;
                             break;
 
                         case 93:

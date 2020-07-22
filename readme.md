@@ -1,5 +1,11 @@
 ## GRBL GCode Sender
 
+2020-07-22: Alpha 20 release of binary.
+
+Changes to probing and updates for new features in grblHAL. This release is for testing of new features both in the sender and in grblHAL. Revert to alpha 19 if problems arise.
+
+Active development will not restart until the summer holidays are over.
+
 2020-05-20: Alpha 19 release of binary.
 
 Changes:

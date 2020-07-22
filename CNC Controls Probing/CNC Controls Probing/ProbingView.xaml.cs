@@ -1,7 +1,7 @@
 ﻿/*
  * ProbingView.xaml.cs - part of CNC Probing library
  *
- * v0.19 / 2020-05-20 / Io Engineering (Terje Io)
+ * v0.20 / 2020-06-03 / Io Engineering (Terje Io)
  *
  */
 
@@ -39,9 +39,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using CNC.Core;
 using CNC.GCode;
-using System.Windows.Input;
 
 namespace CNC.Controls.Probing
 {
@@ -51,7 +51,7 @@ namespace CNC.Controls.Probing
     /// </summary>
     public partial class ProbingView : UserControl, ICNCView
     {
-        private bool jogEnabled = false;
+        private bool jogEnabled = false, probeTriggered = false;
         private DistanceMode mode = DistanceMode.Absolute;
         private ProbingViewModel model = null;
         private ProbingProfiles profiles = new ProbingProfiles();
@@ -61,21 +61,13 @@ namespace CNC.Controls.Probing
         {
             InitializeComponent();
 
-            DataContextChanged += ProbingView_DataContextChanged;
-
             profiles.Load();
-        }
-
-        private void ProbingView_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
-        {
-
         }
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
             if (DataContext is GrblViewModel)
             {
-
                 if (keyboard == null) {
                     keyboard = new KeypressHandler(DataContext as GrblViewModel);
                     keyboard.AddHandler(Key.None, ModifierKeys.Shift, EnableJog);
@@ -89,12 +81,31 @@ namespace CNC.Controls.Probing
             return true;
         }
 
+        private void DisplayPosition(GrblViewModel grbl)
+        {
+            model.Position = string.Format("X:{0}  Y:{1}  Z:{2}{3}", grbl.Position.X.ToInvariantString(grbl.Format), grbl.Position.Y.ToInvariantString(grbl.Format), grbl.Position.Z.ToInvariantString(grbl.Format), probeTriggered ? " P" : "");
+         //   model.Message = string.Format("X:{0}  Y:{1}  Z:{2}", grbl.Position.X.ToInvariantString(), grbl.Position.Y.ToInvariantString(), grbl.Position.Z.ToInvariantString());
+        }
+
         private void Grbl_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
+            var grbl = sender as GrblViewModel;
+
             if (e.PropertyName == nameof(GrblViewModel.IsJobRunning))
             {
                 foreach (TabItem tabitem in tab.Items)
                     tabitem.IsEnabled = !(sender as GrblViewModel).IsJobRunning || tabitem == tab.SelectedItem;
+            }
+
+            if(e.PropertyName == nameof(GrblViewModel.Position))
+            {
+                DisplayPosition(sender as GrblViewModel);
+            }
+
+            if (e.PropertyName == nameof(GrblViewModel.Signals))
+            {
+                probeTriggered = (sender as GrblViewModel).Signals.Value.HasFlag(Signals.Probe);
+                DisplayPosition(sender as GrblViewModel);
             }
         }
 
@@ -120,7 +131,7 @@ namespace CNC.Controls.Probing
                     model.HasToolTable = GrblInfo.NumTools > 0;
                 }
 
-                GrblParserState.Get();
+                GrblParserState.Get(!GrblSettings.IsGrblHAL);
                 mode = GrblParserState.DistanceMode;
                 model.Tool = model.Grbl.Tool == GrblConstants.NO_TOOL ? "0" : model.Grbl.Tool;
                 model.CanProbe = !model.Grbl.Signals.Value.HasFlag(Signals.Probe);
@@ -129,12 +140,21 @@ namespace CNC.Controls.Probing
                 model.CoordinateSystem = csid == 0 || csid >= 9 ? 1 : csid;
 
                 model.Grbl.PropertyChanged += Grbl_PropertyChanged;
+
+                probeTriggered = model.Grbl.Signals.Value.HasFlag(Signals.Probe);
+
+                DisplayPosition(model.Grbl);
             }
             else
             {
                 model.Grbl.PropertyChanged -= Grbl_PropertyChanged;
-                if (model.Grbl.GrblError != 0)
+
+                // If probing alarm active unlock
+                if(model.Grbl.GrblState.State == GrblStates.Alarm && (model.Grbl.GrblState.Substate == 4 || model.Grbl.GrblState.Substate == 5))
+                    model.Grbl.ExecuteCommand(GrblConstants.CMD_UNLOCK);
+                else if (model.Grbl.GrblError != 0)
                     model.Grbl.ExecuteCommand("");  // Clear error
+
                 model.Grbl.ExecuteCommand(mode == DistanceMode.Absolute ? "G90" : "G91");
             }
 

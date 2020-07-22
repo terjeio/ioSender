@@ -62,6 +62,7 @@
     <Compile Include="FacingWizard.xaml.cs">
       <DependentUpon>FacingWizard.xaml</DependentUpon>
     </Compile>
+    <Compile Include="PartingLogic.cs" />
     <Compile Include="ThreadViewModel.cs" />
     <Compile Include="PartingWizard.xaml.cs">
       <DependentUpon>PartingWizard.xaml</DependentUpon>

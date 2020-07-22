@@ -1,13 +1,13 @@
 ﻿/*
  * OverrideControl.xaml.cs - part of CNC Controls library
  *
- * v0.02 / 2019-09-25 / Io Engineering (Terje Io)
+ * v0.20 / 2020-07-19 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2019, Io Engineering (Terje Io)
+Copyright (c) 2018-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -41,6 +41,7 @@ using System;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
+using CNC.Core;
 
 namespace CNC.Controls
 {
@@ -94,6 +95,13 @@ namespace CNC.Controls
                 btnOvFinePlus.Visibility = Visibility.Collapsed;
                 btnOvCoarsePlus.Visibility = Visibility.Collapsed;
             }
+        }
+
+        public static readonly DependencyProperty EncoderModeProperty = DependencyProperty.Register(nameof(EncoderMode), typeof(GrblEncoderMode), typeof(OverrideControl), new PropertyMetadata(GrblEncoderMode.Unknown));
+        public GrblEncoderMode EncoderMode
+        {
+            get { return (GrblEncoderMode)GetValue(EncoderModeProperty); }
+            set { SetValue(MinusOnlyProperty, value); }
         }
 
         void btnOverrideClick(object sender, EventArgs e)

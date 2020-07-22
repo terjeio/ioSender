@@ -1,7 +1,7 @@
 /*
  * Converters.cs - part of CNC Controls Lathe library
  *
- * v0.03 / 2020-01-28 / Io Engineering (Terje Io)
+ * v0.19 / 2020-05-20 / Io Engineering (Terje Io)
  *
  */
 
@@ -62,7 +62,6 @@ namespace CNC.Controls.Lathe
         public static ToolToChamferedBoolConverter ToolToChamferedBoolConverter = new ToolToChamferedBoolConverter();
         public static ToolToLabelStringConverter ToolToLabelStringConverter = new ToolToLabelStringConverter();
         public static TaperTypeToBoolConverter TaperTypeToBoolConverter = new TaperTypeToBoolConverter();
-        public static MultiLineConverter MultiLineConverter = new MultiLineConverter();
     }
 
     public class CNCMeasureToTextConverter : IValueConverter
@@ -211,36 +210,6 @@ namespace CNC.Controls.Lathe
             return (value is ThreadTaper) && (ThreadTaper)value != ThreadTaper.None;
         }
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    // by  D4rth B4n3 - https://stackoverflow.com/questions/30627368/how-to-create-a-tooltip-to-display-multiple-validation-errors-for-a-single-contr
-    public class MultiLineConverter : IMultiValueConverter
-    {
-        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (!(values[0] is IEnumerable<ValidationError>))
-                return null;
-
-            //string.Join(",", (List<string>)logic.Model.GetErrors(e.PropertyName)));
-
-            var val = values[0] as IEnumerable<ValidationError>;
-
-            string retVal = "";
-
-            foreach (var itm in val)
-            {
-                if (retVal.Length > 0)
-                    retVal += "\n";
-                retVal += itm.ErrorContent;
-
-            }
-            return retVal;
-        }
-
-        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
         }

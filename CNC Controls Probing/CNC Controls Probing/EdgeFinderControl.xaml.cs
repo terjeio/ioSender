@@ -1,7 +1,7 @@
 ﻿/*
  * EdgeFinderControl.xaml.cs - part of CNC Probing library
  *
- * v0.19 / 2020-05-20 / Io Engineering (Terje Io)
+ * v0.20 / 2020-06-03 / Io Engineering (Terje Io)
  *
  */
 
@@ -244,12 +244,12 @@ namespace CNC.Controls.Probing
             {
                 case nameof(ProbingViewModel.IsCompleted):
 
+                    bool ok;
                     var probing = DataContext as ProbingViewModel;
                     probing.PropertyChanged -= Probing_PropertyChanged;
 
-                    if (probing.IsSuccess)
+                    if ((ok = probing.IsSuccess && probing.Positions.Count > 0))
                     {
-                        bool ok = true;
                         int p = 0;
                         Position pos = new Position(probing.Grbl.MachinePosition);
 
@@ -292,17 +292,22 @@ namespace CNC.Controls.Probing
                         {
                             if ((ok == probing.GotoMachinePosition(pos, axisflags)))
                             {
-                                pos.X = pos.Y = pos.Z = 0d;
+                                pos.X = pos.Y = 0d;
+                                pos.Z = probing.WorkpieceHeight + probing.TouchPlateHeight;
                                 probing.Grbl.ExecuteCommand("G92" + pos.ToString(axisflags));
-                                if(axisflags.HasFlag(AxisFlags.Z))
+                                if (axisflags.HasFlag(AxisFlags.Z))
                                     probing.GotoMachinePosition(pz, AxisFlags.Z);
                             }
-                        } else
+                        }
+                        else
+                        {
+                            pos.Z -= probing.WorkpieceHeight + probing.TouchPlateHeight + probing.Grbl.ToolOffset.Z;
                             probing.Grbl.ExecuteCommand(string.Format("G10L2P{0}{1}", probing.CoordinateSystem, pos.ToString(axisflags)));
+                        }
 
-                        probing.Program.End(ok ? "Probing completed" : "Probing failed");
                     }
                     probing.Grbl.IsJobRunning = false;
+                    probing.Program.End(ok ? "Probing completed" : "Probing failed");
                     break;
             }
         }

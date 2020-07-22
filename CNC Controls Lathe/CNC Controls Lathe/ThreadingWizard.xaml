@@ -11,6 +11,7 @@
              Loaded="ThreadingWizard_Loaded">
     <UserControl.Resources>
         <Controls:StringCollectionToTextConverter x:Key="GCodeConverter" />
+        <Controls:MultiLineConverter x:Key="ErrorMessageConverter" />
         <Converters:CNCMeasureConverter x:Key="MeasureConverter" />
         <Converters:SideToInsideBoolConverter x:Key="InsideConverter" />
         <Converters:SideToOutsideBoolConverter x:Key="OutsideConverter" />
@@ -20,7 +21,6 @@
         <Converters:ToolToChamferedBoolConverter x:Key="ToolIsChamferedConverter" />
         <Converters:ToolToLabelStringConverter x:Key="ToolLabelConverter" />
         <Converters:TaperTypeToBoolConverter x:Key="TaperEnableConverter" />
-        <Converters:MultiLineConverter x:Key="ErrorMessageConverter" />
         <Style x:Key="CNCValue" TargetType="Controls:NumericField">
             <Setter Property="Format" Value="{Binding Path=Format, Mode=OneWay}"/>
             <Setter Property="Unit" Value="{Binding Path=Unit, Mode=OneWay}"/>
@@ -239,7 +239,7 @@
                     <ColumnDefinition Width="175*"/>
                 </Grid.ColumnDefinitions>
                 <StackPanel Grid.Column="1" HorizontalAlignment="Left" Height="109" VerticalAlignment="Top" Width="175">
-                    <Controls:NumericField x:Name="cvTool" Label="{Binding Path=Tool.Shape, Converter={StaticResource ToolLabelConverter}}" Value="{Binding Path=Tool.Tip}" Format="{Binding Path=Format, Mode=OneWay}"  Unit="{Binding Path=Unit, Mode=OneWay}" Style="{StaticResource ErrorStyle}"/>
+                    <Controls:NumericField x:Name="cvTool" Label="{Binding Path=Tool.Shape, Converter={StaticResource ToolLabelConverter}}" Value="{Binding Path=Tool.Tip, Mode=TwoWay}" Format="{Binding Path=Format, Mode=OneWay}"  Unit="{Binding Path=Unit, Mode=OneWay}" Style="{StaticResource ErrorStyle}"/>
                     <Controls:NumericField x:Name="cvTooltipMax" Style="{StaticResource CNCValue}" Label="maximum:" IsEnabled="False">
                         <Controls:NumericField.Value>
                             <MultiBinding Mode="OneWay" Converter="{StaticResource MeasureConverter}">

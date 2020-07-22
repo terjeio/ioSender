@@ -10,6 +10,7 @@
     <UserControl.Resources>
         <Controls:LogicalNotConverter x:Key="IsNotRunningConverter" />
         <Controls:EnumValueToBooleanConverter x:Key="EnumToCheckedConverter" />
+        <Controls:BoolToVisibleConverter x:Key="IsVisibleConverter" />
     </UserControl.Resources>
     <Grid>
         <StackPanel Margin="10,10,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
@@ -18,14 +19,19 @@
                 <Label Content="with tool:"></Label>
                 <Controls:NumericComboBox Margin="2,2" DisplayMemberPath="Code" SelectedValuePath="Code" ItemsSource="{Binding Path=Grbl.Tools}" SelectedValue="{Binding Path=Tool, Mode=TwoWay}" IsEnabled="{Binding Path=HasToolTable}" Format="##0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="56" Height="22"/>
             </StackPanel>
-            <CheckBox Margin="10,0,0,0" Content="Set Z offset (G92)" IsChecked="{Binding Path=IsCoordinateModeG92, Mode=TwoWay}"/>
-            <!--IsEnabled="{Binding Path=ProbeFixture, Converter={StaticResource IsNotRunningConverter}}"-->
+            <CheckBox Content="Establish reference offset" IsChecked="{Binding Path=ReferenceToolOffset, Mode=TwoWay}" Margin="10,0,0,0" VerticalAlignment="Center"/>
+            <Border Margin="10,5,0,0"  Visibility="{Binding Path=Grbl.IsToolOffsetActive, Converter={StaticResource IsVisibleConverter}}" Background="Salmon" HorizontalAlignment="Left" VerticalAlignment="Center" CornerRadius="2" Width="61" Height="28">
+                <Button Content="Clear" HorizontalAlignment="Center" VerticalAlignment="Center" Width="55" Height="22" Click="clearToolOffset_Click"/>
+            </Border>
+            <!--<CheckBox Margin="10,0,0,0" Content="Set Z offset (G92)" IsChecked="{Binding Path=IsCoordinateModeG92, Mode=TwoWay}"/>
+            IsEnabled="{Binding Path=ProbeFixture, Converter={StaticResource IsNotRunningConverter}}"-->
             <!-->
             <local:CsSelectControl Margin="5,0,0,0" IsEnabled="{Binding Path=ProbeFixture, Converter={StaticResource IsNotRunningConverter}}"/>
-            </!-->
+
             <GroupBox Header="Workpiece">
-                <Controls:NumericField Label="Height" Value="{Binding Path=WorkpieceHeight, Mode=TwoWay}" Margin="0,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <Controls:NumericField Label="Height" Value="{Binding Path=WorkpieceHeight, Mode=TwoWay}" Margin="0,5,85,0" VerticalAlignment="Top"/>
             </GroupBox>
+            </!-->
         </StackPanel>
         <StackPanel Margin="5,0,0,5" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Height="Auto" Width="Auto">
             <Button Content="Start" IsEnabled="{Binding Path=Grbl.IsJobRunning, Converter={StaticResource IsNotRunningConverter}}" Margin="2,0" Width="75" Click="start_Click"/>

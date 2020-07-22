@@ -6,7 +6,7 @@
              xmlns:Controls="clr-namespace:CNC.Controls;assembly=CNC.Controls.WPF"
              xmlns:local="clr-namespace:CNC.Controls.Probing"
              mc:Ignorable="d" Height="350"
-             d:DesignHeight="350" d:DesignWidth="300">
+             d:DesignHeight="350" d:DesignWidth="500">
     <UserControl.Resources>
         <Controls:LogicalNotConverter x:Key="IsNotRunningConverter" />
         <Controls:EnumValueToBooleanConverter x:Key="EnumToEdgeConverter" />
@@ -61,8 +61,13 @@
                     </Setter>
                 </Style>
             </StackPanel.Resources>
-            <local:CsSelectControl Margin="5,0,0,0"/>
-            <CheckBox Content="Probe Z" Margin="5,5,0,5" IsChecked="{Binding Path=ProbeZ}"/>
+            <StackPanel Orientation="Horizontal">
+                <local:CsSelectControl Margin="5,0,0,0"/>
+                <GroupBox Header="Workpiece">
+                    <Controls:NumericField Label="Height" Value="{Binding Path=WorkpieceHeight, Mode=TwoWay}" IsEnabled="{Binding Path=ProbeZ}" Margin="0,5,85,0" VerticalAlignment="Top"/>
+            </GroupBox>
+        </StackPanel>
+        <CheckBox Content="Probe Z" Margin="5,5,0,5" IsChecked="{Binding Path=ProbeZ}"/>
             <Grid ToolTip="Click edge, corner or center to select probing action." Width="180" Height="180"  Margin="5,0,0,0" HorizontalAlignment="Left">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="60" />

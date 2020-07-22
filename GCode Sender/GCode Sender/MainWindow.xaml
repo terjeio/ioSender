@@ -10,7 +10,7 @@
         xmlns:cncprobingcontrols="clr-namespace:CNC.Controls.Probing;assembly=CNC.Controls.Probing"
         xmlns:local="clr-namespace:GCode_Sender"
         mc:Ignorable="d"
-        Title="GCode Sender (alpha-19)" Height="640" Width="925" MinHeight="660" MinWidth="925"
+        Title="GCode Sender (alpha-20)" Height="640" Width="925" MinHeight="660" MinWidth="925"
         Loaded="Window_Load"
         Closing="Window_Closing"
         Closed="Window_Closed" Icon="App.ico">
@@ -104,12 +104,9 @@
             <TabItem x:Name="tabTurning" Header="Turning">
                 <cnclathecontrols:TurningWizard x:Name="turningWizard"/>
             </TabItem>
-            <!--
-                <TabItem x:Name="tabTurning" Header="Turning">
-                    <Grid Background="#FFE5E5E5">
-                        <cnclathecontrols:TurningWizard x:Name="turningWizard" HorizontalAlignment="Left" Height="515" VerticalAlignment="Top" Width="875"/>
-                    </Grid>
-                </TabItem> -->
+            <TabItem x:Name="tabParting" Header="Parting">
+                <cnclathecontrols:PartingWizard x:Name="partingWizard"/>
+            </TabItem>
             <TabItem x:Name="tabThreading" Header="Threading">
                 <cnclathecontrols:ThreadingWizard x:Name="threadingWizard"/>
             </TabItem>

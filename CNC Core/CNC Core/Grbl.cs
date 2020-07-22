@@ -1,7 +1,7 @@
 ﻿/*
  * Grbl.cs - part of CNC Controls library
  *
- * v0.19 / 2020-05-19 / Io Engineering (Terje Io)
+ * v0.20 / 2020-07-18 / Io Engineering (Terje Io)
  *
  */
 
@@ -108,7 +108,7 @@ namespace CNC.Core
             FORMAT_METRIC = "###0.000",
             FORMAT_IMPERIAL = "##0.0000",
             NO_TOOL = "None",
-            SIGNALS = "XYZABCEPRDHSBT"; // Keep in sync with Signals enum below!!
+            SIGNALS = "XYZABCEPRDHSBTO"; // Keep in sync with Signals enum below!!
 
         public const int
             X_AXIS = 0,
@@ -146,6 +146,14 @@ namespace CNC.Core
         Normal = 0,
         Laser,
         Lathe
+    }
+
+    public enum GrblEncoderMode
+    {
+        Unknown = 0,
+        FeedRate = 1,
+        RapidRate = 2,
+        SpindleRPM = 3
     }
 
     public enum GrblSetting
@@ -255,7 +263,8 @@ namespace CNC.Core
         Hold = 1 << 10,
         CycleStart = 1 << 11,
         BlockDelete = 1 << 12,
-        OptionalStop = 1 << 13
+        OptionalStop = 1 << 13,
+        ProbeDisconnected = 1 << 14
     }
 
     public struct GrblState
@@ -790,6 +799,38 @@ namespace CNC.Core
             return Grbl.GrblViewModel != null && Get(Grbl.GrblViewModel);
         }
 
+        /* Vanilla grbl workaround */
+
+        public static bool Get(bool addMissing)
+        {
+            if(addMissing && (addMissing = Grbl.GrblViewModel != null && Get(Grbl.GrblViewModel) && GrblWorkParameters.Get()))
+            {
+                if (IsActive("G43.1") == null || IsActive("G49") == null)
+                    state.Add(IsPositionOffset(GrblWorkParameters.ToolLengtOffset) ? "G43.1" : "G49", "");
+
+                if (IsActive("G92") == null)
+                {
+                    var g92 = GrblWorkParameters.GetCoordinateSystem("G92");
+                    if (g92 != null && IsPositionOffset(g92))
+                        state.Add("G92", "");
+                }
+            }
+
+            return addMissing;
+        }
+
+        private static bool IsPositionOffset(Position pos)
+        {
+            bool isOffset = false;
+
+            foreach (int i in GrblInfo.AxisFlags.ToIndices())
+                isOffset |= pos.Values[i] != 0d;
+
+            return isOffset;
+        }
+
+        /* End vanilla grbl workaround */
+
         public static string Tool
         {
             get { return _tool; }
@@ -1111,7 +1152,7 @@ namespace CNC.Core
                         string[] columns = line.Split(',');
 
                         if (columns.Length == 3)
-                            messages.Add(columns[0], columns[1] + ": " + columns[2]);
+                            messages.Add(columns[0], columns[2]);
 
                         line = file.ReadLine();
                     }
@@ -1209,6 +1250,7 @@ namespace CNC.Core
         public static bool HomingEnabled { get; private set; }
         public static bool UseLegacyRTCommands { get; private set; }
         public static bool IsGrblHAL { get; private set; }
+        public static bool ReportProbeCoordinates { get; private set; }
 
         public static string GetString(GrblSetting key)
         {
@@ -1220,6 +1262,10 @@ namespace CNC.Core
         public static double GetDouble(GrblSetting key)
         {
             return dbl.Parse(GetString(key));
+        }
+        public static double GetInteger(GrblSetting key)
+        {
+            return int.Parse(GetString(key));
         }
 
         public static bool Get(GrblViewModel model)
@@ -1293,6 +1339,9 @@ namespace CNC.Core
             }
 
             settings.AcceptChanges();
+
+            if(!IsGrblHAL)
+                ReportProbeCoordinates = true;
 
             model.GrblState = model.GrblState; // Temporary hack to enable the Home button when homing is enabled
 
@@ -1413,7 +1462,11 @@ namespace CNC.Core
                             break;
 
                         case GrblSetting.StatusReportMask:
-                            Grbl.GrblViewModel.IsParserStateLive = (int.Parse(valuepair[1]) & (1 << 10)) != 0;
+                            {
+                                var value = int.Parse(valuepair[1]);
+                                Grbl.GrblViewModel.IsParserStateLive = (value & (1 << 10)) != 0;
+                                ReportProbeCoordinates = (value & (1 << 7)) != 0;
+                            }
                             break;
 
                         case GrblSetting.ControlInvertMask:

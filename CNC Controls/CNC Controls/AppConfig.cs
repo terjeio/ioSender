@@ -1,7 +1,7 @@
 ﻿/*
  * AppConfig.cs - part of CNC Controls library for Grbl
  *
- * v0.18 / 2020-05-19 / Io Engineering (Terje Io)
+ * v0.20 / 2020-06-30 / Io Engineering (Terje Io)
  *
  */
 
@@ -93,7 +93,7 @@ namespace CNC.Controls
         private bool _isEnabled = true;
         private int _arcResolution = 10;
         private double _minDistance = 0.05d;
-        private bool _showGrid = true, _showAxes = true, _showBoundingBox = false, _showViewCube = true;
+        private bool _showGrid = true, _showAxes = true, _showBoundingBox = false, _showViewCube = true, _showCoordSystem = false;
 
         public bool IsEnabled { get { return _isEnabled; } set { _isEnabled = value; OnPropertyChanged(); } }
         public int ArcResolution { get { return _arcResolution; } set { _arcResolution = value; OnPropertyChanged(); } }
@@ -102,6 +102,7 @@ namespace CNC.Controls
         public bool ShowAxes { get { return _showAxes; } set { _showAxes = value; OnPropertyChanged(); } }
         public bool ShowBoundingBox { get { return _showBoundingBox; } set { _showBoundingBox = value; OnPropertyChanged(); } }
         public bool ShowViewCube { get { return _showViewCube; } set { _showViewCube = value; OnPropertyChanged(); } }
+        public bool ShowCoordinateSystem { get { return _showCoordSystem; } set { _showCoordSystem = value; OnPropertyChanged(); } }
     }
 
     [Serializable]

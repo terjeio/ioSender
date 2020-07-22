@@ -1,7 +1,7 @@
 ﻿/*
  * MDIControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.13 / 2020-03-12 / Io Engineering (Terje Io)
+ * v0.20 / 2020-06-03 / Io Engineering (Terje Io)
  *
  */
 
@@ -40,8 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using CNC.Core;
 using System.Collections.ObjectModel;
+using CNC.Core;
 
 namespace CNC.Controls
 {
@@ -75,9 +75,20 @@ namespace CNC.Controls
             if (e.Key == Key.Return && (DataContext as GrblViewModel).MDICommand.CanExecute(null))
             {
                 string cmd = (sender as ComboBox).Text;
-                if (!string.IsNullOrEmpty(cmd) && !Commands.Contains(cmd))
+                if (!string.IsNullOrEmpty(cmd) && (Commands.Count == 0 || Commands[0] != cmd))
                     Commands.Insert(0, cmd);
                 (DataContext as GrblViewModel).MDICommand.Execute(cmd);
+                (sender as ComboBox).SelectedIndex = -1;
+            }
+        }
+
+        private void txtMDI_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var cmbTextBox = (TextBox)(sender as ComboBox).Template.FindName("PART_EditableTextBox", (sender as ComboBox));
+            if (cmbTextBox != null)
+            {
+                cmbTextBox.Focus();
+                cmbTextBox.CaretIndex = cmbTextBox.Text.Length;
             }
         }
 

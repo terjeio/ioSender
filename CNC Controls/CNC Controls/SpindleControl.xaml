@@ -29,7 +29,7 @@
                     <Label x:Name="lblRPM" Content="RPM" HorizontalContentAlignment="Right" VerticalAlignment="Center" Height="24" Width="34"/>
                     <local:NumericTextBox x:Name="cvRPM" Value="{Binding Path=RPM, Mode=TwoWay}" IsEnabled="{Binding Path=IsJobRunning, Converter={StaticResource LogicalNotConverter}}" Format="####0" HorizontalAlignment="Left" Margin="2,0,0,0" TextWrapping="NoWrap" VerticalAlignment="Center"/>
                 </StackPanel>
-                <local:OverrideControl x:Name="overrideControl" Value="{Binding Path=RPMOverride, Mode=OneWay}" Margin="0,0,3,0" Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+                <local:OverrideControl x:Name="overrideControl" Value="{Binding Path=RPMOverride, Mode=OneWay}" Margin="0,0,3,0" Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Right" EncoderMode="SpindleRPM"/>
             </Grid>
         </GroupBox>
     </Grid>

@@ -31,7 +31,7 @@
         <StackPanel Orientation="Vertical" Width="235" HorizontalAlignment="Left" Margin="5,10,0,0" IsEnabled="{Binding Path=Grbl.IsJobRunning, Converter={StaticResource IsNotRunningConverter}}">
             <StackPanel Orientation="Horizontal" Margin="0,0,0,5" HorizontalAlignment="Stretch">
                 <Label x:Name="lblProfile" Content="Profile:" HorizontalContentAlignment="Right" HorizontalAlignment="Right" VerticalAlignment="Center" Height="25" Width="48"/>
-                <ComboBox x:Name="cbxProfile" IsEditable="True" HorizontalAlignment="Left" VerticalAlignment="Center" Width="155" Height="22"
+                <ComboBox x:Name="cbxProfile" IsEditable="True" IsTextSearchEnabled="False" HorizontalAlignment="Left" VerticalAlignment="Center" Width="155" Height="22"
                     ItemsSource="{Binding Path=Profiles}"    
                     SelectedItem="{Binding Path=Profile, Mode=TwoWay}"
                     DisplayMemberPath="Name"
@@ -75,7 +75,7 @@
         </StackPanel>
         <StackPanel Margin="248,10,0,0" Width="615" HorizontalAlignment="Left" VerticalAlignment="Top">
             <TabControl x:Name="tab" HorizontalAlignment="Stretch" VerticalAlignment="Top" Width="Auto" Height="400" SelectionChanged="tab_SelectionChanged">
-                <TabItem Header="Tool length">
+                <TabItem Header="Tool length offset">
                     <local:ToolLengthControl HorizontalAlignment="Left" VerticalAlignment="Top"/>
                 </TabItem>
                 <TabItem Header="Edge finder">
@@ -94,5 +94,6 @@
             <Run Text="Warning! Use with care - incorrect parameters may damage your probe! (NOTE: only lightly tested)" Foreground="Red" FontWeight="Bold"/>
             </TextBlock>
         </StackPanel>
+        <TextBlock Text="{Binding Path=Position, Mode=OneWay}" TextWrapping="NoWrap" Height="25" Margin="5,0,0,0" Width="235" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
     </Grid>
 </UserControl>
