@@ -1,5 +1,9 @@
 ## GRBL GCode Sender
 
+2020-08-05 : First [beta release](https://github.com/terjeio/Grbl-GCode-Sender/releases/tag/v021-beta1). 
+
+Updated for latest \(20200805\) grblHAL [tool change functionality](https://github.com/terjeio/grblHAL/wiki/Manual,-semi-automatic-and-automatic-tool-change), bug fixes for tool change handling \(UI was not correctly enabled for the different state changes\).
+
 2020-07-22: Alpha 20 release of binary.
 
 Changes to probing and updates for new features in grblHAL. This release is for testing of new features both in the sender and in grblHAL. Revert to alpha 19 if problems arise.
