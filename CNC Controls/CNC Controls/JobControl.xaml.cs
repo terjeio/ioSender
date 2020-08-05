@@ -1,7 +1,7 @@
 /*
  * JobControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.18 / 2020-05-10 / Io Engineering (Terje Io)
+ * v0.21 / 2020-08-05 / Io Engineering (Terje Io)
  *
  */
 
@@ -458,14 +458,27 @@ namespace CNC.Controls
 
         public bool StreamingToolChange(StreamingState newState, bool always)
         {
+            bool changed = streamingState != newState;
+
             switch (newState)
             {
                 case StreamingState.ToolChange:
+                    model.IsJobRunning = false; // only enable UI if no ATC?
                     btnStart.IsEnabled = true;
                     btnHold.IsEnabled = false;
                     break;
 
+                case StreamingState.Idle:
                 case StreamingState.Send:
+                    if (JobTimer.IsRunning)
+                    {
+                        SetStreamingHandler(StreamingHandler.SendFile);
+                        SendNextLine();
+                    }
+                    else
+                        SetStreamingHandler(StreamingHandler.Previous);
+                    break;
+
                 case StreamingState.Error:
                     SetStreamingHandler(StreamingHandler.Previous);
                     break;
@@ -477,8 +490,13 @@ namespace CNC.Controls
 
             if (streamingHandler.Handler != StreamingHandler.ToolChange)
                 return streamingHandler.Call(newState, true);
-            else
-                return true;
+            else if (changed)
+            {
+                model.StreamingState = streamingState = newState;
+                StreamingStateChanged?.Invoke(streamingState, grblState.MPG);
+            }
+
+            return true;
         }
 
         public bool StreamingFeedHold(StreamingState newState, bool always)
@@ -787,7 +805,10 @@ namespace CNC.Controls
 
         void GrblStateChanged(GrblState newstate)
         {
-            if(isActive) switch(newstate.State)
+            if (grblState.State == GrblStates.Jog)
+                model.IsJobRunning = false;
+
+            if (isActive) switch(newstate.State)
             {
                 case GrblStates.Idle:
                     streamingHandler.Call(StreamingState.Idle, false);
@@ -819,9 +840,12 @@ namespace CNC.Controls
                     break;
 
                 case GrblStates.Tool:
-                    streamingHandler.Call(StreamingState.ToolChange, false);
-                    if (!grblState.MPG)
-                        Comms.com.WriteByte(GrblConstants.CMD_TOOL_ACK);
+                        if (grblState.State != GrblStates.Jog)
+                        {
+                            streamingHandler.Call(StreamingState.ToolChange, false);
+                            if (!grblState.MPG)
+                                Comms.com.WriteByte(GrblConstants.CMD_TOOL_ACK);
+                        }
                     break;
 
                 case GrblStates.Hold:

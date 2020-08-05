@@ -1,7 +1,7 @@
 ﻿/*
  * SpindleControl.xaml.cs - part of CNC Controls library
  *
- * v0.12 / 2020-03-11 / Io Engineering (Terje Io)
+ * v0.21 / 2020-08-03 / Io Engineering (Terje Io)
  *
  */
 
@@ -80,7 +80,7 @@ namespace CNC.Controls
             if (sender is GrblViewModel)switch (e.PropertyName)
             {
                 case nameof(GrblViewModel.GrblState):
-                case nameof(GrblViewModel.SpindleState):
+                case nameof(GrblViewModel.IsJobRunning):
                     var p = (GrblViewModel)sender;
                     hold = p.IsJobRunning && (p.GrblState.State == GrblStates.Hold || p.GrblState.State == GrblStates.Door);
                     IsSpindleStateEnabled = !p.IsJobRunning || p.GrblState.State == GrblStates.Hold || p.GrblState.State == GrblStates.Door;

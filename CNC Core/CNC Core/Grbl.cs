@@ -1,7 +1,7 @@
 ﻿/*
  * Grbl.cs - part of CNC Controls library
  *
- * v0.20 / 2020-07-18 / Io Engineering (Terje Io)
+ * v0.21 / 2020-08-05 / Io Engineering (Terje Io)
  *
  */
 
@@ -578,6 +578,7 @@ namespace CNC.Core
 
         public static string AxisLetters { get; private set; } = "XYZABC";
         public static string Version { get; private set; } = string.Empty;
+        public static int Build { get; private set; } = 0;
         public static string Identity { get; private set; } = string.Empty;
         public static string Options { get; private set; } = string.Empty;
         public static string NewOptions { get; private set; } = string.Empty;
@@ -694,6 +695,12 @@ namespace CNC.Core
                         Version = valuepair[1];
                         if (valuepair.Count() > 2)
                             Identity = valuepair[2];
+                        if (Version.LastIndexOf('.') > 0)
+                        {
+                            int build = 0;
+                            int.TryParse(Version.Substring(Version.LastIndexOf('.') + 1), out build);
+                            Build = build;
+                        }
                         break;
 
                     case "OPT":

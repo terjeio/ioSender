@@ -1,7 +1,7 @@
 ﻿/*
  * ToolLengthControl.cs - part of CNC Probing library
  *
- * v0.20 / 2020-06-03 / Io Engineering (Terje Io)
+ * v0.21 / 2020-08-05 / Io Engineering (Terje Io)
  *
  */
 
@@ -113,6 +113,8 @@ namespace CNC.Controls.Probing
                             probing.ReferenceToolOffset = false;
                             baseline = new Position(probing.Positions[0]);
                             probing.Grbl.ExecuteCommand("G49");
+                            if(GrblInfo.Build >= 20200805 && GrblSettings.IsGrblHAL)
+                                probing.Grbl.ExecuteCommand("$TLR");
                         }
                         else
                         {

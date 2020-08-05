@@ -32,7 +32,7 @@
         </Style>
     </UserControl.Resources>
     <DockPanel>
-        <DataGrid x:Name="dgrSettings" DockPanel.Dock="Left" ItemsSource="{Binding}" IsReadOnly="True" HorizontalAlignment="Left" Margin="10,10" VerticalAlignment="Stretch" Width="380"
+        <DataGrid x:Name="dgrSettings" DockPanel.Dock="Left" ItemsSource="{Binding}" IsReadOnly="True" HorizontalAlignment="Left" Margin="10,10" VerticalAlignment="Stretch" Width="390"
                   SelectionMode="Single" SelectionUnit="FullRow" AutoGenerateColumns="False"
                   CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserResizeRows="False" CanUserSortColumns="False" CanUserAddRows="False" SelectionChanged="dgrSettings_SelectionChanged">
             <DataGrid.Columns>
@@ -50,7 +50,7 @@
             </StackPanel>
             <StackPanel DockPanel.Dock="Top" HorizontalAlignment="Left" Height="Auto" Margin="5,15,0,0" VerticalAlignment="Top">
                 <StackPanel x:Name="canvas" HorizontalAlignment="Left" Height="Auto" VerticalAlignment="Center" Width="455"/>
-                <TextBox x:Name="txtDescription" Background="#FFF8F8F8" IsReadOnly="True" HorizontalAlignment="Left" Height="150" TextWrapping="Wrap" VerticalAlignment="Top" Width="450"/>
+                <TextBox x:Name="txtDescription" Background="#FFF8F8F8" IsReadOnly="True" HorizontalAlignment="Left" Height="225" TextWrapping="Wrap" VerticalAlignment="Top" Width="450"/>
             </StackPanel>
         </DockPanel>
     </DockPanel>
