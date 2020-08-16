@@ -50,10 +50,10 @@
                     </MultiBinding>
                 </Button.IsEnabled>
             </Button>
-            <Button x:Name="btnUnlock" Content="Unlock" Focusable="False" Width="55" Height="32" Margin="3,0,0,0" Click="btn_Click"
+            <Button x:Name="btnUnlock" Content="Unlock" ToolTip="Ctrl+U" Focusable="False" Width="55" Height="32" Margin="3,0,0,0" Click="btn_Click"
                 IsEnabled="{Binding Path=IsSleepMode, Converter={StaticResource SleepEnabledConverter}, Mode=OneWay}"
             />
-            <Button x:Name="btnReset" Content="Reset" Focusable="False" Width="55" Height="32" Margin="3,0,0,0" Background="Red" Foreground="White" Click="btn_Click" FontFamily="Segoe UI Semibold" FontSize="14"/>
+            <Button x:Name="btnReset" Content="Reset" ToolTip="Ctrl+Shift+R" Focusable="False" Width="55" Height="32" Margin="3,0,0,0" Background="Red" Foreground="White" Click="btn_Click" FontFamily="Segoe UI Semibold" FontSize="14"/>
         </StackPanel>
     </Grid>
 </UserControl>

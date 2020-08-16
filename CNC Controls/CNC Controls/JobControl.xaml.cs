@@ -1,7 +1,7 @@
 /*
  * JobControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.21 / 2020-08-05 / Io Engineering (Terje Io)
+ * v0.22 / 2020-08-15 / Io Engineering (Terje Io)
  *
  */
 
@@ -262,6 +262,8 @@ namespace CNC.Controls
             keypress.AddHandler(Key.R, ModifierKeys.Alt, StartJob);
             keypress.AddHandler(Key.S, ModifierKeys.Alt, StopJob);
             keypress.AddHandler(Key.H, ModifierKeys.Control, Home);
+            keypress.AddHandler(Key.U, ModifierKeys.Control, Unlock);
+            keypress.AddHandler(Key.R, ModifierKeys.Shift|ModifierKeys.Control, Reset);
             keypress.AddHandler(Key.Space, ModifierKeys.None, FeedHold);
             keypress.AddHandler(Key.F1, ModifierKeys.None, FnKeyHandler);
             keypress.AddHandler(Key.F2, ModifierKeys.None, FnKeyHandler);
@@ -302,6 +304,18 @@ namespace CNC.Controls
         private bool Home(Key key)
         {
             model.ExecuteCommand(GrblConstants.CMD_HOMING);
+            return true;
+        }
+
+        private bool Unlock(Key key)
+        {
+            model.ExecuteCommand(GrblConstants.CMD_UNLOCK);
+            return true;
+        }
+
+        private bool Reset(Key key)
+        {
+            Comms.com.WriteByte((byte)GrblConstants.CMD_RESET);
             return true;
         }
 

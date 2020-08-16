@@ -1,7 +1,7 @@
 ﻿/*
  * CenterFinderControl.xaml.cs - part of CNC Probing library
  *
- * v0.20 / 2020-05-25 / Io Engineering (Terje Io)
+ * v0.22 / 2020-08-15 / Io Engineering (Terje Io)
  *
  */
 
@@ -79,7 +79,7 @@ namespace CNC.Controls.Probing
             if (pass == passes)
                 probing.Program.Add(string.Format("G91F{0}", probing.ProbeFeedRate.ToInvariantString()));
 
-            string gotoCenter = "G53G0" + center.ToString(AxisFlags.X | AxisFlags.Y);
+            string gotoCenter = center.ToString(AxisFlags.X | AxisFlags.Y);
 
             switch (probing.ProbeCenter)
             {
@@ -87,21 +87,21 @@ namespace CNC.Controls.Probing
                     {
                         Position rapid = new Position(diameter_2 - probing.Offset, diameter_2 - probing.Offset, 0d);
 
-                        probing.Program.Add("G0Z-" + probing.Depth.ToInvariantString());
+                        probing.Program.AddRapid("Z-" + probing.Depth.ToInvariantString());
                         if (rapid.X > 1d)
-                            probing.Program.Add("G0" + rapid.ToString(AxisFlags.X, Direction.Negative));
+                            probing.Program.AddRapid(rapid.ToString(AxisFlags.X, Direction.Negative));
                         probing.Program.AddProbingAction(AxisFlags.X, true);
-                        probing.Program.Add(gotoCenter);
+                        probing.Program.AddRapidToMPos(gotoCenter);
                         if (rapid.X > 1d)
-                            probing.Program.Add("G0" + rapid.ToString(AxisFlags.X));
+                            probing.Program.AddRapid(rapid.ToString(AxisFlags.X));
                         probing.Program.AddProbingAction(AxisFlags.X, false);
-                        probing.Program.Add(gotoCenter);
+                        probing.Program.AddRapidToMPos(gotoCenter);
                         if (rapid.Y > 1d)
-                            probing.Program.Add("G0" + rapid.ToString(AxisFlags.Y, Direction.Negative));
+                            probing.Program.AddRapid(rapid.ToString(AxisFlags.Y, Direction.Negative));
                         probing.Program.AddProbingAction(AxisFlags.Y, true);
-                        probing.Program.Add(gotoCenter);
+                        probing.Program.AddRapidToMPos(gotoCenter);
                         if (rapid.Y > 1d)
-                            probing.Program.Add("G0" + rapid.ToString(AxisFlags.Y));
+                            probing.Program.AddRapid(rapid.ToString(AxisFlags.Y));
                         probing.Program.AddProbingAction(AxisFlags.Y, false);
                     }
                     break;
@@ -111,32 +111,32 @@ namespace CNC.Controls.Probing
                         Position rapid = new Position(diameter_2 + probing.XYClearance, diameter_2 + probing.XYClearance, 0d);
                         Position retract = new Position(probing.XYClearance, probing.XYClearance, 0d);
 
-                        probing.Program.Add("G0" + rapid.ToString(AxisFlags.X, Direction.Negative));
-                        probing.Program.Add("G0Z-" + probing.Depth.ToInvariantString());
+                        probing.Program.AddRapid(rapid.ToString(AxisFlags.X, Direction.Negative));
+                        probing.Program.AddRapid("Z-" + probing.Depth.ToInvariantString());
                         probing.Program.AddProbingAction(AxisFlags.X, false);
-                        probing.Program.Add("G0" + retract.ToString(AxisFlags.X, Direction.Negative));
-                        probing.Program.Add("G0Z" + probing.Depth.ToInvariantString());
-                        probing.Program.Add("G53G0" + center.ToString(AxisFlags.X));
+                        probing.Program.AddRapid(retract.ToString(AxisFlags.X, Direction.Negative));
+                        probing.Program.AddRapid("Z" + probing.Depth.ToInvariantString());
+                        probing.Program.AddRapidToMPos(center.ToString(AxisFlags.X));
 
-                        probing.Program.Add("G0" + rapid.ToString(AxisFlags.X, Direction.Positive));
-                        probing.Program.Add("G0Z-" + probing.Depth.ToInvariantString());
+                        probing.Program.AddRapid(rapid.ToString(AxisFlags.X, Direction.Positive));
+                        probing.Program.AddRapid("Z-" + probing.Depth.ToInvariantString());
                         probing.Program.AddProbingAction(AxisFlags.X, true);
-                        probing.Program.Add("G0" + retract.ToString(AxisFlags.X, Direction.Positive));
-                        probing.Program.Add("G0Z" + probing.Depth.ToInvariantString());
-                        probing.Program.Add("G53G0" + center.ToString(AxisFlags.X));
+                        probing.Program.AddRapid(retract.ToString(AxisFlags.X, Direction.Positive));
+                        probing.Program.AddRapid("Z" + probing.Depth.ToInvariantString());
+                        probing.Program.AddRapidToMPos(center.ToString(AxisFlags.X));
 
-                        probing.Program.Add("G0" + rapid.ToString(AxisFlags.Y, Direction.Negative));
-                        probing.Program.Add("G0Z-" + probing.Depth.ToInvariantString());
+                        probing.Program.AddRapid(rapid.ToString(AxisFlags.Y, Direction.Negative));
+                        probing.Program.AddRapid("Z-" + probing.Depth.ToInvariantString());
                         probing.Program.AddProbingAction(AxisFlags.Y, false);
-                        probing.Program.Add("G0" + retract.ToString(AxisFlags.Y, Direction.Negative));
-                        probing.Program.Add("G0Z" + probing.Depth.ToInvariantString());
-                        probing.Program.Add("G53G0" + center.ToString(AxisFlags.Y));
+                        probing.Program.AddRapid(retract.ToString(AxisFlags.Y, Direction.Negative));
+                        probing.Program.AddRapid("Z" + probing.Depth.ToInvariantString());
+                        probing.Program.AddRapidToMPos(center.ToString(AxisFlags.Y));
 
-                        probing.Program.Add("G0" + rapid.ToString(AxisFlags.Y, Direction.Positive));
-                        probing.Program.Add("G0Z-" + probing.Depth.ToInvariantString());
+                        probing.Program.AddRapid(rapid.ToString(AxisFlags.Y, Direction.Positive));
+                        probing.Program.AddRapid("Z-" + probing.Depth.ToInvariantString());
                         probing.Program.AddProbingAction(AxisFlags.Y, true);
-                        probing.Program.Add("G0" + retract.ToString(AxisFlags.Y, Direction.Positive));
-                        probing.Program.Add("G0Z" + probing.Depth.ToInvariantString());
+                        probing.Program.AddRapid(retract.ToString(AxisFlags.Y, Direction.Positive));
+                        probing.Program.AddRapid("Z" + probing.Depth.ToInvariantString());
                     }
                     break;
             }

@@ -6,7 +6,7 @@
              xmlns:Controls="clr-namespace:CNC.Controls;assembly=CNC.Controls.WPF"
              xmlns:local="clr-namespace:CNC.Controls.Probing"
              mc:Ignorable="d" 
-             d:DesignHeight="500" d:DesignWidth="875"
+             d:DesignHeight="515" d:DesignWidth="875"
              Loaded="UserControl_Loaded">
     <UserControl.Resources>
         <Controls:EnumValueToBooleanConverter x:Key="EnumToEnabledConverter" />
@@ -28,7 +28,7 @@
         </Style>
     </UserControl.Resources>
     <Grid>
-        <StackPanel Orientation="Vertical" Width="235" HorizontalAlignment="Left" Margin="5,10,0,0" IsEnabled="{Binding Path=Grbl.IsJobRunning, Converter={StaticResource IsNotRunningConverter}}">
+        <StackPanel Orientation="Vertical" Width="235" HorizontalAlignment="Left" Margin="5,5,0,0" IsEnabled="{Binding Path=Grbl.IsJobRunning, Converter={StaticResource IsNotRunningConverter}}">
             <StackPanel Orientation="Horizontal" Margin="0,0,0,5" HorizontalAlignment="Stretch">
                 <Label x:Name="lblProfile" Content="Profile:" HorizontalContentAlignment="Right" HorizontalAlignment="Right" VerticalAlignment="Center" Height="25" Width="48"/>
                 <ComboBox x:Name="cbxProfile" IsEditable="True" IsTextSearchEnabled="False" HorizontalAlignment="Left" VerticalAlignment="Center" Width="155" Height="22"
@@ -58,8 +58,9 @@
             </GroupBox>
             <GroupBox Header="Probing distances and speed">
                 <StackPanel Orientation="Vertical">
-                    <Controls:NumericField Label="Search feed rate:" ToolTip="Feed rate for initial probing move" Unit="mm/min" Value="{Binding Path=ProbeFeedRate, Mode=TwoWay}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
-                    <Controls:NumericField Label="Latch feed rate:" ToolTip="Feed rate for second slow probing move" Unit="mm/min" Value="{Binding Path=LatchFeedRate, Mode=TwoWay}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
+                    <Controls:NumericField Label="Rapids feed rate:" ToolTip="Feed rate for rapid moves, set to 0 to use controller setting" Format="###0" Unit="mm/min" Value="{Binding Path=RapidsFeedRate, Mode=TwoWay}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
+                    <Controls:NumericField Label="Search feed rate:" ToolTip="Feed rate for initial probing move" Unit="mm/min" Format="###0" Value="{Binding Path=ProbeFeedRate, Mode=TwoWay}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
+                    <Controls:NumericField Label="Latch feed rate:" ToolTip="Feed rate for second slow probing move" Unit="mm/min" Format="###0" Value="{Binding Path=LatchFeedRate, Mode=TwoWay}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
                     <Controls:NumericField Label="Probing distance:" ToolTip="Max. distance for probing moves" Value="{Binding Path=ProbeDistance, Mode=TwoWay}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top" Style="{StaticResource ErrorStyle}"/>
                     <Controls:NumericField Label="Latch distance:" ToolTip="Distance to retract for second slow probing move, set to 0 to skip" Value="{Binding Path=LatchDistance, Mode=TwoWay}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
                 </StackPanel>

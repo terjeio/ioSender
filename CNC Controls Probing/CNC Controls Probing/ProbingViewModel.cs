@@ -64,6 +64,7 @@ namespace CNC.Controls.Probing
         private double _tpHeight, _fHeight, _ProbeDiameter, _workpieceDiameter = 0d, _workpieceHeight = 0d;
         private double _latchDistance, _latchFeedRate;
         private double _probeDistance, _probeFeedRate;
+        private double _rapidsFeedRate;
         private double _offset, _xyClearance, _depth;
 
         private bool _canProbe = false, _isComplete = false, _isSuccess = false, _probeZ = false, _useFixture = false, _hasToolTable = false, _hasCs9 = false;
@@ -170,7 +171,7 @@ namespace CNC.Controls.Probing
             bool? res = null;
             bool wait = true;
 
-            string command = "G53G0" + pos.ToString(axisflags);
+            string command = "G53" + RapidCommand + pos.ToString(axisflags);
 
             Comms.com.PurgeQueue();
 
@@ -247,6 +248,7 @@ namespace CNC.Controls.Probing
             set
             {
                 _profile = value;
+                RapidsFeedRate = _profile.RapidsFeedRate;
                 ProbeFeedRate = _profile.ProbeFeedRate;
                 LatchFeedRate = _profile.LatchFeedRate;
                 ProbeDistance = _profile.ProbeDistance;
@@ -271,6 +273,7 @@ namespace CNC.Controls.Probing
         public double ProbeDiameter { get { return _ProbeDiameter; } set { _ProbeDiameter = value; OnPropertyChanged(); } }
         public double LatchDistance { get { return _latchDistance; } set { _latchDistance = value; OnPropertyChanged(); } }
         public double LatchFeedRate { get { return _latchFeedRate; } set { _latchFeedRate = value; OnPropertyChanged(); } }
+        public double RapidsFeedRate { get { return _rapidsFeedRate; } set { _rapidsFeedRate = value; OnPropertyChanged(); } }
         public double TouchPlateHeight { get { return _tpHeight; } set { _tpHeight = value; OnPropertyChanged(); } }
         public double FixtureHeight { get { return _fHeight; } set { _fHeight = value; OnPropertyChanged(); } }
         public bool CanProbe { get { return _canProbe; } set { _canProbe = value; OnPropertyChanged(); } }
@@ -300,6 +303,7 @@ namespace CNC.Controls.Probing
         public double XYClearance { get { return _xyClearance; } set { _xyClearance = value; OnPropertyChanged(); } }
         public double Offset { get { return _offset; } set { _offset = value; OnPropertyChanged(); } }
         public double Depth { get { return _depth; } set { _depth = value; OnPropertyChanged(); } }
+        public string RapidCommand { get { return RapidsFeedRate == 0d ? "G0" : "G1F" + RapidsFeedRate.ToInvariantString(); } }
 
         public string Message
         {

@@ -1,7 +1,7 @@
 ﻿/*
  * Grbl.cs - part of CNC Controls library
  *
- * v0.21 / 2020-08-05 / Io Engineering (Terje Io)
+ * v0.22 / 2020-08-16 / Io Engineering (Terje Io)
  *
  */
 
@@ -387,6 +387,12 @@ namespace CNC.Core
                 Values[i] = double.NaN;
         }
 
+        public void Zero()
+        {
+            for (var i = 0; i < Values.Length; i++)
+                Values[i] = 0d;
+        }
+
         public static Position operator +(Position b, Position c)
         {
             Position a = new Position();
@@ -431,6 +437,16 @@ namespace CNC.Core
                     Values[i] = pos.Values[i];
             }
             OnPropertyChanged(nameof(Position));
+        }
+
+        public bool IsSet(AxisFlags axisflags)
+        {
+            bool ok = true;
+
+            foreach (int i in axisflags.ToIndices())
+                ok = ok && !double.IsNaN(Values[i]);
+
+            return ok;
         }
 
         public bool Equals(Position pos)

@@ -1,7 +1,7 @@
 /*
  * GrblViewModel.cs - part of CNC Controls library
  *
- * v0.20 / 2020-07-19 / Io Engineering (Terje Io)
+ * v0.22 / 2020-08-16 / Io Engineering (Terje Io)
  *
  */
 
@@ -51,7 +51,8 @@ namespace CNC.Core
     {
         private string _tool, _message, _WPos, _MPos, _wco, _wcs, _a, _fs, _ov, _pn, _sc, _sd, _ex, _d, _gc, _h;
         private string _mdiCommand, _fileName;
-        private bool _flood, _mist, _tubeCoolant, _toolChange, _reset, _isMPos, _isJobRunning, _isProbeSuccess, _pgmEnd, _isParserStateLive;
+        private bool has_wco = false;
+        private bool _flood, _mist, _tubeCoolant, _toolChange, _reset, _isMPos, _isJobRunning, _isProbeSuccess, _pgmEnd, _isParserStateLive, _isTloRefSet;
         private bool? _mpg;
         private int _pwm, _line, _scrollpos, _blocks = 0;
         private double _feedrate = 0d;
@@ -157,7 +158,7 @@ namespace CNC.Core
         {
             _fileName = _mdiCommand = string.Empty;
             _streamingState = StreamingState.NoFile;
-            _isMPos = _reset = _isJobRunning = _isProbeSuccess = _pgmEnd = false;
+            _isMPos = _reset = _isJobRunning = _isProbeSuccess = _pgmEnd = _isTloRefSet = false;
             _pb_avail = _rxb_avail = string.Empty;
             _mpg = null;
             _line = _pwm = _scrollpos = 0;
@@ -169,6 +170,7 @@ namespace CNC.Core
             GrblState = _grblState;
             IsMPGActive = null; //??
 
+            has_wco = false;
             _MPos = _WPos = _wco = _h = string.Empty;
             Position.Clear();
             MachinePosition.Clear();
@@ -231,6 +233,7 @@ namespace CNC.Core
         public ObservableCollection<Tool> Tools { get { return GrblWorkParameters.Tools; } }
         public ObservableCollection<string> SystemInfo { get { return GrblInfo.SystemInfo; } }
         public string Tool { get { return _tool; } set { _tool = value; OnPropertyChanged(); } }
+        public bool IsTloReferenceSet { get { return _isTloRefSet; } private set { if (_isTloRefSet != value) { _isTloRefSet = value; OnPropertyChanged(); } } }
         public bool GrblReset { get { return _reset; } set { if ((_reset = value)) { _grblState.Error = 0; OnPropertyChanged(); Message = ""; } } }
         public GrblState GrblState { get { return _grblState; } set { _grblState = value; OnPropertyChanged(); } }
         public bool IsCheckMode { get { return _grblState.State == GrblStates.Check; } }
@@ -246,11 +249,13 @@ namespace CNC.Core
         public Position WorkPosition { get; private set; } = new Position();
         public Position Position { get; private set; } = new Position();
         public bool IsMachinePosition { get { return _isMPos; } set { _isMPos = value; OnPropertyChanged(); } }
+        public bool IsMachinePositionKnown { get { return MachinePosition.IsSet(GrblInfo.AxisFlags); } }
         public bool SuspendPositionNotifications
         {
             get { return Position.SuspendNotifications; }
             set { Position.SuspendNotifications = value; }
         }
+
         public Position WorkPositionOffset { get; private set; } = new Position();
         public Position ToolOffset { get; private set; } = new Position();
         public Position ProbePosition { get; private set; } = new Position();
@@ -586,7 +591,10 @@ namespace CNC.Core
                             IsMachinePosition = true;
                         _MPos = value;
                         MachinePosition.Parse(_MPos);
-                        Position.Set(MachinePosition - WorkPositionOffset);
+                        if(has_wco)
+                            Position.Set(MachinePosition - WorkPositionOffset);
+                        else
+                            Position.Set(MachinePosition);
                     }
                     break;
 
@@ -597,7 +605,8 @@ namespace CNC.Core
                             IsMachinePosition = false;
                         _WPos = value;
                         WorkPosition.Parse(_WPos);
-                        MachinePosition.Set(WorkPosition + WorkPositionOffset);
+                        if (has_wco)
+                            MachinePosition.Set(WorkPosition + WorkPositionOffset);
                         Position.Set(WorkPosition);
                     }
                     break;
@@ -626,6 +635,7 @@ namespace CNC.Core
                     if (_wco != value)
                     {
                         _wco = value;
+                        has_wco = true;
                         WorkPositionOffset.Parse(value);
                         if (_isMPos)
                             Position.Set(MachinePosition - WorkPositionOffset);
@@ -763,6 +773,10 @@ namespace CNC.Core
                 case "T":
                     if (_tool != value)
                         Tool = GrblParserState.Tool = value == "0" ? GrblConstants.NO_TOOL : value;
+                    break;
+
+                case "TLR":
+                    IsTloReferenceSet = value == "1";
                     break;
 
                 case "MPG":

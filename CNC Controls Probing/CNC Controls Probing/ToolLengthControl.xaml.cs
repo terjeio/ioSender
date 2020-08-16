@@ -1,7 +1,7 @@
 ﻿/*
  * ToolLengthControl.cs - part of CNC Probing library
  *
- * v0.21 / 2020-08-05 / Io Engineering (Terje Io)
+ * v0.22 / 2020-08-16 / Io Engineering (Terje Io)
  *
  */
 
@@ -84,9 +84,9 @@ namespace CNC.Controls.Probing
                 var safeZ = System.Math.Max(g59_3.Z, origin.Z) + probing.Depth;
                 g59_3.Z += probing.Depth;
                 if(safeZ < 0d)
-                    probing.Program.Add("G53G0Z" + safeZ.ToInvariantString());
-                probing.Program.Add("G53G0" + g59_3.ToString(AxisFlags.X | AxisFlags.Y));
-                probing.Program.Add("G53G0" + g59_3.ToString(AxisFlags.Z));
+                    probing.Program.AddRapidToMPos("Z" + safeZ.ToInvariantString());
+                probing.Program.AddRapidToMPos(g59_3.ToString(AxisFlags.X | AxisFlags.Y));
+                probing.Program.AddRapidToMPos(g59_3.ToString(AxisFlags.Z));
                 g59_3.Z -= probing.Depth;
             }
             probing.Program.AddProbingAction(AxisFlags.Z, true);
@@ -110,11 +110,8 @@ namespace CNC.Controls.Probing
                         //else
                         if (probing.ReferenceToolOffset)
                         {
-                            probing.ReferenceToolOffset = false;
                             baseline = new Position(probing.Positions[0]);
                             probing.Grbl.ExecuteCommand("G49");
-                            if(GrblInfo.Build >= 20200805 && GrblSettings.IsGrblHAL)
-                                probing.Grbl.ExecuteCommand("$TLR");
                         }
                         else
                         {
@@ -138,6 +135,14 @@ namespace CNC.Controls.Probing
                             probing.GotoMachinePosition(origin, AxisFlags.Z);
                         }
                     }
+
+                    if (probing.ReferenceToolOffset)
+                    {
+                        probing.ReferenceToolOffset = !ok;
+                        if (GrblInfo.Build >= 20200805 && GrblSettings.IsGrblHAL)
+                            probing.Grbl.ExecuteCommand("$TLR");
+                    }
+
                     origin = null;
                     probing.Program.End(ok ? "Probing completed" : "Probing failed");
                     break;

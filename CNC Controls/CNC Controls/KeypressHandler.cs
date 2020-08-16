@@ -1,7 +1,7 @@
 ﻿/*
  * KeypressHandler.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.19 / 2020-05-10 / Io Engineering (Terje Io)
+ * v0.22 / 2020-08-15 / Io Engineering (Terje Io)
  *
  */
 
@@ -293,7 +293,7 @@ namespace CNC.Controls
                     if (handler != null)
                         return handler.Call(e.SystemKey);
                 }
-                else if (Keyboard.Modifiers == ModifierKeys.None || Keyboard.Modifiers == ModifierKeys.Control)
+                else if (Keyboard.Modifiers == ModifierKeys.None || Keyboard.Modifiers == ModifierKeys.Control || Keyboard.Modifiers == (ModifierKeys.Control | ModifierKeys.Shift))
                 {
                     var handler = handlers.Where(k => k.modifiers == Keyboard.Modifiers && k.key == e.Key).FirstOrDefault();
                     if (handler != null)

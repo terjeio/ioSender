@@ -1,7 +1,7 @@
 ﻿/*
  * Program.cs - part of CNC Probing library
  *
- * v0.20 / 2020-06-03 / Io Engineering (Terje Io)
+ * v0.22 / 2020-08-16 / Io Engineering (Terje Io)
  *
  */
 
@@ -148,7 +148,13 @@ namespace CNC.Controls.Probing
 
             if (res == true && !(Grbl.GrblState.State == GrblStates.Idle || Grbl.GrblState.State == GrblStates.Tool))
             {
-                probing.Message = "Probing failed, Grbl is not in idle or tool state";
+                probing.Message = "Probing failed, Grbl is not in idle or tool changing state";
+                res = false;
+            }
+
+            if (res == true && !Grbl.IsMachinePositionKnown)
+            {
+                probing.Message = "Probing failed, could not establish current machine position";
                 res = false;
             }
 
@@ -174,7 +180,14 @@ namespace CNC.Controls.Probing
         {
             _program.Add(cmd);
         }
-
+        public void AddRapid(string cmd)
+        {
+            _program.Add(probing.RapidCommand + cmd);
+        }
+        public void AddRapidToMPos(string cmd)
+        {
+            _program.Add("G53" + probing.RapidCommand + cmd);
+        }
         public void Cancel()
         {
      //       probing.IsCancelled = true;

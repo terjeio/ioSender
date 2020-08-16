@@ -1,7 +1,7 @@
 ﻿/*
  * ProbingProfiles.cs - part of CNC Probing library
  *
- * v0.19 / 2020-05-19 / Io Engineering (Terje Io)
+ * v0.22 / 2020-08-15 / Io Engineering (Terje Io)
  *
  */
 
@@ -60,6 +60,7 @@ namespace CNC.Controls.Probing
         public double DistanceZ { get; set; }
         public double ProbeFeedRate { get; set; }
         public double LatchFeedRate { get; set; }
+        public double RapidsFeedRate { get; set; }
         public double ProbeDiameter { get; set; }
         public double TouchPlateHeight { get; set; }
         public double FixtureHeight { get; set; }
@@ -77,6 +78,7 @@ namespace CNC.Controls.Probing
             {
                 Id = id++,
                 Name = name,
+                RapidsFeedRate = data.RapidsFeedRate,
                 ProbeFeedRate = data.ProbeFeedRate,
                 LatchFeedRate = data.LatchFeedRate,
                 ProbeDistance = data.ProbeDistance,
@@ -97,6 +99,7 @@ namespace CNC.Controls.Probing
             if (profile != null)
             {
                 profile.Name = name;
+                profile.RapidsFeedRate = data.RapidsFeedRate;
                 profile.ProbeFeedRate = data.ProbeFeedRate;
                 profile.LatchFeedRate = data.LatchFeedRate;
                 profile.ProbeDistance = data.ProbeDistance;
@@ -160,6 +163,7 @@ namespace CNC.Controls.Probing
                 {
                     Id = id++,
                     Name = "<Default>",
+                    RapidsFeedRate = 0d,
                     ProbeFeedRate = 100d,
                     LatchFeedRate = 25d,
                     ProbeDistance = 10d,
