@@ -1,7 +1,7 @@
 ﻿/*
  * HeightMapControl.xaml.cs - part of CNC Probing library
  *
- * v0.22 / 2020-08-15 / Io Engineering (Terje Io)
+ * v0.22 / 2020-08-17 / Io Engineering (Terje Io)
  *
  */
 
@@ -92,12 +92,13 @@ namespace CNC.Controls.Probing
                 for (y = 0; y < probing.HeightMap.Map.SizeY; y++)
                 {
                     probing.Program.AddProbingAction(AxisFlags.Z, true);
-                    probing.Program.AddRapid("Z" + probing.ProbeDiameter.ToInvariantString());
+                    probing.Program.AddRapid("Z" + probing.Depth.ToInvariantString());
                     if(y < (probing.HeightMap.Map.SizeY - 1))
                         probing.Program.AddRapid(string.Format("Y{0}", (probing.HeightMap.GridSize * dir).ToInvariantString()));
                 }
 
-                probing.Program.AddRapid(string.Format("X{0}", probing.HeightMap.GridSize.ToInvariantString()));
+                if (x < (probing.HeightMap.Map.SizeX - 1))
+                    probing.Program.AddRapid(string.Format("X{0}", probing.HeightMap.GridSize.ToInvariantString()));
 
                 dir *= -1d;
             }

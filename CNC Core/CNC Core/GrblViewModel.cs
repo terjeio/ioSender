@@ -836,10 +836,20 @@ namespace CNC.Core
             else if (data.StartsWith("[GC:"))
                 ParseGCStatus(data);
             else if (data.StartsWith("[TLO:"))
+            {
                 ToolOffset.Parse(data.Substring(5).TrimEnd(']'));
+                // Workaround for legacy grbl, it reports only one offset
+                // so copy X offset to Z (there is no info about for which axis...)
+                if(double.IsNaN(ToolOffset.Z))
+                {
+                    ToolOffset.Z = ToolOffset.X;
+                    ToolOffset.X = double.NaN;
+                }
+            }
             else if (data.StartsWith("["))
             {
-                if (data.StartsWith("[MSG:")) {
+                if (data.StartsWith("[MSG:"))
+                {
                     Message = data == "[MSG:]" ? string.Empty : data;
                     if (data == "[MSG:Pgm End]")
                         ProgramEnd = true;
@@ -871,7 +881,7 @@ namespace CNC.Core
                     }
                     else if (!data.StartsWith("?"))
                     {
-       //                 Message = data; //??
+                        //                 Message = data; //??
                     }
                 }
             }
