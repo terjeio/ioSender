@@ -837,14 +837,21 @@ namespace CNC.Core
                 ParseGCStatus(data);
             else if (data.StartsWith("[TLO:"))
             {
+                // Workaround for legacy grbl, it reports only one offset...
+                ToolOffset.SuspendNotifications = true;
+                ToolOffset.Z = double.NaN;
+                ToolOffset.SuspendNotifications = false;
+                // End workaround    
+
                 ToolOffset.Parse(data.Substring(5).TrimEnd(']'));
-                // Workaround for legacy grbl, it reports only one offset
-                // so copy X offset to Z (there is no info about for which axis...)
+
+                // Workaround for legacy grbl, copy X offset to Z (there is no info available for which axis...)
                 if(double.IsNaN(ToolOffset.Z))
                 {
                     ToolOffset.Z = ToolOffset.X;
                     ToolOffset.X = double.NaN;
                 }
+                // End workaround
             }
             else if (data.StartsWith("["))
             {
