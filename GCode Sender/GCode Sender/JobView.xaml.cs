@@ -1,7 +1,7 @@
 /*
  * JobView.xaml.cs - part of Grbl Code Sender
  *
- * v0.20 / 2020-06-03 / Io Engineering (Terje Io)
+ * v0.23 / 2020-08-17 / Io Engineering (Terje Io)
  *
  */
 
@@ -58,6 +58,7 @@ namespace GCode_Sender
         private bool sdStream = false;
         private GrblViewModel model;
         private KeypressHandler keyboard = null;
+        private IInputElement focusedControl = null;
 
         public JobView()
         {
@@ -165,6 +166,7 @@ namespace GCode_Sender
 
                 if (initOK != true)
                 {
+                    focusedControl = this;
                     model.Message = string.Format("Waiting for controller ({0})...", AppConfig.Settings.Base.PortParams);
 
                     Comms.com.PurgeQueue();
@@ -213,13 +215,14 @@ namespace GCode_Sender
                 if (MainWindow.UIViewModel.Camera != null)
                     MainWindow.UIViewModel.Camera.MoveOffset -= Camera_MoveOffset;
                 #endif
+                focusedControl = Keyboard.FocusedElement is TextBox && (string)(Keyboard.FocusedElement as TextBox).Tag == "MDI" ? Keyboard.FocusedElement : this;
             }
 
             if (GCodeSender.Activate(activate)) {
                 Task.Delay(500).ContinueWith(t => DRO.EnableFocus());
                 Application.Current.Dispatcher.BeginInvoke(new System.Action(() =>
                 {
-                    Focus();
+                    focusedControl.Focus();
                 }), DispatcherPriority.Render);
             }
         }

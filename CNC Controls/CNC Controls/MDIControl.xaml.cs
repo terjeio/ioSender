@@ -1,7 +1,7 @@
 ﻿/*
  * MDIControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.20 / 2020-06-03 / Io Engineering (Terje Io)
+ * v0.23 / 2020-08-17 / Io Engineering (Terje Io)
  *
  */
 
@@ -96,6 +96,11 @@ namespace CNC.Controls
         {
             if (!string.IsNullOrEmpty(Command) && !Commands.Contains(Command))
                 Commands.Insert(0, Command);
+        }
+
+        private void MDIControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            (txtMDI.Template.FindName("PART_EditableTextBox", txtMDI) as TextBox).Tag = "MDI";
         }
     }
 }

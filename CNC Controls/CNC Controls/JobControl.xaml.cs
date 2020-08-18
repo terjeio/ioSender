@@ -1,7 +1,7 @@
 /*
  * JobControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.22 / 2020-08-15 / Io Engineering (Terje Io)
+ * v0.23 / 2020-08-18 / Io Engineering (Terje Io)
  *
  */
 
@@ -389,11 +389,11 @@ namespace CNC.Controls
                 job.ACKPending = job.CurrLine = job.ACKPending = job.serialUsed = 0;
                 job.Started = false;
                 job.NextRow = GCode.File.Data.Rows[0];
-                System.Threading.Thread.Sleep(250);
                 Comms.com.PurgeQueue();
                 model.Message = "";
                 JobTimer.Start();
                 streamingHandler.Call(StreamingState.Send, false);
+                System.Threading.Thread.Sleep(250);
                 SendNextLine();
             }
         }
