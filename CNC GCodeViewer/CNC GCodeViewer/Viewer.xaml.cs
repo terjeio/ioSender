@@ -1,7 +1,7 @@
 /*
  * Viewer.xaml.cs - part of CNC Controls library
  *
- * v0.18 / 2020-04-18 / Io Engineering (Terje Io)
+ * v0.20 / 2020-06-03 / Io Engineering (Terje Io)
  *
  */
 
@@ -93,12 +93,20 @@ public partial class Viewer : UserControl, ICNCView
             gcodeView.ShowGrid = AppConfig.Settings.GCodeViewer.ShowGrid;
             gcodeView.ShowAxes = AppConfig.Settings.GCodeViewer.ShowAxes;
             gcodeView.ShowBoundingBox = AppConfig.Settings.GCodeViewer.ShowBoundingBox;
-            gcodeView.ShowViewCube = AppConfig.Settings.GCodeViewer.ShowViewCube;
+            gcodeView.Machine.ShowViewCube = AppConfig.Settings.GCodeViewer.ShowViewCube;
+            gcodeView.Machine.ShowCoordinateSystem = AppConfig.Settings.GCodeViewer.ShowCoordinateSystem;
         }
 
-        public void Open()
+        public void Open(List<GCodeToken> tokens)
         {
-            isNew = true;
+            if (!(isNew = !IsVisible))
+            {
+                using (new UIUtils.WaitCursor())
+                {
+                    gcodeView.ShowPosition();
+                    gcodeView.Render(tokens);
+                }
+            }
         }
 
         private void button_Click(object sender, System.Windows.RoutedEventArgs e)

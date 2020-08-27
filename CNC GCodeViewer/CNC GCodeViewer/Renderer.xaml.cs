@@ -1,7 +1,7 @@
 /*
  * Renderer.xaml.cs - part of CNC Controls library
  *
- * v0.18 / 2020-04-21 / Io Engineering (Terje Io)
+ * v0.20 / 2020-06-03 / Io Engineering (Terje Io)
  *
  */
 
@@ -86,7 +86,7 @@ namespace CNC.Controls.Viewer
     public class Machine : ViewModelBase
     {
         GridLinesVisual3D _grid;
-        bool _showViewCube = true;
+        bool _showViewCube = true, _showCoordSystem = false;
         BoundingBoxWireFrameVisual3D _bbox;
         ModelVisual3D _axes = new ModelVisual3D();
         Point3D _startposition = new Point3D();
@@ -141,6 +141,7 @@ namespace CNC.Controls.Viewer
         }
 
         public bool ShowViewCube { get { return _showViewCube; } set { _showViewCube = value; OnPropertyChanged(); } }
+        public bool ShowCoordinateSystem { get { return _showCoordSystem; } set { _showCoordSystem = value; OnPropertyChanged(); } }
         public GridLinesVisual3D Grid { get { return _grid; } set { _grid = value; OnPropertyChanged(); } }
         public BoundingBoxWireFrameVisual3D BoundingBox { get { return _bbox; } set { _bbox = value; OnPropertyChanged(); } }
         public ModelVisual3D Axes { get { return _axes; } }
@@ -249,7 +250,6 @@ namespace CNC.Controls.Viewer
         public bool ShowGrid { get; set; } = true;
         public bool ShowAxes { get; set; } = true;
         public bool ShowBoundingBox { get; set; } = true;
-        public bool ShowViewCube { get { return Machine.ShowViewCube; } set { Machine.ShowViewCube = value; } }
 
         public bool AnimateTool
         {

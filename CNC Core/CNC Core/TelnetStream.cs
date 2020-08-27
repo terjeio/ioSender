@@ -1,7 +1,7 @@
 /*
  * TelnetStream.cs - part of CNC Controls library
  *
- * v0.03 / 2020-01-05 / Io Engineering (Terje Io)
+ * v0.24 / 2020-08-27 / Io Engineering (Terje Io)
  *
  */
 
@@ -198,7 +198,7 @@ namespace CNC.Core
                 }
             }
 
-            if (ipstream != null)
+            if (ipstream != null && ipserver.Connected)
                 ipstream.BeginRead(buffer, 0, buffer.Length, ReadComplete, buffer);
         }
     }

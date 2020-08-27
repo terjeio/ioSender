@@ -1,7 +1,7 @@
 ﻿/*
  * UIViewModel.cs - part of CNC Controls library for Grbl
  *
- * v0.18 / 2020-05-08 / Io Engineering (Terje Io)
+ * v0.24 / 2020-08-24 / Io Engineering (Terje Io)
  *
  */
 
@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+using System.Linq;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
@@ -67,6 +68,11 @@ namespace CNC.Controls
         public ObservableCollection<SidebarItem> SidebarItems { get; }
         public ObservableCollection<UserControl> ConfigControls { get; }
         public ObservableCollection<MenuItem> TransformMenuItems { get; } = new ObservableCollection<MenuItem>();
+
+        public bool IsConfigControlInstantiated<T>()
+        {
+            return ConfigControls.OfType<T>().FirstOrDefault() != null;
+        }
 
         public ICNCView CurrentView
         {

@@ -5,14 +5,15 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CNC.Controls"
              mc:Ignorable="d" 
-             d:DesignHeight="50" d:DesignWidth="450">
+             d:DesignHeight="50" d:DesignWidth="450"
+             Loaded="MDIControl_Loaded">
     <UserControl.Resources>
         <local:LogicalNotConverter x:Key="BooleanConverter" />
     </UserControl.Resources>
     <GroupBox x:Name="grpMDI" IsEnabled="{Binding Path=IsJobRunning, Converter={StaticResource BooleanConverter}}" Header="MDI" Margin="0,0" HorizontalAlignment="Center" VerticalAlignment="Top">
         <StackPanel Orientation="Horizontal">
             <ComboBox x:Name="txtMDI" IsEditable="True" ItemsSource="{Binding Path=Commands, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" SelectedItem="{Binding Path=Command, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" Text="{Binding Path=Command, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" IsTextSearchEnabled="False" HorizontalAlignment="Left" Height="22" Margin="3,0" VerticalAlignment="Center" Width="375" SelectionChanged="txtMDI_SelectionChanged" KeyDown="txtMDI_KeyDown"/>
-            <Button Command="{Binding MDICommand}" CommandParameter="{Binding Path=Command, RelativeSource={RelativeSource AncestorType=UserControl}}" Content="Send" Grid.Column="1" HorizontalAlignment="Right" Margin="3,0" VerticalAlignment="Center" Width="42" Height="22" Click="Send_Click"/>
+            <Button Command="{Binding MDICommand}" CommandParameter="{Binding Path=Command, RelativeSource={RelativeSource AncestorType=UserControl}}" Content="Send" Focusable="False" Grid.Column="1" HorizontalAlignment="Right" Margin="3,0" VerticalAlignment="Center" Width="42" Height="22" Click="Send_Click"/>
         </StackPanel>
     </GroupBox>
 </UserControl>

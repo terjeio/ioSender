@@ -1,7 +1,7 @@
 /*
  * GrblViewModel.cs - part of CNC Controls library
  *
- * v0.22 / 2020-08-16 / Io Engineering (Terje Io)
+ * v0.24 / 2020-08-27 / Io Engineering (Terje Io)
  *
  */
 
@@ -864,8 +864,9 @@ namespace CNC.Core
             }
             else if (data.StartsWith("Grbl"))
             {
-                GrblReset = true;
+                Poller.SetState(0);
                 _grblState.State = GrblStates.Unknown;
+                GrblReset = true;
                 OnGrblReset?.Invoke();
                 _reset = false;
             }
