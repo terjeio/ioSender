@@ -6,9 +6,9 @@
              xmlns:local="clr-namespace:CNC.Controls.Viewer"
              xmlns:Controls="clr-namespace:CNC.Controls;assembly=CNC.Controls.WPF" x:Class="CNC.Controls.Viewer.ConfigControl"
              mc:Ignorable="d" 
-             d:DesignHeight="175" d:DesignWidth="250">
+             d:DesignHeight="190" d:DesignWidth="250">
     <GroupBox x:Name="grpGCodeViewer" Header="GCode Viewer" HorizontalAlignment="Left" VerticalAlignment="Top" Height="Auto" Width="250">
-        <StackPanel HorizontalAlignment="Left" Height="Auto" Margin="0,3,0,0" VerticalAlignment="Top" Width="235">
+        <StackPanel HorizontalAlignment="Left" Height="Auto" Margin="0,3,0,0" VerticalAlignment="Top">
             <CheckBox Content="Enable" Margin="90,2,0,0" IsChecked="{Binding Path=GCodeViewer.IsEnabled, Mode=TwoWay}"/>
             <Controls:NumericField Label="Arc resolution:" Unit="segments" Format="#0" ColonAt="90" Value="{Binding Path=GCodeViewer.ArcResolution, Mode=TwoWay}" IsEnabled="{Binding Path=GCodeViewer.IsEnabled, Mode=OneWay}"/>
             <Controls:NumericField Label="Min distance:" ColonAt="90" Value="{Binding Path=GCodeViewer.MinDistance, Mode=TwoWay}" IsEnabled="{Binding Path=GCodeViewer.IsEnabled, Mode=OneWay}"/>
@@ -16,6 +16,7 @@
             <CheckBox Content="Show axes" Margin="90,2,0,0" IsChecked="{Binding Path=GCodeViewer.ShowAxes, Mode=TwoWay}" IsEnabled="{Binding Path=GCodeViewer.IsEnabled, Mode=OneWay}"/>
             <CheckBox Content="Show bounding box" Margin="90,2,0,0" IsChecked="{Binding Path=GCodeViewer.ShowBoundingBox, Mode=TwoWay}" IsEnabled="{Binding Path=GCodeViewer.IsEnabled, Mode=OneWay}"/>
             <CheckBox Content="Show ViewCube" Margin="90,2,0,0" IsChecked="{Binding Path=GCodeViewer.ShowViewCube, Mode=TwoWay}" IsEnabled="{Binding Path=GCodeViewer.IsEnabled, Mode=OneWay}"/>
+            <CheckBox Content="Show coordinate system" Margin="90,2,0,0" IsChecked="{Binding Path=GCodeViewer.ShowCoordinateSystem, Mode=TwoWay}" IsEnabled="{Binding Path=GCodeViewer.IsEnabled, Mode=OneWay}"/>
         </StackPanel>
     </GroupBox>
 </UserControl>

@@ -11,7 +11,8 @@
     <helix:HelixViewport3D x:Name="viewport" Panel.ZIndex="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                            ZoomExtentsWhenLoaded="False" RotateAroundMouseDownPoint="true" ZoomAroundMouseDownPoint="true"
                            ShowViewCube="{Binding Path=ShowViewCube}"
-                           AllowDrop="True" DragEnter="viewport_Drag" DragOver="viewport_Drag" DragLeave="viewport_Drag" Drop="viewport_Drop" ShowCoordinateSystem="True">
+                           ShowCoordinateSystem="{Binding Path=ShowCoordinateSystem}"
+                           AllowDrop="True" DragEnter="viewport_Drag" DragOver="viewport_Drag" DragLeave="viewport_Drag" Drop="viewport_Drop">
         <helix:HelixViewport3D.Camera>
             <PerspectiveCamera x:Name="camera"
                         Position="0,100,0" 

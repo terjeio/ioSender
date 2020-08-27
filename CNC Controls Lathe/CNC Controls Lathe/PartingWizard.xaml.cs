@@ -1,7 +1,7 @@
 ﻿/*
  * PartingWizard.xaml.cs - part of CNC Controls library
  *
- * v0.19 / 2020-05-21 / Io Engineering (Terje Io)
+ * v0.24 / 2020-08-24 / Io Engineering (Terje Io)
  *
  */
 
@@ -111,7 +111,8 @@ namespace CNC.Controls.Lathe
         public void Setup(UIViewModel model, AppConfig profile)
         {
             this.model.wz.ApplySettings(profile.Lathe);
-            model.ConfigControls.Add(new ConfigControl());
+            if(!model.IsConfigControlInstantiated<ConfigControl>())
+                model.ConfigControls.Add(new ConfigControl());
         }
 
         #endregion

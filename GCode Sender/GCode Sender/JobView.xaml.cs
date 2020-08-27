@@ -1,7 +1,7 @@
 /*
  * JobView.xaml.cs - part of Grbl Code Sender
  *
- * v0.23 / 2020-08-17 / Io Engineering (Terje Io)
+ * v0.24 / 2020-08-27 / Io Engineering (Terje Io)
  *
  */
 
@@ -107,7 +107,7 @@ namespace GCode_Sender
                     if ((sender as GrblViewModel).IsReady)
                     {
                         initOK = null;
-                        Activate(true, ViewType.GRBL);
+                        Dispatcher.BeginInvoke(new System.Action(() => Activate(true, ViewType.GRBL)), DispatcherPriority.ApplicationIdle);
                     }
                     break;
 
@@ -289,12 +289,21 @@ namespace GCode_Sender
         private void InitSystem()
         {
             initOK = true;
+            int timeout = 5;
 
             // TODO: check if grbl is in a state that allows replies
             using (new UIUtils.WaitCursor())
             {
                 GCodeSender.EnablePolling(false);
-                GrblInfo.Get();
+                while (!GrblInfo.Get())
+                {
+                    if(--timeout == 0)
+                    {
+                        model.Message = "Controller is not responding!";
+                        initOK = false;
+                    }
+                    System.Threading.Thread.Sleep(500);
+                }
                 GrblSettings.Get();
                 GrblParserState.Get();
                 GrblWorkParameters.Get();
