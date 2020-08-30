@@ -56,7 +56,7 @@ namespace CNC.Core
         private bool? _mpg;
         private int _pwm, _line, _scrollpos, _blocks = 0;
         private double _feedrate = 0d;
-        private double _rpm = 0d, _rpmInput = 0d, _rpmDisplay = 0d, _jogStep = 0.1d;
+        private double _rpm = 0d, _rpmInput = 0d, _rpmDisplay = 0d, _jogStep = 0.1d, _tloReferenceOffset = double.NaN;
         private double _rpmActual = double.NaN;
         private double _feedOverride = 100d;
         private double _rapidsOverride = 100d;
@@ -233,7 +233,20 @@ namespace CNC.Core
         public ObservableCollection<Tool> Tools { get { return GrblWorkParameters.Tools; } }
         public ObservableCollection<string> SystemInfo { get { return GrblInfo.SystemInfo; } }
         public string Tool { get { return _tool; } set { _tool = value; OnPropertyChanged(); } }
-        public bool IsTloReferenceSet { get { return _isTloRefSet; } private set { if (_isTloRefSet != value) { _isTloRefSet = value; OnPropertyChanged(); } } }
+        public double TloReference { get { return _tloReferenceOffset; } private set { _tloReferenceOffset = value; OnPropertyChanged(); } }
+        public bool IsTloReferenceSet {
+            get { return _isTloRefSet; }
+            private set
+            {
+                if (_isTloRefSet != value)
+                {
+                    if (_isTloRefSet)
+                        TloReference = double.NaN;
+                    _isTloRefSet = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
         public bool GrblReset { get { return _reset; } set { if ((_reset = value)) { _grblState.Error = 0; OnPropertyChanged(); Message = ""; } } }
         public GrblState GrblState { get { return _grblState; } set { _grblState = value; OnPropertyChanged(); } }
         public bool IsCheckMode { get { return _grblState.State == GrblStates.Check; } }
@@ -831,40 +844,52 @@ namespace CNC.Core
 
                 SetGRBLState("Alarm", alarm.Length == 2 ? int.Parse(alarm[1]) : -1, false);
             }
-            else if (data.StartsWith("[PRB:"))
-                ParseProbeStatus(data);
-            else if (data.StartsWith("[GC:"))
-                ParseGCStatus(data);
-            else if (data.StartsWith("[TLO:"))
-            {
-                // Workaround for legacy grbl, it reports only one offset...
-                ToolOffset.SuspendNotifications = true;
-                ToolOffset.Z = double.NaN;
-                ToolOffset.SuspendNotifications = false;
-                // End workaround    
-
-                ToolOffset.Parse(data.Substring(5).TrimEnd(']'));
-
-                // Workaround for legacy grbl, copy X offset to Z (there is no info available for which axis...)
-                if(double.IsNaN(ToolOffset.Z))
-                {
-                    ToolOffset.Z = ToolOffset.X;
-                    ToolOffset.X = double.NaN;
-                }
-                // End workaround
-            }
             else if (data.StartsWith("["))
             {
-                if (data.StartsWith("[MSG:"))
+                switch(data.Substring(1, 3))
                 {
-                    Message = data == "[MSG:]" ? string.Empty : data;
-                    if (data == "[MSG:Pgm End]")
-                        ProgramEnd = true;
-                } // else ignore?
+                    case "PRB":
+                        ParseProbeStatus(data);
+                        break;
+
+                    case "GC:":
+                        ParseGCStatus(data);
+                        break;
+
+                    case "TLR":
+                        TloReference = dbl.Parse(data.Substring(5).TrimEnd(']'));
+                        break;
+
+                    case "TLO":
+                        // Workaround for legacy grbl, it reports only one offset...
+                        ToolOffset.SuspendNotifications = true;
+                        ToolOffset.Z = double.NaN;
+                        ToolOffset.SuspendNotifications = false;
+                        // End workaround    
+
+                        ToolOffset.Parse(data.Substring(5).TrimEnd(']'));
+
+                        // Workaround for legacy grbl, copy X offset to Z (there is no info available for which axis...)
+                        if (double.IsNaN(ToolOffset.Z))
+                        {
+                            ToolOffset.Z = ToolOffset.X;
+                            ToolOffset.X = double.NaN;
+                        }
+                        // End workaround
+                        break;
+
+                    case "MSG":
+                        Message = data == "[MSG:]" ? string.Empty : data;
+                        if (data == "[MSG:Pgm End]")
+                            ProgramEnd = true;
+                        break;
+                }
             }
+
             else if (data.StartsWith("Grbl"))
             {
-                Poller.SetState(0);
+                if(Poller != null)
+                    Poller.SetState(0);
                 _grblState.State = GrblStates.Unknown;
                 GrblReset = true;
                 OnGrblReset?.Invoke();

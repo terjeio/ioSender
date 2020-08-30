@@ -971,6 +971,7 @@ namespace CNC.Core
 
         public static bool IsLoaded { get { return CoordinateSystems.Count > 0; } }
         public static LatheMode LatheMode { get; private set; }
+        public static double ToolLengthOffsetReference { get; private set; } = double.NaN;
         public static ObservableCollection<CoordinateSystem> CoordinateSystems { get; private set; } = new ObservableCollection<CoordinateSystem>();
         public static ObservableCollection<Tool> Tools { get; private set; } = new ObservableCollection<Tool>();
         public static CoordinateSystem ToolLengtOffset { get; private set; } = new CoordinateSystem("TLO", "");
@@ -1042,7 +1043,8 @@ namespace CNC.Core
                 Tools.Add(new Tool("4"));
             }
 
-            GrblParserState.Tool = GrblParserState.Tool; // Add tool to Tools if not in list
+            GrblParserState.Tool = GrblParserState.Tool;    // Add tool to Tools if not in list
+            model.Tool = model.Tool;                        // Force UI update
 
             // Reeread parser state since work offset and tool lists are now populated
             Comms.com.WriteCommand(GrblConstants.CMD_GETPARSERSTATE);
@@ -1142,6 +1144,12 @@ namespace CNC.Core
 
                     case "TLO":
                         ToolLengtOffset.Parse(parameters);
+                        break;
+
+                    case "TLR":
+                        double tlr;
+                        if(double.TryParse(parameters, out tlr))
+                            ToolLengthOffsetReference = tlr;
                         break;
 
                     case "PRB":

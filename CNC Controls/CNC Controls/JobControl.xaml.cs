@@ -1,7 +1,7 @@
 /*
  * JobControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.23 / 2020-08-18 / Io Engineering (Terje Io)
+ * v0.25 / 2020-08-30 / Io Engineering (Terje Io)
  *
  */
 
@@ -375,11 +375,15 @@ namespace CNC.Controls
 
         public void CycleStart()
         {
-            if (grblState.State == GrblStates.Hold || grblState.State == GrblStates.Tool || (grblState.State == GrblStates.Run && grblState.Substate == 1))
+            if (grblState.State == GrblStates.Hold || (grblState.State == GrblStates.Run && grblState.Substate == 1))
                 Comms.com.WriteByte(GrblLegacy.ConvertRTCommand(GrblConstants.CMD_CYCLE_START));
-            else if(JobTimer.IsRunning)
+            else if(grblState.State == GrblStates.Tool)
             {
                 model.Message = "";
+                Comms.com.WriteByte(GrblLegacy.ConvertRTCommand(GrblConstants.CMD_CYCLE_START));
+            }
+            else if(JobTimer.IsRunning)
+            {
                 JobTimer.Pause = false;
                 streamingHandler.Call(StreamingState.Send, false);
             }
@@ -486,6 +490,7 @@ namespace CNC.Controls
                 case StreamingState.Send:
                     if (JobTimer.IsRunning)
                     {
+                        GCode.File.Data.Rows[job.PendingLine]["Sent"] = "ok";
                         SetStreamingHandler(StreamingHandler.SendFile);
                         SendNextLine();
                     }
@@ -856,6 +861,8 @@ namespace CNC.Controls
                 case GrblStates.Tool:
                         if (grblState.State != GrblStates.Jog)
                         {
+                            if (JobTimer.IsRunning)
+                                ResponseReceived("pending");
                             streamingHandler.Call(StreamingState.ToolChange, false);
                             if (!grblState.MPG)
                                 Comms.com.WriteByte(GrblConstants.CMD_TOOL_ACK);
@@ -888,7 +895,7 @@ namespace CNC.Controls
         {
             if (streamingHandler.Count)
             {
-                if (job.ACKPending > 0)
+                if (job.ACKPending > 0 && response != "pending")
                     job.ACKPending--;
 
                 if (!job.IsSDFile && (string)GCode.File.Data.Rows[job.PendingLine]["Sent"] == "*")
@@ -896,30 +903,30 @@ namespace CNC.Controls
 
                 //if (streamingState == StreamingState.Send || streamingState == StreamingState.Paused)
                 //{
-                    bool isError = response.StartsWith("error");
+                bool isError = response.StartsWith("error");
 
-                    if (!job.IsSDFile)
+                if (!job.IsSDFile)
+                {
+                    GCode.File.Data.Rows[job.PendingLine]["Sent"] = response;
+
+                    if (job.PendingLine > 5)
                     {
-                        GCode.File.Data.Rows[job.PendingLine]["Sent"] = response;
-
-                        if (job.PendingLine > 5)
-                        {
-                            if (grblState.State != GrblStates.Check || isError || (job.PendingLine % 50) == 0)
-                               model.ScrollPosition = job.PendingLine - 5;
-                        }
-
-                        if(streamingHandler.Call == StreamingAwaitAction)
-                        {
-                        streamingHandler.Count = false;
-                        }
-
+                        if (grblState.State != GrblStates.Check || isError || (job.PendingLine % 50) == 0)
+                            model.ScrollPosition = job.PendingLine - 5;
                     }
-                    if (isError)
-                        streamingHandler.Call(StreamingState.Error, true);
-                    else if (job.PgmEndLine == job.PendingLine)
-                        streamingHandler.Call(StreamingState.JobFinished, true);
-                else if(streamingHandler.Count)
-                        SendNextLine();
+
+                    if(streamingHandler.Call == StreamingAwaitAction)
+                    {
+                        streamingHandler.Count = false;
+                    }
+
+                }
+                if (isError)
+                    streamingHandler.Call(StreamingState.Error, true);
+                else if (job.PgmEndLine == job.PendingLine)
+                    streamingHandler.Call(StreamingState.JobFinished, true);
+                else if(streamingHandler.Count && response == "ok")
+                    SendNextLine();
                 //}
 
                 if (!job.Complete)

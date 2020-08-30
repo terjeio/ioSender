@@ -1,7 +1,7 @@
 ﻿/*
  * ProbingViewModel.cs - part of CNC Probing library
  *
- * v0.20 / 2020-06-03 / Io Engineering (Terje Io)
+ * v0.25 / 2020-08-30 / Io Engineering (Terje Io)
  *
  */
 
@@ -66,6 +66,7 @@ namespace CNC.Controls.Probing
         private double _probeDistance, _probeFeedRate;
         private double _rapidsFeedRate;
         private double _offset, _xyClearance, _depth;
+        private double _tloReferenceOffset = double.NaN;
 
         private bool _canProbe = false, _isComplete = false, _isSuccess = false, _probeZ = false, _useFixture = false, _hasToolTable = false, _hasCs9 = false;
         private bool isCancelled = false, wasZselected = false, _referenceToolOffset = true;
@@ -182,7 +183,7 @@ namespace CNC.Controls.Probing
                 null,
                 a => Grbl.OnResponseReceived += a,
                 a => Grbl.OnResponseReceived -= a,
-                100, () => Grbl.ExecuteCommand(command));
+                200, () => Grbl.ExecuteCommand(command));
             }).Start();
 
             while (res == null)
@@ -285,6 +286,7 @@ namespace CNC.Controls.Probing
         public bool HasToolTable { get { return _hasToolTable; } set { _hasToolTable = value; OnPropertyChanged(); } }
         public bool HasCoordinateSystem9 { get { return _hasCs9; } set { _hasCs9 = value; OnPropertyChanged(); } }
         public bool ReferenceToolOffset { get { return _referenceToolOffset; } set { _referenceToolOffset = value; OnPropertyChanged(); } }
+        public double TloReference { get { return _tloReferenceOffset; } set { _tloReferenceOffset = value; OnPropertyChanged(); } }
 
         public bool HeightMapApplied
         {

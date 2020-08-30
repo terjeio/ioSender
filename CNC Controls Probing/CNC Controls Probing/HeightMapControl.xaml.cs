@@ -1,7 +1,7 @@
 ﻿/*
  * HeightMapControl.xaml.cs - part of CNC Probing library
  *
- * v0.22 / 2020-08-17 / Io Engineering (Terje Io)
+ * v0.25 / 2020-08-30 / Io Engineering (Terje Io)
  *
  */
 
@@ -50,7 +50,7 @@ namespace CNC.Controls.Probing
     /// <summary>
     /// Interaction logic for HeightMapControl.xaml
     /// </summary>
-    public partial class HeightMapControl : UserControl
+    public partial class HeightMapControl : UserControl, IProbeTab
     {
         private Position origin = null;
         private int x, y;
@@ -60,7 +60,7 @@ namespace CNC.Controls.Probing
             InitializeComponent();
         }
 
-        private void start_Click(object sender, RoutedEventArgs e)
+        public void Start()
         {
             double dir = 1d;
             var probing = DataContext as ProbingViewModel;
@@ -93,7 +93,7 @@ namespace CNC.Controls.Probing
                 {
                     probing.Program.AddProbingAction(AxisFlags.Z, true);
                     probing.Program.AddRapid("Z" + probing.Depth.ToInvariantString());
-                    if(y < (probing.HeightMap.Map.SizeY - 1))
+                    if (y < (probing.HeightMap.Map.SizeY - 1))
                         probing.Program.AddRapid(string.Format("Y{0}", (probing.HeightMap.GridSize * dir).ToInvariantString()));
                 }
 
@@ -104,6 +104,11 @@ namespace CNC.Controls.Probing
             }
 
             probing.Program.Execute(true);
+        }
+
+        public void Stop()
+        {
+            (DataContext as ProbingViewModel).Program.Cancel();
         }
 
         private int toIndex(double val)
@@ -189,9 +194,14 @@ namespace CNC.Controls.Probing
             probing.HeightMap.HasHeightMap = true;
         }
 
+        private void start_Click(object sender, RoutedEventArgs e)
+        {
+            Start();
+        }
+
         private void stop_Click(object sender, RoutedEventArgs e)
         {
-            (DataContext as ProbingViewModel).Program.Cancel();
+            Stop();
         }
 
         private void load_Click(object sender, RoutedEventArgs e)

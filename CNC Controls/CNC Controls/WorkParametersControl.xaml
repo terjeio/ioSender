@@ -21,7 +21,17 @@
             <ComboBox x:Name="cbxOffset" Grid.Column="1" DisplayMemberPath="Code" SelectedValuePath="Code" ItemsSource="{Binding Path=CoordinateSystems}" SelectedValue="{Binding Path=WorkCoordinateSystem, Mode=OneWay}" HorizontalAlignment="Left" VerticalAlignment="Center" Width="55" Height="22" SelectionChanged="cbxOffset_SelectionChanged"/>
             <Label x:Name="lblTool" Content="Tool:" Grid.Column="2" HorizontalContentAlignment="Right" HorizontalAlignment="Right" VerticalAlignment="Center" Height="26" Width="36"/>
             <Border x:Name="bgTool" Grid.Column="3" HorizontalAlignment="Left" VerticalAlignment="Center" CornerRadius="2" Width="60" Height="30" Margin="0,6">
-                <local:NumericComboBox x:Name="cbxTool" DisplayMemberPath="Code" SelectedValuePath="Code" ItemsSource="{Binding Path=Tools}" SelectedValue="{Binding Path=Tool, Mode=OneWay}"  Grid.Column="3" Format="##0" HorizontalAlignment="Left" VerticalAlignment="Center" Width="56" Height="22" Margin="2,2" SelectionChanged="cbxTool_SelectionChanged"/>
+                <local:NumericComboBox x:Name="cbxTool" DisplayMemberPath="Code" SelectedValuePath="Code" ItemsSource="{Binding Path=Tools}" SelectedValue="{Binding Path=Tool, Mode=OneWay}"  Grid.Column="3" Format="##0" HorizontalAlignment="Left" VerticalAlignment="Center" Width="56" Height="22" Margin="2,2" SelectionChanged="cbxTool_SelectionChanged">
+                    <local:NumericComboBox.Style>
+                        <Style TargetType="{x:Type local:NumericComboBox}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Path=IsTloReferenceSet}" Value="True">
+                                    <Setter Property="Background" Value="#FFE0F8E0"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </local:NumericComboBox.Style>
+                </local:NumericComboBox>
             </Border>
         </Grid>
     </GroupBox>

@@ -1,7 +1,7 @@
 ﻿/*
  * EdgeFinderControl.xaml.cs - part of CNC Probing library
  *
- * v0.22 / 2020-08-16 / Io Engineering (Terje Io)
+ * v0.25 / 2020-08-30 / Io Engineering (Terje Io)
  *
  */
 
@@ -65,7 +65,7 @@ namespace CNC.Controls.Probing
     /// <summary>
     /// Interaction logic for EdgeFinderControl.xaml
     /// </summary>
-    public partial class EdgeFinderControl : UserControl
+    public partial class EdgeFinderControl : UserControl, IProbeTab
     {
         private AxisFlags axisflags = AxisFlags.None;
         private double[] af = new double[3];
@@ -75,7 +75,7 @@ namespace CNC.Controls.Probing
             InitializeComponent();
         }
 
-        private void start_Click(object sender, RoutedEventArgs e)
+        public void Start()
         {
             var probing = DataContext as ProbingViewModel;
 
@@ -238,6 +238,11 @@ namespace CNC.Controls.Probing
             probing.Program.Execute(true);
         }
 
+        public void Stop()
+        {
+            (DataContext as ProbingViewModel).Program.Cancel();
+        }
+
         private void Probing_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             switch (e.PropertyName)
@@ -295,33 +300,40 @@ namespace CNC.Controls.Probing
                             }
                         }
 
-                        if (ok && probing.CoordinateMode == ProbingViewModel.CoordMode.G92)
+                        if (ok)
                         {
-                            if ((ok == probing.GotoMachinePosition(pos, axisflags)))
+                            if (probing.CoordinateMode == ProbingViewModel.CoordMode.G92)
                             {
-                                pos.X = pos.Y = 0d;
-                                pos.Z = probing.WorkpieceHeight + probing.TouchPlateHeight;
-                                probing.Grbl.ExecuteCommand("G92" + pos.ToString(axisflags));
-                                if (axisflags.HasFlag(AxisFlags.Z))
-                                    probing.GotoMachinePosition(pz, AxisFlags.Z);
+                                if ((ok == probing.GotoMachinePosition(pos, axisflags)))
+                                {
+                                    pos.X = pos.Y = 0d;
+                                    pos.Z = probing.WorkpieceHeight + probing.TouchPlateHeight;
+                                    probing.Grbl.ExecuteCommand("G92" + pos.ToString(axisflags));
+                                    if (axisflags.HasFlag(AxisFlags.Z))
+                                        probing.GotoMachinePosition(pz, AxisFlags.Z);
+                                }
+                            }
+                            else
+                            {
+                                pos.Z -= probing.WorkpieceHeight + probing.TouchPlateHeight + probing.Grbl.ToolOffset.Z;
+                                probing.Grbl.ExecuteCommand(string.Format("G10L2P{0}{1}", probing.CoordinateSystem, pos.ToString(axisflags)));
                             }
                         }
-                        else
-                        {
-                            pos.Z -= probing.WorkpieceHeight + probing.TouchPlateHeight + probing.Grbl.ToolOffset.Z;
-                            probing.Grbl.ExecuteCommand(string.Format("G10L2P{0}{1}", probing.CoordinateSystem, pos.ToString(axisflags)));
-                        }
-
                     }
+
                     probing.Grbl.IsJobRunning = false;
                     probing.Program.End(ok ? "Probing completed" : "Probing failed");
                     break;
             }
         }
+        private void start_Click(object sender, RoutedEventArgs e)
+        {
+            Start();
+        }
 
         private void stop_Click(object sender, RoutedEventArgs e)
         {
-            (DataContext as ProbingViewModel).Program.Cancel();
+            Stop();
         }
     }
 }

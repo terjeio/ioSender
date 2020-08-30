@@ -1,7 +1,7 @@
 ﻿/*
  * ToolLengthControl.cs - part of CNC Probing library
  *
- * v0.22 / 2020-08-16 / Io Engineering (Terje Io)
+ * v0.25 / 2020-08-30 / Io Engineering (Terje Io)
  *
  */
 
@@ -47,16 +47,16 @@ namespace CNC.Controls.Probing
     /// <summary>
     /// Interaction logic for ToolLengthControl.xaml
     /// </summary>
-    public partial class ToolLengthControl : UserControl
+    public partial class ToolLengthControl : UserControl, IProbeTab
     {
-        Position origin = null, g59_3 = null, baseline = null;
+        Position origin = null, g59_3 = null;
 
         public ToolLengthControl()
         {
             InitializeComponent();
         }
 
-        private void start_Click(object sender, RoutedEventArgs e)
+        public void Start()
         {
             var probing = DataContext as ProbingViewModel;
 
@@ -83,7 +83,7 @@ namespace CNC.Controls.Probing
                 g59_3 = new Position(GrblWorkParameters.GetCoordinateSystem("G59.3"));
                 var safeZ = System.Math.Max(g59_3.Z, origin.Z) + probing.Depth;
                 g59_3.Z += probing.Depth;
-                if(safeZ < 0d)
+                if (safeZ < 0d)
                     probing.Program.AddRapidToMPos("Z" + safeZ.ToInvariantString());
                 probing.Program.AddRapidToMPos(g59_3.ToString(AxisFlags.X | AxisFlags.Y));
                 probing.Program.AddRapidToMPos(g59_3.ToString(AxisFlags.Z));
@@ -91,6 +91,11 @@ namespace CNC.Controls.Probing
             }
             probing.Program.AddProbingAction(AxisFlags.Z, true);
             probing.Program.Execute(true);
+        }
+
+        public void Stop()
+        {
+            (DataContext as ProbingViewModel).Program.Cancel();
         }
 
         private void Probing_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -110,13 +115,13 @@ namespace CNC.Controls.Probing
                         //else
                         if (probing.ReferenceToolOffset)
                         {
-                            baseline = new Position(probing.Positions[0]);
+                            probing.TloReference = probing.Positions[0].Z; // linear axis?
                             probing.Grbl.ExecuteCommand("G49");
                         }
                         else
                         {
                             var tofs = new Position(probing.Positions[0]);
-                            tofs.Z = probing.Positions[0].Z - (baseline == null ? 0d : baseline.Z);
+                            tofs.Z = probing.Positions[0].Z - (double.IsNaN(probing.TloReference) ? 0d : probing.TloReference);
                             probing.Grbl.ExecuteCommand("G43.1" + tofs.ToString(AxisFlags.Z));
                         }
                         //if (probing.Tool != "0")
@@ -140,7 +145,7 @@ namespace CNC.Controls.Probing
                     {
                         probing.ReferenceToolOffset = !ok;
                         if (GrblInfo.Build >= 20200805 && GrblSettings.IsGrblHAL)
-                            probing.Grbl.ExecuteCommand("$TLR");
+                            probing.Grbl.ExecuteCommand("$TLR"); // Set tool length offset reference in controller
                     }
 
                     origin = null;
@@ -148,15 +153,21 @@ namespace CNC.Controls.Probing
                     break;
             }
         }
+
         private void clearToolOffset_Click(object sender, RoutedEventArgs e)
         {
-            (DataContext as ProbingViewModel).ReferenceToolOffset = true;
-            (DataContext as ProbingViewModel).Grbl.ExecuteCommand("G49");
+            var model = (DataContext as ProbingViewModel);
+            model.ReferenceToolOffset = !(model.Grbl.IsTloReferenceSet && !double.IsNaN(model.Grbl.TloReference));
+            model.Grbl.ExecuteCommand("G49");
+        }
+        private void start_Click(object sender, RoutedEventArgs e)
+        {
+            Start();
         }
 
         private void stop_Click(object sender, RoutedEventArgs e)
         {
-            (DataContext as ProbingViewModel).Program.Cancel();
+            Stop();
         }
     }
 }

@@ -71,13 +71,46 @@ namespace CNC.Controls.Probing
                 if (keyboard == null) {
                     keyboard = new KeypressHandler(DataContext as GrblViewModel);
                     keyboard.AddHandler(Key.None, ModifierKeys.Shift, EnableJog);
+                    keyboard.AddHandler(Key.R, ModifierKeys.Alt, StartProbe);
+                    keyboard.AddHandler(Key.S, ModifierKeys.Alt, StopProbe);
                 }
                 DataContext = model = new ProbingViewModel(DataContext as GrblViewModel, profiles);
             }
         }
 
+        private static IProbeTab getView(TabItem tab)
+        {
+            IProbeTab view = null;
+
+            foreach (UserControl uc in UIUtils.FindLogicalChildren<UserControl>(tab))
+            {
+                if (uc is IProbeTab)
+                {
+                    view = (IProbeTab)uc;
+                    break;
+                }
+            }
+
+            return view;
+        }
+
+        private bool StopProbe(Key key)
+        {
+
+            return true;
+        }
+
+        private bool StartProbe(Key key)
+        {
+            getView(tab.SelectedItem as TabItem)?.Start();
+
+            return true;
+        }
+
         private bool EnableJog(Key key)
         {
+            getView(tab.SelectedItem as TabItem)?.Stop();
+
             return true;
         }
 
@@ -138,6 +171,12 @@ namespace CNC.Controls.Probing
                 model.HeightMapApplied = GCode.File.HeightMapApplied;
                 int csid = GrblWorkParameters.GetCoordinateSystem(model.Grbl.WorkCoordinateSystem).Id;
                 model.CoordinateSystem = csid == 0 || csid >= 9 ? 1 : csid;
+
+                if(model.Grbl.IsTloReferenceSet && !double.IsNaN(model.Grbl.TloReference))
+                {
+                    model.TloReference = model.Grbl.TloReference;
+                    model.ReferenceToolOffset = false;
+                }
 
                 model.Grbl.PropertyChanged += Grbl_PropertyChanged;
 

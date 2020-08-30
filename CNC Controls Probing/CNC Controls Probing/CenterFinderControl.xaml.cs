@@ -1,7 +1,7 @@
 ﻿/*
  * CenterFinderControl.xaml.cs - part of CNC Probing library
  *
- * v0.22 / 2020-08-15 / Io Engineering (Terje Io)
+ * v0.25 / 2020-08-30 / Io Engineering (Terje Io)
  *
  */
 
@@ -54,7 +54,7 @@ namespace CNC.Controls.Probing
     /// <summary>
     /// Interaction logic for CenterFinderControl.xaml
     /// </summary>
-    public partial class CenterFinderControl : UserControl
+    public partial class CenterFinderControl : UserControl, IProbeTab
     {
         private int pass = 0, passes = 1;
         private Position center;
@@ -144,11 +144,11 @@ namespace CNC.Controls.Probing
             probing.Message = string.Format("Probing, pass {0} of {1}", (passes - pass + 1), pass);
         }
 
-        private void start_Click(object sender, RoutedEventArgs e)
+        public void Start()
         {
             var probing = DataContext as ProbingViewModel;
 
-            if(!probing.ValidateInput())
+            if (!probing.ValidateInput())
                 return;
 
             if (probing.WorkpieceDiameter <= 0d)
@@ -174,6 +174,11 @@ namespace CNC.Controls.Probing
 
             Execute();
             probing.Program.Execute(true);
+        }
+
+        public void Stop()
+        {
+            (DataContext as ProbingViewModel).Program.Cancel();
         }
 
         private void Probing_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -246,9 +251,14 @@ namespace CNC.Controls.Probing
             }
         }
 
+        private void start_Click(object sender, RoutedEventArgs e)
+        {
+            Start();
+        }
+
         private void stop_Click(object sender, RoutedEventArgs e)
         {
-            (DataContext as ProbingViewModel).Program.Cancel();
+            Stop();
         }
     }
 }
