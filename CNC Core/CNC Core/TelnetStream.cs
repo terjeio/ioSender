@@ -1,7 +1,7 @@
 /*
  * TelnetStream.cs - part of CNC Controls library
  *
- * v0.24 / 2020-08-27 / Io Engineering (Terje Io)
+ * v0.26 / 2020-09-04 / Io Engineering (Terje Io)
  *
  */
 
@@ -69,6 +69,7 @@ namespace CNC.Core
             if (parameter.Length == 2) try
                 {
                     ipserver = new TcpClient(parameter[0], int.Parse(parameter[1]));
+                    ipserver.NoDelay = true;
                     ipstream = ipserver.GetStream();
                     ipstream.BeginRead(buffer, 0, buffer.Length, ReadComplete, buffer);
                 }
@@ -168,6 +169,16 @@ namespace CNC.Core
             return Reply;
         }
 
+        private int gp()
+        {
+            int pos = 0; bool found = false;
+
+            while (!found && pos < input.Length)
+                found = input[pos++] == '\n';
+
+            return found ? pos - 1 : 0;
+        }
+
         void ReadComplete(IAsyncResult iar)
         {
             int bytesAvailable = 0;
@@ -188,7 +199,7 @@ namespace CNC.Core
             {
                 input.Append(Encoding.ASCII.GetString(buffer, 0, bytesAvailable));
 
-                while (input.Length > 0 && (pos = input.ToString().IndexOf('\n')) > 0)
+                while (input.Length > 0 && (pos = gp()) > 0)
                 {
                     Reply = input.ToString(0, pos - 1);
                     input.Remove(0, pos + 1);

@@ -1,5 +1,9 @@
 ## GRBL GCode Sender
 
+2020-09-04 : Sixth [beta release](https://github.com/terjeio/Grbl-GCode-Sender/releases/tag/v026-beta6). 
+
+Refactored probing to work with networking protocols. Some bug fixes and new shortcuts added since beta 1.
+
 2020-08-05 : First [beta release](https://github.com/terjeio/Grbl-GCode-Sender/releases/tag/v021-beta1). 
 
 Updated for latest \(20200805\) grblHAL [tool change functionality](https://github.com/terjeio/grblHAL/wiki/Manual,-semi-automatic-and-automatic-tool-change), bug fixes for tool change handling \(UI was not correctly enabled for the different state changes\).

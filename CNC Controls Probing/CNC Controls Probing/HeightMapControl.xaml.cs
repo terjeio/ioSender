@@ -1,7 +1,7 @@
 ﻿/*
  * HeightMapControl.xaml.cs - part of CNC Probing library
  *
- * v0.25 / 2020-08-30 / Io Engineering (Terje Io)
+ * v0.26 / 2020-09-04 / Io Engineering (Terje Io)
  *
  */
 
@@ -73,8 +73,6 @@ namespace CNC.Controls.Probing
             if (!probing.Program.Init())
                 return;
 
-            probing.PropertyChanged += Probing_PropertyChanged;
-
             probing.HeightMap.BoundaryPoints = null;
             probing.HeightMap.MapPoints = null;
             probing.HeightMap.MeshGeometry = null;
@@ -104,6 +102,7 @@ namespace CNC.Controls.Probing
             }
 
             probing.Program.Execute(true);
+            OnCompleted();
         }
 
         public void Stop()
@@ -116,56 +115,48 @@ namespace CNC.Controls.Probing
             return (int)(Math.Ceiling(val / (DataContext as ProbingViewModel).HeightMap.GridSize - .2d));
         }
 
-        private void Probing_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void OnCompleted()
         {
-            switch (e.PropertyName)
+            bool ok;
+            var probing = DataContext as ProbingViewModel;
+
+            if ((ok = probing.IsSuccess))
             {
-                case nameof(ProbingViewModel.IsCompleted):
+                probing.GotoMachinePosition(origin, AxisFlags.Z);
+                probing.GotoMachinePosition(origin, AxisFlags.X | AxisFlags.Y);
 
-                    bool ok = true;
-                    var probing = DataContext as ProbingViewModel;
-
-                    probing.PropertyChanged -= Probing_PropertyChanged;
-
-                    if (probing.IsSuccess)
+                if (probing.HeightMap.SetToolOffset)
+                {
+                    if (probing.CoordinateMode == ProbingViewModel.CoordMode.G10)
+                        probing.Grbl.ExecuteCommand(string.Format("G10L2P{0}Z{1}", probing.CoordinateSystem, (probing.Positions[0].Z - probing.Grbl.ToolOffset.Z).ToInvariantString()));
+                    else if ((ok == probing.GotoMachinePosition(probing.Positions[0], AxisFlags.Z)))
                     {
+                        probing.Grbl.ExecuteCommand("G92Z0");
                         probing.GotoMachinePosition(origin, AxisFlags.Z);
-                        probing.GotoMachinePosition(origin, AxisFlags.X | AxisFlags.Y);
-
-                        if(probing.HeightMap.SetToolOffset)
-                        {
-                            if(probing.CoordinateMode == ProbingViewModel.CoordMode.G10)
-                                probing.Grbl.ExecuteCommand(string.Format("G10L2P{0}Z{1}", probing.CoordinateSystem, (probing.Positions[0].Z - probing.Grbl.ToolOffset.Z).ToInvariantString()));
-                            else if ((ok == probing.GotoMachinePosition(probing.Positions[0], AxisFlags.Z)))
-                            {
-                                probing.Grbl.ExecuteCommand("G92Z0");
-                                probing.GotoMachinePosition(origin, AxisFlags.Z);
-                            }
-                        }
-
-                        double Z0 = probing.Positions[0].Z;
-
-                        foreach (var pos in probing.Positions)
-                            probing.HeightMap.Map.AddPoint(toIndex(pos.X - origin.X), toIndex(pos.Y - origin.Y), Math.Round(pos.Z - Z0, probing.Grbl.Precision));
-
-                        LinesVisual3D boundary = new LinesVisual3D();
-                        PointsVisual3D mapPoints = new PointsVisual3D();
-                        MeshGeometryVisual3D mesh = new MeshGeometryVisual3D();
-
-                        // TODO: fix HeightMap object...
-                        probing.HeightMap.Map.GetModel(mesh);
-                        probing.HeightMap.Map.GetPreviewModel(boundary, mapPoints);
-
-                        probing.HeightMap.MeshGeometry = mesh.MeshGeometry;
-                        probing.HeightMap.BoundaryPoints = boundary.Points;
-                        probing.HeightMap.MapPoints = mapPoints.Points;
-                        probing.HeightMap.HasHeightMap = true;
-
-                        probing.Program.End(ok ? "Probing completed" : "Probing failed");
                     }
-                    origin = null;
-                    break;
+                }
+
+                double Z0 = probing.Positions[0].Z;
+
+                foreach (var pos in probing.Positions)
+                    probing.HeightMap.Map.AddPoint(toIndex(pos.X - origin.X), toIndex(pos.Y - origin.Y), Math.Round(pos.Z - Z0, probing.Grbl.Precision));
+
+                LinesVisual3D boundary = new LinesVisual3D();
+                PointsVisual3D mapPoints = new PointsVisual3D();
+                MeshGeometryVisual3D mesh = new MeshGeometryVisual3D();
+
+                // TODO: fix HeightMap object...
+                probing.HeightMap.Map.GetModel(mesh);
+                probing.HeightMap.Map.GetPreviewModel(boundary, mapPoints);
+
+                probing.HeightMap.MeshGeometry = mesh.MeshGeometry;
+                probing.HeightMap.BoundaryPoints = boundary.Points;
+                probing.HeightMap.MapPoints = mapPoints.Points;
+                probing.HeightMap.HasHeightMap = true;
+
+                probing.Program.End(ok ? "Probing completed" : "Probing failed");
             }
+            origin = null;
         }
 
         public void Load (string fileName)

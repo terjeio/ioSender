@@ -1,7 +1,7 @@
 ﻿/*
  * ProbingViewModel.cs - part of CNC Probing library
  *
- * v0.25 / 2020-08-30 / Io Engineering (Terje Io)
+ * v0.26 / 2020-09-04 / Io Engineering (Terje Io)
  *
  */
 
@@ -79,7 +79,6 @@ namespace CNC.Controls.Probing
         private Center _center = Center.None;
         private int _coordinateSystem = 0;
         private ProbingProfile _profile;
-
         private CancellationToken cancellationToken = new CancellationToken();
 
         public Program Program;
@@ -183,7 +182,7 @@ namespace CNC.Controls.Probing
                 null,
                 a => Grbl.OnResponseReceived += a,
                 a => Grbl.OnResponseReceived -= a,
-                200, () => Grbl.ExecuteCommand(command));
+                1000, () => Grbl.ExecuteCommand(command));
             }).Start();
 
             while (res == null)
@@ -202,7 +201,7 @@ namespace CNC.Controls.Probing
                         null,
                         a => Grbl.OnRealtimeStatusProcessed += a,
                         a => Grbl.OnRealtimeStatusProcessed -= a,
-                        200, () => Comms.com.WriteByte(GrblLegacy.ConvertRTCommand(GrblConstants.CMD_STATUS_REPORT)));
+                        400, () => Comms.com.WriteByte(GrblLegacy.ConvertRTCommand(GrblConstants.CMD_STATUS_REPORT)));
                     }).Start();
 
                     while (res == null)
@@ -237,6 +236,11 @@ namespace CNC.Controls.Probing
             }
 
             return !HasErrors;
+        }
+
+        public void ClearExeStatus ()
+        {
+            _isComplete = _isSuccess = false;
         }
 
         public GrblViewModel Grbl { get { return _grblmodel; } private set { _grblmodel = value; OnPropertyChanged(); } }

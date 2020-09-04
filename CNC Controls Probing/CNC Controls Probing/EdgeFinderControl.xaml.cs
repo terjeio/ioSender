@@ -1,7 +1,7 @@
 ﻿/*
  * EdgeFinderControl.xaml.cs - part of CNC Probing library
  *
- * v0.25 / 2020-08-30 / Io Engineering (Terje Io)
+ * v0.26 / 2020-09-04 / Io Engineering (Terje Io)
  *
  */
 
@@ -90,8 +90,6 @@ namespace CNC.Controls.Probing
 
             if (!probing.Program.Init())
                 return;
-
-            probing.PropertyChanged += Probing_PropertyChanged;
 
             probing.Program.Add(string.Format("G91F{0}", probing.ProbeFeedRate.ToInvariantString()));
             probing.Message = string.Empty;
@@ -236,6 +234,8 @@ namespace CNC.Controls.Probing
             }
 
             probing.Program.Execute(true);
+
+            OnCompleted();
         }
 
         public void Stop()
@@ -243,12 +243,90 @@ namespace CNC.Controls.Probing
             (DataContext as ProbingViewModel).Program.Cancel();
         }
 
+        private void OnCompleted ()
+        {
+            bool ok;
+
+            var probing = DataContext as ProbingViewModel;
+
+            if ((ok = probing.IsSuccess && probing.Positions.Count > 0))
+            {
+                int p = 0;
+                Position pos = new Position(probing.Grbl.MachinePosition);
+
+                foreach (int i in axisflags.ToIndices())
+                    pos.Values[i] = probing.Positions[p++].Values[i] + (i == GrblConstants.Z_AXIS ? 0d : probing.ProbeDiameter / 2d * af[i]);
+
+                Position pz = new Position(pos);
+                pos.Z += probing.Depth; // Sometimes NaN...?
+
+                if (double.IsNaN(pos.Z))
+                {
+                    probing.Grbl.IsJobRunning = false;
+                    probing.Program.End("Probing failed, machine position not known");
+                    return;
+                }
+
+                if (probing.ProbeZ && axisflags != AxisFlags.Z)
+                {
+                    ok = probing.GotoMachinePosition(pos, AxisFlags.Z);
+                    pz.X += probing.ProbeDiameter / 2d * af[GrblConstants.X_AXIS];
+                    pz.Y += probing.ProbeDiameter / 2d * af[GrblConstants.Y_AXIS];
+                    if ((ok = (ok && probing.GotoMachinePosition(pz, axisflags))))
+                    {
+                        ok = probing.WaitForResponse(probing.FastProbe + "Z-" + probing.Depth.ToInvariantString());
+                        ok = ok && probing.WaitForResponse(probing.RapidCommand + "Z" + probing.LatchDistance.ToInvariantString());
+                        ok = ok && probing.RemoveLastPosition();
+                        if ((ok = ok && probing.WaitForResponse(probing.SlowProbe + "Z-" + probing.Depth.ToInvariantString())))
+                        {
+                            axisflags |= AxisFlags.Z;
+                            pos.Z = probing.Grbl.ProbePosition.Z;
+                            pz.Z = pos.Z + probing.Depth;
+                            ok = probing.GotoMachinePosition(pz, AxisFlags.Z);
+                        }
+                    }
+                }
+                else
+                {
+                    ok = probing.GotoMachinePosition(pos, AxisFlags.Z);
+                    if (axisflags.HasFlag(AxisFlags.Z))
+                    {
+                        pos.Z = probing.Positions[0].Z;
+                        pz.Z += probing.Depth;
+                    }
+                }
+
+                if (ok)
+                {
+                    if (probing.CoordinateMode == ProbingViewModel.CoordMode.G92)
+                    {
+                        if ((ok = probing.GotoMachinePosition(pos, axisflags)))
+                        {
+                            pos.X = pos.Y = 0d;
+                            pos.Z = probing.WorkpieceHeight + probing.TouchPlateHeight;
+                            probing.Grbl.ExecuteCommand("G92" + pos.ToString(axisflags));
+                            if (axisflags.HasFlag(AxisFlags.Z))
+                                probing.GotoMachinePosition(pz, AxisFlags.Z);
+                        }
+                    }
+                    else
+                    {
+                        pos.Z -= probing.WorkpieceHeight + probing.TouchPlateHeight + probing.Grbl.ToolOffset.Z;
+                        probing.Grbl.ExecuteCommand(string.Format("G10L2P{0}{1}", probing.CoordinateSystem, pos.ToString(axisflags)));
+                    }
+                }
+            }
+
+            probing.Grbl.IsJobRunning = false;
+            probing.Program.End(ok ? "Probing completed" : "Probing failed");
+        }
+
         private void Probing_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             switch (e.PropertyName)
             {
                 case nameof(ProbingViewModel.IsCompleted):
-
+                    /*
                     bool ok;
                     var probing = DataContext as ProbingViewModel;
                     probing.PropertyChanged -= Probing_PropertyChanged;
@@ -304,7 +382,7 @@ namespace CNC.Controls.Probing
                         {
                             if (probing.CoordinateMode == ProbingViewModel.CoordMode.G92)
                             {
-                                if ((ok == probing.GotoMachinePosition(pos, axisflags)))
+                                if ((ok = probing.GotoMachinePosition(pos, axisflags)))
                                 {
                                     pos.X = pos.Y = 0d;
                                     pos.Z = probing.WorkpieceHeight + probing.TouchPlateHeight;
@@ -322,8 +400,9 @@ namespace CNC.Controls.Probing
                     }
 
                     probing.Grbl.IsJobRunning = false;
-                    probing.Program.End(ok ? "Probing completed" : "Probing failed");
+                    probing.Program.End(ok ? "Probing completed" : "Probing failed");*/
                     break;
+                    
             }
         }
         private void start_Click(object sender, RoutedEventArgs e)

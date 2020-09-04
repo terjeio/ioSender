@@ -1,7 +1,7 @@
 ﻿/*
  * Program.cs - part of CNC Probing library
  *
- * v0.22 / 2020-08-16 / Io Engineering (Terje Io)
+ * v0.26 / 2020-09-04 / Io Engineering (Terje Io)
  *
  */
 
@@ -50,7 +50,7 @@ namespace CNC.Controls.Probing
         private GrblViewModel Grbl = null;
         private List<string> _program = new List<string>();
         ProbingViewModel probing;
-        private bool _isComplete = false, _isSuccess = false, isRunning = false, _silent = false;
+        private volatile bool _isComplete = false, isRunning = false;
         private int step = 0;
         private CancellationToken cancellationToken = new CancellationToken();
 
@@ -176,18 +176,22 @@ namespace CNC.Controls.Probing
                 _program.Add(probing.SlowProbe + axisLetter + (negative ? "-" : "") + probing.ProbeDistance.ToInvariantString());
             }
         }
+
         public void Add(string cmd)
         {
             _program.Add(cmd);
         }
+
         public void AddRapid(string cmd)
         {
             _program.Add(probing.RapidCommand + cmd);
         }
+
         public void AddRapidToMPos(string cmd)
         {
             _program.Add("G53" + probing.RapidCommand + cmd);
         }
+
         public void Cancel()
         {
      //       probing.IsCancelled = true;
@@ -200,15 +204,19 @@ namespace CNC.Controls.Probing
             Grbl.PropertyChanged -= Grbl_PropertyChanged;
             Grbl.OnCommandResponseReceived -= ResponseReceived;
             isRunning = Grbl.IsJobRunning = false;
+            _isComplete = true;
             probing.Message = message;
         }
 
-        public void Execute(bool go)
+        public bool Execute(bool go)
         {
+            _isComplete = false;
+
+            probing.ClearExeStatus();
+
             if (_program.Count > 0)
             {
                 step = 0;
-                _isComplete = _isSuccess = false;
                 probing.Positions.Clear();
                 probing.Machine.Clear();
 
@@ -228,7 +236,12 @@ namespace CNC.Controls.Probing
                     probing.Message = "Probing...";
 
                 Grbl.ExecuteCommand(_program[step]);
+
+                while(!_isComplete)
+                    EventUtils.DoEvents();
             }
+
+            return probing.IsSuccess;
         }
 
         private void ResponseReceived(string response)
@@ -263,7 +276,7 @@ namespace CNC.Controls.Probing
                 probing.IsSuccess = step == _program.Count && response == "ok";
                 if (!probing.IsSuccess)
                     End("Probing cancelled/failed" + (Grbl.GrblState.State == GrblStates.Alarm ? " (ALARM)" : ""));
-                probing.IsCompleted = true;
+                _isComplete = probing.IsCompleted = true;
                 Grbl.Poller.SetState(AppConfig.Settings.Base.PollInterval);
             }
         }

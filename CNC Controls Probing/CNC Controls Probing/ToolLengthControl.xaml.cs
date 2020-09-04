@@ -1,7 +1,7 @@
 ﻿/*
  * ToolLengthControl.cs - part of CNC Probing library
  *
- * v0.25 / 2020-08-30 / Io Engineering (Terje Io)
+ * v0.26 / 2020-09-04 / Io Engineering (Terje Io)
  *
  */
 
@@ -72,8 +72,6 @@ namespace CNC.Controls.Probing
             if (!probing.Program.Init())
                 return;
 
-            probing.PropertyChanged += Probing_PropertyChanged;
-
             probing.Program.Add(string.Format("G91F{0}", probing.ProbeFeedRate.ToInvariantString()));
 
             origin = new Position(probing.Grbl.MachinePosition);
@@ -91,6 +89,7 @@ namespace CNC.Controls.Probing
             }
             probing.Program.AddProbingAction(AxisFlags.Z, true);
             probing.Program.Execute(true);
+            OnCompleted();
         }
 
         public void Stop()
@@ -98,60 +97,53 @@ namespace CNC.Controls.Probing
             (DataContext as ProbingViewModel).Program.Cancel();
         }
 
-        private void Probing_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void OnCompleted()
         {
-            switch (e.PropertyName)
+            bool ok = true;
+            var probing = DataContext as ProbingViewModel;
+
+            if ((ok = probing.IsSuccess && probing.Positions.Count == 1))
             {
-                case nameof(ProbingViewModel.IsCompleted):
-                    bool ok = true;
-                    var probing = DataContext as ProbingViewModel;
+                //if (probing.HasToolTable)
+                //    probing.Grbl.ExecuteCommand(string.Format("G43H{0}{1}", probing.Tool, probing.Positions[0].ToString(AxisFlags.Z)));
+                //else
+                if (probing.ReferenceToolOffset)
+                {
+                    probing.TloReference = probing.Positions[0].Z; // linear axis?
+                    probing.Grbl.ExecuteCommand("G49");
+                }
+                else
+                {
+                    var tofs = new Position(probing.Positions[0]);
+                    tofs.Z = probing.Positions[0].Z - (double.IsNaN(probing.TloReference) ? 0d : probing.TloReference);
+                    probing.Grbl.ExecuteCommand("G43.1" + tofs.ToString(AxisFlags.Z));
+                }
+                //if (probing.Tool != "0")
+                //    probing.Grbl.ExecuteCommand(string.Format("G10L11P{0}{1}", probing.Tool, probing.Positions[0].ToString(AxisFlags.Z)));
+                probing.Positions[0].Z += probing.Depth;
+                probing.GotoMachinePosition(probing.Positions[0], AxisFlags.Z);
 
-                    probing.PropertyChanged -= Probing_PropertyChanged;
-
-                    if ((ok = probing.IsSuccess && probing.Positions.Count == 1))
-                    {
-                        //if (probing.HasToolTable)
-                        //    probing.Grbl.ExecuteCommand(string.Format("G43H{0}{1}", probing.Tool, probing.Positions[0].ToString(AxisFlags.Z)));
-                        //else
-                        if (probing.ReferenceToolOffset)
-                        {
-                            probing.TloReference = probing.Positions[0].Z; // linear axis?
-                            probing.Grbl.ExecuteCommand("G49");
-                        }
-                        else
-                        {
-                            var tofs = new Position(probing.Positions[0]);
-                            tofs.Z = probing.Positions[0].Z - (double.IsNaN(probing.TloReference) ? 0d : probing.TloReference);
-                            probing.Grbl.ExecuteCommand("G43.1" + tofs.ToString(AxisFlags.Z));
-                        }
-                        //if (probing.Tool != "0")
-                        //    probing.Grbl.ExecuteCommand(string.Format("G10L11P{0}{1}", probing.Tool, probing.Positions[0].ToString(AxisFlags.Z)));
-                        probing.Positions[0].Z += probing.Depth;
-                        probing.GotoMachinePosition(probing.Positions[0], AxisFlags.Z);
-
-                        if (origin.Z > probing.Positions[0].Z)
-                        {
-                            probing.GotoMachinePosition(origin, AxisFlags.Z);
-                            probing.GotoMachinePosition(origin, AxisFlags.X | AxisFlags.Y);
-                        }
-                        else
-                        {
-                            probing.GotoMachinePosition(origin, AxisFlags.X | AxisFlags.Y);
-                            probing.GotoMachinePosition(origin, AxisFlags.Z);
-                        }
-                    }
-
-                    if (probing.ReferenceToolOffset)
-                    {
-                        probing.ReferenceToolOffset = !ok;
-                        if (GrblInfo.Build >= 20200805 && GrblSettings.IsGrblHAL)
-                            probing.Grbl.ExecuteCommand("$TLR"); // Set tool length offset reference in controller
-                    }
-
-                    origin = null;
-                    probing.Program.End(ok ? "Probing completed" : "Probing failed");
-                    break;
+                if (origin.Z > probing.Positions[0].Z)
+                {
+                    probing.GotoMachinePosition(origin, AxisFlags.Z);
+                    probing.GotoMachinePosition(origin, AxisFlags.X | AxisFlags.Y);
+                }
+                else
+                {
+                    probing.GotoMachinePosition(origin, AxisFlags.X | AxisFlags.Y);
+                    probing.GotoMachinePosition(origin, AxisFlags.Z);
+                }
             }
+
+            if (probing.ReferenceToolOffset)
+            {
+                probing.ReferenceToolOffset = !ok;
+                if (GrblInfo.Build >= 20200805 && GrblSettings.IsGrblHAL)
+                    probing.Grbl.ExecuteCommand("$TLR"); // Set tool length offset reference in controller
+            }
+
+            origin = null;
+            probing.Program.End(ok ? "Probing completed" : "Probing failed");
         }
 
         private void clearToolOffset_Click(object sender, RoutedEventArgs e)

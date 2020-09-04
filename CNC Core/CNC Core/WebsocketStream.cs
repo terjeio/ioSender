@@ -1,13 +1,13 @@
 ﻿/*
  * WebsocketStream.cs - part of CNC Controls library
  *
- * v0.24 / 2020-08-27 / Io Engineering (Terje Io)
+ * v0.26 / 2020-09-04 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2019, Io Engineering (Terje Io)
+Copyright (c) 2018-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -176,6 +176,15 @@ namespace CNC.Core
             websocket.OnClose -= OnClose;
             websocket = null;
         }
+        private int gp()
+        {
+            int pos = 0; bool found = false;
+
+            while (!found && pos < input.Length)
+                found = input[pos++] == '\n';
+
+            return found ? pos - 1 : 0;
+        }
 
         private void OnMessage(object sender, MessageEventArgs e)
         {
@@ -188,7 +197,7 @@ namespace CNC.Core
                 else
                     input.Append(Encoding.Default.GetString(e.RawData, 0, e.RawData.Length));
 
-                while (input.Length > 0 && (pos = input.ToString().IndexOf('\n')) > 0)
+                while (input.Length > 0 && (pos = gp()) > 0)
                 {
                     Reply = input.ToString(0, pos - 1);
                     input.Remove(0, pos + 1);

@@ -1,7 +1,7 @@
 ﻿/*
  * CenterFinderControl.xaml.cs - part of CNC Probing library
  *
- * v0.25 / 2020-08-30 / Io Engineering (Terje Io)
+ * v0.26 / 2020-09-04 / Io Engineering (Terje Io)
  *
  */
 
@@ -64,14 +64,14 @@ namespace CNC.Controls.Probing
             InitializeComponent();
         }
 
-        private void Execute()
+        private bool CreateProgram()
         {
             var probing = DataContext as ProbingViewModel;
 
             if (probing.ProbeCenter == Center.None)
             {
                 MessageBox.Show("Select type of probe by clicking on one of the images above.", "Center finder", MessageBoxButton.OK, MessageBoxImage.Exclamation);
-                return;
+                return false;
             }
 
             double diameter_2 = probing.WorkpieceDiameter / 2d;
@@ -142,6 +142,8 @@ namespace CNC.Controls.Probing
             }
 
             probing.Message = string.Format("Probing, pass {0} of {1}", (passes - pass + 1), pass);
+
+            return true;
         }
 
         public void Start()
@@ -170,10 +172,16 @@ namespace CNC.Controls.Probing
 
             center = new Position(probing.Grbl.MachinePosition);
 
-            probing.PropertyChanged += Probing_PropertyChanged;
-
-            Execute();
-            probing.Program.Execute(true);
+            if (CreateProgram())
+            {
+                do
+                {
+                    probing.Program.Execute(true);
+                    OnCompleted();
+                    if(pass > 1)
+                        CreateProgram();
+                } while (--pass > 0);
+            }
         }
 
         public void Stop()
@@ -181,74 +189,61 @@ namespace CNC.Controls.Probing
             (DataContext as ProbingViewModel).Program.Cancel();
         }
 
-        private void Probing_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private bool OnCompleted()
         {
-            switch (e.PropertyName)
+            var probing = DataContext as ProbingViewModel;
+
+            if (probing.IsSuccess && probing.Positions.Count != 4)
             {
-                case nameof(ProbingViewModel.IsCompleted):
-
-                    bool ok = true;
-                    var probing = DataContext as ProbingViewModel;
-
-                    if (probing.IsSuccess && probing.Positions.Count != 4)
-                    {
-                        probing.PropertyChanged -= Probing_PropertyChanged;
-                        probing.IsSuccess = false;
-                        probing.Program.End("Probing failed");
-                        return;
-                    }
-
-                    if (probing.IsSuccess)
-                    {
-                        center.X = probing.Positions[0].X + (probing.Positions[1].X - probing.Positions[0].X) / 2d;
-                        center.Y = probing.Positions[2].Y + (probing.Positions[3].Y - probing.Positions[2].Y) / 2d;
-
-                        switch(probing.ProbeCenter)
-                        {
-                            case Center.Inside:
-                                ok = probing.GotoMachinePosition(center, AxisFlags.X | AxisFlags.Y);
-                                probing.GotoMachinePosition(center, AxisFlags.Z);
-                                break;
-
-                            case Center.Outside:
-                                if (pass > 1)
-                                {
-                                    Position start = new Position(center);
-                                    start.X -= probing.WorkpieceDiameter / 2d + probing.XYClearance;
-                                    ok = probing.GotoMachinePosition(start, AxisFlags.X);
-                                    probing.GotoMachinePosition(start, AxisFlags.Y);
-                                }
-                                break;
-                        }
-
-                        if (ok)
-                        {
-                            if (--pass > 0)
-                                Execute();
-                            else
-                            {
-                                if (probing.ProbeCenter == Center.Outside)
-                                {
-//                                    center.Z = probing.Grbl.MachinePosition.Z + probing.Depth;
-                                    probing.GotoMachinePosition(center, AxisFlags.Z);
-                                    probing.GotoMachinePosition(center, AxisFlags.X | AxisFlags.Y);
-                                }
-                                if (probing.CoordinateMode == ProbingViewModel.CoordMode.G92)
-                                    probing.Grbl.ExecuteCommand("G92X0Y0");
-                                else
-                                    probing.Grbl.ExecuteCommand(string.Format("G10L2P{0}{1}", probing.CoordinateSystem, center.ToString(AxisFlags.X | AxisFlags.Y)));
-                            }
-                        }
-                        if (!ok || pass == 0)
-                        {
-                            probing.PropertyChanged -= Probing_PropertyChanged;
-                            probing.Program.End(ok ? "Probing completed" : "Probing failed");
-                        } else
-                            probing.Program.Execute(true);
-                    } else
-                        probing.PropertyChanged -= Probing_PropertyChanged;
-                    break;
+                probing.IsSuccess = false;
+                probing.Program.End("Probing failed");
+                return false;
             }
+
+            bool ok;
+
+            if ((ok = probing.IsSuccess))
+            {
+                center.X = probing.Positions[0].X + (probing.Positions[1].X - probing.Positions[0].X) / 2d;
+                center.Y = probing.Positions[2].Y + (probing.Positions[3].Y - probing.Positions[2].Y) / 2d;
+
+                switch (probing.ProbeCenter)
+                {
+                    case Center.Inside:
+                        ok = probing.GotoMachinePosition(center, AxisFlags.X | AxisFlags.Y);
+                        probing.GotoMachinePosition(center, AxisFlags.Z);
+                        break;
+
+                    case Center.Outside:
+                        if (pass > 1)
+                        {
+                            Position start = new Position(center);
+                            start.X -= probing.WorkpieceDiameter / 2d + probing.XYClearance;
+                            ok = probing.GotoMachinePosition(start, AxisFlags.X);
+                            probing.GotoMachinePosition(start, AxisFlags.Y);
+                        }
+                        break;
+                }
+
+                if (ok && pass == 1)
+                {
+                    if (probing.ProbeCenter == Center.Outside)
+                    {
+                        //                                    center.Z = probing.Grbl.MachinePosition.Z + probing.Depth;
+                        probing.GotoMachinePosition(center, AxisFlags.Z);
+                        probing.GotoMachinePosition(center, AxisFlags.X | AxisFlags.Y);
+                    }
+                    if (probing.CoordinateMode == ProbingViewModel.CoordMode.G92)
+                        probing.Grbl.ExecuteCommand("G92X0Y0");
+                    else
+                        probing.Grbl.ExecuteCommand(string.Format("G10L2P{0}{1}", probing.CoordinateSystem, center.ToString(AxisFlags.X | AxisFlags.Y)));
+                }
+
+                if (!ok || pass == 1)
+                    probing.Program.End(ok ? "Probing completed" : "Probing failed");
+            }
+
+            return ok;
         }
 
         private void start_Click(object sender, RoutedEventArgs e)
