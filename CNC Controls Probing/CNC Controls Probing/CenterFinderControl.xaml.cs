@@ -1,7 +1,7 @@
 ﻿/*
  * CenterFinderControl.xaml.cs - part of CNC Probing library
  *
- * v0.26 / 2020-09-04 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-17 / Io Engineering (Terje Io)
  *
  */
 
@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using CNC.Core;
@@ -56,12 +57,16 @@ namespace CNC.Controls.Probing
     /// </summary>
     public partial class CenterFinderControl : UserControl, IProbeTab
     {
-        private int pass = 0, passes = 1;
-        private Position center;
+        private int pass = 0;
 
         public CenterFinderControl()
         {
             InitializeComponent();
+        }
+
+        public void Activate()
+        {
+            (DataContext as ProbingViewModel).Instructions = "Click image above to select probing action.\nPlace the probe above the approximate center of the workpiece before start.";
         }
 
         private bool CreateProgram()
@@ -74,74 +79,103 @@ namespace CNC.Controls.Probing
                 return false;
             }
 
-            double diameter_2 = probing.WorkpieceDiameter / 2d;
+            if (!probing.Program.Init())
+            {
+                probing.Message = "Init failed!";
+                return false;
+            }
 
-            if (pass == passes)
+            if (pass == probing.Passes)
                 probing.Program.Add(string.Format("G91F{0}", probing.ProbeFeedRate.ToInvariantString()));
 
-            string gotoCenter = center.ToString(AxisFlags.X | AxisFlags.Y);
+            var rapidto = new Position(probing.StartPosition);
+
+            rapidto.Z -= probing.Depth;
 
             switch (probing.ProbeCenter)
             {
                 case Center.Inside:
                     {
-                        Position rapid = new Position(diameter_2 - probing.Offset, diameter_2 - probing.Offset, 0d);
+                        double rapid = probing.WorkpieceSizeX / 2d - probing.XYClearance;
 
-                        probing.Program.AddRapid("Z-" + probing.Depth.ToInvariantString());
-                        if (rapid.X > 1d)
-                            probing.Program.AddRapid(rapid.ToString(AxisFlags.X, Direction.Negative));
+                        probing.Program.AddRapidToMPos(rapidto, AxisFlags.Z);
+
+                        if (rapid > 1d)
+                        {
+                            rapidto.X -= rapid;
+                            probing.Program.AddRapidToMPos(rapidto, AxisFlags.X);
+                            rapidto.X = probing.StartPosition.X + rapid;
+                        }
+
                         probing.Program.AddProbingAction(AxisFlags.X, true);
-                        probing.Program.AddRapidToMPos(gotoCenter);
-                        if (rapid.X > 1d)
-                            probing.Program.AddRapid(rapid.ToString(AxisFlags.X));
+
+                        probing.Program.AddRapidToMPos(rapidto, AxisFlags.X);
+
                         probing.Program.AddProbingAction(AxisFlags.X, false);
-                        probing.Program.AddRapidToMPos(gotoCenter);
-                        if (rapid.Y > 1d)
-                            probing.Program.AddRapid(rapid.ToString(AxisFlags.Y, Direction.Negative));
+
+                        probing.Program.AddRapidToMPos(probing.StartPosition, AxisFlags.X);
+
+                        rapid = probing.WorkpieceSizeY / 2d - probing.XYClearance;
+                        if (rapid > 1d)
+                        {
+                            rapidto.Y -= rapid;
+                            probing.Program.AddRapidToMPos(rapidto, AxisFlags.Y);
+                            rapidto.Y = probing.StartPosition.Y + rapid;
+                        }
+
                         probing.Program.AddProbingAction(AxisFlags.Y, true);
-                        probing.Program.AddRapidToMPos(gotoCenter);
-                        if (rapid.Y > 1d)
-                            probing.Program.AddRapid(rapid.ToString(AxisFlags.Y));
+
+                        probing.Program.AddRapidToMPos(rapidto, AxisFlags.Y);
+
                         probing.Program.AddProbingAction(AxisFlags.Y, false);
+
+                        probing.Program.AddRapidToMPos(probing.StartPosition, AxisFlags.Y);
+                        probing.Program.AddRapidToMPos(probing.StartPosition, AxisFlags.Z);
                     }
                     break;
 
                 case Center.Outside:
                     {
-                        Position rapid = new Position(diameter_2 + probing.XYClearance, diameter_2 + probing.XYClearance, 0d);
-                        Position retract = new Position(probing.XYClearance, probing.XYClearance, 0d);
+                        rapidto.X -= probing.WorkpieceSizeX / 2d + probing.XYClearance;
+                        rapidto.Y -= probing.WorkpieceSizeY / 2d + probing.XYClearance;
 
-                        probing.Program.AddRapid(rapid.ToString(AxisFlags.X, Direction.Negative));
-                        probing.Program.AddRapid("Z-" + probing.Depth.ToInvariantString());
+                        probing.Program.AddRapidToMPos(rapidto, AxisFlags.X);
+                        probing.Program.AddRapidToMPos(rapidto, AxisFlags.Z);
+
                         probing.Program.AddProbingAction(AxisFlags.X, false);
-                        probing.Program.AddRapid(retract.ToString(AxisFlags.X, Direction.Negative));
-                        probing.Program.AddRapid("Z" + probing.Depth.ToInvariantString());
-                        probing.Program.AddRapidToMPos(center.ToString(AxisFlags.X));
 
-                        probing.Program.AddRapid(rapid.ToString(AxisFlags.X, Direction.Positive));
-                        probing.Program.AddRapid("Z-" + probing.Depth.ToInvariantString());
+                        probing.Program.AddRapidToMPos(rapidto, AxisFlags.X);
+                        probing.Program.AddRapidToMPos(probing.StartPosition, AxisFlags.Z);
+                        rapidto.X += probing.WorkpieceSizeX + probing.XYClearance * 2d;
+                        probing.Program.AddRapidToMPos(rapidto, AxisFlags.X);
+                        probing.Program.AddRapidToMPos(rapidto, AxisFlags.Z);
+
                         probing.Program.AddProbingAction(AxisFlags.X, true);
-                        probing.Program.AddRapid(retract.ToString(AxisFlags.X, Direction.Positive));
-                        probing.Program.AddRapid("Z" + probing.Depth.ToInvariantString());
-                        probing.Program.AddRapidToMPos(center.ToString(AxisFlags.X));
 
-                        probing.Program.AddRapid(rapid.ToString(AxisFlags.Y, Direction.Negative));
-                        probing.Program.AddRapid("Z-" + probing.Depth.ToInvariantString());
+                        probing.Program.AddRapidToMPos(rapidto, AxisFlags.X);
+                        probing.Program.AddRapidToMPos(probing.StartPosition, AxisFlags.Z);
+                        probing.Program.AddRapidToMPos(probing.StartPosition, AxisFlags.X);
+                        probing.Program.AddRapidToMPos(rapidto, AxisFlags.Y);
+                        probing.Program.AddRapidToMPos(rapidto, AxisFlags.Z);
+
                         probing.Program.AddProbingAction(AxisFlags.Y, false);
-                        probing.Program.AddRapid(retract.ToString(AxisFlags.Y, Direction.Negative));
-                        probing.Program.AddRapid("Z" + probing.Depth.ToInvariantString());
-                        probing.Program.AddRapidToMPos(center.ToString(AxisFlags.Y));
 
-                        probing.Program.AddRapid(rapid.ToString(AxisFlags.Y, Direction.Positive));
-                        probing.Program.AddRapid("Z-" + probing.Depth.ToInvariantString());
+                        probing.Program.AddRapidToMPos(rapidto, AxisFlags.Y);
+                        probing.Program.AddRapidToMPos(probing.StartPosition, AxisFlags.Z);
+                        rapidto.Y += probing.WorkpieceSizeY + probing.XYClearance * 2d;
+                        probing.Program.AddRapidToMPos(rapidto, AxisFlags.Y);
+                        probing.Program.AddRapidToMPos(rapidto, AxisFlags.Z);
+
                         probing.Program.AddProbingAction(AxisFlags.Y, true);
-                        probing.Program.AddRapid(retract.ToString(AxisFlags.Y, Direction.Positive));
-                        probing.Program.AddRapid("Z" + probing.Depth.ToInvariantString());
+
+                        probing.Program.AddRapidToMPos(probing.StartPosition, AxisFlags.Z);
+                        probing.Program.AddRapidToMPos(probing.StartPosition, AxisFlags.Y);
                     }
                     break;
             }
 
-            probing.Message = string.Format("Probing, pass {0} of {1}", (passes - pass + 1), pass);
+            if(probing.Passes > 1)
+                probing.Message = string.Format("Probing, pass {0} of {1}...", (probing.Passes - pass + 1), probing.Passes);
 
             return true;
         }
@@ -150,27 +184,34 @@ namespace CNC.Controls.Probing
         {
             var probing = DataContext as ProbingViewModel;
 
-            if (!probing.ValidateInput())
+            if (!probing.ValidateInput() || probing.Passes == 0)
                 return;
 
-            if (probing.WorkpieceDiameter <= 0d)
+            if (probing.WorkpieceSizeX <= 0d)
             {
-                probing.SetError(nameof(probing.WorkpieceDiameter), "Workpiece diameter cannot be 0.");
+                probing.SetError(nameof(probing.WorkpieceSizeX), "Workpiece diameter cannot be 0.");
                 return;
             }
 
-            if (probing.ProbeCenter == Center.Inside && probing.WorkpieceDiameter < probing.Offset * 2d)
+            if (probing.WorkpieceSizeY <= 0d)
             {
-                probing.SetError(nameof(probing.WorkpieceDiameter), "Probing offset too large for workpiece diameter.");
+                probing.SetError(nameof(probing.WorkpieceSizeY), "Workpiece diameter cannot be 0.");
                 return;
             }
 
-            if (!probing.Program.Init())
+            if (probing.ProbeCenter == Center.Inside && probing.WorkpieceSizeX < probing.Offset * 2d)
+            {
+                probing.SetError(nameof(probing.WorkpieceSizeX), "Probing offset too large for workpiece diameter.");
                 return;
+            }
 
-            pass = passes;
+            if (probing.ProbeCenter == Center.Inside && probing.WorkpieceSizeY < probing.Offset * 2d)
+            {
+                probing.SetError(nameof(probing.WorkpieceSizeY), "Probing offset too large for workpiece diameter.");
+                return;
+            }
 
-            center = new Position(probing.Grbl.MachinePosition);
+            pass = probing.Passes;
 
             if (CreateProgram())
             {
@@ -178,9 +219,7 @@ namespace CNC.Controls.Probing
                 {
                     probing.Program.Execute(true);
                     OnCompleted();
-                    if(pass > 1)
-                        CreateProgram();
-                } while (--pass > 0);
+                } while (--pass != 0 && CreateProgram());
             }
         }
 
@@ -204,43 +243,43 @@ namespace CNC.Controls.Probing
 
             if ((ok = probing.IsSuccess))
             {
+                var center = new Position(probing.StartPosition);
+
                 center.X = probing.Positions[0].X + (probing.Positions[1].X - probing.Positions[0].X) / 2d;
                 center.Y = probing.Positions[2].Y + (probing.Positions[3].Y - probing.Positions[2].Y) / 2d;
+
+                double X_distance = Math.Abs(probing.Positions[1].X - probing.Positions[0].X);
+                double Y_distance = Math.Abs(probing.Positions[2].Y - probing.Positions[3].Y);
 
                 switch (probing.ProbeCenter)
                 {
                     case Center.Inside:
-                        ok = probing.GotoMachinePosition(center, AxisFlags.X | AxisFlags.Y);
-                        probing.GotoMachinePosition(center, AxisFlags.Z);
+                        X_distance += probing.ProbeDiameter;
+                        Y_distance += probing.ProbeDiameter;
                         break;
 
                     case Center.Outside:
-                        if (pass > 1)
-                        {
-                            Position start = new Position(center);
-                            start.X -= probing.WorkpieceDiameter / 2d + probing.XYClearance;
-                            ok = probing.GotoMachinePosition(start, AxisFlags.X);
-                            probing.GotoMachinePosition(start, AxisFlags.Y);
-                        }
+                        X_distance -= probing.ProbeDiameter;
+                        Y_distance -= probing.ProbeDiameter;
                         break;
                 }
 
+                ok = ok && probing.GotoMachinePosition(center, AxisFlags.X | AxisFlags.Y);
+
                 if (ok && pass == 1)
                 {
-                    if (probing.ProbeCenter == Center.Outside)
-                    {
-                        //                                    center.Z = probing.Grbl.MachinePosition.Z + probing.Depth;
-                        probing.GotoMachinePosition(center, AxisFlags.Z);
-                        probing.GotoMachinePosition(center, AxisFlags.X | AxisFlags.Y);
-                    }
                     if (probing.CoordinateMode == ProbingViewModel.CoordMode.G92)
+                    {
                         probing.Grbl.ExecuteCommand("G92X0Y0");
+                        if (!probing.Grbl.IsParserStateLive)
+                            probing.Grbl.ExecuteCommand("$G");
+                    }
                     else
                         probing.Grbl.ExecuteCommand(string.Format("G10L2P{0}{1}", probing.CoordinateSystem, center.ToString(AxisFlags.X | AxisFlags.Y)));
                 }
 
                 if (!ok || pass == 1)
-                    probing.Program.End(ok ? "Probing completed" : "Probing failed");
+                    probing.Program.End(ok ? string.Format("Probing completed: X distance {0}, Y distance {1}", X_distance.ToInvariantString(), Y_distance.ToInvariantString())  : "Probing failed");
             }
 
             return ok;

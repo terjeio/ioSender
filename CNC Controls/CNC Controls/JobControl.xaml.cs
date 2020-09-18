@@ -1,7 +1,7 @@
 /*
  * JobControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.25 / 2020-08-30 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-17 / Io Engineering (Terje Io)
  *
  */
 
@@ -213,7 +213,7 @@ namespace CNC.Controls
                         else
                         {
                             job.IsSDFile = false;
-                            job.CurrLine = job.PendingLine = job.ACKPending = 0;
+                            job.CurrLine = job.PendingLine = job.ACKPending = model.BlockExecuting = 0;
                             job.PgmEndLine = GCode.File.Blocks - 1;
                             streamingHandler.Call(GCode.File.IsLoaded ? StreamingState.Idle : StreamingState.NoFile, false);
                         }
@@ -409,8 +409,6 @@ namespace CNC.Controls
 
         private void SendCommand(string command)
         {
-            model.Message = "";
-
             if (command.Length == 1)
                 SendRTCommand(command);
             else if (streamingState == StreamingState.Idle || streamingState == StreamingState.NoFile || streamingState == StreamingState.ToolChange || streamingState == StreamingState.Stop || command == GrblConstants.CMD_UNLOCK)
@@ -449,7 +447,7 @@ namespace CNC.Controls
 
                     //                  grdGCode.DataContext = GCode.File.Data.DefaultView;
                     model.ScrollPosition = 0;
-                    job.CurrLine = job.PendingLine = job.ACKPending = 0;
+                    job.CurrLine = job.PendingLine = job.ACKPending = model.BlockExecuting = 0;
                     job.PgmEndLine = GCode.File.Blocks - 1;
 
                     btnStart.IsEnabled = true;
@@ -484,12 +482,14 @@ namespace CNC.Controls
                     model.IsJobRunning = false; // only enable UI if no ATC?
                     btnStart.IsEnabled = true;
                     btnHold.IsEnabled = false;
+                    btnStop.IsEnabled = true;
                     break;
 
                 case StreamingState.Idle:
                 case StreamingState.Send:
                     if (JobTimer.IsRunning)
                     {
+                        model.IsJobRunning = true;
                         GCode.File.Data.Rows[job.PendingLine]["Sent"] = "ok";
                         SetStreamingHandler(StreamingHandler.SendFile);
                         SendNextLine();
@@ -577,6 +577,8 @@ namespace CNC.Controls
                         break;
 
                     case StreamingState.Send:
+                        if (!model.IsJobRunning)
+                            model.IsJobRunning = true;
                         btnStart.IsEnabled = false;
                         btnHold.IsEnabled = true;
                         btnStop.IsEnabled = true;
@@ -748,7 +750,7 @@ namespace CNC.Controls
                         btnStop.IsEnabled = false;
                         btnHold.IsEnabled = !grblState.MPG;
                         btnRewind.IsEnabled = !grblState.MPG && GCode.File.IsLoaded && job.CurrLine != 0;
-                        model.IsJobRunning = false;
+                        model.IsJobRunning = JobTimer.IsRunning;
                         break;
 
                     case StreamingState.Send:
@@ -830,11 +832,11 @@ namespace CNC.Controls
             if (isActive) switch(newstate.State)
             {
                 case GrblStates.Idle:
-                    streamingHandler.Call(StreamingState.Idle, false);
+                    streamingHandler.Call(StreamingState.Idle, true);
                     break;
 
                 case GrblStates.Jog:
-                    model.IsJobRunning = true;
+                    model.IsJobRunning = !model.IsToolChanging;
                     break;
 
                 //case GrblStates.Check:
@@ -930,7 +932,10 @@ namespace CNC.Controls
                 //}
 
                 if (!job.Complete)
+                {
                     job.PendingLine++;
+                    model.BlockExecuting = job.PendingLine;
+                }
             }
             else if (response == "ok")
                 missed++;

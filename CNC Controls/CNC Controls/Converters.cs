@@ -1,7 +1,7 @@
 /*
  * Converters.cs - part of CNC Controls library for Grbl
  *
- * v0.20 / 2020-07-19 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-17 / Io Engineering (Terje Io)
  *
  */
 
@@ -58,6 +58,7 @@ namespace CNC.Controls
         public static GrblStateToColorConverter GrblStateToColorConverter = new GrblStateToColorConverter();
         public static EncoderModeToColorConverter EncoderModeToColorConverter = new EncoderModeToColorConverter();
         public static GrblStateToStringConverter GrblStateToStringConverter = new GrblStateToStringConverter();
+        public static BlocksToStringConverter BlocksToStringConverter = new BlocksToStringConverter();
         public static GrblStateToBooleanConverter GrblStateToBooleanConverter = new GrblStateToBooleanConverter();
         public static HomedStateToColorConverter HomedStateToColorConverter = new HomedStateToColorConverter();
         public static IsHomingEnabledConverter IsHomingEnabledConverter = new IsHomingEnabledConverter();
@@ -89,7 +90,7 @@ namespace CNC.Controls
                 return sb.ToString();
             }
             else
-                return String.Empty;
+                return string.Empty;
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
@@ -104,7 +105,7 @@ namespace CNC.Controls
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            string result = String.Empty;
+            string result = string.Empty;
 
             if (value is LatheMode && (LatheMode)value != LatheMode.Disabled)
                 result = (LatheMode)value == LatheMode.Radius ? "Radius" : "Diameter";
@@ -118,6 +119,18 @@ namespace CNC.Controls
         }
     }
 
+    public class BlocksToStringConverter : IMultiValueConverter
+    {
+        public object Convert(object[] value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value[0] is int && value[1] is int ? (string.Format((int)value[1] == 0 ? "Blocks: {1}" : "Block: {0}/{1}", value[1], value[0])) : string.Empty;
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
     public class GrblStateToColorConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

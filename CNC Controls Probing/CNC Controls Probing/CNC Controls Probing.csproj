@@ -65,6 +65,9 @@
     <Compile Include="EdgeFinderControl.xaml.cs">
       <DependentUpon>EdgeFinderControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="EdgeFinderIntControl.xaml.cs">
+      <DependentUpon>EdgeFinderIntControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="GCodeTransform.cs" />
     <Compile Include="HeightMap.cs" />
     <Compile Include="HeightMapControl.xaml.cs">
@@ -106,6 +109,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="EdgeFinderIntControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="HeightMapControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -143,6 +150,16 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\CenterO.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\cornerIA.png" />
+    <Resource Include="Resources\cornerIB.png" />
+    <Resource Include="Resources\cornerIC.png" />
+    <Resource Include="Resources\CornerID.png" />
+    <Resource Include="Resources\edgeIAB.png" />
+    <Resource Include="Resources\edgeIAD.png" />
+    <Resource Include="Resources\edgeIBC.png" />
+    <Resource Include="Resources\edgeICD.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -1,7 +1,7 @@
 ﻿/*
  * WorkParametersControl.xaml.cs - part of CNC Controls library
  *
- * v0.05 / 2020-02-01 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-11 / Io Engineering (Terje Io)
  *
  */
 

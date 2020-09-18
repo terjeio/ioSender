@@ -10,11 +10,12 @@
         xmlns:cncprobingcontrols="clr-namespace:CNC.Controls.Probing;assembly=CNC.Controls.Probing"
         xmlns:local="clr-namespace:GCode_Sender"
         mc:Ignorable="d"
-        Title="GCode Sender (beta-6)" Height="640" Width="925" MinHeight="660" MinWidth="925"
+        Title="GCode Sender (beta-6.5)" Height="640" Width="925" MinHeight="660" MinWidth="925"
         Loaded="Window_Load"
         Closing="Window_Closing"
         Closed="Window_Closed" Icon="App.ico">
     <Window.Resources>
+        <cnccontrols:BlocksToStringConverter x:Key="BlocksToStringConverter" />
         <cnccontrols:LogicalNotConverter x:Key="BooleanConverter" />
     </Window.Resources>
     <Window.DataContext>
@@ -39,7 +40,7 @@
         </Menu>
         <ToolBarTray DockPanel.Dock="Top" IsLocked="True">
             <ToolBar IsEnabled="{Binding Path=IsJobRunning, Converter={StaticResource BooleanConverter}}" Height="42" VerticalAlignment="Top" Width="{Binding Path=ActualWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DockPanel}}}" >
-                <cnccontrols:FileActionControl HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                <cnccontrols:FileActionControl IsEnabled="{Binding Path=IsToolChanging, Converter={StaticResource BooleanConverter}}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                 <Separator Margin="4,0"></Separator>
                 <cnccontrols:MacroToolbarControl x:Name="toolbarMacros"/>
             </ToolBar>
@@ -49,7 +50,7 @@
                 <ItemsPanelTemplate>
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="100" />
+                            <ColumnDefinition Width="Auto" MinWidth="120" />
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
@@ -61,7 +62,14 @@
                 </ItemsPanelTemplate>
             </StatusBar.ItemsPanel>
             <StatusBarItem>
-                <TextBlock Text="{Binding Path=Blocks, StringFormat=Blocks: \{0\}}" TextWrapping="NoWrap"/>
+                <TextBlock TextWrapping="NoWrap">
+                    <TextBlock.Text>
+                        <MultiBinding Converter="{StaticResource BlocksToStringConverter}">
+                            <Binding Path="Blocks" />
+                            <Binding Path="BlockExecuting" />
+                        </MultiBinding>
+                    </TextBlock.Text>
+                </TextBlock>
             </StatusBarItem>
             <Separator Grid.Column="1" />
             <StatusBarItem Grid.Column="2">
@@ -87,6 +95,7 @@
             <cnccontrols:JogControl x:Name="jogControl" Visibility="Hidden" Canvas.Right="22" Canvas.Top="25"/>
             <cnccontrols:MacroExecuteControl x:Name="macroControl" Visibility="Hidden" Canvas.Right="22" Canvas.Top="100"/>
             <cnccontrols:GotoControl x:Name="gotoControl" Visibility="Hidden" Canvas.Right="22" Canvas.Top="175"/>
+            <cnccontrols:THCMonitorControl x:Name="thcControl" Visibility="Hidden" Canvas.Right="22" Canvas.Top="250"/>
         </Canvas>
         <TabControl Background="#FFE5E5E5" DockPanel.Dock="Left" x:Name="tabMode" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SelectionChanged="TabMode_SelectionChanged">
             <TabItem x:Name="tabGrbl" Header="Grbl" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">

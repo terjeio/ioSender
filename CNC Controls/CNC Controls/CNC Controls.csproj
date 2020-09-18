@@ -109,6 +109,9 @@
       <DependentUpon>JogControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="KeypressHandler.cs" />
+    <Compile Include="LEDControl.xaml.cs">
+      <DependentUpon>LEDControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="LimitsBaseControl.xaml.cs">
       <DependentUpon>LimitsBaseControl.xaml</DependentUpon>
     </Compile>
@@ -160,6 +163,9 @@
     </Compile>
     <Compile Include="StripGCodeConfigControl.xaml.cs">
       <DependentUpon>StripGCodeConfigControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="THCMonitorControl.xaml.cs">
+      <DependentUpon>THCMonitorControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="ToolView.xaml.cs">
       <DependentUpon>ToolView.xaml</DependentUpon>
@@ -214,6 +220,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="JogControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="LEDControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -316,6 +326,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="StripGCodeConfigControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="THCMonitorControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

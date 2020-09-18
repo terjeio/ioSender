@@ -1,7 +1,7 @@
 ﻿/*
- * IProbeTab.cs - part of CNC Probing library
+ * THCMonitorControl.xaml.cs - part of CNC Controls library
  *
- * v0.27 / 2020-09-06 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-11 / Io Engineering (Terje Io)
  *
  */
 
@@ -37,12 +37,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-namespace CNC.Controls.Probing
+using System.Windows;
+using System.Windows.Controls;
+
+namespace CNC.Controls
 {
-    public interface IProbeTab
+    /// <summary>
+    /// Interaction logic for THCMonitorControl.xaml
+    /// </summary>
+    public partial class THCMonitorControl : UserControl
     {
-        void Activate();
-        void Start();
-        void Stop();
+        public THCMonitorControl()
+        {
+            InitializeComponent();
+        }
+
+        private void btn_Close(object sender, RoutedEventArgs e)
+        {
+            this.Visibility = Visibility.Hidden;
+        }
     }
 }

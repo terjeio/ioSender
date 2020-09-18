@@ -1,7 +1,7 @@
 ﻿/*
  * MDIControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.25 / 2020-08-29 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-17 / Io Engineering (Terje Io)
  *
  */
 
@@ -75,9 +75,12 @@ namespace CNC.Controls
             if (e.Key == Key.Return && (DataContext as GrblViewModel).MDICommand.CanExecute(null))
             {
                 string cmd = (sender as ComboBox).Text;
+                var model = DataContext as GrblViewModel;
                 if (!string.IsNullOrEmpty(cmd) && (Commands.Count == 0 || Commands[0] != cmd))
                     Commands.Insert(0, cmd);
-                (DataContext as GrblViewModel).MDICommand.Execute(cmd);
+                if (model.GrblError != 0)
+                    model.ExecuteCommand("");
+                model.MDICommand.Execute(cmd);
                 (sender as ComboBox).SelectedIndex = -1;
             }
         }
@@ -94,6 +97,9 @@ namespace CNC.Controls
 
         private void Send_Click(object sender, RoutedEventArgs e)
         {
+            if ((DataContext as GrblViewModel).GrblError != 0)
+                (DataContext as GrblViewModel).ExecuteCommand("");
+
             if (!string.IsNullOrEmpty(Command) && !Commands.Contains(Command))
                 Commands.Insert(0, Command);
         }

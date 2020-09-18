@@ -1,7 +1,7 @@
 ﻿/*
  * ProbingViewModel.cs - part of CNC Probing library
  *
- * v0.26 / 2020-09-04 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-18 / Io Engineering (Terje Io)
  *
  */
 
@@ -61,15 +61,16 @@ namespace CNC.Controls.Probing
         }
 
         private string _message = string.Empty, _tool = string.Empty, _instructions = string.Empty, _position = string.Empty;
-        private double _tpHeight, _fHeight, _ProbeDiameter, _workpieceDiameter = 0d, _workpieceHeight = 0d;
+        private double _tpHeight, _fHeight, _ProbeDiameter, _workpieceSizeX = 0d, _workpieceSizeY = 0d, _workpieceHeight = 0d;
         private double _latchDistance, _latchFeedRate;
         private double _probeDistance, _probeFeedRate;
         private double _rapidsFeedRate;
         private double _offset, _xyClearance, _depth;
         private double _tloReferenceOffset = double.NaN;
 
-        private bool _canProbe = false, _isComplete = false, _isSuccess = false, _probeZ = false, _useFixture = false, _hasToolTable = false, _hasCs9 = false;
-        private bool isCancelled = false, wasZselected = false, _referenceToolOffset = true;
+        private bool _canProbe = false, _isComplete = false, _isSuccess = false, _probeZ = false, _useFixture = false;
+        private bool _hasToolTable = false, _hasCs9 = false, _addAction = false, _isPaused = false;
+        private bool isCancelled = false, wasZselected = false, _referenceToolOffset = true, _workpieceLockXY = true;
         private GrblViewModel _grblmodel = null;
         private List<string> _program = new List<string>();
         private List<Position> _positions = new List<Position>();
@@ -77,7 +78,7 @@ namespace CNC.Controls.Probing
         private CoordMode _cmode = CoordMode.G10;
         private Edge _edge = Edge.None;
         private Center _center = Center.None;
-        private int _coordinateSystem = 0;
+        private int _coordinateSystem = 0, _passes = 1;
         private ProbingProfile _profile;
         private CancellationToken cancellationToken = new CancellationToken();
 
@@ -144,6 +145,22 @@ namespace CNC.Controls.Probing
             if (Grbl.ResponseLogVerbose)
                 Grbl.ResponseLog.Add(command);
 
+            new Thread(() =>
+            {
+                res = WaitFor.AckResponse<string>(
+                cancellationToken,
+                null,
+                a => Grbl.OnResponseReceived += a,
+                a => Grbl.OnResponseReceived -= a,
+                1000, () => Grbl.ExecuteCommand(command));
+            }).Start();
+
+            while (res == null)
+                EventUtils.DoEvents();
+
+            if (res == true)
+                res = null;
+
             while (res == null)
             {
                 new Thread(() =>
@@ -153,7 +170,7 @@ namespace CNC.Controls.Probing
                     null,
                     a => Grbl.OnResponseReceived += a,
                     a => Grbl.OnResponseReceived -= a,
-                    5000, () => Grbl.ExecuteCommand(command));
+                    5000);
                 }).Start();
 
                 while (res == null)
@@ -244,6 +261,7 @@ namespace CNC.Controls.Probing
         }
 
         public GrblViewModel Grbl { get { return _grblmodel; } private set { _grblmodel = value; OnPropertyChanged(); } }
+        public Position StartPosition { get; private set; } = new Position();
         public HeightMapViewModel HeightMap { get; private set; } = new HeightMapViewModel();
         public ObservableCollection<CoordinateSystem> CoordinateSystems { get; private set; } = new ObservableCollection<CoordinateSystem>();
         public ObservableCollection<ProbingProfile> Profiles { get; private set; }
@@ -272,6 +290,7 @@ namespace CNC.Controls.Probing
         public string Instructions { get { return _instructions; } set { _instructions = value; OnPropertyChanged(); } }
         public string Position { get { return _position; } set { if (_position != value) { _position = value; OnPropertyChanged(); }  } }
 
+        public int Passes { get { return _passes; } set { _passes = value; OnPropertyChanged(); } }
         public int CoordinateSystem { get { return _coordinateSystem; } set { _coordinateSystem = value; OnPropertyChanged(); } }
         public double ProbeFeedRate { get { return _probeFeedRate; } set { _probeFeedRate = value; OnPropertyChanged(); } }
         public double ProbeDistance { get { return _probeDistance; } set { _probeDistance = value; OnPropertyChanged(); } }
@@ -284,14 +303,16 @@ namespace CNC.Controls.Probing
         public bool CanProbe { get { return _canProbe; } set { _canProbe = value; OnPropertyChanged(); } }
         public bool IsCompleted { get { return _isComplete; } set { _isComplete = value; OnPropertyChanged(); } }
         public bool IsSuccess { get { return _isSuccess; } set { _isSuccess = value; OnPropertyChanged(); } }
+        public bool IsPaused { get { return _isPaused; } set { _isPaused = value; OnPropertyChanged(); } }
         public bool ProbeZ { get { return _probeZ; } set { _probeZ = value; OnPropertyChanged(); } }
         public string Tool { get { return _tool; } set { _tool = value; OnPropertyChanged(); } }
-        public bool ProbeFixture { get { return _useFixture; } set { _useFixture = value; OnPropertyChanged(); } }
+        public bool ProbeFixture { get { return _useFixture; } set { _useFixture = value; OnPropertyChanged(); if (_useFixture) AddAction = false; } }
         public bool HasToolTable { get { return _hasToolTable; } set { _hasToolTable = value; OnPropertyChanged(); } }
         public bool HasCoordinateSystem9 { get { return _hasCs9; } set { _hasCs9 = value; OnPropertyChanged(); } }
         public bool ReferenceToolOffset { get { return _referenceToolOffset; } set { _referenceToolOffset = value; OnPropertyChanged(); } }
         public double TloReference { get { return _tloReferenceOffset; } set { _tloReferenceOffset = value; OnPropertyChanged(); } }
-
+        public bool AddAction { get { return _addAction; } set { _addAction = value; OnPropertyChanged(); } }
+  
         public bool HeightMapApplied
         {
             get { return GCode.File.HeightMapApplied; }
@@ -353,7 +374,46 @@ namespace CNC.Controls.Probing
             }
         }
         public Center ProbeCenter { get { return _center; } set { _center = value; OnPropertyChanged(); } }
-        public double WorkpieceDiameter { get { return _workpieceDiameter; } set { _workpieceDiameter = value; OnPropertyChanged(); } }
+        public bool WorkpiecLockXY
+        {
+            get { return _workpieceLockXY; }
+            set {
+                _workpieceLockXY = value;
+                OnPropertyChanged();
+                if (_workpieceLockXY && _workpieceSizeY != _workpieceSizeX)
+                {
+                    _workpieceSizeY = _workpieceSizeX;
+                    OnPropertyChanged(nameof(WorkpieceSizeY));
+                }
+            }
+        }
+        public double WorkpieceSizeX
+        {
+            get { return _workpieceSizeX; }
+            set {
+                _workpieceSizeX = value;
+                OnPropertyChanged();
+                if (_workpieceLockXY)
+                {
+                    _workpieceSizeY = value;
+                    OnPropertyChanged(nameof(WorkpieceSizeY));
+                }
+            }
+        }
+        public double WorkpieceSizeY
+        {
+            get { return _workpieceSizeY; }
+            set
+            {
+                _workpieceSizeY = value;
+                OnPropertyChanged();
+                if (_workpieceLockXY)
+                {
+                    _workpieceSizeX = value;
+                    OnPropertyChanged(nameof(WorkpieceSizeX));
+                }
+            }
+        }
         public double WorkpieceHeight { get { return _workpieceHeight; } set { _workpieceHeight = value; OnPropertyChanged(); } }
 
     }

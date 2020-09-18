@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="CNC.Controls.Probing.EdgeFinderControl"
+﻿<UserControl x:Class="CNC.Controls.Probing.EdgeFinderIntControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -79,16 +79,16 @@
                     <ColumnDefinition Width="60" />
                     <ColumnDefinition Width="60" />
                 </Grid.ColumnDefinitions>
-                <RadioButton Content="Resources/cornerD.png" Style="{StaticResource Flag}" IsChecked="{Binding Path=ProbeEdge, Mode=TwoWay, Converter={StaticResource EnumToEdgeConverter}, ConverterParameter=D}" />
-                <RadioButton Content="Resources/edgeCD.png" Grid.Column="1" Style="{StaticResource Flag}" IsChecked="{Binding Path=ProbeEdge, Mode=TwoWay, Converter={StaticResource EnumToEdgeConverter}, ConverterParameter=CD}" />
-                <RadioButton Content="Resources/cornerC.png" Grid.Column="2" Style="{StaticResource Flag}" IsChecked="{Binding Path=ProbeEdge, Mode=TwoWay, Converter={StaticResource EnumToEdgeConverter}, ConverterParameter=C}" />
-                <RadioButton Content="Resources/edgeAD.png" Grid.Row="1" Style="{StaticResource Flag}" IsChecked="{Binding Path=ProbeEdge, Mode=TwoWay, Converter={StaticResource EnumToEdgeConverter}, ConverterParameter=AD}" />
+                <RadioButton Content="Resources/cornerID.png" Style="{StaticResource Flag}" IsChecked="{Binding Path=ProbeEdge, Mode=TwoWay, Converter={StaticResource EnumToEdgeConverter}, ConverterParameter=D}" />
+                <RadioButton Content="Resources/edgeICD.png" Grid.Column="1" Style="{StaticResource Flag}" IsChecked="{Binding Path=ProbeEdge, Mode=TwoWay, Converter={StaticResource EnumToEdgeConverter}, ConverterParameter=CD}" />
+                <RadioButton Content="Resources/cornerIC.png" Grid.Column="2" Style="{StaticResource Flag}" IsChecked="{Binding Path=ProbeEdge, Mode=TwoWay, Converter={StaticResource EnumToEdgeConverter}, ConverterParameter=C}" />
+                <RadioButton Content="Resources/edgeIAD.png" Grid.Row="1" Style="{StaticResource Flag}" IsChecked="{Binding Path=ProbeEdge, Mode=TwoWay, Converter={StaticResource EnumToEdgeConverter}, ConverterParameter=AD}" />
                 <RadioButton Content="Resources/edgeZ.png" Grid.Row="1" Grid.Column="1" Style="{StaticResource Flag}" IsChecked="{Binding Path=ProbeEdge, Mode=TwoWay, Converter={StaticResource EnumToEdgeConverter}, ConverterParameter=Z}" />
-                <RadioButton Content="Resources/edgeBC.png" Grid.Row="1" Grid.Column="2" Style="{StaticResource Flag}" IsChecked="{Binding Path=ProbeEdge, Mode=TwoWay, Converter={StaticResource EnumToEdgeConverter}, ConverterParameter=CB}" />
-                <RadioButton Content="Resources/cornerA.png" Grid.Row="2" Grid.Column="0" Style="{StaticResource Flag}" IsChecked="{Binding Path=ProbeEdge, Mode=TwoWay, Converter={StaticResource EnumToEdgeConverter}, ConverterParameter=A}" />
-                <RadioButton Content="Resources/edgeAB.png" Grid.Row="2" Grid.Column="1" Style="{StaticResource Flag}" IsChecked="{Binding Path=ProbeEdge, Mode=TwoWay, Converter={StaticResource EnumToEdgeConverter}, ConverterParameter=AB}" />
-                <RadioButton Content="Resources/cornerB.png" Grid.Row="2" Grid.Column="2" Style="{StaticResource Flag}" IsChecked="{Binding Path=ProbeEdge, Mode=TwoWay, Converter={StaticResource EnumToEdgeConverter}, ConverterParameter=B}" />
-                <Rectangle Margin="35,35,0,0" Style="{StaticResource ZProbe}">
+                <RadioButton Content="Resources/edgeIBC.png" Grid.Row="1" Grid.Column="2" Style="{StaticResource Flag}" IsChecked="{Binding Path=ProbeEdge, Mode=TwoWay, Converter={StaticResource EnumToEdgeConverter}, ConverterParameter=CB}" />
+                <RadioButton Content="Resources/cornerIA.png" Grid.Row="2" Grid.Column="0" Style="{StaticResource Flag}" IsChecked="{Binding Path=ProbeEdge, Mode=TwoWay, Converter={StaticResource EnumToEdgeConverter}, ConverterParameter=A}" />
+                <RadioButton Content="Resources/edgeIAB.png" Grid.Row="2" Grid.Column="1" Style="{StaticResource Flag}" IsChecked="{Binding Path=ProbeEdge, Mode=TwoWay, Converter={StaticResource EnumToEdgeConverter}, ConverterParameter=AB}" />
+                <RadioButton Content="Resources/cornerIB.png" Grid.Row="2" Grid.Column="2" Style="{StaticResource Flag}" IsChecked="{Binding Path=ProbeEdge, Mode=TwoWay, Converter={StaticResource EnumToEdgeConverter}, ConverterParameter=B}" />
+                <Rectangle Margin="-43,-43,0,0" Style="{StaticResource ZProbe}">
                     <Rectangle.Visibility>
                         <MultiBinding Converter="{StaticResource ZProbeIsVisibleConverter}" ConverterParameter="D">
                             <Binding Path="ProbeEdge"/>
@@ -96,7 +96,7 @@
                         </MultiBinding>
                     </Rectangle.Visibility>
                 </Rectangle>
-                <Rectangle Grid.Column="1" Margin="0,35,0,0" Style="{StaticResource ZProbe}">
+                <Rectangle Grid.Column="1" Margin="0,-43,0,0" Style="{StaticResource ZProbe}">
                     <Rectangle.Visibility>
                         <MultiBinding Converter="{StaticResource ZProbeIsVisibleConverter}" ConverterParameter="CD">
                             <Binding Path="ProbeEdge"/>
@@ -104,7 +104,7 @@
                         </MultiBinding>
                     </Rectangle.Visibility>
                 </Rectangle>
-                <Rectangle Grid.Column="2" Margin="0,35,35,0" Style="{StaticResource ZProbe}">
+                <Rectangle Grid.Column="2" Margin="0,-43,-43,0" Style="{StaticResource ZProbe}">
                     <Rectangle.Visibility>
                         <MultiBinding Converter="{StaticResource ZProbeIsVisibleConverter}" ConverterParameter="C">
                             <Binding Path="ProbeEdge"/>
@@ -112,7 +112,7 @@
                         </MultiBinding>
                     </Rectangle.Visibility>
                 </Rectangle>
-                <Rectangle Grid.Row="1"  Margin="35,0,0,0" Style="{StaticResource ZProbe}">
+                <Rectangle Grid.Row="1"  Margin="-43,0,0,0" Style="{StaticResource ZProbe}">
                     <Rectangle.Visibility>
                         <MultiBinding Converter="{StaticResource ZProbeIsVisibleConverter}" ConverterParameter="AD">
                             <Binding Path="ProbeEdge"/>
@@ -128,7 +128,7 @@
                         </MultiBinding>
                     </Rectangle.Visibility>
                 </Rectangle>
-                <Rectangle Grid.Row="1" Grid.Column="2" Margin="0,0,35,0"  HorizontalAlignment="Center" Style="{StaticResource ZProbe}">
+                <Rectangle Grid.Row="1" Grid.Column="2" Margin="0,0,-43,0"  HorizontalAlignment="Center" Style="{StaticResource ZProbe}">
                     <Rectangle.Visibility>
                         <MultiBinding Converter="{StaticResource ZProbeIsVisibleConverter}" ConverterParameter="CB">
                             <Binding Path="ProbeEdge"/>
@@ -136,7 +136,7 @@
                         </MultiBinding>
                     </Rectangle.Visibility>
                 </Rectangle>
-                <Rectangle Grid.Row="2" Margin="35,0,0,35" Style="{StaticResource ZProbe}">
+                <Rectangle Grid.Row="2" Margin="-43,0,0,-43" Style="{StaticResource ZProbe}">
                     <Rectangle.Visibility>
                         <MultiBinding Converter="{StaticResource ZProbeIsVisibleConverter}" ConverterParameter="A">
                             <Binding Path="ProbeEdge"/>
@@ -144,7 +144,7 @@
                         </MultiBinding>
                     </Rectangle.Visibility>
                 </Rectangle>
-                <Rectangle Grid.Row="2" Grid.Column="1" Margin="0,0,0,35" Style="{StaticResource ZProbe}">
+                <Rectangle Grid.Row="2" Grid.Column="1" Margin="0,0,0,-43" Style="{StaticResource ZProbe}">
                     <Rectangle.Visibility>
                         <MultiBinding Converter="{StaticResource ZProbeIsVisibleConverter}" ConverterParameter="AB">
                             <Binding Path="ProbeEdge"/>
@@ -152,7 +152,7 @@
                         </MultiBinding>
                     </Rectangle.Visibility>
                 </Rectangle>
-                <Rectangle Grid.Row="2" Grid.Column="2" Margin="0,0,35,35" Style="{StaticResource ZProbe}">
+                <Rectangle Grid.Row="2" Grid.Column="2" Margin="0,0,-43,-43" Style="{StaticResource ZProbe}">
                     <Rectangle.Visibility>
                         <MultiBinding Converter="{StaticResource ZProbeIsVisibleConverter}" ConverterParameter="B">
                             <Binding Path="ProbeEdge"/>

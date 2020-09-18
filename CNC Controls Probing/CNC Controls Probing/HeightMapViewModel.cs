@@ -1,7 +1,7 @@
 ﻿/*
  * HeightViewModel.xaml.cs - part of CNC Probing library
  *
- * v0.19 / 2020-05-20 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-15 / Io Engineering (Terje Io)
  *
  */
 
@@ -44,7 +44,7 @@ namespace CNC.Controls.Probing
 {
     public class HeightMapViewModel : ViewModelBase
     {
-        private bool _hasHeightMap = false, _canApply = false, _setToolOffset = false;
+        private bool _hasHeightMap = false, _canApply = false, _setToolOffset = false, _addPause = false;
         private double _minX = 0d, _minY = 0d, _maxX = 50, _maxY = 50d, _gridSize = 5d;
         private HeightMap _heightMap = null;
         private Point3DCollection _mapPoints;
@@ -64,6 +64,8 @@ namespace CNC.Controls.Probing
         public bool HasHeightMap { get { return _hasHeightMap && _heightMap != null; } set { if (value != _hasHeightMap) _hasHeightMap = value; OnPropertyChanged(); } }
         public bool CanApply { get { return _canApply && HasHeightMap; } set { _canApply = value; OnPropertyChanged(); } }
         public bool SetToolOffset { get { return _setToolOffset; } set { _setToolOffset = value; OnPropertyChanged(); } }
+        public bool AddPause { get { return _addPause; } set { _addPause = value; OnPropertyChanged(); } }
+
         public MeshGeometry3D MeshGeometry { get { return _meshGeometry; } set { _meshGeometry = value; OnPropertyChanged(); } }
         public Point3DCollection MapPoints { get { return _mapPoints; } set { _mapPoints = value; OnPropertyChanged(); } }
         public Point3DCollection BoundaryPoints { get { return _bp; } set { _bp = value; OnPropertyChanged(); } }

@@ -1,7 +1,7 @@
 ﻿/*
  * CsSelectControl.xaml.cs - part of CNC Probing library
  *
- * v0.14 / 2020-03-25 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-06 / Io Engineering (Terje Io)
  *
  */
 
@@ -54,7 +54,10 @@ namespace CNC.Controls.Probing
 
         private void ClearG92_Click(object sender, RoutedEventArgs e)
         {
-            (DataContext as ProbingViewModel).Grbl.ExecuteCommand("G92.1");
+            var model = DataContext as ProbingViewModel;
+            model.Grbl.ExecuteCommand("G92.1");
+            if (!model.Grbl.IsParserStateLive)
+                model.Grbl.ExecuteCommand("$G");
         }
     }
 }

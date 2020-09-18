@@ -1,7 +1,7 @@
 ﻿/*
  * ProbingView.xaml.cs - part of CNC Probing library
  *
- * v0.20 / 2020-06-03 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-15 / Io Engineering (Terje Io)
  *
  */
 
@@ -70,7 +70,6 @@ namespace CNC.Controls.Probing
             {
                 if (keyboard == null) {
                     keyboard = new KeypressHandler(DataContext as GrblViewModel);
-                    keyboard.AddHandler(Key.None, ModifierKeys.Shift, EnableJog);
                     keyboard.AddHandler(Key.R, ModifierKeys.Alt, StartProbe);
                     keyboard.AddHandler(Key.S, ModifierKeys.Alt, StopProbe);
                 }
@@ -96,6 +95,7 @@ namespace CNC.Controls.Probing
 
         private bool StopProbe(Key key)
         {
+            getView(tab.SelectedItem as TabItem)?.Stop();
 
             return true;
         }
@@ -103,13 +103,6 @@ namespace CNC.Controls.Probing
         private bool StartProbe(Key key)
         {
             getView(tab.SelectedItem as TabItem)?.Start();
-
-            return true;
-        }
-
-        private bool EnableJog(Key key)
-        {
-            getView(tab.SelectedItem as TabItem)?.Stop();
 
             return true;
         }
@@ -164,6 +157,9 @@ namespace CNC.Controls.Probing
                     model.HasToolTable = GrblInfo.NumTools > 0;
                 }
 
+                if (GrblSettings.IsGrblHAL)
+                    Comms.com.WriteByte(GrblConstants.CMD_STATUS_REPORT_ALL);
+
                 GrblParserState.Get(!GrblSettings.IsGrblHAL);
                 mode = GrblParserState.DistanceMode;
                 model.Tool = model.Grbl.Tool == GrblConstants.NO_TOOL ? "0" : model.Grbl.Tool;
@@ -177,6 +173,8 @@ namespace CNC.Controls.Probing
                     model.TloReference = model.Grbl.TloReference;
                     model.ReferenceToolOffset = false;
                 }
+
+                getView(tab.SelectedItem as TabItem)?.Activate();
 
                 model.Grbl.PropertyChanged += Grbl_PropertyChanged;
 
@@ -197,6 +195,7 @@ namespace CNC.Controls.Probing
                 model.Grbl.ExecuteCommand(mode == DistanceMode.Absolute ? "G90" : "G91");
             }
 
+            model.Message = string.Empty;
             model.Grbl.Poller.SetState(activate ? AppConfig.Settings.Base.PollInterval : 0);
         }
 
@@ -234,7 +233,7 @@ namespace CNC.Controls.Probing
 
         private void btnAddProfile_Click(object sender, RoutedEventArgs e)
         {
-            if (model.Profile == null)
+            if (model.Profile == null || model.Profiles[model.Profile.Id].Name != cbxProfile.Text)
             {
                 mnuAdd.IsEnabled = true;
                 mnuUpdate.IsEnabled = false;
@@ -283,29 +282,10 @@ namespace CNC.Controls.Probing
 
         private void tab_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if((sender as TabControl).SelectedItem != null)
-                switch (((sender as TabControl).SelectedItem as TabItem).Header.ToString())
-                {
-                    case "Tool length":
-                        model.Instructions = string.Empty;
-                        break;
-
-                    case "Center finder":
-                        model.Instructions = "Click image above to select probing action.\nPlace the probe above the approximate center of the workpiece before start.";
-                        break;
-
-                    case "Edge finder":
-                        model.Instructions = "Click edge, corner or center in image above to select probing action.\nMove the probe to above the position indicated by green dot before start.";
-                        break;
-
-                    case "Height map":
-                        model.Instructions = "A rapid motion to X,Y will be performed before probing the height map starts.";
-                        break;
-
-                    default:
-                        model.Instructions = string.Empty;
-                        break;
-                }
+            model.Message = string.Empty;
+            if(GrblSettings.IsGrblHAL)
+                Comms.com.WriteByte(GrblConstants.CMD_STATUS_REPORT_ALL);
+            getView(((sender as TabControl).SelectedItem as TabItem))?.Activate();
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿/*
  * AppConfig.cs - part of CNC Controls library for Grbl
  *
- * v0.20 / 2020-06-30 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-06 / Io Engineering (Terje Io)
  *
  */
 
@@ -131,7 +131,7 @@ namespace CNC.Controls
     public class Config : ViewModelBase
     {
         private int _pollInterval = 200; // ms
-        private bool _useBuffering = false;
+        private bool _useBuffering = false, _keepMdiFocus = true;
         private CommandIgnoreState _ignoreM6 = CommandIgnoreState.No, _ignoreM7 = CommandIgnoreState.No, _ignoreM8 = CommandIgnoreState.No;
 
         public int PollInterval { get { return _pollInterval < 100 ? 100 : _pollInterval; } set { _pollInterval = value; OnPropertyChanged(); } }
@@ -139,6 +139,7 @@ namespace CNC.Controls
         public int ResetDelay { get; set; } = 2000;
         public bool UseBuffering { get { return _useBuffering; } set { _useBuffering = value; OnPropertyChanged(); } }
         public string Editor { get; set; } = "notepad.exe";
+        public bool KeepMdiFocus { get { return _keepMdiFocus; } set { _keepMdiFocus = value; OnPropertyChanged(); } }
 
         [XmlIgnore]
         public CommandIgnoreState[] CommandIgnoreStates { get { return (CommandIgnoreState[])Enum.GetValues(typeof(CommandIgnoreState)); } }

@@ -1,7 +1,7 @@
 /*
  * JobView.xaml.cs - part of Grbl Code Sender
  *
- * v0.24 / 2020-08-27 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-17 / Io Engineering (Terje Io)
  *
  */
 
@@ -98,10 +98,14 @@ namespace GCode_Sender
                         GrblCommand.ToolChange = (sender as GrblViewModel).IsJobRunning ? "T{0}M6" : "M61Q{0}";
                     break;
 
-                case nameof(GrblViewModel.Tool):
-                    if (GrblInfo.ManualToolChange && (sender as GrblViewModel).Tool != GrblConstants.NO_TOOL)
-                        GrblWorkParameters.RemoveNoTool();
+                case nameof(GrblViewModel.IsToolChanging):
+                    MainWindow.ui.JobRunning = (sender as GrblViewModel).IsToolChanging || (sender as GrblViewModel).IsJobRunning;
                     break;
+
+                case nameof(GrblViewModel.Tool):
+                if (GrblInfo.ManualToolChange && (sender as GrblViewModel).Tool != GrblConstants.NO_TOOL)
+                    GrblWorkParameters.RemoveNoTool();
+                break;
 
                 case nameof(GrblViewModel.GrblReset):
                     if ((sender as GrblViewModel).IsReady)
@@ -187,6 +191,12 @@ namespace GCode_Sender
                         if (!(data.GrblState.Substate == 1 || data.GrblState.Substate == 2 || data.GrblState.Substate == 10))
                             InitSystem();
                     }
+                    else if (Comms.com.Reply.StartsWith("<Tool"))
+                    {
+                        Comms.com.WriteByte(GrblConstants.CMD_STOP);
+                        GrblViewModel data = (GrblViewModel)DataContext;
+                        data.ParseStatus(Comms.com.Reply);
+                    }
                     else if (Comms.com.Reply != "")
                         InitSystem();
                 }
@@ -215,7 +225,9 @@ namespace GCode_Sender
                 if (MainWindow.UIViewModel.Camera != null)
                     MainWindow.UIViewModel.Camera.MoveOffset -= Camera_MoveOffset;
                 #endif
-                focusedControl = Keyboard.FocusedElement is TextBox && (string)(Keyboard.FocusedElement as TextBox).Tag == "MDI" ? Keyboard.FocusedElement : this;
+                focusedControl = AppConfig.Settings.Base.KeepMdiFocus && Keyboard.FocusedElement is TextBox && (string)(Keyboard.FocusedElement as TextBox).Tag == "MDI"
+                                  ? Keyboard.FocusedElement
+                                  : this;
             }
 
             if (GCodeSender.Activate(activate)) {
@@ -412,7 +424,12 @@ namespace GCode_Sender
         protected override void OnPreviewKeyDown(KeyEventArgs e)
         {
             if (!(e.Handled = ProcessKeyPreview(e)))
+            {
+                if (Keyboard.Modifiers == (ModifierKeys.Control | ModifierKeys.Shift))
+                    Focus();
+
                 base.OnPreviewKeyDown(e);
+            }
         }
         protected override void OnPreviewKeyUp(KeyEventArgs e)
         {

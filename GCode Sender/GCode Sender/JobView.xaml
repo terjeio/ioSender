@@ -11,6 +11,7 @@
              Focusable="True"
              Loaded="JobView_Load"
              IsVisibleChanged="JobView_IsVisibleChanged"
+             FocusVisualStyle="{x:Null}"
              SizeChanged="JobView_SizeChanged">
     <UserControl.Resources>
         <cnccontrols:BoolToVisibleConverter x:Key="IsVisibleConverter" />

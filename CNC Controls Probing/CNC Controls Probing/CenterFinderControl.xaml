@@ -6,7 +6,7 @@
              xmlns:Controls="clr-namespace:CNC.Controls;assembly=CNC.Controls.WPF"
              xmlns:local="clr-namespace:CNC.Controls.Probing"
              mc:Ignorable="d" Height="350"
-             d:DesignHeight="300" d:DesignWidth="300">
+             d:DesignHeight="300" d:DesignWidth="350">
     <UserControl.Resources>
         <Controls:MultiLineConverter x:Key="ErrorMessageConverter" />
         <Controls:LogicalNotConverter x:Key="IsNotRunningConverter" />
@@ -28,11 +28,24 @@
     </UserControl.Resources>
     <Grid>
         <StackPanel Orientation="Vertical" Margin="10">
-            <local:CsSelectControl Margin="5,0,0,0"/>
-            <GroupBox Header="Workpiece">
-                <Controls:NumericField Label="Diameter" Value="{Binding Path=WorkpieceDiameter, Mode=TwoWay}" Margin="0,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Style="{StaticResource ErrorStyle}"/>
+            <StackPanel Orientation="Horizontal">
+                <local:CsSelectControl/>
+                <GroupBox Header="Passes" Width="120" ToolTip="More than one pass is usually needed to get accurate dimensions.">
+                    <Controls:NumericField Label="Passes:" Value="{Binding Path=Passes, Mode=TwoWay}" Unit="" Format="0" Margin="0,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Style="{StaticResource ErrorStyle}"/>
+                 </GroupBox>
+            </StackPanel>
+            <GroupBox Header="Workpiece dimensions">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                    </Grid.RowDefinitions>
+                    <Controls:NumericField Grid.Row="0" Label="X size:" Value="{Binding Path=WorkpieceSizeX, Mode=TwoWay}" Margin="0,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Style="{StaticResource ErrorStyle}"/>
+                    <Controls:NumericField Grid.Row="1" Label="Y size:" Value="{Binding Path=WorkpieceSizeY, Mode=TwoWay}" Margin="0,2,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Style="{StaticResource ErrorStyle}"/>
+                    <CheckBox Content="Lock" Grid.RowSpan="2" IsChecked="{Binding Path=WorkpiecLockXY, Mode=TwoWay}" Margin="170,4,0,0" VerticalAlignment="Center"/>
+                </Grid>
             </GroupBox>
-            <StackPanel Orientation="Horizontal" Margin="10,5,0,0" Width="240" ToolTip="Click to select probing action.">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,5,0,0" ToolTip="Click to select probing action.">
                 <StackPanel.Resources>
                     <Style x:Key="RadioImage" TargetType="RadioButton">
                         <Style.Triggers>
@@ -58,7 +71,7 @@
                     </Style>
                 </StackPanel.Resources>
                 <RadioButton Content="Resources/centerI.png" Style="{StaticResource RadioImage}" GroupName="edge" IsChecked="{Binding Path=ProbeCenter, Mode=TwoWay, Converter={StaticResource EnumToEdgeConverter}, ConverterParameter=Inside}" />
-                <RadioButton Content="Resources/centerO.png" Style="{StaticResource RadioImage}" GroupName="edge" IsChecked="{Binding Path=ProbeCenter, Mode=TwoWay, Converter={StaticResource EnumToEdgeConverter}, ConverterParameter=Outside}" />
+                <RadioButton Content="Resources/centerO.png" Style="{StaticResource RadioImage}" GroupName="edge" IsChecked="{Binding Path=ProbeCenter, Mode=TwoWay, Converter={StaticResource EnumToEdgeConverter}, ConverterParameter=Outside}" Margin="5,0,0,0" />
             </StackPanel>
         </StackPanel>
         <StackPanel Margin="5,0,0,5" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Height="Auto" Width="Auto">

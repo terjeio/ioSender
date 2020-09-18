@@ -1,7 +1,7 @@
 ﻿/*
  * HeightMapControl.xaml.cs - part of CNC Probing library
  *
- * v0.26 / 2020-09-04 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-18 / Io Engineering (Terje Io)
  *
  */
 
@@ -52,12 +52,16 @@ namespace CNC.Controls.Probing
     /// </summary>
     public partial class HeightMapControl : UserControl, IProbeTab
     {
-        private Position origin = null;
         private int x, y;
 
         public HeightMapControl()
         {
             InitializeComponent();
+        }
+
+        public void Activate()
+        {
+            (DataContext as ProbingViewModel).Instructions = "A rapid motion to X0Y0 will be performed before probing the height map starts.";
         }
 
         public void Start()
@@ -83,12 +87,12 @@ namespace CNC.Controls.Probing
             probing.HeightMap.HasHeightMap = false;
             probing.HeightMap.Map = new HeightMap(probing.HeightMap.GridSize, new Vector2(probing.HeightMap.MinX, probing.HeightMap.MinY), new Vector2(probing.HeightMap.MaxX, probing.HeightMap.MaxY));
 
-            origin = new Position(probing.Grbl.MachinePosition);
-
             for (x = 0; x < probing.HeightMap.Map.SizeX; x++)
             {
                 for (y = 0; y < probing.HeightMap.Map.SizeY; y++)
                 {
+                    if (probing.HeightMap.AddPause && (x > 0 || y > 0))
+                        probing.Program.AddPause();
                     probing.Program.AddProbingAction(AxisFlags.Z, true);
                     probing.Program.AddRapid("Z" + probing.Depth.ToInvariantString());
                     if (y < (probing.HeightMap.Map.SizeY - 1))
@@ -122,8 +126,8 @@ namespace CNC.Controls.Probing
 
             if ((ok = probing.IsSuccess))
             {
-                probing.GotoMachinePosition(origin, AxisFlags.Z);
-                probing.GotoMachinePosition(origin, AxisFlags.X | AxisFlags.Y);
+                probing.GotoMachinePosition(probing.StartPosition, AxisFlags.Z);
+                probing.GotoMachinePosition(probing.StartPosition, AxisFlags.X | AxisFlags.Y);
 
                 if (probing.HeightMap.SetToolOffset)
                 {
@@ -132,14 +136,21 @@ namespace CNC.Controls.Probing
                     else if ((ok == probing.GotoMachinePosition(probing.Positions[0], AxisFlags.Z)))
                     {
                         probing.Grbl.ExecuteCommand("G92Z0");
-                        probing.GotoMachinePosition(origin, AxisFlags.Z);
+                        probing.GotoMachinePosition(probing.StartPosition, AxisFlags.Z);
+                        if (!probing.Grbl.IsParserStateLive)
+                            probing.Grbl.ExecuteCommand("$G");
                     }
                 }
 
-                double Z0 = probing.Positions[0].Z;
+                double Z0 = probing.Positions[0].Z, z_min = 0d, z_max = 0d, z_delta;
 
                 foreach (var pos in probing.Positions)
-                    probing.HeightMap.Map.AddPoint(toIndex(pos.X - origin.X), toIndex(pos.Y - origin.Y), Math.Round(pos.Z - Z0, probing.Grbl.Precision));
+                {
+                    z_delta = pos.Z - Z0;
+                    z_min = Math.Min(z_min, z_delta);
+                    z_max = Math.Max(z_max, z_delta);
+                    probing.HeightMap.Map.AddPoint(toIndex(pos.X - probing.StartPosition.X), toIndex(pos.Y - probing.StartPosition.Y), Math.Round(z_delta, probing.Grbl.Precision));
+                }
 
                 LinesVisual3D boundary = new LinesVisual3D();
                 PointsVisual3D mapPoints = new PointsVisual3D();
@@ -154,9 +165,8 @@ namespace CNC.Controls.Probing
                 probing.HeightMap.MapPoints = mapPoints.Points;
                 probing.HeightMap.HasHeightMap = true;
 
-                probing.Program.End(ok ? "Probing completed" : "Probing failed");
+                probing.Program.End(ok ? string.Format("Probing completed: Z min: {0}, Z max: {1}", z_min.ToInvariantString(probing.Grbl.Format), z_max.ToInvariantString(probing.Grbl.Format)) : "Probing failed");
             }
-            origin = null;
         }
 
         public void Load (string fileName)
@@ -240,6 +250,10 @@ namespace CNC.Controls.Probing
 
                 gt.ApplyHeightMap(probing);
             }
+        }
+        private void probe_Click(object sender, RoutedEventArgs e)
+        {
+            (DataContext as ProbingViewModel).IsPaused = false;
         }
 
         private void limits_Click(object sender, RoutedEventArgs e)

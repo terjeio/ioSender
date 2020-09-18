@@ -1,7 +1,7 @@
 ﻿/*
  * Grbl.cs - part of CNC Controls library
  *
- * v0.22 / 2020-08-16 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-17 / Io Engineering (Terje Io)
  *
  */
 
@@ -108,7 +108,8 @@ namespace CNC.Core
             FORMAT_METRIC = "###0.000",
             FORMAT_IMPERIAL = "##0.0000",
             NO_TOOL = "None",
-            SIGNALS = "XYZABCEPRDHSBTO"; // Keep in sync with Signals enum below!!
+            SIGNALS = "XYZABCEPRDHSBTO", // Keep in sync with Signals enum below!!
+            THCSIGNALS = "AERTOVHDU"; // Keep in sync with THCSignals enum below!!
 
         public const int
             X_AXIS = 0,
@@ -267,6 +268,20 @@ namespace CNC.Core
         ProbeDisconnected = 1 << 14
     }
 
+    [Flags]
+    public enum THCSignals : int
+    {
+        Off = 0,
+        ArcOk = 1 << 0,
+        THCEnabled = 1 << 1,
+        THCActive = 1 << 2,
+        TorchOn = 1 << 3,
+        OhmicProbe = 1 << 4,
+        VelocityLock = 1 << 5,
+        VoidLock = 1 << 6,
+        Down = 1 << 7,
+        Up = 1 << 8
+    }
     public struct GrblState
     {
         public GrblStates State;
@@ -1043,7 +1058,7 @@ namespace CNC.Core
                 Tools.Add(new Tool("4"));
             }
 
-            GrblParserState.Tool = GrblParserState.Tool;    // Add tool to Tools if not in list
+//            GrblParserState.Tool = GrblParserState.Tool;    // Add tool to Tools if not in list
             model.Tool = model.Tool;                        // Force UI update
 
             // Reeread parser state since work offset and tool lists are now populated
@@ -1495,7 +1510,7 @@ namespace CNC.Core
                         case GrblSetting.StatusReportMask:
                             {
                                 var value = int.Parse(valuepair[1]);
-                                Grbl.GrblViewModel.IsParserStateLive = (value & (1 << 10)) != 0;
+                                Grbl.GrblViewModel.IsParserStateLive = (value & (1 << 9)) != 0;
                                 ReportProbeCoordinates = (value & (1 << 7)) != 0;
                             }
                             break;

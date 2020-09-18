@@ -1,7 +1,7 @@
 ﻿/*
  * ToolLengthControl.cs - part of CNC Probing library
  *
- * v0.26 / 2020-09-04 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-16 / Io Engineering (Terje Io)
  *
  */
 
@@ -49,11 +49,19 @@ namespace CNC.Controls.Probing
     /// </summary>
     public partial class ToolLengthControl : UserControl, IProbeTab
     {
-        Position origin = null, g59_3 = null;
+        Position g59_3 = null;
 
         public ToolLengthControl()
         {
             InitializeComponent();
+        }
+
+        public void Activate()
+        {
+            var probing = (DataContext as ProbingViewModel);
+            probing.Instructions = string.Empty;
+            if (!probing.Grbl.IsParserStateLive)
+                probing.Grbl.ExecuteCommand("$G");
         }
 
         public void Start()
@@ -74,17 +82,15 @@ namespace CNC.Controls.Probing
 
             probing.Program.Add(string.Format("G91F{0}", probing.ProbeFeedRate.ToInvariantString()));
 
-            origin = new Position(probing.Grbl.MachinePosition);
-
             if (probing.ProbeFixture)
             {
                 g59_3 = new Position(GrblWorkParameters.GetCoordinateSystem("G59.3"));
-                var safeZ = System.Math.Max(g59_3.Z, origin.Z) + probing.Depth;
+                var safeZ = System.Math.Max(g59_3.Z, probing.StartPosition.Z) + probing.Depth;
                 g59_3.Z += probing.Depth;
                 if (safeZ < 0d)
                     probing.Program.AddRapidToMPos("Z" + safeZ.ToInvariantString());
-                probing.Program.AddRapidToMPos(g59_3.ToString(AxisFlags.X | AxisFlags.Y));
-                probing.Program.AddRapidToMPos(g59_3.ToString(AxisFlags.Z));
+                probing.Program.AddRapidToMPos(g59_3, AxisFlags.X | AxisFlags.Y);
+                probing.Program.AddRapidToMPos(g59_3, AxisFlags.Z);
                 g59_3.Z -= probing.Depth;
             }
             probing.Program.AddProbingAction(AxisFlags.Z, true);
@@ -104,34 +110,59 @@ namespace CNC.Controls.Probing
 
             if ((ok = probing.IsSuccess && probing.Positions.Count == 1))
             {
+                double tlo = 0d;
+                Position pos = new Position(probing.Positions[0]);
+
                 //if (probing.HasToolTable)
                 //    probing.Grbl.ExecuteCommand(string.Format("G43H{0}{1}", probing.Tool, probing.Positions[0].ToString(AxisFlags.Z)));
                 //else
                 if (probing.ReferenceToolOffset)
                 {
-                    probing.TloReference = probing.Positions[0].Z; // linear axis?
+                    probing.TloReference = pos.Z; // linear axis?
                     probing.Grbl.ExecuteCommand("G49");
                 }
                 else
                 {
-                    var tofs = new Position(probing.Positions[0]);
-                    tofs.Z = probing.Positions[0].Z - (double.IsNaN(probing.TloReference) ? 0d : probing.TloReference);
+                    var tofs = new Position(pos);
+                    tlo = tofs.Z = pos.Z - (double.IsNaN(probing.TloReference) ? 0d : probing.TloReference);
                     probing.Grbl.ExecuteCommand("G43.1" + tofs.ToString(AxisFlags.Z));
                 }
+
+                if (probing.AddAction && (ok = probing.WaitForResponse("$#")))
+                {
+                    if (probing.CoordinateMode == ProbingViewModel.CoordMode.G92)
+                    {
+                        if ((ok = probing.GotoMachinePosition(pos, AxisFlags.Z)))
+                        {
+                            pos.X = pos.Y = 0d;
+                            pos.Z = probing.WorkpieceHeight + probing.TouchPlateHeight;
+                            probing.Grbl.ExecuteCommand("G92" + pos.ToString(AxisFlags.Z));
+                        }
+                    }
+                    else
+                    {
+                        pos.Z -= probing.WorkpieceHeight + probing.TouchPlateHeight + probing.Grbl.ToolOffset.Z;
+                        probing.Grbl.ExecuteCommand(string.Format("G10L2P{0}{1}", probing.CoordinateSystem, pos.ToString(AxisFlags.Z)));
+                    }
+                }
+
                 //if (probing.Tool != "0")
                 //    probing.Grbl.ExecuteCommand(string.Format("G10L11P{0}{1}", probing.Tool, probing.Positions[0].ToString(AxisFlags.Z)));
                 probing.Positions[0].Z += probing.Depth;
                 probing.GotoMachinePosition(probing.Positions[0], AxisFlags.Z);
 
-                if (origin.Z > probing.Positions[0].Z)
+                if (probing.ProbeFixture) // Go back to origin
                 {
-                    probing.GotoMachinePosition(origin, AxisFlags.Z);
-                    probing.GotoMachinePosition(origin, AxisFlags.X | AxisFlags.Y);
-                }
-                else
-                {
-                    probing.GotoMachinePosition(origin, AxisFlags.X | AxisFlags.Y);
-                    probing.GotoMachinePosition(origin, AxisFlags.Z);
+                    if (probing.StartPosition.Z > probing.Positions[0].Z)
+                    {
+                        probing.GotoMachinePosition(probing.StartPosition, AxisFlags.Z);
+                        probing.GotoMachinePosition(probing.StartPosition, AxisFlags.X | AxisFlags.Y);
+                    }
+                    else
+                    {
+                        probing.GotoMachinePosition(probing.StartPosition, AxisFlags.X | AxisFlags.Y);
+                        probing.GotoMachinePosition(probing.StartPosition, AxisFlags.Z);
+                    }
                 }
             }
 
@@ -142,7 +173,9 @@ namespace CNC.Controls.Probing
                     probing.Grbl.ExecuteCommand("$TLR"); // Set tool length offset reference in controller
             }
 
-            origin = null;
+            if (!probing.Grbl.IsParserStateLive)
+                probing.Grbl.ExecuteCommand("$G");
+
             probing.Program.End(ok ? "Probing completed" : "Probing failed");
         }
 
@@ -151,6 +184,8 @@ namespace CNC.Controls.Probing
             var model = (DataContext as ProbingViewModel);
             model.ReferenceToolOffset = !(model.Grbl.IsTloReferenceSet && !double.IsNaN(model.Grbl.TloReference));
             model.Grbl.ExecuteCommand("G49");
+            if(!model.Grbl.IsParserStateLive)
+                model.Grbl.ExecuteCommand("$G");
         }
         private void start_Click(object sender, RoutedEventArgs e)
         {

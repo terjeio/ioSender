@@ -1,7 +1,8 @@
 ﻿/*
  * Program.cs - part of CNC Probing library
  *
- * v0.26 / 2020-09-04 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-17 / Io Engineering (Terje Io)
+
  *
  */
 
@@ -50,7 +51,7 @@ namespace CNC.Controls.Probing
         private GrblViewModel Grbl = null;
         private List<string> _program = new List<string>();
         ProbingViewModel probing;
-        private volatile bool _isComplete = false, isRunning = false;
+        private volatile bool _isComplete = false, isRunning = false, hasPause = false, probeOnCycleStart = false;
         private int step = 0;
         private CancellationToken cancellationToken = new CancellationToken();
 
@@ -78,6 +79,17 @@ namespace CNC.Controls.Probing
                         ResponseReceived("fail");
                     break;
 
+                case nameof(GrblViewModel.Signals):
+                    if((sender as GrblViewModel).Signals.Value.HasFlag(Signals.CycleStart)) {
+                        if (probing.IsPaused && probeOnCycleStart)
+                        {
+                            probeOnCycleStart = false;
+                            probing.IsPaused = false;
+                        }
+                        //TODO: add start as well?
+                    }
+                    break;
+
                 case nameof(GrblViewModel.Message):
                     if (!Silent)
                         probing.Message = Grbl.Message;
@@ -85,11 +97,22 @@ namespace CNC.Controls.Probing
             }
         }
 
+        private void Probing_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(ProbingViewModel.IsPaused) && hasPause && isRunning)
+            {
+                if (!probing.IsPaused)
+                    ResponseReceived("ok");
+                else if (Grbl.ResponseLogVerbose)
+                    Grbl.ResponseLog.Add("PM:paused");
+            }
+        }
+
         public bool Init()
         {
             bool? res = null;
 
-            probing.Message = String.Empty;
+            probing.Message = string.Empty;
 
             Grbl.Poller.SetState(0);  // Disable status polling during probing
 
@@ -120,7 +143,7 @@ namespace CNC.Controls.Probing
                 null,
                 a => Grbl.OnResponseReceived += a,
                 a => Grbl.OnResponseReceived -= a,
-                1000, () => Comms.com.WriteByte(GrblLegacy.ConvertRTCommand(GrblConstants.CMD_STATUS_REPORT)));
+                1000, () => Comms.com.WriteByte(GrblSettings.IsGrblHAL ? GrblConstants.CMD_STATUS_REPORT_ALL : GrblLegacy.ConvertRTCommand(GrblConstants.CMD_STATUS_REPORT)));
             }).Start();
 
             while (res == null)
@@ -158,6 +181,9 @@ namespace CNC.Controls.Probing
                 res = false;
             }
 
+            probing.StartPosition.Set(probing.Grbl.MachinePosition);
+
+            hasPause = probeOnCycleStart = false;
             _program.Clear();
 
             if (res != true) // Reenable status polling if init fails 
@@ -172,7 +198,7 @@ namespace CNC.Controls.Probing
             _program.Add(probing.FastProbe + axisLetter + (negative ? "-" : "") + probing.ProbeDistance.ToInvariantString());
             if (probing.LatchDistance > 0d)
             {
-                _program.Add("!G0" + axisLetter + (negative ? "" : "-") + probing.LatchDistance.ToInvariantString());
+                _program.Add("!" + probing.RapidCommand + axisLetter + (negative ? "" : "-") + probing.LatchDistance.ToInvariantString());
                 _program.Add(probing.SlowProbe + axisLetter + (negative ? "-" : "") + probing.ProbeDistance.ToInvariantString());
             }
         }
@@ -187,9 +213,20 @@ namespace CNC.Controls.Probing
             _program.Add(probing.RapidCommand + cmd);
         }
 
+        public void AddPause()
+        {
+            hasPause = true;
+            _program.Add("pause");
+        }
+
         public void AddRapidToMPos(string cmd)
         {
             _program.Add("G53" + probing.RapidCommand + cmd);
+        }
+
+        public void AddRapidToMPos(Position pos, AxisFlags axisflags)
+        {
+            _program.Add("G53" + probing.RapidCommand + pos.ToString(axisflags));
         }
 
         public void Cancel()
@@ -203,6 +240,8 @@ namespace CNC.Controls.Probing
         {
             Grbl.PropertyChanged -= Grbl_PropertyChanged;
             Grbl.OnCommandResponseReceived -= ResponseReceived;
+            if (hasPause)
+                probing.PropertyChanged -= Probing_PropertyChanged;
             isRunning = Grbl.IsJobRunning = false;
             _isComplete = true;
             probing.Message = message;
@@ -228,6 +267,8 @@ namespace CNC.Controls.Probing
 
                     Grbl.OnCommandResponseReceived += ResponseReceived;
                     Grbl.PropertyChanged += Grbl_PropertyChanged;
+                    if(hasPause)
+                        probing.PropertyChanged += Probing_PropertyChanged;
                 }
 
                 Grbl.IsJobRunning = true;
@@ -267,7 +308,14 @@ namespace CNC.Controls.Probing
                         _program[step] = _program[step].Substring(1);
                         probing.RemoveLastPosition();
                     }
-                    Grbl.ExecuteCommand(_program[step]);
+
+                    if (_program[step] == "pause")
+                    {
+                        probing.IsPaused = true;
+                        probeOnCycleStart = !probing.Grbl.Signals.Value.HasFlag(Signals.CycleStart);
+                    }
+                    else
+                        Grbl.ExecuteCommand(_program[step]);
                 }
             }
 
