@@ -1,7 +1,7 @@
 ﻿/*
  * HeightMapControl.xaml.cs - part of CNC Probing library
  *
- * v0.27 / 2020-09-18 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-20 / Io Engineering (Terje Io)
  *
  */
 
@@ -59,12 +59,14 @@ namespace CNC.Controls.Probing
             InitializeComponent();
         }
 
+        public ProbingType ProbingType { get { return ProbingType.HeightMap; } }
+
         public void Activate()
         {
             (DataContext as ProbingViewModel).Instructions = "A rapid motion to X0Y0 will be performed before probing the height map starts.";
         }
 
-        public void Start()
+        public void Start(bool preview = false)
         {
             double dir = 1d;
             var probing = DataContext as ProbingViewModel;
@@ -85,7 +87,20 @@ namespace CNC.Controls.Probing
             probing.Message = string.Empty;
 
             probing.HeightMap.HasHeightMap = false;
-            probing.HeightMap.Map = new HeightMap(probing.HeightMap.GridSize, new Vector2(probing.HeightMap.MinX, probing.HeightMap.MinY), new Vector2(probing.HeightMap.MaxX, probing.HeightMap.MaxY));
+
+            try
+            {
+                probing.HeightMap.Map = new HeightMap(probing.HeightMap.GridSizeX, probing.HeightMap.GridSizeY, new Vector2(probing.HeightMap.MinX, probing.HeightMap.MinY), new Vector2(probing.HeightMap.MaxX, probing.HeightMap.MaxY));
+            }
+            catch(Exception ex)
+            {
+                probing.Message = ex.Message;
+                return;
+            }
+
+            probing.HeightMap.GridSizeLockXY = probing.HeightMap.Map.GridX == probing.HeightMap.Map.GridY;
+            probing.HeightMap.GridSizeX = probing.HeightMap.Map.GridX;
+            probing.HeightMap.GridSizeY = probing.HeightMap.Map.GridY;
 
             for (x = 0; x < probing.HeightMap.Map.SizeX; x++)
             {
@@ -94,13 +109,13 @@ namespace CNC.Controls.Probing
                     if (probing.HeightMap.AddPause && (x > 0 || y > 0))
                         probing.Program.AddPause();
                     probing.Program.AddProbingAction(AxisFlags.Z, true);
-                    probing.Program.AddRapid("Z" + probing.Depth.ToInvariantString());
+                    probing.Program.AddRapid("Z" + probing.Depth.ToInvariantString(probing.Grbl.Format));
                     if (y < (probing.HeightMap.Map.SizeY - 1))
-                        probing.Program.AddRapid(string.Format("Y{0}", (probing.HeightMap.GridSize * dir).ToInvariantString()));
+                        probing.Program.AddRapid(string.Format("Y{0}", (probing.HeightMap.Map.GridY * dir).ToInvariantString(probing.Grbl.Format)));
                 }
 
                 if (x < (probing.HeightMap.Map.SizeX - 1))
-                    probing.Program.AddRapid(string.Format("X{0}", probing.HeightMap.GridSize.ToInvariantString()));
+                    probing.Program.AddRapid(string.Format("X{0}", probing.HeightMap.Map.GridX.ToInvariantString(probing.Grbl.Format)));
 
                 dir *= -1d;
             }
@@ -114,17 +129,12 @@ namespace CNC.Controls.Probing
             (DataContext as ProbingViewModel).Program.Cancel();
         }
 
-        private int toIndex(double val)
-        {
-            return (int)(Math.Ceiling(val / (DataContext as ProbingViewModel).HeightMap.GridSize - .2d));
-        }
-
         private void OnCompleted()
         {
             bool ok;
             var probing = DataContext as ProbingViewModel;
 
-            if ((ok = probing.IsSuccess))
+            if ((ok = probing.IsSuccess && probing.Positions.Count == probing.HeightMap.Map.TotalPoints))
             {
                 probing.GotoMachinePosition(probing.StartPosition, AxisFlags.Z);
                 probing.GotoMachinePosition(probing.StartPosition, AxisFlags.X | AxisFlags.Y);
@@ -144,12 +154,26 @@ namespace CNC.Controls.Probing
 
                 double Z0 = probing.Positions[0].Z, z_min = 0d, z_max = 0d, z_delta;
 
-                foreach (var pos in probing.Positions)
+                int i = 0;
+                for (x = 0; x < probing.HeightMap.Map.SizeX; x++)
                 {
-                    z_delta = pos.Z - Z0;
-                    z_min = Math.Min(z_min, z_delta);
-                    z_max = Math.Max(z_max, z_delta);
-                    probing.HeightMap.Map.AddPoint(toIndex(pos.X - probing.StartPosition.X), toIndex(pos.Y - probing.StartPosition.Y), Math.Round(z_delta, probing.Grbl.Precision));
+                    for (y = 0; y < probing.HeightMap.Map.SizeY; y++)
+                    {
+                        z_delta = probing.Positions[i++].Z - Z0;
+                        z_min = Math.Min(z_min, z_delta);
+                        z_max = Math.Max(z_max, z_delta);
+                        probing.HeightMap.Map.AddPoint(x, y, Math.Round(z_delta, probing.Grbl.Precision));
+                    }
+                    if (++x < probing.HeightMap.Map.SizeX)
+                    {
+                        for (y = probing.HeightMap.Map.SizeY - 1; y >= 0; y--)
+                        {
+                            z_delta = probing.Positions[i++].Z - Z0;
+                            z_min = Math.Min(z_min, z_delta);
+                            z_max = Math.Max(z_max, z_delta);
+                            probing.HeightMap.Map.AddPoint(x, y, Math.Round(z_delta, probing.Grbl.Precision));
+                        }
+                    }
                 }
 
                 LinesVisual3D boundary = new LinesVisual3D();
@@ -175,7 +199,9 @@ namespace CNC.Controls.Probing
 
             probing.HeightMap.HasHeightMap = false;
             probing.HeightMap.Map = HeightMap.Load(fileName);
-            probing.HeightMap.GridSize = probing.HeightMap.Map.GridX;
+            probing.HeightMap.GridSizeLockXY = probing.HeightMap.Map.GridX == probing.HeightMap.Map.GridY;
+            probing.HeightMap.GridSizeX = probing.HeightMap.Map.GridX;
+            probing.HeightMap.GridSizeY = probing.HeightMap.Map.GridY;
             probing.HeightMap.MinX = probing.HeightMap.Map.Min.X;
             probing.HeightMap.MinY = probing.HeightMap.Map.Min.Y;
             probing.HeightMap.MaxX = probing.HeightMap.Map.Max.X;
@@ -264,6 +290,9 @@ namespace CNC.Controls.Probing
             probing.HeightMap.MinY = probing.Grbl.ProgramLimits.MinY;
             probing.HeightMap.MaxX = probing.Grbl.ProgramLimits.MaxX;
             probing.HeightMap.MaxY = probing.Grbl.ProgramLimits.MaxY;
+            probing.HeightMap.GridSizeLockXY = true;
+            probing.HeightMap.GridSizeX =
+            probing.HeightMap.GridSizeY = 5d;
         }
 
         private void viewport_Drag(object sender, DragEventArgs e)

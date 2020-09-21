@@ -1,7 +1,7 @@
 /*
  * MainWindow.xaml.cs - part of Grbl Code Sender
  *
- * v0.29 / 2020-09-17 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-20 / Io Engineering (Terje Io)
  *
  */
 
@@ -166,6 +166,9 @@ namespace GCode_Sender
             if (!(e.Cancel = !menuFile.IsEnabled))
             {
                 UIViewModel.CurrentView.Activate(false, ViewType.Shutdown);
+
+                if (UIViewModel.Console != null)
+                    UIViewModel.Console.Close();
 #if ADD_CAMERA
                 if (UIViewModel.Camera != null)
                 {
@@ -322,6 +325,23 @@ namespace GCode_Sender
         private void CameraOpen_Click(object sender, RoutedEventArgs e)
         {
             UIViewModel.Camera.Open();
+        }
+
+        private void openConsoleMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (UIViewModel.Console == null)
+            {
+                UIViewModel.Console = new ConsoleWindow();
+                UIViewModel.Console.DataContext = DataContext;
+                UIViewModel.Console.Show();
+            }
+            else
+            {
+                if (UIViewModel.Console.IsVisible)
+                    UIViewModel.Console.Visibility = Visibility.Hidden;
+                else
+                    UIViewModel.Console.Show();
+            }
         }
 #else
         private void CameraOpen_Click(object sender, RoutedEventArgs e)

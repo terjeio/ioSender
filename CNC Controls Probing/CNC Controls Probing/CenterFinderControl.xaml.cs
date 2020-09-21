@@ -1,7 +1,7 @@
 ﻿/*
  * CenterFinderControl.xaml.cs - part of CNC Probing library
  *
- * v0.27 / 2020-09-17 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-20 / Io Engineering (Terje Io)
  *
  */
 
@@ -63,6 +63,8 @@ namespace CNC.Controls.Probing
         {
             InitializeComponent();
         }
+
+        public ProbingType ProbingType { get { return ProbingType.CenterFinder; } }
 
         public void Activate()
         {
@@ -180,7 +182,7 @@ namespace CNC.Controls.Probing
             return true;
         }
 
-        public void Start()
+        public void Start(bool preview = false)
         {
             var probing = DataContext as ProbingViewModel;
 
@@ -189,25 +191,25 @@ namespace CNC.Controls.Probing
 
             if (probing.WorkpieceSizeX <= 0d)
             {
-                probing.SetError(nameof(probing.WorkpieceSizeX), "Workpiece diameter cannot be 0.");
+                probing.SetError(nameof(probing.WorkpieceSizeX), "Workpiece X size cannot be 0.");
                 return;
             }
 
             if (probing.WorkpieceSizeY <= 0d)
             {
-                probing.SetError(nameof(probing.WorkpieceSizeY), "Workpiece diameter cannot be 0.");
+                probing.SetError(nameof(probing.WorkpieceSizeY), "Workpiece Y size cannot be 0.");
                 return;
             }
 
-            if (probing.ProbeCenter == Center.Inside && probing.WorkpieceSizeX < probing.Offset * 2d)
+            if (probing.ProbeCenter == Center.Inside && probing.WorkpieceSizeX < probing.XYClearance * 2d)
             {
-                probing.SetError(nameof(probing.WorkpieceSizeX), "Probing offset too large for workpiece diameter.");
+                probing.SetError(nameof(probing.WorkpieceSizeX), "Probing XY clearance too large for workpiece X size.");
                 return;
             }
 
-            if (probing.ProbeCenter == Center.Inside && probing.WorkpieceSizeY < probing.Offset * 2d)
+            if (probing.ProbeCenter == Center.Inside && probing.WorkpieceSizeY < probing.XYClearance * 2d)
             {
-                probing.SetError(nameof(probing.WorkpieceSizeY), "Probing offset too large for workpiece diameter.");
+                probing.SetError(nameof(probing.WorkpieceSizeY), "Probing XY clearance too large for workpiece Y size.");
                 return;
             }
 

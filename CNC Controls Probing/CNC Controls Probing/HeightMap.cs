@@ -26,6 +26,13 @@ SOFTWARE.
 
 // Sourced from https://github.com/martin2250/OpenCNCPilot
 
+/*
+    Changes by Terje Io for GCode Sender
+
+    2020-09-20 : Added constructor for separate X and Y grid sizes
+
+*/
+
 using HelixToolkit.Wpf;
 using System;
 using System.Collections.Generic;
@@ -79,14 +86,23 @@ namespace CNC.Controls.Probing
         public double GridX { get { return (Max.X - Min.X) / (SizeX - 1); } }
         public double GridY { get { return (Max.Y - Min.Y) / (SizeY - 1); } }
 
+        public HeightMap(double gridSizeX, double gridSizeY, Vector2 min, Vector2 max)
+        {
+            CreateHeightMap(gridSizeX, gridSizeY, min, max);
+        }
 
         public HeightMap(double gridSize, Vector2 min, Vector2 max)
+        {
+            CreateHeightMap(gridSize, gridSize, min, max);
+        }
+
+        private void CreateHeightMap(double gridSizeX, double gridSizeY, Vector2 min, Vector2 max)
         {
             if (min.X == max.X || min.Y == max.Y)
                 throw new Exception("Height map can't be infinitely narrow");
 
-            int pointsX = (int)Math.Ceiling((max.X - min.X) / gridSize) + 1;
-            int pointsY = (int)Math.Ceiling((max.Y - min.Y) / gridSize) + 1;
+            int pointsX = (int)Math.Ceiling((max.X - min.X) / gridSizeX) + 1;
+            int pointsY = (int)Math.Ceiling((max.Y - min.Y) / gridSizeY) + 1;
 
             if (pointsX < 2 || pointsY < 2)
                 throw new Exception("Height map must have at least 4 points");
@@ -112,7 +128,6 @@ namespace CNC.Controls.Probing
 
             SizeX = pointsX;
             SizeY = pointsY;
-
 
             for (int x = 0; x < SizeX; x++)
             {
@@ -235,7 +250,6 @@ namespace CNC.Controls.Probing
             w.WriteAttributeString("MaxY", Max.Y.ToString(Constants.DecimalParseFormat));
             w.WriteAttributeString("SizeX", SizeX.ToString(Constants.DecimalParseFormat));
             w.WriteAttributeString("SizeY", SizeY.ToString(Constants.DecimalParseFormat));
-
             for (int x = 0; x < SizeX; x++)
             {
                 for (int y = 0; y < SizeY; y++)

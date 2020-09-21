@@ -10,7 +10,7 @@
         xmlns:cncprobingcontrols="clr-namespace:CNC.Controls.Probing;assembly=CNC.Controls.Probing"
         xmlns:local="clr-namespace:GCode_Sender"
         mc:Ignorable="d"
-        Title="GCode Sender (beta-6.5)" Height="640" Width="925" MinHeight="660" MinWidth="925"
+        Title="GCode Sender (beta-6.6)" Height="640" Width="925" MinHeight="660" MinWidth="925"
         Loaded="Window_Load"
         Closing="Window_Closing"
         Closed="Window_Closed" Icon="App.ico">
@@ -28,6 +28,7 @@
                 <MenuItem x:Name="menuSaveFile" Header="_Save" IsEnabled="false" Click="fileSaveMenuItem_Click"/>
                 <MenuItem x:Name="menuCloseFile" Header="_Close" IsEnabled="false" Click="fileCloseMenuItem_Click"/>
                 <MenuItem x:Name="menuTransform" Header="_Transform" IsEnabled="false" ItemsSource="{Binding Path=UIViewModel.TransformMenuItems, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                <MenuItem x:Name="menuOpenConsole" Header="_Open Console" Click="openConsoleMenuItem_Click"/>
                 <MenuItem Header="_Exit" Click="exitMenuItem_Click"/>
             </MenuItem>
             <MenuItem x:Name="menuCamera" Header="_Camera">

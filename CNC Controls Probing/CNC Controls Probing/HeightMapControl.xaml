@@ -6,13 +6,13 @@
              xmlns:local="clr-namespace:CNC.Controls.Probing"
              xmlns:Controls="clr-namespace:CNC.Controls;assembly=CNC.Controls.WPF" x:Class="CNC.Controls.Probing.HeightMapControl"
              xmlns:helix="clr-namespace:HelixToolkit.Wpf;assembly=HelixToolkit.Wpf"
-             mc:Ignorable="d" Height="350"
-             d:DesignHeight="300" d:DesignWidth="600">
+             mc:Ignorable="d" Height="370"
+             d:DesignHeight="370" d:DesignWidth="600">
     <UserControl.Resources>
         <Controls:LogicalNotConverter x:Key="IsNotRunningConverter" />
     </UserControl.Resources>
         <Grid>
-        <StackPanel Margin="5,10,0,0" Width="250" HorizontalAlignment="Left" VerticalAlignment="Top">
+        <StackPanel Margin="5,5,0,0" Width="250" HorizontalAlignment="Left" VerticalAlignment="Top">
             <GroupBox Header="Area to probe" Height="Auto" HorizontalAlignment="Left" VerticalAlignment="Top">
                 <StackPanel Margin="5,5,0,0">
                     <StackPanel Orientation="Horizontal">
@@ -26,8 +26,18 @@
                     <Button Content="Set from program limits" IsEnabled="{Binding Path=Grbl.IsFileLoaded}" Margin="5,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Click="limits_Click"/>
                 </StackPanel>
             </GroupBox>
-            <Controls:NumericField Label="Gridsize:" Value="{Binding Path=HeightMap.GridSize, Mode=TwoWay}" Format="###0.0##" HorizontalAlignment="Left" Margin="0,5,0,0" VerticalAlignment="Top"/>
-            <CheckBox Content="Pause before probing" Margin="5,12,0,0" IsChecked="{Binding Path=HeightMap.AddPause, Mode=TwoWay}"/>
+            <GroupBox Header="Gridsize">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                    </Grid.RowDefinitions>
+                    <Controls:NumericField Grid.Row="0" Label="X:" Value="{Binding Path=HeightMap.GridSizeX, Mode=TwoWay}" ColonAt="25" Margin="0,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                    <Controls:NumericField Grid.Row="1" Label="Y:" Value="{Binding Path=HeightMap.GridSizeY, Mode=TwoWay}" ColonAt="25" Margin="0,2,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                    <CheckBox Content="Lock" Grid.RowSpan="2" IsChecked="{Binding Path=HeightMap.GridSizeLockXY, Mode=TwoWay}" Margin="125,4,0,0" VerticalAlignment="Center"/>
+                </Grid>
+            </GroupBox>
+            <CheckBox Content="Pause before probing" Margin="5,5,0,0" IsChecked="{Binding Path=HeightMap.AddPause, Mode=TwoWay}"/>
             <CheckBox Content="Set Z = 0 at X0Y0:" Margin="5,0,0,0" IsChecked="{Binding Path=HeightMap.SetToolOffset, Mode=TwoWay}"/>
             <local:CsSelectControl IsEnabled="{Binding Path=HeightMap.SetToolOffset}"/>
         </StackPanel>

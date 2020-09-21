@@ -5,8 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:Controls="clr-namespace:CNC.Controls;assembly=CNC.Controls.WPF"
              xmlns:local="clr-namespace:CNC.Controls.Probing"
-             mc:Ignorable="d" Height="350"
-             d:DesignHeight="350" d:DesignWidth="500">
+             mc:Ignorable="d" Height="370"
+             d:DesignHeight="370" d:DesignWidth="500">
     <UserControl.Resources>
         <Controls:LogicalNotConverter x:Key="IsNotRunningConverter" />
         <Controls:EnumValueToBooleanConverter x:Key="EnumToEdgeConverter" />
@@ -67,7 +67,7 @@
                     <Controls:NumericField Label="Height" Value="{Binding Path=WorkpieceHeight, Mode=TwoWay}" IsEnabled="{Binding Path=ProbeZ}" Margin="0,5,85,0" VerticalAlignment="Top"/>
                 </GroupBox>
             </StackPanel>
-            <CheckBox Content="Probe Z" Margin="5,5,0,5" IsChecked="{Binding Path=ProbeZ}"/>
+            <CheckBox Content="Probe Z" Margin="5,5,0,5" IsChecked="{Binding Path=ProbeZ}" IsEnabled="{Binding ElementName=probez, Path=IsChecked, Converter={StaticResource IsNotRunningConverter}}"/>
             <Grid ToolTip="Click edge, corner or center to select probing action." Width="180" Height="180"  Margin="5,0,0,0" HorizontalAlignment="Left">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="60" />
@@ -83,7 +83,7 @@
                 <RadioButton Content="Resources/edgeICD.png" Grid.Column="1" Style="{StaticResource Flag}" IsChecked="{Binding Path=ProbeEdge, Mode=TwoWay, Converter={StaticResource EnumToEdgeConverter}, ConverterParameter=CD}" />
                 <RadioButton Content="Resources/cornerIC.png" Grid.Column="2" Style="{StaticResource Flag}" IsChecked="{Binding Path=ProbeEdge, Mode=TwoWay, Converter={StaticResource EnumToEdgeConverter}, ConverterParameter=C}" />
                 <RadioButton Content="Resources/edgeIAD.png" Grid.Row="1" Style="{StaticResource Flag}" IsChecked="{Binding Path=ProbeEdge, Mode=TwoWay, Converter={StaticResource EnumToEdgeConverter}, ConverterParameter=AD}" />
-                <RadioButton Content="Resources/edgeZ.png" Grid.Row="1" Grid.Column="1" Style="{StaticResource Flag}" IsChecked="{Binding Path=ProbeEdge, Mode=TwoWay, Converter={StaticResource EnumToEdgeConverter}, ConverterParameter=Z}" />
+                <RadioButton x:Name="probez" Content="Resources/edgeZ.png" Grid.Row="1" Grid.Column="1" Style="{StaticResource Flag}" IsChecked="{Binding Path=ProbeEdge, Mode=TwoWay, Converter={StaticResource EnumToEdgeConverter}, ConverterParameter=Z}" />
                 <RadioButton Content="Resources/edgeIBC.png" Grid.Row="1" Grid.Column="2" Style="{StaticResource Flag}" IsChecked="{Binding Path=ProbeEdge, Mode=TwoWay, Converter={StaticResource EnumToEdgeConverter}, ConverterParameter=CB}" />
                 <RadioButton Content="Resources/cornerIA.png" Grid.Row="2" Grid.Column="0" Style="{StaticResource Flag}" IsChecked="{Binding Path=ProbeEdge, Mode=TwoWay, Converter={StaticResource EnumToEdgeConverter}, ConverterParameter=A}" />
                 <RadioButton Content="Resources/edgeIAB.png" Grid.Row="2" Grid.Column="1" Style="{StaticResource Flag}" IsChecked="{Binding Path=ProbeEdge, Mode=TwoWay, Converter={StaticResource EnumToEdgeConverter}, ConverterParameter=AB}" />

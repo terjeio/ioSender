@@ -1,7 +1,7 @@
 ﻿/*
  * IProbeTab.cs - part of CNC Probing library
  *
- * v0.27 / 2020-09-06 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-18 / Io Engineering (Terje Io)
  *
  */
 
@@ -39,10 +39,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace CNC.Controls.Probing
 {
+    public enum ProbingType
+    {
+        None = 0,
+        ToolLength,
+        EdgeFinderInternal,
+        EdgeFinderExternal,
+        CenterFinder,
+        Rotation,
+        HeightMap
+    }
+
     public interface IProbeTab
     {
+        ProbingType ProbingType { get; }
         void Activate();
-        void Start();
+        void Start(bool preview = false);
         void Stop();
     }
 }

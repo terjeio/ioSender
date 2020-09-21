@@ -1,7 +1,7 @@
 ﻿/*
  * ProbingViewModel.cs - part of CNC Probing library
  *
- * v0.27 / 2020-09-18 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-19 / Io Engineering (Terje Io)
  *
  */
 
@@ -60,7 +60,7 @@ namespace CNC.Controls.Probing
             G92
         }
 
-        private string _message = string.Empty, _tool = string.Empty, _instructions = string.Empty, _position = string.Empty;
+        private string _message = string.Empty, _tool = string.Empty, _instructions = string.Empty, _position = string.Empty, _probeProgram = string.Empty;
         private double _tpHeight, _fHeight, _ProbeDiameter, _workpieceSizeX = 0d, _workpieceSizeY = 0d, _workpieceHeight = 0d;
         private double _latchDistance, _latchFeedRate;
         private double _probeDistance, _probeFeedRate;
@@ -69,8 +69,10 @@ namespace CNC.Controls.Probing
         private double _tloReferenceOffset = double.NaN;
 
         private bool _canProbe = false, _isComplete = false, _isSuccess = false, _probeZ = false, _useFixture = false;
-        private bool _hasToolTable = false, _hasCs9 = false, _addAction = false, _isPaused = false;
+        private bool _hasToolTable = false, _hasCs9 = false, _addAction = false, _isPaused = false, _isCorner = false;
         private bool isCancelled = false, wasZselected = false, _referenceToolOffset = true, _workpieceLockXY = true;
+        private bool _enableOffset = true, _enableXYD = true, _enableProbeDiameter = true;
+        private bool _enableFixtureHeight = true, _enableTouchPlateHeight = true;
         private GrblViewModel _grblmodel = null;
         private List<string> _program = new List<string>();
         private List<Position> _positions = new List<Position>();
@@ -79,6 +81,7 @@ namespace CNC.Controls.Probing
         private Edge _edge = Edge.None;
         private Center _center = Center.None;
         private int _coordinateSystem = 0, _passes = 1;
+        private ProbingType _probingType = ProbingType.None;
         private ProbingProfile _profile;
         private CancellationToken cancellationToken = new CancellationToken();
 
@@ -285,6 +288,7 @@ namespace CNC.Controls.Probing
             }
         }
 
+        public ProbingType ProbingType { get { return _probingType; } set { _probingType = value; OnPropertyChanged(); OnPropertyChanged(nameof(TouchPlateHeightEnable)); } }
         public string FastProbe { get { return string.Format(Probing.Command + "F{0}", ProbeFeedRate.ToInvariantString()); } }
         public string SlowProbe { get { return string.Format(Probing.Command + "F{0}", LatchFeedRate.ToInvariantString()); } }
         public string Instructions { get { return _instructions; } set { _instructions = value; OnPropertyChanged(); } }
@@ -304,9 +308,9 @@ namespace CNC.Controls.Probing
         public bool IsCompleted { get { return _isComplete; } set { _isComplete = value; OnPropertyChanged(); } }
         public bool IsSuccess { get { return _isSuccess; } set { _isSuccess = value; OnPropertyChanged(); } }
         public bool IsPaused { get { return _isPaused; } set { _isPaused = value; OnPropertyChanged(); } }
-        public bool ProbeZ { get { return _probeZ; } set { _probeZ = value; OnPropertyChanged(); } }
+        public bool ProbeZ { get { return _probeZ; } set { _probeZ = value; OnPropertyChanged(); OnPropertyChanged(nameof(TouchPlateHeightEnable)); } }
         public string Tool { get { return _tool; } set { _tool = value; OnPropertyChanged(); } }
-        public bool ProbeFixture { get { return _useFixture; } set { _useFixture = value; OnPropertyChanged(); if (_useFixture) AddAction = false; } }
+        public bool ProbeFixture { get { return _useFixture; } set { _useFixture = value; OnPropertyChanged(); OnPropertyChanged(nameof(FixtureHeightEnable)); OnPropertyChanged(nameof(TouchPlateHeightEnable)); if (_useFixture) AddAction = false; } }
         public bool HasToolTable { get { return _hasToolTable; } set { _hasToolTable = value; OnPropertyChanged(); } }
         public bool HasCoordinateSystem9 { get { return _hasCs9; } set { _hasCs9 = value; OnPropertyChanged(); } }
         public bool ReferenceToolOffset { get { return _referenceToolOffset; } set { _referenceToolOffset = value; OnPropertyChanged(); } }
@@ -329,8 +333,20 @@ namespace CNC.Controls.Probing
         public List<Position> Machine { get { return _machine; } }
         public double XYClearance { get { return _xyClearance; } set { _xyClearance = value; OnPropertyChanged(); } }
         public double Offset { get { return _offset; } set { _offset = value; OnPropertyChanged(); } }
+        public bool OffsetEnable { get { return _enableOffset && _isCorner; } set { _enableOffset = value;  OnPropertyChanged(); } }
         public double Depth { get { return _depth; } set { _depth = value; OnPropertyChanged(); } }
         public string RapidCommand { get { return RapidsFeedRate == 0d ? "G0" : "G1F" + RapidsFeedRate.ToInvariantString(); } }
+        public string ProbeProgram { get { return Program.ToString().Replace("G53", string.Empty); } }
+        public bool XYDEnable { get { return _enableXYD; } set { _enableXYD = value; OnPropertyChanged(); } }
+        public bool ProbeDiameterEnable { get { return _enableProbeDiameter && (_probingType == ProbingType.EdgeFinderInternal || _probingType == ProbingType.EdgeFinderExternal ? _edge != Edge.Z : true); } set { _enableProbeDiameter = value; OnPropertyChanged(); } }
+        public bool FixtureHeightEnable { get { return _enableFixtureHeight && _useFixture; } set { _enableFixtureHeight = value; OnPropertyChanged(); } }
+        public bool TouchPlateHeightEnable
+        {
+            get {
+                return _enableTouchPlateHeight && (_probingType == ProbingType.ToolLength ? !_useFixture : _probeZ || _probingType == ProbingType.HeightMap || _probingType == ProbingType.None);
+            }
+            set { _enableTouchPlateHeight = value; OnPropertyChanged(); }
+        }
 
         public string Message
         {
@@ -370,9 +386,14 @@ namespace CNC.Controls.Probing
                         ProbeZ = false;
                     }
                 }
-                _edge = value; OnPropertyChanged();
+                _edge = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(ProbeDiameterEnable));
+                ProbeCorner = _edge == Edge.A || _edge == Edge.B || _edge == Edge.C || _edge == Edge.D;
             }
         }
+
+        public bool ProbeCorner { get { return _isCorner; } set { _isCorner = value; OnPropertyChanged(); OnPropertyChanged(nameof(OffsetEnable)); } }
         public Center ProbeCenter { get { return _center; } set { _center = value; OnPropertyChanged(); } }
         public bool WorkpiecLockXY
         {

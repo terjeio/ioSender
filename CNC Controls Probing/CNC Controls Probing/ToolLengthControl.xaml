@@ -5,8 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CNC.Controls.Probing"
              xmlns:Controls="clr-namespace:CNC.Controls;assembly=CNC.Controls.WPF"
-             mc:Ignorable="d" Height="350"
-             d:DesignHeight="300" d:DesignWidth="510">
+             mc:Ignorable="d" Height="370"
+             d:DesignHeight="370" d:DesignWidth="510">
     <UserControl.Resources>
         <Controls:LogicalNotConverter x:Key="IsNotRunningConverter" />
         <Controls:EnumValueToBooleanConverter x:Key="EnumToCheckedConverter" />

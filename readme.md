@@ -10,7 +10,7 @@ Latest changes committed 20200918, see the [changelog](changelog.md) for details
 
 ---
 
-A complete rewrite of my [Grbl CNC Controls library](https://github.com/terjeio/Grbl_CNC_Controls) including a sender application on top of these. It supports new features in [GrblHAL](https://github.com/terjeio/grblHAL) such as manual tool change and [external MPG](https://github.com/terjeio/GRBL_MPG_DRO_BoosterPack) control - and is one of the reasons for writing this library and app. Other senders I have tried does not play nice when a MPG pendant is connected directly to the Grbl processor card...
+A complete rewrite of my [Grbl CNC Controls library](https://github.com/terjeio/Grbl_CNC_Controls) including a sender application on top of these. It supports new features in [grblHAL](https://github.com/terjeio/grblHAL) such as manual tool change and [external MPG](https://github.com/terjeio/GRBL_MPG_DRO_BoosterPack) control - and is one of the reasons for writing this library and app. Other senders I have tried does not play nice when a MPG pendant is connected directly to the Grbl processor card...
 
 ---
 
@@ -28,7 +28,7 @@ Main screen.
 
 ![Jog flyout](Media/Sender7.png)
 
-Jogging flyout, supports up to 6 axes. The sender also support keyboard jogging with \<Shift\> \(speed\) and \<Ctrl\> \(distance\) modifiers.
+Jogging flyout, supports up to 6 axes. The sender also supports keyboard jogging with \<Shift\> \(speed\) and \<Ctrl\> \(distance\) modifiers.
 <br><br>
 
 ![Easy configuration](Media/Sender3.png)
@@ -48,7 +48,7 @@ Lathe mode.
 
 ![Easy configuration](Media/Sender6.png)
 
-Conversational programming for Lathe Mode.
+Conversational programming for Lathe Mode. Threading requires [grblHAL](https://github.com/terjeio/grblHAL) controller with driver that has spindle sync support.
 
 ---
 2020-09-18

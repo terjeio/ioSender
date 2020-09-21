@@ -1,7 +1,7 @@
 ﻿/*
  * EdgeFinderIntControl.xaml.cs - part of CNC Probing library
  *
- * v0.27 / 2020-09-16 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-18 / Io Engineering (Terje Io)
  *
  */
 
@@ -61,12 +61,14 @@ namespace CNC.Controls.Probing
             InitializeComponent();
         }
 
+        public ProbingType ProbingType { get { return ProbingType.EdgeFinderInternal; } }
+
         public void Activate()
         {
             (DataContext as ProbingViewModel).Instructions = "Click edge, corner or center in image above to select probing action.\nMove the probe to above the position indicated by green dot before start.";
         }
 
-        public void Start()
+        public void Start(bool preview = false)
         {
             var probing = DataContext as ProbingViewModel;
 

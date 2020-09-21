@@ -13,6 +13,7 @@
     <DockPanel VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
         <DockPanel DockPanel.Dock="Top" HorizontalAlignment="Stretch" Margin="0,0,0,5">
             <CheckBox Content="Verbose" IsChecked="{Binding Path=ResponseLogVerbose}" HorizontalAlignment="Left" Margin="10,8,0,0" VerticalAlignment="Top"/>
+            <CheckBox Content="Filter out realtime responses" IsChecked="{Binding Path=ResponseLogFilterRT}" HorizontalAlignment="Left" Margin="10,8,0,0" VerticalAlignment="Top"/>
             <Button Content="Clear" HorizontalAlignment="Right" Margin="0,5,5,0" VerticalAlignment="Top" Width="75" Click="btn_Clear"/>
         </DockPanel>
         <TextBox IsReadOnly="True" TextWrapping="NoWrap" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"

@@ -5,8 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:Controls="clr-namespace:CNC.Controls;assembly=CNC.Controls.WPF"
              xmlns:local="clr-namespace:CNC.Controls.Probing"
-             mc:Ignorable="d" Height="350"
-             d:DesignHeight="300" d:DesignWidth="350">
+             mc:Ignorable="d" Height="370"
+             d:DesignHeight="370" d:DesignWidth="350">
     <UserControl.Resources>
         <Controls:MultiLineConverter x:Key="ErrorMessageConverter" />
         <Controls:LogicalNotConverter x:Key="IsNotRunningConverter" />

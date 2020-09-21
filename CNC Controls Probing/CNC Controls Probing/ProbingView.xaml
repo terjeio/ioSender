@@ -48,12 +48,12 @@
                 </Button>
             </StackPanel>
             <GroupBox Header="Probe tip/tool">
-                <Controls:NumericField Label="Diameter:" Value="{Binding Path=ProbeDiameter, Mode=TwoWay}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
+                <Controls:NumericField Label="Diameter:" Value="{Binding Path=ProbeDiameter, Mode=TwoWay}" IsEnabled="{Binding Path=ProbeDiameterEnable}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
             </GroupBox>
             <GroupBox Header="Touch plate/fixture heights">
                 <StackPanel Orientation="Vertical">
-                    <Controls:NumericField Label="Touch plate:" Value="{Binding Path=TouchPlateHeight, Mode=TwoWay}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
-                    <Controls:NumericField Label="Fixture:" Value="{Binding Path=FixtureHeight, Mode=TwoWay}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
+                    <Controls:NumericField Label="Touch plate:" Value="{Binding Path=TouchPlateHeight, Mode=TwoWay}" IsEnabled="{Binding Path=TouchPlateHeightEnable}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
+                    <Controls:NumericField Visibility="Collapsed" Label="Fixture:" Value="{Binding Path=FixtureHeight, Mode=TwoWay}" IsEnabled="{Binding Path=FixtureHeightEnable}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
                 </StackPanel>
             </GroupBox>
             <GroupBox Header="Probing distances and speed">
@@ -67,9 +67,9 @@
             </GroupBox>
             <GroupBox Header="Probing clearances">
                 <StackPanel Orientation="Vertical">
-                    <Controls:NumericField Label="XY Clearance:" ToolTip="Initial distance away from face to probe" Value="{Binding Path=XYClearance, Mode=TwoWay}" ColonAt="102" HorizontalAlignment="Left" Margin="0,7,0,0" VerticalAlignment="Top" Style="{StaticResource ErrorStyle}"/>
-                    <Controls:NumericField Label="Offset:" ToolTip="Distance from corner or radius to probe" Value="{Binding Path=Offset, Mode=TwoWay}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
-                    <Controls:NumericField Label="Depth:" ToolTip="Z offset from current position where probing will take place" Value="{Binding Path=Depth, Mode=TwoWay}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
+                    <Controls:NumericField Label="XY Clearance:" ToolTip="Initial distance away from face to probe" Value="{Binding Path=XYClearance, Mode=TwoWay}" IsEnabled="{Binding Path=XYDEnable}" ColonAt="102" HorizontalAlignment="Left" Margin="0,7,0,0" VerticalAlignment="Top" Style="{StaticResource ErrorStyle}"/>
+                    <Controls:NumericField Label="Offset:" ToolTip="Distance from corner to probe" Value="{Binding Path=Offset, Mode=TwoWay}" IsEnabled="{Binding Path=OffsetEnable}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
+                    <Controls:NumericField Label="Depth:" ToolTip="Z offset from current position where probing will take place" Value="{Binding Path=Depth, Mode=TwoWay}" IsEnabled="{Binding Path=XYDEnable}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
                 </StackPanel>
             </GroupBox>
             <Button x:Name="Jog" Content="Click to activate keyboard jogging" ToolTip="Ctrl+Shift to activate" Margin="0,5,0,0" Focusable="True" GotFocus="Jog_FocusedChanged" LostFocus="Jog_FocusedChanged"/>

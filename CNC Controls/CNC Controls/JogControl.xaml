@@ -5,7 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:local="clr-namespace:CNC.Controls"
-             mc:Ignorable="d" 
+             mc:Ignorable="d"
+             FocusVisualStyle="{x:Null}"
              Loaded="UserControl_Loaded" IsVisibleChanged="JogControl_IsVisibleChanged"
              d:DesignHeight="250" Width="Auto">
     <UserControl.Resources>

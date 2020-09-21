@@ -1,7 +1,7 @@
 /*
  * GrblViewModel.cs - part of CNC Controls library
  *
- * v0.27 / 2020-09-17 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-21 / Io Engineering (Terje Io)
  *
  */
 
@@ -244,7 +244,10 @@ namespace CNC.Core
         }
 
         public bool ResponseLogVerbose { get; set; } = false;
+        public bool ResponseLogFilterRT { get; set; } = false;
+
         public bool IsReady { get; set; } = false;
+        public bool IsGrblHAL { get { return GrblSettings.IsGrblHAL; } }
 
         #region Dependencyproperties
 
@@ -292,6 +295,9 @@ namespace CNC.Core
             get { return Position.SuspendNotifications; }
             set { Position.SuspendNotifications = value; }
         }
+
+        public EnumFlags<AxisFlags> AxisHomed { get; private set; } = new EnumFlags<AxisFlags>(AxisFlags.None);
+        public Position HomePosition { get; private set; } = new Position();
 
         public Position WorkPositionOffset { get; private set; } = new Position();
         public Position ToolOffset { get; private set; } = new Position();
@@ -609,6 +615,21 @@ namespace CNC.Core
             return IsProbeSuccess && values.Length == 3;
         }
 
+        public void ParseHomedStatus(string data)
+        {
+            string[] values = data.TrimEnd(']').Split(':');
+            if (values.Length == 3)
+            {
+                HomePosition.Parse(values[1]);
+                AxisHomed.Value = (AxisFlags)int.Parse(values[2]);
+                for (int i = 0; i < GrblInfo.NumAxes; i++)
+                {
+                    if(!AxisHomed.Value.HasFlag(GrblInfo.AxisIndexToFlag(i)))
+                        HomePosition.Values[i] = double.NaN;
+                }
+            }
+        }
+
         public void ParseStatus(string data)
         {
             bool pos_changed = false;
@@ -839,7 +860,7 @@ namespace CNC.Core
                     break;
 
                 case "TLR":
-                    IsTloReferenceSet = value == "1";
+                    IsTloReferenceSet = value != "0";
                     break;
 
                 case "MPG":
@@ -907,9 +928,12 @@ namespace CNC.Core
 
             if (ResponseLogVerbose || !(data.First() == '<' || data.First() == '$' || data.First() == 'o') || data.StartsWith("error"))
             {
-                ResponseLog.Add(data);
-                if (ResponseLog.Count > 200)
-                    ResponseLog.RemoveAt(0);
+                if (!(data.First() == '<' && ResponseLogFilterRT))
+                {
+                    ResponseLog.Add(data);
+                    if (ResponseLog.Count > 200)
+                        ResponseLog.RemoveAt(0);
+                }
             }
 
             if (data.First() == '<')
@@ -926,13 +950,13 @@ namespace CNC.Core
             }
             else if (data.StartsWith("["))
             {
-                switch(data.Substring(1, 3))
+                switch(data.Substring(1, data.IndexOf(':') - 1))
                 {
                     case "PRB":
                         ParseProbeStatus(data);
                         break;
 
-                    case "GC:":
+                    case "GC":
                         ParseGCStatus(data);
                         break;
 
@@ -956,6 +980,10 @@ namespace CNC.Core
                             ToolOffset.X = double.NaN;
                         }
                         // End workaround
+                        break;
+
+                    case "HOME":
+                        ParseHomedStatus(data);
                         break;
 
                     case "MSG":

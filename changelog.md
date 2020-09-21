@@ -1,6 +1,21 @@
 ## GCode sender changelog
 
-2020-09-17: Development build for testing, executable available for download [here](http://www.io-engineering.com/downloads/) if you want to participate.
+Executable for development builds available for download [here](http://www.io-engineering.com/downloads/) if you want to participate in testing.
+
+---
+
+2020-09-21: Development build for testing.
+
+* Added support for non-uniform heightmap grid size.
+* Added floating console window, show/hide it from the _File_ menu.
+* Added filter to supress real time messages in console.
+* Bug fixes, a major one was heightmap probing could exceed the defined area to be probed.
+* Added home position in machine coordinates to the core viewmodel, will be set by new message. From next build of grblHAL.  
+Axes not homed is set to `double.NaN`.
+
+---
+
+2020-09-17: Development build for testing.
 
 * Added TLO \(Tool Length Offset\) and TLO referenced "LEDs" to _Work Parameters_ box in the _Grbl_ tab.  
 The first will lit when a tool offset is active, the second when a tool offset reference is set \(grblHAL only\).

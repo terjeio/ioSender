@@ -1,7 +1,7 @@
 ﻿/*
  * EdgeFinderControl.xaml.cs - part of CNC Probing library
  *
- * v0.27 / 2020-09-17 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-18 / Io Engineering (Terje Io)
  *
  */
 
@@ -75,12 +75,14 @@ namespace CNC.Controls.Probing
             InitializeComponent();
         }
 
+        public ProbingType ProbingType { get { return ProbingType.EdgeFinderExternal; } }
+
         public void Activate()
         {
             (DataContext as ProbingViewModel).Instructions = "Click edge, corner or center in image above to select probing action.\nMove the probe to above the position indicated by green dot before start.";
         }
 
-        public void Start()
+        public void Start(bool preview = false)
         {
             var probing = DataContext as ProbingViewModel;
 
@@ -95,6 +97,9 @@ namespace CNC.Controls.Probing
 
             if (!probing.Program.Init())
                 return;
+
+            if (preview)
+                probing.StartPosition.Zero();
 
             probing.Program.Add(string.Format("G91F{0}", probing.ProbeFeedRate.ToInvariantString()));
 
@@ -140,9 +145,11 @@ namespace CNC.Controls.Probing
                     break;
             }
 
-            probing.Program.Execute(true);
-
-            OnCompleted();
+            if (!preview)
+            {
+                probing.Program.Execute(true);
+                OnCompleted();
+            }
         }
 
         private void AddEdge(ProbingViewModel probing, char axisletter, bool negative)

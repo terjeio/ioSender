@@ -1,7 +1,7 @@
 ﻿/*
  * ProbingView.xaml.cs - part of CNC Probing library
  *
- * v0.27 / 2020-09-15 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-19 / Io Engineering (Terje Io)
  *
  */
 
@@ -282,10 +282,23 @@ namespace CNC.Controls.Probing
 
         private void tab_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            model.Message = string.Empty;
-            if(GrblSettings.IsGrblHAL)
-                Comms.com.WriteByte(GrblConstants.CMD_STATUS_REPORT_ALL);
-            getView(((sender as TabControl).SelectedItem as TabItem))?.Activate();
+
+            var view = getView(((sender as TabControl).SelectedItem as TabItem));
+            if (view != null)
+            {
+                model.ProbingType = view.ProbingType;
+                model.Message = string.Empty;
+                model.OffsetEnable = view.ProbingType == ProbingType.EdgeFinderInternal || view.ProbingType == ProbingType.EdgeFinderExternal;
+                model.XYDEnable = view.ProbingType == ProbingType.EdgeFinderInternal || view.ProbingType == ProbingType.EdgeFinderExternal || view.ProbingType == ProbingType.CenterFinder;
+                model.ProbeDiameterEnable = model.XYDEnable;
+                model.TouchPlateHeightEnable = view.ProbingType != ProbingType.CenterFinder && !(view.ProbingType == ProbingType.ToolLength && model.FixtureHeightEnable);
+                model.FixtureHeightEnable = view.ProbingType == ProbingType.ToolLength;
+
+                if (GrblSettings.IsGrblHAL)
+                    Comms.com.WriteByte(GrblConstants.CMD_STATUS_REPORT_ALL);
+
+                view.Activate();
+            }
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿/*
  * ToolLengthControl.cs - part of CNC Probing library
  *
- * v0.27 / 2020-09-16 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-21 / Io Engineering (Terje Io)
  *
  */
 
@@ -49,12 +49,13 @@ namespace CNC.Controls.Probing
     /// </summary>
     public partial class ToolLengthControl : UserControl, IProbeTab
     {
-        Position g59_3 = null;
+        private Position safeZ = null, g59_3 = null;
 
         public ToolLengthControl()
         {
             InitializeComponent();
         }
+        public ProbingType ProbingType { get { return ProbingType.ToolLength; } }
 
         public void Activate()
         {
@@ -64,7 +65,7 @@ namespace CNC.Controls.Probing
                 probing.Grbl.ExecuteCommand("$G");
         }
 
-        public void Start()
+        public void Start(bool preview = false)
         {
             var probing = DataContext as ProbingViewModel;
 
@@ -85,10 +86,13 @@ namespace CNC.Controls.Probing
             if (probing.ProbeFixture)
             {
                 g59_3 = new Position(GrblWorkParameters.GetCoordinateSystem("G59.3"));
-                var safeZ = System.Math.Max(g59_3.Z, probing.StartPosition.Z) + probing.Depth;
+                safeZ = new Position(probing.StartPosition);
+                safeZ.Z = System.Math.Max(g59_3.Z, probing.StartPosition.Z) + probing.Depth;
                 g59_3.Z += probing.Depth;
-                if (safeZ < 0d)
-                    probing.Program.AddRapidToMPos("Z" + safeZ.ToInvariantString());
+                if (safeZ.Z < 0d)
+                    probing.Program.AddRapidToMPos(safeZ, AxisFlags.Z);
+                else
+                    safeZ.Z = g59_3.Z;
                 probing.Program.AddRapidToMPos(g59_3, AxisFlags.X | AxisFlags.Y);
                 probing.Program.AddRapidToMPos(g59_3, AxisFlags.Z);
                 g59_3.Z -= probing.Depth;
@@ -110,7 +114,6 @@ namespace CNC.Controls.Probing
 
             if ((ok = probing.IsSuccess && probing.Positions.Count == 1))
             {
-                double tlo = 0d;
                 Position pos = new Position(probing.Positions[0]);
 
                 //if (probing.HasToolTable)
@@ -123,9 +126,10 @@ namespace CNC.Controls.Probing
                 }
                 else
                 {
-                    var tofs = new Position(pos);
-                    tlo = tofs.Z = pos.Z - (double.IsNaN(probing.TloReference) ? 0d : probing.TloReference);
-                    probing.Grbl.ExecuteCommand("G43.1" + tofs.ToString(AxisFlags.Z));
+                    double tlo = pos.Z - (double.IsNaN(probing.TloReference) ? 0d : probing.TloReference);
+                    if (probing.ProbeFixture)
+                       tlo += probing.FixtureHeight;
+                    probing.Grbl.ExecuteCommand("G43.1Z" + tlo.ToInvariantString(probing.Grbl.Format));
                 }
 
                 if (probing.AddAction && (ok = probing.WaitForResponse("$#")))
@@ -135,7 +139,7 @@ namespace CNC.Controls.Probing
                         if ((ok = probing.GotoMachinePosition(pos, AxisFlags.Z)))
                         {
                             pos.X = pos.Y = 0d;
-                            pos.Z = probing.WorkpieceHeight + probing.TouchPlateHeight;
+                            pos.Z = probing.WorkpieceHeight + probing.TouchPlateHeight + probing.Grbl.ToolOffset.Z;
                             probing.Grbl.ExecuteCommand("G92" + pos.ToString(AxisFlags.Z));
                         }
                     }
@@ -148,22 +152,14 @@ namespace CNC.Controls.Probing
 
                 //if (probing.Tool != "0")
                 //    probing.Grbl.ExecuteCommand(string.Format("G10L11P{0}{1}", probing.Tool, probing.Positions[0].ToString(AxisFlags.Z)));
-                probing.Positions[0].Z += probing.Depth;
-                probing.GotoMachinePosition(probing.Positions[0], AxisFlags.Z);
 
-                if (probing.ProbeFixture) // Go back to origin
-                {
-                    if (probing.StartPosition.Z > probing.Positions[0].Z)
-                    {
-                        probing.GotoMachinePosition(probing.StartPosition, AxisFlags.Z);
-                        probing.GotoMachinePosition(probing.StartPosition, AxisFlags.X | AxisFlags.Y);
-                    }
-                    else
-                    {
-                        probing.GotoMachinePosition(probing.StartPosition, AxisFlags.X | AxisFlags.Y);
-                        probing.GotoMachinePosition(probing.StartPosition, AxisFlags.Z);
-                    }
+                // Go back to origin
+                if (probing.ProbeFixture) {
+                    probing.Program.AddRapidToMPos(safeZ, AxisFlags.Z);
+                    probing.GotoMachinePosition(probing.StartPosition, AxisFlags.X | AxisFlags.Y);
                 }
+
+                probing.GotoMachinePosition(probing.StartPosition, AxisFlags.Z);
             }
 
             if (probing.ReferenceToolOffset)

@@ -1,7 +1,7 @@
 ﻿/*
  * Program.cs - part of CNC Probing library
  *
- * v0.27 / 2020-09-17 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-18 / Io Engineering (Terje Io)
 
  *
  */
@@ -327,6 +327,11 @@ namespace CNC.Controls.Probing
                 _isComplete = probing.IsCompleted = true;
                 Grbl.Poller.SetState(AppConfig.Settings.Base.PollInterval);
             }
+        }
+
+        public override string ToString()
+        {
+            return string.Join("\n", _program);
         }
     }
 }

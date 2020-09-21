@@ -1,7 +1,7 @@
 ﻿/*
  * HeightViewModel.xaml.cs - part of CNC Probing library
  *
- * v0.27 / 2020-09-15 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-20 / Io Engineering (Terje Io)
  *
  */
 
@@ -44,8 +44,8 @@ namespace CNC.Controls.Probing
 {
     public class HeightMapViewModel : ViewModelBase
     {
-        private bool _hasHeightMap = false, _canApply = false, _setToolOffset = false, _addPause = false;
-        private double _minX = 0d, _minY = 0d, _maxX = 50, _maxY = 50d, _gridSize = 5d;
+        private bool _hasHeightMap = false, _canApply = false, _setToolOffset = false, _addPause = false, _lockGridSizeXY = true;
+        private double _minX = 0d, _minY = 0d, _maxX = 50, _maxY = 50d, _gridSizeX = 5d, _gridSizeY = 5d;
         private HeightMap _heightMap = null;
         private Point3DCollection _mapPoints;
         private Point3DCollection _bp;
@@ -58,13 +58,54 @@ namespace CNC.Controls.Probing
         public double Width { get { return _maxX - _minX; } set { if (value != Width) { _maxX = value + _minX; OnPropertyChanged(nameof(MaxX)); } } }
         public double Height { get { return _maxY - _minY; } set { if (value != Height) { _maxY = value + _minY; OnPropertyChanged(nameof(MaxY)); } } }
 
-
-        public double GridSize { get { return _gridSize; } set { if (value != _gridSize) { _gridSize = value; OnPropertyChanged(); } } }
         public HeightMap Map { get { return _heightMap; } set { if (value != _heightMap) { _heightMap = value; OnPropertyChanged(); } } }
         public bool HasHeightMap { get { return _hasHeightMap && _heightMap != null; } set { if (value != _hasHeightMap) _hasHeightMap = value; OnPropertyChanged(); } }
         public bool CanApply { get { return _canApply && HasHeightMap; } set { _canApply = value; OnPropertyChanged(); } }
         public bool SetToolOffset { get { return _setToolOffset; } set { _setToolOffset = value; OnPropertyChanged(); } }
         public bool AddPause { get { return _addPause; } set { _addPause = value; OnPropertyChanged(); } }
+
+        public bool GridSizeLockXY
+        {
+            get { return _lockGridSizeXY; }
+            set
+            {
+                _lockGridSizeXY = value;
+                OnPropertyChanged();
+                if (_lockGridSizeXY && _gridSizeY != _gridSizeX)
+                {
+                    _gridSizeY = _gridSizeX;
+                    OnPropertyChanged(nameof(GridSizeY));
+                }
+            }
+        }
+        public double GridSizeX
+        {
+            get { return _gridSizeX; }
+            set
+            {
+                _gridSizeX = value;
+                OnPropertyChanged();
+                if (_lockGridSizeXY)
+                {
+                    _gridSizeY = value;
+                    OnPropertyChanged(nameof(GridSizeY));
+                }
+            }
+        }
+        public double GridSizeY
+        {
+            get { return _gridSizeY; }
+            set
+            {
+                _gridSizeY = value;
+                OnPropertyChanged();
+                if (_lockGridSizeXY)
+                {
+                    _gridSizeX = value;
+                    OnPropertyChanged(nameof(GridSizeX));
+                }
+            }
+        }
 
         public MeshGeometry3D MeshGeometry { get { return _meshGeometry; } set { _meshGeometry = value; OnPropertyChanged(); } }
         public Point3DCollection MapPoints { get { return _mapPoints; } set { _mapPoints = value; OnPropertyChanged(); } }

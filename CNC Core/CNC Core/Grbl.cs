@@ -1,7 +1,7 @@
 ﻿/*
  * Grbl.cs - part of CNC Controls library
  *
- * v0.27 / 2020-09-17 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-21 / Io Engineering (Terje Io)
  *
  */
 
@@ -666,10 +666,16 @@ namespace CNC.Core
             return AxisLetters.IndexOf(letter);
         }
 
+        public static AxisFlags AxisIndexToFlag(int index)
+        {
+            return (AxisFlags)(1 << index);
+        }
+
         public static AxisFlags AxisLetterToFlag(string letter)
         {
             return (AxisFlags)(1 << AxisLetters.IndexOf(letter));
         }
+
         public static AxisFlags AxisLetterToFlag(char letter)
         {
             return (AxisFlags)(1 << AxisLetters.IndexOf(letter));
