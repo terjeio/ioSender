@@ -1,7 +1,7 @@
 ﻿/*
  * GCode.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.16 / 2020-04-12 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-21 / Io Engineering (Terje Io)
  *
  */
 
@@ -97,7 +97,7 @@ namespace CNC.Controls
         public static GCode File { get { return file.Value; } }
         public bool IsLoaded { get { return Program.Loaded; } }
         public string FileName { get { return Model == null ? string.Empty : Model.FileName; } }
-
+        public int ToolChanges { get { return Program.Parser.ToolChanges; } }
         public bool HeightMapApplied { get { return Program.HeightMapApplied; } set { Program.HeightMapApplied = value; } }
 
         public DataTable Data { get { return Program.Data; } }

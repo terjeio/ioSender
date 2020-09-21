@@ -4,9 +4,13 @@
 
 Please check out the [Wiki](https://github.com/terjeio/Grbl-GCode-Sender/wiki) for further details.
 
+8-bit Arduino controllers needs _Toggle DTR_ selected in order to reset the controller on connect. Behaviour may be erratic if not set.
+
+![Toggle DTR](Media/Sender8.png)
+
 ---
 
-Latest changes committed 20200918, see the [changelog](changelog.md) for details.
+Latest changes committed 20200921, see the [changelog](changelog.md) for details.
 
 ---
 

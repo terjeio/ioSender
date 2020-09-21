@@ -217,7 +217,8 @@ namespace CNC.Core
         AxisSetting_YMaxTravel = 131,
         AxisSetting_ZMaxRate = 112,
         AxisSetting_ZAcceleration = 122,
-        AxisSetting_ZMaxTravel = 132
+        AxisSetting_ZMaxTravel = 132,
+        ToolChangeMode = 341
     }
 
     public enum StreamingState
@@ -1315,6 +1316,7 @@ namespace CNC.Core
         {
             return dbl.Parse(GetString(key));
         }
+
         public static double GetInteger(GrblSetting key)
         {
             return int.Parse(GetString(key));

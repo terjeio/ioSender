@@ -6,6 +6,8 @@ Executable for development builds available for download [here](http://www.io-en
 
 2020-09-21: Development build for testing.
 
+* Added machine position flyout.
+* Added warning about setting tool length reference if job has tool changes.
 * Added support for non-uniform heightmap grid size.
 * Added floating console window, show/hide it from the _File_ menu.
 * Added filter to supress real time messages in console.

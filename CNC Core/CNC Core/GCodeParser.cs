@@ -1,7 +1,7 @@
 ﻿/*
  * GCodeParser.cs - part of CNC Controls library
  *
- * v0.20 / 2020-05-27 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-21 / Io Engineering (Terje Io)
  *
  */
 
@@ -222,6 +222,7 @@ namespace CNC.GCode
         public static CommandIgnoreState IgnoreM8 { get; set; } = CommandIgnoreState.No;
 
         public Dialect Dialect { get; set; } = Dialect.GrblHAL;
+        public int ToolChanges { get; private set; }
         public bool ProgramEnd { get; private set; }
         public List<GCodeToken> Tokens { get; private set; } = new List<GCodeToken>();
 
@@ -236,6 +237,7 @@ namespace CNC.GCode
             motionMode = MotionMode.Seek;
             coordSystem = 0;
             demarcCount = 0;
+            ToolChanges = 0;
             IsScaled = motionModeChanged = false;
             zorg = 0d;
         }
@@ -859,6 +861,7 @@ namespace CNC.GCode
                 // M6
                 if (modalGroups.HasFlag(ModalGroups.M6))
                 {
+                    ToolChanges++;
                     Tokens.Add(new GCodeToken(Commands.M6, gcValues.N));
                 }
 

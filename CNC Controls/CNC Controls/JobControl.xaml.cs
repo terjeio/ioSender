@@ -1,7 +1,7 @@
 /*
  * JobControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.27 / 2020-09-17 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-21 / Io Engineering (Terje Io)
  *
  */
 
@@ -215,6 +215,8 @@ namespace CNC.Controls
                             job.IsSDFile = false;
                             job.CurrLine = job.PendingLine = job.ACKPending = model.BlockExecuting = 0;
                             job.PgmEndLine = GCode.File.Blocks - 1;
+                            if (GCode.File.ToolChanges > 0 && GrblSettings.GetInteger(GrblSetting.ToolChangeMode) > 0 && !model.IsTloReferenceSet)
+                                MessageBox.Show(string.Format("Job has {0} tool change(s), tool length reference should be established before start.", GCode.File.ToolChanges), "GCode Sender", MessageBoxButton.OK, MessageBoxImage.Warning);
                             streamingHandler.Call(GCode.File.IsLoaded ? StreamingState.Idle : StreamingState.NoFile, false);
                         }
                         break;
