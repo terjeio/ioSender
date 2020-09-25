@@ -2,6 +2,13 @@
 
 Executable for development builds available for download [here](http://www.io-engineering.com/downloads/) if you want to participate in testing.
 
+2020-09-26: Development build for testing.
+
+* Added gcode preview to edge finders, based on code/input from @jschoch.
+* Added warning on loading of gcode if it contains tool changes and tool reference offset is not set \(grblHAL only\).
+* Added workaround for [legacy grbl](https://github.com/gnea/grbl) in order to keep probing UI in sync with controller status.
+* Bug fixes.
+
 ---
 
 2020-09-21: Development build for testing.
@@ -10,7 +17,7 @@ Executable for development builds available for download [here](http://www.io-en
 * Added warning about setting tool length reference if job has tool changes.
 * Added support for non-uniform heightmap grid size.
 * Added floating console window, show/hide it from the _File_ menu.
-* Added filter to supress real time messages in console.
+* Added filter to suppress real time messages in console.
 * Bug fixes, a major one was heightmap probing could exceed the defined area to be probed.
 * Added home position in machine coordinates to the core viewmodel, will be set by new message. From next build of grblHAL.  
 Axes not homed is set to `double.NaN`.

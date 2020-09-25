@@ -1,7 +1,7 @@
 ﻿/*
  * ToolLengthControl.cs - part of CNC Probing library
  *
- * v0.27 / 2020-09-21 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-22 / Io Engineering (Terje Io)
  *
  */
 
@@ -59,10 +59,10 @@ namespace CNC.Controls.Probing
 
         public void Activate()
         {
-            var probing = (DataContext as ProbingViewModel);
+            var probing = DataContext as ProbingViewModel;
             probing.Instructions = string.Empty;
             if (!probing.Grbl.IsParserStateLive)
-                probing.Grbl.ExecuteCommand("$G");
+                probing.Grbl.ExecuteCommand(probing.Grbl.IsGrblHAL ? GrblConstants.CMD_GETPARSERSTATE : GrblConstants.CMD_GETNGCPARAMETERS);
         }
 
         public void Start(bool preview = false)
@@ -132,7 +132,7 @@ namespace CNC.Controls.Probing
                     probing.Grbl.ExecuteCommand("G43.1Z" + tlo.ToInvariantString(probing.Grbl.Format));
                 }
 
-                if (probing.AddAction && (ok = probing.WaitForResponse("$#")))
+                if (probing.AddAction && (ok = probing.WaitForResponse(GrblConstants.CMD_GETNGCPARAMETERS)))
                 {
                     if (probing.CoordinateMode == ProbingViewModel.CoordMode.G92)
                     {
@@ -170,18 +170,18 @@ namespace CNC.Controls.Probing
             }
 
             if (!probing.Grbl.IsParserStateLive)
-                probing.Grbl.ExecuteCommand("$G");
+                probing.Grbl.ExecuteCommand(GrblConstants.CMD_GETPARSERSTATE);
 
             probing.Program.End(ok ? "Probing completed" : "Probing failed");
         }
 
         private void clearToolOffset_Click(object sender, RoutedEventArgs e)
         {
-            var model = (DataContext as ProbingViewModel);
+            var model = DataContext as ProbingViewModel;
             model.ReferenceToolOffset = !(model.Grbl.IsTloReferenceSet && !double.IsNaN(model.Grbl.TloReference));
             model.Grbl.ExecuteCommand("G49");
             if(!model.Grbl.IsParserStateLive)
-                model.Grbl.ExecuteCommand("$G");
+                model.Grbl.ExecuteCommand(model.Grbl.IsGrblHAL ? GrblConstants.CMD_GETPARSERSTATE : GrblConstants.CMD_GETNGCPARAMETERS);
         }
         private void start_Click(object sender, RoutedEventArgs e)
         {

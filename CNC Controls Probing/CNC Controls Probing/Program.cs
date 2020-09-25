@@ -1,7 +1,7 @@
 ﻿/*
  * Program.cs - part of CNC Probing library
  *
- * v0.27 / 2020-09-18 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-26 / Io Engineering (Terje Io)
 
  *
  */
@@ -63,6 +63,8 @@ namespace CNC.Controls.Probing
             probing = model;
         }
 
+        public bool IsCancelled { get; set; }
+
         private void Grbl_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             switch (e.PropertyName)
@@ -112,6 +114,7 @@ namespace CNC.Controls.Probing
         {
             bool? res = null;
 
+            IsCancelled = false;
             probing.Message = string.Empty;
 
             Grbl.Poller.SetState(0);  // Disable status polling during probing
@@ -231,9 +234,10 @@ namespace CNC.Controls.Probing
 
         public void Cancel()
         {
-     //       probing.IsCancelled = true;
+            IsCancelled = true;
             Comms.com.WriteByte(GrblConstants.CMD_STOP);
-            ResponseReceived("cancel");
+            if(!_isComplete)
+                ResponseReceived("cancel");
         }
 
         public void End(string message)

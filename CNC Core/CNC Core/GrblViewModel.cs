@@ -1,7 +1,7 @@
 /*
  * GrblViewModel.cs - part of CNC Controls library
  *
- * v0.27 / 2020-09-21 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-22 / Io Engineering (Terje Io)
  *
  */
 
@@ -279,7 +279,7 @@ namespace CNC.Core
         public bool IsCheckMode { get { return _grblState.State == GrblStates.Check; } }
         public bool IsSleepMode { get { return _grblState.State == GrblStates.Sleep; } }
         public bool IsG92Active { get { return GrblParserState.IsActive("G92") != null; } }
-        public bool IsToolOffsetActive { get { return GrblParserState.IsActive("G49") == null; } }
+        public bool IsToolOffsetActive { get { return IsGrblHAL ? GrblParserState.IsActive("G49") == null : !double.IsNaN(ToolOffset.Z); } }
         public bool IsJobRunning { get { return _isJobRunning; } set { if (_isJobRunning != value) { _isJobRunning = value; OnPropertyChanged(); } } }
         public bool ProgramEnd { get { return _pgmEnd; } set { _pgmEnd = value; if(_pgmEnd) OnPropertyChanged(); } }
         public int GrblError { get { return _grblState.Error; } set { _grblState.Error = value; OnPropertyChanged(); } }
@@ -976,8 +976,9 @@ namespace CNC.Core
                         // Workaround for legacy grbl, copy X offset to Z (there is no info available for which axis...)
                         if (double.IsNaN(ToolOffset.Z))
                         {
-                            ToolOffset.Z = ToolOffset.X;
+                            ToolOffset.Z = ToolOffset.X == 0 ? double.NaN : ToolOffset.X;
                             ToolOffset.X = double.NaN;
+                            OnPropertyChanged(nameof(IsToolOffsetActive));
                         }
                         // End workaround
                         break;

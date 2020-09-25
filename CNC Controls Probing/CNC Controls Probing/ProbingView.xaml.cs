@@ -1,7 +1,7 @@
 ﻿/*
  * ProbingView.xaml.cs - part of CNC Probing library
  *
- * v0.27 / 2020-09-19 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-22 / Io Engineering (Terje Io)
  *
  */
 
@@ -160,6 +160,9 @@ namespace CNC.Controls.Probing
                 if (GrblSettings.IsGrblHAL)
                     Comms.com.WriteByte(GrblConstants.CMD_STATUS_REPORT_ALL);
 
+                if (!model.Grbl.IsGrblHAL && !AppConfig.Settings.Jog.KeyboardEnable)
+                    Jog.Visibility = Visibility.Collapsed;
+
                 GrblParserState.Get(!GrblSettings.IsGrblHAL);
                 mode = GrblParserState.DistanceMode;
                 model.Tool = model.Grbl.Tool == GrblConstants.NO_TOOL ? "0" : model.Grbl.Tool;
@@ -288,6 +291,7 @@ namespace CNC.Controls.Probing
             {
                 model.ProbingType = view.ProbingType;
                 model.Message = string.Empty;
+                model.PreviewEnable = false;
                 model.OffsetEnable = view.ProbingType == ProbingType.EdgeFinderInternal || view.ProbingType == ProbingType.EdgeFinderExternal;
                 model.XYDEnable = view.ProbingType == ProbingType.EdgeFinderInternal || view.ProbingType == ProbingType.EdgeFinderExternal || view.ProbingType == ProbingType.CenterFinder;
                 model.ProbeDiameterEnable = model.XYDEnable;

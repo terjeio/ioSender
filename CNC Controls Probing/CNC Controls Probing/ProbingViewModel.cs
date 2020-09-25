@@ -1,7 +1,7 @@
 ﻿/*
  * ProbingViewModel.cs - part of CNC Probing library
  *
- * v0.27 / 2020-09-19 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-26 / Io Engineering (Terje Io)
  *
  */
 
@@ -61,6 +61,7 @@ namespace CNC.Controls.Probing
         }
 
         private string _message = string.Empty, _tool = string.Empty, _instructions = string.Empty, _position = string.Empty, _probeProgram = string.Empty;
+        private string _previewText = string.Empty;
         private double _tpHeight, _fHeight, _ProbeDiameter, _workpieceSizeX = 0d, _workpieceSizeY = 0d, _workpieceHeight = 0d;
         private double _latchDistance, _latchFeedRate;
         private double _probeDistance, _probeFeedRate;
@@ -72,7 +73,7 @@ namespace CNC.Controls.Probing
         private bool _hasToolTable = false, _hasCs9 = false, _addAction = false, _isPaused = false, _isCorner = false;
         private bool isCancelled = false, wasZselected = false, _referenceToolOffset = true, _workpieceLockXY = true;
         private bool _enableOffset = true, _enableXYD = true, _enableProbeDiameter = true;
-        private bool _enableFixtureHeight = true, _enableTouchPlateHeight = true;
+        private bool _enableFixtureHeight = true, _enableTouchPlateHeight = true, _enablePreview = false;
         private GrblViewModel _grblmodel = null;
         private List<string> _program = new List<string>();
         private List<Position> _positions = new List<Position>();
@@ -118,6 +119,10 @@ namespace CNC.Controls.Probing
             return ok;
         }
 
+        public void Cancel ()
+        {
+        }
+
         public bool WaitForResponse(string command)
         {
             bool? res = null;
@@ -125,7 +130,7 @@ namespace CNC.Controls.Probing
             if (Grbl.ResponseLogVerbose)
                 Grbl.ResponseLog.Add(command);
 
-            new Thread(() =>
+            var t = new Thread(() =>
             {
                 res = WaitFor.AckResponse<string>(
                 cancellationToken,
@@ -133,7 +138,7 @@ namespace CNC.Controls.Probing
                 a => Grbl.OnResponseReceived += a,
                 a => Grbl.OnResponseReceived -= a,
                 5000, () => Grbl.ExecuteCommand(command));
-            }).Start();
+            }); t.Start();
 
             while (res == null)
                 EventUtils.DoEvents();
@@ -392,6 +397,22 @@ namespace CNC.Controls.Probing
                 ProbeCorner = _edge == Edge.A || _edge == Edge.B || _edge == Edge.C || _edge == Edge.D;
             }
         }
+
+        public bool PreviewEnable
+        {
+            get { return _enablePreview; }
+            set
+            {
+                if (_enablePreview != value)
+                {
+                    _enablePreview = value;
+                    OnPropertyChanged();
+                    if (!_enablePreview)
+                        PreviewText = string.Empty;
+                }
+            }
+        }
+        public string PreviewText { get { return _previewText; } set { _previewText = value; OnPropertyChanged(); } }
 
         public bool ProbeCorner { get { return _isCorner; } set { _isCorner = value; OnPropertyChanged(); OnPropertyChanged(nameof(OffsetEnable)); } }
         public Center ProbeCenter { get { return _center; } set { _center = value; OnPropertyChanged(); } }

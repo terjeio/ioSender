@@ -1,7 +1,7 @@
 ﻿/*
  * EdgeFinderControl.xaml.cs - part of CNC Probing library
  *
- * v0.27 / 2020-09-18 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-26 / Io Engineering (Terje Io)
  *
  */
 
@@ -67,6 +67,7 @@ namespace CNC.Controls.Probing
     /// </summary>
     public partial class EdgeFinderControl : UserControl, IProbeTab
     {
+        private volatile bool isCancelled = false;
         private AxisFlags axisflags = AxisFlags.None;
         private double[] af = new double[3];
 
@@ -97,6 +98,8 @@ namespace CNC.Controls.Probing
 
             if (!probing.Program.Init())
                 return;
+
+            isCancelled = false;
 
             if (preview)
                 probing.StartPosition.Zero();
@@ -145,7 +148,9 @@ namespace CNC.Controls.Probing
                     break;
             }
 
-            if (!preview)
+            if (preview)
+                probing.PreviewText = probing.Program.ToString().Replace("G53", string.Empty);
+            else
             {
                 probing.Program.Execute(true);
                 OnCompleted();
@@ -179,8 +184,6 @@ namespace CNC.Controls.Probing
             af[GrblConstants.X_AXIS] = negx ? -1d : 1d;
             af[GrblConstants.Y_AXIS] = negy ? -1d : 1d;
 
-            axisflags = AxisFlags.X | AxisFlags.Y;
-
             Position rapidto = new Position(probing.StartPosition);
             rapidto.X -= probing.XYClearance * af[GrblConstants.X_AXIS];
             rapidto.Y += probing.Offset * af[GrblConstants.Y_AXIS];
@@ -198,7 +201,7 @@ namespace CNC.Controls.Probing
 
             rapidto.X = probing.StartPosition.X + probing.Offset * af[GrblConstants.X_AXIS];
             rapidto.Y = probing.StartPosition.Y;
-            probing.Program.AddRapidToMPos(rapidto, axisflags);
+            probing.Program.AddRapidToMPos(rapidto, AxisFlags.X | AxisFlags.Y);
             rapidto.Y = probing.StartPosition.Values[GrblConstants.Y_AXIS] - probing.XYClearance * af[GrblConstants.Y_AXIS];
             probing.Program.AddRapidToMPos(rapidto, AxisFlags.Y);
             probing.Program.AddRapidToMPos(rapidto, AxisFlags.Z);
@@ -211,6 +214,7 @@ namespace CNC.Controls.Probing
 
         public void Stop()
         {
+            isCancelled = true;
             (DataContext as ProbingViewModel).Program.Cancel();
         }
 
@@ -241,21 +245,21 @@ namespace CNC.Controls.Probing
 
                     pz.X += probing.ProbeDiameter / 2d * af[GrblConstants.X_AXIS];
                     pz.Y += probing.ProbeDiameter / 2d * af[GrblConstants.Y_AXIS];
-                    if ((ok = probing.GotoMachinePosition(pz, axisflags)))
+                    if ((ok = !isCancelled && probing.GotoMachinePosition(pz, axisflags)))
                     {
-                        ok = probing.WaitForResponse(probing.FastProbe + "Z-" + probing.Depth.ToInvariantString());
-                        ok = ok && probing.WaitForResponse(probing.RapidCommand + "Z" + probing.LatchDistance.ToInvariantString());
-                        ok = ok && probing.RemoveLastPosition();
-                        if ((ok = ok && probing.WaitForResponse(probing.SlowProbe + "Z-" + probing.Depth.ToInvariantString())))
+                        ok = !isCancelled && probing.WaitForResponse(probing.FastProbe + "Z-" + probing.Depth.ToInvariantString());
+                        ok = ok && !isCancelled && probing.WaitForResponse(probing.RapidCommand + "Z" + probing.LatchDistance.ToInvariantString());
+                        ok = ok && !isCancelled && probing.RemoveLastPosition();
+                        if ((ok = ok && !isCancelled && probing.WaitForResponse(probing.SlowProbe + "Z-" + probing.Depth.ToInvariantString())))
                         {
                             pos.Z = probing.Grbl.ProbePosition.Z;
-                            ok = probing.GotoMachinePosition(probing.StartPosition, AxisFlags.Z);
+                            ok = !isCancelled && probing.GotoMachinePosition(probing.StartPosition, AxisFlags.Z);
                         }
                     }
                 }
 
-                ok = ok && probing.GotoMachinePosition(pos, AxisFlags.Y);
-                ok = ok && probing.GotoMachinePosition(pos, AxisFlags.X);
+                ok = ok && !isCancelled && probing.GotoMachinePosition(pos, AxisFlags.Y);
+                ok = ok && !isCancelled && probing.GotoMachinePosition(pos, AxisFlags.X);
 
                 if (probing.ProbeZ)
                     axisflags |= AxisFlags.Z;
@@ -264,11 +268,11 @@ namespace CNC.Controls.Probing
                 {
                     if (probing.CoordinateMode == ProbingViewModel.CoordMode.G92)
                     {
-                        if((ok = probing.GotoMachinePosition(pos, AxisFlags.Z))) {
+                        if((ok = !isCancelled && probing.GotoMachinePosition(pos, AxisFlags.Z))) {
                             pos.X = pos.Y = 0d;
                             pos.Z = probing.WorkpieceHeight + probing.TouchPlateHeight;
                             probing.Grbl.ExecuteCommand("G92" + pos.ToString(axisflags));
-                            if (axisflags.HasFlag(AxisFlags.Z))
+                            if (!isCancelled && axisflags.HasFlag(AxisFlags.Z))
                                 probing.GotoMachinePosition(probing.StartPosition, AxisFlags.Z);
                         }
                     }
@@ -289,7 +293,7 @@ namespace CNC.Controls.Probing
 
         private void start_Click(object sender, RoutedEventArgs e)
         {
-            Start();
+            Start((DataContext as ProbingViewModel).PreviewEnable);
         }
 
         private void stop_Click(object sender, RoutedEventArgs e)
