@@ -1,7 +1,7 @@
 ﻿/*
  * CenterFinderControl.xaml.cs - part of CNC Probing library
  *
- * v0.27 / 2020-09-20 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-26 / Io Engineering (Terje Io)
  *
  */
 
@@ -71,7 +71,7 @@ namespace CNC.Controls.Probing
             (DataContext as ProbingViewModel).Instructions = "Click image above to select probing action.\nPlace the probe above the approximate center of the workpiece before start.";
         }
 
-        private bool CreateProgram()
+        private bool CreateProgram(bool preview)
         {
             var probing = DataContext as ProbingViewModel;
 
@@ -90,7 +90,11 @@ namespace CNC.Controls.Probing
             if (pass == probing.Passes)
                 probing.Program.Add(string.Format("G91F{0}", probing.ProbeFeedRate.ToInvariantString()));
 
+            if (preview)
+                probing.StartPosition.Zero();
+
             var rapidto = new Position(probing.StartPosition);
+            var XYClearance = probing.XYClearance + probing.ProbeDiameter / 2d;
 
             rapidto.Z -= probing.Depth;
 
@@ -98,7 +102,7 @@ namespace CNC.Controls.Probing
             {
                 case Center.Inside:
                     {
-                        double rapid = probing.WorkpieceSizeX / 2d - probing.XYClearance;
+                        double rapid = probing.WorkpieceSizeX / 2d - XYClearance;
 
                         probing.Program.AddRapidToMPos(rapidto, AxisFlags.Z);
 
@@ -117,7 +121,7 @@ namespace CNC.Controls.Probing
 
                         probing.Program.AddRapidToMPos(probing.StartPosition, AxisFlags.X);
 
-                        rapid = probing.WorkpieceSizeY / 2d - probing.XYClearance;
+                        rapid = probing.WorkpieceSizeY / 2d - XYClearance;
                         if (rapid > 1d)
                         {
                             rapidto.Y -= rapid;
@@ -138,8 +142,8 @@ namespace CNC.Controls.Probing
 
                 case Center.Outside:
                     {
-                        rapidto.X -= probing.WorkpieceSizeX / 2d + probing.XYClearance;
-                        rapidto.Y -= probing.WorkpieceSizeY / 2d + probing.XYClearance;
+                        rapidto.X -= probing.WorkpieceSizeX / 2d + XYClearance;
+                        rapidto.Y -= probing.WorkpieceSizeY / 2d + XYClearance;
 
                         probing.Program.AddRapidToMPos(rapidto, AxisFlags.X);
                         probing.Program.AddRapidToMPos(rapidto, AxisFlags.Z);
@@ -148,7 +152,7 @@ namespace CNC.Controls.Probing
 
                         probing.Program.AddRapidToMPos(rapidto, AxisFlags.X);
                         probing.Program.AddRapidToMPos(probing.StartPosition, AxisFlags.Z);
-                        rapidto.X += probing.WorkpieceSizeX + probing.XYClearance * 2d;
+                        rapidto.X += probing.WorkpieceSizeX + XYClearance * 2d;
                         probing.Program.AddRapidToMPos(rapidto, AxisFlags.X);
                         probing.Program.AddRapidToMPos(rapidto, AxisFlags.Z);
 
@@ -164,14 +168,14 @@ namespace CNC.Controls.Probing
 
                         probing.Program.AddRapidToMPos(rapidto, AxisFlags.Y);
                         probing.Program.AddRapidToMPos(probing.StartPosition, AxisFlags.Z);
-                        rapidto.Y += probing.WorkpieceSizeY + probing.XYClearance * 2d;
+                        rapidto.Y += probing.WorkpieceSizeY + XYClearance * 2d;
                         probing.Program.AddRapidToMPos(rapidto, AxisFlags.Y);
                         probing.Program.AddRapidToMPos(rapidto, AxisFlags.Z);
 
                         probing.Program.AddProbingAction(AxisFlags.Y, true);
 
+                        probing.Program.AddRapidToMPos(rapidto, AxisFlags.Y);
                         probing.Program.AddRapidToMPos(probing.StartPosition, AxisFlags.Z);
-                        probing.Program.AddRapidToMPos(probing.StartPosition, AxisFlags.Y);
                     }
                     break;
             }
@@ -201,27 +205,36 @@ namespace CNC.Controls.Probing
                 return;
             }
 
-            if (probing.ProbeCenter == Center.Inside && probing.WorkpieceSizeX < probing.XYClearance * 2d)
+            if (probing.ProbeCenter == Center.Inside && probing.WorkpieceSizeX < probing.XYClearance * 2d + probing.ProbeDiameter)
             {
                 probing.SetError(nameof(probing.WorkpieceSizeX), "Probing XY clearance too large for workpiece X size.");
                 return;
             }
 
-            if (probing.ProbeCenter == Center.Inside && probing.WorkpieceSizeY < probing.XYClearance * 2d)
+            if (probing.ProbeCenter == Center.Inside && probing.WorkpieceSizeY < probing.XYClearance * 2d + probing.ProbeDiameter)
             {
                 probing.SetError(nameof(probing.WorkpieceSizeY), "Probing XY clearance too large for workpiece Y size.");
                 return;
             }
 
-            pass = probing.Passes;
+            pass = preview ? 1 : probing.Passes;
 
-            if (CreateProgram())
+            if (CreateProgram(preview))
             {
                 do
                 {
-                    probing.Program.Execute(true);
-                    OnCompleted();
-                } while (--pass != 0 && CreateProgram());
+                    if (preview)
+                    {
+                        probing.PreviewText = probing.Program.ToString().Replace("G53", string.Empty);
+                        PreviewOnCompleted();
+                        probing.PreviewText += "\n; Post XY probe\n" + probing.Program.ToString().Replace("G53", string.Empty);
+                    }
+                    else
+                    {
+                        probing.Program.Execute(true);
+                        OnCompleted();
+                    }
+                } while (--pass != 0 && CreateProgram(preview));
             }
         }
 
@@ -287,9 +300,22 @@ namespace CNC.Controls.Probing
             return ok;
         }
 
-        private void start_Click(object sender, RoutedEventArgs e)
+        private void PreviewOnCompleted()
         {
-            Start();
+            var probing = DataContext as ProbingViewModel;
+
+            probing.Program.Clear();
+
+            probing.Program.AddRapidToMPos(probing.StartPosition, AxisFlags.X | AxisFlags.Y);
+            if (probing.CoordinateMode == ProbingViewModel.CoordMode.G92)
+                probing.Program.Add("G92X0Y0");
+            else
+                probing.Program.Add(string.Format("G10L2P{0}{1}", probing.CoordinateSystem, probing.StartPosition.ToString(AxisFlags.X | AxisFlags.Y)));
+        }
+
+private void start_Click(object sender, RoutedEventArgs e)
+        {
+            Start((DataContext as ProbingViewModel).PreviewEnable);
         }
 
         private void stop_Click(object sender, RoutedEventArgs e)

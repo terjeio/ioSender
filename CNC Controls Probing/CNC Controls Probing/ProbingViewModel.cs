@@ -1,7 +1,7 @@
 ﻿/*
  * ProbingViewModel.cs - part of CNC Probing library
  *
- * v0.27 / 2020-09-26 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-27 / Io Engineering (Terje Io)
  *
  */
 
@@ -194,11 +194,14 @@ namespace CNC.Controls.Probing
         public bool GotoMachinePosition(Position pos, AxisFlags axisflags)
         {
             bool? res = null;
-            bool wait = true;
+            bool wait = true, running = false;
+            double delta, delta_max = 0d;
 
             string command = "G53" + RapidCommand + pos.ToString(axisflags);
 
             Comms.com.PurgeQueue();
+
+            Grbl.Poller.SetState(0);
 
             new Thread(() =>
             {
@@ -233,19 +236,31 @@ namespace CNC.Controls.Probing
                         EventUtils.DoEvents();
 
                     wait = res != true;
+                    running |= Grbl.GrblState.State == GrblStates.Run;
 
                     int i = 0, axes = (int)axisflags;
                     while (axes != 0 && !wait)
                     {
                         if ((axes & 0x01) != 0)
-                            wait = Math.Abs(pos.Values[i] - Grbl.MachinePosition.Values[i]) >= 0.003d; // use step resolution plus some?
+                        {
+                            delta = Math.Abs(pos.Values[i] - Grbl.MachinePosition.Values[i]);
+                            wait = delta > Math.Max(0.003d, GrblInfo.TravelResolution.Values[i] * 2d);
+                            delta_max = Math.Max(delta, delta_max);
+                            if (wait && Grbl.GrblState.State == GrblStates.Idle && (running || delta_max < 0.01d))
+                            {
+                                wait = false;
+                                isCancelled = true;
+                            }
+                        }
                         i++; axes >>= 1;
                     }
 
                     if (wait)
-                        Thread.Sleep(200); // needed?
+                        Thread.Sleep(AppConfig.Settings.Base.PollInterval); // needed?
                 }
             }
+
+            Grbl.Poller.SetState(AppConfig.Settings.Base.PollInterval);
 
             return isCancelled ? false : !wait;
         }
@@ -254,10 +269,16 @@ namespace CNC.Controls.Probing
         {
             ClearErrors();
 
-            if(XYClearance > ProbeDistance)
+            if(XYClearance + ProbeDiameter / 2d > ProbeDistance)
             {
-                SetError(nameof(XYClearance), "Probing distance must be larger than XY Clearance.");
-                SetError(nameof(ProbeDistance), "Probing distance must be larger than XY Clearance.");
+                SetError(nameof(XYClearance), "Probing distance must be larger than XY Clearance + ½ Probe/tool diameter.");
+                SetError(nameof(ProbeDistance), "Probing distance must be larger than XY Clearance + ½ Probe/tool diameter.");
+            }
+
+            if (LatchDistance >= ProbeDistance)
+            {
+                SetError(nameof(LatchDistance), "Latch distance must be less than Probing distance.");
+                SetError(nameof(ProbeDistance), "Latch distance must be less than Probing distance.");
             }
 
             return !HasErrors;

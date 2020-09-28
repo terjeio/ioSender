@@ -51,7 +51,8 @@ namespace CNC.Controls.Probing
         private GrblViewModel Grbl = null;
         private List<string> _program = new List<string>();
         ProbingViewModel probing;
-        private volatile bool _isComplete = false, isRunning = false, hasPause = false, probeOnCycleStart = false;
+        private bool probeProtect = false;
+        private volatile bool _isComplete = false, isRunning = false, isProbing = false, hasPause = false, probeOnCycleStart = false;
         private int step = 0;
         private CancellationToken cancellationToken = new CancellationToken();
 
@@ -82,13 +83,19 @@ namespace CNC.Controls.Probing
                     break;
 
                 case nameof(GrblViewModel.Signals):
-                    if((sender as GrblViewModel).Signals.Value.HasFlag(Signals.CycleStart)) {
+                    var model = sender as GrblViewModel;
+                    if (model.Signals.Value.HasFlag(Signals.CycleStart)) {
                         if (probing.IsPaused && probeOnCycleStart)
                         {
                             probeOnCycleStart = false;
                             probing.IsPaused = false;
                         }
                         //TODO: add start as well?
+                    }
+                    if (probeProtect && model.Signals.Value.HasFlag(Signals.Probe) && model.GrblState.State == GrblStates.Run & model.GrblState.Substate != 2)
+                    {
+                        Comms.com.WriteByte(GrblConstants.CMD_STOP);
+                        ResponseReceived("fail");
                     }
                     break;
 
@@ -110,6 +117,11 @@ namespace CNC.Controls.Probing
             }
         }
 
+        public void Clear()
+        {
+            _program.Clear();
+        }
+
         public bool Init()
         {
             bool? res = null;
@@ -117,7 +129,7 @@ namespace CNC.Controls.Probing
             IsCancelled = false;
             probing.Message = string.Empty;
 
-            Grbl.Poller.SetState(0);  // Disable status polling during probing
+            Grbl.Poller.SetState(0);  // Disable status polling during initialization
 
             // Clear error status if set
             if (Grbl.GrblError != 0)
@@ -146,7 +158,7 @@ namespace CNC.Controls.Probing
                 null,
                 a => Grbl.OnResponseReceived += a,
                 a => Grbl.OnResponseReceived -= a,
-                1000, () => Comms.com.WriteByte(GrblSettings.IsGrblHAL ? GrblConstants.CMD_STATUS_REPORT_ALL : GrblLegacy.ConvertRTCommand(GrblConstants.CMD_STATUS_REPORT)));
+                1000, () => Comms.com.WriteByte(GrblInfo.IsGrblHAL ? GrblConstants.CMD_STATUS_REPORT_ALL : GrblLegacy.ConvertRTCommand(GrblConstants.CMD_STATUS_REPORT)));
             }).Start();
 
             while (res == null)
@@ -189,8 +201,8 @@ namespace CNC.Controls.Probing
             hasPause = probeOnCycleStart = false;
             _program.Clear();
 
-            if (res != true) // Reenable status polling if init fails 
-                Grbl.Poller.SetState(AppConfig.Settings.Base.PollInterval);
+            //if (res != true) // Reenable status polling if init fails 
+            //    Grbl.Poller.SetState(AppConfig.Settings.Base.PollInterval);
 
             return res == true;
         }
@@ -204,6 +216,13 @@ namespace CNC.Controls.Probing
                 _program.Add("!" + probing.RapidCommand + axisLetter + (negative ? "" : "-") + probing.LatchDistance.ToInvariantString());
                 _program.Add(probing.SlowProbe + axisLetter + (negative ? "-" : "") + probing.ProbeDistance.ToInvariantString());
             }
+        }
+
+        public void AddSimulatedProbe(int p)
+        {
+            probing.IsSuccess = true;
+            probing.Positions.Add(new Position(probing.StartPosition));
+            probing.Positions.Add(new Position(probing.StartPosition));
         }
 
         public void Add(string cmd)
@@ -242,18 +261,21 @@ namespace CNC.Controls.Probing
 
         public void End(string message)
         {
-            Grbl.PropertyChanged -= Grbl_PropertyChanged;
-            Grbl.OnCommandResponseReceived -= ResponseReceived;
-            if (hasPause)
-                probing.PropertyChanged -= Probing_PropertyChanged;
-            isRunning = Grbl.IsJobRunning = false;
+            if (isRunning)
+            {
+                Grbl.PropertyChanged -= Grbl_PropertyChanged;
+                Grbl.OnCommandResponseReceived -= ResponseReceived;
+                if (hasPause)
+                    probing.PropertyChanged -= Probing_PropertyChanged;
+                isRunning = Grbl.IsJobRunning = false;
+            }
             _isComplete = true;
             probing.Message = message;
         }
 
         public bool Execute(bool go)
         {
-            _isComplete = false;
+            _isComplete = isProbing = false;
 
             probing.ClearExeStatus();
 
@@ -268,6 +290,7 @@ namespace CNC.Controls.Probing
                 if (!isRunning)
                 {
                     isRunning = true;
+                    probeProtect = GrblInfo.HasSimpleProbeProtect;
 
                     Grbl.OnCommandResponseReceived += ResponseReceived;
                     Grbl.PropertyChanged += Grbl_PropertyChanged;
@@ -309,6 +332,7 @@ namespace CNC.Controls.Probing
                     //}
                     if (_program[step].StartsWith("!"))
                     {
+                        isProbing = false;
                         _program[step] = _program[step].Substring(1);
                         probing.RemoveLastPosition();
                     }
@@ -319,7 +343,10 @@ namespace CNC.Controls.Probing
                         probeOnCycleStart = !probing.Grbl.Signals.Value.HasFlag(Signals.CycleStart);
                     }
                     else
+                    {
+                        isProbing = _program[step].Contains("G38");
                         Grbl.ExecuteCommand(_program[step]);
+                    }
                 }
             }
 
@@ -329,7 +356,7 @@ namespace CNC.Controls.Probing
                 if (!probing.IsSuccess)
                     End("Probing cancelled/failed" + (Grbl.GrblState.State == GrblStates.Alarm ? " (ALARM)" : ""));
                 _isComplete = probing.IsCompleted = true;
-                Grbl.Poller.SetState(AppConfig.Settings.Base.PollInterval);
+//                Grbl.Poller.SetState(AppConfig.Settings.Base.PollInterval);
             }
         }
 

@@ -24,6 +24,9 @@
                         </Setter.Value>
                     </Setter>
                 </Trigger>
+                <Trigger Property="Validation.HasError" Value="false">
+                    <Setter Property="ToolTip" Value="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Tag}" />
+                </Trigger>
             </Style.Triggers>
         </Style>
     </UserControl.Resources>
@@ -61,13 +64,13 @@
                     <Controls:NumericField Label="Rapids feed rate:" ToolTip="Feed rate for rapid moves, set to 0 to use controller setting" Format="###0" Unit="mm/min" Value="{Binding Path=RapidsFeedRate, Mode=TwoWay}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
                     <Controls:NumericField Label="Search feed rate:" ToolTip="Feed rate for initial probing move" Unit="mm/min" Format="###0" Value="{Binding Path=ProbeFeedRate, Mode=TwoWay}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
                     <Controls:NumericField Label="Latch feed rate:" ToolTip="Feed rate for second slow probing move" Unit="mm/min" Format="###0" Value="{Binding Path=LatchFeedRate, Mode=TwoWay}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
-                    <Controls:NumericField Label="Probing distance:" ToolTip="Max. distance for probing moves" Value="{Binding Path=ProbeDistance, Mode=TwoWay}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top" Style="{StaticResource ErrorStyle}"/>
-                    <Controls:NumericField Label="Latch distance:" ToolTip="Distance to retract for second slow probing move, set to 0 to skip" Value="{Binding Path=LatchDistance, Mode=TwoWay}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
+                    <Controls:NumericField Label="Probing distance:" Tag="Max. distance for probing moves" Value="{Binding Path=ProbeDistance, Mode=TwoWay}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top" Style="{StaticResource ErrorStyle}"/>
+                    <Controls:NumericField Label="Latch distance:" Tag="Distance to retract for second slow probing move, set to 0 to skip" Value="{Binding Path=LatchDistance, Mode=TwoWay}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top" Style="{StaticResource ErrorStyle}"/>
                 </StackPanel>
             </GroupBox>
             <GroupBox Header="Probing clearances">
                 <StackPanel Orientation="Vertical">
-                    <Controls:NumericField Label="XY Clearance:" ToolTip="Initial distance away from face to probe" Value="{Binding Path=XYClearance, Mode=TwoWay}" IsEnabled="{Binding Path=XYDEnable}" ColonAt="102" HorizontalAlignment="Left" Margin="0,7,0,0" VerticalAlignment="Top" Style="{StaticResource ErrorStyle}"/>
+                    <Controls:NumericField Label="XY Clearance:" Tag="Initial distance away from face to probe" Value="{Binding Path=XYClearance, Mode=TwoWay}" IsEnabled="{Binding Path=XYDEnable}" ColonAt="102" HorizontalAlignment="Left" Margin="0,7,0,0" VerticalAlignment="Top" Style="{StaticResource ErrorStyle}"/>
                     <Controls:NumericField Label="Offset:" ToolTip="Distance from corner to probe" Value="{Binding Path=Offset, Mode=TwoWay}" IsEnabled="{Binding Path=OffsetEnable}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
                     <Controls:NumericField Label="Depth:" ToolTip="Z offset from current position where probing will take place" Value="{Binding Path=Depth, Mode=TwoWay}" IsEnabled="{Binding Path=XYDEnable}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
                 </StackPanel>

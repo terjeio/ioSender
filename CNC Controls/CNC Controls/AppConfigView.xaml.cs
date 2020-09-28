@@ -1,7 +1,7 @@
 /*
  * AppConfigView.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.17 / 2020-04-15 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-26 / Io Engineering (Terje Io)
  *
  */
 /*
@@ -67,7 +67,7 @@ namespace CNC.Controls
                     if (GrblSettings.GetString(GrblSetting.JogStepSpeed) != null)
                         control.Visibility = Visibility.Hidden;
                     else
-                        (control as JogConfigControl).IsGrbl = !GrblSettings.IsGrblHAL;
+                        (control as JogConfigControl).IsGrbl = !GrblInfo.IsGrblHAL;
                 } else if (control is ICameraConfig && model.Camera != null && !model.Camera.HasCamera)
                     control.Visibility = Visibility.Collapsed;
             }

@@ -1,7 +1,7 @@
 ﻿/*
  * KeypressHandler.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.22 / 2020-08-15 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-26 / Io Engineering (Terje Io)
  *
  */
 
@@ -97,7 +97,7 @@ namespace CNC.Controls
                 if (!(val = GrblSettings.GetDouble(GrblSetting.JogFastSpeed)).Equals(double.NaN))
                     jogSpeed[(int)JogMode.Fast] = val;
 
-                fullJog = GrblSettings.IsGrblHAL;
+                fullJog = GrblInfo.IsGrblHAL;
                 model.IsMetric = GrblSettings.GetString(GrblSetting.ReportInches) != "1";
             }
 
@@ -125,7 +125,7 @@ namespace CNC.Controls
             jogSpeed[(int)JogMode.Slow] = AppConfig.Settings.Jog.SlowFeedrate;
             jogSpeed[(int)JogMode.Fast] = AppConfig.Settings.Jog.FastFeedrate;
 
-            if(!GrblSettings.IsGrblHAL)
+            if(!GrblInfo.IsGrblHAL)
                 fullJog = AppConfig.Settings.Jog.KeyboardEnable;
         }
 

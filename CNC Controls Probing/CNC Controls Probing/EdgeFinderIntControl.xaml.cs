@@ -1,7 +1,7 @@
 ﻿/*
  * EdgeFinderIntControl.xaml.cs - part of CNC Probing library
  *
- * v0.27 / 2020-09-26 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-27 / Io Engineering (Terje Io)
  *
  */
 
@@ -91,27 +91,29 @@ namespace CNC.Controls.Probing
             if (preview)
                 probing.StartPosition.Zero();
 
+            var XYClearance = probing.XYClearance + probing.ProbeDiameter / 2d;
+
             probing.Program.Add(string.Format("G91F{0}", probing.ProbeFeedRate.ToInvariantString()));
 
             switch (probing.ProbeEdge)
             {
                 case Edge.A:
-                    if (!AddCorner(probing, true, true))
+                    if (!AddCorner(probing, true, true, XYClearance))
                         return;
                     break;
 
                 case Edge.B:
-                    if (!AddCorner(probing, false, true))
+                    if (!AddCorner(probing, false, true, XYClearance))
                         return;
                     break;
 
                 case Edge.C:
-                    if (!AddCorner(probing, false, false))
+                    if (!AddCorner(probing, false, false, XYClearance))
                         return;
                     break;
 
                 case Edge.D:
-                    if (!AddCorner(probing, true, false))
+                    if (!AddCorner(probing, true, false, XYClearance))
                         return;
                     break;
 
@@ -122,24 +124,28 @@ namespace CNC.Controls.Probing
                     break;
 
                 case Edge.AD:
-                    AddEdge(probing, 'X', true);
+                    AddEdge(probing, 'X', true, XYClearance);
                     break;
 
                 case Edge.AB:
-                    AddEdge(probing, 'Y', true);
+                    AddEdge(probing, 'Y', true, XYClearance);
                     break;
 
                 case Edge.CB:
-                    AddEdge(probing, 'X', false);
+                    AddEdge(probing, 'X', false, XYClearance);
                     break;
 
                 case Edge.CD:
-                    AddEdge(probing, 'Y', false);
+                    AddEdge(probing, 'Y', false, XYClearance);
                     break;
             }
 
             if (preview)
+            {
                 probing.PreviewText = probing.Program.ToString().Replace("G53", string.Empty);
+                PreviewOnCompleted();
+                probing.PreviewText += "\n; Post XY probe\n" + probing.Program.ToString().Replace("G53", string.Empty);
+            }
             else
             {
                 probing.Program.Execute(true);
@@ -147,7 +153,7 @@ namespace CNC.Controls.Probing
             }
         }
 
-        private void AddEdge(ProbingViewModel probing, char axisletter, bool negative)
+        private void AddEdge(ProbingViewModel probing, char axisletter, bool negative, double XYClearance)
         {
             int axis = GrblInfo.AxisLetterToIndex(axisletter);
 
@@ -156,7 +162,7 @@ namespace CNC.Controls.Probing
             axisflags = GrblInfo.AxisLetterToFlag(axisletter);
 
             var rapidto = new Position(probing.StartPosition);
-            rapidto.Values[axis] -= probing.XYClearance * af[axis];
+            rapidto.Values[axis] -= XYClearance * af[axis];
             rapidto.Z -= probing.Depth;
 
             probing.Program.AddRapidToMPos(rapidto, axisflags);
@@ -164,22 +170,22 @@ namespace CNC.Controls.Probing
 
             probing.Program.AddProbingAction(axisflags, negative);
 
-            rapidto.Values[axis] = probing.StartPosition.Values[axis] - probing.XYClearance * af[axis];
+            rapidto.Values[axis] = probing.StartPosition.Values[axis] - XYClearance * af[axis];
             probing.Program.AddRapidToMPos(rapidto, axisflags);
             probing.Program.AddRapidToMPos(probing.StartPosition, AxisFlags.Z);
         }
 
-        private bool AddCorner(ProbingViewModel probing, bool negx, bool negy)
+        private bool AddCorner(ProbingViewModel probing, bool negx, bool negy, double XYClearance)
         {
             af[GrblConstants.X_AXIS] = negx ? -1d : 1d;
             af[GrblConstants.Y_AXIS] = negy ? -1d : 1d;
 
             axisflags = AxisFlags.X | AxisFlags.Y;
 
-            var XYClearance = Math.Min(probing.XYClearance, probing.Offset);
-
-            if (XYClearance < probing.XYClearance && MessageBox.Show("XY Clearance is less than Offset, run anyway?", "GCode Sender", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
+            if (XYClearance > probing.Offset && MessageBox.Show("Offset is less than XY Clearance + ½ Probe/tool diameter.\nUse Offset as clearance and run anyway?", "GCode Sender", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
                 return false;
+
+            XYClearance = Math.Min(XYClearance, probing.Offset);
 
             var rapidto = new Position(probing.StartPosition);
             rapidto.X -= XYClearance * af[GrblConstants.X_AXIS];
@@ -239,7 +245,7 @@ namespace CNC.Controls.Probing
                     pz.Y += probing.ProbeDiameter / 2d * af[GrblConstants.Y_AXIS];
                     if ((ok = !isCancelled && probing.GotoMachinePosition(pz, axisflags)))
                     {
-                        ok = probing.WaitForResponse(probing.FastProbe + "Z-" + probing.Depth.ToInvariantString());
+                        ok = !isCancelled && probing.WaitForResponse(probing.FastProbe + "Z-" + probing.Depth.ToInvariantString());
                         ok = ok && !isCancelled && probing.WaitForResponse(probing.RapidCommand + "Z" + probing.LatchDistance.ToInvariantString());
                         ok = ok && !isCancelled && probing.RemoveLastPosition();
                         if ((ok = ok && !isCancelled && probing.WaitForResponse(probing.SlowProbe + "Z-" + probing.Depth.ToInvariantString())))
@@ -274,13 +280,61 @@ namespace CNC.Controls.Probing
                         probing.Grbl.ExecuteCommand(string.Format("G10L2P{0}{1}", probing.CoordinateSystem, pos.ToString(axisflags)));
                     }
                 }
+
+                probing.Program.End(ok ? "Probing completed" : "Probing failed");
             }
 
             if (!probing.Grbl.IsParserStateLive && probing.CoordinateMode == ProbingViewModel.CoordMode.G92)
                 probing.Grbl.ExecuteCommand("$G");
 
             probing.Grbl.IsJobRunning = false;
-            probing.Program.End(ok ? "Probing completed" : "Probing failed");
+        }
+
+        private void PreviewOnCompleted()
+        {
+            var probing = DataContext as ProbingViewModel;
+            Position pos = new Position(probing.StartPosition);
+
+            probing.Program.Clear();
+
+            foreach (int i in axisflags.ToIndices())
+                pos.Values[i] = probing.StartPosition.Values[i] + (i == GrblConstants.Z_AXIS ? 0d : probing.ProbeDiameter / 2d * af[i]);
+
+            if (probing.ProbeZ && axisflags != AxisFlags.Z)
+            {
+                Position pz = new Position(pos);
+
+                pz.X += probing.ProbeDiameter / 2d * af[GrblConstants.X_AXIS];
+                pz.Y += probing.ProbeDiameter / 2d * af[GrblConstants.Y_AXIS];
+
+                probing.Program.AddRapidToMPos(pz, axisflags);
+                probing.Program.AddProbingAction(AxisFlags.Z, true);
+                probing.Program.AddRapidToMPos(probing.StartPosition, AxisFlags.Z);
+
+                //                    pos.Z = probing.Grbl.ProbePosition.Z;
+
+            }
+
+            probing.Program.AddRapidToMPos(pos, AxisFlags.Y);
+            probing.Program.AddRapidToMPos(pos, AxisFlags.X);
+
+            if (probing.ProbeZ)
+                axisflags |= AxisFlags.Z;
+
+            if (probing.CoordinateMode == ProbingViewModel.CoordMode.G92)
+            {
+                probing.Program.AddRapidToMPos(pos, AxisFlags.Z);
+                pos.X = pos.Y = 0d;
+                pos.Z = probing.WorkpieceHeight + probing.TouchPlateHeight;
+                probing.Program.Add("G92" + pos.ToString(axisflags));
+                if (axisflags.HasFlag(AxisFlags.Z))
+                    probing.Program.AddRapidToMPos(probing.StartPosition, AxisFlags.Z);
+            }
+            else
+            {
+                pos.Z -= probing.WorkpieceHeight + probing.TouchPlateHeight + probing.Grbl.ToolOffset.Z;
+                probing.Program.Add(string.Format("G10L2P{0}{1}", probing.CoordinateSystem, pos.ToString(axisflags)));
+            }
         }
 
         private void start_Click(object sender, RoutedEventArgs e)

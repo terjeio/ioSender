@@ -1,7 +1,7 @@
 ﻿/*
  * ProbingProfiles.cs - part of CNC Probing library
  *
- * v0.22 / 2020-08-15 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-28 / Io Engineering (Terje Io)
  *
  */
 
@@ -72,7 +72,7 @@ namespace CNC.Controls.Probing
 
         public ObservableCollection<ProbingProfile> Profiles { get; private set; } = new ObservableCollection<ProbingProfile>();
 
-        public void Add(string name, ProbingViewModel data)
+        public int Add(string name, ProbingViewModel data)
         {
             Profiles.Add(new ProbingProfile
             {
@@ -90,6 +90,8 @@ namespace CNC.Controls.Probing
                 TouchPlateHeight = data.TouchPlateHeight,
                 FixtureHeight = data.FixtureHeight
             });
+
+            return id - 1;
         }
 
         public void Update(int id, string name, ProbingViewModel data)

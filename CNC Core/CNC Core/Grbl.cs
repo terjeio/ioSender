@@ -1,7 +1,7 @@
 ﻿/*
  * Grbl.cs - part of CNC Controls library
  *
- * v0.27 / 2020-09-21 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-26 / Io Engineering (Terje Io)
  *
  */
 
@@ -209,6 +209,7 @@ namespace CNC.Core
         JogStepDistance = 53,
         JogSlowDistance = 54,
         JogFastDistance = 55,
+        AxisSetting_XTravelResolution = 100,
         AxisSetting_XMaxRate = 110,
         AxisSetting_XAcceleration = 120,
         AxisSetting_XMaxTravel = 130,
@@ -601,6 +602,7 @@ namespace CNC.Core
     {
         #region Attributes
 
+        private static bool _probeProtect = false;
         private static int _numAxes;
 
         static GrblInfo()
@@ -611,6 +613,7 @@ namespace CNC.Core
         public static string AxisLetters { get; private set; } = "XYZABC";
         public static string Version { get; private set; } = string.Empty;
         public static int Build { get; private set; } = 0;
+        public static bool IsGrblHAL { get; internal set; }
         public static string Identity { get; private set; } = string.Empty;
         public static string Options { get; private set; } = string.Empty;
         public static string NewOptions { get; private set; } = string.Empty;
@@ -634,10 +637,12 @@ namespace CNC.Core
                 AxisFlags = (AxisFlags)flags;
             }
         }
+        public static Position TravelResolution { get; private set; } = new Position();
         public static Signals OptionalSignals { get; private set; } = Signals.Off;
         public static AxisFlags AxisFlags { get; private set; } = AxisFlags.None;
         public static int NumTools { get; private set; } = 0;
         public static bool HasATC { get; private set; }
+        public static bool HasSimpleProbeProtect { get { return _probeProtect & IsGrblHAL && Build >= 20200924; } internal set { _probeProtect = value; } }
         public static bool ManualToolChange { get; private set; }
         public static bool HasSDCard { get; private set; }
         public static bool HasPIDLog { get; private set; }
@@ -1302,7 +1307,6 @@ namespace CNC.Core
         public static bool IsLoaded { get { return settings.Rows.Count > 0; } }
         public static bool HomingEnabled { get; private set; }
         public static bool UseLegacyRTCommands { get; private set; }
-        public static bool IsGrblHAL { get; private set; }
         public static bool ReportProbeCoordinates { get; private set; }
 
         public static string GetString(GrblSetting key)
@@ -1347,7 +1351,7 @@ namespace CNC.Core
 
             model.Silent = false;
 
-            if (IsGrblHAL && !Resources.ConfigName.StartsWith("hal_"))
+            if (GrblInfo.IsGrblHAL && !Resources.ConfigName.StartsWith("hal_"))
                 Resources.ConfigName = "hal_" + Resources.ConfigName;
 
             try
@@ -1394,10 +1398,18 @@ namespace CNC.Core
 
             settings.AcceptChanges();
 
-            if(!IsGrblHAL)
+            if(!GrblInfo.IsGrblHAL)
                 ReportProbeCoordinates = true;
 
             model.GrblState = model.GrblState; // Temporary hack to enable the Home button when homing is enabled
+
+            int i = 0;
+            double stepsmm;
+            do
+            {
+                stepsmm = GetDouble(GrblSetting.AxisSetting_XTravelResolution + i);
+                GrblInfo.TravelResolution.Values[i++] = 1d / stepsmm;
+            } while (!double.IsNaN(stepsmm));
 
             return IsLoaded;
         }
@@ -1434,10 +1446,10 @@ namespace CNC.Core
         {
             List<string> exp = new List<string>();
 
-            if (IsGrblHAL)
+            if (GrblInfo.IsGrblHAL)
                 exp.Add("%");
 
-            exp.Add("; " + (IsGrblHAL ? "grblHAL" : "grbl") + (GrblInfo.Identity != string.Empty ? ":" + GrblInfo.Identity : ""));
+            exp.Add("; " + (GrblInfo.IsGrblHAL ? "grblHAL" : "grbl") + (GrblInfo.Identity != string.Empty ? ":" + GrblInfo.Identity : ""));
             exp.Add("; " + GrblInfo.Version);
             exp.Add("; [OPT:" + GrblInfo.Options + "]");
 
@@ -1452,7 +1464,7 @@ namespace CNC.Core
             foreach (DataRow Setting in settings.Rows)
                 exp.Add(string.Format("${0}={1}", (int)Setting["Id"], (string)Setting["Value"]));
 
-            if (IsGrblHAL)
+            if (GrblInfo.IsGrblHAL)
                 exp.Add("%");
 
             return exp;
@@ -1520,11 +1532,12 @@ namespace CNC.Core
                                 var value = int.Parse(valuepair[1]);
                                 Grbl.GrblViewModel.IsParserStateLive = (value & (1 << 9)) != 0;
                                 ReportProbeCoordinates = (value & (1 << 7)) != 0;
+                                GrblInfo.HasSimpleProbeProtect = (value & (1 << 11)) != 0;
                             }
                             break;
 
                         case GrblSetting.ControlInvertMask:
-                            IsGrblHAL = true;
+                            GrblInfo.IsGrblHAL = true;
                             break;
                     }
 

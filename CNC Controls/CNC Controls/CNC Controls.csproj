@@ -179,6 +179,9 @@
     <Compile Include="UIUtils.cs" />
     <Compile Include="UIViewModel.cs" />
     <Compile Include="Widget.cs" />
+    <Compile Include="MachinePositionFlyout.xaml.cs">
+      <DependentUpon>MachinePositionFlyout.xaml</DependentUpon>
+    </Compile>
     <Compile Include="WorkParametersControl.xaml.cs">
       <DependentUpon>WorkParametersControl.xaml</DependentUpon>
     </Compile>
@@ -345,6 +348,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="TrinamicView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MachinePositionFlyout.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

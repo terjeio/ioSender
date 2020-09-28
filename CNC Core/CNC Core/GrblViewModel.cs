@@ -1,7 +1,7 @@
 /*
  * GrblViewModel.cs - part of CNC Controls library
  *
- * v0.27 / 2020-09-22 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-26 / Io Engineering (Terje Io)
  *
  */
 
@@ -247,7 +247,7 @@ namespace CNC.Core
         public bool ResponseLogFilterRT { get; set; } = false;
 
         public bool IsReady { get; set; } = false;
-        public bool IsGrblHAL { get { return GrblSettings.IsGrblHAL; } }
+        public bool IsGrblHAL { get { return GrblInfo.IsGrblHAL; } }
 
         #region Dependencyproperties
 
@@ -574,10 +574,10 @@ namespace CNC.Core
                     OnPropertyChanged(nameof(IsSleepMode));
 
                 if (newstate == GrblStates.Sleep)
-                    Message = "<Reset> to continue.";
+                    Message += ", " + "<Reset> to continue.";
                 else if (newstate == GrblStates.Alarm)
                 {
-                    Message = substate == 11 ? "<Home> to continue." : "<Reset> then <Unlock> to continue.";
+                    Message += ", " + (substate == 11 ? "<Home> to continue." : "<Reset> then <Unlock> to continue.");
                     if (substate == 11)
                         HomedState = HomedState.NotHomed;
                 }

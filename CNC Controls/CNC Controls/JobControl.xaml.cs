@@ -1,7 +1,7 @@
 /*
  * JobControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.27 / 2020-09-21 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-26 / Io Engineering (Terje Io)
  *
  */
 
@@ -148,7 +148,7 @@ namespace CNC.Controls
             GCodeParser.IgnoreM7 = AppConfig.Settings.Base.IgnoreM7;
             GCodeParser.IgnoreM8 = AppConfig.Settings.Base.IgnoreM8;
 
-            useBuffering = AppConfig.Settings.Base.UseBuffering && GrblSettings.IsGrblHAL;
+            useBuffering = AppConfig.Settings.Base.UseBuffering && GrblInfo.IsGrblHAL;
         }
 
         private void JobControl_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -240,7 +240,7 @@ namespace CNC.Controls
             {
                 initOK = true;
                 serialSize = Math.Min(300, (int)(GrblInfo.SerialBufferSize * 0.9f)); // size should be less than hardware handshake HWM
-                GCode.File.Parser.Dialect = GrblSettings.IsGrblHAL ? Dialect.GrblHAL : Dialect.Grbl;
+                GCode.File.Parser.Dialect = GrblInfo.IsGrblHAL ? Dialect.GrblHAL : Dialect.Grbl;
             }
 
             EnablePolling(activate);
@@ -284,7 +284,7 @@ namespace CNC.Controls
             GCodeParser.IgnoreM7 = AppConfig.Settings.Base.IgnoreM7;
             GCodeParser.IgnoreM8 = AppConfig.Settings.Base.IgnoreM8;
 
-            useBuffering = AppConfig.Settings.Base.UseBuffering && GrblSettings.IsGrblHAL;
+            useBuffering = AppConfig.Settings.Base.UseBuffering && GrblInfo.IsGrblHAL;
 
             return GrblSettings.IsLoaded;
         }
@@ -569,7 +569,7 @@ namespace CNC.Controls
                     case StreamingState.Idle:
                         if(streamingState == StreamingState.Error)
                         {
-                            btnStart.IsEnabled = !GrblSettings.IsGrblHAL; // BAD! ?
+                            btnStart.IsEnabled = !GrblInfo.IsGrblHAL; // BAD! ?
                             btnHold.IsEnabled = false;
                             btnStop.IsEnabled = true;
                             SetStreamingHandler(StreamingHandler.AwaitAction);
@@ -609,7 +609,7 @@ namespace CNC.Controls
                         break;
 
                     case StreamingState.Stop:
-                        if (GrblSettings.IsGrblHAL)
+                        if (GrblInfo.IsGrblHAL)
                             SetStreamingHandler(StreamingHandler.Idle);
                         else
                         {
@@ -640,11 +640,11 @@ namespace CNC.Controls
                 switch (newState)
                 {
                     case StreamingState.Idle:
-                        btnStart.IsEnabled = !GrblSettings.IsGrblHAL;
+                        btnStart.IsEnabled = !GrblInfo.IsGrblHAL;
                         break;
 
                     case StreamingState.Stop:
-                        if (GrblSettings.IsGrblHAL) {
+                        if (GrblInfo.IsGrblHAL) {
                             if(!model.GrblReset)
                                 Comms.com.WriteByte(GrblConstants.CMD_STOP);
                         } else if(grblState.State == GrblStates.Run)
@@ -700,7 +700,7 @@ namespace CNC.Controls
 
                     case StreamingState.Error:
                     case StreamingState.Halted:
-                        btnStart.IsEnabled = !GrblSettings.IsGrblHAL;
+                        btnStart.IsEnabled = !GrblInfo.IsGrblHAL;
                         btnHold.IsEnabled = false;
                         btnStop.IsEnabled = true;
                         break;
@@ -789,14 +789,14 @@ namespace CNC.Controls
 
                     case StreamingState.Stop:
                         btnHold.IsEnabled = !(grblState.MPG || grblState.State == GrblStates.Alarm);
-                        btnStart.IsEnabled = btnHold.IsEnabled && GCode.File.IsLoaded; //!GrblSettings.IsGrblHAL;
+                        btnStart.IsEnabled = btnHold.IsEnabled && GCode.File.IsLoaded; //!GrblInfo.IsGrblHAL;
                         btnStop.IsEnabled = false;
                         btnRewind.IsEnabled = false;
                         job.IsSDFile = false;
                         model.IsJobRunning = false;
                         if (!grblState.MPG)
                         {
-                            if (GrblSettings.IsGrblHAL)
+                            if (GrblInfo.IsGrblHAL)
                             {
                                 if (!model.GrblReset)
                                     Comms.com.WriteByte(GrblConstants.CMD_STOP);

@@ -1,7 +1,7 @@
 ﻿/*
  * ProbingView.xaml.cs - part of CNC Probing library
  *
- * v0.27 / 2020-09-22 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-26 / Io Engineering (Terje Io)
  *
  */
 
@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 using System.Windows;
+using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Input;
 using CNC.Core;
@@ -72,6 +73,18 @@ namespace CNC.Controls.Probing
                     keyboard = new KeypressHandler(DataContext as GrblViewModel);
                     keyboard.AddHandler(Key.R, ModifierKeys.Alt, StartProbe);
                     keyboard.AddHandler(Key.S, ModifierKeys.Alt, StopProbe);
+                    keyboard.AddHandler(Key.F1, ModifierKeys.None, FnKeyHandler);
+                    keyboard.AddHandler(Key.F2, ModifierKeys.None, FnKeyHandler);
+                    keyboard.AddHandler(Key.F3, ModifierKeys.None, FnKeyHandler);
+                    keyboard.AddHandler(Key.F4, ModifierKeys.None, FnKeyHandler);
+                    keyboard.AddHandler(Key.F5, ModifierKeys.None, FnKeyHandler);
+                    keyboard.AddHandler(Key.F6, ModifierKeys.None, FnKeyHandler);
+                    keyboard.AddHandler(Key.F7, ModifierKeys.None, FnKeyHandler);
+                    keyboard.AddHandler(Key.F8, ModifierKeys.None, FnKeyHandler);
+                    keyboard.AddHandler(Key.F9, ModifierKeys.None, FnKeyHandler);
+                    keyboard.AddHandler(Key.F10, ModifierKeys.None, FnKeyHandler);
+                    keyboard.AddHandler(Key.F11, ModifierKeys.None, FnKeyHandler);
+                    keyboard.AddHandler(Key.F12, ModifierKeys.None, FnKeyHandler);
                 }
                 DataContext = model = new ProbingViewModel(DataContext as GrblViewModel, profiles);
             }
@@ -105,6 +118,21 @@ namespace CNC.Controls.Probing
             getView(tab.SelectedItem as TabItem)?.Start();
 
             return true;
+        }
+
+        private bool FnKeyHandler(Key key)
+        {
+            if (!model.Grbl.IsJobRunning)
+            {
+                int id = int.Parse(key.ToString().Substring(1));
+                var macro = AppConfig.Settings.Macros.FirstOrDefault(o => o.Id == id);
+                if (macro != null && MessageBox.Show(string.Format("Run {0} macro?", macro.Name), "Run macro", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                {
+                    model.Grbl.ExecuteCommand(macro.Code);
+                    return true;
+                }
+            }
+            return false;
         }
 
         private void DisplayPosition(GrblViewModel grbl)
@@ -157,13 +185,13 @@ namespace CNC.Controls.Probing
                     model.HasToolTable = GrblInfo.NumTools > 0;
                 }
 
-                if (GrblSettings.IsGrblHAL)
+                if (GrblInfo.IsGrblHAL)
                     Comms.com.WriteByte(GrblConstants.CMD_STATUS_REPORT_ALL);
 
                 if (!model.Grbl.IsGrblHAL && !AppConfig.Settings.Jog.KeyboardEnable)
                     Jog.Visibility = Visibility.Collapsed;
 
-                GrblParserState.Get(!GrblSettings.IsGrblHAL);
+                GrblParserState.Get(!GrblInfo.IsGrblHAL);
                 mode = GrblParserState.DistanceMode;
                 model.Tool = model.Grbl.Tool == GrblConstants.NO_TOOL ? "0" : model.Grbl.Tool;
                 model.CanProbe = !model.Grbl.Signals.Value.HasFlag(Signals.Probe);
@@ -190,9 +218,10 @@ namespace CNC.Controls.Probing
                 model.Grbl.PropertyChanged -= Grbl_PropertyChanged;
 
                 // If probing alarm active unlock
-                if(model.Grbl.GrblState.State == GrblStates.Alarm && (model.Grbl.GrblState.Substate == 4 || model.Grbl.GrblState.Substate == 5))
-                    model.Grbl.ExecuteCommand(GrblConstants.CMD_UNLOCK);
-                else if (model.Grbl.GrblError != 0)
+                //if(model.Grbl.GrblState.State == GrblStates.Alarm && (model.Grbl.GrblState.Substate == 4 || model.Grbl.GrblState.Substate == 5))
+                //    model.Grbl.ExecuteCommand(GrblConstants.CMD_UNLOCK);
+                //else
+                if (model.Grbl.GrblError != 0)
                     model.Grbl.ExecuteCommand("");  // Clear error
 
                 model.Grbl.ExecuteCommand(mode == DistanceMode.Absolute ? "G90" : "G91");
@@ -298,7 +327,7 @@ namespace CNC.Controls.Probing
                 model.TouchPlateHeightEnable = view.ProbingType != ProbingType.CenterFinder && !(view.ProbingType == ProbingType.ToolLength && model.FixtureHeightEnable);
                 model.FixtureHeightEnable = view.ProbingType == ProbingType.ToolLength;
 
-                if (GrblSettings.IsGrblHAL)
+                if (GrblInfo.IsGrblHAL)
                     Comms.com.WriteByte(GrblConstants.CMD_STATUS_REPORT_ALL);
 
                 view.Activate();

@@ -1,7 +1,7 @@
 ﻿/*
  * ToolLengthControl.cs - part of CNC Probing library
  *
- * v0.27 / 2020-09-22 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-26 / Io Engineering (Terje Io)
  *
  */
 
@@ -165,7 +165,7 @@ namespace CNC.Controls.Probing
             if (probing.ReferenceToolOffset)
             {
                 probing.ReferenceToolOffset = !ok;
-                if (GrblInfo.Build >= 20200805 && GrblSettings.IsGrblHAL)
+                if (GrblInfo.Build >= 20200805 && GrblInfo.IsGrblHAL)
                     probing.Grbl.ExecuteCommand("$TLR"); // Set tool length offset reference in controller
             }
 

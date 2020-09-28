@@ -136,7 +136,8 @@ namespace GCode_Sender
             UIViewModel.SidebarItems.Add(new SidebarItem("_Jog", jogControl));
             UIViewModel.SidebarItems.Add(new SidebarItem("_Macros", macroControl));
             UIViewModel.SidebarItems.Add(new SidebarItem("_Goto", gotoControl));
-            UIViewModel.SidebarItems.Add(new SidebarItem("_THC Monitor", thcControl));
+            UIViewModel.SidebarItems.Add(new SidebarItem("M_Pos", mposFlyout));
+//            UIViewModel.SidebarItems.Add(new SidebarItem("_THC Monitor", thcControl));
 
             UIViewModel.CurrentView = getView((TabItem)tabMode.Items[tabMode.SelectedIndex = 0]);
             System.Threading.Thread.Sleep(50);

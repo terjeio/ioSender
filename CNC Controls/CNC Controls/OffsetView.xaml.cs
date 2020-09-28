@@ -1,7 +1,7 @@
 /*
  * OffsetView.xaml.cs - part of CNC Controls library
  *
- * v0.15 / 2020-03-29 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-26 / Io Engineering (Terje Io)
  *
  */
 
@@ -61,7 +61,7 @@ namespace CNC.Controls
             InitializeComponent();
 
             parameters.WorkPositionOffset.PropertyChanged += Parameters_PropertyChanged;
-            if(!GrblSettings.IsGrblHAL)
+            if(!GrblInfo.IsGrblHAL)
                 parameters.PropertyChanged += Parameters_PropertyChanged;
         }
 

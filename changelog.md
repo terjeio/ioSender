@@ -2,10 +2,23 @@
 
 Executable for development builds available for download [here](http://www.io-engineering.com/downloads/) if you want to participate in testing.
 
+2020-09-28: Development build for testing.
+
+* Added gcode preview to center finder.
+* Enabled function key shortcuts for macros in probing tab.
+* Fixed profile handling in probing tab.
+* Added simple probe protect to parts of probing sequence.  
+Requires grblHAL based controller with build 20200927 or later and _Run substatus_ enabled in _Status report options_.  
+NOTE: "simple" because the sender will cancel non-probing motions and stop the sequence when receiving a probe triggered message.
+This message can be delayed up to the status report polling time, typically 200 ms.  
+__Warning:__ do _not_ rely on this saving your probe from probing setup mistakes.
+* Bug fixes.
+
+---
+
 2020-09-26: Development build for testing.
 
-* Added gcode preview to edge finders, based on code/input from @jschoch.
-* Added warning on loading of gcode if it contains tool changes and tool reference offset is not set \(grblHAL only\).
+* Added gcode preview to edge finders, based on code/input from @jschoch
 * Added workaround for [legacy grbl](https://github.com/gnea/grbl) in order to keep probing UI in sync with controller status.
 * Bug fixes.
 

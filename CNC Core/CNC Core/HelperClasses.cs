@@ -1,7 +1,7 @@
 ﻿/*
  * HelperClasses.cs - part of CNC Controls library for Grbl
  *
- * v0.15 / 2020-04-12 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-26 / Io Engineering (Terje Io)
  *
  */
 
@@ -14,11 +14,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Windows;
 using System.Diagnostics.Contracts;
-using CNC.GCode;
 using System.Threading;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using CNC.GCode;
 
 namespace CNC.Core
 {
@@ -58,9 +58,14 @@ namespace CNC.Core
         {
             _validationErrors.Add(string.Empty, new List<string> { message });
         }
+
         public void SetError(string property, string message)
         {
-            _validationErrors.Add(property, new List<string> { message });
+            ICollection<string> value;
+            if (_validationErrors.TryGetValue(property, out value))
+                value.Add(message);
+            else
+                _validationErrors.Add(property, new List<string> { message });
 
             RaiseErrorsChanged(property);
         }

@@ -37,7 +37,7 @@
         </Style>
     </UserControl.Resources>
     <Grid>
-        <StackPanel Orientation="Vertical" Margin="10">
+        <StackPanel Orientation="Vertical" Margin="5">
             <StackPanel.Resources>
                 <Style x:Key="Flag" TargetType="RadioButton">
                     <Style.Triggers>
@@ -63,12 +63,12 @@
                 </Style>
             </StackPanel.Resources>
             <StackPanel Orientation="Horizontal">
-                <local:CsSelectControl Margin="5,0,0,0"/>
+                <local:CsSelectControl/>
                 <GroupBox Header="Workpiece">
                     <Controls:NumericField Label="Height" Value="{Binding Path=WorkpieceHeight, Mode=TwoWay}" IsEnabled="{Binding Path=ProbeZ}" Margin="0,5,85,0" VerticalAlignment="Top"/>
                 </GroupBox>
             </StackPanel>
-            <StackPanel Orientation="Horizontal" Margin="5,5,0,5">
+            <StackPanel Orientation="Horizontal" Margin="0,5,0,5">
                 <CheckBox Content="Probe Z" IsChecked="{Binding Path=ProbeZ}" IsEnabled="{Binding ElementName=probez, Path=IsChecked, Converter={StaticResource IsNotRunningConverter}}"/>
                 <CheckBox Content="Preview" Margin="15,0,0,0" IsChecked="{Binding Path=PreviewEnable}"/>
             </StackPanel>
@@ -167,7 +167,7 @@
                     </Rectangle>
                 </Grid>
                 <GroupBox Header="Preview" Margin="30,0,0,0" Visibility="{Binding Path=PreviewEnable, Converter={StaticResource ToVisibleConverter}}" VerticalAlignment="Top">
-                    <TextBox IsReadOnly="True" Text="{Binding Path=PreviewText, Mode=OneWay}" TextWrapping="NoWrap" Margin="0,5,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="250" Height="180"
+                    <TextBox IsReadOnly="True" Text="{Binding Path=PreviewText, Mode=OneWay}" TextWrapping="NoWrap" Margin="0,5,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="245" Height="180"
                          FontSize="10" FontFamily="Verdana"
                          ScrollViewer.VerticalScrollBarVisibility="Auto"
                          ScrollViewer.HorizontalScrollBarVisibility="Auto">
