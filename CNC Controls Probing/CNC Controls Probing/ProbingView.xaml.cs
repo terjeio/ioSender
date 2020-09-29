@@ -1,7 +1,7 @@
 ﻿/*
  * ProbingView.xaml.cs - part of CNC Probing library
  *
- * v0.27 / 2020-09-26 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-29 / Io Engineering (Terje Io)
  *
  */
 
@@ -52,7 +52,7 @@ namespace CNC.Controls.Probing
     /// </summary>
     public partial class ProbingView : UserControl, ICNCView
     {
-        private bool jogEnabled = false, probeTriggered = false;
+        private bool jogEnabled = false, probeTriggered = false, probeDisconnected = false;
         private DistanceMode mode = DistanceMode.Absolute;
         private ProbingViewModel model = null;
         private ProbingProfiles profiles = new ProbingProfiles();
@@ -73,6 +73,7 @@ namespace CNC.Controls.Probing
                     keyboard = new KeypressHandler(DataContext as GrblViewModel);
                     keyboard.AddHandler(Key.R, ModifierKeys.Alt, StartProbe);
                     keyboard.AddHandler(Key.S, ModifierKeys.Alt, StopProbe);
+                    keyboard.AddHandler(Key.C, ModifierKeys.Alt, ProbeConnectedToggle);
                     keyboard.AddHandler(Key.F1, ModifierKeys.None, FnKeyHandler);
                     keyboard.AddHandler(Key.F2, ModifierKeys.None, FnKeyHandler);
                     keyboard.AddHandler(Key.F3, ModifierKeys.None, FnKeyHandler);
@@ -120,6 +121,12 @@ namespace CNC.Controls.Probing
             return true;
         }
 
+        private bool ProbeConnectedToggle(Key key)
+        {
+            Comms.com.WriteByte(GrblConstants.CMD_PROBE_CONNECTED_TOGGLE);
+            return true;
+        }
+
         private bool FnKeyHandler(Key key)
         {
             if (!model.Grbl.IsJobRunning)
@@ -137,8 +144,12 @@ namespace CNC.Controls.Probing
 
         private void DisplayPosition(GrblViewModel grbl)
         {
-            model.Position = string.Format("X:{0}  Y:{1}  Z:{2}{3}", grbl.Position.X.ToInvariantString(grbl.Format), grbl.Position.Y.ToInvariantString(grbl.Format), grbl.Position.Z.ToInvariantString(grbl.Format), probeTriggered ? " P" : "");
-         //   model.Message = string.Format("X:{0}  Y:{1}  Z:{2}", grbl.Position.X.ToInvariantString(), grbl.Position.Y.ToInvariantString(), grbl.Position.Z.ToInvariantString());
+            model.Position = string.Format("X:{0}  Y:{1}  Z:{2} {3} {4}",
+                                            grbl.Position.X.ToInvariantString(grbl.Format),
+                                             grbl.Position.Y.ToInvariantString(grbl.Format),
+                                              grbl.Position.Z.ToInvariantString(grbl.Format),
+                                               probeTriggered ? "P" : "",
+                                                probeDisconnected ? "D" : "");
         }
 
         private void Grbl_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -159,6 +170,7 @@ namespace CNC.Controls.Probing
             if (e.PropertyName == nameof(GrblViewModel.Signals))
             {
                 probeTriggered = (sender as GrblViewModel).Signals.Value.HasFlag(Signals.Probe);
+                probeDisconnected = (sender as GrblViewModel).Signals.Value.HasFlag(Signals.ProbeDisconnected);
                 DisplayPosition(sender as GrblViewModel);
             }
         }
@@ -210,6 +222,7 @@ namespace CNC.Controls.Probing
                 model.Grbl.PropertyChanged += Grbl_PropertyChanged;
 
                 probeTriggered = model.Grbl.Signals.Value.HasFlag(Signals.Probe);
+                probeDisconnected = model.Grbl.Signals.Value.HasFlag(Signals.ProbeDisconnected);
 
                 DisplayPosition(model.Grbl);
             }
@@ -246,7 +259,7 @@ namespace CNC.Controls.Probing
             switch ((string)((MenuItem)sender).Header)
             {
                 case "Add":
-                    profiles.Add(cbxProfile.Text, model);
+                    cbxProfile.SelectedValue = profiles.Add(cbxProfile.Text, model);                
                     break;
 
                 case "Update":
@@ -256,7 +269,7 @@ namespace CNC.Controls.Probing
 
                 case "Delete":
                     if (model.Profile != null && profiles.Delete(model.Profile.Id))
-                        model.Profile = profiles.Profiles[0];
+                        cbxProfile.SelectedValue = profiles.Profiles[0].Id;
                     break;
             }
 
@@ -265,7 +278,7 @@ namespace CNC.Controls.Probing
 
         private void btnAddProfile_Click(object sender, RoutedEventArgs e)
         {
-            if (model.Profile == null || model.Profiles[model.Profile.Id].Name != cbxProfile.Text)
+            if (model.Profile == null || model.Profile.Name != cbxProfile.Text)
             {
                 mnuAdd.IsEnabled = true;
                 mnuUpdate.IsEnabled = false;

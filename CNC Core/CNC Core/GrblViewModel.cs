@@ -1,7 +1,7 @@
 /*
  * GrblViewModel.cs - part of CNC Controls library
  *
- * v0.27 / 2020-09-26 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-29 / Io Engineering (Terje Io)
  *
  */
 
@@ -577,7 +577,9 @@ namespace CNC.Core
                     Message += ", " + "<Reset> to continue.";
                 else if (newstate == GrblStates.Alarm)
                 {
-                    Message += ", " + (substate == 11 ? "<Home> to continue." : "<Reset> then <Unlock> to continue.");
+                    string addmsg = substate == 11 ? "<Home> to continue." : "<Reset> then <Unlock> to continue.";
+                    if (!Message.Contains(addmsg))
+                        Message += (Message == string.Empty ? string.Empty : ", ") + addmsg;
                     if (substate == 11)
                         HomedState = HomedState.NotHomed;
                 }

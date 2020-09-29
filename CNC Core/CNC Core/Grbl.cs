@@ -1,7 +1,7 @@
 ﻿/*
  * Grbl.cs - part of CNC Controls library
  *
- * v0.27 / 2020-09-26 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-29 / Io Engineering (Terje Io)
  *
  */
 
@@ -88,7 +88,8 @@ namespace CNC.Core
             CMD_COOLANT_FLOOD_OVR_TOGGLE = 0xA0,
             CMD_COOLANT_MIST_OVR_TOGGLE = 0xA1,
             CMD_PID_REPORT = 0xA2,
-            CMD_TOOL_ACK = 0xA3;
+            CMD_TOOL_ACK = 0xA3,
+            CMD_PROBE_CONNECTED_TOGGLE = 0xA4;
 
         public const string
             CMD_STATUS_REPORT_LEGACY = "?",

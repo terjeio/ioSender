@@ -10,7 +10,7 @@ Please check out the [Wiki](https://github.com/terjeio/Grbl-GCode-Sender/wiki) f
 
 ---
 
-Latest changes committed 20200928, see the [changelog](changelog.md) for details.
+Latest changes committed 20200929, see the [changelog](changelog.md) for details.
 
 ---
 
