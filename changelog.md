@@ -2,7 +2,7 @@
 
 Executable for development builds available for download [here](http://www.io-engineering.com/downloads/) if you want to participate in testing.
 
-2020-09-29: [Beta release 7](https://github.com/terjeio/Grbl-GCode-Sender/releases/tag/v026-beta7).
+2020-09-29: [Beta release 7](https://github.com/terjeio/Grbl-GCode-Sender/releases/tag/v027-beta7).
 
 * Minor changes to message handling on alarm.
 
