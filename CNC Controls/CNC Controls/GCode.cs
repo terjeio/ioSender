@@ -1,7 +1,7 @@
 ﻿/*
  * GCode.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.27 / 2020-09-21 / Io Engineering (Terje Io)
+ * v0.28 / 2020-10-19 / Io Engineering (Terje Io)
  *
  */
 
@@ -73,9 +73,17 @@ namespace CNC.Controls
 
         private static readonly Lazy<GCode> file = new Lazy<GCode>(() => new GCode());
 
+        public event GCodeJob.ToolChangedHandler ToolChanged = null;
+
         private GCode()
         {
             Program.FileChanged += Program_FileChanged;
+            Program.ToolChanged += Program_ToolChanged;
+        }
+
+        private bool Program_ToolChanged(int toolNumber)
+        {
+            return ToolChanged == null ? true : ToolChanged(toolNumber);
         }
 
         private void Program_FileChanged(string filename)
@@ -97,6 +105,7 @@ namespace CNC.Controls
         public static GCode File { get { return file.Value; } }
         public bool IsLoaded { get { return Program.Loaded; } }
         public string FileName { get { return Model == null ? string.Empty : Model.FileName; } }
+
         public int ToolChanges { get { return Program.Parser.ToolChanges; } }
         public bool HeightMapApplied { get { return Program.HeightMapApplied; } set { Program.HeightMapApplied = value; } }
 

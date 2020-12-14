@@ -1,7 +1,7 @@
 /*
  * GrblViewModel.cs - part of CNC Controls library
  *
- * v0.27 / 2020-09-29 / Io Engineering (Terje Io)
+ * v0.28 / 2020-11-19 / Io Engineering (Terje Io)
  *
  */
 
@@ -923,12 +923,17 @@ namespace CNC.Core
             return pos_changed;
         }
 
+        private bool DataIsEnumeration (string data)
+        {
+            return data.StartsWith("[SETTING:") || data.StartsWith("[ERRORCODE:") || data.StartsWith("[ALARMCODE:") || data.StartsWith("[SETTINGGROUP:");
+        }
+
         public void DataReceived(string data)
         {
             if (data.Length == 0)
                 return;
 
-            if (ResponseLogVerbose || !(data.First() == '<' || data.First() == '$' || data.First() == 'o') || data.StartsWith("error"))
+            if (ResponseLogVerbose || !(data.First() == '<' || data.First() == '$' || data.First() == 'o' || (data.First() == '[' && DataIsEnumeration(data))) || data.StartsWith("error"))
             {
                 if (!(data.First() == '<' && ResponseLogFilterRT))
                 {

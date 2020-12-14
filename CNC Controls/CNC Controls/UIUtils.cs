@@ -1,7 +1,7 @@
 /*
  * UIUtils.cs - part of CNC Controls library
  *
- * v0.03 / 2020-01-27 / Io Engineering (Terje Io)
+ * v0.28 / 2020-11-15 / Io Engineering (Terje Io)
  *
  */
 
@@ -128,7 +128,7 @@ namespace CNC.Controls
             double v = (double)value;
 
             if(!double.IsNaN(Min) && !double.IsNaN(Max) && (v < Min || v > Max))
-                return new ValidationResult(false, $"Invalid input: allowed range is {Min}-{Max}.");
+                return new ValidationResult(false, $"Invalid input: allowed range is {Min} - {Max}.");
 
             if (!double.IsNaN(Min) && v < Min)
                 return new ValidationResult(false, $"Invalid input: minimum allowed value is {Min}.");

@@ -1,7 +1,7 @@
 ﻿/*
  * ProbingView.xaml.cs - part of CNC Probing library
  *
- * v0.27 / 2020-09-29 / Io Engineering (Terje Io)
+ * v0.28 / 2020-10-20 / Io Engineering (Terje Io)
  *
  */
 
@@ -41,6 +41,8 @@ using System.Windows;
 using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Threading;
+using System.Threading.Tasks;
 using CNC.Core;
 using CNC.GCode;
 
@@ -53,10 +55,10 @@ namespace CNC.Controls.Probing
     public partial class ProbingView : UserControl, ICNCView
     {
         private bool jogEnabled = false, probeTriggered = false, probeDisconnected = false;
-        private DistanceMode mode = DistanceMode.Absolute;
         private ProbingViewModel model = null;
         private ProbingProfiles profiles = new ProbingProfiles();
         private KeypressHandler keyboard = null;
+        private IInputElement focusedControl = null;
 
         public ProbingView()
         {
@@ -116,6 +118,7 @@ namespace CNC.Controls.Probing
 
         private bool StartProbe(Key key)
         {
+            focusedControl = Keyboard.FocusedElement;
             getView(tab.SelectedItem as TabItem)?.Start();
 
             return true;
@@ -156,22 +159,30 @@ namespace CNC.Controls.Probing
         {
             var grbl = sender as GrblViewModel;
 
-            if (e.PropertyName == nameof(GrblViewModel.IsJobRunning))
-            {
-                foreach (TabItem tabitem in tab.Items)
-                    tabitem.IsEnabled = !(sender as GrblViewModel).IsJobRunning || tabitem == tab.SelectedItem;
-            }
+            switch (e.PropertyName) {
 
-            if(e.PropertyName == nameof(GrblViewModel.Position))
-            {
-                DisplayPosition(sender as GrblViewModel);
-            }
+                case nameof(GrblViewModel.IsJobRunning):
+                    foreach (TabItem tabitem in tab.Items)
+                        tabitem.IsEnabled = !grbl.IsJobRunning || tabitem == tab.SelectedItem;
+                    if (!grbl.IsJobRunning && focusedControl != null)
+                    {
+                        Application.Current.Dispatcher.BeginInvoke(new System.Action(() =>
+                        {
+                            focusedControl.Focus();
+                            focusedControl = null;
+                        }), DispatcherPriority.Render);
+                    }
+                    break;
 
-            if (e.PropertyName == nameof(GrblViewModel.Signals))
-            {
-                probeTriggered = (sender as GrblViewModel).Signals.Value.HasFlag(Signals.Probe);
-                probeDisconnected = (sender as GrblViewModel).Signals.Value.HasFlag(Signals.ProbeDisconnected);
-                DisplayPosition(sender as GrblViewModel);
+                case nameof(GrblViewModel.Position):
+                    DisplayPosition(grbl);
+                    break;
+
+                case nameof(GrblViewModel.Signals):
+                    probeTriggered = grbl.Signals.Value.HasFlag(Signals.Probe);
+                    probeDisconnected = grbl.Signals.Value.HasFlag(Signals.ProbeDisconnected);
+                    DisplayPosition(grbl);
+                    break;
             }
         }
 
@@ -204,7 +215,7 @@ namespace CNC.Controls.Probing
                     Jog.Visibility = Visibility.Collapsed;
 
                 GrblParserState.Get(!GrblInfo.IsGrblHAL);
-                mode = GrblParserState.DistanceMode;
+                model.DistanceMode = GrblParserState.DistanceMode;
                 model.Tool = model.Grbl.Tool == GrblConstants.NO_TOOL ? "0" : model.Grbl.Tool;
                 model.CanProbe = !model.Grbl.Signals.Value.HasFlag(Signals.Probe);
                 model.HeightMapApplied = GCode.File.HeightMapApplied;
@@ -237,7 +248,7 @@ namespace CNC.Controls.Probing
                 if (model.Grbl.GrblError != 0)
                     model.Grbl.ExecuteCommand("");  // Clear error
 
-                model.Grbl.ExecuteCommand(mode == DistanceMode.Absolute ? "G90" : "G91");
+                model.Grbl.ExecuteCommand(model.DistanceMode == DistanceMode.Absolute ? "G90" : "G91");
             }
 
             model.Message = string.Empty;

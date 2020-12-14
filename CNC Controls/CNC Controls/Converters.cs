@@ -1,7 +1,7 @@
 /*
  * Converters.cs - part of CNC Controls library for Grbl
  *
- * v0.27 / 2020-09-17 / Io Engineering (Terje Io)
+ * v0.28 / 2020-10-04 / Io Engineering (Terje Io)
  *
  */
 
@@ -62,6 +62,7 @@ namespace CNC.Controls
         public static GrblStateToBooleanConverter GrblStateToBooleanConverter = new GrblStateToBooleanConverter();
         public static HomedStateToColorConverter HomedStateToColorConverter = new HomedStateToColorConverter();
         public static IsHomingEnabledConverter IsHomingEnabledConverter = new IsHomingEnabledConverter();
+        public static HomedStateToBooleanConverter HomedStateToBooleanConverter = new HomedStateToBooleanConverter();
         public static LogicalNotConverter LogicalNotConverter = new LogicalNotConverter();
         public static LogicalAndConverter LogicalAndConverter = new LogicalAndConverter();
         public static LogicalOrConverter LogicalOrConverter = new LogicalOrConverter();
@@ -186,6 +187,19 @@ namespace CNC.Controls
             }
 
             return result;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class HomedStateToBooleanConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value is HomedState && (HomedState)value == HomedState.Homed;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

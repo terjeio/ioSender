@@ -10,7 +10,7 @@ Please check out the [Wiki](https://github.com/terjeio/Grbl-GCode-Sender/wiki) f
 
 ---
 
-Latest changes committed 20200929, see the [changelog](changelog.md) for details.
+Latest changes committed 20201214, see the [changelog](changelog.md) for details.
 
 ---
 
@@ -37,7 +37,7 @@ Jogging flyout, supports up to 6 axes. The sender also supports keyboard jogging
 
 ![Easy configuration](Media/Sender3.png)
 
-Advanced grbl configuration with on-screen documentation. UI is dynamically generated from data in a file.
+Advanced grbl configuration with on-screen documentation. UI is dynamically generated from data in a file and/or from the controller.
 <br><br>
 
 ![Probing options](Media/Sender4.png)
@@ -55,4 +55,4 @@ Lathe mode.
 Conversational programming for Lathe Mode. Threading requires [grblHAL](https://github.com/terjeio/grblHAL) controller with driver that has spindle sync support.
 
 ---
-2020-09-18
+2020-12-14

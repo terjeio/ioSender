@@ -1,7 +1,7 @@
 ﻿/*
  * GCodeJob.cs - part of CNC Controls library
  *
- * v0.18 / 2020-04-21 / Io Engineering (Terje Io)
+ * v0.28 / 2020-10-19 / Io Engineering (Terje Io)
  *
  */
 
@@ -78,6 +78,7 @@ namespace CNC.Core
             gcode.Columns.Add("Data", typeof(string));
             gcode.Columns.Add("Length", typeof(int));
             gcode.Columns.Add("File", typeof(bool));
+            gcode.Columns.Add("IsComment", typeof(bool));
             gcode.Columns.Add("ProgramEnd", typeof(bool));
             gcode.Columns.Add("Sent", typeof(string));
             gcode.Columns.Add("Ok", typeof(bool));
@@ -106,35 +107,38 @@ namespace CNC.Core
 
         public bool LoadFile(string filename)
         {
-            bool ok = true;
+            bool ok = true, isComment;
 
             FileInfo file = new FileInfo(filename);
 
             StreamReader sr = file.OpenText();
 
-            string s = sr.ReadLine();
+            string block = sr.ReadLine();
 
             AddBlock(filename, Action.New);
 
-            while (s != null)
+            while (block != null)
             {
                 try
                 {
-                    s = s.Trim();
-                    if (Parser.ParseBlock(ref s, false))
+                    block = block.Trim();
+                    if (Parser.ParseBlock(ref block, false, out isComment))
                     {
-                        gcode.Rows.Add(new object[] { LineNumber++, s, s.Length + 1, true, Parser.ProgramEnd, "", false });
+                        gcode.Rows.Add(new object[] { LineNumber++, block, block.Length + 1, true, isComment, Parser.ProgramEnd, "", false });
                         while (commands.Count > 0)
-                            gcode.Rows.Add(new object[] { LineNumber++, commands.Dequeue(), 20, true, false, "", false });
+                        {
+                            block = commands.Dequeue();
+                            gcode.Rows.Add(new object[] { LineNumber++, block, block.Length + 1, true, false, false, "", false });
+                        }
                     }
-                    s = sr.ReadLine();
+                    block = sr.ReadLine();
                 }
                 catch (Exception e)
                 {
-                    if ((ok = MessageBox.Show(string.Format("Line: {0}\rBlock: \"{1}\"\r\rContinue loading?", LineNumber, s), e.Message, MessageBoxButton.YesNo) == MessageBoxResult.Yes))
-                        s = sr.ReadLine();
+                    if ((ok = MessageBox.Show(string.Format("Line: {0}\rBlock: \"{1}\"\r\rContinue loading?", LineNumber, block), e.Message, MessageBoxButton.YesNo) == MessageBoxResult.Yes))
+                        block = sr.ReadLine();
                     else
-                        s = null;
+                        block = null;
                 }
             }
 
@@ -164,12 +168,16 @@ namespace CNC.Core
             }
             else if (block != null && block.Trim().Length > 0) try
             {
+                bool isComment;
                 block = block.Trim();
-                if (Parser.ParseBlock(ref block, false))
+                if (Parser.ParseBlock(ref block, false, out isComment))
                 {
-                    gcode.Rows.Add(new object[] { LineNumber++, block, block.Length + 1, true, Parser.ProgramEnd, "", false });
+                    gcode.Rows.Add(new object[] { LineNumber++, block, block.Length + 1, true, isComment, Parser.ProgramEnd, "", false });
                     while (commands.Count > 0)
-                        gcode.Rows.Add(new object[] { LineNumber++, commands.Dequeue(), 20, true, false, "", false });
+                    {
+                        block = commands.Dequeue();
+                        gcode.Rows.Add(new object[] { LineNumber++, block, block.Length + 1, true, false, false, "", false });
+                    }
                 }
             }
             catch //(Exception e)

@@ -2,6 +2,19 @@
 
 Executable for development builds available for download [here](http://www.io-engineering.com/downloads/) if you want to participate in testing.
 
+---
+
+2020-12-14: [Beta release 8](https://github.com/terjeio/Grbl-GCode-Sender/releases/tag/v028-beta8).
+
+* Added treeview for settings when settings details is available from the controller.
+* Added option for single direction probing to center finder \(unlock XY and set the size to 0 for direction not to probe\).
+* Added truncate of comment lines on send.
+* Some bug fixes.
+
+Since a treeview of controller settings has been added this is still a beta release.
+
+---
+
 2020-09-29: [Beta release 7](https://github.com/terjeio/Grbl-GCode-Sender/releases/tag/v027-beta7).
 
 * Minor changes to message handling on alarm.

@@ -1,7 +1,7 @@
 ﻿/*
  * ICNCView.cs - part of CNC Controls library for Grbl
  *
- * v0.10 / 2020-03-05 / Io Engineering (Terje Io)
+ * v0.28 / 2020-10-20 / Io Engineering (Terje Io)
  *
  */
 
@@ -45,7 +45,6 @@ namespace CNC.Controls
         Shutdown,
         AppConfig,
         Engraving,
-        Mach3,
         GRBL,
         GRBLConfig,
         Offsets,

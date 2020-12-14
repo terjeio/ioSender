@@ -1,7 +1,7 @@
 /*
  * JobControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.27 / 2020-09-26 / Io Engineering (Terje Io)
+ * v0.28 / 2020-12-04 / Io Engineering (Terje Io)
  *
  */
 
@@ -796,7 +796,7 @@ namespace CNC.Controls
                         model.IsJobRunning = false;
                         if (!grblState.MPG)
                         {
-                            if (GrblInfo.IsGrblHAL)
+                            if (GrblInfo.IsGrblHAL && !(grblState.State == GrblStates.Home || grblState.State == GrblStates.Alarm))
                             {
                                 if (!model.GrblReset)
                                     Comms.com.WriteByte(GrblConstants.CMD_STOP);
@@ -969,31 +969,45 @@ namespace CNC.Controls
 
         void SendNextLine()
         {
-            while (job.NextRow != null && job.serialUsed < (serialSize - (int)job.NextRow["Length"]))
-            {
-                if (GCode.File.Commands.Count > 0)
-                    Comms.com.WriteCommand(GCode.File.Commands.Dequeue());
-                else
+            while (job.NextRow != null) {
+
+                string line = (string)job.NextRow["Data"]; //  GCodeUtils.StripSpaces((string)currentRow["Data"]);
+
+                // Send comment lines as empty comment
+                if ((bool)job.NextRow["IsComment"])
                 {
-                    job.CurrentRow = job.NextRow;
-                    string line = (string)job.CurrentRow["Data"]; //  GCodeUtils.StripSpaces((string)currentRow["Data"]);
-
-                    job.CurrentRow["Sent"] = "*";
-                    if (line == "%")
-                    {
-                        if (!(job.Started = !job.Started))
-                            job.PgmEndLine = job.CurrLine;
-                    }
-                    else if ((bool)job.CurrentRow["ProgramEnd"])
-                        job.PgmEndLine = job.CurrLine;
-                    job.NextRow = job.PgmEndLine == job.CurrLine ? null : GCode.File.Data.Rows[++job.CurrLine];
-                    //            ParseBlock(line + "\r");
-                    job.serialUsed += (int)job.CurrentRow["Length"];
-                    Comms.com.WriteString(line + '\r');
+                    line = "()";
+                    job.NextRow["Length"] = line.Length + 1;
                 }
-                job.ACKPending++;
 
-                if (!useBuffering)
+                if (job.serialUsed < (serialSize - (int)job.NextRow["Length"]))
+                {
+
+                    if (GCode.File.Commands.Count > 0)
+                        Comms.com.WriteCommand(GCode.File.Commands.Dequeue());
+                    else
+                    {
+                        job.CurrentRow = job.NextRow;
+
+                        job.CurrentRow["Sent"] = "*";
+                        if (line == "%")
+                        {
+                            if (!(job.Started = !job.Started))
+                                job.PgmEndLine = job.CurrLine;
+                        }
+                        else if ((bool)job.CurrentRow["ProgramEnd"])
+                            job.PgmEndLine = job.CurrLine;
+                        job.NextRow = job.PgmEndLine == job.CurrLine ? null : GCode.File.Data.Rows[++job.CurrLine];
+                        //            ParseBlock(line + "\r");
+                        job.serialUsed += (int)job.CurrentRow["Length"];
+                        Comms.com.WriteString(line + '\r');
+                    }
+                    job.ACKPending++;
+
+                    if (!useBuffering)
+                        break;
+                }
+                else
                     break;
             }
         }

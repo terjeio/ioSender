@@ -4,16 +4,24 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CNC.Controls"
-             mc:Ignorable="d" 
+             mc:Ignorable="d"
+             Focusable="False"
              d:DesignHeight="100" d:DesignWidth="200">
     <UserControl.Resources>
-        <ResourceDictionary Source="SharedStyles.xaml"/>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="SharedStyles.xaml"/>
+                <ResourceDictionary>
+                    <local:HomedStateToBooleanConverter x:Key="IsHomed" />
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </UserControl.Resources>
     <Border BorderBrush="DarkGray" BorderThickness="1" CornerRadius="3" Background="#FFE5E5EA">
         <Grid>
             <StackPanel Margin="5,15,25,15">
-                <Button Tag="G28" Content="Goto position 1 (G28)" HorizontalAlignment="Left" Margin="5,5,0,0" Width="150" VerticalAlignment="Top" Click="button_Click"/>
-                <Button Tag="G30" Content="Goto position 2 (G30)" HorizontalAlignment="Left" Margin="5,5,0,0" Width="150" VerticalAlignment="Top" Click="button_Click"/>
+                <Button Tag="G28" Content="Goto position 1 (G28)" IsEnabled="{Binding Path=HomedState, Mode=OneWay, Converter={StaticResource IsHomed}}" Focusable="False" HorizontalAlignment="Left" Margin="5,5,0,0" Width="150" VerticalAlignment="Top" Click="button_Click"/>
+                <Button Tag="G30" Content="Goto position 2 (G30)" IsEnabled="{Binding Path=HomedState, Mode=OneWay, Converter={StaticResource IsHomed}}" Focusable="False" HorizontalAlignment="Left" Margin="5,5,0,0" Width="150" VerticalAlignment="Top" Click="button_Click"/>
             </StackPanel>
             <Button Content="×" Focusable="False" Style="{StaticResource SmallXButtonStyle}" VerticalContentAlignment="Top" HorizontalAlignment="Right" Margin="0,0,5,0" VerticalAlignment="Top" Width="14" Height="18" Click="btn_Close"/>
         </Grid>

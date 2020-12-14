@@ -1,7 +1,7 @@
 ﻿/*
  * ProbingViewModel.cs - part of CNC Probing library
  *
- * v0.27 / 2020-09-27 / Io Engineering (Terje Io)
+ * v0.28 / 2020-10-20 / Io Engineering (Terje Io)
  *
  */
 
@@ -390,6 +390,8 @@ namespace CNC.Controls.Probing
         public CoordMode CoordinateMode { get { return _cmode; } set { _cmode = value; OnPropertyChanged(); } }
 
         public bool IsCoordinateModeG92 { get { return _cmode == CoordMode.G92; } set { _cmode = value ? CoordMode.G92 : CoordMode.G10; OnPropertyChanged(); OnPropertyChanged(nameof(CoordinateMode)); } }
+
+        public DistanceMode DistanceMode { get; set; } = DistanceMode.Absolute;
 
         public Edge ProbeEdge
         {

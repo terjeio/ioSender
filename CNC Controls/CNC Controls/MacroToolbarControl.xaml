@@ -19,7 +19,7 @@
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Button Height="30" Margin="2,0" Padding="2,0" Tag="{Binding Id}" Click="Button_Click">
+                    <Button Height="30" Margin="2,0" Padding="2,0" Tag="{Binding Id}" Focusable="False" Click="Button_Click">
                         <Button.Content>
                             <MultiBinding Converter="{StaticResource addFnKey}" ConverterParameter=" (F{0})">
                                 <Binding Path="Name"/>

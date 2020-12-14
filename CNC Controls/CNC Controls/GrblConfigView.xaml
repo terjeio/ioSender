@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CNC.Controls"
+             xmlns:cnccore="clr-namespace:CNC.Core;assembly=CNC.Core"
              mc:Ignorable="d" 
              d:DesignHeight="515" d:DesignWidth="875"
              Loaded="ConfigView_Loaded">
@@ -32,8 +33,25 @@
         </Style>
     </UserControl.Resources>
     <DockPanel>
+        <TreeView x:Name="treeView" HorizontalAlignment="Left" Margin="10,10" VerticalAlignment="Stretch" Width="390" SelectedItemChanged="treeView_SelectedItemChanged">
+            <TreeView.Resources>
+                <HierarchicalDataTemplate DataType="{x:Type cnccore:GrblSettingGroup}" ItemsSource="{Binding Settings}" >
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Name}" />
+                    </StackPanel>
+                </HierarchicalDataTemplate>
+                <DataTemplate DataType="{x:Type cnccore:GrblSettingDetails}" >
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Id}" Margin="0,0,5,0" />
+                        <TextBlock Text="{Binding Name, StringFormat=\{0\}:}" />
+                        <TextBlock Text="{Binding FormattedValue}" Margin="5,0"/>
+                        <TextBlock Text="{Binding Unit}" />
+                    </StackPanel>
+                </DataTemplate>
+            </TreeView.Resources>
+        </TreeView>
         <DataGrid x:Name="dgrSettings" DockPanel.Dock="Left" ItemsSource="{Binding}" IsReadOnly="True" HorizontalAlignment="Left" Margin="10,10" VerticalAlignment="Stretch" Width="390"
-                  SelectionMode="Single" SelectionUnit="FullRow" AutoGenerateColumns="False"
+                  SelectionMode="Single" SelectionUnit="FullRow" AutoGenerateColumns="False" Visibility="Collapsed"
                   CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserResizeRows="False" CanUserSortColumns="False" CanUserAddRows="False" SelectionChanged="dgrSettings_SelectionChanged">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="50"/>
@@ -42,7 +60,7 @@
                 <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
             </DataGrid.Columns>
         </DataGrid>
-        <DockPanel DockPanel.Dock="Left">
+        <DockPanel x:Name="dpan" DockPanel.Dock="Left" Visibility="Hidden">
             <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Left" Height="Auto" Margin="10,0,0,10" VerticalAlignment="Top" Width="Auto">
                 <Button x:Name="btnReload" Content="Reload" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Click="btnReload_Click"/>
                 <Button x:Name="btnSave" Content="Save" HorizontalAlignment="Left" Margin="5,0,0,0" VerticalAlignment="Top" Width="75" Click="btnSave_Click"/>

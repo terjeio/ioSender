@@ -1,7 +1,7 @@
 ﻿/*
  * SerialStream.cs - part of CNC Controls library
  *
- * v0.20 / 2020-06-10 / Io Engineering (Terje Io)
+ * v0.28 / 2020-09-12 / Io Engineering (Terje Io)
  *
  */
 
@@ -321,8 +321,11 @@ StreamWriter log = null;
                     Reply = pos == 0 ? "" : input.ToString(0, pos - 1);
                     input.Remove(0, pos + 1);
 #if RESPONSELOG
-            log.WriteLine(Reply);
-            log.Flush();
+                    if (log != null)
+                    {
+                        log.WriteLine(Reply);
+                        log.Flush();
+                    }
 #endif
                     if (Reply.Length != 0 && DataReceived != null)
                         Dispatcher.BeginInvoke(DataReceived, Reply);

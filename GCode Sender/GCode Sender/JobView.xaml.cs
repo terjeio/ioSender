@@ -1,7 +1,7 @@
 /*
  * JobView.xaml.cs - part of Grbl Code Sender
  *
- * v0.27 / 2020-09-17 / Io Engineering (Terje Io)
+ * v0.28 / 2020-12-04 / Io Engineering (Terje Io)
  *
  */
 
@@ -173,31 +173,24 @@ namespace GCode_Sender
                     focusedControl = this;
                     model.Message = string.Format("Waiting for controller ({0})...", AppConfig.Settings.Base.PortParams);
 
-                    Comms.com.PurgeQueue();
-                    Comms.com.WriteByte(GrblLegacy.ConvertRTCommand(GrblConstants.CMD_STATUS_REPORT));
+                    string response = GrblInfo.Startup();
 
-                    int timeout = 30; // 1.5s
-                    do
+                    if (response.StartsWith("<Alarm"))
                     {
-                        System.Threading.Thread.Sleep(50);
-                    } while (Comms.com.Reply == "" && --timeout != 0);
-
-                    if (Comms.com.Reply.StartsWith("<Alarm"))
-                    {
-                        GrblViewModel data = (GrblViewModel)DataContext;
-                        data.ParseStatus(Comms.com.Reply);
+                        GrblViewModel data = DataContext as GrblViewModel;
+                        data.ParseStatus(response);
 
                         // Alarm 1, 2 and 10 are critical events
                         if (!(data.GrblState.Substate == 1 || data.GrblState.Substate == 2 || data.GrblState.Substate == 10))
                             InitSystem();
                     }
-                    else if (Comms.com.Reply.StartsWith("<Tool"))
+                    else if (response.StartsWith("<Tool"))
                     {
                         Comms.com.WriteByte(GrblConstants.CMD_STOP);
-                        GrblViewModel data = (GrblViewModel)DataContext;
+                        GrblViewModel data = DataContext as GrblViewModel;
                         data.ParseStatus(Comms.com.Reply);
                     }
-                    else if (Comms.com.Reply != "")
+                    else if (response != string.Empty)
                         InitSystem();
                 }
 
@@ -316,6 +309,8 @@ namespace GCode_Sender
                     }
                     System.Threading.Thread.Sleep(500);
                 }
+                GrblAlarms.Get();
+                GrblErrors.Get();
                 GrblSettings.Get();
                 GrblParserState.Get();
                 GrblWorkParameters.Get();

@@ -75,7 +75,7 @@
                     <Controls:NumericField Label="Depth:" ToolTip="Z offset from current position where probing will take place" Value="{Binding Path=Depth, Mode=TwoWay}" IsEnabled="{Binding Path=XYDEnable}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
                 </StackPanel>
             </GroupBox>
-            <Button x:Name="Jog" Content="Click to activate keyboard jogging" ToolTip="Ctrl+Shift to activate" Margin="0,5,0,0" Focusable="True" GotFocus="Jog_FocusedChanged" LostFocus="Jog_FocusedChanged"/>
+            <Button x:Name="Jog" Content="Click to activate keyboard jogging" ToolTip="Ctrl+Shift to activate" Margin="0,5,0,0" Focusable="True" FocusVisualStyle="{x:Null}" GotFocus="Jog_FocusedChanged" LostFocus="Jog_FocusedChanged"/>
         </StackPanel>
         <StackPanel Margin="248,10,0,0" Width="615" HorizontalAlignment="Left" VerticalAlignment="Top">
             <TabControl x:Name="tab" HorizontalAlignment="Stretch" VerticalAlignment="Top" Width="Auto" Height="400" SelectionChanged="tab_SelectionChanged">

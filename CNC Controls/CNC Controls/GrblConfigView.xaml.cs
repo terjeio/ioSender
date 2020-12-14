@@ -1,7 +1,7 @@
 /*
  * GrblConfigView.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.12 / 2020-03-10 / Io Engineering (Terje Io)
+ * v0.28 / 2020-12-13 / Io Engineering (Terje Io)
  *
  */
 
@@ -37,7 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-using System.Data;
 using System.Windows;
 using System.Windows.Controls;
 using CNC.Core;
@@ -65,8 +64,20 @@ namespace CNC.Controls
         private void ConfigView_Loaded(object sender, RoutedEventArgs e)
         {
             DataContext = new WidgetViewModel();
-            dgrSettings.DataContext = GrblSettings.Settings;
-            dgrSettings.SelectedIndex = 0;
+
+            dgrSettings.Visibility = GrblInfo.HasEnums ? Visibility.Collapsed : Visibility.Visible;
+            treeView.Visibility = !GrblInfo.HasEnums ? Visibility.Collapsed : Visibility.Visible;
+            dpan.Visibility = GrblInfo.HasEnums ? Visibility.Hidden : Visibility.Visible;
+
+            if (GrblInfo.HasEnums)
+            {
+                treeView.ItemsSource = GrblSettingGroups.Groups;
+            }
+            else
+            {
+                dgrSettings.DataContext = GrblSettings.Settings;
+                dgrSettings.SelectedIndex = 0;
+            }
         }
 
         #region Methods required by CNCView interface
@@ -116,8 +127,8 @@ namespace CNC.Controls
         {
             if (e.AddedItems.Count == 1)
             {
-                DataRow row = ((DataRowView)e.AddedItems[0]).Row;
-                txtDescription.Text = ((string)row["Description"]).Replace("\\n", "\r\n");
+                dpan.Visibility = Visibility.Visible;
+
                 if (curSetting != null)
                 {
                     curSetting.Assign();
@@ -125,10 +136,34 @@ namespace CNC.Controls
                     curSetting.Dispose();
                 }
 
-                curSetting = new Widget(this, new WidgetProperties(row), canvas);
+                var setting = e.AddedItems[0] as GrblSettingDetails;
+                txtDescription.Text = setting.Description;
+                curSetting = new Widget(this, new WidgetProperties(setting), canvas);
                 curSetting.IsEnabled = true;
             }
         }
         #endregion
+
+        private void treeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            if (e != null && e.NewValue is GrblSettingDetails)
+            {
+                dpan.Visibility = Visibility.Visible;
+
+                if (curSetting != null)
+                {
+                    curSetting.Assign();
+                    canvas.Children.Clear();
+                    curSetting.Dispose();
+                }
+
+                var setting = e.NewValue as GrblSettingDetails;
+                txtDescription.Text = setting.Description;
+                curSetting = new Widget(this, new WidgetProperties(setting), canvas);
+                curSetting.IsEnabled = true;
+            }
+            else
+                dpan.Visibility = Visibility.Hidden;
+        }
     }
 }

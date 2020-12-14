@@ -1,7 +1,7 @@
 ﻿/*
  * GCodeParser.cs - part of CNC Controls library
  *
- * v0.27 / 2020-09-21 / Io Engineering (Terje Io)
+ * v0.28 / 2020-10-03 / Io Engineering (Terje Io)
  *
  */
 
@@ -267,6 +267,12 @@ namespace CNC.GCode
 
         public bool ParseBlock(ref string line, bool quiet)
         {
+            bool isComment;
+            return ParseBlock(ref line, quiet, out isComment);
+        }
+
+        public bool ParseBlock(ref string line, bool quiet, out bool isComment)
+        {
             WordFlags wordFlags = 0, wordFlag = 0;
             AxisFlags axisWords = AxisFlags.None;
             IJKFlags ijkWords = IJKFlags.None;
@@ -279,6 +285,8 @@ namespace CNC.GCode
             AxisCommand axisCommand = AxisCommand.None;
 
             List<string> gcodes = new List<string>();
+
+            isComment = false;
 
             if (block.Length == 0 || block[0] == ';')
                 return block.Length != 0;
@@ -322,6 +330,8 @@ namespace CNC.GCode
                 else if (c > ' ' || inMessage)
                     gcode += c;
             }
+
+            isComment = gcodes.Count == 1 && gcodes[0].First() == '(' && !gcodes[0].StartsWith("(MSG");
 
             foreach (string code in gcodes)
             {

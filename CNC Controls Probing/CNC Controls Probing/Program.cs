@@ -268,6 +268,7 @@ namespace CNC.Controls.Probing
                 if (hasPause)
                     probing.PropertyChanged -= Probing_PropertyChanged;
                 isRunning = Grbl.IsJobRunning = false;
+                Grbl.ExecuteCommand(probing.DistanceMode == DistanceMode.Absolute ? "G90" : "G91");
             }
             _isComplete = true;
             probing.Message = message;

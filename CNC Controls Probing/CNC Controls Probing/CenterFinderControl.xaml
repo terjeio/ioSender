@@ -41,9 +41,9 @@
                         <RowDefinition Height="30"/>
                         <RowDefinition Height="30"/>
                     </Grid.RowDefinitions>
-                    <Controls:NumericField Grid.Row="0" Label="X size:" Value="{Binding Path=WorkpieceSizeX, Mode=TwoWay}" Margin="0,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Style="{StaticResource ErrorStyle}"/>
-                    <Controls:NumericField Grid.Row="1" Label="Y size:" Value="{Binding Path=WorkpieceSizeY, Mode=TwoWay}" Margin="0,2,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Style="{StaticResource ErrorStyle}"/>
-                    <CheckBox Content="Lock" Grid.RowSpan="2" IsChecked="{Binding Path=WorkpiecLockXY, Mode=TwoWay}" Margin="170,4,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Width="100"/>
+                    <Controls:NumericField Grid.Row="0" Label="X size:" Format="{Binding Path=Grbl.Format}" Value="{Binding Path=WorkpieceSizeX, Mode=TwoWay}" Margin="0,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Style="{StaticResource ErrorStyle}"/>
+                    <Controls:NumericField Grid.Row="1" Label="Y size:" Format="{Binding Path=Grbl.Format}" Value="{Binding Path=WorkpieceSizeY, Mode=TwoWay}" Margin="0,2,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Style="{StaticResource ErrorStyle}"/>
+                    <CheckBox Content="Lock" Grid.RowSpan="2" IsChecked="{Binding Path=WorkpiecLockXY, Mode=TwoWay}" ToolTip="Unlock and set X or Y size to 0 to probe in one direction only." Margin="170,4,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Width="100"/>
                 </Grid>
             </GroupBox>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,5,0,0" ToolTip="Click to select probing action.">
@@ -54,6 +54,7 @@
                                 <Setter Property="Opacity" Value="0.5"/>
                             </Trigger>
                         </Style.Triggers>
+                        <Setter Property="Focusable" Value="False"/>
                         <Setter Property="BorderThickness" Value="0"/>
                         <Setter Property="Width" Value="120"/>
                         <Setter Property="Height" Value="120"/>
