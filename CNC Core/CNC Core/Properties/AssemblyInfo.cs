@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Io Engineering")]
 [assembly: AssemblyProduct("CNC Core")]
-[assembly: AssemblyCopyright("Copyright ©  2019 Io Engineering")]
+[assembly: AssemblyCopyright("Copyright ©  2021 Io Engineering")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

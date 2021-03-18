@@ -1,13 +1,13 @@
 /*
  * WizardConfig.cs - part of CNC Controls library for Grbl
  *
- * v0.18 / 2020-05-01 / Io Engineering (Terje Io)
+ * v0.29 / 2021-02-02 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2020, Io Engineering (Terje Io)
+Copyright (c) 2019-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -108,10 +108,10 @@ namespace CNC.Controls.Lathe
         {
             if (GrblSettings.IsLoaded)
             {
-                XMaxFeedRate = GrblSettings.GetDouble(GrblSetting.AxisSetting_XMaxRate);
-                XAcceleration = GrblSettings.GetDouble(GrblSetting.AxisSetting_XAcceleration);
-                ZMaxFeedRate = GrblSettings.GetDouble(GrblSetting.AxisSetting_ZMaxRate);
-                ZAcceleration = GrblSettings.GetDouble(GrblSetting.AxisSetting_ZAcceleration);
+                XMaxFeedRate = GrblSettings.GetDouble(GrblSetting.MaxFeedRateBase);
+                XAcceleration = GrblSettings.GetDouble(GrblSetting.AccelerationBase);
+                ZMaxFeedRate = GrblSettings.GetDouble(GrblSetting.MaxFeedRateBase + GrblConstants.Z_AXIS);
+                ZAcceleration = GrblSettings.GetDouble(GrblSetting.AccelerationBase + GrblConstants.Z_AXIS);
                 RpmMin = GrblSettings.GetDouble(GrblSetting.RpmMin);
                 RpmMax = GrblSettings.GetDouble(GrblSetting.RpmMax);
 

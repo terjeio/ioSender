@@ -1,13 +1,13 @@
 /*
  * JobControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.28 / 2020-12-04 / Io Engineering (Terje Io)
+ * v0.29 / 2020-02-23 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2020, Io Engineering (Terje Io)
+Copyright (c) 2018-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -161,6 +161,7 @@ namespace CNC.Controls
                 model.PropertyChanged += OnDataContextPropertyChanged;
                 model.OnRealtimeStatusProcessed += RealtimeStatusProcessed;
                 model.OnCommandResponseReceived += ResponseReceived;
+
                 GCode.File.Model = model;
             }
         }
@@ -190,7 +191,7 @@ namespace CNC.Controls
                     break;
 
                 case nameof(GrblViewModel.Signals):
-                    {
+                    if(isActive) {
                         var signals = ((GrblViewModel)sender).Signals.Value;
                         if (JobPending && signals.HasFlag(Signals.CycleStart) && !signals.HasFlag(Signals.Hold) && !cycleStartSignal)
                             CycleStart();
@@ -239,7 +240,7 @@ namespace CNC.Controls
             if (activate && !initOK)
             {
                 initOK = true;
-                serialSize = Math.Min(300, (int)(GrblInfo.SerialBufferSize * 0.9f)); // size should be less than hardware handshake HWM
+                serialSize = Math.Min(AppConfig.Settings.Base.MaxBufferSize, (int)(GrblInfo.SerialBufferSize * 0.9f)); // size should be less than hardware handshake HWM
                 GCode.File.Parser.Dialect = GrblInfo.IsGrblHAL ? Dialect.GrblHAL : Dialect.Grbl;
             }
 
@@ -801,7 +802,7 @@ namespace CNC.Controls
                                 if (!model.GrblReset)
                                     Comms.com.WriteByte(GrblConstants.CMD_STOP);
                             }
-                            else if (grblState.State == GrblStates.Hold)
+                            else if (grblState.State == GrblStates.Hold && !model.GrblReset)
                                 Comms.com.WriteByte(GrblConstants.CMD_RESET);
                         }
                         if (JobTimer.IsRunning)

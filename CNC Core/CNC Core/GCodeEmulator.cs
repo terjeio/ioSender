@@ -1,7 +1,7 @@
 ﻿/*
  * GCodeEmulator.cs - part of CNC Controls library
  *
- * v0.20 / 2020-05-28 / Io Engineering (Terje Io)
+ * v0.29 / 2021-01-30 / Io Engineering (Terje Io)
  *
  */
 
@@ -168,7 +168,7 @@ namespace CNC.Core
                         //    scaleFactors[i] = 1d;
                         break;
 
-                    // G28: Set Predefined Position
+                    // G28: Goto Predefined Position
                     case Commands.G28:
                         {
                             var motion = token as GCLinearMotion;
@@ -184,9 +184,11 @@ namespace CNC.Core
                                 axisFlags = AxisFlags.All;
 
                             foreach (int i in axisFlags.ToIndices())
-                                machinePos[i] = g28.Values[i] - offsets[i] - origin[i];
+                                machinePos[i] = g28.Values[i]; // - offsets[i] - origin[i];
                             action.End = machinePos.Point3D;
-                            action.Token = new GCLinearMotion(Commands.G0, token.LineNumber, machinePos.Array, AxisFlags.All);
+                //            action.Token = new GCLinearMotion(Commands.G0, token.LineNumber, machinePos.Array, AxisFlags.All);
+                            action.Token = new GCAbsLinearMotion(token.Command, Commands.G0, token.LineNumber, machinePos.Array, axisFlags);
+
                             yield return action;
                             action.Start = action.End;
                         }
@@ -200,7 +202,7 @@ namespace CNC.Core
                         }
                         break;
 
-                    // G30: Go Predefined Position
+                    // G30: Goto Predefined Position
                     case Commands.G30:
                         {
                             var motion = token as GCLinearMotion;
@@ -217,9 +219,10 @@ namespace CNC.Core
                                 axisFlags = AxisFlags.All;
 
                             foreach (int i in axisFlags.ToIndices())
-                                machinePos[i] = g30.Values[i] - offsets[i] - origin[i];
+                                machinePos[i] = g30.Values[i]; // - offsets[i] - origin[i];
                             action.End = machinePos.Point3D;
-                            action.Token = new GCLinearMotion(Commands.G0, token.LineNumber, machinePos.Array, AxisFlags.All);
+//                            action.Token = new GCLinearMotion(Commands.G0, token.LineNumber, machinePos.Array, AxisFlags.All);
+                            action.Token = new GCAbsLinearMotion(token.Command, Commands.G0, token.LineNumber, machinePos.Array, axisFlags);
                             yield return action;
                             action.Start = action.End;
                         }

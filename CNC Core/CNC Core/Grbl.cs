@@ -1,13 +1,13 @@
 ﻿/*
  * Grbl.cs - part of CNC Controls library
  *
- * v0.28 / 2020-12-13 / Io Engineering (Terje Io)
+ * v0.29 / 2021-03-16 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2020, Io Engineering (Terje Io)
+Copyright (c) 2018-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -53,6 +53,8 @@ using System.Threading;
 using System.Windows.Threading;
 using System.Windows;
 using CNC.GCode;
+using System.Collections.Concurrent;
+using System.Threading.Tasks;
 
 namespace CNC.Core
 {
@@ -104,6 +106,7 @@ namespace CNC.Core
             CMD_GETINFO = "$I",
             CMD_GETINFO_EXTENDED = "$I+",
             CMD_GETNGCPARAMETERS = "$#",
+            CMD_GETSTARTUPLINES = "$N",
             CMD_GETSETTINGSDETAILS = "$ES",
             CMD_GETSETTINGSGROUPS = "$EG",
             CMD_GETALARMCODES = "$EA",
@@ -115,7 +118,7 @@ namespace CNC.Core
             FORMAT_METRIC = "###0.000",
             FORMAT_IMPERIAL = "##0.0000",
             NO_TOOL = "None",
-            SIGNALS = "XYZABCEPRDHSBTO", // Keep in sync with Signals enum below!!
+            SIGNALS = "XYZABCEPRDHSBTOW", // Keep in sync with Signals enum below!!
             THCSIGNALS = "AERTOVHDU"; // Keep in sync with THCSignals enum below!!
 
         public const int
@@ -216,16 +219,15 @@ namespace CNC.Core
         JogStepDistance = 53,
         JogSlowDistance = 54,
         JogFastDistance = 55,
-        AxisSetting_XTravelResolution = 100,
-        AxisSetting_XMaxRate = 110,
-        AxisSetting_XAcceleration = 120,
-        AxisSetting_XMaxTravel = 130,
-        AxisSetting_YMaxRate = 111,
-        AxisSetting_YAcceleration = 121,
-        AxisSetting_YMaxTravel = 131,
-        AxisSetting_ZMaxRate = 112,
-        AxisSetting_ZAcceleration = 122,
-        AxisSetting_ZMaxTravel = 132,
+        // Per axis settings
+        TravelResolutionBase = 100,
+        MaxFeedRateBase = 110,
+        AccelerationBase = 120,
+        MaxTravelBase = 130,
+        MotorCurrentBase = 140,
+        MicroStepsBase = 150,
+        StallGuardBase = 200,
+        // End per axis settings
         ToolChangeMode = 341
     }
 
@@ -274,7 +276,8 @@ namespace CNC.Core
         CycleStart = 1 << 11,
         BlockDelete = 1 << 12,
         OptionalStop = 1 << 13,
-        ProbeDisconnected = 1 << 14
+        ProbeDisconnected = 1 << 14,
+        MotorWarning = 1 << 15
     }
 
     [Flags]
@@ -295,6 +298,7 @@ namespace CNC.Core
     {
         public GrblStates State;
         public int Substate;
+        public int LastAlarm;
         public int Error;
         public Color Color;
         public bool MPG;
@@ -656,6 +660,9 @@ namespace CNC.Core
         public static bool ManualToolChange { get; private set; }
         public static bool HasSDCard { get; private set; }
         public static bool HasPIDLog { get; private set; }
+        public static bool HasProbe { get; private set; } = true;
+        public static bool HomingEnabled { get; internal set; } = true;
+        public static bool UseLegacyRTCommands { get; internal set; } = true;
         public static bool MPGMode { get; set; }
         public static bool LatheModeEnabled
         {
@@ -707,6 +714,7 @@ namespace CNC.Core
             SystemInfo.Clear();
 
             model.Silent = true;
+            Firmware = model.Firmware;
 
             new Thread(() =>
             {
@@ -732,6 +740,10 @@ namespace CNC.Core
             if(IsGrblHAL) // For now...
                 Firmware = "grblHAL";
 
+            model.Firmware = Firmware;
+
+            IsGrblHAL = IsGrblHAL || Firmware == "grblHAL";
+
             return res == true;
         }
 
@@ -740,33 +752,53 @@ namespace CNC.Core
             return Grbl.GrblViewModel != null && Get(Grbl.GrblViewModel);
         }
 
-        public static string Startup()
+        public static string Startup(GrblViewModel model)
         {
             Comms.com.PurgeQueue();
-            Comms.com.WriteByte(GrblConstants.CMD_STATUS_REPORT_ALL);
+            bool? res = null;
 
-            int timeout = 5; // 250 ms
-            do
+            CancellationToken cancellationToken = new CancellationToken();
+
+            new Thread(() =>
             {
-                Thread.Sleep(50);
-            } while (Comms.com.Reply == string.Empty && --timeout != 0);
+                res = WaitFor.SingleEvent<string>(
+                cancellationToken,
+                OnStartup,
+                a => model.OnResponseReceived += a,
+                a => model.OnResponseReceived -= a,
+                250, () => Comms.com.WriteByte(GrblConstants.CMD_STATUS_REPORT_ALL));
+            }).Start();
 
-            if (!(ExtendedProtocol = Comms.com.Reply != string.Empty))
+            while (res == null)
+                EventUtils.DoEvents();
+
+            if (!ExtendedProtocol)
             {
-
+                res = null;
                 Comms.com.PurgeQueue();
-                Comms.com.WriteByte(GrblLegacy.ConvertRTCommand(GrblConstants.CMD_STATUS_REPORT));
 
-                timeout = 30; // 1.5s
-                do
+                new Thread(() =>
                 {
-                    Thread.Sleep(50);
-                } while (Comms.com.Reply == string.Empty && --timeout != 0);
+                    res = WaitFor.SingleEvent<string>(
+                    cancellationToken,
+                    null,
+                    a => model.OnResponseReceived += a,
+                    a => model.OnResponseReceived -= a,
+                    1500, () => Comms.com.WriteByte((byte)GrblConstants.CMD_STATUS_REPORT_LEGACY[0]));
+                }).Start();
+
+                while (res == null)
+                    EventUtils.DoEvents();
             }
             else
-                IsGrblHAL = true; // for now...
+                IsGrblHAL = model.Firmware == "grblHAL";
 
             return Comms.com.Reply;
+        }
+
+        private static void OnStartup(string data)
+        {
+            ExtendedProtocol = data.StartsWith("<");
         }
 
         private static void Process(string data)
@@ -809,7 +841,7 @@ namespace CNC.Core
                         string[] s2 = valuepair[1].Split(',');
                         foreach (string value in s2)
                         {
-                            if (value.StartsWith("TMC:"))
+                            if (value.StartsWith("TMC="))
                                 TrinamicDrivers = value.Substring(4);
                             else switch (value)
                                 {
@@ -828,12 +860,20 @@ namespace CNC.Core
                                     case "ETH":
                                         break;
 
+                                    case "HOME":
+                                        HomingEnabled = true;
+                                        break;
+
                                     case "SD":
                                         HasSDCard = true;
                                         break;
 
                                     case "PID":
                                         HasPIDLog = true;
+                                        break;
+
+                                    case "NOPROBE":
+                                        HasProbe = false;
                                         break;
 
                                     case "LATHE":
@@ -848,8 +888,17 @@ namespace CNC.Core
                                         OptionalSignals |= Signals.EStop;
                                         break;
 
+                                    case "MW":
+                                        OptionalSignals |= Signals.MotorWarning;
+                                        break;
+
                                     case "OS":
                                         OptionalSignals |= Signals.OptionalStop;
+                                        break;
+
+                                    case "RT+":
+                                    case "RT-":
+                                        UseLegacyRTCommands = false;
                                         break;
                                 }
                         }
@@ -857,7 +906,6 @@ namespace CNC.Core
 
                     case "FIRMWARE":
                         Firmware = valuepair[1];
-                        IsGrblHAL = IsGrblHAL || Firmware == "grblHAL";
                         SystemInfo.Add(data);
                         break;
 
@@ -909,7 +957,11 @@ namespace CNC.Core
             if(addMissing && (addMissing = Grbl.GrblViewModel != null && Get(Grbl.GrblViewModel) && GrblWorkParameters.Get()))
             {
                 if (IsActive("G43.1") == null || IsActive("G49") == null)
-                    state.Add(IsPositionOffset(GrblWorkParameters.ToolLengtOffset) ? "G43.1" : "G49", "");
+                {
+                    var isOffset = IsPositionOffset(GrblWorkParameters.ToolLengtOffset);
+                    if((isOffset ? IsActive("G43.1") : IsActive("G49")) == null)
+                        state.Add(isOffset ? "G43.1" : "G49", "");
+                }
 
                 if (IsActive("G92") == null)
                 {
@@ -1124,6 +1176,7 @@ namespace CNC.Core
 
 //            GrblParserState.Tool = GrblParserState.Tool;    // Add tool to Tools if not in list
             model.Tool = model.Tool;                        // Force UI update
+            model.ToolOffset.Z = ToolLengtOffset.Z;
 
             // Reeread parser state since work offset and tool lists are now populated
             Comms.com.WriteCommand(GrblConstants.CMD_GETPARSERSTATE);
@@ -1196,7 +1249,6 @@ namespace CNC.Core
                 return;
             }
 
-
             if (data.StartsWith("["))
             {
                 string parameters, gCode = extractValues(data, out parameters);
@@ -1223,6 +1275,7 @@ namespace CNC.Core
 
                     case "TLO":
                         ToolLengtOffset.Parse(parameters);
+//                        AddOrUpdateCS("G43.1", parameters);
                         break;
 
                     case "TLR":
@@ -1306,15 +1359,10 @@ namespace CNC.Core
 
         private static void Process(string data)
         {
-            if (data != "ok")
+            if (data.StartsWith("[ERRORCODE:"))
             {
-                string[] valuepair = data.TrimEnd(']').Split(':');
-                if (valuepair.Length == 2 && valuepair[0] == "[ERRORCODE")
-                {
-                    string[] details = valuepair[1].Split('|');
-
-                    messages.Add(details[0], details[2]);
-                }
+                var details = data.Substring(11).TrimEnd(']').Split('|');
+                messages.Add(details[0], details[2]);
             }
         }
 
@@ -1330,7 +1378,7 @@ namespace CNC.Core
             if (messages != null)
                 messages.TryGetValue(key, out message);
 
-            return message == null ? string.Format("Error {0}", key) : message;
+            return message == null ? string.Format("error:{0}", key) : message;
         }
     }
 
@@ -1374,7 +1422,6 @@ namespace CNC.Core
 
                     if (file != null)
                     {
-
                         string line = file.ReadLine();
 
                         line = file.ReadLine(); // Skip header  
@@ -1402,15 +1449,10 @@ namespace CNC.Core
 
         private static void Process(string data)
         {
-            if (data != "ok")
+            if (data.StartsWith("[ALARMCODE:"))
             {
-                string[] valuepair = data.TrimEnd(']').Split(':');
-                if (valuepair.Length == 2 && valuepair[0] == "[ALARMCODE")
-                {
-                    string[] details = valuepair[1].Split('|');
-
-                    messages.Add(details[0], details[1] + ": " + details[2]);
-                }
+                var details = data.Substring(11).TrimEnd(']').Split('|');
+                messages.Add(details[0], details[1] + ": " + details[2]);
             }
         }
 
@@ -1509,6 +1551,53 @@ namespace CNC.Core
         }
     }
 
+    public static class GrblStartupLines
+    {
+        public static List<string> Lines { get; private set; } = new List<string>();
+
+        public static bool Get()
+        {
+            return Grbl.GrblViewModel != null && Get(Grbl.GrblViewModel);
+        }
+
+        public static bool Get(GrblViewModel model)
+        {
+            bool? res = null;
+
+            Lines.Clear();
+
+            Comms.com.PurgeQueue();
+            CancellationToken cancellationToken = new CancellationToken();
+
+            new Thread(() =>
+            {
+                res = WaitFor.AckResponse<string>(
+                    cancellationToken,
+                    response => Process(response),
+                    a => model.OnResponseReceived += a,
+                    a => model.OnResponseReceived -= a,
+                    400, () => Comms.com.WriteCommand(GrblConstants.CMD_GETSTARTUPLINES));
+            }).Start();
+
+            while (res == null)
+                EventUtils.DoEvents();
+
+            return Lines.Count > 0;
+        }
+
+        private static void Process(string data)
+        {
+            if (data.StartsWith(GrblConstants.CMD_GETSTARTUPLINES))
+            {
+                string[] valuepair = data.Split('=');
+                if (valuepair.Length == 2)
+                {
+                    Lines.Add(valuepair[1]);
+                }
+            }
+        }
+    }
+
     public class GrblSettingDetails : ViewModelBase
     {
         public enum DataTypes
@@ -1526,7 +1615,6 @@ namespace CNC.Core
         };
 
         string value;
-
         internal bool Silent = true;
 
         public int Id { get; internal set; }
@@ -1551,6 +1639,9 @@ namespace CNC.Core
         {
             get
             {
+                if (value == null)
+                    return "n/a";
+
                 switch(DataType)
                 {
                     case DataTypes.BOOL:
@@ -1612,14 +1703,7 @@ namespace CNC.Core
     {
         public static ObservableCollection<GrblSettingDetails> Settings { get; private set; } = new ObservableCollection<GrblSettingDetails>();
 
-        static GrblSettings()
-        {
-            UseLegacyRTCommands = true;
-        }
-
         public static bool IsLoaded { get { return Settings.Count > 0; } }
-        public static bool HomingEnabled { get; private set; }
-        public static bool UseLegacyRTCommands { get; private set; }
         public static bool ReportProbeCoordinates { get; private set; }
 
         public static string GetString(GrblSetting key)
@@ -1634,7 +1718,7 @@ namespace CNC.Core
             return dbl.Parse(GetString(key));
         }
 
-        public static double GetInteger(GrblSetting key)
+        public static int GetInteger(GrblSetting key)
         {
             return int.Parse(GetString(key));
         }
@@ -1753,13 +1837,19 @@ namespace CNC.Core
 
             model.GrblState = model.GrblState; // Temporary hack to enable the Home button when homing is enabled
 
-            int i = 0;
-            double stepsmm;
-            do
+            if(GrblInfo.AxisFlags == AxisFlags.None)
             {
-                stepsmm = GetDouble(GrblSetting.AxisSetting_XTravelResolution + i);
-                GrblInfo.TravelResolution.Values[i++] = 1d / stepsmm;
-            } while (!double.IsNaN(stepsmm));
+                int i = 0;
+                double stepsmm;
+                do
+                {
+                    stepsmm = GetDouble(GrblSetting.TravelResolutionBase + i);
+                    GrblInfo.TravelResolution.Values[i++] = 1d / stepsmm;
+                } while (!double.IsNaN(stepsmm) && i < GrblInfo.TravelResolution.Values.Length);
+            }
+            else foreach (int i in GrblInfo.AxisFlags.ToIndices()) {
+                GrblInfo.TravelResolution.Values[i] = 1d / GetDouble(GrblSetting.TravelResolutionBase + i);
+            }
 
             return IsLoaded;
         }
@@ -1778,7 +1868,7 @@ namespace CNC.Core
             bool ok = true;
             var changed = Settings.Where(x => x.IsDirty);
 
-            if (changed != null)
+            if (changed != null && changed.Count() > 0)
             {
                 foreach (var setting in changed)
                 {
@@ -1796,7 +1886,7 @@ namespace CNC.Core
                         setting.SetError(GrblErrors.GetMessage(Comms.com.Reply.Substring(6)));
                     }
 
-                    setting.IsDirty = !setting.HasErrors;
+                    setting.IsDirty = setting.HasErrors;
                 }
             }
 
@@ -1821,6 +1911,18 @@ namespace CNC.Core
                 exp.Add("; " + opt);
 
             exp.Add(";");
+
+            if (GrblInfo.Identity != string.Empty)
+                exp.Add(string.Format("{0}={1}", GrblConstants.CMD_GETINFO, GrblInfo.Identity));
+
+            if (GrblStartupLines.Get())
+            {
+                int id = 0;
+                foreach (var line in GrblStartupLines.Lines)
+                {
+                    exp.Add(string.Format("{0}{1}={2}", GrblConstants.CMD_GETSTARTUPLINES, id++, line));
+                }
+            }
 
             foreach (GrblSettingDetails Setting in Settings)
                 exp.Add(string.Format("${0}={1}", Setting.Id, Setting.Value));
@@ -1884,18 +1986,19 @@ namespace CNC.Core
         {
             if (data != "ok")
             {
+                int id;
                 string[] valuepair = data.Split('=');
-                if (valuepair.Length == 2)
+
+                if (valuepair.Length == 2 && int.TryParse(valuepair[0].Substring(1), out id))
                 {
-                    GrblSetting id = (GrblSetting)int.Parse(valuepair[0].Substring(1));
-                    switch (id)
+                    switch ((GrblSetting)id)
                     {
-                        case GrblSetting.HomingEnable:
-                            HomingEnabled = valuepair[1] != "0";
+                        case GrblSetting.HomingEnable: // TODO: remove?
+                            GrblInfo.HomingEnabled = valuepair[1] != "0";
                             break;
 
-                        case GrblSetting.EnableLegacyRTCommands:
-                            UseLegacyRTCommands = valuepair[1] != "0";
+                        case GrblSetting.EnableLegacyRTCommands: // TODO: remove!
+                            GrblInfo.UseLegacyRTCommands = valuepair[1] != "0";
                             break;
 
                         case GrblSetting.StatusReportMask:
@@ -1908,16 +2011,16 @@ namespace CNC.Core
                             break;
                     }
 
-                    var setting = Settings.Where(x => x.Id == (int)id).FirstOrDefault();
+                    var setting = Settings.Where(x => x.Id == id).FirstOrDefault();
 
                     if (setting == null)
                     {
-                        setting = new GrblSettingDetails(((int)id).ToString() + "|0||||||");
+                        setting = new GrblSettingDetails(id.ToString() + "|0||||||");
                         Settings.Add(setting);
                     }
 
                     setting.Value = valuepair[1];
-                    setting.Silent = false;
+                    setting.Silent = setting.IsDirty = false;
                 }
             }
         }
@@ -1965,24 +2068,24 @@ namespace CNC.Core
     {
         public static byte ConvertRTCommand(byte cmd)
         {
-            if (GrblSettings.UseLegacyRTCommands) switch (cmd)
-                {
-                    case GrblConstants.CMD_STATUS_REPORT_ALL:
-                        cmd = (byte)GrblConstants.CMD_STATUS_REPORT_LEGACY[0];
-                        break;
+            if (GrblInfo.UseLegacyRTCommands) switch (cmd)
+            {
+                case GrblConstants.CMD_STATUS_REPORT_ALL:
+                    cmd = (byte)GrblConstants.CMD_STATUS_REPORT_LEGACY[0];
+                    break;
 
-                    case GrblConstants.CMD_STATUS_REPORT:
-                        cmd = (byte)GrblConstants.CMD_STATUS_REPORT_LEGACY[0];
-                        break;
+                case GrblConstants.CMD_STATUS_REPORT:
+                    cmd = (byte)GrblConstants.CMD_STATUS_REPORT_LEGACY[0];
+                    break;
 
-                    case GrblConstants.CMD_CYCLE_START:
-                        cmd = (byte)GrblConstants.CMD_CYCLE_START_LEGACY[0];
-                        break;
+                case GrblConstants.CMD_CYCLE_START:
+                    cmd = (byte)GrblConstants.CMD_CYCLE_START_LEGACY[0];
+                    break;
 
-                    case GrblConstants.CMD_FEED_HOLD:
-                        cmd = (byte)GrblConstants.CMD_FEED_HOLD_LEGACY[0];
-                        break;
-                }
+                case GrblConstants.CMD_FEED_HOLD:
+                    cmd = (byte)GrblConstants.CMD_FEED_HOLD_LEGACY[0];
+                    break;
+            }
 
             return cmd;
         }

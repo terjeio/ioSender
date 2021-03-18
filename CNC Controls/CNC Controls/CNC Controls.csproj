@@ -138,6 +138,9 @@
     <Compile Include="OffsetView.xaml.cs">
       <DependentUpon>OffsetView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="OutlineFlyout.xaml.cs">
+      <DependentUpon>OutlineFlyout.xaml</DependentUpon>
+    </Compile>
     <Compile Include="OverrideControl.xaml.cs">
       <DependentUpon>OverrideControl.xaml</DependentUpon>
     </Compile>
@@ -296,6 +299,10 @@
       <DependentUpon>MPGPending.xaml</DependentUpon>
     </Compile>
     <Page Include="OffsetView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="OutlineFlyout.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

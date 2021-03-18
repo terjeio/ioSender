@@ -1,7 +1,7 @@
 /*
  * Converters.cs - part of CNC Controls Lathe library
  *
- * v0.19 / 2020-05-20 / Io Engineering (Terje Io)
+ * v0.29 / 2020-09-17 / Io Engineering (Terje Io)
  *
  */
 
@@ -68,7 +68,7 @@ namespace CNC.Controls.Lathe
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            string result = String.Empty;
+            string result = string.Empty;
             bool isMetric = parameter is bool ? (bool)parameter : Converters.IsMetric;
 
             if (value is double && !double.IsNaN((double)value))

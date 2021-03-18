@@ -1,13 +1,13 @@
 ﻿/*
  * ToolLengthControl.cs - part of CNC Probing library
  *
- * v0.27 / 2020-09-26 / Io Engineering (Terje Io)
+ * v0.29 / 2021-02-10 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020, Io Engineering (Terje Io)
+Copyright (c) 2020-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -72,7 +72,7 @@ namespace CNC.Controls.Probing
             if (!probing.ValidateInput())
                 return;
 
-            if (probing.ProbeFixture && probing.Grbl.HomedState != HomedState.Homed)
+            if (probing.ProbeFixture && !probing.Grbl.AxisHomed.Value.HasFlag(AxisFlags.X | AxisFlags.Y | AxisFlags.Z))
             {
                 MessageBox.Show("Axes must be homed before probing the fixture!", "Probing");
                 return;
@@ -86,16 +86,12 @@ namespace CNC.Controls.Probing
             if (probing.ProbeFixture)
             {
                 g59_3 = new Position(GrblWorkParameters.GetCoordinateSystem("G59.3"));
-                safeZ = new Position(probing.StartPosition);
-                safeZ.Z = System.Math.Max(g59_3.Z, probing.StartPosition.Z) + probing.Depth;
-                g59_3.Z += probing.Depth;
-                if (safeZ.Z < 0d)
-                    probing.Program.AddRapidToMPos(safeZ, AxisFlags.Z);
-                else
-                    safeZ.Z = g59_3.Z;
+                double g59_3_Z = g59_3.Z;
+                g59_3.Z = System.Math.Min(probing.Grbl.HomePosition.Z, g59_3.Z + probing.Depth);
+                probing.Program.AddRapidToMPos(probing.Grbl.HomePosition, AxisFlags.Z);
                 probing.Program.AddRapidToMPos(g59_3, AxisFlags.X | AxisFlags.Y);
                 probing.Program.AddRapidToMPos(g59_3, AxisFlags.Z);
-                g59_3.Z -= probing.Depth;
+                g59_3.Z = g59_3_Z;
             }
             probing.Program.AddProbingAction(AxisFlags.Z, true);
             probing.Program.Execute(true);
@@ -124,30 +120,33 @@ namespace CNC.Controls.Probing
                     probing.TloReference = pos.Z; // linear axis?
                     probing.Grbl.ExecuteCommand("G49");
                 }
-                else
-                {
-                    double tlo = pos.Z - (double.IsNaN(probing.TloReference) ? 0d : probing.TloReference);
-                    if (probing.ProbeFixture)
-                       tlo += probing.FixtureHeight;
-                    probing.Grbl.ExecuteCommand("G43.1Z" + tlo.ToInvariantString(probing.Grbl.Format));
-                }
 
-                if (probing.AddAction && (ok = probing.WaitForResponse(GrblConstants.CMD_GETNGCPARAMETERS)))
+                if (probing.AddAction)
                 {
-                    if (probing.CoordinateMode == ProbingViewModel.CoordMode.G92)
-                    {
-                        if ((ok = probing.GotoMachinePosition(pos, AxisFlags.Z)))
-                        {
-                            pos.X = pos.Y = 0d;
-                            pos.Z = probing.WorkpieceHeight + probing.TouchPlateHeight + probing.Grbl.ToolOffset.Z;
-                            probing.Grbl.ExecuteCommand("G92" + pos.ToString(AxisFlags.Z));
-                        }
-                    }
+                    if (probing.ProbeFixture)
+                        pos.Z = probing.FixtureHeight;
                     else
+                        pos.Z = probing.WorkpieceHeight + probing.TouchPlateHeight;
+
+                    if (probing.CoordinateMode == ProbingViewModel.CoordMode.G92)
+                        probing.Grbl.ExecuteCommand("G92" + pos.ToString(AxisFlags.Z));
+                    else
+                        probing.Grbl.ExecuteCommand(string.Format("G10L20P{0}{1}", probing.CoordinateSystem, pos.ToString(AxisFlags.Z)));
+                }
+                else if(!probing.ReferenceToolOffset)
+                {
+                    double tlo = pos.Z;
+
+                    if (!probing.ProbeFixture)
                     {
-                        pos.Z -= probing.WorkpieceHeight + probing.TouchPlateHeight + probing.Grbl.ToolOffset.Z;
-                        probing.Grbl.ExecuteCommand(string.Format("G10L2P{0}{1}", probing.CoordinateSystem, pos.ToString(AxisFlags.Z)));
+                        if (!double.IsNaN(probing.TloReference))
+                            tlo -= probing.TloReference;
                     }
+                    else if ((ok = probing.WaitForWcoUpdate() && probing.WaitForResponse(GrblConstants.CMD_GETNGCPARAMETERS)))
+                        tlo = tlo - (probing.Grbl.WorkPositionOffset.Z - probing.Grbl.ToolOffset.Z) - probing.FixtureHeight;
+
+                    if (ok)
+                        probing.Grbl.ExecuteCommand("G43.1Z" + tlo.ToInvariantString(probing.Grbl.Format));
                 }
 
                 //if (probing.Tool != "0")
@@ -155,18 +154,16 @@ namespace CNC.Controls.Probing
 
                 // Go back to origin
                 if (probing.ProbeFixture) {
-                    probing.Program.AddRapidToMPos(safeZ, AxisFlags.Z);
+                    probing.GotoMachinePosition(probing.Grbl.HomePosition, AxisFlags.Z);
                     probing.GotoMachinePosition(probing.StartPosition, AxisFlags.X | AxisFlags.Y);
                 }
-
                 probing.GotoMachinePosition(probing.StartPosition, AxisFlags.Z);
             }
 
             if (probing.ReferenceToolOffset)
             {
                 probing.ReferenceToolOffset = !ok;
-                if (GrblInfo.Build >= 20200805 && GrblInfo.IsGrblHAL)
-                    probing.Grbl.ExecuteCommand("$TLR"); // Set tool length offset reference in controller
+                probing.Grbl.ExecuteCommand("$TLR"); // Set tool length offset reference in controller
             }
 
             if (!probing.Grbl.IsParserStateLive)

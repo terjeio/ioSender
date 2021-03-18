@@ -10,8 +10,9 @@
         xmlns:cncprobingcontrols="clr-namespace:CNC.Controls.Probing;assembly=CNC.Controls.Probing"
         xmlns:local="clr-namespace:GCode_Sender"
         mc:Ignorable="d"
-        Title="Sender (beta-8)" Height="640" Width="925" MinHeight="660" MinWidth="925"
+        Title="Sender (beta-8.8)" Height="640" Width="925" MinHeight="660" MinWidth="925"
         Loaded="Window_Load"
+        SizeChanged="Window_SizeChanged"
         Closing="Window_Closing"
         Closed="Window_Closed" Icon="App.ico">
     <Window.Resources>
@@ -96,8 +97,9 @@
             <cnccontrols:JogControl x:Name="jogControl" Visibility="Hidden" Canvas.Right="22" Canvas.Top="25"/>
             <cnccontrols:MacroExecuteControl x:Name="macroControl" Visibility="Hidden" Canvas.Right="22" Canvas.Top="100"/>
             <cnccontrols:GotoControl x:Name="gotoControl" Visibility="Hidden" Canvas.Right="22" Canvas.Top="175"/>
-            <cnccontrols:MachinePositionFlyout x:Name="mposFlyout" Visibility="Hidden" Canvas.Right="22" Canvas.Top="250"/>
-            <cnccontrols:THCMonitorControl x:Name="thcControl" Visibility="Hidden" Canvas.Right="22" Canvas.Top="325"/>
+            <cnccontrols:OutlineFlyout x:Name="outlineFlyout" Visibility="Hidden" Canvas.Right="22" Canvas.Top="250"/>
+            <cnccontrols:MachinePositionFlyout x:Name="mposFlyout" Visibility="Hidden" Canvas.Right="22" Canvas.Top="325"/>
+            <cnccontrols:THCMonitorControl x:Name="thcControl" Visibility="Hidden" Canvas.Right="22" Canvas.Top="500"/>
         </Canvas>
         <TabControl Background="#FFE5E5E5" DockPanel.Dock="Left" x:Name="tabMode" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Focusable="False" SelectionChanged="TabMode_SelectionChanged">
             <TabItem x:Name="tabGrbl" Header="Grbl" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">

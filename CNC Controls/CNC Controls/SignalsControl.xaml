@@ -47,6 +47,20 @@
                             </Setter.Value>
                         </Setter>
                     </Style>
+                    <Style x:Key="MotorWarningVisibleStyle">
+                        <Setter Property="Control.Visibility">
+                            <Setter.Value>
+                                <MultiBinding Converter="{StaticResource IsSignalVisibleConverter}">
+                                    <Binding Path="OptionalSignals" />
+                                    <Binding>
+                                        <Binding.Source>
+                                            <core:Signals>MotorWarning</core:Signals>
+                                        </Binding.Source>
+                                    </Binding>
+                                </MultiBinding>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
                     <Style x:Key="BlockDeleteVisibleStyle">
                         <Setter Property="Control.Visibility">
                             <Setter.Value>
@@ -90,6 +104,7 @@
                 <local:SignalControl Label="C" IsSet="{Binding Path=Signals[(core:Signals)LimitC], Mode=OneWay}" Style="{StaticResource CAxisVisibleStyle}"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,3,0" VerticalAlignment="Center" DockPanel.Dock="Right">
+                <local:SignalControl Label="W" ToolTip="Motor warning" IsSet="{Binding Path=Signals[(core:Signals)MotorWarning], Mode=OneWay}" Style="{StaticResource MotorWarningVisibleStyle}"/>
                 <local:SignalControl Label="B" ToolTip="Block delete" IsSet="{Binding Path=Signals[(core:Signals)BlockDelete], Mode=OneWay}" Style="{StaticResource BlockDeleteVisibleStyle}"/>
                 <local:SignalControl Label="O" ToolTip="Optional stop" IsSet="{Binding Path=Signals[(core:Signals)OptionalStop], Mode=OneWay}" Style="{StaticResource OptionalStopVisibleStyle}"/>
                 <local:SignalControl Label="H" ToolTip="Feed hold" IsSet="{Binding Path=Signals[(core:Signals)Hold], Mode=OneWay}"/>

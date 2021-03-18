@@ -1,13 +1,13 @@
 ﻿/*
  * AppConfig.cs - part of CNC Controls library for Grbl
  *
- * v0.27 / 2020-09-06 / Io Engineering (Terje Io)
+ * v0.29 / 2021-01-05 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2020, Io Engineering (Terje Io)
+Copyright (c) 2019-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -130,16 +130,21 @@ namespace CNC.Controls
     [Serializable]
     public class Config : ViewModelBase
     {
-        private int _pollInterval = 200; // ms
-        private bool _useBuffering = false, _keepMdiFocus = true;
+        private int _pollInterval = 200, /* ms*/  _maxBufferSize = 300;
+        private bool _useBuffering = false, _keepMdiFocus = true, _filterOkResponse = false, _saveWindowSize = false;
         private CommandIgnoreState _ignoreM6 = CommandIgnoreState.No, _ignoreM7 = CommandIgnoreState.No, _ignoreM8 = CommandIgnoreState.No;
 
         public int PollInterval { get { return _pollInterval < 100 ? 100 : _pollInterval; } set { _pollInterval = value; OnPropertyChanged(); } }
         public string PortParams { get; set; } = "COMn:115200,N,8,1";
         public int ResetDelay { get; set; } = 2000;
         public bool UseBuffering { get { return _useBuffering; } set { _useBuffering = value; OnPropertyChanged(); } }
+        public bool KeepWindowSize { get { return _saveWindowSize; } set { if (_saveWindowSize != value) { _saveWindowSize = value; OnPropertyChanged(); } } }
+        public double WindowWidth { get; set; } = 925;
+        public double WindowHeight { get; set; } = 660;
+        public int MaxBufferSize { get { return _maxBufferSize < 300 ? 300 : _maxBufferSize; } set { _maxBufferSize = value; OnPropertyChanged(); } }
         public string Editor { get; set; } = "notepad.exe";
         public bool KeepMdiFocus { get { return _keepMdiFocus; } set { _keepMdiFocus = value; OnPropertyChanged(); } }
+        public bool FilterOkResponse { get { return _filterOkResponse; } set { _filterOkResponse = value; OnPropertyChanged(); } }
 
         [XmlIgnore]
         public CommandIgnoreState[] CommandIgnoreStates { get { return (CommandIgnoreState[])Enum.GetValues(typeof(CommandIgnoreState)); } }

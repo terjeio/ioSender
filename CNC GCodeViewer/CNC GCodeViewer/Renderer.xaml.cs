@@ -1,7 +1,7 @@
 /*
  * Renderer.xaml.cs - part of CNC Controls library
  *
- * v0.20 / 2020-06-03 / Io Engineering (Terje Io)
+ * v0.20 / 2021-02-02 / Io Engineering (Terje Io)
  *
  */
 
@@ -14,7 +14,7 @@
 
 /*
 
-Copyright (c) 2019-2020, Io Engineering (Terje Io)
+Copyright (c) 2019-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -330,9 +330,9 @@ namespace CNC.Controls.Viewer
             positionPoints.Clear();
 
             if (Machine.Limits.X == 0d)
-                Machine.SetLimits(GrblSettings.GetDouble(GrblSetting.AxisSetting_XMaxTravel),
-                                   GrblSettings.GetDouble(GrblSetting.AxisSetting_YMaxTravel),
-                                    GrblSettings.GetDouble(GrblSetting.AxisSetting_ZMaxTravel));
+                Machine.SetLimits(GrblSettings.GetDouble(GrblSetting.MaxTravelBase),
+                                   GrblSettings.GetDouble(GrblSetting.MaxTravelBase + GrblConstants.Y_AXIS),
+                                    GrblSettings.GetDouble(GrblSetting.MaxTravelBase + GrblConstants.Z_AXIS));
 
             positionPoints.Add(new Point3D(Math.Min(model.Position.X, model.ProgramLimits.MinX) - 5d, model.Position.Y, model.Position.Z));
             positionPoints.Add(new Point3D(Machine.Limits.X, model.Position.Y, model.Position.Z));

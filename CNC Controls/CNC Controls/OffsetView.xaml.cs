@@ -1,13 +1,13 @@
 /*
  * OffsetView.xaml.cs - part of CNC Controls library
  *
- * v0.27 / 2020-09-26 / Io Engineering (Terje Io)
+ * v0.29 / 2020-01-29 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2020, Io Engineering (Terje Io)
+Copyright (c) 2018-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -185,9 +185,8 @@ namespace CNC.Controls
                 string code = selectedOffset.Code == "G28" || selectedOffset.Code == "G30" ? selectedOffset.Code + ".1" : selectedOffset.Code;
 
                 if (axis == "ClearAll" || IsPredefined)
-                {
-                    cmd = selectedOffset.Code + ".1";
-                } else
+                    cmd = selectedOffset.Code == "G43.1" ? "G49" : selectedOffset.Code + ".1";
+                else
                     cmd = string.Format("G90{0}{1}", code, newpos.ToString(axis == "All" ? GrblInfo.AxisFlags : GrblInfo.AxisLetterToFlag(axis)));
             } else
                 cmd = string.Format("G90G10L2P{0}{1}", selectedOffset.Id, newpos.ToString(axis == "All" || axis == "ClearAll" ? GrblInfo.AxisFlags : GrblInfo.AxisLetterToFlag(axis)));

@@ -4,17 +4,73 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CNC.Controls"
+             xmlns:gcode="clr-namespace:CNC.GCode;assembly=CNC.Core"
              mc:Ignorable="d" 
-             d:DesignHeight="515" d:DesignWidth="875">
-    <Grid>
-        <Border BorderThickness="1" BorderBrush="DarkGray" Height="258" Width="514" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10">
-            <Canvas x:Name="SGPlot" Background="WhiteSmoke" HorizontalAlignment="Left" Height="256" VerticalAlignment="Top" Width="512"/>
-        </Border>
-        <TextBox x:Name="txtStatus" IsReadOnly="True" HorizontalAlignment="Left" Height="460" Margin="561,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="300"/>
-        <Button x:Name="btnGetState" Content="Get status" HorizontalAlignment="Left" Margin="561,484,0,0" VerticalAlignment="Top" Width="76"/>
-        <Label x:Name="lblLoad" Content="Load (SG_RESULT)" Foreground="Blue" HorizontalAlignment="Left" Margin="423,268,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.132,9.308"/>
-        <CheckBox x:Name="chkEnableSfilt" Content="Enable stallGuard filter (SFILT)" HorizontalAlignment="Left" Margin="10,275,0,0" VerticalAlignment="Top"/>
-        <local:MDIControl x:Name="mdiControl" HorizontalAlignment="Left" Margin="26,446,0,0" VerticalAlignment="Top"/>
-
-    </Grid>
+             d:DesignHeight="515" d:DesignWidth="875"
+             Loaded="TrinamicView_Loaded">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="SharedStyles.xaml"/>
+                <ResourceDictionary>
+                    <local:LogicalNotConverter x:Key="BooleanConverter" />
+                    <local:BoolToVisibleConverter x:Key="IsVisibleConverter" />
+                    <local:PositionToStringConverter x:Key="PositionConverter" />
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <DockPanel Background="Transparent" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+        <DockPanel x:Name="dp" DockPanel.Dock="Left" Margin="5,5,5,0" Width="520" HorizontalAlignment="Left" VerticalAlignment="Stretch">
+            <StackPanel DockPanel.Dock="Top">
+                <Border BorderThickness="1" BorderBrush="DarkGray" Height="258" Width="514" HorizontalAlignment="Left" VerticalAlignment="Top">
+                    <Canvas x:Name="SGPlot" Background="WhiteSmoke" HorizontalAlignment="Left" Height="256" VerticalAlignment="Top" Width="512"/>
+                </Border>
+                <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                    <StackPanel Orientation="Horizontal" Height="24">
+                        <RadioButton Content="X" IsChecked="{Binding Path=AxisEnabled[(gcode:AxisFlags)X], RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" HorizontalAlignment="Left" VerticalAlignment="Center" Height="16" Margin="5,0"/>
+                        <RadioButton Content="Y" IsChecked="{Binding Path=AxisEnabled[(gcode:AxisFlags)Y], RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" Style="{StaticResource YAxisVisibleStyle}" Margin="5,0" HorizontalAlignment="Left" VerticalAlignment="Center" Height="16"/>
+                        <RadioButton Content="Z" IsChecked="{Binding Path=AxisEnabled[(gcode:AxisFlags)Z], RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" Style="{StaticResource ZAxisVisibleStyle}" Margin="5,0" HorizontalAlignment="Left" VerticalAlignment="Center" Height="16"/>
+                        <RadioButton Content="A" Style="{StaticResource AAxisVisibleStyle}" Margin="5,0" HorizontalAlignment="Left" VerticalAlignment="Center" Height="16"/>
+                        <RadioButton Content="B" Style="{StaticResource BAxisVisibleStyle}" Margin="5,0" HorizontalAlignment="Left" VerticalAlignment="Center" Height="16"/>
+                        <RadioButton Content="C" Style="{StaticResource CAxisVisibleStyle}" Margin="5,0" HorizontalAlignment="Left" VerticalAlignment="Center" Height="16"/>
+                    </StackPanel>
+                    <Label x:Name="lblLoad" Content="Load (SG_RESULT)" Foreground="Blue" Margin="0,0,5,0" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                </Grid>
+                <GroupBox Header="stallGuard">
+                    <StackPanel>
+                        <CheckBox IsChecked="{Binding Path=SFiltEnabled, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" Content="Enable filter (SFILT)" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top"/>
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <Slider Value="{Binding SGValue, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" Width="169" Minimum="-64" Maximum="63" TickPlacement="BottomRight" IsSnapToTickEnabled="False" LostMouseCapture="Slider_LostMouseCapture"/>
+                            <TextBox Text="{Binding Path=SGValue, RelativeSource={RelativeSource AncestorType=UserControl}, StringFormat='##0'}" HorizontalContentAlignment="Right" IsReadOnly="True" Width="30" Margin="5,0,0,0" />
+                            <Button Content="Configure" Width="60" VerticalAlignment="Center" Margin="5,0" Click="btnConfigureSGVal_Click"/>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+                <local:StatusControl x:Name="statusControl" Margin="0,5,0,0" VerticalAlignment="Bottom"/>
+            </StackPanel>
+            <StackPanel  HorizontalAlignment="Left" VerticalAlignment="Bottom">
+                <local:MDIControl x:Name="mdiControl"/>
+                <TextBlock TextWrapping="NoWrap" Height="25" Width="235" HorizontalAlignment="Left" Margin="0,5,0,0">
+                    <TextBlock.Text>
+                        <MultiBinding Converter="{StaticResource PositionConverter}">
+                            <Binding Path="Position"/>
+                            <Binding Path="Format"/>
+                        </MultiBinding>
+                    </TextBlock.Text>
+                </TextBlock>
+            </StackPanel>
+        </DockPanel>
+        <Grid DockPanel.Dock="Top" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="30"/>
+            </Grid.RowDefinitions>
+            <TextBox Grid.Row="0" Text="{Binding Path=DriverStatus, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=OneWay}" IsReadOnly="True" HorizontalAlignment="Stretch" TextWrapping="Wrap" VerticalAlignment="Stretch" FontSize="12" FontFamily="Global Monospace"/>
+            <StackPanel Grid.Row="1" Orientation="Horizontal">
+                <Button Content="Get status" Width="130" HorizontalAlignment="Left" VerticalAlignment="Center" Click="btnGetState_Click"/>
+                <Button Content="Get status, all drivers" Width="130" Margin="5,0" HorizontalAlignment="Left" VerticalAlignment="Center" Click="btnGetStateAll_Click"/>
+            </StackPanel>
+        </Grid>
+    </DockPanel>
 </UserControl>

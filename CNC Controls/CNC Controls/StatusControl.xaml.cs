@@ -1,7 +1,7 @@
 ﻿/*
  * StatusControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.28 / 2020-10-04 / Io Engineering (Terje Io)
+ * v0.29 / 2021-01-01 / Io Engineering (Terje Io)
  *
  */
 
@@ -73,7 +73,11 @@ namespace CNC.Controls
             switch ((StatusButton)((Control)sender).Tag)
             {
                 case StatusButton.Reset:
-                    Grbl.Reset();
+                    var model = (DataContext as GrblViewModel);
+                    if (model.GrblState.State == GrblStates.Alarm && model.GrblState.Substate == 10 && model.Signals.Value.HasFlag(Signals.EStop))
+                        MessageBox.Show("Clear E-Stop before <Reset>", "ioSender",  MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                    else
+                        Grbl.Reset();
                     break;
 
                 case StatusButton.Unlock:

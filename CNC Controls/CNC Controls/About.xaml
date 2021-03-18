@@ -19,7 +19,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Label x:Name="version" Content="Version 2.0" HorizontalAlignment="Left" Margin="10,0" VerticalAlignment="Top"/>
-        <Label x:Name="copyright" Content="©2015-2020 Io Engineering (Terje Io)" HorizontalAlignment="Left" Margin="10,0" Grid.Row="1" VerticalAlignment="Top"/>
+        <Label x:Name="copyright" Content="©2015-2021 Io Engineering (Terje Io)" HorizontalAlignment="Left" Margin="10,0" Grid.Row="1" VerticalAlignment="Top"/>
         <GroupBox x:Name="grpGrbl" Header="grbl" HorizontalAlignment="Center" Grid.Row="2" VerticalAlignment="Top" Height="185" Width="290">
             <StackPanel Orientation="Vertical">
                 <Label x:Name="txtGrblVersion" Content="-" HorizontalAlignment="Left" Margin="10,0" VerticalAlignment="Center" Height="26"/>

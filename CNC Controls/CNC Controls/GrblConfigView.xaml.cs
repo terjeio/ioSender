@@ -1,13 +1,13 @@
 /*
  * GrblConfigView.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.28 / 2020-12-13 / Io Engineering (Terje Io)
+ * v0.29 / 2021-01-15 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2020, Io Engineering (Terje Io)
+Copyright (c) 2018-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -40,6 +40,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using System.Windows;
 using System.Windows.Controls;
 using CNC.Core;
+using Microsoft.Win32;
+using System.Collections.Generic;
+using System.IO;
+using System;
+using System.Threading;
 
 namespace CNC.Controls
 {
@@ -47,6 +52,8 @@ namespace CNC.Controls
     {
         private Widget curSetting = null;
         private GrblViewModel model = null;
+
+        private string retval;
 
         public GrblConfigView()
         {
@@ -67,7 +74,7 @@ namespace CNC.Controls
 
             dgrSettings.Visibility = GrblInfo.HasEnums ? Visibility.Collapsed : Visibility.Visible;
             treeView.Visibility = !GrblInfo.HasEnums ? Visibility.Collapsed : Visibility.Visible;
-            dpan.Visibility = GrblInfo.HasEnums ? Visibility.Hidden : Visibility.Visible;
+            details.Visibility = GrblInfo.HasEnums && curSetting == null ? Visibility.Hidden : Visibility.Visible;
 
             if (GrblInfo.HasEnums)
             {
@@ -87,7 +94,10 @@ namespace CNC.Controls
         public void Activate(bool activate, ViewType chgMode)
         {
             if (model != null)
+            {
                 btnSave.IsEnabled = !model.IsCheckMode;
+                model.Message = string.Empty;
+            }
         }
 
         public void CloseFile()
@@ -120,14 +130,120 @@ namespace CNC.Controls
 
         void btnBackup_Click(object sender, RoutedEventArgs e)
         {
-            GrblSettings.Backup(string.Format("{0}settings.txt", CNC.Core.Resources.Path));
+            GrblSettings.Backup(string.Format("{0}settings.txt", Core.Resources.Path));
+            model.Message = "All settings written to settings.txt in the sender folder.";
+        }
+
+        public bool LoadFile(string filename)
+        {
+            bool ok = false;
+            List<string> lines = new List<string>();
+
+            FileInfo file = new FileInfo(filename);
+
+            StreamReader sr = file.OpenText();
+
+            string block = sr.ReadLine();
+
+            while (block != null)
+            {
+                try
+                {
+                    ok |= block.StartsWith("$");
+                    lines.Add(block.Trim());
+
+                    block = sr.ReadLine();
+                }
+                catch (Exception e)
+                {
+                    if ((ok = MessageBox.Show("Bummer...\r\rContinue loading?", e.Message, MessageBoxButton.YesNo) == MessageBoxResult.Yes))
+                        block = sr.ReadLine();
+                    else
+                        block = null;
+                }
+            }
+
+            sr.Close();
+
+            if (ok)
+            {
+                bool? res = null;
+                CancellationToken cancellationToken = new CancellationToken();
+
+                Comms.com.PurgeQueue();
+
+                foreach (var cmd in lines)
+                {
+                    if (cmd.StartsWith(";"))
+                        continue;
+
+                    res = null;
+                    retval = string.Empty;
+
+                    new Thread(() =>
+                    {
+                        res = WaitFor.AckResponse<string>(
+                            cancellationToken,
+                            response => Process(response),
+                            a => model.OnResponseReceived += a,
+                            a => model.OnResponseReceived -= a,
+                            400, () => Comms.com.WriteCommand(cmd));
+                    }).Start();
+
+                    while (res == null)
+                        EventUtils.DoEvents();
+
+                    if (retval != string.Empty)
+                    {
+                        if (MessageBox.Show(string.Format("Setting {0} returned {1}, continue?", cmd, retval), "ioSender", MessageBoxButton.YesNo, MessageBoxImage.Exclamation) == MessageBoxResult.No)
+                            break;
+                    }
+                    else if (res == false && MessageBox.Show(string.Format("Timed out while setting {0} , continue?", cmd), "ioSender", MessageBoxButton.YesNo, MessageBoxImage.Exclamation) == MessageBoxResult.No)
+                        break;
+                }
+
+                using (new UIUtils.WaitCursor())
+                {
+                    GrblSettings.Get();
+                }
+            }
+            else
+                MessageBox.Show("The file does not contain any settings.", "ioSender");
+
+            model.Message = string.Empty;
+
+            return ok;
+        }
+
+        private void Process(string data)
+        {
+            if (data != "ok")
+                retval = data;
+        }
+
+        private void btnRestore_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog file = new OpenFileDialog();
+
+            file.InitialDirectory = Core.Resources.Path;
+            file.Title = "Restore settings from file";
+
+            file.Filter = string.Format("Text files (*.txt)|*.txt");
+
+            if (file.ShowDialog() == true)
+            {
+                using (new UIUtils.WaitCursor())
+                {
+                    LoadFile(file.FileName);
+                }
+            }
         }
 
         private void dgrSettings_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (e.AddedItems.Count == 1)
             {
-                dpan.Visibility = Visibility.Visible;
+                details.Visibility = Visibility.Visible;
 
                 if (curSetting != null)
                 {
@@ -146,9 +262,9 @@ namespace CNC.Controls
 
         private void treeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (e != null && e.NewValue is GrblSettingDetails)
+            if (e != null && e.NewValue is GrblSettingDetails && (e.NewValue as GrblSettingDetails).Value != null)
             {
-                dpan.Visibility = Visibility.Visible;
+                details.Visibility = Visibility.Visible;
 
                 if (curSetting != null)
                 {
@@ -163,7 +279,7 @@ namespace CNC.Controls
                 curSetting.IsEnabled = true;
             }
             else
-                dpan.Visibility = Visibility.Hidden;
+                details.Visibility = Visibility.Hidden;
         }
     }
 }

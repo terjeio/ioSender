@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CNC.Controls"
              mc:Ignorable="d" 
-             d:DesignHeight="220" d:DesignWidth="300"
+             d:DesignHeight="220" d:DesignWidth="315"
              Loaded="macroExecuteControl_Loaded">
     <UserControl.Resources>
         <Style x:Key="SmallXButtonStyle" TargetType="Button">
@@ -22,7 +22,7 @@
         </Style>
     </UserControl.Resources>
     <Border BorderBrush="DarkGray" BorderThickness="1" CornerRadius="3" Background="#FFE5E5EA">
-        <Grid Width="300" Height="220">
+        <Grid Width="315" Height="220">
             <ItemsControl ItemsSource="{Binding Path=Macros, RelativeSource={RelativeSource AncestorType=UserControl}}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
@@ -38,7 +38,7 @@
             </ItemsControl>
             <Label x:Name="label" Content="No macros defined, use Edit button to add." HorizontalContentAlignment="Center" Visibility="{Binding Path=IsMessageVisible, RelativeSource={RelativeSource AncestorType=UserControl}}" HorizontalAlignment="Center" Margin="0,80,0,0" Width="280" VerticalAlignment="Top"/>
             <Button x:Name="button" Content="Edit" Width="50" Height="25" HorizontalAlignment="Right" Margin="0,0,8,8" VerticalAlignment="Bottom" Click="button_Edit" />
-            <Button Content="×" Focusable="False" Style="{StaticResource SmallXButtonStyle}" VerticalContentAlignment="Top" HorizontalAlignment="Left" Margin="282,0,0,0" VerticalAlignment="Top" Width="14" Height="18" Click="btn_Close"/>
+            <Button Content="×" Focusable="False" Style="{StaticResource SmallXButtonStyle}" VerticalContentAlignment="Top" HorizontalAlignment="Left" Margin="297,0,0,0" VerticalAlignment="Top" Width="14" Height="18" Click="btn_Close"/>
         </Grid>
     </Border>
 </UserControl>

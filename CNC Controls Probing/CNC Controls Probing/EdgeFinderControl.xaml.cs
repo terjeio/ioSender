@@ -1,13 +1,13 @@
 ﻿/*
  * EdgeFinderControl.xaml.cs - part of CNC Probing library
  *
- * v0.27 / 2020-09-25 / Io Engineering (Terje Io)
+ * v0.29 / 2021-01-15 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020, Io Engineering (Terje Io)
+Copyright (c) 2020-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -278,7 +278,8 @@ namespace CNC.Controls.Probing
                     {
                         if((ok = !isCancelled && probing.GotoMachinePosition(pos, AxisFlags.Z)))
                         {
-                            pos.X = pos.Y = 0d;
+                            pos.X = -probing.ProbeOffsetX;
+                            pos.Y = -probing.ProbeOffsetY;
                             pos.Z = probing.WorkpieceHeight + probing.TouchPlateHeight;
                             probing.Grbl.ExecuteCommand("G92" + pos.ToString(axisflags));
                             if (!isCancelled && axisflags.HasFlag(AxisFlags.Z))
@@ -287,6 +288,8 @@ namespace CNC.Controls.Probing
                     }
                     else
                     {
+                        pos.X += probing.ProbeOffsetX;
+                        pos.Y += probing.ProbeOffsetY;
                         pos.Z -= probing.WorkpieceHeight + probing.TouchPlateHeight + probing.Grbl.ToolOffset.Z;
                         probing.Grbl.ExecuteCommand(string.Format("G10L2P{0}{1}", probing.CoordinateSystem, pos.ToString(axisflags)));
                     }
@@ -335,7 +338,8 @@ namespace CNC.Controls.Probing
             if (probing.CoordinateMode == ProbingViewModel.CoordMode.G92)
             {
                 probing.Program.AddRapidToMPos(pos, AxisFlags.Z);
-                pos.X = pos.Y = 0d;
+                pos.X = -probing.ProbeOffsetX;
+                pos.Y = -probing.ProbeOffsetY;
                 pos.Z = probing.WorkpieceHeight + probing.TouchPlateHeight;
                 probing.Program.Add("G92" + pos.ToString(axisflags));
                 if (axisflags.HasFlag(AxisFlags.Z))
@@ -343,6 +347,8 @@ namespace CNC.Controls.Probing
             }
             else
             {
+                pos.X += probing.ProbeOffsetX;
+                pos.Y += probing.ProbeOffsetY;
                 pos.Z -= probing.WorkpieceHeight + probing.TouchPlateHeight + probing.Grbl.ToolOffset.Z;
                 probing.Program.Add(string.Format("G10L2P{0}{1}", probing.CoordinateSystem, pos.ToString(axisflags)));
             }

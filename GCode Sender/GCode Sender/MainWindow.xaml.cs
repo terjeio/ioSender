@@ -1,13 +1,13 @@
 /*
  * MainWindow.xaml.cs - part of Grbl Code Sender
  *
- * v0.27 / 2020-09-20 / Io Engineering (Terje Io)
+ * v0.29 / 2021-01-30 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2020, Io Engineering (Terje Io)
+Copyright (c) 2019-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -56,8 +56,9 @@ namespace GCode_Sender
     {
         public static MainWindow ui = null;
         public static CNC.Controls.Viewer.Viewer GCodeViewer = null;
+        public static UIViewModel UIViewModel { get; } = new UIViewModel();
 
-        static public UIViewModel UIViewModel { get; } = new UIViewModel();
+        private bool saveWinSize = false;
 
         public MainWindow()
         {
@@ -87,6 +88,7 @@ namespace GCode_Sender
 
             new PipeServer(App.Current.Dispatcher);
             PipeServer.FileTransfer += Pipe_FileTransfer;
+            AppConfig.Settings.Base.PropertyChanged += Base_PropertyChanged;
         }
 
         public string BaseWindowTitle { get; set; }
@@ -119,6 +121,22 @@ namespace GCode_Sender
 
         private void Window_Load(object sender, EventArgs e)
         {
+            if (AppConfig.Settings.Base.KeepWindowSize)
+            {
+                if (AppConfig.Settings.Base.WindowWidth == -1)
+                    WindowState = WindowState.Maximized;
+                else
+                {
+                    Width = Math.Max(Math.Min(AppConfig.Settings.Base.WindowWidth, SystemParameters.PrimaryScreenWidth), 925);
+                    Height = Math.Max(Math.Min(AppConfig.Settings.Base.WindowHeight, SystemParameters.PrimaryScreenHeight), 660);
+                    if (Left + Width > SystemParameters.PrimaryScreenWidth)
+                        Left = 0d;
+                    if (Top + Height > SystemParameters.PrimaryScreenHeight)
+                        Top = 0d;
+                }
+            }
+            saveWinSize = AppConfig.Settings.Base.KeepWindowSize;
+
             foreach (TabItem tab in UIUtils.FindLogicalChildren<TabItem>(ui.tabMode))
             {
                 ICNCView view = getView(tab);
@@ -136,8 +154,10 @@ namespace GCode_Sender
             UIViewModel.SidebarItems.Add(new SidebarItem("_Jog", jogControl));
             UIViewModel.SidebarItems.Add(new SidebarItem("_Macros", macroControl));
             UIViewModel.SidebarItems.Add(new SidebarItem("_Goto", gotoControl));
+            UIViewModel.SidebarItems.Add(new SidebarItem("_Outline", outlineFlyout));
             UIViewModel.SidebarItems.Add(new SidebarItem("M_Pos", mposFlyout));
-//            UIViewModel.SidebarItems.Add(new SidebarItem("_THC Monitor", thcControl));
+
+            //            UIViewModel.SidebarItems.Add(new SidebarItem("_THC Monitor", thcControl));
 
             UIViewModel.CurrentView = getView((TabItem)tabMode.Items[tabMode.SelectedIndex = 0]);
             System.Threading.Thread.Sleep(50);
@@ -160,6 +180,16 @@ namespace GCode_Sender
 
             GCode.File.AddTransformer(typeof(CNC.Controls.ArcsToLines), "Arcs to lines", UIViewModel.TransformMenuItems);
             GCode.File.AddTransformer(typeof(CNC.Controls.DragKnife.DragKnifeViewModel), "Add drag knife moves", UIViewModel.TransformMenuItems);
+        }
+
+        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if(saveWinSize && !(AppConfig.Settings.Base.WindowWidth == e.NewSize.Width && AppConfig.Settings.Base.WindowHeight == e.NewSize.Height))
+            {
+                AppConfig.Settings.Base.WindowWidth = WindowState == WindowState.Maximized ? -1 : e.NewSize.Width;
+                AppConfig.Settings.Base.WindowHeight = WindowState == WindowState.Maximized ? -1 : e.NewSize.Height;
+                AppConfig.Settings.Save();
+            }
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -207,6 +237,19 @@ namespace GCode_Sender
             about.DataContext = DataContext;
             about.ShowDialog();
         }
+
+        private void Base_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if(e.PropertyName == nameof(Config.KeepWindowSize))
+            {
+                if((sender as Config).KeepWindowSize)
+                {
+                    AppConfig.Settings.Base.WindowWidth = Width;
+                    AppConfig.Settings.Base.WindowHeight = Height;
+                }
+            }
+        }
+
 
         private void Pipe_FileTransfer(string filename)
         {

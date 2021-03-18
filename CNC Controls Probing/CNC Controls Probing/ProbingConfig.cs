@@ -1,13 +1,13 @@
 ﻿/*
  * ProbingProfiles.cs - part of CNC Probing library
  *
- * v0.27 / 2020-09-28 / Io Engineering (Terje Io)
+ * v0.29 / 2021-01-14 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020, Io Engineering (Terje Io)
+Copyright (c) 2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -64,6 +64,8 @@ namespace CNC.Controls.Probing
         public double ProbeDiameter { get; set; }
         public double TouchPlateHeight { get; set; }
         public double FixtureHeight { get; set; }
+        public double ProbeOffsetX { get; set; }
+        public double ProbeOffsetY { get; set; }
     }
 
     public class ProbingProfiles
@@ -85,6 +87,8 @@ namespace CNC.Controls.Probing
                 LatchDistance = data.LatchDistance,
                 ProbeDiameter = data.ProbeDiameter,
                 Offset = data.Offset,
+                ProbeOffsetX = data.ProbeOffsetX,
+                ProbeOffsetY = data.ProbeOffsetY,
                 XYClearance = data.XYClearance,
                 Depth = data.Depth,
                 TouchPlateHeight = data.TouchPlateHeight,
@@ -108,6 +112,8 @@ namespace CNC.Controls.Probing
                 profile.LatchDistance = data.LatchDistance;
                 profile.ProbeDiameter = data.ProbeDiameter;
                 profile.Offset = data.Offset;
+                profile.ProbeOffsetX = data.ProbeOffsetX;
+                profile.ProbeOffsetY = data.ProbeOffsetY;
                 profile.XYClearance = data.XYClearance;
                 profile.Depth = data.Depth;
                 profile.TouchPlateHeight = data.TouchPlateHeight;
@@ -173,6 +179,8 @@ namespace CNC.Controls.Probing
                     ProbeDiameter = 2d,
                     XYClearance = 5d,
                     Offset = 5d,
+                    ProbeOffsetX = 0d,
+                    ProbeOffsetY = 0d,
                     Depth = 3d,
                     TouchPlateHeight = 1d,
                     FixtureHeight = 1d

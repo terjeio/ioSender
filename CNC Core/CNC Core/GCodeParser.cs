@@ -1,13 +1,13 @@
 ﻿/*
  * GCodeParser.cs - part of CNC Controls library
  *
- * v0.28 / 2020-10-03 / Io Engineering (Terje Io)
+ * v0.29 / 2021-01-30 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2020, Io Engineering (Terje Io)
+Copyright (c) 2019-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -1507,7 +1507,7 @@ namespace CNC.GCode
                     bin.Serialize(stream, objToSerialize);
                 }
             }
-            catch (IOException)
+            catch (IOException e)
             {
             }
         }
@@ -1834,7 +1834,10 @@ namespace CNC.GCode
                 if (isRelative)
                 {
                     for (int i = 0; i < 3; i++)
-                        end[i] += start[i];
+                    {
+                        if(i != plane.AxisLinear)
+                            end[i] += start[i];
+                    }
                 }
 
                 if (IsRadiusMode)
@@ -2104,7 +2107,7 @@ namespace CNC.GCode
             int numPoints;
 
             if (arcResolution > 1d)
-                numPoints = (int)Math.Max(1d, (sweep / (Math.PI * 18d / 180d)));
+                numPoints = (int)Math.Max(8d, sweep * arcResolution / (Math.PI * 2d));
             else
                 numPoints = (int)Math.Floor(Math.Abs(0.5d * sweep * R) / Math.Sqrt(arcResolution * (2.0f * R - arcResolution)));
 

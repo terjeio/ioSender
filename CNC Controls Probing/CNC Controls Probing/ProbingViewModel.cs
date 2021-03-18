@@ -1,13 +1,13 @@
 ﻿/*
  * ProbingViewModel.cs - part of CNC Probing library
  *
- * v0.28 / 2020-10-20 / Io Engineering (Terje Io)
+ * v0.29 / 2021-02-10 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020, Io Engineering (Terje Io)
+Copyright (c) 2020-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -68,12 +68,12 @@ namespace CNC.Controls.Probing
         private double _rapidsFeedRate;
         private double _offset, _xyClearance, _depth;
         private double _tloReferenceOffset = double.NaN;
+        private double _probeOffsetX, _probeOffsetY;
 
         private bool _canProbe = false, _isComplete = false, _isSuccess = false, _probeZ = false, _useFixture = false;
         private bool _hasToolTable = false, _hasCs9 = false, _addAction = false, _isPaused = false, _isCorner = false;
         private bool isCancelled = false, wasZselected = false, _referenceToolOffset = true, _workpieceLockXY = true;
-        private bool _enableOffset = true, _enableXYD = true, _enableProbeDiameter = true;
-        private bool _enableFixtureHeight = true, _enableTouchPlateHeight = true, _enablePreview = false;
+        private bool _enablePreview = false;
         private GrblViewModel _grblmodel = null;
         private List<string> _program = new List<string>();
         private List<Position> _positions = new List<Position>();
@@ -187,6 +187,31 @@ namespace CNC.Controls.Probing
                 if (Grbl.GrblState.State != GrblStates.Idle)
                     res = null;
             }
+
+            return res == true;
+        }
+
+        public bool WaitForWcoUpdate()
+        {
+            bool? res = null;
+
+            // Wait for WCO update to get current work offsets
+
+            if (Grbl.Poller.IsEnabled)
+            {
+                new Thread(() =>
+                {
+                    res = WaitFor.SingleEvent<string>(
+                    cancellationToken,
+                    null,
+                    a => Grbl.OnWCOUpdated += a,
+                    a => Grbl.OnWCOUpdated -= a,
+                    5000);
+                }).Start();
+            }
+
+            while (res == null)
+                EventUtils.DoEvents();
 
             return res == true;
         }
@@ -308,13 +333,27 @@ namespace CNC.Controls.Probing
                 ProbeDiameter = _profile.ProbeDiameter;
                 Offset = _profile.Offset;
                 XYClearance = _profile.XYClearance;
+                ProbeOffsetX = _profile.ProbeOffsetX;
+                ProbeOffsetY = _profile.ProbeOffsetY;
                 Depth = _profile.Depth;
                 TouchPlateHeight = _profile.TouchPlateHeight;
                 FixtureHeight = _profile.FixtureHeight;
             }
         }
 
-        public ProbingType ProbingType { get { return _probingType; } set { _probingType = value; OnPropertyChanged(); OnPropertyChanged(nameof(TouchPlateHeightEnable)); } }
+        public ProbingType ProbingType
+        {
+            get { return _probingType; }
+            set {
+                _probingType = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(OffsetEnable));
+                OnPropertyChanged(nameof(XYOffsetEnable));
+                OnPropertyChanged(nameof(XYDEnable));
+                OnPropertyChanged(nameof(ProbeDiameterEnable));
+                OnPropertyChanged(nameof(TouchPlateHeightEnable));
+            }
+        }
         public string FastProbe { get { return string.Format(Probing.Command + "F{0}", ProbeFeedRate.ToInvariantString()); } }
         public string SlowProbe { get { return string.Format(Probing.Command + "F{0}", LatchFeedRate.ToInvariantString()); } }
         public string Instructions { get { return _instructions; } set { _instructions = value; OnPropertyChanged(); } }
@@ -334,13 +373,33 @@ namespace CNC.Controls.Probing
         public bool IsCompleted { get { return _isComplete; } set { _isComplete = value; OnPropertyChanged(); } }
         public bool IsSuccess { get { return _isSuccess; } set { _isSuccess = value; OnPropertyChanged(); } }
         public bool IsPaused { get { return _isPaused; } set { _isPaused = value; OnPropertyChanged(); } }
-        public bool ProbeZ { get { return _probeZ; } set { _probeZ = value; OnPropertyChanged(); OnPropertyChanged(nameof(TouchPlateHeightEnable)); } }
+        public bool ProbeZ
+        {
+            get { return _probeZ; }
+            set {
+                _probeZ = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(TouchPlateHeightEnable));
+                OnPropertyChanged(nameof(XYOffsetEnable));
+            }
+        }
         public string Tool { get { return _tool; } set { _tool = value; OnPropertyChanged(); } }
-        public bool ProbeFixture { get { return _useFixture; } set { _useFixture = value; OnPropertyChanged(); OnPropertyChanged(nameof(FixtureHeightEnable)); OnPropertyChanged(nameof(TouchPlateHeightEnable)); if (_useFixture) AddAction = false; } }
+        public bool ProbeFixture {
+            get { return _useFixture; }
+            set {
+                _useFixture = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(FixtureHeightEnable));
+                OnPropertyChanged(nameof(TouchPlateHeightEnable));
+                if (_useFixture)
+                    AddAction = false;
+            }
+        }
         public bool HasToolTable { get { return _hasToolTable; } set { _hasToolTable = value; OnPropertyChanged(); } }
         public bool HasCoordinateSystem9 { get { return _hasCs9; } set { _hasCs9 = value; OnPropertyChanged(); } }
-        public bool ReferenceToolOffset { get { return _referenceToolOffset; } set { _referenceToolOffset = value; OnPropertyChanged(); } }
-        public double TloReference { get { return _tloReferenceOffset; } set { _tloReferenceOffset = value; OnPropertyChanged(); } }
+        public bool ReferenceToolOffset { get { return _referenceToolOffset; } set { _referenceToolOffset = value && CanReferenceToolOffset; OnPropertyChanged(); OnPropertyChanged(nameof(FixtureHeightEnable)); } }
+        public bool CanReferenceToolOffset { get { return GrblInfo.Build >= 20200805 && GrblInfo.IsGrblHAL; } }
+        public double TloReference { get { return Grbl.IsTloReferenceSet ? _tloReferenceOffset : double.NaN; } set { _tloReferenceOffset = value; OnPropertyChanged(); } }
         public bool AddAction { get { return _addAction; } set { _addAction = value; OnPropertyChanged(); } }
   
         public bool HeightMapApplied
@@ -359,20 +418,18 @@ namespace CNC.Controls.Probing
         public List<Position> Machine { get { return _machine; } }
         public double XYClearance { get { return _xyClearance; } set { _xyClearance = value; OnPropertyChanged(); } }
         public double Offset { get { return _offset; } set { _offset = value; OnPropertyChanged(); } }
-        public bool OffsetEnable { get { return _enableOffset && _isCorner; } set { _enableOffset = value;  OnPropertyChanged(); } }
+        public double ProbeOffsetX { get { return _probeOffsetX; } set { _probeOffsetX = value; OnPropertyChanged(); } }
+        public double ProbeOffsetY { get { return _probeOffsetY; } set { _probeOffsetY = value; OnPropertyChanged(); } }
+        public bool ProbeIsOffset { get { return !(_probeOffsetX == 0d && _probeOffsetY == 0d); } }
+        public bool OffsetEnable { get { return (_probingType == ProbingType.EdgeFinderInternal || _probingType == ProbingType.EdgeFinderExternal) && _isCorner; } }
+        public bool XYOffsetEnable { get { return ((_probingType == ProbingType.EdgeFinderInternal || _probingType == ProbingType.EdgeFinderExternal) && _edge != Edge.None && _edge != Edge.Z) || _probingType == ProbingType.CenterFinder; } }
         public double Depth { get { return _depth; } set { _depth = value; OnPropertyChanged(); } }
         public string RapidCommand { get { return RapidsFeedRate == 0d ? "G0" : "G1F" + RapidsFeedRate.ToInvariantString(); } }
         public string ProbeProgram { get { return Program.ToString().Replace("G53", string.Empty); } }
-        public bool XYDEnable { get { return _enableXYD; } set { _enableXYD = value; OnPropertyChanged(); } }
-        public bool ProbeDiameterEnable { get { return _enableProbeDiameter && (_probingType == ProbingType.EdgeFinderInternal || _probingType == ProbingType.EdgeFinderExternal ? _edge != Edge.Z : true); } set { _enableProbeDiameter = value; OnPropertyChanged(); } }
-        public bool FixtureHeightEnable { get { return _enableFixtureHeight && _useFixture; } set { _enableFixtureHeight = value; OnPropertyChanged(); } }
-        public bool TouchPlateHeightEnable
-        {
-            get {
-                return _enableTouchPlateHeight && (_probingType == ProbingType.ToolLength ? !_useFixture : _probeZ || _probingType == ProbingType.HeightMap || _probingType == ProbingType.None);
-            }
-            set { _enableTouchPlateHeight = value; OnPropertyChanged(); }
-        }
+        public bool XYDEnable { get { return _probingType == ProbingType.EdgeFinderInternal || _probingType == ProbingType.EdgeFinderExternal || _probingType == ProbingType.CenterFinder; } }
+        public bool ProbeDiameterEnable { get { return _probingType == ProbingType.CenterFinder || ((_probingType == ProbingType.EdgeFinderInternal || _probingType == ProbingType.EdgeFinderExternal) && _edge != Edge.Z); } }
+        public bool FixtureHeightEnable { get { return _probingType == ProbingType.ToolLength && _useFixture /*&& !ReferenceToolOffset && !Grbl.IsTloReferenceSet*/; } }
+        public bool TouchPlateHeightEnable { get { return _probingType == ProbingType.ToolLength ? !_useFixture : (_probingType == ProbingType.EdgeFinderExternal || _probingType == ProbingType.EdgeFinderInternal ? _probeZ : _probingType == ProbingType.HeightMap); } }
 
         public string Message
         {
@@ -437,7 +494,16 @@ namespace CNC.Controls.Probing
         }
         public string PreviewText { get { return _previewText; } set { _previewText = value; OnPropertyChanged(); } }
 
-        public bool ProbeCorner { get { return _isCorner; } set { _isCorner = value; OnPropertyChanged(); OnPropertyChanged(nameof(OffsetEnable)); } }
+        public bool ProbeCorner
+        {
+            get { return _isCorner; }
+            set {
+                _isCorner = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(OffsetEnable));
+                OnPropertyChanged(nameof(XYOffsetEnable));
+            }
+        }
         public Center ProbeCenter { get { return _center; } set { _center = value; OnPropertyChanged(); } }
         public bool WorkpiecLockXY
         {

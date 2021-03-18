@@ -1,7 +1,7 @@
 ﻿/*
  * About.xaml.cs - part of CNC Controls library
  *
- * v0.27 / 2020-09-26 / Io Engineering (Terje Io)
+ * v0.29 / 2021-01-12 / Io Engineering (Terje Io)
  *
  */
 
@@ -58,7 +58,7 @@ namespace CNC.Controls
             txtGrblVersion.Content = GrblInfo.Version;
             txtGrblOptions.Content = GrblInfo.Options;
             txtGrblNewOpts.Content = GrblInfo.NewOptions;
-            grpGrbl.Header = GrblInfo.IsGrblHAL ? "grblHAL" : "grbl";
+            grpGrbl.Header = GrblInfo.Firmware;
 
             if (GrblInfo.Identity != "")
                 grpGrbl.Header += ": " + GrblInfo.Identity;

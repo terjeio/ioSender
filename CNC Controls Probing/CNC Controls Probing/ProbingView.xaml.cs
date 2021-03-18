@@ -1,13 +1,13 @@
 ﻿/*
  * ProbingView.xaml.cs - part of CNC Probing library
  *
- * v0.28 / 2020-10-20 / Io Engineering (Terje Io)
+ * v0.29 / 2021-02-25 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020, Io Engineering (Terje Io)
+Copyright (c) 2020-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -54,7 +54,7 @@ namespace CNC.Controls.Probing
     /// </summary>
     public partial class ProbingView : UserControl, ICNCView
     {
-        private bool jogEnabled = false, probeTriggered = false, probeDisconnected = false;
+        private bool jogEnabled = false, probeTriggered = false, probeDisconnected = false, cycleStartSignal = false;
         private ProbingViewModel model = null;
         private ProbingProfiles profiles = new ProbingProfiles();
         private KeypressHandler keyboard = null;
@@ -182,8 +182,34 @@ namespace CNC.Controls.Probing
                     probeTriggered = grbl.Signals.Value.HasFlag(Signals.Probe);
                     probeDisconnected = grbl.Signals.Value.HasFlag(Signals.ProbeDisconnected);
                     DisplayPosition(grbl);
+                    var signals = ((GrblViewModel)sender).Signals.Value;
+                    if (signals.HasFlag(Signals.CycleStart) && !signals.HasFlag(Signals.Hold) && !cycleStartSignal)
+                        StartProbe(Key.R);
+                    cycleStartSignal = signals.HasFlag(Signals.CycleStart);
                     break;
             }
+        }
+
+        private void ProbingView_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            showProbeProperties();
+        }
+
+        private void showProbeProperties()
+        {
+            double height;
+
+            if (probeProperties.Visibility == Visibility.Collapsed)
+            {
+                probeProperties.Visibility = Visibility.Hidden;
+                probeProperties.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+                height = probeProperties.DesiredSize.Height;
+                probeProperties.Visibility = Visibility.Collapsed;
+            }
+            else
+                height = probeProperties.ActualHeight;
+
+            probeProperties.Visibility = (dp.ActualHeight - t1.ActualHeight - Jog.ActualHeight + probeProperties.ActualHeight) > height ? Visibility.Visible : Visibility.Collapsed;
         }
 
         #region Methods required by CNCView interface
@@ -214,7 +240,8 @@ namespace CNC.Controls.Probing
                 if (!model.Grbl.IsGrblHAL && !AppConfig.Settings.Jog.KeyboardEnable)
                     Jog.Visibility = Visibility.Collapsed;
 
-                GrblParserState.Get(!GrblInfo.IsGrblHAL);
+                GrblWorkParameters.Get();
+                GrblParserState.Get(true);
                 model.DistanceMode = GrblParserState.DistanceMode;
                 model.Tool = model.Grbl.Tool == GrblConstants.NO_TOOL ? "0" : model.Grbl.Tool;
                 model.CanProbe = !model.Grbl.Signals.Value.HasFlag(Signals.Probe);
@@ -234,6 +261,7 @@ namespace CNC.Controls.Probing
 
                 probeTriggered = model.Grbl.Signals.Value.HasFlag(Signals.Probe);
                 probeDisconnected = model.Grbl.Signals.Value.HasFlag(Signals.ProbeDisconnected);
+                cycleStartSignal = model.Grbl.Signals.Value.HasFlag(Signals.CycleStart);
 
                 DisplayPosition(model.Grbl);
             }
@@ -338,18 +366,12 @@ namespace CNC.Controls.Probing
 
         private void tab_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-
             var view = getView(((sender as TabControl).SelectedItem as TabItem));
             if (view != null)
             {
                 model.ProbingType = view.ProbingType;
                 model.Message = string.Empty;
                 model.PreviewEnable = false;
-                model.OffsetEnable = view.ProbingType == ProbingType.EdgeFinderInternal || view.ProbingType == ProbingType.EdgeFinderExternal;
-                model.XYDEnable = view.ProbingType == ProbingType.EdgeFinderInternal || view.ProbingType == ProbingType.EdgeFinderExternal || view.ProbingType == ProbingType.CenterFinder;
-                model.ProbeDiameterEnable = model.XYDEnable;
-                model.TouchPlateHeightEnable = view.ProbingType != ProbingType.CenterFinder && !(view.ProbingType == ProbingType.ToolLength && model.FixtureHeightEnable);
-                model.FixtureHeightEnable = view.ProbingType == ProbingType.ToolLength;
 
                 if (GrblInfo.IsGrblHAL)
                     Comms.com.WriteByte(GrblConstants.CMD_STATUS_REPORT_ALL);

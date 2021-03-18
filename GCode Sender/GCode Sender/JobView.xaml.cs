@@ -1,13 +1,13 @@
 /*
  * JobView.xaml.cs - part of Grbl Code Sender
  *
- * v0.28 / 2020-12-04 / Io Engineering (Terje Io)
+ * v0.29 / 2021-01-15 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2020, Io Engineering (Terje Io)
+Copyright (c) 2019-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -43,6 +43,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.ComponentModel;
 using System.Threading.Tasks;
+using System.Threading;
 using System.Windows.Threading;
 using CNC.Core;
 using CNC.Controls;
@@ -55,7 +56,7 @@ namespace GCode_Sender
     public partial class JobView : UserControl, ICNCView
     {
         private bool? initOK = null;
-        private bool sdStream = false;
+        private bool sdStream = false, resetPending = false;
         private GrblViewModel model;
         private KeypressHandler keyboard = null;
         private IInputElement focusedControl = null;
@@ -81,11 +82,13 @@ namespace GCode_Sender
 
         private void OnDataContextPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (sender is GrblViewModel) switch(e.PropertyName)
-            {
+            if (sender is GrblViewModel) switch (e.PropertyName)
+                {
                 case nameof(GrblViewModel.GrblState):
-                    if (initOK == false && (sender as GrblViewModel).GrblState.State != GrblStates.Alarm)
-                        InitSystem();
+                    if (!resetPending) {
+                        if (initOK == false && (sender as GrblViewModel).GrblState.State != GrblStates.Alarm)
+                            InitSystem();
+                    }
                     break;
 
                 case nameof(GrblViewModel.IsSleepMode):
@@ -110,13 +113,16 @@ namespace GCode_Sender
                 case nameof(GrblViewModel.GrblReset):
                     if ((sender as GrblViewModel).IsReady)
                     {
-                        initOK = null;
-                        Dispatcher.BeginInvoke(new System.Action(() => Activate(true, ViewType.GRBL)), DispatcherPriority.ApplicationIdle);
+                        if (!resetPending)
+                        {
+                            initOK = null;
+                            Dispatcher.BeginInvoke(new System.Action(() => Activate(true, ViewType.GRBL)), DispatcherPriority.ApplicationIdle);
+                        }
                     }
                     break;
 
                 case nameof(GrblViewModel.ParserState):
-                    if ((sender as GrblViewModel).GrblReset)
+                    if (!resetPending && (sender as GrblViewModel).GrblReset)
                     {
                         EnableUI(true);
                         (sender as GrblViewModel).GrblReset = false;
@@ -156,7 +162,36 @@ namespace GCode_Sender
             }
         }
 
-#region Methods required by CNCView interface
+        #region Methods required by CNCView interface
+
+        private void TrapReset(string rws)
+        {
+            resetPending = false;
+        }
+
+        private bool AttemptReset ()
+        {
+            resetPending = true;
+            Comms.com.PurgeQueue();
+
+            bool? res = null;
+            CancellationToken cancellationToken = new CancellationToken();
+
+            new Thread(() =>
+            {
+                res = WaitFor.SingleEvent<string>(
+                    cancellationToken,
+                    s => TrapReset(s),
+                    a => model.OnGrblReset += a,
+                    a => model.OnGrblReset -= a,
+                    AppConfig.Settings.Base.ResetDelay, () => Comms.com.WriteByte(GrblConstants.CMD_RESET));
+            }).Start();
+
+            while (res == null)
+                EventUtils.DoEvents();
+
+            return !resetPending;
+        }
 
         public ViewType ViewType { get { return ViewType.GRBL; } }
 
@@ -168,30 +203,158 @@ namespace GCode_Sender
                 GCodeSender.CallHandler(GCode.File.IsLoaded ? StreamingState.Idle : (sdStream ? StreamingState.Start : StreamingState.NoFile), false);
                 sdStream = false;
 
+                model.ResponseLogFilterOk = AppConfig.Settings.Base.FilterOkResponse;
+
                 if (initOK != true)
                 {
                     focusedControl = this;
+
+                    var message = (DataContext as GrblViewModel).Message;
                     model.Message = string.Format("Waiting for controller ({0})...", AppConfig.Settings.Base.PortParams);
 
                     string response = GrblInfo.Startup();
 
-                    if (response.StartsWith("<Alarm"))
+                    if (response.StartsWith("<"))
                     {
-                        GrblViewModel data = DataContext as GrblViewModel;
-                        data.ParseStatus(response);
+                        GrblViewModel model = DataContext as GrblViewModel;
+                        model.ParseStatus(response);
 
-                        // Alarm 1, 2 and 10 are critical events
-                        if (!(data.GrblState.Substate == 1 || data.GrblState.Substate == 2 || data.GrblState.Substate == 10))
-                            InitSystem();
+                        if(model.GrblState.State != GrblStates.Unknown) {
+
+                            switch(model.GrblState.State)
+                            {
+                                case GrblStates.Alarm:
+                                    switch (model.GrblState.Substate)
+                                    {
+                                        case 1: // Hard limits
+                                            if (!GrblInfo.IsLoaded)
+                                            {
+                                                if (model.LimitTriggered)
+                                                {
+                                                    MessageBox.Show(string.Format("Controller is not able to communicate due to alarm {0}, attempting a soft reset.", model.GrblState.Substate.ToString()), "ioSender");
+                                                    if (AttemptReset())
+                                                        model.ExecuteCommand(GrblConstants.CMD_UNLOCK);
+                                                    else
+                                                    {
+                                                        MessageBox.Show("Controller soft reset failed, exiting.", "ioSender");
+                                                        MainWindow.ui.Close();
+                                                    }
+                                                }
+                                                else if (AttemptReset())
+                                                    model.ExecuteCommand(GrblConstants.CMD_UNLOCK);
+                                            } else
+                                                response = string.Empty;
+                                            break;
+
+                                        case 2: // Soft limits
+                                            if (!GrblInfo.IsLoaded)
+                                            {
+                                                MessageBox.Show(string.Format("Controller is not able to communicate due to alarm {0}, attempting a soft reset.", model.GrblState.Substate.ToString()), "ioSender");
+                                                if (AttemptReset())
+                                                    model.ExecuteCommand(GrblConstants.CMD_UNLOCK);
+                                                else
+                                                {
+                                                    MessageBox.Show("Controller soft reset failed, exiting.", "ioSender");
+                                                    MainWindow.ui.Close();
+                                                }
+                                            } else
+                                                response = string.Empty;
+                                            break;
+
+                                        case 10: // EStop
+                                            if (GrblInfo.IsGrblHAL && model.Signals.Value.HasFlag(Signals.EStop))
+                                            {
+                                                MessageBox.Show("E-Stop active! - clear before continuing.", "ioSender", MessageBoxButton.OK, MessageBoxImage.Warning);
+                                                while (!AttemptReset() && model.GrblState.State == GrblStates.Alarm)
+                                                {
+                                                    if (MessageBox.Show("E-Stop still active, exit?", "ioSender", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                                                        MainWindow.ui.Close();
+                                                };
+                                            }
+                                            else
+                                                AttemptReset();
+                                            if (!GrblInfo.IsLoaded)
+                                                model.ExecuteCommand(GrblConstants.CMD_UNLOCK);
+                                            break;
+
+                                        case 11: // Homing required
+                                            if (GrblInfo.IsLoaded)
+                                                response = string.Empty;
+                                            else
+                                                message = "Homing cycle required, <Home> to continue";
+                                            break;
+                                    }
+                                    break;
+
+                                case GrblStates.Tool:
+                                    Comms.com.WriteByte(GrblConstants.CMD_STOP);
+                                    break;
+
+                                case GrblStates.Door:
+                                    if (!GrblInfo.IsLoaded)
+                                    {
+                                        if (MessageBox.Show("Door is open, close door and continue?", "ioSender", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+                                            MainWindow.ui.Close();
+                                        else
+                                        {
+                                            bool exit = false;
+                                            do
+                                            {
+                                                Comms.com.PurgeQueue();
+
+                                                bool? res = null;
+                                                CancellationToken cancellationToken = new CancellationToken();
+
+                                                new Thread(() =>
+                                                {
+                                                    res = WaitFor.SingleEvent<string>(
+                                                        cancellationToken,
+                                                        s => TrapReset(s),
+                                                        a => model.OnGrblReset += a,
+                                                        a => model.OnGrblReset -= a,
+                                                        200, () => Comms.com.WriteByte(GrblConstants.CMD_STATUS_REPORT));
+                                                }).Start();
+
+                                                while (res == null)
+                                                    EventUtils.DoEvents();
+
+                                                if (!(exit = !model.Signals.Value.HasFlag(Signals.SafetyDoor)))
+                                                {
+                                                    if (MessageBox.Show("Door is still open, exit?", "ioSender", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                                                    {
+                                                        exit = true;
+                                                        MainWindow.ui.Close();
+                                                    }
+                                                }
+                                            } while (!exit);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        MessageBox.Show("Door state cannot be cleared with <Reset>", "ioSender", MessageBoxButton.YesNo, MessageBoxImage.Exclamation);
+                                        response = string.Empty;
+                                    }
+                                    break;
+
+                                case GrblStates.Hold:
+                                case GrblStates.Sleep:
+                                    if (MessageBox.Show(string.Format("Controller is in {0} state and cannot respond, try a soft reset?", model.GrblState.State.ToString()),
+                                                         "ioSender", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+                                        MainWindow.ui.Close();
+                                    else if (!AttemptReset())
+                                    {
+                                        MessageBox.Show("Controller soft reset failed, exiting.", "ioSender");
+                                        MainWindow.ui.Close();
+                                    }
+                                    break;
+                            }
+                        }
                     }
-                    else if (response.StartsWith("<Tool"))
-                    {
-                        Comms.com.WriteByte(GrblConstants.CMD_STOP);
-                        GrblViewModel data = DataContext as GrblViewModel;
-                        data.ParseStatus(Comms.com.Reply);
-                    }
-                    else if (response != string.Empty)
+
+                    if (response != string.Empty)
                         InitSystem();
+
+                    (DataContext as GrblViewModel).Message = message;
                 }
 
                 if (initOK == null)
@@ -251,7 +414,7 @@ namespace GCode_Sender
             if (limitsControl.Visibility == Visibility.Collapsed)
             {
                 limitsControl.Visibility = Visibility.Hidden;
-                limitsControl.Measure(new Size(Double.PositiveInfinity, Double.PositiveInfinity));
+                limitsControl.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
                 height = limitsControl.DesiredSize.Height;
                 limitsControl.Visibility = Visibility.Collapsed;
             }
@@ -296,7 +459,6 @@ namespace GCode_Sender
             initOK = true;
             int timeout = 5;
 
-            // TODO: check if grbl is in a state that allows replies
             using (new UIUtils.WaitCursor())
             {
                 GCodeSender.EnablePolling(false);
@@ -316,8 +478,6 @@ namespace GCode_Sender
                 GrblWorkParameters.Get();
                 GCodeSender.EnablePolling(true);
             }
-
-            model.Message = string.Empty;
 
             GrblCommand.ToolChange = GrblInfo.ManualToolChange ? "M61Q{0}" : "T{0}";
 
@@ -366,8 +526,9 @@ namespace GCode_Sender
             else
                 MainWindow.ShowView(false, ViewType.Tools);
 
-            if(GrblSettings.ReportProbeCoordinates)
+            if(GrblInfo.HasProbe && GrblSettings.ReportProbeCoordinates)
                 MainWindow.EnableView(true, ViewType.Probing);
+
             MainWindow.EnableView(true, ViewType.Offsets);
             MainWindow.EnableView(true, ViewType.GRBLConfig);
 

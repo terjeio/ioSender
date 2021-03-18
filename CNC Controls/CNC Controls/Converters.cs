@@ -1,13 +1,13 @@
 /*
  * Converters.cs - part of CNC Controls library for Grbl
  *
- * v0.28 / 2020-10-04 / Io Engineering (Terje Io)
+ * v0.29 / 2021-02-02 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2020, Io Engineering (Terje Io)
+Copyright (c) 2019-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -72,6 +72,7 @@ namespace CNC.Controls
         public static EnumValueToBooleanConverter EnumValueToBooleanConverter = new EnumValueToBooleanConverter();
         public static StringAddToConverter StringAddToConverter = new StringAddToConverter();
         public static MultiLineConverter MultiLineConverter = new MultiLineConverter();
+        public static PositionToStringConverter PositionToStringConverter = new PositionToStringConverter();
     }
 
     // Adapted from: https://stackoverflow.com/questions/4353186/binding-observablecollection-to-a-textbox/8847910#8847910
@@ -132,6 +133,25 @@ namespace CNC.Controls
             throw new NotImplementedException();
         }
     }
+
+    public class PositionToStringConverter : IMultiValueConverter
+    {
+        public object Convert(object[] value, Type targetType, object parameter, CultureInfo culture)
+        {
+            string format = value.Length > 1 && value[1] is string ? value[1] as string : "####0.000";
+
+            return value[0] is Position ? string.Format("X:{0}  Y:{1}  Z:{2}",
+                                            (value[0] as Position).X.ToInvariantString(format),
+                                             (value[0] as Position).Y.ToInvariantString(format),
+                                              (value[0] as Position).Z.ToInvariantString(format)) : string.Empty;
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class GrblStateToColorConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -157,8 +177,8 @@ namespace CNC.Controls
             // If ALARM:11 homing is required
             bool result = value[0] is GrblState && ((GrblState)value[0]).State == GrblStates.Alarm && ((GrblState)value[0]).Substate == 11;
 
-            if (!result && GrblSettings.HomingEnabled && value.Length > 2 && value[1] is bool && !(bool)value[1] && value[2] is bool && !(bool)value[2])
-                result = value[0] is GrblState && !((GrblState)value[0]).MPG && ((GrblState)value[0]).State == GrblStates.Idle;
+            if (!result && GrblInfo.HomingEnabled && value.Length > 2 && value[1] is bool && !(bool)value[1] && value[2] is bool && !(bool)value[2])
+                result = value[0] is GrblState && !((GrblState)value[0]).MPG && (((GrblState)value[0]).State == GrblStates.Idle || !GrblInfo.IsGrblHAL);
 
             return result;
         }
@@ -232,10 +252,11 @@ namespace CNC.Controls
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            String result = string.Empty;
+            string result = string.Empty;
+            int substate = ((GrblState)value).State == GrblStates.Alarm && ((GrblState)value).LastAlarm > 0 ? ((GrblState)value).LastAlarm : ((GrblState)value).Substate;
 
             if (value is GrblState && ((GrblState)value).State != GrblStates.Unknown) 
-                result = ((GrblState)value).State.ToString().ToUpper() + (((GrblState)value).Substate == -1 ? "" : (":" + ((GrblState)value).Substate.ToString()));
+                result = ((GrblState)value).State.ToString().ToUpper() + (substate == -1 ? "" : (":" + substate.ToString()));
 
             return result;
         }

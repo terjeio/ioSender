@@ -1,13 +1,13 @@
 ﻿/*
  * CenterFinderControl.xaml.cs - part of CNC Probing library
  *
- * v0.28 / 2020-12-14 / Io Engineering (Terje Io)
+ * v0.29 / 2021-01-15 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020, Io Engineering (Terje Io)
+Copyright (c) 2020-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -333,12 +333,18 @@ namespace CNC.Controls.Probing
                 {
                     if (probing.CoordinateMode == ProbingViewModel.CoordMode.G92)
                     {
-                        probing.Grbl.ExecuteCommand("G92X0Y0");
+                        center.X = probing.ProbeOffsetX;
+                        center.Y = probing.ProbeOffsetY;
+                        probing.Grbl.ExecuteCommand("G92" + center.ToString(axisflags));
                         if (!probing.Grbl.IsParserStateLive)
                             probing.Grbl.ExecuteCommand("$G");
                     }
                     else
+                    {
+                        center.X += probing.ProbeOffsetX;
+                        center.Y += probing.ProbeOffsetY;
                         probing.Grbl.ExecuteCommand(string.Format("G10L2P{0}{1}", probing.CoordinateSystem, center.ToString(axisflags)));
+                    }
                 }
 
                 if (!ok || pass == 1)
@@ -357,7 +363,12 @@ namespace CNC.Controls.Probing
 
             probing.Program.AddRapidToMPos(probing.StartPosition, axisflags);
             if (probing.CoordinateMode == ProbingViewModel.CoordMode.G92)
-                probing.Program.Add("G92X0Y0");
+            {
+                var center = new Position();
+                center.X = probing.ProbeOffsetX;
+                center.Y = probing.ProbeOffsetY;
+                probing.Program.Add("G92" + center.ToString(axisflags));
+            }
             else
                 probing.Program.Add(string.Format("G10L2P{0}{1}", probing.CoordinateSystem, probing.StartPosition.ToString(axisflags)));
         }

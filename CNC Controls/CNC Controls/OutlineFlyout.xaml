@@ -1,0 +1,36 @@
+﻿<UserControl x:Class="CNC.Controls.OutlineFlyout"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CNC.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="150" d:DesignWidth="300"
+             Loaded="OutlineFlyout_Loaded">
+    <UserControl.Resources>
+        <Style x:Key="SmallXButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid Background="{TemplateBinding Background}">
+                            <ContentPresenter HorizontalAlignment="Center"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+    <Border BorderBrush="DarkGray" BorderThickness="1" CornerRadius="3" Background="#FFE5E5EA">
+        <Grid Height="150">
+            <TextBlock HorizontalAlignment="Center" Margin="0,20,0,0" Width="280" VerticalAlignment="Top">
+                <Run Text="Execute moves to outline X and Y program limits."/>
+                <LineBreak/>
+                <Run Text="Ensure tool tip is clear of any obstructions!" Foreground="Red" FontWeight="Bold"/>
+            </TextBlock>
+            <local:NumericField Label="Feed rate:" Value="{Binding Path=FeedRate, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=UserControl}}" Unit="{Binding Path=FeedrateUnit, Mode=OneWay}" Format="###0" HorizontalAlignment="Left" Margin="5,75,0,0" VerticalAlignment="Top"/>
+            <Button Content="Go" IsEnabled="{Binding Path=IsFileLoaded}" Width="50" Height="25" HorizontalAlignment="Right" Margin="0,0,8,8" VerticalAlignment="Bottom" Click="button_Go" />
+            <Button Content="×" Focusable="False" Style="{StaticResource SmallXButtonStyle}" VerticalContentAlignment="Top" HorizontalAlignment="Left" Margin="285,0,0,0" VerticalAlignment="Top" Width="14" Height="18" Click="btn_Close"/>
+        </Grid>
+    </Border>
+</UserControl>

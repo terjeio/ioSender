@@ -60,13 +60,14 @@
                 <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
             </DataGrid.Columns>
         </DataGrid>
-        <DockPanel x:Name="dpan" DockPanel.Dock="Left" Visibility="Hidden">
+        <DockPanel x:Name="dpan" DockPanel.Dock="Left">
             <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Left" Height="Auto" Margin="10,0,0,10" VerticalAlignment="Top" Width="Auto">
-                <Button x:Name="btnReload" Content="Reload" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Click="btnReload_Click"/>
-                <Button x:Name="btnSave" Content="Save" HorizontalAlignment="Left" Margin="5,0,0,0" VerticalAlignment="Top" Width="75" Click="btnSave_Click"/>
-                <Button x:Name="btnBackup" Content="Backup" HorizontalAlignment="Left" Margin="5,0,0,0" VerticalAlignment="Top" Width="75" Click="btnBackup_Click"/>
+                <Button x:Name="btnReload" Content="Reload" ToolTip="Reload settings from controller." HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Click="btnReload_Click"/>
+                <Button x:Name="btnSave" Content="Save" ToolTip="Save changed settings to controller." HorizontalAlignment="Left" Margin="5,0,0,0" VerticalAlignment="Top" Width="75" Click="btnSave_Click"/>
+                <Button x:Name="btnBackup" Content="Backup" HorizontalAlignment="Left" Margin="100,0,0,0" VerticalAlignment="Top" Width="75" Click="btnBackup_Click"/>
+                <Button x:Name="btnRestore" Content="Restore" HorizontalAlignment="Left" Margin="5,0,0,0" VerticalAlignment="Top" Width="75" Click="btnRestore_Click"/>
             </StackPanel>
-            <StackPanel DockPanel.Dock="Top" HorizontalAlignment="Left" Height="Auto" Margin="5,15,0,0" VerticalAlignment="Top">
+            <StackPanel x:Name="details" DockPanel.Dock="Top" HorizontalAlignment="Left" Height="Auto" Margin="5,15,0,0" VerticalAlignment="Top">
                 <StackPanel x:Name="canvas" HorizontalAlignment="Left" Height="Auto" VerticalAlignment="Center" Width="455"/>
                 <TextBox x:Name="txtDescription" Background="#FFF8F8F8" IsReadOnly="True" HorizontalAlignment="Left" Height="225" TextWrapping="Wrap" VerticalAlignment="Top" Width="450"/>
             </StackPanel>
