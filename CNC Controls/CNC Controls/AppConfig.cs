@@ -1,7 +1,7 @@
 ﻿/*
  * AppConfig.cs - part of CNC Controls library for Grbl
  *
- * v0.29 / 2021-01-05 / Io Engineering (Terje Io)
+ * v0.29 / 2021-03-22 / Io Engineering (Terje Io)
  *
  */
 
@@ -263,6 +263,10 @@ namespace CNC.Controls
                 {
                     case "-inifile":
                         CNC.Core.Resources.IniName = GetArg(args, p++);
+                        break;
+
+                    case "-debugfile":
+                        CNC.Core.Resources.DebugFile = GetArg(args, p++);
                         break;
 
                     case "-configmapping":

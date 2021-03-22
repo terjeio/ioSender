@@ -1,13 +1,13 @@
 ﻿/*
  * EltimaStream.cs - part of CNC Controls library
  *
- * v0.18 / 2020-05-09 / Io Engineering (Terje Io)
+ * v0.29 / 2021-03-22 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2020, Io Engineering (Terje Io)
+Copyright (c) 2018-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -67,7 +67,7 @@ namespace CNC.Core
         {
             Comms.com = this;
             Dispatcher = dispatcher;
-            Reply = "";
+            Reply = string.Empty;
 
             if (PortParams.IndexOf(":") < 0)
                 PortParams += ":115200,N,8,1";
@@ -141,7 +141,13 @@ namespace CNC.Core
                 }
 
 #if RESPONSELOG
-                log = new StreamWriter(@"D:\grbl.txt");
+                if (Resources.DebugFile != string.Empty) try
+                {
+                    log = new StreamWriter(Resources.DebugFile);
+                } catch
+                {
+                    MessageBox.Show("Unable to open log file: " + Resources.DebugFile, "GCode Sender");
+                }
 #endif
             }
         }
@@ -170,7 +176,7 @@ namespace CNC.Core
         public void PurgeQueue()
         {
             serialPort.PurgeQueue();
-            Reply = "";
+            Reply = string.Empty;
         }
 
         private Parity ParseParity(string parity)
@@ -261,7 +267,7 @@ namespace CNC.Core
         public void AwaitAck(string command)
         {
             PurgeQueue();
-            Reply = "";
+            Reply = string.Empty;
             WriteCommand(command);
 
             while (Comms.com.CommandState == Comms.State.DataReceived || Comms.com.CommandState == Comms.State.AwaitAck)
@@ -277,7 +283,7 @@ namespace CNC.Core
         public void AwaitResponse(string command)
         {
             PurgeQueue();
-            Reply = "";
+            Reply = string.Empty;
             WriteCommand(command);
 
             while (Comms.com.CommandState == Comms.State.AwaitAck)
@@ -286,7 +292,7 @@ namespace CNC.Core
 
         public string GetReply(string command)
         {
-            Reply = "";
+            Reply = string.Empty;
             WriteCommand(command);
 
             AwaitResponse();

@@ -1,13 +1,13 @@
 ﻿/*
  * SerialStream.cs - part of CNC Controls library
  *
- * v0.28 / 2020-09-12 / Io Engineering (Terje Io)
+ * v0.29 / 2021-03-22 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2020, Io Engineering (Terje Io)
+Copyright (c) 2018-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -66,7 +66,7 @@ StreamWriter log = null;
         {
             Comms.com = this;
             Dispatcher = dispatcher;
-            Reply = "";
+            Reply = string.Empty;
 
             if (PortParams.IndexOf(":") < 0)
                 PortParams += ":115200,N,8,1";
@@ -144,7 +144,13 @@ StreamWriter log = null;
                 }
 
 #if RESPONSELOG
-        log = new StreamWriter(@"D:\grbl.txt");
+                if (Resources.DebugFile != string.Empty) try
+                {
+                    log = new StreamWriter(Resources.DebugFile);
+                } catch
+                {
+                    MessageBox.Show("Unable to open log file: " + Resources.DebugFile, "GCode Sender");
+                }
 #endif
             }
         }
@@ -174,7 +180,7 @@ StreamWriter log = null;
         {
             serialPort.DiscardInBuffer();
             serialPort.DiscardOutBuffer();
-            Reply = "";
+            Reply = string.Empty;
         }
 
         private Parity ParseParity(string parity)
@@ -265,7 +271,7 @@ StreamWriter log = null;
         public void AwaitAck(string command)
         {
             PurgeQueue();
-            Reply = "";
+            Reply = string.Empty;
             WriteCommand(command);
 
             while (Comms.com.CommandState == Comms.State.DataReceived || Comms.com.CommandState == Comms.State.AwaitAck)
@@ -281,7 +287,7 @@ StreamWriter log = null;
         public void AwaitResponse(string command)
         {
             PurgeQueue();
-            Reply = "";
+            Reply = string.Empty;
             WriteCommand(command);
 
             while (Comms.com.CommandState == Comms.State.AwaitAck)
@@ -290,7 +296,7 @@ StreamWriter log = null;
 
         public string GetReply(string command)
         {
-            Reply = "";
+            Reply = string.Empty;
             WriteCommand(command);
 
             AwaitResponse();
@@ -318,7 +324,7 @@ StreamWriter log = null;
 
                 while (input.Length > 0 && (pos = gp()) > 0)
                 {
-                    Reply = pos == 0 ? "" : input.ToString(0, pos - 1);
+                    Reply = pos == 0 ? string.Empty : input.ToString(0, pos - 1);
                     input.Remove(0, pos + 1);
 #if RESPONSELOG
                     if (log != null)

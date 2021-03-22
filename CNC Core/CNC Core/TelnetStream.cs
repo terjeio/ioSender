@@ -1,13 +1,13 @@
 /*
  * TelnetStream.cs - part of CNC Controls library
  *
- * v0.26 / 2020-09-04 / Io Engineering (Terje Io)
+ * v0.29 / 2021-03-22 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2020, Io Engineering (Terje Io)
+Copyright (c) 2018-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -58,7 +58,7 @@ namespace CNC.Core
         public TelnetStream(string host, Dispatcher dispatcher)
         {
             Comms.com = this;
-            Reply = "";
+            Reply = string.Empty;
             Dispatcher = dispatcher;
 
             if (!host.Contains(":"))
@@ -67,15 +67,15 @@ namespace CNC.Core
             string[] parameter = host.Split(':');
 
             if (parameter.Length == 2) try
-                {
-                    ipserver = new TcpClient(parameter[0], int.Parse(parameter[1]));
-                    ipserver.NoDelay = true;
-                    ipstream = ipserver.GetStream();
-                    ipstream.BeginRead(buffer, 0, buffer.Length, ReadComplete, buffer);
-                }
-                catch
-                {
-                }
+            {
+                ipserver = new TcpClient(parameter[0], int.Parse(parameter[1]));
+                ipserver.NoDelay = true;
+                ipstream = ipserver.GetStream();
+                ipstream.BeginRead(buffer, 0, buffer.Length, ReadComplete, buffer);
+            }
+            catch
+            {
+            }
         }
 
         ~TelnetStream()
@@ -93,7 +93,7 @@ namespace CNC.Core
         {
             while (ipstream.DataAvailable)
                 ipstream.ReadByte();
-            Reply = "";
+            Reply = string.Empty;
         }
 
         public void Close()
@@ -160,7 +160,7 @@ namespace CNC.Core
 
         public string GetReply(string command)
         {
-            Reply = "";
+            Reply = string.Empty;
             WriteCommand(command);
 
             while (state == Comms.State.AwaitAck)

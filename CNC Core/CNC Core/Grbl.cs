@@ -1,7 +1,7 @@
 ﻿/*
  * Grbl.cs - part of CNC Controls library
  *
- * v0.29 / 2021-03-16 / Io Engineering (Terje Io)
+ * v0.29 / 2021-03-22 / Io Engineering (Terje Io)
  *
  */
 
@@ -310,6 +310,7 @@ namespace CNC.Core
         public static string Language { get; set; }
         public static string IniName { get; set; }
         public static string IniFile { get { return Path + IniName; } }
+        public static string DebugFile { get; set; } = string.Empty;
         public static string ConfigName { get; set; }
 
         static Resources()

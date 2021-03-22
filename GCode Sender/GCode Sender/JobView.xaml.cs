@@ -1,7 +1,7 @@
 /*
  * JobView.xaml.cs - part of Grbl Code Sender
  *
- * v0.29 / 2021-01-15 / Io Engineering (Terje Io)
+ * v0.29 / 2021-03-18 / Io Engineering (Terje Io)
  *
  */
 
@@ -113,7 +113,7 @@ namespace GCode_Sender
                 case nameof(GrblViewModel.GrblReset):
                     if ((sender as GrblViewModel).IsReady)
                     {
-                        if (!resetPending)
+                        if (!resetPending && (sender as GrblViewModel).GrblReset)
                         {
                             initOK = null;
                             Dispatcher.BeginInvoke(new System.Action(() => Activate(true, ViewType.GRBL)), DispatcherPriority.ApplicationIdle);
@@ -209,21 +209,21 @@ namespace GCode_Sender
                 {
                     focusedControl = this;
 
-                    var message = (DataContext as GrblViewModel).Message;
+                    var message = model.Message;
                     model.Message = string.Format("Waiting for controller ({0})...", AppConfig.Settings.Base.PortParams);
 
-                    string response = GrblInfo.Startup();
+                    string response = GrblInfo.Startup(model);
 
                     if (response.StartsWith("<"))
                     {
-                        GrblViewModel model = DataContext as GrblViewModel;
-                        model.ParseStatus(response);
-
                         if(model.GrblState.State != GrblStates.Unknown) {
 
                             switch(model.GrblState.State)
                             {
                                 case GrblStates.Alarm:
+
+                                    model.Poller.SetState(AppConfig.Settings.Base.PollInterval);
+
                                     switch (model.GrblState.Substate)
                                     {
                                         case 1: // Hard limits
@@ -354,7 +354,7 @@ namespace GCode_Sender
                     if (response != string.Empty)
                         InitSystem();
 
-                    (DataContext as GrblViewModel).Message = message;
+                    model.Message = message;
                 }
 
                 if (initOK == null)
@@ -469,7 +469,7 @@ namespace GCode_Sender
                         model.Message = "Controller is not responding!";
                         initOK = false;
                     }
-                    System.Threading.Thread.Sleep(500);
+                    Thread.Sleep(500);
                 }
                 GrblAlarms.Get();
                 GrblErrors.Get();
