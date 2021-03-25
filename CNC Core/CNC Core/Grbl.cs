@@ -1,7 +1,7 @@
 ﻿/*
  * Grbl.cs - part of CNC Controls library
  *
- * v0.29 / 2021-03-22 / Io Engineering (Terje Io)
+ * v0.29 / 2021-03-25 / Io Engineering (Terje Io)
  *
  */
 
@@ -980,7 +980,7 @@ namespace CNC.Core
             bool isOffset = false;
 
             foreach (int i in GrblInfo.AxisFlags.ToIndices())
-                isOffset |= pos.Values[i] != 0d;
+                isOffset |= !(double.IsNaN(pos.Values[i]) || pos.Values[i] != 0d);
 
             return isOffset;
         }
@@ -1275,8 +1275,23 @@ namespace CNC.Core
                         break;
 
                     case "TLO":
+                        // Workaround for legacy grbl, it reports only one offset...
+                        ToolLengtOffset.SuspendNotifications = true;
+                        ToolLengtOffset.Z = double.NaN;
+                        ToolLengtOffset.SuspendNotifications = false;
+                        // End workaround   
+
                         ToolLengtOffset.Parse(parameters);
-//                        AddOrUpdateCS("G43.1", parameters);
+
+                        // Workaround for legacy grbl, copy X offset to Z (there is no info available for which axis...)
+                        if (double.IsNaN(ToolLengtOffset.Z))
+                        {
+                            ToolLengtOffset.Z = ToolLengtOffset.X;
+                            ToolLengtOffset.X = ToolLengtOffset.Y = 0d;
+                        }
+                        // End workaround
+
+                        //AddOrUpdateCS("G43.1", parameters);
                         break;
 
                     case "TLR":

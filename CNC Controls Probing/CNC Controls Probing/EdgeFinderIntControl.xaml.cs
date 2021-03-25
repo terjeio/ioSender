@@ -1,7 +1,7 @@
 ﻿/*
  * EdgeFinderIntControl.xaml.cs - part of CNC Probing library
  *
- * v0.29 / 2021-01-15 / Io Engineering (Terje Io)
+ * v0.29 / 2021-03-25 / Io Engineering (Terje Io)
  *
  */
 
@@ -284,11 +284,14 @@ namespace CNC.Controls.Probing
                     }
                 }
 
+                if (axisflags == AxisFlags.Z)
+                    probing.GotoMachinePosition(probing.StartPosition, AxisFlags.Z);
+
                 probing.Program.End(ok ? "Probing completed" : "Probing failed");
             }
 
             if (!probing.Grbl.IsParserStateLive && probing.CoordinateMode == ProbingViewModel.CoordMode.G92)
-                probing.Grbl.ExecuteCommand("$G");
+                probing.Grbl.ExecuteCommand(GrblConstants.CMD_GETPARSERSTATE);
 
             probing.Grbl.IsJobRunning = false;
         }

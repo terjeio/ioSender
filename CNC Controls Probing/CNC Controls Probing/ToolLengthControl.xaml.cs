@@ -1,7 +1,7 @@
 ﻿/*
  * ToolLengthControl.cs - part of CNC Probing library
  *
- * v0.29 / 2021-02-10 / Io Engineering (Terje Io)
+ * v0.29 / 2021-03-25 / Io Engineering (Terje Io)
  *
  */
 
@@ -175,7 +175,7 @@ namespace CNC.Controls.Probing
         private void clearToolOffset_Click(object sender, RoutedEventArgs e)
         {
             var model = DataContext as ProbingViewModel;
-            model.ReferenceToolOffset = !(model.Grbl.IsTloReferenceSet && !double.IsNaN(model.Grbl.TloReference));
+            model.ReferenceToolOffset = model.CanReferenceToolOffset && !(model.Grbl.IsTloReferenceSet && !double.IsNaN(model.Grbl.TloReference));
             model.Grbl.ExecuteCommand("G49");
             if(!model.Grbl.IsParserStateLive)
                 model.Grbl.ExecuteCommand(model.Grbl.IsGrblHAL ? GrblConstants.CMD_GETPARSERSTATE : GrblConstants.CMD_GETNGCPARAMETERS);

@@ -248,8 +248,9 @@ namespace CNC.Controls.Probing
                 model.HeightMapApplied = GCode.File.HeightMapApplied;
                 int csid = GrblWorkParameters.GetCoordinateSystem(model.Grbl.WorkCoordinateSystem).Id;
                 model.CoordinateSystem = csid == 0 || csid >= 9 ? 1 : csid;
+                model.ReferenceToolOffset &= model.CanReferenceToolOffset;
 
-                if(model.Grbl.IsTloReferenceSet && !double.IsNaN(model.Grbl.TloReference))
+                if (model.Grbl.IsTloReferenceSet && !double.IsNaN(model.Grbl.TloReference))
                 {
                     model.TloReference = model.Grbl.TloReference;
                     model.ReferenceToolOffset = false;
