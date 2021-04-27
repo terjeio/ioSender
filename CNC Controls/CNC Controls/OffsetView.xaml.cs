@@ -1,7 +1,7 @@
 /*
  * OffsetView.xaml.cs - part of CNC Controls library
  *
- * v0.29 / 2020-01-29 / Io Engineering (Terje Io)
+ * v0.31 / 2020-04-27 / Io Engineering (Terje Io)
  *
  */
 
@@ -85,6 +85,7 @@ namespace CNC.Controls
         #region Methods and properties required by CNCView interface
 
         public ViewType ViewType { get { return ViewType.Offsets; } }
+        public bool CanEnable { get { return !(DataContext as GrblViewModel).IsGCLock; } }
 
         public void Activate(bool activate, ViewType chgMode)
         {

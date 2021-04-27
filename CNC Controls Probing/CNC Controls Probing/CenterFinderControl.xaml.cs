@@ -1,7 +1,7 @@
 ﻿/*
  * CenterFinderControl.xaml.cs - part of CNC Probing library
  *
- * v0.29 / 2021-01-15 / Io Engineering (Terje Io)
+ * v0.30 / 2021-04-04 / Io Engineering (Terje Io)
  *
  */
 
@@ -213,7 +213,7 @@ namespace CNC.Controls.Probing
         {
             var probing = DataContext as ProbingViewModel;
 
-            if (!probing.ValidateInput() || probing.Passes == 0)
+            if (!probing.ValidateInput(false) || probing.Passes == 0)
                 return;
 
             mode = FindMode.XY;

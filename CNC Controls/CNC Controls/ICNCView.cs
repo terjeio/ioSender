@@ -1,13 +1,13 @@
 ﻿/*
  * ICNCView.cs - part of CNC Controls library for Grbl
  *
- * v0.28 / 2020-10-20 / Io Engineering (Terje Io)
+ * v0.31 / 2021-04-27 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2020, Io Engineering (Terje Io)
+Copyright (c) 2018-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -64,6 +64,7 @@ namespace CNC.Controls
     public interface ICNCView
     {
         ViewType ViewType { get; }
+        bool CanEnable { get; }
         void Activate(bool activate, ViewType chgMode);
         void CloseFile();
         void Setup(UIViewModel model, AppConfig profile);

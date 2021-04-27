@@ -1,12 +1,12 @@
 /*
  * AppConfigView.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.27 / 2020-09-26 / Io Engineering (Terje Io)
+ * v0.31 / 2021-04-27 / Io Engineering (Terje Io)
  *
  */
 /*
 
-Copyright (c) 2020, Io Engineering (Terje Io)
+Copyright (c) 2020-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -58,6 +58,7 @@ namespace CNC.Controls
         #region Methods and properties required by CNCView interface
 
         public ViewType ViewType { get { return ViewType.AppConfig; } }
+        public bool CanEnable { get { return true; } }
 
         public void Activate(bool activate, ViewType chgMode)
         {

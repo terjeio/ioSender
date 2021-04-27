@@ -1,13 +1,13 @@
 ﻿/*
  * ProbingView.xaml.cs - part of CNC Probing library
  *
- * v0.29 / 2021-02-25 / Io Engineering (Terje Io)
+ * v0.31 / 2021-04-27 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020-2020, Io Engineering (Terje Io)
+Copyright (c) 2020-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -212,9 +212,10 @@ namespace CNC.Controls.Probing
             probeProperties.Visibility = (dp.ActualHeight - t1.ActualHeight - Jog.ActualHeight + probeProperties.ActualHeight) > height ? Visibility.Visible : Visibility.Collapsed;
         }
 
-        #region Methods required by CNCView interface
+        #region Methods and properties required by CNCView interface
 
         public ViewType ViewType { get { return ViewType.Probing; } }
+        public bool CanEnable { get { return DataContext is GrblViewModel ? !(DataContext as GrblViewModel).IsGCLock : !model.Grbl.IsGCLock; } }
 
         public void Activate(bool activate, ViewType chgMode)
         {
@@ -270,14 +271,17 @@ namespace CNC.Controls.Probing
             {
                 model.Grbl.PropertyChanged -= Grbl_PropertyChanged;
 
-                // If probing alarm active unlock
-                //if(model.Grbl.GrblState.State == GrblStates.Alarm && (model.Grbl.GrblState.Substate == 4 || model.Grbl.GrblState.Substate == 5))
-                //    model.Grbl.ExecuteCommand(GrblConstants.CMD_UNLOCK);
-                //else
-                if (model.Grbl.GrblError != 0)
-                    model.Grbl.ExecuteCommand("");  // Clear error
+                if (!model.Grbl.IsGCLock)
+                {
+                    // If probing alarm active unlock
+                    //if(model.Grbl.GrblState.State == GrblStates.Alarm && (model.Grbl.GrblState.Substate == 4 || model.Grbl.GrblState.Substate == 5))
+                    //    model.WaitForResponse(GrblConstants.CMD_UNLOCK);
+                    //else
+                    if (model.Grbl.GrblError != 0)
+                        model.WaitForResponse("");  // Clear error
 
-                model.Grbl.ExecuteCommand(model.DistanceMode == DistanceMode.Absolute ? "G90" : "G91");
+                    model.WaitForResponse(model.DistanceMode == DistanceMode.Absolute ? "G90" : "G91");
+                }
             }
 
             model.Message = string.Empty;
@@ -367,17 +371,21 @@ namespace CNC.Controls.Probing
 
         private void tab_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var view = getView(((sender as TabControl).SelectedItem as TabItem));
-            if (view != null)
+            if (Equals(e.OriginalSource, sender))
             {
-                model.ProbingType = view.ProbingType;
-                model.Message = string.Empty;
-                model.PreviewEnable = false;
+                var view = getView(((sender as TabControl).SelectedItem as TabItem));
+                if (view != null)
+                {
+                    model.ProbingType = view.ProbingType;
+                    model.Message = string.Empty;
+                    model.PreviewEnable = false;
 
-                if (GrblInfo.IsGrblHAL)
-                    Comms.com.WriteByte(GrblConstants.CMD_STATUS_REPORT_ALL);
+                    if (GrblInfo.IsGrblHAL)
+                        Comms.com.WriteByte(GrblConstants.CMD_STATUS_REPORT_ALL);
 
-                view.Activate();
+                    view.Activate();
+                }
+                e.Handled = true;
             }
         }
     }

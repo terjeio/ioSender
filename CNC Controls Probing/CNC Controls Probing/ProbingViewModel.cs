@@ -1,7 +1,7 @@
 ﻿/*
  * ProbingViewModel.cs - part of CNC Probing library
  *
- * v0.29 / 2021-03-25 / Io Engineering (Terje Io)
+ * v0.30 / 2021-04-04 / Io Engineering (Terje Io)
  *
  */
 
@@ -290,11 +290,11 @@ namespace CNC.Controls.Probing
             return isCancelled ? false : !wait;
         }
 
-        public bool ValidateInput ()
+        public bool ValidateInput (bool z_only)
         {
             ClearErrors();
 
-            if(XYClearance + ProbeDiameter / 2d > ProbeDistance)
+            if(!z_only && XYClearance + ProbeDiameter / 2d > ProbeDistance)
             {
                 SetError(nameof(XYClearance), "Probing distance must be larger than XY Clearance + ½ Probe/tool diameter.");
                 SetError(nameof(ProbeDistance), "Probing distance must be larger than XY Clearance + ½ Probe/tool diameter.");
@@ -349,7 +349,6 @@ namespace CNC.Controls.Probing
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(OffsetEnable));
                 OnPropertyChanged(nameof(XYOffsetEnable));
-                OnPropertyChanged(nameof(XYDEnable));
                 OnPropertyChanged(nameof(ProbeDiameterEnable));
                 OnPropertyChanged(nameof(TouchPlateHeightEnable));
             }
@@ -426,7 +425,6 @@ namespace CNC.Controls.Probing
         public double Depth { get { return _depth; } set { _depth = value; OnPropertyChanged(); } }
         public string RapidCommand { get { return RapidsFeedRate == 0d ? "G0" : "G1F" + RapidsFeedRate.ToInvariantString(); } }
         public string ProbeProgram { get { return Program.ToString().Replace("G53", string.Empty); } }
-        public bool XYDEnable { get { return _probingType == ProbingType.EdgeFinderInternal || _probingType == ProbingType.EdgeFinderExternal || _probingType == ProbingType.CenterFinder; } }
         public bool ProbeDiameterEnable { get { return _probingType == ProbingType.CenterFinder || ((_probingType == ProbingType.EdgeFinderInternal || _probingType == ProbingType.EdgeFinderExternal) && _edge != Edge.Z); } }
         public bool FixtureHeightEnable { get { return _probingType == ProbingType.ToolLength && _useFixture /*&& !ReferenceToolOffset && !Grbl.IsTloReferenceSet*/; } }
         public bool TouchPlateHeightEnable { get { return _probingType == ProbingType.ToolLength ? !_useFixture : (_probingType == ProbingType.EdgeFinderExternal || _probingType == ProbingType.EdgeFinderInternal ? _probeZ : _probingType == ProbingType.HeightMap); } }
@@ -457,6 +455,8 @@ namespace CNC.Controls.Probing
             {
                 if(value == Edge.Z)
                 {
+                    ClearErrors();
+
                     if (!_probeZ && !ProbeZ)
                     {
                         wasZselected = true;

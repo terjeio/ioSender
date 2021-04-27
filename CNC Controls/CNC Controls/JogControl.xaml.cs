@@ -1,13 +1,13 @@
 /*
  * JogControl.xaml.cs - part of CNC Controls library
  *
- * v0.17 / 2020-04-17 / Io Engineering (Terje Io)
+ * v0.30 / 2021-04-08 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020, Io Engineering (Terje Io)
+Copyright (c) 2020-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -80,7 +80,7 @@ namespace CNC.Controls
             }                
         }
 
-        public JogViewModel JogData { get; private set; }
+        public static JogViewModel JogData { get; private set; }
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
@@ -112,24 +112,6 @@ namespace CNC.Controls
 
                 case nameof(GrblViewModel.IsMetric):
                     JogData.SetMetric((metricInput = (sender as GrblViewModel).IsMetric));
-                    break;
-
-                case nameof(GrblViewModel.JogStep):
-                    if(!silent) switch ((int)((sender as GrblViewModel).JogStep * (metricCommand ? 100d : 1000d)))
-                    {
-                        case 1:
-                            JogData.StepSize = JogViewModel.JogStep.Step0;
-                            break;
-                        case 10:
-                            JogData.StepSize = JogViewModel.JogStep.Step1;
-                            break;
-                        case 100:
-                            JogData.StepSize = JogViewModel.JogStep.Step2;
-                            break;
-                        case 1000:
-                            JogData.StepSize = JogViewModel.JogStep.Step3;
-                            break;
-                    }
                     break;
             }
         }
@@ -307,5 +289,27 @@ namespace CNC.Controls
         public double Distance1 { get { return _distance[1]; } }
         public double Distance2 { get { return _distance[2]; } }
         public double Distance3 { get { return _distance[3]; } }
+
+        public void StepInc ()
+        {
+            if (StepSize != JogStep.Step3)
+                StepSize += 1;
+        }
+        public void StepDec()
+        {
+            if (StepSize != JogStep.Step0)
+                StepSize -= 1;
+        }
+
+        public void FeedInc()
+        {
+            if (Feed != JogFeed.Feed3)
+                Feed += 1;
+        }
+        public void FeedDec()
+        {
+            if (Feed != JogFeed.Feed0)
+                Feed -= 1;
+        }
     }
 }

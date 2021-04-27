@@ -1,7 +1,7 @@
 ﻿/*
  * EltimaStream.cs - part of CNC Controls library
  *
- * v0.29 / 2021-03-22 / Io Engineering (Terje Io)
+ * v0.30 / 2021-04-23 / Io Engineering (Terje Io)
  *
  */
 
@@ -56,6 +56,8 @@ namespace CNC.Core
         private StringBuilder input = new StringBuilder(400);
         private volatile Comms.State state = Comms.State.ACK;
         private Dispatcher Dispatcher { get; set; }
+        public bool EventMode { get; set; } = true;
+        public Action<int> ByteReceived { get; set; }
 
         public event DataReceivedHandler DataReceived;
 
@@ -226,6 +228,16 @@ namespace CNC.Core
             }
         }
 
+        public int ReadByte()
+        {
+            int c = input.Length == 0 ? -1 : input[0];
+
+            if (c != -1)
+                input.Remove(0, 1);
+
+            return c;
+        }
+
         public void WriteByte(byte data)
         {
             serialPort.Write(ref data, 1);
@@ -308,19 +320,27 @@ namespace CNC.Core
             {
                 input.Append(serialPort.ReadStr());
 
-                while (input.Length > 0 && (pos = input.ToString().IndexOf('\n')) > 0)
+                if (EventMode)
                 {
-                    Reply = input.ToString(0, pos - 1);
-                    input.Remove(0, pos + 1);
+                    while (input.Length > 0 && (pos = gp()) > 0)
+                    {
+                        Reply = pos == 0 ? string.Empty : input.ToString(0, pos - 1);
+                        input.Remove(0, pos + 1);
 #if RESPONSELOG
-                    log.WriteLine(Reply);
-                    log.Flush();
+                        if (log != null)
+                        {
+                            log.WriteLine(Reply);
+                            log.Flush();
+                        }
 #endif
-                    if (Reply.Length != 0 && DataReceived != null)
-                        Dispatcher.BeginInvoke(DataReceived, Reply);
+                        if (Reply.Length != 0 && DataReceived != null)
+                            Dispatcher.BeginInvoke(DataReceived, Reply);
 
-                    state = Reply == "ok" ? Comms.State.ACK : (Reply.StartsWith("error") ? Comms.State.NAK : Comms.State.DataReceived);
+                        state = Reply == "ok" ? Comms.State.ACK : (Reply.StartsWith("error") ? Comms.State.NAK : Comms.State.DataReceived);
+                    }
                 }
+                else
+                    ByteReceived?.Invoke(ReadByte());
             }
         }
     }

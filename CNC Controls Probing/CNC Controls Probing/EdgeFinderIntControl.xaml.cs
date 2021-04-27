@@ -1,7 +1,7 @@
 ﻿/*
  * EdgeFinderIntControl.xaml.cs - part of CNC Probing library
  *
- * v0.29 / 2021-03-25 / Io Engineering (Terje Io)
+ * v0.30 / 2021-04-04 / Io Engineering (Terje Io)
  *
  */
 
@@ -74,7 +74,7 @@ namespace CNC.Controls.Probing
         {
             var probing = DataContext as ProbingViewModel;
 
-            if (!probing.ValidateInput())
+            if (!probing.ValidateInput(probing.ProbeEdge == Edge.Z))
                 return;
 
             if (probing.ProbeEdge == Edge.None)

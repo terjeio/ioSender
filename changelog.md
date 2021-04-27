@@ -1,6 +1,16 @@
-## GCode sender changelog
+## ioSender changelog
 
 Executable for development builds available for download [here](http://www.io-engineering.com/downloads/) if you want to participate in testing.
+
+2021-04-27: [Release 2.0.31](https://github.com/terjeio/Grbl-GCode-Sender/releases/tag/2.0.31).
+
+* Renamed executable to ioSender.exe.
+* Improved grbl settings tab: error handling and reload from backup.
+* Improved probing tabs: input validation and alarm handling.
+* Improved SD Card tab: added experimental YModem based upload and context menu for file actions.  
+YModem upload requires grblHAL controller build 20210421 or later.
+* Improved jog flyout: when active numeric pad 2 and 8 can be used to change feed rate.
+* Bug fixes and code hardening.
 
 ---
 

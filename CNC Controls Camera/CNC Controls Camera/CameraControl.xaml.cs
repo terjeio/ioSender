@@ -1,13 +1,13 @@
 ﻿/*
- * CNCCameraControl.xaml.cs - part of CNC Controls library
+ * CameraControl.xaml.cs - part of CNC Controls Camera library
  *
- * v0.18 / 2020-04-17 / Io Engineering (Terje Io)
+ * v0.30 / 2021-04-08 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2020, Io Engineering (Terje Io) - parts derived from AForge example code
+Copyright (c) 2018-2021, Io Engineering (Terje Io) - parts derived from AForge example code
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -57,7 +57,6 @@ namespace CNC.Controls.Camera
     {
         VideoCaptureDevice videoSource = null;
         public FilterInfoCollection LoaclWebCamsCollection;
-        private int cpct = 20;
 
         public delegate void MoveOffsetHandler(CameraMoveMode Mode, double XOffset, double YOffset);
         public event MoveOffsetHandler MoveOffset;
@@ -111,6 +110,17 @@ namespace CNC.Controls.Camera
         {
             get { return (bool)GetValue(IsMoveEnabledProperty); }
             set { SetValue(IsMoveEnabledProperty, value); }
+        }
+
+        public static readonly DependencyProperty GuideScaleProperty = DependencyProperty.Register(nameof(GuideScale), typeof(int), typeof(CameraControl), new PropertyMetadata(10, new PropertyChangedCallback(OnGuideScaleChanged)));
+        public int GuideScale
+        {
+            get { return (int)GetValue(GuideScaleProperty); }
+            set { SetValue(GuideScaleProperty, value); }
+        }
+        private static void OnGuideScaleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            AppConfig.Settings.Camera.GuideScale = (int)e.NewValue;
         }
 
         public double XOffset
@@ -178,7 +188,7 @@ namespace CNC.Controls.Camera
                 r.DrawImage(bmp, new Rect(0, 0, bmp.Width, bmp.Height));
                 r.DrawLine(pen, new System.Windows.Point(0, center.Y), new System.Windows.Point(bmp.Width, center.Y));
                 r.DrawLine(pen, new System.Windows.Point(center.X, 0), new System.Windows.Point(center.X, bmp.Height));
-                r.DrawEllipse(null, pen, center, center.Y * cpct / 100d, center.Y * cpct / 100d);
+                r.DrawEllipse(null, pen, center, center.Y * GuideScale / 100d, center.Y * GuideScale / 100d);
             }
             overlay.Render(visual);
         }
@@ -210,7 +220,7 @@ namespace CNC.Controls.Camera
 
         private void sldcircle_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            cpct = (int)sldcircle.Value;
+         //   AppConfig.Settings.Camera.GuideScale = (int)sldcircle.Value;
         }
 
         private void btnMove_Click(object sender, RoutedEventArgs e)

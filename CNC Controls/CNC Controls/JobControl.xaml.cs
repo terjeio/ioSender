@@ -1,7 +1,7 @@
 /*
  * JobControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.29 / 2020-02-23 / Io Engineering (Terje Io)
+ * v0.31 / 2021-04-26 / Io Engineering (Terje Io)
  *
  */
 
@@ -177,22 +177,22 @@ namespace CNC.Controls
             if (sender is GrblViewModel) switch (e.PropertyName)
             {
                 case nameof(GrblViewModel.GrblState):
-                    GrblStateChanged(((GrblViewModel)sender).GrblState);
+                    GrblStateChanged((sender as GrblViewModel).GrblState);
                     break;
 
                 case nameof(GrblViewModel.MDI):
-                    SendCommand(((GrblViewModel)sender).MDI);
+                    SendCommand((sender as GrblViewModel).MDI);
                     break;
 
                 case nameof(GrblViewModel.IsMPGActive):
-                    grblState.MPG = ((GrblViewModel)sender).IsMPGActive == true;
-                    ((GrblViewModel)sender).Poller.SetState(grblState.MPG ? 0 : AppConfig.Settings.Base.PollInterval);
+                    grblState.MPG = (sender as GrblViewModel).IsMPGActive == true;
+                    (sender as GrblViewModel).Poller.SetState(grblState.MPG ? 0 : AppConfig.Settings.Base.PollInterval);
                     streamingHandler.Call(grblState.MPG ? StreamingState.Disabled : StreamingState.Idle, false);
                     break;
 
                 case nameof(GrblViewModel.Signals):
                     if(isActive) {
-                        var signals = ((GrblViewModel)sender).Signals.Value;
+                        var signals = (sender as GrblViewModel).Signals.Value;
                         if (JobPending && signals.HasFlag(Signals.CycleStart) && !signals.HasFlag(Signals.Hold) && !cycleStartSignal)
                             CycleStart();
                         holdSignal = signals.HasFlag(Signals.Hold);
@@ -202,18 +202,18 @@ namespace CNC.Controls
 
                 case nameof(GrblViewModel.ProgramEnd):
                     if (!GCode.File.IsLoaded)
-                        streamingHandler.Call(job.IsSDFile ? StreamingState.JobFinished : StreamingState.NoFile, job.IsSDFile);
+                        streamingHandler.Call(model.IsSDCardJob ? StreamingState.JobFinished : StreamingState.NoFile, model.IsSDCardJob);
                     else if(JobTimer.IsRunning && !job.Complete)
                         streamingHandler.Call(StreamingState.JobFinished, true);
                     break;
 
                 case nameof(GrblViewModel.FileName):
                     {
-                        if(string.IsNullOrEmpty(((GrblViewModel)sender).FileName))
+                        job.IsSDFile = false;
+                        if(string.IsNullOrEmpty((sender as GrblViewModel).FileName))
                             job.NextRow = null;
                         else
                         {
-                            job.IsSDFile = false;
                             job.CurrLine = job.PendingLine = job.ACKPending = model.BlockExecuting = 0;
                             job.PgmEndLine = GCode.File.Blocks - 1;
                             if (GCode.File.ToolChanges > 0 && GrblSettings.GetInteger(GrblSetting.ToolChangeMode) > 0 && !model.IsTloReferenceSet)
@@ -380,7 +380,11 @@ namespace CNC.Controls
         {
             if (grblState.State == GrblStates.Hold || (grblState.State == GrblStates.Run && grblState.Substate == 1))
                 Comms.com.WriteByte(GrblLegacy.ConvertRTCommand(GrblConstants.CMD_CYCLE_START));
-            else if(grblState.State == GrblStates.Tool)
+            else if(grblState.State == GrblStates.Idle && model.SDRewind) {
+                streamingHandler.Call(StreamingState.Start, false);
+                Comms.com.WriteByte(GrblLegacy.ConvertRTCommand(GrblConstants.CMD_CYCLE_START));
+            }
+            else if (grblState.State == GrblStates.Tool)
             {
                 model.Message = "";
                 Comms.com.WriteByte(GrblLegacy.ConvertRTCommand(GrblConstants.CMD_CYCLE_START));
@@ -746,11 +750,16 @@ namespace CNC.Controls
                         IsEnabled = false;
                         break;
 
+                    case StreamingState.JobFinished:
+                        if(model.IsSDCardJob && grblState.State == GrblStates.Check)
+                            SetStreamingHandler(StreamingHandler.SendFile);
+                        break;
+
                     case StreamingState.Idle:
                     case StreamingState.NoFile:
                         IsEnabled = !grblState.MPG;
-                        btnStart.IsEnabled = GCode.File.IsLoaded;
-                        btnStop.IsEnabled = false;
+                        btnStart.IsEnabled = GCode.File.IsLoaded || (model.IsSDCardJob && model.SDRewind);
+                        btnStop.IsEnabled = model.IsSDCardJob && model.SDRewind;
                         btnHold.IsEnabled = !grblState.MPG;
                         btnRewind.IsEnabled = !grblState.MPG && GCode.File.IsLoaded && job.CurrLine != 0;
                         model.IsJobRunning = JobTimer.IsRunning;
@@ -793,8 +802,9 @@ namespace CNC.Controls
                         btnStart.IsEnabled = btnHold.IsEnabled && GCode.File.IsLoaded; //!GrblInfo.IsGrblHAL;
                         btnStop.IsEnabled = false;
                         btnRewind.IsEnabled = false;
-                        job.IsSDFile = false;
                         model.IsJobRunning = false;
+                        if (model.IsSDCardJob)
+                            model.FileName = string.Empty;
                         if (!grblState.MPG)
                         {
                             if (GrblInfo.IsGrblHAL && !(grblState.State == GrblStates.Home || grblState.State == GrblStates.Alarm))

@@ -78,9 +78,9 @@
                 </GroupBox>
                 <GroupBox Header="Probing clearances">
                     <StackPanel Orientation="Vertical">
-                        <Controls:NumericField Label="XY Clearance:" Tag="Initial distance away from face to probe" Value="{Binding Path=XYClearance, Mode=TwoWay}" IsEnabled="{Binding Path=XYDEnable}" ColonAt="102" HorizontalAlignment="Left" Margin="0,7,0,0" VerticalAlignment="Top" Style="{StaticResource ErrorStyle}"/>
+                        <Controls:NumericField Label="XY Clearance:" Tag="Initial distance away from face to probe" Value="{Binding Path=XYClearance, Mode=TwoWay}" IsEnabled="{Binding Path=XYOffsetEnable}" ColonAt="102" HorizontalAlignment="Left" Margin="0,7,0,0" VerticalAlignment="Top" Style="{StaticResource ErrorStyle}"/>
                         <Controls:NumericField Label="Offset:" ToolTip="Distance from corner to probe" Value="{Binding Path=Offset, Mode=TwoWay}" IsEnabled="{Binding Path=OffsetEnable}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
-                        <Controls:NumericField Label="Depth:" ToolTip="Z offset from current position where probing will take place" Value="{Binding Path=Depth, Mode=TwoWay}" IsEnabled="{Binding Path=XYDEnable}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
+                        <Controls:NumericField Label="Depth:" ToolTip="Z offset from current position where probing will take place" Value="{Binding Path=Depth, Mode=TwoWay}" IsEnabled="{Binding Path=XYOffsetEnable}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
                     </StackPanel>
                 </GroupBox>
                 <GroupBox x:Name="probeProperties" Header="Probe XY offsets" Visibility="Collapsed" IsEnabled="{Binding Path=XYOffsetEnable}">

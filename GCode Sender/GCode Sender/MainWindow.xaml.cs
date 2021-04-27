@@ -1,7 +1,7 @@
 /*
  * MainWindow.xaml.cs - part of Grbl Code Sender
  *
- * v0.29 / 2021-01-30 / Io Engineering (Terje Io)
+ * v0.31 / 2021-04-27 / Io Engineering (Terje Io)
  *
  */
 
@@ -54,6 +54,7 @@ namespace GCode_Sender
 
     public partial class MainWindow : Window
     {
+        private const string version = "2.0.31";
         public static MainWindow ui = null;
         public static CNC.Controls.Viewer.Viewer GCodeViewer = null;
         public static UIViewModel UIViewModel { get; } = new UIViewModel();
@@ -68,6 +69,7 @@ namespace GCode_Sender
 
             ui = this;
             GCodeViewer = viewer;
+            Title = string.Format(Title, version);
 
             int res;
             if ((res = AppConfig.Settings.SetupAndOpen(Title, (GrblViewModel)DataContext, App.Current.Dispatcher)) != 0)
@@ -112,7 +114,7 @@ namespace GCode_Sender
                 {
                     var view = getView(tabitem);
                     if (view != null)
-                        tabitem.IsEnabled = !value || tabitem == ui.tabMode.SelectedItem;
+                        tabitem.IsEnabled = (!value && view.CanEnable) || tabitem == ui.tabMode.SelectedItem;
                 }
             }
         }
@@ -209,9 +211,10 @@ namespace GCode_Sender
 #endif
                 Comms.com.DataReceived -= (DataContext as GrblViewModel).DataReceived;
 
-                using (new UIUtils.WaitCursor()) // disconnecting from websocket may take some time...
+                using (new UIUtils.WaitCursor())
                 {
-                     Comms.com.Close();
+                    Comms.com.Close(); // disconnecting from websocket may take some time...
+                    AppConfig.Settings.Shutdown();
                 }
             }
         }
@@ -277,23 +280,23 @@ namespace GCode_Sender
             if (!(DataContext as GrblViewModel).IsReady)
                 return;
 
-            if (UIViewModel.CurrentView != null && e.AddedItems.Count > 0)
+            if (Equals(e.OriginalSource, sender) && UIViewModel.CurrentView != null && e.AddedItems.Count == 1)
             {
-                ViewType prevMode = UIViewModel.CurrentView.ViewType;
-                ICNCView nextView = getView((TabItem)tabMode.Items[tabMode.SelectedIndex]);
-                if (nextView != UIViewModel.CurrentView)
+                ICNCView prevView = UIViewModel.CurrentView, nextView = getView((TabItem)e.AddedItems[0]);
+                if (nextView != null && nextView != UIViewModel.CurrentView)
                 {
-                    UIViewModel.CurrentView.Activate(false, nextView.ViewType);
                     UIViewModel.CurrentView = nextView;
-                    UIViewModel.CurrentView.Activate(true, prevMode);
+                    prevView.Activate(false, nextView.ViewType);
+                    nextView.Activate(true, prevView.ViewType);
                 }
             }
         }
 
-        private void SDCardView_FileSelected(string filename)
+        private void SDCardView_FileSelected(string filename, bool rewind)
         {
             GCode.File.Close();
-            ((GrblViewModel)ui.DataContext).FileName = filename;
+            (ui.DataContext as GrblViewModel).FileName = filename;
+            (ui.DataContext as GrblViewModel).SDRewind = rewind;
             Dispatcher.BeginInvoke((System.Action)(() => ui.tabMode.SelectedItem = getTab(ViewType.GRBL)));
         }
 

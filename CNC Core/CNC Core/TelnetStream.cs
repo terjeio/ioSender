@@ -1,7 +1,7 @@
 /*
  * TelnetStream.cs - part of CNC Controls library
  *
- * v0.29 / 2021-03-22 / Io Engineering (Terje Io)
+ * v0.31 / 2021-04-23 / Io Engineering (Terje Io)
  *
  */
 
@@ -88,12 +88,16 @@ namespace CNC.Core
         public int OutCount { get { return 0; } }
         public Comms.State CommandState { get { return state; } set { state = value; } }
         public string Reply { get; private set; }
+        public bool EventMode { get; set; } = true;
+        public Action<int> ByteReceived { get; set; }
 
         public void PurgeQueue()
         {
             while (ipstream.DataAvailable)
                 ipstream.ReadByte();
             Reply = string.Empty;
+            if (!EventMode)
+                input.Clear();
         }
 
         public void Close()
@@ -105,6 +109,16 @@ namespace CNC.Core
                 ipserver.Close();
                 ipserver = null;
             }
+        }
+
+        public int ReadByte()
+        {
+            int c = input.Length == 0 ? -1 : input[0];
+
+            if (c != -1)
+                input.Remove(0, 1);
+
+            return c;
         }
 
         public void WriteByte(byte data)
@@ -199,18 +213,23 @@ namespace CNC.Core
             {
                 input.Append(Encoding.ASCII.GetString(buffer, 0, bytesAvailable));
 
-                while (input.Length > 0 && (pos = gp()) > 0)
+                if (EventMode)
                 {
-                    Reply = input.ToString(0, pos - 1);
-                    input.Remove(0, pos + 1);
-                    state = Reply == "ok" ? Comms.State.ACK : (Reply.StartsWith("error") ? Comms.State.NAK : Comms.State.DataReceived);
-                    if (Reply.Length != 0 && DataReceived != null)
-                        Dispatcher.Invoke(DataReceived, Reply);
+                    while (input.Length > 0 && (pos = gp()) > 0)
+                    {
+                        Reply = input.ToString(0, pos - 1);
+                        input.Remove(0, pos + 1);
+                        state = Reply == "ok" ? Comms.State.ACK : (Reply.StartsWith("error") ? Comms.State.NAK : Comms.State.DataReceived);
+                        if (Reply.Length != 0 && DataReceived != null)
+                            Dispatcher.Invoke(DataReceived, Reply);
+                    }
                 }
-            }
+                else
+                    ByteReceived?.Invoke(ReadByte());
 
-            if (ipstream != null && ipserver.Connected)
-                ipstream.BeginRead(buffer, 0, buffer.Length, ReadComplete, buffer);
+                if (ipstream != null && ipserver.Connected)
+                    ipstream.BeginRead(buffer, 0, buffer.Length, ReadComplete, buffer);
+            }
         }
     }
 }

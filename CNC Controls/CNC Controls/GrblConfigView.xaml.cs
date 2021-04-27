@@ -1,7 +1,7 @@
 /*
  * GrblConfigView.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.29 / 2021-01-15 / Io Engineering (Terje Io)
+ * v0.31 / 2021-04-27 / Io Engineering (Terje Io)
  *
  */
 
@@ -90,6 +90,7 @@ namespace CNC.Controls
         #region Methods required by CNCView interface
 
         public ViewType ViewType { get { return ViewType.GRBLConfig; } }
+        public bool CanEnable { get { return true; } }
 
         public void Activate(bool activate, ViewType chgMode)
         {
@@ -103,6 +104,7 @@ namespace CNC.Controls
         public void CloseFile()
         {
         }
+
         public void Setup(UIViewModel model, AppConfig profile)
         {
         }
@@ -124,7 +126,7 @@ namespace CNC.Controls
         void btnReload_Click(object sender, RoutedEventArgs e)
         {
             using(new UIUtils.WaitCursor()) {
-                GrblSettings.Get();
+                GrblSettings.Load();
             }
         }
 
@@ -134,49 +136,102 @@ namespace CNC.Controls
             model.Message = "All settings written to settings.txt in the sender folder.";
         }
 
+        private bool SetSetting (KeyValuePair<int, string> setting)
+        {
+            bool? res = null;
+            CancellationToken cancellationToken = new CancellationToken();
+            var scmd = string.Format("${0}={1}", setting.Key, setting.Value);
+
+            retval = string.Empty;
+
+            new Thread(() =>
+            {
+                res = WaitFor.AckResponse<string>(
+                    cancellationToken,
+                    response => Process(response),
+                    a => model.OnResponseReceived += a,
+                    a => model.OnResponseReceived -= a,
+                    400, () => Comms.com.WriteCommand(scmd));
+            }).Start();
+
+            while (res == null)
+                EventUtils.DoEvents();
+
+            if (retval != string.Empty)
+            {
+                if(retval.StartsWith("error:"))
+                {
+                    var msg = GrblErrors.GetMessage(retval.Substring(6));
+                    if(msg != retval)
+                        retval += " - \"" + msg + "\"";
+                }
+
+                var details = GrblSettings.Get((GrblSetting)setting.Key);
+
+                if (MessageBox.Show(string.Format("Setting {0} returned {1}, continue?", scmd, retval), "ioSender" + (details == null ? "" : " - " + details.Name), MessageBoxButton.YesNo, MessageBoxImage.Exclamation) == MessageBoxResult.No)
+                    return false;
+            }
+            else if (res == false && MessageBox.Show(string.Format("Timed out while setting {0} , continue?", scmd), "ioSender", MessageBoxButton.YesNo, MessageBoxImage.Exclamation) == MessageBoxResult.No)
+                return false;
+
+            return true;
+        }
+
         public bool LoadFile(string filename)
         {
-            bool ok = false;
+            int pos, id;
             List<string> lines = new List<string>();
-
+            List<int> dep = new List<int>();
+            Dictionary<int, string> settings = new Dictionary<int, string>();
             FileInfo file = new FileInfo(filename);
-
             StreamReader sr = file.OpenText();
 
             string block = sr.ReadLine();
 
             while (block != null)
             {
+                block = block.Trim();
                 try
                 {
-                    ok |= block.StartsWith("$");
-                    lines.Add(block.Trim());
+                    if (lines.Count == 0 && model.IsGrblHAL && block == "%")
+                        lines.Add(block);
+                    else if (block.StartsWith("$") && (pos = block.IndexOf('=')) > 1)
+                    {
+                        if (int.TryParse(block.Substring(1, pos - 1), out id))
+                            settings.Add(id, block.Substring(pos + 1));
+                        else
+                            lines.Add(block);
+                    }
 
                     block = sr.ReadLine();
                 }
                 catch (Exception e)
                 {
-                    if ((ok = MessageBox.Show("Bummer...\r\rContinue loading?", e.Message, MessageBoxButton.YesNo) == MessageBoxResult.Yes))
+                    if (MessageBox.Show("Bummer...\r\rContinue loading?", e.Message, MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                         block = sr.ReadLine();
                     else
+                    {
                         block = null;
+                        settings.Clear();
+                        lines.Clear();
+                    }
                 }
             }
 
             sr.Close();
 
-            if (ok)
+            if (settings.Count == 0)
+                MessageBox.Show("The file does not contain any settings.", "ioSender");
+            else
             {
                 bool? res = null;
                 CancellationToken cancellationToken = new CancellationToken();
 
-                Comms.com.PurgeQueue();
+                // List of settings that have other dependent settings and have to be set before them
+                dep.Add((int)GrblSetting.HomingEnable);
 
                 foreach (var cmd in lines)
                 {
-                    if (cmd.StartsWith(";"))
-                        continue;
-
                     res = null;
                     retval = string.Empty;
 
@@ -202,17 +257,38 @@ namespace CNC.Controls
                         break;
                 }
 
+                foreach (var d in dep)
+                {
+                    if (settings.ContainsKey(d))
+                    {
+                        if (!SetSetting(new KeyValuePair<int, string>(d, settings[d])))
+                        {
+                            settings.Clear();
+                            break;
+                        }
+                    }
+                }
+
+                foreach (var setting in settings)
+                {
+                    if (!dep.Contains(setting.Key)) {
+                        if(!SetSetting(setting))
+                            break;
+                    }
+                }
+
+                if (lines[0] == "%")
+                    Comms.com.WriteCommand("%");
+
                 using (new UIUtils.WaitCursor())
                 {
-                    GrblSettings.Get();
+                    GrblSettings.Load();
                 }
             }
-            else
-                MessageBox.Show("The file does not contain any settings.", "ioSender");
 
             model.Message = string.Empty;
 
-            return ok;
+            return settings.Count > 0;
         }
 
         private void Process(string data)

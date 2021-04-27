@@ -1,13 +1,13 @@
 ﻿/*
  * KeypressHandler.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.27 / 2020-09-26 / Io Engineering (Terje Io)
+ * v0.30 / 2021-04-08 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020, Io Engineering (Terje Io)
+Copyright (c) 2020-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -302,20 +302,22 @@ namespace CNC.Controls
                     else switch (e.Key)
                     {
                         case Key.NumPad4:
-                            {
-                                var step = grbl.JogStep / 10d;
-                                grbl.JogStep = grbl.IsMetric ? (step < 0.01d ? 0.01d : step) : (step < 0.001d ? 0.001d : step);
-                            }
+                            JogControl.JogData.StepDec();
                             return true;
                         //  break;
 
                         case Key.NumPad6:
-                            {
-                                var step = grbl.JogStep * 10d;
-                                grbl.JogStep = grbl.IsMetric ? (step > 1d ? 1d : step) : (step > 0.1d ? 0.1d : step);
-                            }
+                            JogControl.JogData.StepInc();
                             return true;
-                        //  break;
+
+                        case Key.NumPad8:
+                            JogControl.JogData.FeedInc();
+                            return true;
+
+                        case Key.NumPad2:
+                            JogControl.JogData.FeedDec();
+                            return true;
+                                //  break;
                     }
                 }
             }

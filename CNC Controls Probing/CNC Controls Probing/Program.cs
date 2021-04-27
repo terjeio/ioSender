@@ -79,7 +79,7 @@ namespace CNC.Controls.Probing
 
                 case nameof(GrblViewModel.GrblState):
                     if (Grbl.GrblState.State == GrblStates.Alarm)
-                        ResponseReceived("fail");
+                        ResponseReceived("alarm");
                     break;
 
                 case nameof(GrblViewModel.Signals):
@@ -270,8 +270,9 @@ namespace CNC.Controls.Probing
                 isRunning = Grbl.IsJobRunning = false;
                 Grbl.ExecuteCommand(probing.DistanceMode == DistanceMode.Absolute ? "G90" : "G91");
             }
+            if(!_isComplete)
+                probing.Message = message;
             _isComplete = true;
-            probing.Message = message;
         }
 
         public bool Execute(bool go)
@@ -355,7 +356,7 @@ namespace CNC.Controls.Probing
             {
                 probing.IsSuccess = step == _program.Count && response == "ok";
                 if (!probing.IsSuccess)
-                    End("Probing cancelled/failed" + (Grbl.GrblState.State == GrblStates.Alarm ? " (ALARM)" : ""));
+                    End(Grbl.GrblState.State == GrblStates.Alarm ? "Probing failed with alarm, clear in Grbl tab" : "Probing cancelled/failed");
                 _isComplete = probing.IsCompleted = true;
 //                Grbl.Poller.SetState(AppConfig.Settings.Base.PollInterval);
             }

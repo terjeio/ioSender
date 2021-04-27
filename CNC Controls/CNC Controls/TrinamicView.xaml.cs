@@ -1,7 +1,7 @@
 /*
  * TrinamicView.xaml.cs - part of CNC Controls library
  *
- * v0.29 / 2021-02-07 / Io Engineering (Terje Io)
+ * v0.31 / 2021-04-27 / Io Engineering (Terje Io)
  *
  */
 
@@ -94,6 +94,7 @@ namespace CNC.Controls
         #region Methods and properties required by CNCView interface
 
         public ViewType ViewType { get { return ViewType.TrinamicTuner; } }
+        public bool CanEnable { get { return !(DataContext as GrblViewModel).IsGCLock; } }
 
         public void Activate(bool activate, ViewType chgMode)
         {

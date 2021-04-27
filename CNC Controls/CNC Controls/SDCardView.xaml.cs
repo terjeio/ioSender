@@ -1,13 +1,13 @@
 /*
  * SDCardView.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.10 / 2019-03-05 / Io Engineering (Terje Io)
+ * v0.31 / 2021-04-27 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2020, Io Engineering (Terje Io)
+Copyright (c) 2018-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -41,8 +41,9 @@ using System.Data;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using CNC.Core;
 using System.Threading;
+using Microsoft.Win32;
+using CNC.Core;
 
 namespace CNC.Controls
 {
@@ -51,7 +52,7 @@ namespace CNC.Controls
     /// </summary>
     public partial class SDCardView : UserControl, ICNCView
     {
-        public delegate void FileSelectedHandler(string filename);
+        public delegate void FileSelectedHandler(string filename, bool rewind);
         public event FileSelectedHandler FileSelected;
 
         private DataRow currentFile = null;
@@ -59,16 +60,25 @@ namespace CNC.Controls
         public SDCardView()
         {
             InitializeComponent();
+            ctxMenu.DataContext = this;
         }
 
         #region Methods and properties required by IRenderer interface
 
         public ViewType ViewType { get { return ViewType.SDCard; } }
+        public bool CanEnable { get { return !(DataContext as GrblViewModel).IsGCLock; } }
 
         public void Activate(bool activate, ViewType chgMode)
         {
             if (activate)
-                GrblSDCard.Load((GrblViewModel)DataContext);
+            {
+                GrblSDCard.Load(DataContext as GrblViewModel);
+                CanUpload = GrblInfo.YModemUpload;
+                CanDelete = GrblInfo.Build >= 20210421;
+                CanRewind = GrblInfo.IsGrblHAL;
+            }
+            else
+                (DataContext as GrblViewModel).Message = string.Empty;
         }
 
         public void CloseFile()
@@ -81,10 +91,42 @@ namespace CNC.Controls
 
         #endregion
 
+        #region Dependency properties
+
+        public static readonly DependencyProperty RewindProperty = DependencyProperty.Register(nameof(Rewind), typeof(bool), typeof(SDCardView), new PropertyMetadata(false));
+        public bool Rewind
+        {
+            get { return (bool)GetValue(RewindProperty); }
+            set { SetValue(RewindProperty, value); }
+        }
+
+        public static readonly DependencyProperty CanRewindProperty = DependencyProperty.Register(nameof(CanRewind), typeof(bool), typeof(SDCardView), new PropertyMetadata(false));
+        public bool CanRewind
+        {
+            get { return (bool)GetValue(CanRewindProperty); }
+            set { SetValue(CanRewindProperty, value); }
+        }
+
+        public static readonly DependencyProperty CanUploadProperty = DependencyProperty.Register(nameof(CanUpload), typeof(bool), typeof(SDCardView), new PropertyMetadata(false));
+        public bool CanUpload
+        {
+            get { return (bool)GetValue(CanUploadProperty); }
+            set { SetValue(CanUploadProperty, value); }
+        }
+
+        public static readonly DependencyProperty CanDeleteProperty = DependencyProperty.Register(nameof(CanDelete), typeof(bool), typeof(SDCardView), new PropertyMetadata(false));
+        public bool CanDelete
+        {
+            get { return (bool)GetValue(CanDeleteProperty); }
+            set { SetValue(CanDeleteProperty, value); }
+        }
+
+        #endregion
+
         private void SDCardView_Loaded(object sender, RoutedEventArgs e)
         {
             dgrSDCard.DataContext = GrblSDCard.Files;
-      //      dgrSDCard.SelectedIndex = 0;
+            //      dgrSDCard.SelectedIndex = 0;
         }
 
         void dgrSDCard_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -94,15 +136,75 @@ namespace CNC.Controls
 
         private void dgrSDCard_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if(currentFile != null)
+            RunFile();
+        }
+
+        private void Upload_Click(object sender, RoutedEventArgs e)
+        {
+            string filename = string.Empty;
+            OpenFileDialog file = new OpenFileDialog();
+
+            file.Filter = string.Format("GCode files ({0})|{0}|Text files (*.txt)|*.txt|All files (*.*)|*.*", FileUtils.ExtensionsToFilter(GCode.FileTypes));
+
+            if (file.ShowDialog() == true)
+            {
+                filename = file.FileName;
+            }
+
+            if (filename != string.Empty)
+            {
+                GrblViewModel model = DataContext as GrblViewModel;
+
+                model.Message = "Uploading...";
+
+                YModem ymodem = new YModem();
+                ymodem.DataTransferred += Ymodem_DataTransferred;
+                bool ok = ymodem.Upload(filename);
+
+                model.Message = ok ? "Transfer done." : "Transfer aborted.";
+
+                GrblSDCard.Load(model);
+            }
+        }
+
+        private void Ymodem_DataTransferred(long size, long transferred)
+        {
+            GrblViewModel model = DataContext as GrblViewModel;
+            model.Message = string.Format("Transferred {0} of {1} bytes...", transferred, size);
+        }
+
+        private void Run_Click(object sender, RoutedEventArgs e)
+        {
+            RunFile();
+        }
+
+        private void Delete_Click(object sender, RoutedEventArgs e)
+        {
+            if (MessageBox.Show(string.Format("Delete {0}?", (string)currentFile["Name"]), "SD Card", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes) == MessageBoxResult.Yes)
+            {
+                Comms.com.WriteCommand(GrblConstants.CMD_SDCARD_UNLINK + (string)currentFile["Name"]);
+                GrblSDCard.Load(DataContext as GrblViewModel);
+            }
+        }
+
+        private void RunFile()
+        {
+            if (currentFile != null)
             {
                 if ((bool)currentFile["Invalid"])
                 {
                     MessageBox.Show(string.Format("File: \"{0}\"\r\r!,?,~ and SPACE is not supported in filenames, please rename.", (string)currentFile["Name"]), "Unsupported characters in filename",
                                      MessageBoxButton.OK, MessageBoxImage.Error);
-                } else {
-                    FileSelected?.Invoke("SDCard:" + (string)currentFile["Name"]);
+                }
+                else
+                {
+                    if (Rewind)
+                    {
+                        Comms.com.WriteCommand(GrblConstants.CMD_SDCARD_REWIND);
+                    }
+                    FileSelected?.Invoke("SDCard:" + (string)currentFile["Name"], Rewind);
                     Comms.com.WriteCommand(GrblConstants.CMD_SDCARD_RUN + (string)currentFile["Name"]);
+                    Rewind = false;
                 }
             }
         }

@@ -1,4 +1,4 @@
-## GRBL GCode Sender
+## ioSender - a gcode sender for grblHAL or grbl  
 
 ---
 
@@ -10,7 +10,7 @@ Please check out the [Wiki](https://github.com/terjeio/Grbl-GCode-Sender/wiki) f
 
 ---
 
-Latest changes committed 20201214, see the [changelog](changelog.md) for details.
+First production release 2.0.31, see the [changelog](changelog.md) for details.
 
 ---
 
@@ -55,4 +55,4 @@ Lathe mode.
 Conversational programming for Lathe Mode. Threading requires [grblHAL](https://github.com/terjeio/grblHAL) controller with driver that has spindle sync support.
 
 ---
-2020-12-14
+2021-04-27

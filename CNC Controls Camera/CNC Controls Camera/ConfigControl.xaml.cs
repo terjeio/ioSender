@@ -1,5 +1,5 @@
 ﻿/*
- * ConfigControl.xaml.cs - part of Grbl Code Sender
+ * ConfigControl.xaml.cs - part of CNC Controls Camera library
  *
  * v0.10 / 2019-03-05 / Io Engineering (Terje Io)
  *

@@ -1,7 +1,7 @@
 /*
  * GrblViewModel.cs - part of CNC Controls library
  *
- * v0.29 / 2021-03-25 / Io Engineering (Terje Io)
+ * v0.31 / 2021-04-26 / Io Engineering (Terje Io)
  *
  */
 
@@ -299,6 +299,7 @@ namespace CNC.Core
 //        public bool CanReset { get { return _canReset; } private set { if(value != _canReset) { _canReset = value; OnPropertyChanged(); } } }
         public bool GrblReset { get { return _reset; } set { if ((_reset = value)) { _grblState.Error = 0; OnPropertyChanged(); Message = ""; } } }
         public GrblState GrblState { get { return _grblState; } set { _grblState = value; OnPropertyChanged(); } }
+        public bool IsGCLock { get { return _grblState.State == GrblStates.Alarm; } }
         public bool IsCheckMode { get { return _grblState.State == GrblStates.Check; } }
         public bool IsSleepMode { get { return _grblState.State == GrblStates.Sleep; } }
         public bool IsG92Active { get { return GrblParserState.IsActive("G92") != null; } }
@@ -330,7 +331,9 @@ namespace CNC.Core
         public EnumFlags<Signals> Signals { get; private set; } = new EnumFlags<Signals>(Core.Signals.Off);
         public EnumFlags<Signals> OptionalSignals { get; set; } = new EnumFlags<Signals>(Core.Signals.Off);
         public EnumFlags<AxisFlags> AxisScaled { get; private set; } = new EnumFlags<AxisFlags>(AxisFlags.None);
-        public string FileName { get { return _fileName; } set { _fileName = value; OnPropertyChanged(); OnPropertyChanged(nameof(IsFileLoaded)); OnPropertyChanged(nameof(IsPhysicalFileLoaded)); } }
+        public string FileName { get { return _fileName; } set { _fileName = value; SDRewind = false; OnPropertyChanged(); OnPropertyChanged(nameof(IsFileLoaded)); OnPropertyChanged(nameof(IsPhysicalFileLoaded)); } }
+        public bool IsSDCardJob { get { return FileName.StartsWith("SDCard:"); } }
+        public bool SDRewind { get; set; }
         public bool IsFileLoaded { get { return _fileName != string.Empty; } }
         public int Blocks
         {
@@ -563,6 +566,7 @@ namespace CNC.Core
             {
                 bool checkChanged = _grblState.State == GrblStates.Check || newstate == GrblStates.Check;
                 bool sleepChanged = _grblState.State == GrblStates.Sleep || newstate == GrblStates.Sleep;
+                bool alarmChanged = _grblState.State == GrblStates.Alarm || newstate == GrblStates.Alarm;
 
                 if (_grblState.State == GrblStates.Door && newstate != GrblStates.Door)
                     Message = string.Empty;
@@ -626,6 +630,9 @@ namespace CNC.Core
 
                 if (sleepChanged || force)
                     OnPropertyChanged(nameof(IsSleepMode));
+
+                if (alarmChanged || force)
+                    OnPropertyChanged(nameof(IsGCLock));
 
                 if (newstate == GrblStates.Sleep)
                     Message += ", " + "<Reset> to continue";
@@ -913,9 +920,12 @@ namespace CNC.Core
                     break;
 
                 case "SD":
-                    value = string.Format("SD Card streaming {0}% complete", value.Split(',')[0]);
-                    if (SDCardStatus != value)
-                        Message = SDCardStatus = value;
+                    if (value != "Pending")
+                    {
+                        value = string.Format("SD Card streaming {0}% complete", value.Split(',')[0]);
+                        if (SDCardStatus != value)
+                            Message = SDCardStatus = value;
+                    }
                     break;
 
                 case "T":
@@ -1032,7 +1042,8 @@ namespace CNC.Core
             }
             else if (data.StartsWith("["))
             {
-                switch(data.Substring(1, data.IndexOf(':') - 1))
+                int sep = data.IndexOf(':');
+                if(sep > 1) switch (data.Substring(1, sep - 1))
                 {
                     case "PRB":
                         ParseProbeStatus(data);
@@ -1099,7 +1110,6 @@ namespace CNC.Core
                         break;
                 }
             }
-
             else if (data.StartsWith("Grbl"))
             {
                 if(Poller != null)
@@ -1110,6 +1120,8 @@ namespace CNC.Core
                 OnGrblReset?.Invoke(data);
                 Message = msg;
                 _reset = false;
+                OnPropertyChanged(nameof(IsCheckMode));
+                OnPropertyChanged(nameof(IsSleepMode));
             }
             else if (_grblState.State != GrblStates.Jog)
             {

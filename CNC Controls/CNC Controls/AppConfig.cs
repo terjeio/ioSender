@@ -1,7 +1,7 @@
 ﻿/*
  * AppConfig.cs - part of CNC Controls library for Grbl
  *
- * v0.29 / 2021-03-22 / Io Engineering (Terje Io)
+ * v0.30 / 2021-04-08 / Io Engineering (Terje Io)
  *
  */
 
@@ -77,13 +77,18 @@ namespace CNC.Controls
     public class CameraConfig : ViewModelBase
     {
         private double _xoffset = 0d, _yoffset = 0d;
+        private int _guideScale = 10;
         private CameraMoveMode _moveMode = CameraMoveMode.BothAxes;
+
+        [XmlIgnore]
+        internal bool IsDirty { get; private set; } = false;
 
         [XmlIgnore]
         public CameraMoveMode[] MoveModes { get { return (CameraMoveMode[])Enum.GetValues(typeof(CameraMoveMode)); } }
 
         public double XOffset { get { return _xoffset; } set { _xoffset = value; OnPropertyChanged(); } }
         public double YOffset { get { return _yoffset; } set { _yoffset = value; OnPropertyChanged(); } }
+        public int GuideScale { get { return _guideScale; } set { _guideScale = value; IsDirty = true; OnPropertyChanged(); } }
         public CameraMoveMode MoveMode { get { return _moveMode; } set { _moveMode = value; OnPropertyChanged(); } }
     }
 
@@ -236,6 +241,12 @@ namespace CNC.Controls
             }
 
             return ok;
+        }
+
+        public void Shutdown()
+        {
+            if (Camera.IsDirty)
+                Save();
         }
 
         private void setPort(string port)

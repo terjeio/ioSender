@@ -10,7 +10,7 @@
         xmlns:cncprobingcontrols="clr-namespace:CNC.Controls.Probing;assembly=CNC.Controls.Probing"
         xmlns:local="clr-namespace:GCode_Sender"
         mc:Ignorable="d"
-        Title="Sender (beta-8.12)" Height="640" Width="925" MinHeight="660" MinWidth="925"
+        Title="Sender ({0})" Height="640" Width="925" MinHeight="660" MinWidth="925"
         Loaded="Window_Load"
         SizeChanged="Window_SizeChanged"
         Closing="Window_Closing"

@@ -1,7 +1,7 @@
 ﻿/*
  * SerialStream.cs - part of CNC Controls library
  *
- * v0.29 / 2021-03-22 / Io Engineering (Terje Io)
+ * v0.31 / 2021-04-23 / Io Engineering (Terje Io)
  *
  */
 
@@ -59,7 +59,7 @@ namespace CNC.Core
         public event DataReceivedHandler DataReceived;
 
 #if RESPONSELOG
-StreamWriter log = null;
+        StreamWriter log = null;
 #endif
 
         public SerialStream(string PortParams, int ResetDelay, Dispatcher dispatcher)
@@ -147,7 +147,8 @@ StreamWriter log = null;
                 if (Resources.DebugFile != string.Empty) try
                 {
                     log = new StreamWriter(Resources.DebugFile);
-                } catch
+                }
+                catch
                 {
                     MessageBox.Show("Unable to open log file: " + Resources.DebugFile, "GCode Sender");
                 }
@@ -175,12 +176,16 @@ StreamWriter log = null;
         public bool IsOpen { get { return serialPort != null && serialPort.IsOpen; } }
         public bool IsClosing { get; private set; }
         public int OutCount { get { return serialPort.BytesToWrite; } }
+        public bool EventMode { get; set; } = true;
+        public Action<int> ByteReceived { get; set; }
 
         public void PurgeQueue()
         {
             serialPort.DiscardInBuffer();
             serialPort.DiscardOutBuffer();
             Reply = string.Empty;
+            if (!EventMode)
+                input.Clear();
         }
 
         private Parity ParseParity(string parity)
@@ -230,16 +235,24 @@ StreamWriter log = null;
             }
         }
 
+        public int ReadByte()
+        {
+            int c = input.Length == 0 ? -1 : input[0];
+
+            if (c != -1)
+                input.Remove(0, 1);
+
+            return c;
+        }
+
         public void WriteByte(byte data)
         {
             serialPort.BaseStream.Write(new byte[1] { data }, 0, 1);
-            //serialPort.Write(new byte[1] { data }, 0, 1);
         }
 
         public void WriteBytes(byte[] bytes, int len)
         {
             serialPort.BaseStream.Write(bytes, 0, len);
-            //      serialPort.Write(bytes, 0, len);
         }
 
         public void WriteString(string data)
@@ -258,7 +271,6 @@ StreamWriter log = null;
                 command += "\r";
                 byte[] bytes = System.Text.Encoding.UTF8.GetBytes(command);
                 serialPort.BaseStream.Write(bytes, 0, bytes.Length);
-                // serialPort.Write(command);
             }
         }
 
@@ -314,6 +326,7 @@ StreamWriter log = null;
             return found ? pos - 1 : 0;
         }
 
+
         private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
             int pos = 0;
@@ -322,22 +335,27 @@ StreamWriter log = null;
             {
                 input.Append(serialPort.ReadExisting());
 
-                while (input.Length > 0 && (pos = gp()) > 0)
+                if (EventMode)
                 {
-                    Reply = pos == 0 ? string.Empty : input.ToString(0, pos - 1);
-                    input.Remove(0, pos + 1);
-#if RESPONSELOG
-                    if (log != null)
+                    while (input.Length > 0 && (pos = gp()) > 0)
                     {
-                        log.WriteLine(Reply);
-                        log.Flush();
-                    }
+                        Reply = pos == 0 ? string.Empty : input.ToString(0, pos - 1);
+                        input.Remove(0, pos + 1);
+#if RESPONSELOG
+                        if (log != null)
+                        {
+                            log.WriteLine(Reply);
+                            log.Flush();
+                        }
 #endif
-                    if (Reply.Length != 0 && DataReceived != null)
-                        Dispatcher.BeginInvoke(DataReceived, Reply);
+                        if (Reply.Length != 0 && DataReceived != null)
+                            Dispatcher.BeginInvoke(DataReceived, Reply);
 
-                    state = Reply == "ok" ? Comms.State.ACK : (Reply.StartsWith("error") ? Comms.State.NAK : Comms.State.DataReceived);
+                        state = Reply == "ok" ? Comms.State.ACK : (Reply.StartsWith("error") ? Comms.State.NAK : Comms.State.DataReceived);
+                    }
                 }
+                else
+                    ByteReceived?.Invoke(ReadByte());
             }
         }
     }

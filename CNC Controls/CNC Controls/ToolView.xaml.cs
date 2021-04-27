@@ -1,13 +1,13 @@
 /*
  * ToolView.xaml.cs - part of CNC Controls library
  *
- * v0.14 / 2020-03-28 / Io Engineering (Terje Io)
+ * v0.31 / 2021-04-27 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2020, Io Engineering (Terje Io)
+Copyright (c) 2018-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -67,6 +67,7 @@ namespace CNC.Controls
         #region Methods and properties required by CNCView interface
 
         public ViewType ViewType { get { return ViewType.Tools; } }
+        public bool CanEnable { get { return !(DataContext as GrblViewModel).IsGCLock; } }
 
         public void Activate(bool activate, ViewType chgMode)
         {
@@ -89,6 +90,7 @@ namespace CNC.Controls
         public void CloseFile()
         {
         }
+
         public void Setup(UIViewModel model, AppConfig profile)
         {
         }

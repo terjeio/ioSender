@@ -1,7 +1,7 @@
 ﻿/*
  * HeightMapControl.xaml.cs - part of CNC Probing library
  *
- * v0.27 / 2020-09-20 / Io Engineering (Terje Io)
+ * v0.30 / 2021-04-04 / Io Engineering (Terje Io)
  *
  */
 
@@ -63,7 +63,7 @@ namespace CNC.Controls.Probing
 
         public void Activate()
         {
-            (DataContext as ProbingViewModel).Instructions = "A rapid motion to X0Y0 will be performed before probing the height map starts.";
+            (DataContext as ProbingViewModel).Instructions = "A rapid motion to X0Y0 will be performed before probing the height map starts.\nEnsure the initial Z-position is clear of any obstacles that might be encountered during probing.";
         }
 
         public void Start(bool preview = false)
@@ -71,7 +71,7 @@ namespace CNC.Controls.Probing
             double dir = 1d;
             var probing = DataContext as ProbingViewModel;
 
-            if (!probing.ValidateInput())
+            if (!probing.ValidateInput(true))
                 return;
 
             probing.WaitForIdle(string.Format("G90G0X{0}Y{1}", probing.HeightMap.MinX.ToInvariantString(), probing.HeightMap.MinY.ToInvariantString()));
@@ -109,7 +109,7 @@ namespace CNC.Controls.Probing
                     if (probing.HeightMap.AddPause && (x > 0 || y > 0))
                         probing.Program.AddPause();
                     probing.Program.AddProbingAction(AxisFlags.Z, true);
-                    probing.Program.AddRapid("Z" + probing.Depth.ToInvariantString(probing.Grbl.Format));
+                    probing.Program.AddRapidToMPos(probing.StartPosition, AxisFlags.Z);
                     if (y < (probing.HeightMap.Map.SizeY - 1))
                         probing.Program.AddRapid(string.Format("Y{0}", (probing.HeightMap.Map.GridY * dir).ToInvariantString(probing.Grbl.Format)));
                 }

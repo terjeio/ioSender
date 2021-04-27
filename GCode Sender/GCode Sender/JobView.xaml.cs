@@ -1,7 +1,7 @@
 /*
  * JobView.xaml.cs - part of Grbl Code Sender
  *
- * v0.29 / 2021-03-18 / Io Engineering (Terje Io)
+ * v0.31 / 2021-04-27 / Io Engineering (Terje Io)
  *
  */
 
@@ -85,10 +85,16 @@ namespace GCode_Sender
             if (sender is GrblViewModel) switch (e.PropertyName)
                 {
                 case nameof(GrblViewModel.GrblState):
-                    if (!resetPending) {
+                    if (!resetPending)
+                    {
                         if (initOK == false && (sender as GrblViewModel).GrblState.State != GrblStates.Alarm)
                             InitSystem();
                     }
+                    break;
+
+                case nameof(GrblViewModel.IsGCLock):
+                        MainWindow.ui.JobRunning = (sender as GrblViewModel).IsJobRunning;
+           //             MainWindow.EnableView(!(sender as GrblViewModel).IsGCLock, ViewType.Probing);
                     break;
 
                 case nameof(GrblViewModel.IsSleepMode):
@@ -135,9 +141,8 @@ namespace GCode_Sender
 
                     if(string.IsNullOrEmpty(filename))
                         MainWindow.CloseFile();
-                    else if (filename.StartsWith("SDCard:"))
+                    else if ((sender as GrblViewModel).IsSDCardJob)
                     {
-                        sdStream = true;
                         MainWindow.EnableView(false, ViewType.GCodeViewer);
                     }
                     else if (filename.StartsWith("Wizard:"))
@@ -162,7 +167,10 @@ namespace GCode_Sender
             }
         }
 
-        #region Methods required by CNCView interface
+        #region Methods and properties required by CNCView interface
+
+        public ViewType ViewType { get { return ViewType.GRBL; } }
+        public bool CanEnable { get { return true; } }
 
         private void TrapReset(string rws)
         {
@@ -193,15 +201,12 @@ namespace GCode_Sender
             return !resetPending;
         }
 
-        public ViewType ViewType { get { return ViewType.GRBL; } }
-
         public void Activate(bool activate, ViewType chgMode)
         {
             if (activate)
             {
                 GCodeSender.RewindFile();
-                GCodeSender.CallHandler(GCode.File.IsLoaded ? StreamingState.Idle : (sdStream ? StreamingState.Start : StreamingState.NoFile), false);
-                sdStream = false;
+                GCodeSender.CallHandler(GCode.File.IsLoaded ? StreamingState.Idle : (model.IsSDCardJob ? StreamingState.Start : StreamingState.NoFile), false);
 
                 model.ResponseLogFilterOk = AppConfig.Settings.Base.FilterOkResponse;
 
@@ -347,6 +352,11 @@ namespace GCode_Sender
                                         MainWindow.ui.Close();
                                     }
                                     break;
+
+                                case GrblStates.Idle:
+                                    if(response.Contains("|SD:Pending"))
+                                        AttemptReset();
+                                    break;
                             }
                         }
                     }
@@ -473,7 +483,7 @@ namespace GCode_Sender
                 }
                 GrblAlarms.Get();
                 GrblErrors.Get();
-                GrblSettings.Get();
+                GrblSettings.Load();
                 GrblParserState.Get();
                 GrblWorkParameters.Get();
                 GCodeSender.EnablePolling(true);

@@ -1,13 +1,13 @@
 ﻿/*
- * Camera.xaml.cs - part of CNC Controls library
+ * Camera.xaml.cs - part of CNC Controls Camera library
  *
- * v0.17 / 2020-04-15 / Io Engineering (Terje Io)
+ * v0.30 / 2021-04-08 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2019, Io Engineering (Terje Io) - parts derived from AForge example code
+Copyright (c) 2018-2021, Io Engineering (Terje Io) - parts derived from AForge example code
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -69,6 +69,7 @@ namespace CNC.Controls.Camera
         public void Setup(UIViewModel model)
         {
             CameraConfig config = AppConfig.Settings.Camera;
+            CameraControl.GuideScale = config.GuideScale;
             CameraControl.XOffset = config.XOffset;
             CameraControl.YOffset = config.YOffset;
             CameraControl.Mode = config.MoveMode;

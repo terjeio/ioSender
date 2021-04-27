@@ -1,7 +1,7 @@
 ﻿/*
  * Grbl.cs - part of CNC Controls library
  *
- * v0.29 / 2021-03-25 / Io Engineering (Terje Io)
+ * v0.31 / 2021-04-26 / Io Engineering (Terje Io)
  *
  */
 
@@ -114,7 +114,9 @@ namespace CNC.Core
             CMD_PROGRAM_DEMARCATION = "%",
             CMD_SDCARD_MOUNT = "$FM",
             CMD_SDCARD_DIR = "$F",
+            CMD_SDCARD_REWIND = "$FR",
             CMD_SDCARD_RUN = "$F=",
+            CMD_SDCARD_UNLINK = "$FD=",
             FORMAT_METRIC = "###0.000",
             FORMAT_IMPERIAL = "##0.0000",
             NO_TOOL = "None",
@@ -660,6 +662,7 @@ namespace CNC.Core
         public static bool HasSimpleProbeProtect { get { return _probeProtect & IsGrblHAL && Build >= 20200924; } internal set { _probeProtect = value; } }
         public static bool ManualToolChange { get; private set; }
         public static bool HasSDCard { get; private set; }
+        public static bool YModemUpload { get; private set; }
         public static bool HasPIDLog { get; private set; }
         public static bool HasProbe { get; private set; } = true;
         public static bool HomingEnabled { get; internal set; } = true;
@@ -867,6 +870,10 @@ namespace CNC.Core
 
                                     case "SD":
                                         HasSDCard = true;
+                                        break;
+
+                                    case "YM":
+                                        YModemUpload = true;
                                         break;
 
                                     case "PID":
@@ -1722,6 +1729,11 @@ namespace CNC.Core
         public static bool IsLoaded { get { return Settings.Count > 0; } }
         public static bool ReportProbeCoordinates { get; private set; }
 
+        public static GrblSettingDetails Get(GrblSetting key)
+        {
+            return Settings.Where(x => x.Id == ((int)key)).FirstOrDefault();
+        }
+
         public static string GetString(GrblSetting key)
         {
             var setting = Settings.Where(x => x.Id == ((int)key)).FirstOrDefault();
@@ -1739,7 +1751,7 @@ namespace CNC.Core
             return int.Parse(GetString(key));
         }
 
-        public static bool Get(GrblViewModel model)
+        public static bool Load(GrblViewModel model)
         {
             bool? res = null;
             bool load, getExtended = GrblInfo.ExtendedProtocol && GrblInfo.Build >= 20200716;
@@ -1870,9 +1882,9 @@ namespace CNC.Core
             return IsLoaded;
         }
 
-        public static bool Get()
+        public static bool Load()
         {
-            return Grbl.GrblViewModel != null && Get(Grbl.GrblViewModel);
+            return Grbl.GrblViewModel != null && Load(Grbl.GrblViewModel);
         }
 
 #if USE_ASYNC
@@ -1940,8 +1952,12 @@ namespace CNC.Core
                 }
             }
 
-            foreach (GrblSettingDetails Setting in Settings)
-                exp.Add(string.Format("${0}={1}", Setting.Id, Setting.Value));
+            foreach (GrblSettingDetails setting in Settings)
+            {
+                if(!string.IsNullOrEmpty(setting.Name))
+                    exp.Add(string.Format("; {0} - {1}", setting.Id, setting.Name));
+                exp.Add(string.Format("${0}={1}", setting.Id, setting.Value));
+            }
 
             if (GrblInfo.IsGrblHAL)
                 exp.Add("%");

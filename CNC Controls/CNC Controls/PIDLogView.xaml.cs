@@ -1,7 +1,7 @@
 /*
  * PIDLogView.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.10 / 2019-03-05 / Io Engineering (Terje Io)
+ * v0.31 / 2021-04-27 / Io Engineering (Terje Io)
  *
  */
 
@@ -72,6 +72,7 @@ namespace CNC.Controls
         #region Methods and properties required by CNCView interface
 
         public ViewType ViewType { get { return ViewType.PIDTuner; } }
+        public bool CanEnable { get { return true; } }
 
         public void Activate(bool activate, ViewType chgMode)
         {
@@ -80,6 +81,7 @@ namespace CNC.Controls
         public void CloseFile()
         {
         }
+
         public void Setup(UIViewModel model, AppConfig profile)
         {
         }

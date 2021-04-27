@@ -1,13 +1,13 @@
 ﻿/*
  * Comms.cs - part of CNC Controls library
  *
- * v0.03 / 2019-12-04 / Io Engineering (Terje Io)
+ * v0.31 / 2021-04-23 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2019, Io Engineering (Terje Io)
+Copyright (c) 2018-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+using System;
 using System.Windows.Threading;
 
 namespace CNC.Core
@@ -79,8 +80,11 @@ namespace CNC.Core
         string Reply { get; }
         Comms.StreamType StreamType { get; }
         Comms.State CommandState { get; set; }
+        bool EventMode { get; set; }
+        Action<int> ByteReceived { get; set; }
 
         void Close();
+        int ReadByte();
         void WriteByte(byte data);
         void WriteBytes(byte[] bytes, int len);
         void WriteString(string data);

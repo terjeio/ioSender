@@ -1,13 +1,13 @@
 ﻿/*
- * GCode.xaml.cs - part of CNC Controls library for Grbl
+ * GCode.cs - part of CNC Controls library for Grbl
  *
- * v0.28 / 2020-10-19 / Io Engineering (Terje Io)
+ * v0.31 / 2021-04-22 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2020, Io Engineering (Terje Io)
+Copyright (c) 2018-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -64,7 +64,7 @@ namespace CNC.Controls
             public string Name;
         }
 
-        private string allowedTypes = "cnc,nc,ncc,ngc,gcode,tap";
+        public const string FileTypes = "cnc,nc,ncc,ngc,gcode,tap";
         private string conversionTypes = string.Empty;
 
         private GCodeJob Program { get; set; } = new GCodeJob();
@@ -191,7 +191,7 @@ namespace CNC.Controls
             if (allow && e.Data.GetDataPresent(DataFormats.FileDrop))
             {
                 string[] files = (string[])e.Data.GetData(DataFormats.FileDrop, false);
-                allow = files.Count() == 1 && FileUtils.IsAllowedFile(files[0].ToLower(), allowedTypes + (conversionTypes == string.Empty ? "" : "," + conversionTypes) + ",txt");
+                allow = files.Count() == 1 && FileUtils.IsAllowedFile(files[0].ToLower(), FileTypes + (conversionTypes == string.Empty ? "" : "," + conversionTypes) + ",txt");
             }
 
             e.Handled = true;
@@ -221,7 +221,7 @@ namespace CNC.Controls
 
             string conversionFilter = conversionTypes == string.Empty ? string.Empty : string.Format("Other files ({0})|{0}|", FileUtils.ExtensionsToFilter(conversionTypes));
 
-            file.Filter = string.Format("GCode files ({0})|{0}|{1}Text files (*.txt)|*.txt|All files (*.*)|*.*", FileUtils.ExtensionsToFilter(allowedTypes), conversionFilter);
+            file.Filter = string.Format("GCode files ({0})|{0}|{1}Text files (*.txt)|*.txt|All files (*.*)|*.*", FileUtils.ExtensionsToFilter(FileTypes), conversionFilter);
 
             if (file.ShowDialog() == true)
             {

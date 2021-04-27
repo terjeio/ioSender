@@ -7,7 +7,7 @@
 
 /*
 
-Copyright (c) 2019-2020, Io Engineering (Terje Io)
+Copyright (c) 2019-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -58,6 +58,7 @@ public partial class Viewer : UserControl, ICNCView
         }
 
         public ViewType ViewType { get { return ViewType.GCodeViewer; } }
+        public bool CanEnable { get { return true; } }
 
         public void Activate(bool activate, ViewType chgMode)
         {
