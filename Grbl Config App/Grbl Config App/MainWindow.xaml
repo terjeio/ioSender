@@ -13,15 +13,15 @@
     <Window.DataContext>
         <cnccore:GrblViewModel />
     </Window.DataContext>
-    <DockPanel>
+    <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
         <Menu DockPanel.Dock="Top">
             <MenuItem x:Name="menuFile" Header="_File">
                 <MenuItem Header="_About" Click="aboutMenuItem_Click"/>
                 <MenuItem Header="_Exit" Click="exitMenuItem_Click"/>
             </MenuItem>
         </Menu>
-        <Grid Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
-            <Controls:GrblConfigView x:Name="configView" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+        <Grid Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <Controls:GrblConfigView x:Name="configView" HorizontalAlignment="Left" VerticalAlignment="Top" MinHeight="545"/>
         </Grid>
     </DockPanel>
 </Window>

@@ -49,14 +49,16 @@ namespace Grbl_Config_App
     public partial class MainWindow : Window
     {
 
-        public static AppConfig Profile = new AppConfig();
+        public static UIViewModel UIViewModel { get; } = new UIViewModel();
 
         public MainWindow()
         {
+            CNC.Core.Resources.Path = AppDomain.CurrentDomain.BaseDirectory;
+
             InitializeComponent();
 
             int res;
-            if ((res = Profile.SetupAndOpen(Title, (GrblViewModel)DataContext, App.Current.Dispatcher)) != 0)
+            if ((res = AppConfig.Settings.SetupAndOpen(Title, (GrblViewModel)DataContext, App.Current.Dispatcher)) != 0)
                 Environment.Exit(res);
 
             CNC.Core.Grbl.GrblViewModel = (GrblViewModel)DataContext;
@@ -72,7 +74,7 @@ namespace Grbl_Config_App
             using (new UIUtils.WaitCursor())
             {
                 GrblInfo.Get();
-                GrblSettings.Get();
+                GrblSettings.Load();
             }
 
             configView.Activate(true, ViewType.Startup);
