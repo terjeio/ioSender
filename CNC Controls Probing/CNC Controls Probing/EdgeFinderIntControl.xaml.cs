@@ -1,7 +1,7 @@
 ﻿/*
  * EdgeFinderIntControl.xaml.cs - part of CNC Probing library
  *
- * v0.30 / 2021-04-04 / Io Engineering (Terje Io)
+ * v0.33 / 2021-05-12 / Io Engineering (Terje Io)
  *
  */
 
@@ -182,7 +182,7 @@ namespace CNC.Controls.Probing
 
             axisflags = AxisFlags.X | AxisFlags.Y;
 
-            if (XYClearance > probing.Offset && MessageBox.Show("Offset is less than XY Clearance + ½ Probe/tool diameter.\nUse Offset as clearance and run anyway?", "GCode Sender", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
+            if (XYClearance > probing.Offset && MessageBox.Show("Offset is less than XY Clearance + ½ Probe/tool diameter.\nUse Offset as clearance and run anyway?", "ioSender", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
                 return false;
 
             XYClearance = Math.Min(XYClearance, probing.Offset);

@@ -1,13 +1,13 @@
 ﻿/*
  * StripGCodeConfigControl.xaml.cs - part of CNC Controls library
  *
- * v0.01 / 2020-01-24 / Io Engineering (Terje Io)
+ * v0.33 / 2021-05-09 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020, Io Engineering (Terje Io)
+Copyright (c) 2020-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,

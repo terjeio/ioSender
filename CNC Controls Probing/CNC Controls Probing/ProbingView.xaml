@@ -104,6 +104,9 @@
                 <TabItem Header="Edge finder, internal">
                     <local:EdgeFinderIntControl HorizontalAlignment="Left" VerticalAlignment="Top"/>
                 </TabItem>
+                <TabItem Header="Rotation">
+                    <local:RotationControl HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                </TabItem>
                 <TabItem Header="Center finder">
                     <local:CenterFinderControl HorizontalAlignment="Left" VerticalAlignment="Top"/>
                 </TabItem>

@@ -10,7 +10,7 @@
         xmlns:cncprobingcontrols="clr-namespace:CNC.Controls.Probing;assembly=CNC.Controls.Probing"
         xmlns:local="clr-namespace:GCode_Sender"
         mc:Ignorable="d"
-        Title="Sender ({0})" Height="640" Width="925" MinHeight="660" MinWidth="925"
+        Title="Sender ({0})" Height="640" Width="925" MinHeight="700" MinWidth="1020"
         Loaded="Window_Load"
         SizeChanged="Window_SizeChanged"
         Closing="Window_Closing"
@@ -37,6 +37,7 @@
             </MenuItem>
             <MenuItem x:Name="menuHelp" Header="_Help">
                 <MenuItem Header="_Wiki" Click="aboutWikiItem_Click"/>
+                <MenuItem Header="Usage _tips" Click="tipsWikiItem_Click"/>
                 <MenuItem Header="_About" Click="aboutMenuItem_Click"/>
             </MenuItem>
         </Menu>

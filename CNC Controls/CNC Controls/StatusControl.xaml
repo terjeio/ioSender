@@ -17,13 +17,14 @@
                 <local:LogicalNotConverter />
             </local:LogicalOrConverter.FinalConverter>
         </local:LogicalOrConverter>
+        <Style x:Key="StatusButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="66" />
+            <Setter Property="Height" Value="36" />
+            <Setter Property="Focusable" Value="False" />
+        </Style>
     </UserControl.Resources>
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="30*"/>
-            <RowDefinition Height="40*"/>
-        </Grid.RowDefinitions>
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="3,0" VerticalAlignment="Center" Width="210">
+    <StackPanel Orientation="Vertical">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
             <Label x:Name="lblState" Content="State:" HorizontalContentAlignment="Right" HorizontalAlignment="Left" VerticalAlignment="Center" Height="26" Width="40"/>
             <TextBox x:Name="txtState" HorizontalAlignment="Left" Height="24" Margin="2,0" TextWrapping="NoWrap" IsReadOnly="True" TextAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center" Width="74"
                      Text="{Binding Path=GrblState, Converter={StaticResource ToStringConverter}}"
@@ -40,8 +41,8 @@
             </CheckBox>
             <Label Content="Check" VerticalAlignment="Center" Height="26"/>
         </StackPanel>
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Height="34" Margin="3,3,0,0" Grid.Row="1" VerticalAlignment="Top" Width="210">
-            <Button x:Name="btnHome" Content="Home" ToolTip="Ctrl+H" Background="{Binding Path=HomedState, Converter={StaticResource HomedStateConverter}}" Focusable="False" Width="55" Height="32" Click="btn_Click">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,4,0,0" VerticalAlignment="Bottom">
+            <Button x:Name="btnHome" Content="Home" ToolTip="Ctrl+H" Background="{Binding Path=HomedState, Converter={StaticResource HomedStateConverter}}" Style="{StaticResource StatusButtonStyle}" Click="btn_Click">
                 <Button.IsEnabled>
                     <MultiBinding Converter="{StaticResource HomingEnabledConverter}">
                         <Binding Path="GrblState" Mode="OneWay"/>
@@ -50,10 +51,10 @@
                     </MultiBinding>
                 </Button.IsEnabled>
             </Button>
-            <Button x:Name="btnUnlock" Content="Unlock" ToolTip="Ctrl+U" Focusable="False" Width="55" Height="32" Margin="3,0,0,0" Click="btn_Click"
+            <Button x:Name="btnUnlock" Content="Unlock" ToolTip="Ctrl+U" Style="{StaticResource StatusButtonStyle}" Margin="5,0,0,0" Click="btn_Click"
                 IsEnabled="{Binding Path=IsSleepMode, Converter={StaticResource SleepEnabledConverter}, Mode=OneWay}"
             />
-            <Button x:Name="btnReset" Content="Reset" ToolTip="Ctrl+Shift+R" Focusable="False" Width="55" Height="32" Margin="3,0,0,0" Background="Red" Foreground="White" Click="btn_Click" FontFamily="Segoe UI Semibold" FontSize="14"/>
+            <Button x:Name="btnReset" Content="Reset" ToolTip="Ctrl+Shift+R" Style="{StaticResource StatusButtonStyle}" Margin="5,0,0,0" Background="Red" Foreground="White" Click="btn_Click" FontFamily="Segoe UI Semibold" FontSize="14"/>
         </StackPanel>
-    </Grid>
+    </StackPanel>
 </UserControl>

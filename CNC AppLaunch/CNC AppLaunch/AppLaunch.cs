@@ -1,13 +1,13 @@
 ﻿/*
  * AppLaunch.cs - part of CNC Library
  *
- * v0.17 / 2020-04-14 / Io Engineering (Terje Io)
+ * v0.33 / 2021-05-17 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020, Io Engineering (Terje Io)
+Copyright (c) 2020-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -56,7 +56,7 @@ namespace CNC.AppLaunch
             {
                 filename = args[0];
 
-                using (var pipeClient = new NamedPipeClientStream(".", "gcodesender", PipeDirection.InOut, PipeOptions.None, TokenImpersonationLevel.Impersonation))
+                using (var pipeClient = new NamedPipeClientStream(".", "ioSender", PipeDirection.InOut, PipeOptions.None, TokenImpersonationLevel.Impersonation))
                 {
                     try
                     {
@@ -71,7 +71,7 @@ namespace CNC.AppLaunch
                     {
                         if (ex is System.TimeoutException)
                         {
-                            string cmd = AppDomain.CurrentDomain.BaseDirectory + "GCode Sender.exe";
+                            string cmd = AppDomain.CurrentDomain.BaseDirectory + "ioSender.exe";
                             if (File.Exists(cmd))
                             {
                                 ProcessStartInfo startInfo = new ProcessStartInfo()

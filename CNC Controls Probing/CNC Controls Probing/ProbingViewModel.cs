@@ -1,7 +1,7 @@
 ﻿/*
  * ProbingViewModel.cs - part of CNC Probing library
  *
- * v0.30 / 2021-04-04 / Io Engineering (Terje Io)
+ * v0.33 / 2021-05-10 / Io Engineering (Terje Io)
  *
  */
 
@@ -73,7 +73,8 @@ namespace CNC.Controls.Probing
         private bool _canProbe = false, _isComplete = false, _isSuccess = false, _probeZ = false, _useFixture = false;
         private bool _hasToolTable = false, _hasCs9 = false, _addAction = false, _isPaused = false, _isCorner = false;
         private bool isCancelled = false, wasZselected = false, _referenceToolOffset = true, _workpieceLockXY = true;
-        private bool _enablePreview = false;
+        private bool _enablePreview = false, _canApplyTransform = false;
+        private OriginControl.Origin _origin = OriginControl.Origin.None;
         private GrblViewModel _grblmodel = null;
         private List<string> _program = new List<string>();
         private List<Position> _positions = new List<Position>();
@@ -420,14 +421,15 @@ namespace CNC.Controls.Probing
         public double ProbeOffsetX { get { return _probeOffsetX; } set { _probeOffsetX = value; OnPropertyChanged(); } }
         public double ProbeOffsetY { get { return _probeOffsetY; } set { _probeOffsetY = value; OnPropertyChanged(); } }
         public bool ProbeIsOffset { get { return !(_probeOffsetX == 0d && _probeOffsetY == 0d); } }
-        public bool OffsetEnable { get { return (_probingType == ProbingType.EdgeFinderInternal || _probingType == ProbingType.EdgeFinderExternal) && _isCorner; } }
-        public bool XYOffsetEnable { get { return ((_probingType == ProbingType.EdgeFinderInternal || _probingType == ProbingType.EdgeFinderExternal) && _edge != Edge.None && _edge != Edge.Z) || _probingType == ProbingType.CenterFinder; } }
+        public bool OffsetEnable { get { return ((_probingType == ProbingType.EdgeFinderInternal || _probingType == ProbingType.EdgeFinderExternal) && _isCorner) || _probingType == ProbingType.Rotation; } }
+        public bool XYOffsetEnable { get { return ((_probingType == ProbingType.EdgeFinderInternal || _probingType == ProbingType.EdgeFinderExternal) && _edge != Edge.None && _edge != Edge.Z) || _probingType == ProbingType.CenterFinder || _probingType == ProbingType.Rotation; } }
         public double Depth { get { return _depth; } set { _depth = value; OnPropertyChanged(); } }
         public string RapidCommand { get { return RapidsFeedRate == 0d ? "G0" : "G1F" + RapidsFeedRate.ToInvariantString(); } }
         public string ProbeProgram { get { return Program.ToString().Replace("G53", string.Empty); } }
         public bool ProbeDiameterEnable { get { return _probingType == ProbingType.CenterFinder || ((_probingType == ProbingType.EdgeFinderInternal || _probingType == ProbingType.EdgeFinderExternal) && _edge != Edge.Z); } }
         public bool FixtureHeightEnable { get { return _probingType == ProbingType.ToolLength && _useFixture /*&& !ReferenceToolOffset && !Grbl.IsTloReferenceSet*/; } }
         public bool TouchPlateHeightEnable { get { return _probingType == ProbingType.ToolLength ? !_useFixture : (_probingType == ProbingType.EdgeFinderExternal || _probingType == ProbingType.EdgeFinderInternal ? _probeZ : _probingType == ProbingType.HeightMap); } }
+        public bool CanApplyTransform { get { return _canApplyTransform; } set { _canApplyTransform = value; OnPropertyChanged(); } }
 
         public string Message
         {
@@ -477,6 +479,8 @@ namespace CNC.Controls.Probing
                 ProbeCorner = _edge == Edge.A || _edge == Edge.B || _edge == Edge.C || _edge == Edge.D;
             }
         }
+
+        public OriginControl.Origin Origin { get { return _origin; } set { _origin = value; OnPropertyChanged(); } }
 
         public bool PreviewEnable
         {

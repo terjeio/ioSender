@@ -1,7 +1,7 @@
 /*
  * AppConfigView.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.31 / 2021-04-27 / Io Engineering (Terje Io)
+ * v0.33 / 2021-05-15 / Io Engineering (Terje Io)
  *
  */
 /*
@@ -81,13 +81,16 @@ namespace CNC.Controls
 
         public void Setup(UIViewModel model, AppConfig profile)
         {
-            this.model = model;
-            grblmodel = DataContext as GrblViewModel;
-            DataContext = profile.Base;
-            xx.ItemsSource = model.ConfigControls;
-            model.ConfigControls.Add(new BasicConfigControl());
-            model.ConfigControls.Add(new StripGCodeConfigControl());
-            model.ConfigControls.Add(new JogConfigControl());
+            if (this.model == null)
+            {
+                this.model = model;
+                grblmodel = DataContext as GrblViewModel;
+                DataContext = profile.Base;
+                xx.ItemsSource = model.ConfigControls;
+                model.ConfigControls.Add(new BasicConfigControl());
+                model.ConfigControls.Add(new StripGCodeConfigControl());
+                model.ConfigControls.Add(new JogConfigControl());
+            }
         }
 
         #endregion

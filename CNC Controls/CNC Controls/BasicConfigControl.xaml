@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CNC.Controls"
              mc:Ignorable="d" 
-             d:DesignHeight="175" d:DesignWidth="250">
+             d:DesignHeight="185" d:DesignWidth="250">
     <GroupBox x:Name="grpBasic" Header="Main" HorizontalAlignment="Left" VerticalAlignment="Top" Height="Auto" Width="250">
         <StackPanel HorizontalAlignment="Left">
             <local:NumericField Label="Reset delay:" ColonAt="90" Unit="ms" Format="###0" Value="{Binding Path=ResetDelay, Mode=TwoWay}" Height="29" VerticalAlignment="Bottom" ToolTip="Delay to allow controller to finish booting before communication starts."/>
@@ -14,6 +14,7 @@
             <CheckBox Content="Agressive buffering" HorizontalContentAlignment="Left" HorizontalAlignment="Left" Margin="5,0,0,0" IsChecked="{Binding Path=UseBuffering, Mode=TwoWay}" ToolTip="Buffers more than one GCode block in controller for smoother execution. For GrblHAL only!"/>
             <CheckBox Content="Keep MDI focus" HorizontalContentAlignment="Left" HorizontalAlignment="Left" Margin="5,0,0,0" IsChecked="{Binding Path=KeepMdiFocus, Mode=TwoWay}" ToolTip="Buffers more than one GCode block in controller for smoother execution. For GrblHAL only!"/>
             <CheckBox Content='Filter "ok" response' HorizontalContentAlignment="Left" HorizontalAlignment="Left" Margin="5,0,0,0" IsChecked="{Binding Path=FilterOkResponse, Mode=TwoWay}" ToolTip="Enable if ok responses overwhelm console logging, typically happens when sending lots of short commands."/>
+            <CheckBox Content='Auto-compress gcode on transforms' HorizontalContentAlignment="Left" HorizontalAlignment="Left" Margin="5,0,0,0" IsChecked="{Binding Path=AutoCompress, Mode=TwoWay}" ToolTip="Removes superfluous gcode command elements."/>
             <CheckBox Content='Restore last window size on startup' HorizontalContentAlignment="Left" HorizontalAlignment="Left" Margin="5,0,0,0" IsChecked="{Binding Path=KeepWindowSize, Mode=TwoWay}" ToolTip="Restore window size on next startup."/>
         </StackPanel>
     </GroupBox>

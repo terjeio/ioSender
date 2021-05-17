@@ -82,6 +82,9 @@
     <Compile Include="ProbingViewModel.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RotationControl.xaml.cs">
+      <DependentUpon>RotationControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ToolLengthControl.xaml.cs">
       <DependentUpon>ToolLengthControl.xaml</DependentUpon>
     </Compile>
@@ -118,6 +121,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="ProbingView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="RotationControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -160,6 +167,12 @@
     <Resource Include="Resources\edgeIAD.png" />
     <Resource Include="Resources\edgeIBC.png" />
     <Resource Include="Resources\edgeICD.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\RotaterAB.png" />
+    <Resource Include="Resources\RotaterAD.png" />
+    <Resource Include="Resources\RotaterCB.png" />
+    <Resource Include="Resources\RotaterCD.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

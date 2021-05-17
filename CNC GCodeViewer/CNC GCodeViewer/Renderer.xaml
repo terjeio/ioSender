@@ -5,16 +5,17 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:helix="clr-namespace:HelixToolkit.Wpf;assembly=HelixToolkit.Wpf"
              xmlns:local="clr-namespace:CNC.Controls.Viewer"
-             mc:Ignorable="d" 
+             mc:Ignorable="d"
              d:DesignHeight="500" d:DesignWidth="500"
              Loaded="Renderer_Loaded" IsVisibleChanged="Renderer_IsVisibleChanged">
     <helix:HelixViewport3D x:Name="viewport" Panel.ZIndex="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                            ZoomExtentsWhenLoaded="False" RotateAroundMouseDownPoint="true" ZoomAroundMouseDownPoint="true"
                            ShowViewCube="{Binding Path=ShowViewCube}"
                            ShowCoordinateSystem="{Binding Path=ShowCoordinateSystem}"
+                           Background="{Binding Path=CanvasColor}"
                            AllowDrop="True" DragEnter="viewport_Drag" DragOver="viewport_Drag" DragLeave="viewport_Drag" Drop="viewport_Drop">
         <helix:HelixViewport3D.Camera>
-            <PerspectiveCamera x:Name="camera"
+            <PerspectiveCamera x:Name="ccamera"
                         Position="0,100,0" 
                         LookDirection="0,-100,0" 
                         UpDirection="0,1,0.5" 
@@ -26,10 +27,11 @@
         <!-->            <helix:TruncatedConeVisual3D Height="5" BaseRadius="0" >
 
             </helix:TruncatedConeVisual3D> <!-->
-        <helix:LinesVisual3D Thickness="1" Color="Black" Points="{Binding Path=CutLines}"/>
-        <helix:LinesVisual3D Thickness="0.5" Color="LightPink" Points="{Binding Path=RapidLines}"/>
-        <helix:LinesVisual3D Thickness="0.5" Color="Green" Points="{Binding Path=RetractLines}"/>
-        <helix:LinesVisual3D Thickness="1.5" Color="Green" Points="{Binding Path=ToolOrigin}"/>
+        <helix:LinesVisual3D Thickness="2" Color="{Binding Path=HighlightColor}" Points="{Binding Path=ExecutedLines}"/>
+        <helix:LinesVisual3D Thickness="1" Color="{Binding Path=CutMotionColor}" Points="{Binding Path=CutLines}"/>
+        <helix:LinesVisual3D Thickness="0.5" Color="{Binding Path=RapidMotionColor}" Points="{Binding Path=RapidLines}"/>
+        <helix:LinesVisual3D Thickness="0.5" Color="{Binding Path=RetractMotionColor}" Points="{Binding Path=RetractLines}"/>
+        <helix:LinesVisual3D Thickness="1.5" Color="{Binding Path=ToolOriginColor}" Points="{Binding Path=ToolOrigin}"/>
         <!-->            <helix:GridLinesVisual3D binding?/> <!-->
     </helix:HelixViewport3D>
 </UserControl>

@@ -1,13 +1,13 @@
 ﻿/*
  * JobParametersDialog.xaml.cs - part of CNC Converters library
  *
- * v0.15 / 2020-04-08 / Io Engineering (Terje Io)
+ * v0.33 / 2021-05-09 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020, Io Engineering (Terje Io)
+Copyright (c) 2020-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -40,15 +40,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using System.IO;
 using System.Windows;
 using System.Xml.Serialization;
+using System.Windows.Threading;
+using System.Windows.Input;
 using CNC.Core;
 
 namespace CNC.Converters
 {
-    /// <summary>
-    /// Interaction logic for UserControl1.xaml
-    /// </summary>
-    /// 
-
     public partial class JobParametersDialog : Window
     {
         const string suffix = "Conversion.xml";
@@ -80,6 +77,11 @@ namespace CNC.Converters
             catch
             {
             }
+
+            (sender as Window).Dispatcher.Invoke(new System.Action(() =>
+            {
+                (sender as Window).MoveFocus(new TraversalRequest(FocusNavigationDirection.First));
+            }), DispatcherPriority.ContextIdle);
         }
 
         public bool SaveSettings()

@@ -9,12 +9,10 @@
     <UserControl.Resources>
         <local:LogicalNotConverter x:Key="BooleanConverter" />
     </UserControl.Resources>
-    <Grid>
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Height="33" VerticalAlignment="Top" Width="193" RenderTransformOrigin="0.425,0">
-            <Label x:Name="lblAxis" Content="{Binding Label, RelativeSource={RelativeSource AncestorType=UserControl}}" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Margin="3,0,3,0" Width="26" FontSize="20"/>
-            <local:NumericTextBox x:Name="txtReadout" Format="{Binding Path=FormatSigned}" Value="{Binding Path=Value, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" IsReadOnly="True" Background="#FFF8F8F8" Height="29" Width="103" TextWrapping="NoWrap" TextAlignment="Right" FontSize="20"/>
-            <Button x:Name="btnZero" Content="0" IsEnabled="{Binding Path=IsJobRunning, Converter={StaticResource BooleanConverter}}" Focusable="False" Margin="3,0,3,0" Height="29" Width="29" Click="btnZero_Click"/>
-            <Button x:Name="btnScaled" Height="29" Focusable="False" Width="10" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"/>
-        </StackPanel>
-    </Grid>
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Height="33" VerticalAlignment="Top" Width="193" RenderTransformOrigin="0.425,0">
+        <Label x:Name="lblAxis" Content="{Binding Label, RelativeSource={RelativeSource AncestorType=UserControl}}" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Margin="3,0,3,0" Width="26" FontSize="20"/>
+        <local:NumericTextBox x:Name="txtReadout" Format="{Binding Path=FormatSigned}" Value="{Binding Path=Value, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" IsReadOnly="True" Background="#FFF8F8F8" Height="29" Width="103" TextWrapping="NoWrap" TextAlignment="Right" FontSize="20"/>
+        <Button x:Name="btnZero" Content="0" IsEnabled="{Binding Path=IsJobRunning, Converter={StaticResource BooleanConverter}}" Focusable="False" Margin="3,0,3,0" Height="29" Width="29" Click="btnZero_Click"/>
+        <Button x:Name="btnScaled" Height="29" Focusable="False" Width="10" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"/>
+    </StackPanel>
 </UserControl>

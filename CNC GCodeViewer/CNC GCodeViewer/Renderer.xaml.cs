@@ -1,7 +1,7 @@
 /*
  * Renderer.xaml.cs - part of CNC Controls library
  *
- * v0.20 / 2021-02-02 / Io Engineering (Terje Io)
+ * v0.33 / 2021-05-15 / Io Engineering (Terje Io)
  *
  */
 
@@ -92,13 +92,15 @@ namespace CNC.Controls.Viewer
         Point3D _startposition = new Point3D();
         Point3D _limits = new Point3D();
         Point3D _toolposition = new Point3D();
-        Point3DCollection _toolorigin, _cutlines, _rapidlines, _retractlines;
+        Point3DCollection _toolorigin, _cutlines, _rapidlines, _retractlines, _executedlines;
+        Color _cutMotion = Colors.Red, _rapidMotion = Colors.LightPink, _retractMotion = Colors.Green, _toolOrigin = Colors.Green, _gridColor = Colors.LightGray, _highlight = Colors.Crimson;
+        SolidColorBrush _canvas = Brushes.White;
 
         public void Clear()
         {
          //   Grid = null;
          //   BoundingBox = null;
-            ToolOrigin = CutLines = RapidLines = RetractLines = null;
+            ToolOrigin = CutLines = RapidLines = RetractLines = ExecutedLines = null;
         }
 
         public void SetStartPosition(double x, double y, double z)
@@ -150,8 +152,17 @@ namespace CNC.Controls.Viewer
         public Point3DCollection CutLines { get { return _cutlines; } set { _cutlines = value; OnPropertyChanged(); } }
         public Point3DCollection RapidLines { get { return _rapidlines; } set { _rapidlines = value; OnPropertyChanged(); } }
         public Point3DCollection RetractLines { get { return _retractlines; } set { _retractlines = value; OnPropertyChanged(); } }
+        public Point3DCollection ExecutedLines { get { return _executedlines; } set { _executedlines = value; OnPropertyChanged(); } }
         public Point3D StartPosition { get { return _startposition; } }
         public Point3D Limits { get { return _limits; } }
+
+        public Color CutMotionColor { get { return _cutMotion; } set { _cutMotion = value; OnPropertyChanged(); } }
+        public Color RapidMotionColor { get { return _rapidMotion; } set { _rapidMotion = value; OnPropertyChanged(); } }
+        public Color RetractMotionColor { get { return _retractMotion; } set { _retractMotion = value; OnPropertyChanged(); } }
+        public Color ToolOriginColor { get { return _toolOrigin; } set { _toolOrigin = value; OnPropertyChanged(); } }
+        public Color GridColor { get { return _gridColor; } set { _gridColor = value; OnPropertyChanged(); } }
+        public Color HighlightColor { get { return _highlight; } set { _highlight = value; OnPropertyChanged(); } }
+        public SolidColorBrush CanvasColor { get { return _canvas; } set { _canvas = value; OnPropertyChanged(); } }
     }
 
     /// <summary>
@@ -163,7 +174,7 @@ namespace CNC.Controls.Viewer
         private Vector3D delta0;  // (dx,dy,dz)
         private double minDistanceSquared, _minDistance;
 
-        bool _animateSubscribed = false;
+        bool _animateSubscribed = false, renderExecuted = false;
         double[] offsets = new double[6] { 0d, 0d, 0d, 0d, 0d, 0d };
 
         public SolidColorBrush ToolBrush { get; set; } = Brushes.Red;
@@ -176,8 +187,11 @@ namespace CNC.Controls.Viewer
         private bool isDiameterMode = false;
         private int cutCount;
         private MoveType lastType;
+        private IEnumerator<RunAction> job = null;
+        private GCodeEmulator emu = new GCodeEmulator(true);
+        private List<GCodeToken> tokens;
 
-        Point3DCollection linePoints = new Point3DCollection();
+        Point3DCollection cutPoints = new Point3DCollection();
         Point3DCollection rapidPoints = new Point3DCollection();
         Point3DCollection retractPoints = new Point3DCollection();
         Point3DCollection positionPoints = new Point3DCollection();
@@ -219,8 +233,8 @@ namespace CNC.Controls.Viewer
         {
             model = DataContext as GrblViewModel;
 
-            if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
-                AppConfig.Settings.GCodeViewer.PropertyChanged += GCodeViewer_PropertyChanged;
+//            if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
+//                AppConfig.Settings.GCodeViewer.PropertyChanged += GCodeViewer_PropertyChanged;
         }
 
         private void GCodeViewer_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -243,6 +257,8 @@ namespace CNC.Controls.Viewer
             }
             else if (e.PropertyName == nameof(GrblViewModel.LatheMode))
                 isDiameterMode = model.LatheMode == LatheMode.Diameter;
+            else if (renderExecuted && e.PropertyName == nameof(GrblViewModel.BlockExecuting))
+                RenderExecuting(model.BlockExecuting);
         }
 
         public int ArcResolution { get; set; } = 5;
@@ -250,6 +266,7 @@ namespace CNC.Controls.Viewer
         public bool ShowGrid { get; set; } = true;
         public bool ShowAxes { get; set; } = true;
         public bool ShowBoundingBox { get; set; } = true;
+        public bool RenderExecuted { get; set; } = false;
 
         public bool AnimateTool
         {
@@ -302,9 +319,15 @@ namespace CNC.Controls.Viewer
         public void ClearViewport()
         {
             Machine.Clear();
-            linePoints.Clear();
+            cutPoints.Clear();
             rapidPoints.Clear();
             retractPoints.Clear();
+            if(job != null)
+            {
+                job.Dispose();
+                job = null;
+                tokens = null;
+            }
 
             if (Machine.BoundingBox != null)
                 viewport.Children.Remove(Machine.BoundingBox);
@@ -354,7 +377,47 @@ namespace CNC.Controls.Viewer
             }
         }
 
-        public double boffset (double w, double wh, double xs, double xm)
+        void RenderExecuting(int block)
+        {
+            if (block == -1)
+            {
+                if (Machine.ExecutedLines != null)
+                    Machine.ExecutedLines.Clear();
+                if(job != null)
+                {
+                    job.Dispose();
+                    emu.SetStartPosition(Machine.StartPosition);
+                    job = emu.Execute(tokens).GetEnumerator();
+                    job.MoveNext();
+                }
+            }
+            else if (job != null && block > 0)
+            {
+                while (job.Current.Token.LineNumber < block)
+                {
+                    job.MoveNext();
+                    point0 = job.Current.Start;
+
+                    switch (job.Current.Token.Command)
+                    {
+                        case Commands.G1:
+                            AddCutMove(job.Current.End);
+                            break;
+
+                        case Commands.G2:
+                        case Commands.G3:
+                            DrawArc(job.Current.Token as GCArc, point0.ToArray(), emu.Plane, emu.DistanceMode == DistanceMode.Incremental);
+                            break;
+
+                        case Commands.G5:
+                            DrawSpline(job.Current.Token as GCSpline, point0.ToArray());
+                            break;
+                    }
+                }
+            }
+        }
+
+        private double boffset (double w, double wh, double xs, double xm)
         {
             double v, vv = xm - Math.Floor(xm);
 
@@ -372,6 +435,9 @@ namespace CNC.Controls.Viewer
             double labelOffset = lineThickness * 50d;
 
             ClearViewport();
+
+            this.tokens = tokens;
+            renderExecuted = RenderExecuted && !Machine.HighlightColor.Equals(Machine.CutMotionColor) && _animateSubscribed;
 
             if (isLatheMode == null)
             {
@@ -399,6 +465,8 @@ namespace CNC.Controls.Viewer
 
             if (ShowGrid)
             {
+                AxisBrush = new SolidColorBrush(Machine.GridColor);
+
                 double wh, h, wm = bbox.SizeX % TickSize, w = Math.Ceiling(bbox.SizeX - bbox.SizeX % TickSize + TickSize * 2d);
 
                 if (model.LatheMode == LatheMode.Disabled)
@@ -415,7 +483,7 @@ namespace CNC.Controls.Viewer
                         Width = h,
                         Length = w,
                         Thickness = 0.1d,
-                        Fill = AxisBrush
+                        Fill = AxisBrush,
                     };
                 }
                 else
@@ -507,8 +575,6 @@ namespace CNC.Controls.Viewer
 
             #endregion
 
-            GCodeEmulator emu = new GCodeEmulator(true);
-
             emu.SetStartPosition(Machine.StartPosition);
 
             foreach (var cmd in emu.Execute(tokens))
@@ -551,18 +617,27 @@ namespace CNC.Controls.Viewer
             }
 
             Machine.RapidLines = rapidPoints;
-            Machine.CutLines = linePoints;
             Machine.RetractLines = retractPoints;
-
             refreshCamera(bbox);
+
+            if (RenderExecuted)
+            {
+                Machine.CutLines = new Point3DCollection(cutPoints);
+                cutPoints.Clear();
+                Machine.ExecutedLines = cutPoints;
+                emu.SetStartPosition(Machine.StartPosition);
+                job = emu.Execute(tokens).GetEnumerator();
+                job.MoveNext();
+            } else
+                Machine.CutLines = cutPoints;
         }
+
         public void refreshCamera(ProgramLimits bbox)
         {
-
             if (model.LatheMode == LatheMode.Disabled)
             {
 
-                double zpos = Math.Max(5d, Math.Max(bbox.SizeX, bbox.SizeY) / Math.Tan(camera.FieldOfView * Math.PI / 360d));
+                double zpos = Math.Max(5d, Math.Max(bbox.SizeX, bbox.SizeY) / Math.Tan(ccamera.FieldOfView * Math.PI / 360d));
 
                 // TODO: set a sensible viewing distance dynamically
 
@@ -572,7 +647,7 @@ namespace CNC.Controls.Viewer
             }
             else
             {
-                double ypos = Math.Max(5d, Math.Max(bbox.SizeX, bbox.SizeZ) / Math.Tan(camera.FieldOfView * Math.PI / 360d));
+                double ypos = Math.Max(5d, Math.Max(bbox.SizeX, bbox.SizeZ) / Math.Tan(ccamera.FieldOfView * Math.PI / 360d));
 
                 // TODO: set a sensible viewing distance dynamically
 
@@ -582,6 +657,7 @@ namespace CNC.Controls.Viewer
             }
             //                viewport.CameraController.AddRotateForce(0.001, 0.001); // emulate move camera 
         }
+
         private Point3D toPoint(double[] values, bool isRelative = false)
         {
             Point3D p = new Point3D(values[0], values[1], values[2]);
@@ -596,8 +672,8 @@ namespace CNC.Controls.Viewer
         {
             if (cutCount > 1)
             {
-                linePoints.Add(linePoints.Last());
-                linePoints.Add(point);
+                cutPoints.Add(cutPoints.Last());
+                cutPoints.Add(point);
             }
 
             if (lastType == MoveType.Cut)
@@ -615,8 +691,8 @@ namespace CNC.Controls.Viewer
         {
             if (cutCount > 1)
             {
-                linePoints.Add(linePoints.Last());
-                linePoints.Add(point);
+                cutPoints.Add(cutPoints.Last());
+                cutPoints.Add(point);
             }
 
             if (lastType == MoveType.Cut)
@@ -656,8 +732,8 @@ namespace CNC.Controls.Viewer
                     //last.X = point.X;
                     //last.Y = point.Y;
                     //last.Z = point.Z;
-                    linePoints.RemoveAt(linePoints.Count - 1);
-                    linePoints.Add(point);
+                    cutPoints.RemoveAt(cutPoints.Count - 1);
+                    cutPoints.Add(point);
                     delta0 += delta;
                     cutCount++;
                 }
@@ -672,8 +748,8 @@ namespace CNC.Controls.Viewer
             if (!sameDir)
             {
                 cutCount = 1;
-                linePoints.Add(point0);
-                linePoints.Add(point);
+                cutPoints.Add(point0);
+                cutPoints.Add(point);
             }
 
             lastType = MoveType.Cut;

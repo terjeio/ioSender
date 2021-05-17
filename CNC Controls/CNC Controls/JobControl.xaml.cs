@@ -1,7 +1,7 @@
 /*
  * JobControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.31 / 2021-04-26 / Io Engineering (Terje Io)
+ * v0.33 / 2021-05-15 / Io Engineering (Terje Io)
  *
  */
 
@@ -147,7 +147,8 @@ namespace CNC.Controls
             GCodeParser.IgnoreM6 = AppConfig.Settings.Base.IgnoreM6;
             GCodeParser.IgnoreM7 = AppConfig.Settings.Base.IgnoreM7;
             GCodeParser.IgnoreM8 = AppConfig.Settings.Base.IgnoreM8;
-
+            GCodeParser.IgnoreG61G64 = AppConfig.Settings.Base.IgnoreG61G64;
+            
             useBuffering = AppConfig.Settings.Base.UseBuffering && GrblInfo.IsGrblHAL;
         }
 
@@ -216,9 +217,19 @@ namespace CNC.Controls
                         {
                             job.CurrLine = job.PendingLine = job.ACKPending = model.BlockExecuting = 0;
                             job.PgmEndLine = GCode.File.Blocks - 1;
-                            if (GCode.File.ToolChanges > 0 && GrblSettings.GetInteger(GrblSetting.ToolChangeMode) > 0 && !model.IsTloReferenceSet)
-                                MessageBox.Show(string.Format("Job has {0} tool change(s), tool length reference should be established before start.", GCode.File.ToolChanges), "GCode Sender", MessageBoxButton.OK, MessageBoxImage.Warning);
-                            streamingHandler.Call(GCode.File.IsLoaded ? StreamingState.Idle : StreamingState.NoFile, false);
+                            if ((sender as GrblViewModel).IsPhysicalFileLoaded)
+                            {
+                                if (GCode.File.ToolChanges > 0)
+                                {
+                                    if (!GrblSettings.HasSetting(GrblSetting.ToolChangeMode))
+                                        MessageBox.Show(string.Format("Job has {0} tool change(s) using M6, only a few Grbl ports supports that.", GCode.File.ToolChanges), "ioSender", MessageBoxButton.OK, MessageBoxImage.Warning);
+                                    else if (GrblSettings.GetInteger(GrblSetting.ToolChangeMode) > 0 && !model.IsTloReferenceSet)
+                                        MessageBox.Show(string.Format("Job has {0} tool change(s), tool length reference should be established before start.", GCode.File.ToolChanges), "ioSender", MessageBoxButton.OK, MessageBoxImage.Warning);
+                                }
+                                if (GCode.File.HasGoPredefinedPosition && (sender as GrblViewModel).IsGrblHAL && (sender as GrblViewModel).HomedState != HomedState.Homed)
+                                    MessageBox.Show("Job has G28/G30 moves and machine is not homed.", "ioSender", MessageBoxButton.OK, MessageBoxImage.Warning);
+                                streamingHandler.Call(GCode.File.IsLoaded ? StreamingState.Idle : StreamingState.NoFile, false);
+                            }
                         }
                         break;
                     }
@@ -397,6 +408,7 @@ namespace CNC.Controls
             else if (GCode.File.IsLoaded)
             {
                 model.RunTime = "";
+                model.BlockExecuting = -1;
                 job.ACKPending = job.CurrLine = job.ACKPending = job.serialUsed = 0;
                 job.Started = false;
                 job.NextRow = GCode.File.Data.Rows[0];
@@ -940,11 +952,11 @@ namespace CNC.Controls
                     streamingHandler.Call(StreamingState.Error, true);
                 else if (job.PgmEndLine == job.PendingLine)
                     streamingHandler.Call(StreamingState.JobFinished, true);
-                else if(streamingHandler.Count && response == "ok")
+                else if (streamingHandler.Count && response == "ok")
                     SendNextLine();
                 //}
 
-                if (!job.Complete)
+                if (!job.Complete && job.PendingLine != job.PgmEndLine)
                 {
                     job.PendingLine++;
                     model.BlockExecuting = job.PendingLine;

@@ -1,7 +1,7 @@
 /*
  * TelnetStream.cs - part of CNC Controls library
  *
- * v0.31 / 2021-04-23 / Io Engineering (Terje Io)
+ * v0.33 / 2021-05-16 / Io Engineering (Terje Io)
  *
  */
 
@@ -104,7 +104,9 @@ namespace CNC.Core
         {
             if (IsOpen)
             {
+                PurgeQueue();
                 ipstream.Close(300);
+                ipstream.Dispose();
                 ipstream = null;
                 ipserver.Close();
                 ipserver = null;

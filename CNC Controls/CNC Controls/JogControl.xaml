@@ -8,15 +8,15 @@
              mc:Ignorable="d"
              FocusVisualStyle="{x:Null}"
              Loaded="UserControl_Loaded" IsVisibleChanged="JogControl_IsVisibleChanged"
-             d:DesignHeight="250" Width="Auto">
+             d:DesignHeight="238" Width="Auto">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="SharedStyles.xaml"/>
                 <ResourceDictionary>
                     <Style x:Key="JogButtonStyle" TargetType="Button">
-                        <Setter Property="Width" Value="40"/>
-                        <Setter Property="Height" Value="40"/>
+                        <Setter Property="Width" Value="60"/>
+                        <Setter Property="Height" Value="60"/>
                         <Setter Property="Focusable" Value="False"/>
                     </Style>
                 </ResourceDictionary>
@@ -57,58 +57,58 @@
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="90,10,2,0" Width="Auto" Height="Auto">
                 <StackPanel Orientation="Horizontal" Width="Auto" Height="Auto" Visibility="{Binding Path=LatheModeEnabled, Converter={StaticResource IsNotVisibleConverter}}">
-                    <StackPanel>
-                        <Button Content="X-" Style="{StaticResource JogButtonStyle}" Margin="2,90" VerticalAlignment="Center" Click="Button_Click"/>
+                    <StackPanel VerticalAlignment="Center">
+                        <Button Content="X-" Style="{StaticResource JogButtonStyle}" Click="Button_Click"/>
                     </StackPanel>
-                    <StackPanel>
-                        <Button Content="Y+" Style="{StaticResource JogButtonStyle}" Margin="2,45,2,3" VerticalAlignment="Top" Click="Button_Click"/>
-                        <Button Tag="stop" Style="{StaticResource JogButtonStyle}" Margin="2,2" VerticalAlignment="Top" Click="Button_Click">
+                    <StackPanel VerticalAlignment="Center" Margin="5,0">
+                        <Button Content="Y+" Style="{StaticResource JogButtonStyle}" Click="Button_Click"/>
+                        <Button Tag="stop" Style="{StaticResource JogButtonStyle}" Margin="0,5" Click="Button_Click">
                             <Button.Content>
                                 <Image Source="Resources/Symbols_Stop_32xLG.png"/>
                             </Button.Content>
                         </Button>
-                        <Button Content="Y-" Style="{StaticResource JogButtonStyle}" Margin="2,5" VerticalAlignment="Top" Click="Button_Click"/>
+                        <Button Content="Y-" Style="{StaticResource JogButtonStyle}" Click="Button_Click"/>
                     </StackPanel>
-                    <StackPanel>
-                        <Button Content="X+"  Style="{StaticResource JogButtonStyle}" Margin="2,90" VerticalAlignment="Top" Click="Button_Click"/>
+                    <StackPanel VerticalAlignment="Center">
+                        <Button Content="X+" Style="{StaticResource JogButtonStyle}" Click="Button_Click"/>
                     </StackPanel>
-                    <StackPanel Style="{StaticResource ZAxisVisibleStyle}">
-                        <Button Content="Z+" Style="{StaticResource JogButtonStyle}" Margin="2,45" VerticalAlignment="Top" Click="Button_Click"/>
-                        <Button Content="Z-" Style="{StaticResource JogButtonStyle}" Margin="2,5" VerticalAlignment="Top" Click="Button_Click"/>
+                    <StackPanel Style="{StaticResource ZAxisVisibleStyle}" VerticalAlignment="Center" Margin="5,0,0,0">
+                        <Button Content="Z+" Style="{StaticResource JogButtonStyle}" Click="Button_Click"/>
+                        <Button Content="Z-" Style="{StaticResource JogButtonStyle}" Margin="0,70,0,0" VerticalAlignment="Top" Click="Button_Click"/>
                     </StackPanel>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Width="Auto" Height="Auto" Visibility="{Binding Path=LatheModeEnabled, Converter={StaticResource IsVisibleConverter}}">
-                    <StackPanel>
-                        <Button Content="Z-" Style="{StaticResource JogButtonStyle}" Margin="2,90" VerticalAlignment="Center" Click="Button_Click"/>
+                    <StackPanel VerticalAlignment="Center">
+                        <Button Content="Z-" Style="{StaticResource JogButtonStyle}" Click="Button_Click"/>
                     </StackPanel>
-                    <StackPanel>
-                        <Button Content="X-" Style="{StaticResource JogButtonStyle}" Margin="2,45,2,3" VerticalAlignment="Top" Click="Button_Click"/>
-                        <Button Tag="stop" Style="{StaticResource JogButtonStyle}" Margin="2,2" VerticalAlignment="Top" Click="Button_Click">
+                    <StackPanel VerticalAlignment="Center" Margin="5,0">
+                        <Button Content="X-" Style="{StaticResource JogButtonStyle}" Click="Button_Click"/>
+                        <Button Tag="stop" Style="{StaticResource JogButtonStyle}" Margin="0,5" Click="Button_Click">
                             <Button.Content>
                                 <Image Source="Resources/Symbols_Stop_32xLG.png"/>
                             </Button.Content>
                         </Button>
-                        <Button Content="X+" Style="{StaticResource JogButtonStyle}" Margin="2,5" VerticalAlignment="Top" Click="Button_Click"/>
+                        <Button Content="X+" Style="{StaticResource JogButtonStyle}" Click="Button_Click"/>
                     </StackPanel>
-                    <StackPanel>
-                        <Button Content="Z+"  Style="{StaticResource JogButtonStyle}" Margin="2,90" VerticalAlignment="Top" Click="Button_Click"/>
+                    <StackPanel VerticalAlignment="Center">
+                        <Button Content="Z+" Style="{StaticResource JogButtonStyle}" Click="Button_Click"/>
                     </StackPanel>
-                    <StackPanel Style="{StaticResource YAxisVisibleStyle}">
-                        <Button Content="Y+" Style="{StaticResource JogButtonStyle}" Margin="2,45" VerticalAlignment="Top" Click="Button_Click"/>
-                        <Button Content="Y-" Style="{StaticResource JogButtonStyle}" Margin="2,5" VerticalAlignment="Top" Click="Button_Click"/>
+                    <StackPanel Style="{StaticResource YAxisVisibleStyle}" VerticalAlignment="Center" Margin="5,0,0,0">
+                        <Button Content="Y+" Style="{StaticResource JogButtonStyle}" Click="Button_Click"/>
+                        <Button Content="Y-" Style="{StaticResource JogButtonStyle}" Margin="0,70,0,0" Click="Button_Click"/>
                     </StackPanel>
                 </StackPanel>
-                <StackPanel Style="{StaticResource AAxisVisibleStyle}">
-                    <Button Content="A+" Style="{StaticResource JogButtonStyle}" Margin="2,45" VerticalAlignment="Top" Click="Button_Click"/>
-                    <Button Content="A-" Style="{StaticResource JogButtonStyle}" Margin="2,5" VerticalAlignment="Top" Click="Button_Click"/>
+                <StackPanel Style="{StaticResource AAxisVisibleStyle}" VerticalAlignment="Center" Margin="5,0,0,0">
+                    <Button Content="A+" Style="{StaticResource JogButtonStyle}" Click="Button_Click"/>
+                    <Button Content="A-" Style="{StaticResource JogButtonStyle}" Margin="0,70,0,0" Click="Button_Click"/>
                 </StackPanel>
-                <StackPanel Style="{StaticResource BAxisVisibleStyle}">
-                    <Button Content="B+" Style="{StaticResource JogButtonStyle}" Margin="2,45" VerticalAlignment="Top" Click="Button_Click"/>
-                    <Button Content="B-" Style="{StaticResource JogButtonStyle}" Margin="2,5" VerticalAlignment="Top" Click="Button_Click"/>
+                <StackPanel Style="{StaticResource BAxisVisibleStyle}" VerticalAlignment="Center" Margin="5,0,0,0">
+                    <Button Content="B+" Style="{StaticResource JogButtonStyle}" Click="Button_Click"/>
+                    <Button Content="B-" Style="{StaticResource JogButtonStyle}" Margin="0,70,0,0" Click="Button_Click"/>
                 </StackPanel>
-                <StackPanel Style="{StaticResource CAxisVisibleStyle}">
-                    <Button Content="C+" Style="{StaticResource JogButtonStyle}" Margin="2,45" VerticalAlignment="Top" Click="Button_Click"/>
-                    <Button Content="C-" Style="{StaticResource JogButtonStyle}" Margin="2,5" VerticalAlignment="Top" Click="Button_Click"/>
+                <StackPanel Style="{StaticResource CAxisVisibleStyle}" VerticalAlignment="Center" Margin="5,0,0,0">
+                    <Button Content="C+" Style="{StaticResource JogButtonStyle}" Click="Button_Click"/>
+                    <Button Content="C-" Style="{StaticResource JogButtonStyle}" Margin="0,70,0,0" Click="Button_Click"/>
                 </StackPanel>
             </StackPanel>
             <Button Content="×" Focusable="False" Style="{StaticResource SmallXButtonStyle}" VerticalContentAlignment="Top" HorizontalAlignment="Right" Margin="0,0,5,0" VerticalAlignment="Top" Width="14" Height="18" Click="btn_Close"/>

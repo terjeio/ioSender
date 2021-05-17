@@ -1,13 +1,13 @@
 /*
  * Widget.cs - part of CNC Controls library for Grbl
  *
- * v0.28 / 2020-12-13 / Io Engineering (Terje Io)
+ * v0.33 / 2021-05-16 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2020, Io Engineering (Terje Io)
+Copyright (c) 2018-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -245,7 +245,9 @@ namespace CNC.Controls
                     wTextBox = new TextBox
                     {
                         Name = "tb_name_xxx",
-                        MaxLength = widget.Format.Length
+                        MaxLength = widget.Format.Length,
+                        VerticalContentAlignment = VerticalAlignment.Bottom,
+                        Height = 24
                         //TabIndex = Canvas.Row
                     };
                     if (widget.DataType == GrblSettingDetails.DataTypes.TEXT && widget.Format.StartsWith("x("))

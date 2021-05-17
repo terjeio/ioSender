@@ -1,7 +1,7 @@
 ﻿/*
  * Grbl.cs - part of CNC Controls library
  *
- * v0.31 / 2021-04-26 / Io Engineering (Terje Io)
+ * v0.33 / 2021-05-12 / Io Engineering (Terje Io)
  *
  */
 
@@ -1734,6 +1734,11 @@ namespace CNC.Core
             return Settings.Where(x => x.Id == ((int)key)).FirstOrDefault();
         }
 
+        public static bool HasSetting(GrblSetting key)
+        {
+            return GetString(key) != null;
+        }
+
         public static string GetString(GrblSetting key)
         {
             var setting = Settings.Where(x => x.Id == ((int)key)).FirstOrDefault();
@@ -1748,7 +1753,8 @@ namespace CNC.Core
 
         public static int GetInteger(GrblSetting key)
         {
-            return int.Parse(GetString(key));
+            var v = GetString(key);
+            return v == null ? -1 : int.Parse(GetString(key));
         }
 
         public static bool Load(GrblViewModel model)

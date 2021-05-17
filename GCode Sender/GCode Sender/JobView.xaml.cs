@@ -1,7 +1,7 @@
 /*
  * JobView.xaml.cs - part of Grbl Code Sender
  *
- * v0.31 / 2021-04-27 / Io Engineering (Terje Io)
+ * v0.33 / 2021-05-06 / Io Engineering (Terje Io)
  *
  */
 
@@ -374,7 +374,7 @@ namespace GCode_Sender
                 if (MainWindow.UIViewModel.Camera != null)
                 {
                     MainWindow.UIViewModel.Camera.MoveOffset += Camera_MoveOffset;
-                    MainWindow.UIViewModel.Camera.Opened += Camera_Opened;
+                    MainWindow.UIViewModel.Camera.IsVisibilityChanged += Camera_Opened;
                 }
                 #endif
                 //if (viewer == null)
@@ -437,7 +437,8 @@ namespace GCode_Sender
 #if ADD_CAMERA
         void Camera_Opened()
         {
-            this.Focus();
+            model.IsCameraVisible = MainWindow.UIViewModel.Camera.IsVisible;
+            Focus();
         }
 
         void Camera_MoveOffset(CameraMoveMode Mode, double XOffset, double YOffset)

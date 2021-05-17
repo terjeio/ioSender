@@ -1,13 +1,13 @@
 ﻿/*
  * GCodeEmulator.cs - part of CNC Controls library
  *
- * v0.29 / 2021-01-30 / Io Engineering (Terje Io)
+ * v0.33 / 2021-05-16 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020, Io Engineering (Terje Io)
+Copyright (c) 2020-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -60,8 +60,9 @@ namespace CNC.Core
 
     public class GCodeEmulator : Machine
     {
-        private bool canned, translate;
+        private bool translate;
         private RunAction action;
+        private double retractPosition = double.NaN;
 
         public GCodeEmulator(bool translate = false) : base()
         {
@@ -154,11 +155,10 @@ namespace CNC.Core
 
                     // G21: Metric Units
                     case Commands.G20:
-                        // Strip G20 for now - Tokens are metric and needs to be transformed back...
+                        // Tokens are metric and needs to be transformed back...
                         IsImperial = true;
                         //for (int i = 0; i < scaleFactors.Length; i++)
                         //    scaleFactors[i] = 25.4d;
-                        action.Token.Command = Commands.Undefined; // Strip G20 - need to implement unscale...
                         break;
 
                     // G21 Imperial (inches) Units
@@ -170,6 +170,7 @@ namespace CNC.Core
 
                     // G28: Goto Predefined Position
                     case Commands.G28:
+                        if(translate)
                         {
                             var motion = token as GCLinearMotion;
                             AxisFlags axisFlags;
@@ -204,6 +205,7 @@ namespace CNC.Core
 
                     // G30: Goto Predefined Position
                     case Commands.G30:
+                        if (translate)
                         {
                             var motion = token as GCLinearMotion;
                             AxisFlags axisFlags;
@@ -482,7 +484,6 @@ namespace CNC.Core
 
                     // G80: Cancel Canned Cycle
                     case Commands.G80:
-                        canned = false;
                         break;
 
                     // G73: Drilling Cycle with Chip Breaking
@@ -503,30 +504,29 @@ namespace CNC.Core
                         if(translate) {
                             bool wasRelative = isRelative;
                             GCCannedDrill drill = (token as GCCannedDrill);
-                            double r = isRelative ? action.End.Z + drill.R : drill.R;
-                            double z = isRelative ? action.End.Z + drill.Z : drill.Z;
+                            if (!double.IsNaN(drill.R))
+                                retractPosition = drill.R;
+                            double r = isRelative ? action.End.Z + retractPosition : retractPosition;
+                            double z = isRelative ? r + drill.Z : drill.Z;
                             uint repeats = DistanceMode == DistanceMode.Incremental ? drill.L : 1; // no need to draw absolute repeats(?)
 
-                            setEndP(drill.Values, AxisFlags.XY);
-
-                            isRelative = false;
-
-                            if (!canned)
+                            if (action.End.Z < r)
                             {
-//                                canned = true;
-                                if (action.End.Z < r)
-                                {
-                                    double[] start = new double[] { action.Start.X, action.Start.Y, r };
-                                    setEndP(start, AxisFlags.Z);
-                                    action.Token = new GCLinearMotion(Commands.G0, token.LineNumber, start, AxisFlags.Z);
-                                    yield return action;
-                                    action.Start = action.End;
-                                }
+                                double[] start = new double[] { action.Start.X, action.Start.Y, r };
+                                isRelative = false;
+                                setEndP(start, AxisFlags.Z);
+                                action.Token = new GCLinearMotion(Commands.G0, token.LineNumber, start, AxisFlags.Z);
+                                yield return action;
+                                action.Start = action.End;
                             }
+
+                            isRelative = wasRelative;
+                            setEndP(drill.Values, AxisFlags.XY);
+                            isRelative = false;
 
                             double[] values = new double[] { action.End.X, action.End.Y, action.End.Z };
 
-                            setEndP(values, AxisFlags.X | AxisFlags.Y);
+                            setEndP(values, AxisFlags.XY);
                             action.Token = new GCLinearMotion(Commands.G0, token.LineNumber, values, AxisFlags.XY);
                             yield return action;
                             action.Start = action.End;

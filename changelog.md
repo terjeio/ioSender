@@ -2,6 +2,17 @@
 
 Executable for development builds available for download [here](http://www.io-engineering.com/downloads/) if you want to participate in testing.
 
+2021-05-16: [Release 2.0.33](https://github.com/terjeio/Grbl-GCode-Sender/releases/tag/2.0.33).
+
+* Added _Rotation_ tab to _Probing_ and _Rotate_ submenu to _File > Transform_.
+* Added experimental _Compress_ submenu to _File > Transform_.  
+This removes superfluous G-code commands and values from the loaded program.
+* Added color selection for elements in the 3D-viewer in the _Settings: App_ tab.
+* Increased the size of some UI buttons for easier use from touch screens.
+* Increased the minimum window size somewhat, some minor UI layout changes related to that.
+* Added tab for network connection parameters to connection dialog.
+* Bug fixes, mainly for the tokenizer/detokenizer.
+
 2021-04-27: [Release 2.0.31](https://github.com/terjeio/Grbl-GCode-Sender/releases/tag/2.0.31).
 
 * Renamed executable to ioSender.exe.

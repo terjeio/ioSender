@@ -6,13 +6,11 @@
              xmlns:local="clr-namespace:CNC.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="26" d:DesignWidth="200">
-    <Grid>
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Height="26" VerticalAlignment="Top" Width="200">
-            <Label x:Name="axis" Width="20" HorizontalContentAlignment="Right" Content="{Binding Label, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=OneWay}"/>
-            <local:NumericTextBox x:Name="cvMin" Format="{Binding Path=Format, Mode=OneWay}" Value="{Binding Path=MinValue, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=OneWay}" IsReadOnly="True" Focusable="False" Background="#FFF8F8F8"/>
-            <Label Content="-"/>
-            <local:NumericTextBox x:Name="cVMax" Format="{Binding Path=Format, Mode=OneWay}" Value="{Binding Path=MaxValue, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=OneWay}" IsReadOnly="True" Focusable="False" Background="#FFF8F8F8"/>
-            <Label x:Name="unit" Content="{Binding Path=Unit, Mode=OneWay}"/>
-        </StackPanel>
-    </Grid>
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Height="26" VerticalAlignment="Top" Width="200">
+        <Label x:Name="axis" Width="20" HorizontalContentAlignment="Right" Content="{Binding Label, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=OneWay}"/>
+        <local:NumericTextBox x:Name="cvMin" Format="{Binding Path=Format, Mode=OneWay}" Value="{Binding Path=MinValue, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=OneWay}" IsReadOnly="True" Focusable="False" Background="#FFF8F8F8"/>
+        <Label Content="-"/>
+        <local:NumericTextBox x:Name="cVMax" Format="{Binding Path=Format, Mode=OneWay}" Value="{Binding Path=MaxValue, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=OneWay}" IsReadOnly="True" Focusable="False" Background="#FFF8F8F8"/>
+        <Label x:Name="unit" Content="{Binding Path=Unit, Mode=OneWay}"/>
+    </StackPanel>
 </UserControl>

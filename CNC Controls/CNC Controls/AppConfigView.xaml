@@ -7,11 +7,11 @@
              mc:Ignorable="d" 
              d:DesignHeight="515" d:DesignWidth="875">
     <DockPanel>
-        <Button x:Name="btnSave" DockPanel.Dock="Bottom" Content="Save settings" HorizontalAlignment="Left" VerticalAlignment="Top" Width="100" Click="btnSave_Click"/>
+        <Button x:Name="btnSave" DockPanel.Dock="Bottom" Content="Save settings" Margin="10,0,0,5" HorizontalAlignment="Left" VerticalAlignment="Top" Width="100" Click="btnSave_Click"/>
         <ItemsControl x:Name="xx" DockPanel.Dock="Top">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <WrapPanel Orientation="Vertical" ItemWidth="255" Margin="10,10,0,5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                    <WrapPanel Orientation="Vertical" ItemWidth="255" Margin="5,5,0,5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
         </ItemsControl>

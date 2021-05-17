@@ -37,8 +37,8 @@
             <cnccontrols:SpindleControl x:Name="spindleControl" HorizontalAlignment="Left" VerticalAlignment="Top"/>
             <cnccontrols:FeedControl x:Name="feedControl" HorizontalAlignment="Left" VerticalAlignment="Top" />
         </StackPanel>
-        <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,5">
-            <cnccontrols:JobControl x:Name="GCodeSender" DockPanel.Dock="Bottom"/>
+        <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,5,0,0">
+            <cnccontrols:JobControl x:Name="GCodeSender" Margin="0,5,0,0" DockPanel.Dock="Bottom"/>
             <TabControl x:Name="tabGCode" TabStripPlacement="Bottom" DockPanel.Dock="Top" >
                 <TabItem Header="Program">
                     <cnccontrols:GCodeListControl/>

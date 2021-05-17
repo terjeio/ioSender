@@ -1,13 +1,13 @@
 ﻿/*
  * DragKnifeViewModel.cs - part of CNC Controls DragKnife library for Grbl
  *
- * v0.15 / 2020-04-10 / Io Engineering (Terje Io)
+ * v0.33 / 2021-05-14 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020, Io Engineering (Terje Io)
+Copyright (c) 2020-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -114,7 +114,7 @@ namespace CNC.Controls.DragKnife
                     }
                 }
 
-                List<string> gc = GCodeParser.TokensToGCode(newToolPath);
+                List<string> gc = GCodeParser.TokensToGCode(newToolPath, AppConfig.Settings.Base.AutoCompress);
                 //            GCodeParser.Save(@"C:\Users\terjeio\Desktop\Probing\knife.nc", gc);
 
                 GCode.File.AddBlock(string.Format("Drag knife transform applied: {0}", GCode.File.Model.FileName), CNC.Core.Action.New);

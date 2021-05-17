@@ -1,13 +1,13 @@
 ﻿/*
  * ArcsToLines.cs - part of CNC Controls library for Grbl
  *
- * v0.15 / 2020-04-20 / Io Engineering (Terje Io)
+ * v0.33 / 2021-05-14 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020, Io Engineering (Terje Io)
+Copyright (c) 2020-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -53,6 +53,8 @@ namespace CNC.Controls
             GCodeEmulator emu = new GCodeEmulator();
             List<GCodeToken> toolPath = new List<GCodeToken>();
 
+            uint lnr = 0, lnroffset = 0;
+
             using (new UIUtils.WaitCursor())
             {
                 toolPath.Add(new GCComment(Commands.Comment, 0, "Arcs to lines transform applied"));
@@ -65,45 +67,55 @@ namespace CNC.Controls
                         case Commands.G3:
                             {
                                 var arc = cmd.Token as GCArc;
-                                var lnr = arc.LineNumber;
-                                toolPath.Add(new GCComment(Commands.Comment, lnr++, "Arc to lines start: " + arc.ToString()));
+                                lnroffset++;
+                                lnr = arc.LineNumber;
+                                toolPath.Add(new GCComment(Commands.Comment, arc.LineNumber + lnroffset, "Arc to lines start: " + arc.ToString()));
 
                                 List<Point3D> points = arc.GeneratePoints(emu.Plane, ToPos(cmd.Start, emu.IsImperial), arcTolerance, emu.DistanceMode == DistanceMode.Incremental); // Dynamic resolution
                                 foreach (Point3D point in points)
-                                    toolPath.Add(new GCLinearMotion(Commands.G1, lnr++, ToPos(point, emu.IsImperial), AxisFlags.XYZ));
-
-                                toolPath.Add(new GCComment(Commands.Comment, lnr, "Arc to lines end"));
+                                {
+                                    lnroffset++;
+                                    toolPath.Add(new GCLinearMotion(Commands.G1, arc.LineNumber + lnroffset, ToPos(point, emu.IsImperial), AxisFlags.XYZ));
+                                }
+                                lnroffset++;
+                                toolPath.Add(new GCComment(Commands.Comment, arc.LineNumber + lnroffset, "Arc to lines end"));
                             }
                             break;
 
                         case Commands.G5:
                             {
                                 var spline = cmd.Token as GCSpline;
-                                var lnr = spline.LineNumber;
-                                toolPath.Add(new GCComment(Commands.Comment, lnr++, "Spline to lines start: " + spline.ToString()));
+                                lnroffset++;
+                                lnr = spline.LineNumber;
+                                toolPath.Add(new GCComment(Commands.Comment, spline.LineNumber + lnroffset, "Spline to lines start: " + spline.ToString()));
 
                                 List<Point3D> points = spline.GeneratePoints(ToPos(cmd.Start, emu.IsImperial), arcTolerance, emu.DistanceMode == DistanceMode.Incremental); // Dynamic resolution
                                 foreach (Point3D point in points)
-                                    toolPath.Add(new GCLinearMotion(Commands.G1, lnr++, ToPos(point, emu.IsImperial), AxisFlags.XYZ));
-
+                                {
+                                    lnroffset++;
+                                    toolPath.Add(new GCLinearMotion(Commands.G1, spline.LineNumber + lnroffset, ToPos(point, emu.IsImperial), AxisFlags.XYZ));
+                                }
+                                lnroffset++;
                                 toolPath.Add(new GCComment(Commands.Comment, lnr, "Spline to lines end"));
                             }
                             break;
 
                         default:
+                            cmd.Token.LineNumber += lnroffset;
                             toolPath.Add(cmd.Token);
+                            lnr = cmd.Token.LineNumber;
                             break;
                     }
                 }
 
-                List<string> gc = GCodeParser.TokensToGCode(toolPath);
+                List<string> gc = GCodeParser.TokensToGCode(toolPath, AppConfig.Settings.Base.AutoCompress);
 
-                GCode.File.AddBlock(string.Format("Arcs to lines transform applied: {0}", GCode.File.Model.FileName), CNC.Core.Action.New);
+                GCode.File.AddBlock(string.Format("Arcs to lines transform applied: {0}", GCode.File.Model.FileName), Core.Action.New);
 
                 foreach (string block in gc)
-                    GCode.File.AddBlock(block, CNC.Core.Action.Add);
+                    GCode.File.AddBlock(block, Core.Action.Add);
 
-                GCode.File.AddBlock("", CNC.Core.Action.End);
+                GCode.File.AddBlock("", Core.Action.End);
             }
         }
 

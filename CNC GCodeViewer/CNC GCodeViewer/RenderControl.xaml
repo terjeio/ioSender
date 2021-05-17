@@ -5,7 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CNC.Controls.Viewer"
              mc:Ignorable="d"
-             d:DesignHeight="335" d:DesignWidth="400">
+             d:DesignHeight="335" d:DesignWidth="400"
+             Loaded="control_Loaded">
     <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
         <Button x:Name="button" DockPanel.Dock="Bottom" Content="Reset view" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="75" Click="button_Click"/>
         <local:Renderer DockPanel.Dock="Top" x:Name="gcodeView"/>

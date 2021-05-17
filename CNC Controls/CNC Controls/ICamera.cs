@@ -1,12 +1,12 @@
 ﻿/*
  * ICamera.cs - part of CNC Controls library for Grbl
  *
- * v0.10 / 2019-03-05 / Io Engineering (Terje Io)
+ * v0.33 / 2021-05-04 / Io Engineering (Terje Io)
  *
  */
 /*
 
-Copyright (c) 2020, Io Engineering (Terje Io)
+Copyright (c) 2020-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -40,15 +40,16 @@ using CNC.Core;
 
 namespace CNC.Controls
 {
-    public delegate void CameraOpenedHandler();
+    public delegate void IsVisibilityChangedHandler();
     public delegate void CameraMoveOffsetHandler(CameraMoveMode Mode, double XOffset, double YOffset);
 
     public interface ICamera
     {
-        event CameraOpenedHandler Opened;
+        event IsVisibilityChangedHandler IsVisibilityChanged;
         event CameraMoveOffsetHandler MoveOffset;
 
         bool HasCamera { get; }
+        bool IsVisible { get; }
 
         void Open();
         void Close();

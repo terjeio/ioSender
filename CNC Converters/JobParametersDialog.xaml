@@ -31,8 +31,8 @@
             </GroupBox>
             <GroupBox Header="Scaling factors" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Height="Auto" Width="280">
                 <StackPanel>
-                    <Controls:NumericField Label="X:" ColonAt="90" Unit="" Format="-###0.###" Value="{Binding Path=ScaleX, Mode=TwoWay}"/>
-                    <Controls:NumericField Label="Y:" ColonAt="90" Unit="" Format="-###0.###" Value="{Binding Path=ScaleY, Mode=TwoWay}"/>
+                    <Controls:NumericField Label="X:" ColonAt="90" Unit="" Format="-###0.###" Value="{Binding Path=ScaleX, Mode=TwoWay}" ToolTip="A negative factor flips the output."/>
+                    <Controls:NumericField Label="Y:" ColonAt="90" Unit="" Format="-###0.###" Value="{Binding Path=ScaleY, Mode=TwoWay}" ToolTip="A negative factor flips the output."/>
                 </StackPanel>
             </GroupBox>
             <GroupBox Header="Tool" Visibility="{Binding Path=EnableToolSelection, Converter={StaticResource IsVisibleConverter}}" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Height="Auto" Width="280">

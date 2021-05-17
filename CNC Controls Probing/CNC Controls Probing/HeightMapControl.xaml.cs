@@ -1,7 +1,7 @@
 ﻿/*
  * HeightMapControl.xaml.cs - part of CNC Probing library
  *
- * v0.30 / 2021-04-04 / Io Engineering (Terje Io)
+ * v0.33 / 2021-05-09 / Io Engineering (Terje Io)
  *
  */
 
@@ -271,12 +271,17 @@ namespace CNC.Controls.Probing
 
             using (new UIUtils.WaitCursor())
             {
-
-                GCodeTransform gt = new GCodeTransform(probing);
-
-                gt.ApplyHeightMap(probing);
+                try
+                {
+                    new GCodeTransform(probing).ApplyHeightMap(probing);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "Heightmap", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                }
             }
         }
+
         private void probe_Click(object sender, RoutedEventArgs e)
         {
             (DataContext as ProbingViewModel).IsPaused = false;

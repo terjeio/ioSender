@@ -35,6 +35,9 @@
     <ApplicationIcon>App.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="RP.Math.Vector3">
+      <HintPath>..\..\Vector-master\RP.Math.Vector3\bin\Release\RP.Math.Vector3.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -66,8 +69,13 @@
     <Compile Include="FileActionControl.xaml.cs">
       <DependentUpon>FileActionControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="GCodeCompress.cs" />
     <Compile Include="GCodeListControl.xaml.cs">
       <DependentUpon>GCodeListControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="GCodeRotate.cs" />
+    <Compile Include="GCodeRotateDialog.xaml.cs">
+      <DependentUpon>GCodeRotateDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="GotoControl.xaml.cs">
       <DependentUpon>GotoControl.xaml</DependentUpon>
@@ -138,6 +146,9 @@
     <Compile Include="OffsetView.xaml.cs">
       <DependentUpon>OffsetView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="OriginControl.xaml.cs">
+      <DependentUpon>OriginControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="OutlineFlyout.xaml.cs">
       <DependentUpon>OutlineFlyout.xaml</DependentUpon>
     </Compile>
@@ -205,6 +216,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="GCodeListControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="GCodeRotateDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -299,6 +314,10 @@
       <DependentUpon>MPGPending.xaml</DependentUpon>
     </Compile>
     <Page Include="OffsetView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="OriginControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

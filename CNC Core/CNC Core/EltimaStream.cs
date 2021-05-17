@@ -1,7 +1,7 @@
 ﻿/*
  * EltimaStream.cs - part of CNC Controls library
  *
- * v0.30 / 2021-04-23 / Io Engineering (Terje Io)
+ * v0.33 / 2021-05-12 / Io Engineering (Terje Io)
  *
  */
 
@@ -78,7 +78,7 @@ namespace CNC.Core
 
             if (parameter.Count() < 4)
             {
-                MessageBox.Show("Unable to open serial port: " + PortParams, "GCode Sender");
+                MessageBox.Show("Unable to open serial port: " + PortParams, "ioSender");
                 System.Environment.Exit(2);
             }
 
@@ -88,7 +88,7 @@ namespace CNC.Core
             }
             catch
             {
-                MessageBox.Show("Failed to load serial port driver.", "GCode Sender");
+                MessageBox.Show("Failed to load serial port driver.", "ioSender");
                 System.Environment.Exit(1);
             }
 
@@ -148,7 +148,7 @@ namespace CNC.Core
                     log = new StreamWriter(Resources.DebugFile);
                 } catch
                 {
-                    MessageBox.Show("Unable to open log file: " + Resources.DebugFile, "GCode Sender");
+                    MessageBox.Show("Unable to open log file: " + Resources.DebugFile, "ioSender");
                 }
 #endif
             }

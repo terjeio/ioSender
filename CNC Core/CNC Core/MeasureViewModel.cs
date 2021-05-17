@@ -1,13 +1,13 @@
 ﻿/*
  * MeasureViewModel.cs - part of CNC Controls library
  *
- * v0.03 / 2020-01-28 / Io Engineering (Terje Io)
+ * v0.33 / 2021-05-16 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020, Io Engineering (Terje Io)
+Copyright (c) 2020-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -42,6 +42,8 @@ namespace CNC.Core
     public class MeasureViewModel : ViewModelBase
     {
         bool _isMetric = true;
+
+        public const double MM_PER_INCH = 25.4d;
 
         public bool IsMetric
         {

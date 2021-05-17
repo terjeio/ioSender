@@ -1,13 +1,13 @@
 ﻿/*
  * Renderer.xaml.cs - part of CNC Controls library
  *
- * v0.20 / 2020-06-03 / Io Engineering (Terje Io)
+ * v0.33 / 2021-05-15 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2020, Io Engineering (Terje Io)
+Copyright (c) 2019-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -48,9 +48,16 @@ namespace CNC.Controls.Viewer
     /// </summary>
     public partial class RenderControl : UserControl
     {
+        private bool isLoaded = false;
+
         public RenderControl()
         {
             InitializeComponent();
+        }
+
+        private void SettingsChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            Configure();
         }
 
         public bool ShowTool
@@ -66,8 +73,16 @@ namespace CNC.Controls.Viewer
             gcodeView.ShowGrid = AppConfig.Settings.GCodeViewer.ShowGrid;
             gcodeView.ShowAxes = AppConfig.Settings.GCodeViewer.ShowAxes;
             gcodeView.ShowBoundingBox = AppConfig.Settings.GCodeViewer.ShowBoundingBox;
+            gcodeView.RenderExecuted = AppConfig.Settings.GCodeViewer.RenderExecuted;
             gcodeView.Machine.ShowViewCube = AppConfig.Settings.GCodeViewer.ShowViewCube;
             gcodeView.Machine.ShowCoordinateSystem = AppConfig.Settings.GCodeViewer.ShowCoordinateSystem;
+            gcodeView.Machine.CutMotionColor = AppConfig.Settings.GCodeViewer.CutMotionColor;
+            gcodeView.Machine.RapidMotionColor = AppConfig.Settings.GCodeViewer.RapidMotionColor;
+            gcodeView.Machine.RetractMotionColor = AppConfig.Settings.GCodeViewer.RetractMotionColor;
+            gcodeView.Machine.HighlightColor = AppConfig.Settings.GCodeViewer.HighlightColor;
+            gcodeView.Machine.ToolOriginColor = AppConfig.Settings.GCodeViewer.ToolOriginColor;
+            gcodeView.Machine.GridColor = AppConfig.Settings.GCodeViewer.GridColor;
+            gcodeView.Machine.CanvasColor = AppConfig.Settings.GCodeViewer.BlackBackground ? System.Windows.Media.Brushes.Black : System.Windows.Media.Brushes.White;
         }
 
         public void Close()
@@ -84,6 +99,15 @@ namespace CNC.Controls.Viewer
         private void button_Click(object sender, System.Windows.RoutedEventArgs e)
         {
             gcodeView.ResetView();
+        }
+
+        private void control_Loaded(object sender, System.Windows.RoutedEventArgs e)
+        {
+            if (!isLoaded && !System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
+            {
+                isLoaded = true;
+                AppConfig.Settings.GCodeViewer.PropertyChanged += SettingsChanged;
+            }
         }
     }
 }

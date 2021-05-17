@@ -1,7 +1,7 @@
 /*
  * MainWindow.xaml.cs - part of Grbl Code Sender
  *
- * v0.31 / 2021-04-27 / Io Engineering (Terje Io)
+ * v0.33 / 2021-05-16 / Io Engineering (Terje Io)
  *
  */
 
@@ -54,7 +54,7 @@ namespace GCode_Sender
 
     public partial class MainWindow : Window
     {
-        private const string version = "2.0.31";
+        private const string version = "2.0.33";
         public static MainWindow ui = null;
         public static CNC.Controls.Viewer.Viewer GCodeViewer = null;
         public static UIViewModel UIViewModel { get; } = new UIViewModel();
@@ -79,12 +79,6 @@ namespace GCode_Sender
 
             CNC.Core.Grbl.GrblViewModel = (GrblViewModel)DataContext;
             GrblInfo.LatheModeEnabled = AppConfig.Settings.Lathe.IsEnabled;
-
-#if ADD_CAMERA
-            enableCamera(this);
-#else
-            menuCamera.Visibility = Visibility.Hidden;
-#endif
 
             //       SDCardControl.FileSelected += new CNC_Controls.SDCardControl.FileSelectedHandler(SDCardControl_FileSelected);
 
@@ -129,8 +123,8 @@ namespace GCode_Sender
                     WindowState = WindowState.Maximized;
                 else
                 {
-                    Width = Math.Max(Math.Min(AppConfig.Settings.Base.WindowWidth, SystemParameters.PrimaryScreenWidth), 925);
-                    Height = Math.Max(Math.Min(AppConfig.Settings.Base.WindowHeight, SystemParameters.PrimaryScreenHeight), 660);
+                    Width = Math.Max(Math.Min(AppConfig.Settings.Base.WindowWidth, SystemParameters.PrimaryScreenWidth), MinWidth);
+                    Height = Math.Max(Math.Min(AppConfig.Settings.Base.WindowHeight, SystemParameters.PrimaryScreenHeight), MinHeight);
                     if (Left + Width > SystemParameters.PrimaryScreenWidth)
                         Left = 0d;
                     if (Top + Height > SystemParameters.PrimaryScreenHeight)
@@ -138,17 +132,24 @@ namespace GCode_Sender
                 }
             }
             saveWinSize = AppConfig.Settings.Base.KeepWindowSize;
+            var appconf = getView(getTab(ViewType.AppConfig));
+
+            appconf.Setup(UIViewModel, AppConfig.Settings);
 
             foreach (TabItem tab in UIUtils.FindLogicalChildren<TabItem>(ui.tabMode))
             {
                 ICNCView view = getView(tab);
-                if (view != null)
+                if (view != null && view != appconf)
                 {
                     view.Setup(UIViewModel, AppConfig.Settings);
                     tab.IsEnabled = view.ViewType == ViewType.GRBL || view.ViewType == ViewType.AppConfig;
                 }
             }
-
+#if ADD_CAMERA
+            enableCamera(this);
+#else
+            menuCamera.Visibility = Visibility.Hidden;
+#endif
             if (!AppConfig.Settings.GCodeViewer.IsEnabled)
                 ShowView(false, ViewType.GCodeViewer);
 
@@ -180,7 +181,9 @@ namespace GCode_Sender
             c = new HpglToGCode();
             GCode.File.AddConverter(c.GetType(), c.FileType);
 
-            GCode.File.AddTransformer(typeof(CNC.Controls.ArcsToLines), "Arcs to lines", UIViewModel.TransformMenuItems);
+            GCode.File.AddTransformer(typeof(GCodeRotateViewModel), "Rotate", UIViewModel.TransformMenuItems);
+            GCode.File.AddTransformer(typeof(ArcsToLines), "Arcs to lines", UIViewModel.TransformMenuItems);
+            GCode.File.AddTransformer(typeof(GCodeCompress), "Compress (experimental)", UIViewModel.TransformMenuItems);
             GCode.File.AddTransformer(typeof(CNC.Controls.DragKnife.DragKnifeViewModel), "Add drag knife moves", UIViewModel.TransformMenuItems);
         }
 
@@ -231,7 +234,12 @@ namespace GCode_Sender
 
         void aboutWikiItem_Click(object sender, EventArgs e)
         {
-            System.Diagnostics.Process.Start("https://github.com/terjeio/Grbl-GCode-Sender/wiki");
+            System.Diagnostics.Process.Start("https://github.com/terjeio/ioSender/wiki");
+        }
+
+        void tipsWikiItem_Click(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start("https://github.com/terjeio/ioSender/wiki/Usage-tips");
         }
 
         void aboutMenuItem_Click(object sender, EventArgs e)

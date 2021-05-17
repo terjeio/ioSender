@@ -6,13 +6,10 @@
              xmlns:local="clr-namespace:CNC.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="65" d:DesignWidth="216">
-    <Grid>
-        <GroupBox x:Name="grpCoolant" Header="Coolant" HorizontalAlignment="Left" VerticalAlignment="Top" Height="65" Width="216">
-            <StackPanel HorizontalAlignment="Left" Height="40" Margin="3,3,0,0" Grid.Row="1" VerticalAlignment="Top" Width="184">
-                <CheckBox x:Name="chkFlood" Content="Flood" IsChecked="{Binding Path=Flood, Mode=OneWay}" HorizontalAlignment="Left" Margin="20,3,0,0" VerticalAlignment="Top" Click="chkBox_Click"/>
-                <CheckBox x:Name="chkMist" Content="Mist" IsChecked="{Binding Path=Mist, Mode=OneWay}"  HorizontalAlignment="Left" Margin="20,3,0,0" VerticalAlignment="Top" Click="chkBox_Click"/>
-            </StackPanel>
-        </GroupBox>
-
-    </Grid>
+    <GroupBox x:Name="grpCoolant" Header="Coolant" HorizontalAlignment="Left" VerticalAlignment="Top" Height="65" Width="216">
+        <StackPanel HorizontalAlignment="Left" Height="40" Margin="3,3,0,0" Grid.Row="1" VerticalAlignment="Top" Width="184">
+            <CheckBox x:Name="chkFlood" Content="Flood" IsChecked="{Binding Path=Flood, Mode=OneWay}" HorizontalAlignment="Left" Margin="20,3,0,0" VerticalAlignment="Top" Click="chkBox_Click"/>
+            <CheckBox x:Name="chkMist" Content="Mist" IsChecked="{Binding Path=Mist, Mode=OneWay}"  HorizontalAlignment="Left" Margin="20,3,0,0" VerticalAlignment="Top" Click="chkBox_Click"/>
+        </StackPanel>
+    </GroupBox>
 </UserControl>

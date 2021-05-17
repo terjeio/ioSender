@@ -10,7 +10,7 @@ Please check out the [Wiki](https://github.com/terjeio/Grbl-GCode-Sender/wiki) f
 
 ---
 
-First production release 2.0.31, see the [changelog](changelog.md) for details.
+Second production release 2.0.33, see the [changelog](changelog.md) for details.
 
 ---
 
@@ -55,4 +55,4 @@ Lathe mode.
 Conversational programming for Lathe Mode. Threading requires [grblHAL](https://github.com/terjeio/grblHAL) controller with driver that has spindle sync support.
 
 ---
-2021-04-27
+2021-05-16

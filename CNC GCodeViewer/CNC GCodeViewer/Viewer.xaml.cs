@@ -1,7 +1,7 @@
 /*
  * Viewer.xaml.cs - part of CNC Controls library
  *
- * v0.20 / 2020-06-03 / Io Engineering (Terje Io)
+ * v0.33 / 2021-05-16 / Io Engineering (Terje Io)
  *
  */
 
@@ -49,7 +49,8 @@ namespace CNC.Controls.Viewer
 /// </summary>
 public partial class Viewer : UserControl, ICNCView
     {
-        private bool isNew = false;
+        private bool isNew = false, isLoaded = false;
+
         public Viewer()
         {
             InitializeComponent();
@@ -59,6 +60,11 @@ public partial class Viewer : UserControl, ICNCView
 
         public ViewType ViewType { get { return ViewType.GCodeViewer; } }
         public bool CanEnable { get { return true; } }
+
+        private void SettingsChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            Configure();
+        }
 
         public void Activate(bool activate, ViewType chgMode)
         {
@@ -84,11 +90,8 @@ public partial class Viewer : UserControl, ICNCView
         {
             gcodeView.ClearViewport();
         }
-
-        public void Setup(UIViewModel model, AppConfig profile)
+        public void Configure()
         {
-            model.ConfigControls.Add(new ConfigControl());
-
             gcodeView.ArcResolution = AppConfig.Settings.GCodeViewer.ArcResolution;
             gcodeView.MinDistance = AppConfig.Settings.GCodeViewer.MinDistance;
             gcodeView.ShowGrid = AppConfig.Settings.GCodeViewer.ShowGrid;
@@ -96,6 +99,19 @@ public partial class Viewer : UserControl, ICNCView
             gcodeView.ShowBoundingBox = AppConfig.Settings.GCodeViewer.ShowBoundingBox;
             gcodeView.Machine.ShowViewCube = AppConfig.Settings.GCodeViewer.ShowViewCube;
             gcodeView.Machine.ShowCoordinateSystem = AppConfig.Settings.GCodeViewer.ShowCoordinateSystem;
+            gcodeView.Machine.CutMotionColor = AppConfig.Settings.GCodeViewer.CutMotionColor;
+            gcodeView.Machine.RapidMotionColor = AppConfig.Settings.GCodeViewer.RapidMotionColor;
+            gcodeView.Machine.RetractMotionColor = AppConfig.Settings.GCodeViewer.RetractMotionColor;
+            gcodeView.Machine.ToolOriginColor = AppConfig.Settings.GCodeViewer.ToolOriginColor;
+            gcodeView.Machine.GridColor = AppConfig.Settings.GCodeViewer.GridColor;
+            gcodeView.Machine.CanvasColor = AppConfig.Settings.GCodeViewer.BlackBackground ? System.Windows.Media.Brushes.Black : System.Windows.Media.Brushes.White;
+        }
+
+        public void Setup(UIViewModel model, AppConfig profile)
+        {
+            model.ConfigControls.Add(new ConfigControl());
+
+            Configure();
         }
 
         public void Open(List<GCodeToken> tokens)
@@ -113,6 +129,15 @@ public partial class Viewer : UserControl, ICNCView
         private void button_Click(object sender, System.Windows.RoutedEventArgs e)
         {
             gcodeView.ResetView();
+        }
+
+        private void control_Loaded(object sender, System.Windows.RoutedEventArgs e)
+        {
+            if (!isLoaded && !System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
+            {
+                isLoaded = true;
+                AppConfig.Settings.GCodeViewer.PropertyChanged += SettingsChanged;
+            }
         }
     }
 }

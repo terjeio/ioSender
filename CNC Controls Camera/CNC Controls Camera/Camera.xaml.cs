@@ -1,7 +1,7 @@
 ﻿/*
  * Camera.xaml.cs - part of CNC Controls Camera library
  *
- * v0.30 / 2021-04-08 / Io Engineering (Terje Io)
+ * v0.33 / 2021-05-04 / Io Engineering (Terje Io)
  *
  */
 
@@ -48,7 +48,7 @@ namespace CNC.Controls.Camera
     {
         private bool initialOpen = true, userClosing = true;
 
-        public event CameraOpenedHandler Opened;
+        public event IsVisibilityChangedHandler IsVisibilityChanged;
         public event CameraMoveOffsetHandler MoveOffset;
 
         public Camera()
@@ -65,6 +65,7 @@ namespace CNC.Controls.Camera
 
         public bool HasCamera { get { return CNCCamera.HasCamera; } }
         public CameraControl CameraControl { get { return CNCCamera; } }
+        public new bool IsVisible { get { return CNCCamera.IsVisible; } }
 
         public void Setup(UIViewModel model)
         {
@@ -88,8 +89,8 @@ namespace CNC.Controls.Camera
 
             Show();
 
-            if(CNCCamera.OpenVideoSource())
-                Opened?.Invoke();
+            if (CNCCamera.OpenVideoSource())
+                IsVisibilityChanged?.Invoke();
         }
 
         public void CloseCamera()
@@ -99,13 +100,15 @@ namespace CNC.Controls.Camera
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if(userClosing)
+            if (userClosing)
             {
                 e.Cancel = true;
                 Hide();
             }
             else
                 CNCCamera.CloseCurrentVideoSource();
+
+            IsVisibilityChanged?.Invoke();
         }
     }
 }

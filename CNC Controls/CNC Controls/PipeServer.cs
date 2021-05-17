@@ -1,13 +1,13 @@
 /*
  * PipeServer.cs - part of Grbl Code Sender
  *
- * v0.15 / 2020-04-10 / Io Engineering (Terje Io)
+ * v0.33 / 2021-05-17 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020, Io Engineering (Terje Io)
+Copyright (c) 2020-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -52,7 +52,7 @@ namespace CNC.Controls
         {
             Task server = null;
 
-            if(!File.Exists("gcodesender"))
+            if(!File.Exists("ioSender"))
                 server = Task.Factory.StartNew(() => RunServer(dispatcher));
         }
 
@@ -62,7 +62,7 @@ namespace CNC.Controls
 
             try {
 
-                using (var pipeServer = new NamedPipeServerStream("gcodesender", PipeDirection.InOut))
+                using (var pipeServer = new NamedPipeServerStream("ioSender", PipeDirection.InOut))
                 {
                     using (var reader = new StreamReader(pipeServer))
                     {

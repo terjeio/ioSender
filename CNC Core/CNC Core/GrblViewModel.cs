@@ -1,7 +1,7 @@
 /*
  * GrblViewModel.cs - part of CNC Controls library
  *
- * v0.31 / 2021-04-26 / Io Engineering (Terje Io)
+ * v0.33 / 2021-05-06 / Io Engineering (Terje Io)
  *
  */
 
@@ -53,7 +53,7 @@ namespace CNC.Core
         private string _mdiCommand, _fileName;
         private bool has_wco = false, suspend = false;
         private bool _flood, _mist, _tubeCoolant, _toolChange, _reset, _isMPos, _isJobRunning, _isProbeSuccess, _pgmEnd, _isParserStateLive, _isTloRefSet;
-        private bool _canReset;
+        private bool _canReset, _isCameraVisible = false;
         private bool? _mpg;
         private int _pwm, _line, _scrollpos, _blocks = 0, _executingBlock = 0;
         private double _feedrate = 0d;
@@ -295,8 +295,9 @@ namespace CNC.Core
                 }
             }
         }
+        public bool IsCameraVisible { get { return _isCameraVisible; } set { if (_isCameraVisible != value) { _isCameraVisible = value; OnPropertyChanged(); } } }
 
-//        public bool CanReset { get { return _canReset; } private set { if(value != _canReset) { _canReset = value; OnPropertyChanged(); } } }
+        //        public bool CanReset { get { return _canReset; } private set { if(value != _canReset) { _canReset = value; OnPropertyChanged(); } } }
         public bool GrblReset { get { return _reset; } set { if ((_reset = value)) { _grblState.Error = 0; OnPropertyChanged(); Message = ""; } } }
         public GrblState GrblState { get { return _grblState; } set { _grblState = value; OnPropertyChanged(); } }
         public bool IsGCLock { get { return _grblState.State == GrblStates.Alarm; } }

@@ -7,8 +7,6 @@ using CNC.GCode;
 using RP.Math;
 using System;
 using System.Collections.Generic;
-using System.IO;
-
 
 namespace CNC.Controls.Probing
 {
@@ -21,54 +19,6 @@ namespace CNC.Controls.Probing
         {
             this.model = model;
         }
-/*
-        public GCodeFile Split(double length)
-        {
-            List<Command> newFile = new List<Command>();
-
-            foreach (Command c in Toolpath)
-            {
-                if (c is Motion)
-                {
-                    newFile.AddRange(((Motion)c).Split(length));
-                }
-                else
-                {
-                    newFile.Add(c);
-                }
-            }
-
-            return new GCodeFile(newFile);
-        }
-        
-        public GCodeFile ArcsToLines(double length)
-        {
-            List<Command> newFile = new List<Command>();
-
-            foreach (Command c in Toolpath)
-            {
-                if (c is Arc)
-                {
-                    foreach (Arc segment in ((Arc)c).Split(length).Cast<Arc>())
-                    {
-                        Line l = new Line();
-                        l.Start = segment.Start;
-                        l.End = segment.End;
-                        l.Feed = segment.Feed;
-                        l.Rapid = false;
-                        l.PositionValid = new bool[] { true, true, true };
-                        newFile.Add(l);
-                    }
-                }
-                else
-                {
-                    newFile.Add(c);
-                }
-            }
-
-            return new GCodeFile(newFile);
-        }
-        */
 
         private Vector3 ToAbsolute(Vector3 orig, double[] values, bool isRelative = false)
         {
@@ -123,7 +73,7 @@ namespace CNC.Controls.Probing
                     case Commands.G3:
                         {
                             if (plane.Plane != Plane.XY)
-                                throw new Exception("GCode contains arcs in YZ or XZ plane (G18/19), can't apply height map. Use 'Arcs to Lines' if you really need this.");
+                                throw new Exception("GCode contains arcs in XZ or YZ plane (G18/19), can't apply transform. Use 'Arcs to Lines' if you really need this.");
 
                             var arc = token as GCArc;
                             double[] center = arc.GetCenter(plane, pos.Array);
@@ -173,13 +123,13 @@ namespace CNC.Controls.Probing
                 }
             }
 
-            List<string> gc = GCodeParser.TokensToGCode(newToolPath);
+            List<string> gc = GCodeParser.TokensToGCode(newToolPath, AppConfig.Settings.Base.AutoCompress);
 
 //            GCodeParser.Save(@"C:\Users\terjeio\Desktop\Probing\file.nc", gc);
 
             GCode.File.AddBlock(string.Format("Heightmap applied: {0}", model.Grbl.FileName), Core.Action.New);
 
-            foreach(string block in gc)
+            foreach (string block in gc)
                 GCode.File.AddBlock(block, Core.Action.Add);
 
             GCode.File.AddBlock("", Core.Action.End);
