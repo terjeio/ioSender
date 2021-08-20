@@ -232,9 +232,35 @@ namespace CNC.Controls.Viewer
         private void Renderer_Loaded(object sender, RoutedEventArgs e)
         {
             model = DataContext as GrblViewModel;
+            viewport.PreviewMouseWheel += Viewport_MouseWheel;
 
 //            if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
 //                AppConfig.Settings.GCodeViewer.PropertyChanged += GCodeViewer_PropertyChanged;
+        }
+
+        double pl = 0d;
+
+        private void Viewport_MouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
+        {
+            ScaleTool();
+
+
+            model.ResponseLog.Add(string.Format("M: {0} {1}", e.Delta, viewport.Camera.LookDirection.Length - pl));
+            pl = viewport.Camera.LookDirection.Length;
+
+            if (e.Delta > 0)
+            {
+                if (viewport.Camera.LookDirection.Length > 100)
+                {
+                }  
+            }
+            else
+            {
+                if (viewport.Camera.LookDirection.Length < 10)
+                {
+
+                }
+            }
         }
 
         private void GCodeViewer_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -374,6 +400,15 @@ namespace CNC.Controls.Viewer
             {
                 Machine.RapidLines.RemoveAt(0);
                 Machine.RapidLines.Insert(0, Machine.StartPosition);
+            }
+        }
+
+        void ScaleTool ()
+        {
+            if (AnimateTool)
+            {
+              //  tool.Height = Math.Abs(viewport.Camera.LookDirection.Z) / 20d;
+              //  tool.TopRadius = tool.Height / 5d;
             }
         }
 
@@ -656,6 +691,7 @@ namespace CNC.Controls.Viewer
                 viewport.Camera.UpDirection = new Vector3D(-1d, 0d, 0d);
             }
             //                viewport.CameraController.AddRotateForce(0.001, 0.001); // emulate move camera 
+            ScaleTool();
         }
 
         private Point3D toPoint(double[] values, bool isRelative = false)

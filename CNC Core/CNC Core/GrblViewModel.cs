@@ -1,7 +1,7 @@
 /*
  * GrblViewModel.cs - part of CNC Controls library
  *
- * v0.33 / 2021-05-06 / Io Engineering (Terje Io)
+ * v0.34 / 2021-08-12 / Io Engineering (Terje Io)
  *
  */
 
@@ -49,13 +49,13 @@ namespace CNC.Core
 {
     public class GrblViewModel : MeasureViewModel
     {
-        private string _tool, _message, _WPos, _MPos, _wco, _wcs, _a, _fs, _ov, _pn, _sc, _sd, _ex, _d, _gc, _h, _thcv, _thcs;
-        private string _mdiCommand, _fileName;
-        private bool has_wco = false, suspend = false;
-        private bool _flood, _mist, _tubeCoolant, _toolChange, _reset, _isMPos, _isJobRunning, _isProbeSuccess, _pgmEnd, _isParserStateLive, _isTloRefSet;
-        private bool _canReset, _isCameraVisible = false;
+        private string _tool, _message, _WPos, _MPos, _wco, _wcs, _a, _fs, _ov, _pn, _sc, _sd, _fans, _d, _gc, _h, _thcv, _thcs;
+        private string _mdiCommand, _fileName, _rtState, _rtStateEx;
+        private bool has_wco = false, suspend = false, _hasFans = false;
+        private bool _flood, _mist, _fan0, _toolChange, _reset, _isMPos, _isJobRunning, _isProbeSuccess, _pgmEnd, _isParserStateLive, _isTloRefSet;
+        private bool _canReset, _isCameraVisible = false, _responseLogVerbose = false;
         private bool? _mpg;
-        private int _pwm, _line, _scrollpos, _blocks = 0, _executingBlock = 0;
+        private int _pwm, _line, _scrollpos, _blocks = 0, _executingBlock = 0, _auxinValue = -2;
         private double _feedrate = 0d;
         private double _rpm = 0d, _rpmInput = 0d, _rpmDisplay = 0d, _jogStep = 0.1d, _tloReferenceOffset = double.NaN;
         private double _rpmActual = double.NaN;
@@ -171,9 +171,10 @@ namespace CNC.Core
             _streamingState = StreamingState.NoFile;
             _isMPos = _reset = _isJobRunning = _isProbeSuccess = _pgmEnd = _isTloRefSet = false;
             _canReset = true;
-            _pb_avail = _rxb_avail = string.Empty;
+            _pb_avail = _rxb_avail = _rtState = _rtStateEx = string.Empty;
             _mpg = null;
             _line = _pwm = _scrollpos = 0;
+            _auxinValue = -2; // No value read (use a nullable type?)
 
             _grblState.Error = 0;
             _grblState.State = GrblStates.Unknown;
@@ -250,9 +251,10 @@ namespace CNC.Core
                 }
             }
         }
-        public bool ResponseLogVerbose { get; set; } = false;
+        public bool ResponseLogVerbose { get { return _responseLogVerbose; } set { _responseLogVerbose = value; OnPropertyChanged(); } }
         public bool ResponseLogFilterRT { get; set; } = false;
         public bool ResponseLogFilterOk { get; set; } = false;
+        public bool ResponseLogShowRTAll { get; set; } = false;
 
         public bool IsReady { get; set; } = false;
         public bool IsGrblHAL { get { return GrblInfo.IsGrblHAL; } }
@@ -396,9 +398,9 @@ namespace CNC.Core
         public GrblEncoderMode OverrideEncoderMode { get { return _encoder_ovr; } set { _encoder_ovr = value; OnPropertyChanged(); } }
 
         public string RunTime { get { return JobTimer.RunTime; } set { OnPropertyChanged(); } } // Cannot be set...
-        // CO2 Laser
-        public bool TubeCoolant { get { return _tubeCoolant; }  set { _tubeCoolant = value; OnPropertyChanged(); } }
-        //
+                                                                                                // CO2 Laser
+        public bool HasFans { get { return _hasFans; } set { _hasFans = value; OnPropertyChanged(); } }
+        public bool Fan0 { get { return _fan0; }  set { _fan0 = value; OnPropertyChanged(); } }
         public int LineNumber { get { return _line; } private set { _line = value; OnPropertyChanged(); } }
 
         public double THCVoltage { get { return _thcVoltage; } private set { _thcVoltage = value; OnPropertyChanged(); } }
@@ -517,6 +519,8 @@ namespace CNC.Core
         public int RxBufferAvailable { get { return int.Parse(_rxb_avail); } }
 
         #endregion
+
+        public int AuxInputValue { get { return _auxinValue; } private set { _auxinValue = value; OnPropertyChanged(); } }
 
         public bool Silent { get; set; } = false;
         public string Message
@@ -691,47 +695,59 @@ namespace CNC.Core
             }
         }
 
-        public void ParseStatus(string data)
+        public bool ParseStatus(string data)
         {
-            bool pos_changed = false;
-            string[] elements = data.TrimEnd('>').Split('|');
+            bool changed, wco_present = data.Contains("|WCO:");
 
-            if (elements.Length > 1)
-            {
-                string[] pair = elements[0].Split(':');
-                SetGRBLState(pair[0].Substring(1), pair.Count() == 1 ? -1 : int.Parse(pair[1]), false);
+            if((changed = (wco_present ? _rtStateEx : _rtState) != data)) {
 
-                for (int i = elements.Length - 1; i > 0; i--)
+                bool pos_changed = false;
+                string[] elements = data.TrimEnd('>').Split('|');
+
+                if(wco_present)
+                    _rtStateEx = data;
+                else
+                    _rtState = data;
+
+                if (elements.Length > 1)
                 {
-                    pair = elements[i].Split(':');
+                    string[] pair = elements[0].Split(':');
+                    SetGRBLState(pair[0].Substring(1), pair.Count() == 1 ? -1 : int.Parse(pair[1]), false);
 
-                    if (pair.Length == 2)
+                    for (int i = elements.Length - 1; i > 0; i--)
                     {
-                        if(Set(pair[0], pair[1]))
-                            pos_changed = true;
+                        pair = elements[i].Split(':');
+
+                        if (pair.Length == 2)
+                        {
+                            if(Set(pair[0], pair[1]))
+                                pos_changed = true;
+                        }
                     }
-                }
 
-                if (!data.Contains("|Pn:"))
-                    Set("Pn", "");
+                    if (!data.Contains("|Pn:"))
+                        Set("Pn", "");
 
-                if (pos_changed)
-                {
-                    if(_isMPos)
+                    if (pos_changed)
                     {
-                        if (has_wco)
-                            Position.Set(MachinePosition - WorkPositionOffset);
+                        if(_isMPos)
+                        {
+                            if (has_wco)
+                                Position.Set(MachinePosition - WorkPositionOffset);
+                            else
+                                Position.Set(MachinePosition);
+                        }
                         else
-                            Position.Set(MachinePosition);
-                    }
-                    else
-                    {
-                        if (has_wco)
-                            MachinePosition.Set(WorkPosition + WorkPositionOffset);
-                        Position.Set(WorkPosition);
+                        {
+                            if (has_wco)
+                                MachinePosition.Set(WorkPosition + WorkPositionOffset);
+                            Position.Set(WorkPosition);
+                        }
                     }
                 }
             }
+
+            return changed;
         }
 
         private bool canReset ()
@@ -915,9 +931,16 @@ namespace CNC.Core
                     }
                     break;
 
-                case "Ex":
-                    if (_ex != value)
-                        TubeCoolant = value == "C";
+                case "Fan":
+                    if (_fans != value)
+                    {
+                        _fans = value;
+                        try
+                        {
+                            Fan0 = (int.Parse(value) & 0x1) == 1;
+                        }
+                        catch { };
+                    }
                     break;
 
                 case "SD":
@@ -991,6 +1014,10 @@ namespace CNC.Core
                         OverrideEncoderMode = (GrblEncoderMode)int.Parse(enc[0]);
                     }
                     break;
+
+                case "In":
+                    AuxInputValue = int.Parse(value);
+                    break;
             }
 
             return pos_changed;
@@ -1012,26 +1039,11 @@ namespace CNC.Core
                 return;
             }
 
-            if (ResponseLogVerbose || !(data.First() == '<' || data.First() == '$' || data.First() == 'o' || (data.First() == '[' && DataIsEnumeration(data))) || data.StartsWith("error"))
-            {
-                if (!(data.First() == '<' && ResponseLogFilterRT))
-                {
-                    if (data.StartsWith("error:"))
-                    {
-                        var msg = GrblErrors.GetMessage(data.Substring(6));
-                        ResponseLog.Add(data + (msg == data ? "" : " - " + msg));
-                    }
-                    else if(!ResponseLogFilterOk || data != "ok")
-                        ResponseLog.Add(data);
-
-                    if (ResponseLog.Count > 200)
-                        ResponseLog.RemoveAt(0);
-                }
-            }
+            bool stateChanged = true;
 
             if (data.First() == '<')
             {
-                ParseStatus(data);
+                stateChanged = ParseStatus(data);
 
                 OnRealtimeStatusProcessed?.Invoke(data);
             }
@@ -1084,10 +1096,10 @@ namespace CNC.Core
                         break;
 
                     case "MSG":
-                        data = data.Substring(5).Trim().TrimEnd(']');
-                        if (data == "'$H'|'$X' to unlock")
+                        var msg = data.Substring(5).Trim().TrimEnd(']');
+                        if (msg == "'$H'|'$X' to unlock")
                             Message = GrblInfo.IsGrblHAL ? "<Unlock> to continue" : "<Home> or <Unlock> to continue";
-                        else if (GrblState.State == GrblStates.Alarm && data != "Caution: Unlocked")
+                        else if (GrblState.State == GrblStates.Alarm && msg != "Caution: Unlocked")
                         {
                             switch(GrblState.Substate)
                             {
@@ -1102,10 +1114,10 @@ namespace CNC.Core
                                     _message = "<Reset> then <Unlock> to continue";
                                     break;
                             }
-                            Message = (data == "Reset to continue" ? string.Empty : data + ", ") + _message;
+                            Message = (msg == "Reset to continue" ? string.Empty : msg + ", ") + _message;
                         }
                         else
-                            Message = data;
+                            Message = msg;
                         if (data == "Pgm End")
                             ProgramEnd = true;
                         break;
@@ -1147,6 +1159,24 @@ namespace CNC.Core
                     }
                 }
             }
+
+            if (ResponseLogVerbose || !(data.First() == '<' || data.First() == '$' || data.First() == 'o' || (data.First() == '[' && DataIsEnumeration(data))) || data.StartsWith("error"))
+            {
+                if (!(data.First() == '<' && ResponseLogFilterRT))
+                {
+                    if (data.StartsWith("error:"))
+                    {
+                        var msg = GrblErrors.GetMessage(data.Substring(6));
+                        ResponseLog.Add(data + (msg == data ? "" : " - " + msg));
+                    }
+                    else if (data == "ok" ? ResponseLogFilterOk : stateChanged || ResponseLogShowRTAll)
+                        ResponseLog.Add(data);
+
+                    if (ResponseLog.Count > 200)
+                        ResponseLog.RemoveAt(0);
+                }
+            }
+
             OnResponseReceived?.Invoke(data);
         }
     }

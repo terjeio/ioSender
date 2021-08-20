@@ -2,7 +2,7 @@
 /*
  * MainWindow.xaml.cs - part of Grbl Code Sender
  *
- * v0.10 / 2020-03-05 / Io Engineering (Terje Io)
+ * v0.34 / 2021-08-20 / Io Engineering (Terje Io)
  *
  */
 
@@ -42,13 +42,17 @@ using System;
 using System.Windows;
 using CNC.Core;
 using CNC.Controls;
+using System.Collections.Generic;
+using System.Threading;
+using System.IO;
+using Microsoft.Win32;
 
 namespace Grbl_Config_App
 {
 
     public partial class MainWindow : Window
     {
-
+        private const string version = "2.0.34";
         public static UIViewModel UIViewModel { get; } = new UIViewModel();
 
         public MainWindow()
@@ -56,6 +60,7 @@ namespace Grbl_Config_App
             CNC.Core.Resources.Path = AppDomain.CurrentDomain.BaseDirectory;
 
             InitializeComponent();
+            Title = string.Format(Title, version);
 
             int res;
             if ((res = AppConfig.Settings.SetupAndOpen(Title, (GrblViewModel)DataContext, App.Current.Dispatcher)) != 0)
@@ -102,6 +107,104 @@ namespace Grbl_Config_App
             about.ShowDialog();
         }
 
-        #endregion  
+        #endregion
+
+        private void getHalSettingsItem_Click(object sender, RoutedEventArgs e)
+        {
+            bool getExtended = GrblInfo.ExtendedProtocol && GrblInfo.Build >= 20200716;
+
+            var g = new Settings();
+
+            if(g.Load(DataContext as GrblViewModel, "$ESH"))
+            {
+                SaveFileDialog saveDialog = new SaveFileDialog()
+                {
+                    Filter = "Tab separated file (*.txt)|*.txt",
+                    AddExtension = true,
+                    DefaultExt = ".txt",
+                    ValidateNames = true
+                };
+
+                if (saveDialog.ShowDialog() == true)
+                    g.Backup(saveDialog.FileName);
+            }
+        }
+
+        private void getGrblSettingsItem_Click(object sender, RoutedEventArgs e)
+        {
+            bool getExtended = GrblInfo.ExtendedProtocol && GrblInfo.Build >= 20200716;
+
+            var g = new Settings();
+
+            if (g.Load(DataContext as GrblViewModel, "$ESG"))
+            {
+                SaveFileDialog saveDialog = new SaveFileDialog()
+                {
+                    Filter = "Comma separated file (*.csv)|*.csv",
+                    AddExtension = true,
+                    DefaultExt = ".csv",
+                    ValidateNames = true
+                };
+
+                if (saveDialog.ShowDialog() == true)
+                    g.Backup(saveDialog.FileName);
+            }
+        }
+    }
+
+    public class Settings
+    {
+        List<string> settings = new List<string>();
+
+        public bool Load(GrblViewModel model, string cmd)
+        {
+            bool? res = null;
+            CancellationToken cancellationToken = new CancellationToken();
+
+            Comms.com.PurgeQueue();
+
+            model.Silent = true;
+
+                new Thread(() =>
+                {
+                    res = WaitFor.AckResponse<string>(
+                        cancellationToken,
+                        response => ProcessDetail(response),
+                        a => model.OnResponseReceived += a,
+                        a => model.OnResponseReceived -= a,
+                        400, () => Comms.com.WriteCommand(cmd));
+                }).Start();
+
+                while (res == null)
+                    EventUtils.DoEvents();
+
+            return settings.Count > 0;
+        }
+
+        public void Backup(string filename)
+        {
+            if (settings.Count > 0) try
+            {
+                StreamWriter file = new StreamWriter(filename);
+                if (file != null)
+                {
+                    foreach (string s in settings)
+                        file.WriteLine(s);
+
+                    file.Close();
+                }
+            }
+            catch
+            {
+            }
+        }
+
+        private void ProcessDetail(string data)
+        {
+            if (data != "ok")
+            {
+                settings.Add(data);
+            }
+        }
     }
 }

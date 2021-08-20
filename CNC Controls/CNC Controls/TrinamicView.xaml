@@ -31,9 +31,9 @@
                         <RadioButton Content="X" IsChecked="{Binding Path=AxisEnabled[(gcode:AxisFlags)X], RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" HorizontalAlignment="Left" VerticalAlignment="Center" Height="16" Margin="5,0"/>
                         <RadioButton Content="Y" IsChecked="{Binding Path=AxisEnabled[(gcode:AxisFlags)Y], RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" Style="{StaticResource YAxisVisibleStyle}" Margin="5,0" HorizontalAlignment="Left" VerticalAlignment="Center" Height="16"/>
                         <RadioButton Content="Z" IsChecked="{Binding Path=AxisEnabled[(gcode:AxisFlags)Z], RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" Style="{StaticResource ZAxisVisibleStyle}" Margin="5,0" HorizontalAlignment="Left" VerticalAlignment="Center" Height="16"/>
-                        <RadioButton Content="A" Style="{StaticResource AAxisVisibleStyle}" Margin="5,0" HorizontalAlignment="Left" VerticalAlignment="Center" Height="16"/>
-                        <RadioButton Content="B" Style="{StaticResource BAxisVisibleStyle}" Margin="5,0" HorizontalAlignment="Left" VerticalAlignment="Center" Height="16"/>
-                        <RadioButton Content="C" Style="{StaticResource CAxisVisibleStyle}" Margin="5,0" HorizontalAlignment="Left" VerticalAlignment="Center" Height="16"/>
+                        <RadioButton Content="A" IsChecked="{Binding Path=AxisEnabled[(gcode:AxisFlags)A], RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" Style="{StaticResource AAxisVisibleStyle}" Margin="5,0" HorizontalAlignment="Left" VerticalAlignment="Center" Height="16"/>
+                        <RadioButton Content="B" IsChecked="{Binding Path=AxisEnabled[(gcode:AxisFlags)B], RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" Style="{StaticResource BAxisVisibleStyle}" Margin="5,0" HorizontalAlignment="Left" VerticalAlignment="Center" Height="16"/>
+                        <RadioButton Content="C" IsChecked="{Binding Path=AxisEnabled[(gcode:AxisFlags)C], RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" Style="{StaticResource CAxisVisibleStyle}" Margin="5,0" HorizontalAlignment="Left" VerticalAlignment="Center" Height="16"/>
                     </StackPanel>
                     <Label x:Name="lblLoad" Content="Load (SG_RESULT)" Foreground="Blue" Margin="0,0,5,0" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                 </Grid>
@@ -41,7 +41,7 @@
                     <StackPanel>
                         <CheckBox IsChecked="{Binding Path=SFiltEnabled, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" Content="Enable filter (SFILT)" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top"/>
                         <StackPanel Orientation="Horizontal" Margin="0,5">
-                            <Slider Value="{Binding SGValue, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" Width="169" Minimum="-64" Maximum="63" TickPlacement="BottomRight" IsSnapToTickEnabled="False" LostMouseCapture="Slider_LostMouseCapture"/>
+                            <Slider Value="{Binding SGValue, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" Width="169" Minimum="{Binding Path=SGValueMin, RelativeSource={RelativeSource AncestorType=UserControl}}" Maximum="{Binding Path=SGValueMax, RelativeSource={RelativeSource AncestorType=UserControl}}" TickPlacement="BottomRight" IsSnapToTickEnabled="False" LostMouseCapture="Slider_LostMouseCapture"/>
                             <TextBox Text="{Binding Path=SGValue, RelativeSource={RelativeSource AncestorType=UserControl}, StringFormat='##0'}" HorizontalContentAlignment="Right" IsReadOnly="True" Width="30" Margin="5,0,0,0" />
                             <Button Content="Configure" Width="60" VerticalAlignment="Center" Margin="5,0" Click="btnConfigureSGVal_Click"/>
                         </StackPanel>

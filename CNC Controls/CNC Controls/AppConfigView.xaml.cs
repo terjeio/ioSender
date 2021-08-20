@@ -1,7 +1,7 @@
 /*
  * AppConfigView.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.33 / 2021-05-15 / Io Engineering (Terje Io)
+ * v0.34 / 2021-07-26 / Io Engineering (Terje Io)
  *
  */
 /*
@@ -90,6 +90,7 @@ namespace CNC.Controls
                 model.ConfigControls.Add(new BasicConfigControl());
                 model.ConfigControls.Add(new StripGCodeConfigControl());
                 model.ConfigControls.Add(new JogConfigControl());
+                model.ConfigControls.Add(new JogUiConfigControl());
             }
         }
 

@@ -1,7 +1,7 @@
 /*
  * Widget.cs - part of CNC Controls library for Grbl
  *
- * v0.33 / 2021-05-16 / Io Engineering (Terje Io)
+ * v0.34 / 2021-07-18 / Io Engineering (Terje Io)
  *
  */
 
@@ -117,6 +117,8 @@ namespace CNC.Controls
         public RadioButton wRadiobutton = null;
         private StackPanel Canvas;
 
+        public string BaseValue { get { return widget.Value; } }
+
         public Widget(GrblConfigView View, WidgetProperties widget, StackPanel Canvas)
         {
             this.Canvas = components = Canvas;
@@ -154,6 +156,8 @@ namespace CNC.Controls
                     for (int i = 0; i < (axes ? 6 : format.Length); i++)
                     {
                         if (axes && !GrblInfo.AxisFlags.HasFlag(GCodeParser.AxisFlag[i]))
+                            continue;
+                        else if (format[i] == "N/A")
                             continue;
 
                         wCheckBox = new CheckBox
@@ -237,7 +241,7 @@ namespace CNC.Controls
                     });
                     wNumericTextBox.Style = View.Resources["NumericErrorStyle"] as Style;
                     BindingOperations.SetBinding(wNumericTextBox, NumericTextBox.ValueProperty, binding);
-                    model.NumericValue = dbl.Parse(widget.Value);
+//                    model.NumericValue = dbl.Parse(widget.Value);
                     break;
 
                 default:
@@ -470,6 +474,7 @@ namespace CNC.Controls
 
                     case GrblSettingDetails.DataTypes.INTEGER:
                     case GrblSettingDetails.DataTypes.FLOAT:
+                        model.NumericValue = dbl.Parse(value);
                         break;
 
                     default:

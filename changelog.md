@@ -2,6 +2,21 @@
 
 Executable for development builds available for download [here](http://www.io-engineering.com/downloads/) if you want to participate in testing.
 
+2021-08-20: [Release 2.0.34](https://github.com/terjeio/Grbl-GCode-Sender/releases/tag/2.0.34).
+
+Sender:
+
+* Added optional text overlay to 3D-viewer.
+* Improved controller settings handling, with grblHAL controller build >= 20210819 up to date descriptions are fetched from the controller and unsupported checkboxes are hidden.
+* Added app settings for jog flyout, for distances and speeds.
+* Added checkbox for on-the-fly \(while job is running\) control of fan. Requires grblHAL controller with optional fan plugin installed.
+* Bug fixes, some pretty obscure.
+
+Config app:
+
+* Updated for latest libraries.
+* Added fetch and save of settings information for sender use in Grbl- and grblHAL-format. Requires grblHAL controller build 20210819 or later.
+
 2021-05-16: [Release 2.0.33](https://github.com/terjeio/Grbl-GCode-Sender/releases/tag/2.0.33).
 
 * Added _Rotation_ tab to _Probing_ and _Rotate_ submenu to _File > Transform_.

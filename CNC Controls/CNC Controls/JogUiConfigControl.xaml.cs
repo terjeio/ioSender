@@ -1,13 +1,13 @@
 ﻿/*
- * CoolantControl.xaml.cs - part of CNC Controls library
+ * JogUIConfigControl.xaml.cs - part of CNC Controls library
  *
- * v0.34 / 2021-07-11 / Io Engineering (Terje Io)
+ * v0.34 / 2021-07-26 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2021, Io Engineering (Terje Io)
+Copyright (c) 2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -38,26 +38,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 using System.Windows.Controls;
-using CNC.Core;
 
 namespace CNC.Controls
 {
-    public partial class CoolantControl : UserControl
+    /// <summary>
+    /// Interaction logic for JogUiConfigControl.xaml
+    /// </summary>
+    public partial class JogUiConfigControl : UserControl
     {
-
-        public CoolantControl()
+        public JogUiConfigControl()
         {
             InitializeComponent();
-        }
-
-        private void chkBox_Click(object sender, System.Windows.RoutedEventArgs e)
-        {
-            if((string)(sender as CheckBox).Tag == "Flood")
-                (DataContext as GrblViewModel).ExecuteCommand(GrblCommand.Flood);
-            else if ((string)(sender as CheckBox).Tag == "Mist")
-                (DataContext as GrblViewModel).ExecuteCommand(GrblCommand.Mist);
-            else
-                (DataContext as GrblViewModel).ExecuteCommand(GrblCommand.Fan);
         }
     }
 }

@@ -1,7 +1,7 @@
 /*
  * JobView.xaml.cs - part of Grbl Code Sender
  *
- * v0.33 / 2021-05-06 / Io Engineering (Terje Io)
+ * v0.34 / 2021-08-11 / Io Engineering (Terje Io)
  *
  */
 
@@ -88,7 +88,7 @@ namespace GCode_Sender
                     if (!resetPending)
                     {
                         if (initOK == false && (sender as GrblViewModel).GrblState.State != GrblStates.Alarm)
-                            InitSystem();
+                            Dispatcher.BeginInvoke(new System.Action(() => InitSystem()), DispatcherPriority.ApplicationIdle);
                     }
                     break;
 
@@ -247,7 +247,8 @@ namespace GCode_Sender
                                                 }
                                                 else if (AttemptReset())
                                                     model.ExecuteCommand(GrblConstants.CMD_UNLOCK);
-                                            } else
+                                            }
+                                            else
                                                 response = string.Empty;
                                             break;
 
@@ -479,6 +480,7 @@ namespace GCode_Sender
                     {
                         model.Message = "Controller is not responding!";
                         initOK = false;
+                        return;
                     }
                     Thread.Sleep(500);
                 }

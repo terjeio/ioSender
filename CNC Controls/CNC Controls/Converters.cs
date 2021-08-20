@@ -1,7 +1,7 @@
 /*
  * Converters.cs - part of CNC Controls library for Grbl
  *
- * v0.29 / 2021-02-02 / Io Engineering (Terje Io)
+ * v0.34 / 2021-07-13 / Io Engineering (Terje Io)
  *
  */
 
@@ -73,6 +73,7 @@ namespace CNC.Controls
         public static StringAddToConverter StringAddToConverter = new StringAddToConverter();
         public static MultiLineConverter MultiLineConverter = new MultiLineConverter();
         public static PositionToStringConverter PositionToStringConverter = new PositionToStringConverter();
+        public static FeedSpeedToStringConverter FeedSpeedToStringConverter = new FeedSpeedToStringConverter();
     }
 
     // Adapted from: https://stackoverflow.com/questions/4353186/binding-observablecollection-to-a-textbox/8847910#8847910
@@ -138,12 +139,62 @@ namespace CNC.Controls
     {
         public object Convert(object[] value, Type targetType, object parameter, CultureInfo culture)
         {
+            string res = string.Empty;
             string format = value.Length > 1 && value[1] is string ? value[1] as string : "####0.000";
 
-            return value[0] is Position ? string.Format("X:{0}  Y:{1}  Z:{2}",
-                                            (value[0] as Position).X.ToInvariantString(format),
-                                             (value[0] as Position).Y.ToInvariantString(format),
-                                              (value[0] as Position).Z.ToInvariantString(format)) : string.Empty;
+            if(value[0] is Position) switch(GrblInfo.NumAxes)
+            {
+                case 4:
+                    res = string.Format(GrblInfo.PositionFormatString,
+                                        (value[0] as Position).X.ToInvariantString(format),
+                                         (value[0] as Position).Y.ToInvariantString(format),
+                                          (value[0] as Position).Z.ToInvariantString(format),
+                                           (value[0] as Position).A.ToInvariantString(format));
+                    break;
+
+                case 5:
+                    res = string.Format(GrblInfo.PositionFormatString,
+                                        (value[0] as Position).X.ToInvariantString(format),
+                                         (value[0] as Position).Y.ToInvariantString(format),
+                                          (value[0] as Position).Z.ToInvariantString(format),
+                                           (value[0] as Position).A.ToInvariantString(format),
+                                            (value[0] as Position).B.ToInvariantString(format));
+                    break;
+
+                case 6:
+                    res = string.Format(GrblInfo.PositionFormatString,
+                                        (value[0] as Position).X.ToInvariantString(format),
+                                         (value[0] as Position).Y.ToInvariantString(format),
+                                          (value[0] as Position).Z.ToInvariantString(format),
+                                           (value[0] as Position).A.ToInvariantString(format),
+                                            (value[0] as Position).B.ToInvariantString(format),
+                                             (value[0] as Position).C.ToInvariantString(format));
+                    break;
+
+                default:
+                    res = string.Format(GrblInfo.PositionFormatString,
+                                        (value[0] as Position).X.ToInvariantString(format),
+                                         (value[0] as Position).Y.ToInvariantString(format),
+                                          (value[0] as Position).Z.ToInvariantString(format));
+                    break;
+            }
+
+            return res;
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class FeedSpeedToStringConverter : IMultiValueConverter
+    {
+        public object Convert(object[] value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value.Length == 2 && value[0] is double && value[1] is double
+                    ? string.Format("F: {0}  S: {1}", ((double)value[0]).ToInvariantString(), ((double)value[1]).ToInvariantString())
+                    : string.Empty;
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
@@ -174,11 +225,16 @@ namespace CNC.Controls
     {
         public object Convert(object[] value, Type targetType, object parameter, CultureInfo culture)
         {
+            GrblStates state = value[0] is GrblState ? ((GrblState)value[0]).State : GrblStates.Unknown;
+
             // If ALARM:11 homing is required
-            bool result = value[0] is GrblState && ((GrblState)value[0]).State == GrblStates.Alarm && ((GrblState)value[0]).Substate == 11;
+            bool result = state == GrblStates.Alarm && ((GrblState)value[0]).Substate == 11;
+
+            // value[1] = IsJobRunning
+            // value[2] = IsSleeping
 
             if (!result && GrblInfo.HomingEnabled && value.Length > 2 && value[1] is bool && !(bool)value[1] && value[2] is bool && !(bool)value[2])
-                result = value[0] is GrblState && !((GrblState)value[0]).MPG && (((GrblState)value[0]).State == GrblStates.Idle || !GrblInfo.IsGrblHAL);
+                result = state != GrblStates.Unknown && !((GrblState)value[0]).MPG && (state == GrblStates.Idle || state == GrblStates.Alarm || !GrblInfo.IsGrblHAL);
 
             return result;
         }

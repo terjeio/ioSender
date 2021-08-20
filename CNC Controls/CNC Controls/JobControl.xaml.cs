@@ -1,7 +1,7 @@
 /*
  * JobControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.33 / 2021-05-15 / Io Engineering (Terje Io)
+ * v0.34 / 2021-07-04 / Io Engineering (Terje Io)
  *
  */
 
@@ -550,6 +550,7 @@ namespace CNC.Controls
                         btnStart.IsEnabled = true;
                         btnHold.IsEnabled = false;
                         btnStop.IsEnabled = model.IsJobRunning;
+                        streamingHandler.Count = job.CurrentRow != null;
                         break;
 
                     case StreamingState.Send:
@@ -622,6 +623,7 @@ namespace CNC.Controls
                             newState = StreamingState.Idle;
                         job.Complete = true;
                         job.ACKPending = job.CurrLine = 0;
+                        job.CurrentRow = job.NextRow = null;
                         SetStreamingHandler(StreamingHandler.AwaitIdle);
                         break;
 
@@ -815,6 +817,7 @@ namespace CNC.Controls
                         btnStop.IsEnabled = false;
                         btnRewind.IsEnabled = false;
                         model.IsJobRunning = false;
+                        job.CurrentRow = job.NextRow = null;
                         if (model.IsSDCardJob)
                             model.FileName = string.Empty;
                         if (!grblState.MPG)

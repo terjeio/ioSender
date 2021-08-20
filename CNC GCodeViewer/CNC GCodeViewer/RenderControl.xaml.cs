@@ -83,6 +83,7 @@ namespace CNC.Controls.Viewer
             gcodeView.Machine.ToolOriginColor = AppConfig.Settings.GCodeViewer.ToolOriginColor;
             gcodeView.Machine.GridColor = AppConfig.Settings.GCodeViewer.GridColor;
             gcodeView.Machine.CanvasColor = AppConfig.Settings.GCodeViewer.BlackBackground ? System.Windows.Media.Brushes.Black : System.Windows.Media.Brushes.White;
+            textOverlay.Visibility = AppConfig.Settings.GCodeViewer.ShowTextOverlay ? System.Windows.Visibility.Visible : System.Windows.Visibility.Hidden;
         }
 
         public void Close()

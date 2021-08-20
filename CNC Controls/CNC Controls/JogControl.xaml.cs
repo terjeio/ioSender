@@ -252,11 +252,6 @@ namespace CNC.Controls
             Feed3
         }
 
-        // TODO: calculate sensible feedrates from grbl settings
-        int[] feedrate_metric = new int[4] { 5, 100, 500, 1000 };
-        double[] distance_metric = new double[4] { .01d, .1d, 1d, 10d };
-        int[] feedrate_imperial = new int[4] { 5, 10, 50, 100 };
-        double[] distance_imperial = new double[4] { .001d, .01d, .1d, 1d };
         JogStep _jogStep = JogStep.Step1;
         JogFeed _jogFeed = JogFeed.Feed1;
         private double[] _distance = new double[4];
@@ -264,14 +259,16 @@ namespace CNC.Controls
 
         public JogViewModel()
         {
-            SetMetric(true);
+//            SetMetric(true);
         }
 
         public void SetMetric(bool on)
         {
             for (int i = 0; i < _feedRate.Length; i++) {
-                _distance[i] = on ? distance_metric[i] : distance_imperial[i];
-                _feedRate[i] = on ? feedrate_metric[i] : feedrate_imperial[i];
+                _distance[i] = on ? AppConfig.Settings.JogUiMetric.Distance[i] : AppConfig.Settings.JogUiImperial.Distance[i];
+                _feedRate[i] = on ? AppConfig.Settings.JogUiMetric.Feedrate[i] : AppConfig.Settings.JogUiImperial.Feedrate[i];
+                OnPropertyChanged("Feedrate" + i.ToString());
+                OnPropertyChanged("Distance" + i.ToString());
             }
         }
 

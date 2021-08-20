@@ -1,7 +1,7 @@
 /*
  * TrinamicView.xaml.cs - part of CNC Controls library
  *
- * v0.31 / 2021-04-27 / Io Engineering (Terje Io)
+ * v0.34 / 2021-08-05 / Io Engineering (Terje Io)
  *
  */
 
@@ -94,7 +94,7 @@ namespace CNC.Controls
         #region Methods and properties required by CNCView interface
 
         public ViewType ViewType { get { return ViewType.TrinamicTuner; } }
-        public bool CanEnable { get { return !(DataContext as GrblViewModel).IsGCLock; } }
+        public bool CanEnable { get { return DataContext == null || !(DataContext as GrblViewModel).IsGCLock; } }
 
         public void Activate(bool activate, ViewType chgMode)
         {
@@ -105,7 +105,10 @@ namespace CNC.Controls
                 DataContext = model;
                 model.OnResponseReceived += ProcessSGValue;
                 model.PropertyChanged += OnDataContextPropertyChanged;
-                SGValue = GrblSettings.GetInteger(GrblSetting.StallGuardBase + GrblInfo.AxisLetterToIndex(AxisEnabled.Value.ToString()));
+                var sgdetails = GrblSettings.Get(GrblSetting.StallGuardBase + GrblInfo.AxisLetterToIndex(AxisEnabled.Value.ToString()));
+                SGValue = int.Parse(sgdetails.Value);
+                SGValueMin = (int)sgdetails.Min;
+                SGValueMax = (int)sgdetails.Max;
             }
             else
             {
@@ -160,6 +163,20 @@ namespace CNC.Controls
         {
             get { return (string)GetValue(DriverStatusProperty); }
             set { SetValue(DriverStatusProperty, value); }
+        }
+
+        public static readonly DependencyProperty SGValueMinProperty = DependencyProperty.Register(nameof(SGValueMin), typeof(int), typeof(TrinamicView), new PropertyMetadata(-64));
+        public int SGValueMin
+        {
+            get { return (int)GetValue(SGValueMinProperty); }
+            set { SetValue(SGValueMinProperty, value); }
+        }
+
+        public static readonly DependencyProperty SGValueMaxProperty = DependencyProperty.Register(nameof(SGValueMax), typeof(int), typeof(TrinamicView), new PropertyMetadata(63));
+        public int SGValueMax
+        {
+            get { return (int)GetValue(SGValueMaxProperty); }
+            set { SetValue(SGValueMaxProperty, value); }
         }
 
         public static readonly DependencyProperty SGValueProperty = DependencyProperty.Register(nameof(SGValue), typeof(int), typeof(TrinamicView));

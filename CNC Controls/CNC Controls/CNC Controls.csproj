@@ -119,6 +119,9 @@
     <Compile Include="JogControl.xaml.cs">
       <DependentUpon>JogControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="JogUiConfigControl.xaml.cs">
+      <DependentUpon>JogUiConfigControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="KeypressHandler.cs" />
     <Compile Include="LEDControl.xaml.cs">
       <DependentUpon>LEDControl.xaml</DependentUpon>
@@ -248,6 +251,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="JogControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="JogUiConfigControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -9,6 +9,9 @@
              Loaded="control_Loaded">
     <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
         <Button x:Name="button" DockPanel.Dock="Bottom" Content="Reset view" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="75" Click="button_Click"/>
-        <local:Renderer DockPanel.Dock="Top" x:Name="gcodeView"/>
+        <Grid DockPanel.Dock="Top">
+        <local:Renderer x:Name="gcodeView"/>
+        <local:TextOverlayControl x:Name="textOverlay" HorizontalAlignment="Right" Margin="5,5" VerticalAlignment="Top"/>
+        </Grid>
     </DockPanel>
 </UserControl>

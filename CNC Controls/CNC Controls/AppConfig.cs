@@ -1,7 +1,7 @@
 ﻿/*
  * AppConfig.cs - part of CNC Controls library for Grbl
  *
- * v0.33 / 2021-05-15 / Io Engineering (Terje Io)
+ * v0.34 / 2021-07-26 / Io Engineering (Terje Io)
  *
  */
 
@@ -47,6 +47,7 @@ using System.Threading;
 using CNC.Core;
 using CNC.GCode;
 using static CNC.GCode.GCodeParser;
+
 namespace CNC.Controls
 {
     [Serializable]
@@ -98,8 +99,9 @@ namespace CNC.Controls
         private bool _isEnabled = true;
         private int _arcResolution = 10;
         private double _minDistance = 0.05d;
-        private bool _showGrid = true, _showAxes = true, _showBoundingBox = false, _showViewCube = true, _showCoordSystem = false, _renderExecuted = false, _blackBackground = false;
-        Color _cutMotion = Colors.Red, _rapidMotion = Colors.LightPink, _retractMotion = Colors.Green, _toolOrigin = Colors.Green, _grid = Colors.Gray, _highlight = Colors.Crimson;
+        private bool _showGrid = true, _showAxes = true, _showBoundingBox = false, _showViewCube = true, _showCoordSystem = false;
+        private bool _showTextOverlay = false, _renderExecuted = false, _blackBackground = false;
+        Color _cutMotion = Colors.Black, _rapidMotion = Colors.LightPink, _retractMotion = Colors.Green, _toolOrigin = Colors.Green, _grid = Colors.Gray, _highlight = Colors.Crimson;
 
         public bool IsEnabled { get { return _isEnabled; } set { _isEnabled = value; OnPropertyChanged(); } }
         public int ArcResolution { get { return _arcResolution; } set { _arcResolution = value; OnPropertyChanged(); } }
@@ -108,6 +110,7 @@ namespace CNC.Controls
         public bool ShowAxes { get { return _showAxes; } set { _showAxes = value; OnPropertyChanged(); } }
         public bool ShowBoundingBox { get { return _showBoundingBox; } set { _showBoundingBox = value; OnPropertyChanged(); } }
         public bool ShowViewCube { get { return _showViewCube; } set { _showViewCube = value; OnPropertyChanged(); } }
+        public bool ShowTextOverlay { get { return _showTextOverlay; } set { _showTextOverlay = value; OnPropertyChanged(); } }
         public bool ShowCoordinateSystem { get { return _showCoordSystem; } set { _showCoordSystem = value; OnPropertyChanged(); } }
         public bool RenderExecuted { get { return _renderExecuted; } set { _renderExecuted = value; OnPropertyChanged(); } }
         public bool BlackBackground { get { return _blackBackground; } set { _blackBackground = value; OnPropertyChanged(); } }
@@ -118,6 +121,40 @@ namespace CNC.Controls
         public Color GridColor { get { return _grid; } set { _grid = value; OnPropertyChanged(); } }
         public Color HighlightColor { get { return _highlight; } set { _highlight = value; OnPropertyChanged(); } }
 
+    }
+
+    [Serializable]
+    public class JogUIConfig : ViewModelBase
+    {
+        private int[] _feedrate = new int[4];
+        private double[] _distance = new double[4];
+
+        public JogUIConfig()
+        {
+        }
+
+        public JogUIConfig(int[] feedrate, double[] distance)
+        {
+            for(int i = 0; i < feedrate.Length; i++)
+            {
+                _feedrate[i] = feedrate[i];
+                _distance[i] = distance[i];
+            }
+        }
+
+        [XmlIgnore]
+        public int[] Feedrate { get { return _feedrate; } }
+        public int Feedrate0 { get { return _feedrate[0]; } set { _feedrate[0] = value; OnPropertyChanged(); } }
+        public int Feedrate1 { get { return _feedrate[1]; } set { _feedrate[1] = value; OnPropertyChanged(); } }
+        public int Feedrate2 { get { return _feedrate[2]; } set { _feedrate[2] = value; OnPropertyChanged(); } }
+        public int Feedrate3 { get { return _feedrate[3]; } set { _feedrate[3] = value; OnPropertyChanged(); } }
+
+        [XmlIgnore]
+        public double[] Distance { get { return _distance; } }
+        public double Distance0 { get { return _distance[0]; } set { _distance[0] = value; OnPropertyChanged(); } }
+        public double Distance1 { get { return _distance[1]; } set { _distance[1] = value; OnPropertyChanged(); } }
+        public double Distance2 { get { return _distance[2]; } set { _distance[2] = value; OnPropertyChanged(); } }
+        public double Distance3 { get { return _distance[3]; } set { _distance[3] = value; OnPropertyChanged(); } }
     }
 
     [Serializable]
@@ -170,6 +207,9 @@ namespace CNC.Controls
         public CommandIgnoreState IgnoreG61G64 { get { return _ignoreG61G64; } set { _ignoreG61G64 = value; OnPropertyChanged(); } }
         public ObservableCollection<CNC.GCode.Macro> Macros { get; set; } = new ObservableCollection<CNC.GCode.Macro>();
         public JogConfig Jog { get; set; } = new JogConfig();
+        public JogUIConfig JogUiMetric { get; set; } = new JogUIConfig(new int[4] { 5, 100, 500, 1000 }, new double[4] { .01d, .1d, 1d, 10d });
+        public JogUIConfig JogUiImperial { get; set; } = new JogUIConfig(new int[4] { 5, 10, 50, 100 }, new double[4] { .001d, .01d, .1d, 1d });
+
         public LatheConfig Lathe { get; set; } = new LatheConfig();
         public CameraConfig Camera { get; set; } = new CameraConfig();
         public GCodeViewerConfig GCodeViewer { get; set; } = new GCodeViewerConfig();
@@ -192,6 +232,9 @@ namespace CNC.Controls
         public Config Base { get; private set; } = null;
         public ObservableCollection<CNC.GCode.Macro> Macros { get { return Base == null ? null : Base.Macros; } }
         public JogConfig Jog { get { return Base == null ? null : Base.Jog; } }
+        public JogUIConfig JogUiMetric { get { return Base == null ? null : Base.JogUiMetric; } }
+        public JogUIConfig JogUiImperial { get { return Base == null ? null : Base.JogUiImperial; } }
+
         public CameraConfig Camera { get { return Base == null ? null : Base.Camera; } }
         public LatheConfig Lathe { get { return Base == null ? null : Base.Lathe; } }
         public GCodeViewerConfig GCodeViewer { get { return Base == null ? null : Base.GCodeViewer; } }

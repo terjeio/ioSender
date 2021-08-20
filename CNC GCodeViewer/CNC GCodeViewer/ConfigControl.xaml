@@ -39,7 +39,11 @@
             <CheckBox Content="Show bounding box" Margin="5,2,0,0" IsChecked="{Binding Path=GCodeViewer.ShowBoundingBox, Mode=TwoWay}" IsEnabled="{Binding Path=GCodeViewer.IsEnabled, Mode=OneWay}"/>
             <CheckBox Content="Show ViewCube" Margin="5,2,0,0" IsChecked="{Binding Path=GCodeViewer.ShowViewCube, Mode=TwoWay}" IsEnabled="{Binding Path=GCodeViewer.IsEnabled, Mode=OneWay}"/>
             <CheckBox Content="Show coordinate system" Margin="5,2,0,0" IsChecked="{Binding Path=GCodeViewer.ShowCoordinateSystem, Mode=TwoWay}" IsEnabled="{Binding Path=GCodeViewer.IsEnabled, Mode=OneWay}"/>
+            <CheckBox Content="Show text overlay" Margin="5,2,0,0" IsChecked="{Binding Path=GCodeViewer.ShowTextOverlay, Mode=TwoWay}" IsEnabled="{Binding Path=GCodeViewer.IsEnabled, Mode=OneWay}"/>
+            <CheckBox Content="Highlight completed cuts" Margin="5,2,0,0" IsChecked="false" IsEnabled="False"/>
+            <!--
             <CheckBox Content="Highlight completed cuts" Margin="5,2,0,0" IsChecked="{Binding Path=GCodeViewer.RenderExecuted, Mode=TwoWay}" IsEnabled="{Binding Path=GCodeViewer.IsEnabled, Mode=OneWay}"/>
+            -->
         </StackPanel>
     </GroupBox>
 </UserControl>

@@ -7,7 +7,7 @@
         xmlns:cnccore="clr-namespace:CNC.Core;assembly=CNC.Core"
         xmlns:Controls="clr-namespace:CNC.Controls;assembly=CNC.Controls.WPF" x:Class="Grbl_Config_App.MainWindow"
         mc:Ignorable="d"
-        Title="Grbl Config App" Height="600" Width="900"
+        Title="grblHAL/Grbl config ({0})" Height="620" Width="1000" MinHeight="620" MinWidth="1000"
         Loaded="Window_Loaded"
         Closing="Window_Closing" ResizeMode="NoResize" Icon="App.ico">
     <Window.DataContext>
@@ -17,6 +17,8 @@
         <Menu DockPanel.Dock="Top">
             <MenuItem x:Name="menuFile" Header="_File">
                 <MenuItem Header="_About" Click="aboutMenuItem_Click"/>
+                <MenuItem Header="Fetch and save grbl_HAL settings info" Click="getHalSettingsItem_Click"/>
+                <MenuItem Header="Fetch and save _Grbl settings info" Click="getGrblSettingsItem_Click"/>
                 <MenuItem Header="_Exit" Click="exitMenuItem_Click"/>
             </MenuItem>
         </Menu>

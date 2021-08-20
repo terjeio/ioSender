@@ -1,5 +1,5 @@
 ﻿/*
- * CoolantControl.xaml.cs - part of CNC Controls library
+ * TextOverlayControl.xaml.cs - part of CNC Controls library
  *
  * v0.34 / 2021-07-11 / Io Engineering (Terje Io)
  *
@@ -7,7 +7,7 @@
 
 /*
 
-Copyright (c) 2018-2021, Io Engineering (Terje Io)
+Copyright (c) 2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -37,27 +37,36 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+using System.Windows;
 using System.Windows.Controls;
 using CNC.Core;
 
-namespace CNC.Controls
+namespace CNC.Controls.Viewer
 {
-    public partial class CoolantControl : UserControl
+    /// <summary>
+    /// Interaction logic for TextOverlayControl.xaml
+    /// </summary>
+    public partial class TextOverlayControl : UserControl
     {
+        GrblViewModel model = null;
 
-        public CoolantControl()
+        public TextOverlayControl()
         {
             InitializeComponent();
         }
 
-        private void chkBox_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void OnLoaded(object sender, RoutedEventArgs e)
         {
-            if((string)(sender as CheckBox).Tag == "Flood")
-                (DataContext as GrblViewModel).ExecuteCommand(GrblCommand.Flood);
-            else if ((string)(sender as CheckBox).Tag == "Mist")
-                (DataContext as GrblViewModel).ExecuteCommand(GrblCommand.Mist);
-            else
-                (DataContext as GrblViewModel).ExecuteCommand(GrblCommand.Fan);
+            if(DataContext is GrblViewModel)
+                model = DataContext as GrblViewModel;
+
+            if (Visibility != Visibility.Visible)
+                DataContext = null;
+        }
+
+        private void OnVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            DataContext = (bool)e.NewValue ? model : null;
         }
     }
 }

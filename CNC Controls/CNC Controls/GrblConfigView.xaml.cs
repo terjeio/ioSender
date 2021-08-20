@@ -1,7 +1,7 @@
 /*
  * GrblConfigView.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.31 / 2021-04-27 / Io Engineering (Terje Io)
+ * v0.34 / 2021-08-05 / Io Engineering (Terje Io)
  *
  */
 
@@ -98,6 +98,30 @@ namespace CNC.Controls
             {
                 btnSave.IsEnabled = !model.IsCheckMode;
                 model.Message = string.Empty;
+
+                if (activate)
+                {
+                    using (new UIUtils.WaitCursor())
+                    {
+                        GrblSettings.Load();
+                    }
+
+                    if(treeView.SelectedItem != null && treeView.SelectedItem is GrblSettingDetails)
+                        ShowSetting(treeView.SelectedItem as GrblSettingDetails, false);
+                    else if (dgrSettings.SelectedItem != null)
+                        ShowSetting(dgrSettings.SelectedItem as GrblSettingDetails, false);
+                }
+                else
+                {
+                    if (curSetting != null)
+                        curSetting.Assign();
+
+                    if (GrblSettings.HasChanges())
+                    {
+                        if (MessageBox.Show("Settings changed, save now?", "Controller settings", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.Yes)
+                            GrblSettings.Save();
+                    }
+                }
             }
         }
 
@@ -134,6 +158,22 @@ namespace CNC.Controls
         {
             GrblSettings.Backup(string.Format("{0}settings.txt", Core.Resources.Path));
             model.Message = "All settings written to settings.txt in the sender folder.";
+        }
+
+        private void ShowSetting(GrblSettingDetails setting, bool assign)
+        {
+            details.Visibility = Visibility.Visible;
+
+            if (curSetting != null)
+            {
+                if (assign)
+                    curSetting.Assign();
+                canvas.Children.Clear();
+                curSetting.Dispose();
+            }
+            txtDescription.Text = setting.Description;
+            curSetting = new Widget(this, new WidgetProperties(setting), canvas);
+            curSetting.IsEnabled = true;
         }
 
         private bool SetSetting (KeyValuePair<int, string> setting)
@@ -318,42 +358,14 @@ namespace CNC.Controls
         private void dgrSettings_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (e.AddedItems.Count == 1)
-            {
-                details.Visibility = Visibility.Visible;
-
-                if (curSetting != null)
-                {
-                    curSetting.Assign();
-                    canvas.Children.Clear();
-                    curSetting.Dispose();
-                }
-
-                var setting = e.AddedItems[0] as GrblSettingDetails;
-                txtDescription.Text = setting.Description;
-                curSetting = new Widget(this, new WidgetProperties(setting), canvas);
-                curSetting.IsEnabled = true;
-            }
+                ShowSetting(e.AddedItems[0] as GrblSettingDetails, true);
         }
         #endregion
 
         private void treeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             if (e != null && e.NewValue is GrblSettingDetails && (e.NewValue as GrblSettingDetails).Value != null)
-            {
-                details.Visibility = Visibility.Visible;
-
-                if (curSetting != null)
-                {
-                    curSetting.Assign();
-                    canvas.Children.Clear();
-                    curSetting.Dispose();
-                }
-
-                var setting = e.NewValue as GrblSettingDetails;
-                txtDescription.Text = setting.Description;
-                curSetting = new Widget(this, new WidgetProperties(setting), canvas);
-                curSetting.IsEnabled = true;
-            }
+                ShowSetting(e.NewValue as GrblSettingDetails, true);
             else
                 details.Visibility = Visibility.Hidden;
         }

@@ -1,7 +1,7 @@
 ﻿/*
  * GCodeRotate.cs - part of CNC Controls library for Grbl
  *
- * v0.33 / 2021-05-14 / Io Engineering (Terje Io)
+ * v0.33 / 2021-05-17 / Io Engineering (Terje Io)
  *
  */
 
@@ -189,7 +189,7 @@ namespace CNC.Controls
                             else
                                 pos = target;
 
-                            toolPath.Add(new GCCannedDrill(drill.Command, drill.LineNumber, target.Round(precision).Array, drill.AxisFlags, drill.R, drill.L, drill.Q, drill.P));
+                            toolPath.Add(new GCCannedDrill(drill.Command, drill.LineNumber, target.Round(precision).Array, drill.AxisFlags, drill.R, drill.L, drill.P, drill.Q));
                         }
                         break;
 

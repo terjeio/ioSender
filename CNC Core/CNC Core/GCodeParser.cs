@@ -1,7 +1,7 @@
 ﻿/*
  * GCodeParser.cs - part of CNC Controls library
  *
- * v0.33 / 2021-05-16 / Io Engineering (Terje Io)
+ * v0.34 / 2021-05-18 / Io Engineering (Terje Io)
  *
  */
 
@@ -268,6 +268,11 @@ namespace CNC.GCode
                 strip = MessageBox.Show(string.Format("{0} command found, strip?", code), "Strip command", MessageBoxButton.YesNo) == MessageBoxResult.Yes;
 
             return strip;
+        }
+
+        private double ToMetric(double v)
+        {
+            return IsImperial ? v * 2.54d : v;
         }
 
         public bool ParseBlock(ref string line, bool quiet)
@@ -1367,11 +1372,11 @@ namespace CNC.GCode
                     case MotionMode.DrillChipBreak:
                         {
                             uint repeats = wordFlags.HasFlag(WordFlags.L) ? (uint)gcValues.L : 1;
-                            if (!wordFlags.HasFlag(WordFlags.R))
+                            if (motionModeChanged && !wordFlags.HasFlag(WordFlags.R))
                                 throw new GCodeException("R word missing");
-                            if (!wordFlags.HasFlag(WordFlags.Q) || gcValues.Q <= 0d)
+                            if (motionModeChanged && !wordFlags.HasFlag(WordFlags.Q) || gcValues.Q <= 0d)
                                 throw new GCodeException("Q word missing or out of range");
-                            Tokens.Add(new GCCannedDrill(Commands.G73, gcValues.N, gcValues.XYZ, axisWords, gcValues.R, repeats, 0d, gcValues.Q));
+                            Tokens.Add(new GCCannedDrill(Commands.G73, gcValues.N, gcValues.XYZ, axisWords, ToMetric(gcValues.R), repeats, 0d, ToMetric(gcValues.Q)));
                         }
                         break;
 
@@ -1451,7 +1456,7 @@ namespace CNC.GCode
                     case MotionMode.CannedCycle81:
                         {
                             uint repeats = wordFlags.HasFlag(WordFlags.L) ? (uint)gcValues.L : 1;
-                            Tokens.Add(new GCCannedDrill(Commands.G81, gcValues.N, gcValues.XYZ, axisWords, wordFlags.HasFlag(WordFlags.R) ? gcValues.R : double.NaN, repeats));
+                            Tokens.Add(new GCCannedDrill(Commands.G81, gcValues.N, gcValues.XYZ, axisWords, wordFlags.HasFlag(WordFlags.R) ? ToMetric(gcValues.R) : double.NaN, repeats));
                         }
                         break;
 
@@ -1459,24 +1464,23 @@ namespace CNC.GCode
                         {
                             uint repeats = wordFlags.HasFlag(WordFlags.L) ? (uint)gcValues.L : 1;
                             double dwell = wordFlags.HasFlag(WordFlags.P) ? gcValues.P : 0d;
-                            Tokens.Add(new GCCannedDrill(Commands.G82, gcValues.N, gcValues.XYZ, axisWords, wordFlags.HasFlag(WordFlags.R) ? gcValues.R : double.NaN, repeats, dwell));
+                            Tokens.Add(new GCCannedDrill(Commands.G82, gcValues.N, gcValues.XYZ, axisWords, wordFlags.HasFlag(WordFlags.R) ? ToMetric(gcValues.R) : double.NaN, repeats, dwell));
                         }
                         break;
 
                     case MotionMode.CannedCycle83:
                         {
                             uint repeats = wordFlags.HasFlag(WordFlags.L) ? (uint)gcValues.L : 1;
-                            double dwell = wordFlags.HasFlag(WordFlags.P) ? gcValues.P : 0d;
-                            if (!wordFlags.HasFlag(WordFlags.Q) || gcValues.Q <= 0d)
+                            if (motionModeChanged && !wordFlags.HasFlag(WordFlags.Q) || gcValues.Q <= 0d)
                                 throw new GCodeException("Q word missing or out of range");
-                            Tokens.Add(new GCCannedDrill(Commands.G83, gcValues.N, gcValues.XYZ, axisWords, wordFlags.HasFlag(WordFlags.R) ? gcValues.R : double.NaN, repeats, dwell, gcValues.Q));
+                            Tokens.Add(new GCCannedDrill(Commands.G83, gcValues.N, gcValues.XYZ, axisWords, wordFlags.HasFlag(WordFlags.R) ? ToMetric(gcValues.R) : double.NaN, repeats, 0d, ToMetric(gcValues.Q)));
                         }
                         break;
 
                     case MotionMode.CannedCycle85:
                         {
                             uint repeats = wordFlags.HasFlag(WordFlags.L) ? (uint)gcValues.L : 1;
-                            Tokens.Add(new GCCannedDrill(Commands.G85, gcValues.N, gcValues.XYZ, axisWords, wordFlags.HasFlag(WordFlags.R) ? gcValues.R : double.NaN, repeats));
+                            Tokens.Add(new GCCannedDrill(Commands.G85, gcValues.N, gcValues.XYZ, axisWords, wordFlags.HasFlag(WordFlags.R) ? ToMetric(gcValues.R) : double.NaN, repeats));
                         }
                         break;
 
@@ -1485,7 +1489,7 @@ namespace CNC.GCode
                             // error if spindle not running
                             uint repeats = wordFlags.HasFlag(WordFlags.L) ? (uint)gcValues.L : 1;
                             double dwell = wordFlags.HasFlag(WordFlags.P) ? gcValues.P : 0d;
-                            Tokens.Add(new GCCannedDrill(Commands.G86, gcValues.N, gcValues.XYZ, axisWords, wordFlags.HasFlag(WordFlags.R) ? gcValues.R : double.NaN, repeats, dwell));
+                            Tokens.Add(new GCCannedDrill(Commands.G86, gcValues.N, gcValues.XYZ, axisWords, wordFlags.HasFlag(WordFlags.R) ? ToMetric(gcValues.R) : double.NaN, repeats, dwell));
                         }
                         break;
 
@@ -1493,7 +1497,7 @@ namespace CNC.GCode
                         {
                             uint repeats = wordFlags.HasFlag(WordFlags.L) ? (uint)gcValues.L : 1;
                             double dwell = wordFlags.HasFlag(WordFlags.P) ? gcValues.P : 0d;
-                            Tokens.Add(new GCCannedDrill(Commands.G86, gcValues.N, gcValues.XYZ, axisWords, wordFlags.HasFlag(WordFlags.R) ? gcValues.R : double.NaN, repeats, dwell));
+                            Tokens.Add(new GCCannedDrill(Commands.G86, gcValues.N, gcValues.XYZ, axisWords, wordFlags.HasFlag(WordFlags.R) ? ToMetric(gcValues.R) : double.NaN, repeats, dwell));
                         }
                         break;
                 }
@@ -2483,21 +2487,29 @@ namespace CNC.GCode
         public GCCannedDrill()
         { }
 
+        // G81,G85
         public GCCannedDrill(Commands command, uint lnr, double[] values, AxisFlags axisFlags, double r, uint l) : base(command, lnr, values, axisFlags)
         {
             R = r;
             L = l == 0 ? 1 : l;
+            P = Q = 0d;
         }
+
+        // G82,G86,G89
         public GCCannedDrill(Commands command, uint lnr, double[] values, AxisFlags axisFlags, double r, uint l, double p) : base(command, lnr, values, axisFlags)
         {
             R = r;
             L = l == 0 ? 1 : l;
             P = p;
+            Q = 0d;
         }
+
+        // G73,G83 // P always 0 for these
         public GCCannedDrill(Commands command, uint lnr, double[] values, AxisFlags axisFlags, double r, uint l, double p, double q) : base(command, lnr, values, axisFlags)
         {
             R = r;
             L = l == 0 ? 1 : l;
+            P = p;
             Q = q;
         }
 
