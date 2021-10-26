@@ -1,0 +1,4 @@
+﻿CNC.Controls.Camera.g.en-US.resources:configcontrol.baml,btn_getPosition:System.Windows.Controls.ContentControl.Content,Button,True,True,,Get current position
+CNC.Controls.Camera.g.en-US.resources:cameracontrol.baml,btn_moveOffset:System.Windows.Controls.ContentControl.Content,Button,True,True,,Move offset
+CNC.Controls.Camera.g.en-US.resources:configcontrol.baml,grp_camera:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Camera
+CNC.Controls.Camera.g.en-US.resources:configcontrol.baml,lbl_offsetMotion:System.Windows.Controls.ContentControl.Content,Label,True,True,,Offset motion:

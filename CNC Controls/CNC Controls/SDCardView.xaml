@@ -8,26 +8,26 @@
              d:DesignHeight="515" d:DesignWidth="875"
              Loaded="SDCardView_Loaded">
     <Grid>
-        <DataGrid x:Name="dgrSDCard" ItemsSource="{Binding}" IsReadOnly="True" HorizontalAlignment="Left" Margin="30,30,0,0" VerticalAlignment="Top" Height="450" Width="380"
+        <DataGrid x:Uid="dgr_sdcard" x:Name="dgrSDCard" ItemsSource="{Binding}" IsReadOnly="True" HorizontalAlignment="Left" Margin="30,30,0,0" VerticalAlignment="Top" Height="450" Width="380"
                   SelectionMode="Single" SelectionUnit="FullRow" AutoGenerateColumns="False"
                   CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserResizeRows="False" CanUserSortColumns="False" CanUserAddRows="False"
                   SelectionChanged="dgrSDCard_SelectionChanged" MouseDoubleClick="dgrSDCard_MouseDoubleClick"
                   ToolTip="Right click for menu, double click to run file.">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
-                <DataGridTextColumn Header="Size" Binding="{Binding Size}" Width="70"/>
+                <DataGridTextColumn x:Uid="hdr_name" Header="Name" Binding="{Binding Name}" Width="*"/>
+                <DataGridTextColumn x:Uid="hdr_size" Header="Size" Binding="{Binding Size}" Width="70"/>
                 <!--
                 <DataGridTextColumn Header="Remark" Binding="{Binding Invalid}" Width="*"/>
                 -->
             </DataGrid.Columns>
             <DataGrid.ContextMenu>
                 <ContextMenu x:Name="ctxMenu">
-                    <MenuItem Header="Run" Click="Run_Click" />
-                    <MenuItem Header="Enable rewind" IsEnabled="{Binding Path=CanRewind}" IsChecked="{Binding Path=Rewind, Mode=TwoWay}" IsCheckable="True" />
-                    <MenuItem Header="Delete" IsEnabled="{Binding Path=CanDelete}" Click="Delete_Click" />
+                    <MenuItem x:Uid="mnu_run" Header="Run" Click="Run_Click" />
+                    <MenuItem x:Uid="mnu_enableRewind" Header="Enable rewind" IsEnabled="{Binding Path=CanRewind}" IsChecked="{Binding Path=Rewind, Mode=TwoWay}" IsCheckable="True" />
+                    <MenuItem x:Uid="mnu_delete" Header="Delete" IsEnabled="{Binding Path=CanDelete}" Click="Delete_Click" />
                 </ContextMenu>
             </DataGrid.ContextMenu>
         </DataGrid>
-        <Button Content="Upload" IsEnabled="{Binding Path=CanUpload, RelativeSource={RelativeSource AncestorType=UserControl}}" HorizontalAlignment="Left" Margin="428,460,0,0" VerticalAlignment="Top" Width="75" Click="Upload_Click"/>
+        <Button x:Uid="btn_upload" Content="Upload" IsEnabled="{Binding Path=CanUpload, RelativeSource={RelativeSource AncestorType=UserControl}}" HorizontalAlignment="Left" Margin="428,460,0,0" VerticalAlignment="Top" Width="75" Click="Upload_Click"/>
     </Grid>
 </UserControl>

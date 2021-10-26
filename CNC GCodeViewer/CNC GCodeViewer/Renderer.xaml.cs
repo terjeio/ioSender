@@ -232,7 +232,7 @@ namespace CNC.Controls.Viewer
         private void Renderer_Loaded(object sender, RoutedEventArgs e)
         {
             model = DataContext as GrblViewModel;
-            viewport.PreviewMouseWheel += Viewport_MouseWheel;
+//            viewport.PreviewMouseWheel += Viewport_MouseWheel;
 
 //            if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
 //                AppConfig.Settings.GCodeViewer.PropertyChanged += GCodeViewer_PropertyChanged;
@@ -299,7 +299,7 @@ namespace CNC.Controls.Viewer
             get { return _animateTool; }
             set
             {
-                if(value != _animateTool)
+                if(value != _animateTool && model != null)
                 {
                     if ((_animateTool = value))
                     {

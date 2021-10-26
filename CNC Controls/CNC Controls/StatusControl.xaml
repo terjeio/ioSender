@@ -25,7 +25,7 @@
     </UserControl.Resources>
     <StackPanel Orientation="Vertical">
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
-            <Label x:Name="lblState" Content="State:" HorizontalContentAlignment="Right" HorizontalAlignment="Left" VerticalAlignment="Center" Height="26" Width="40"/>
+            <Label x:Uid="lbl_state" x:Name="lblState" Content="State:" HorizontalContentAlignment="Right" HorizontalAlignment="Left" VerticalAlignment="Center" Height="26" Width="40"/>
             <TextBox x:Name="txtState" HorizontalAlignment="Left" Height="24" Margin="2,0" TextWrapping="NoWrap" IsReadOnly="True" TextAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center" Width="74"
                      Text="{Binding Path=GrblState, Converter={StaticResource ToStringConverter}}"
                      Background="{Binding Path=GrblState, Converter={StaticResource ToColorConverter}}"
@@ -39,10 +39,10 @@
                     </MultiBinding>
                 </CheckBox.IsEnabled>
             </CheckBox>
-            <Label Content="Check" VerticalAlignment="Center" Height="26"/>
+            <Label x:Uid="lbl_check" Content="Check" VerticalAlignment="Center" Height="26"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,4,0,0" VerticalAlignment="Bottom">
-            <Button x:Name="btnHome" Content="Home" ToolTip="Ctrl+H" Background="{Binding Path=HomedState, Converter={StaticResource HomedStateConverter}}" Style="{StaticResource StatusButtonStyle}" Click="btn_Click">
+            <Button x:Uid="btn_home" x:Name="btnHome" Content="Home" ToolTip="Ctrl+H" Background="{Binding Path=HomedState, Converter={StaticResource HomedStateConverter}}" Style="{StaticResource StatusButtonStyle}" Click="btn_Click">
                 <Button.IsEnabled>
                     <MultiBinding Converter="{StaticResource HomingEnabledConverter}">
                         <Binding Path="GrblState" Mode="OneWay"/>
@@ -51,10 +51,10 @@
                     </MultiBinding>
                 </Button.IsEnabled>
             </Button>
-            <Button x:Name="btnUnlock" Content="Unlock" ToolTip="Ctrl+U" Style="{StaticResource StatusButtonStyle}" Margin="5,0,0,0" Click="btn_Click"
+            <Button x:Uid="btn_unlock" x:Name="btnUnlock" Content="Unlock" ToolTip="Ctrl+U" Style="{StaticResource StatusButtonStyle}" Margin="5,0,0,0" Click="btn_Click"
                 IsEnabled="{Binding Path=IsSleepMode, Converter={StaticResource SleepEnabledConverter}, Mode=OneWay}"
             />
-            <Button x:Name="btnReset" Content="Reset" ToolTip="Ctrl+Shift+R" Style="{StaticResource StatusButtonStyle}" Margin="5,0,0,0" Background="Red" Foreground="White" Click="btn_Click" FontFamily="Segoe UI Semibold" FontSize="14"/>
+            <Button x:Uid="btn_reset" x:Name="btnReset" Content="Reset" ToolTip="Ctrl+Shift+R" Style="{StaticResource StatusButtonStyle}" Margin="5,0,0,0" Background="Red" Foreground="White" Click="btn_Click" FontFamily="Segoe UI Semibold" FontSize="14"/>
         </StackPanel>
     </StackPanel>
 </UserControl>

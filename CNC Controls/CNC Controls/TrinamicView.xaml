@@ -22,7 +22,7 @@
     </UserControl.Resources>
     <DockPanel Background="Transparent" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
         <DockPanel x:Name="dp" DockPanel.Dock="Left" Margin="5,5,5,0" Width="520" HorizontalAlignment="Left" VerticalAlignment="Stretch">
-            <StackPanel DockPanel.Dock="Top">
+            <StackPanel DockPanel.Dock="Top" Width="520" VerticalAlignment="Stretch">
                 <Border BorderThickness="1" BorderBrush="DarkGray" Height="258" Width="514" HorizontalAlignment="Left" VerticalAlignment="Top">
                     <Canvas x:Name="SGPlot" Background="WhiteSmoke" HorizontalAlignment="Left" Height="256" VerticalAlignment="Top" Width="512"/>
                 </Border>
@@ -35,19 +35,22 @@
                         <RadioButton Content="B" IsChecked="{Binding Path=AxisEnabled[(gcode:AxisFlags)B], RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" Style="{StaticResource BAxisVisibleStyle}" Margin="5,0" HorizontalAlignment="Left" VerticalAlignment="Center" Height="16"/>
                         <RadioButton Content="C" IsChecked="{Binding Path=AxisEnabled[(gcode:AxisFlags)C], RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" Style="{StaticResource CAxisVisibleStyle}" Margin="5,0" HorizontalAlignment="Left" VerticalAlignment="Center" Height="16"/>
                     </StackPanel>
-                    <Label x:Name="lblLoad" Content="Load (SG_RESULT)" Foreground="Blue" Margin="0,0,5,0" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                    <Label x:Uid="lbl_sgLoad" x:Name="lblLoad" Content="Load (SG_RESULT)" Foreground="Blue" Margin="0,0,5,0" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                 </Grid>
-                <GroupBox Header="stallGuard">
+                <GroupBox x:Uid="grp_stallGuard" Header="stallGuard">
                     <StackPanel>
-                        <CheckBox IsChecked="{Binding Path=SFiltEnabled, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" Content="Enable filter (SFILT)" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top"/>
+                        <CheckBox x:Uid="lbl_stallGuardEnable" IsChecked="{Binding Path=SFiltEnabled, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" Content="Enable filter (SFILT)" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top"/>
                         <StackPanel Orientation="Horizontal" Margin="0,5">
                             <Slider Value="{Binding SGValue, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" Width="169" Minimum="{Binding Path=SGValueMin, RelativeSource={RelativeSource AncestorType=UserControl}}" Maximum="{Binding Path=SGValueMax, RelativeSource={RelativeSource AncestorType=UserControl}}" TickPlacement="BottomRight" IsSnapToTickEnabled="False" LostMouseCapture="Slider_LostMouseCapture"/>
                             <TextBox Text="{Binding Path=SGValue, RelativeSource={RelativeSource AncestorType=UserControl}, StringFormat='##0'}" HorizontalContentAlignment="Right" IsReadOnly="True" Width="30" Margin="5,0,0,0" />
-                            <Button Content="Configure" Width="60" VerticalAlignment="Center" Margin="5,0" Click="btnConfigureSGVal_Click"/>
+                            <Button x:Uid="lbl_configure" Content="Configure" Width="60" VerticalAlignment="Center" Margin="5,0" Click="btnConfigureSGVal_Click"/>
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
-                <local:StatusControl x:Name="statusControl" Margin="0,5,0,0" VerticalAlignment="Bottom"/>
+                <DockPanel>
+                    <local:StatusControl DockPanel.Dock="Left" Margin="0,5,0,0" VerticalAlignment="Bottom"/>
+                    <local:SignalsControl DockPanel.Dock="Right" VerticalAlignment="Bottom" HorizontalAlignment="Right"/>
+                </DockPanel>
             </StackPanel>
             <StackPanel  HorizontalAlignment="Left" VerticalAlignment="Bottom">
                 <local:MDIControl x:Name="mdiControl"/>
@@ -68,8 +71,8 @@
             </Grid.RowDefinitions>
             <TextBox Grid.Row="0" Text="{Binding Path=DriverStatus, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=OneWay}" IsReadOnly="True" HorizontalAlignment="Stretch" TextWrapping="Wrap" VerticalAlignment="Stretch" FontSize="12" FontFamily="Global Monospace"/>
             <StackPanel Grid.Row="1" Orientation="Horizontal">
-                <Button Content="Get status" Width="130" HorizontalAlignment="Left" VerticalAlignment="Center" Click="btnGetState_Click"/>
-                <Button Content="Get status, all drivers" Width="130" Margin="5,0" HorizontalAlignment="Left" VerticalAlignment="Center" Click="btnGetStateAll_Click"/>
+                <Button x:Uid="btn_getStatus" Content="Get status" Width="130" HorizontalAlignment="Left" VerticalAlignment="Center" Click="btnGetState_Click"/>
+                <Button x:Uid="btn_getStatusAll" Content="Get status, all drivers" Width="130" Margin="5,0" HorizontalAlignment="Left" VerticalAlignment="Center" Click="btnGetStateAll_Click"/>
             </StackPanel>
         </Grid>
     </DockPanel>

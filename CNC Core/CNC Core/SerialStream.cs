@@ -1,7 +1,7 @@
 ﻿/*
  * SerialStream.cs - part of CNC Controls library
  *
- * v0.33 / 2021-05-12 / Io Engineering (Terje Io)
+ * v0.35 / 2021-09-25 / Io Engineering (Terje Io)
  *
  */
 
@@ -41,9 +41,10 @@ using System;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using System.IO.Ports;
-using System.Windows.Threading;
 using System.IO;
+using System.IO.Ports;
+using System.Management;
+using System.Windows.Threading;
 using System.Collections.ObjectModel;
 
 namespace CNC.Core
@@ -373,18 +374,23 @@ namespace CNC.Core
         public string Name { get; private set; }
     }
 
+    public class ComPort
+    {
+        public string Name { get; set; }
+        public string FullName { get; set; }
+    }
+
     public class SerialPorts : ViewModelBase
     {
         string _selected = string.Empty;
-        string[] _portnames;
         private ConnectMode _mode = null;
 
         public SerialPorts()
         {
             Refresh();
 
-            if (PortNames.Length > 0)
-                _selected = PortNames[0];
+            if (Ports.Count > 0)
+                _selected = Ports[0].Name;
 
             ConnectModes.Add(new ConnectMode(Comms.ResetMode.None, "No action"));
             ConnectModes.Add(new ConnectMode(Comms.ResetMode.DTR, "Toggle DTR"));
@@ -395,12 +401,34 @@ namespace CNC.Core
 
         public void Refresh ()
         {
-            string[] _portnames = SerialPort.GetPortNames();
+            var _portnames = SerialPort.GetPortNames();
             Array.Sort(_portnames);
-            PortNames = _portnames;
+
+            Ports.Clear();
+
+            using (var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_PnPEntity WHERE Caption like '%(COM%'"))
+            {
+                var ports = searcher.Get().Cast<ManagementBaseObject>().ToList().Select(p => p["Caption"].ToString());
+                var portList = _portnames.Select(n => ports.FirstOrDefault(s => s.Contains('(' + n + ')'))).ToList();
+                for(int i = 0; i < portList.Count; i++)
+                {
+                    var port = new ComPort();
+                    port.Name = _portnames[i];
+
+                    if (portList[i].Contains('(' + _portnames[i] + ')'))
+                        port.FullName = _portnames[i] + " - " + portList[i].Replace('(' + _portnames[i] + ')', "").Trim();
+                    else
+                        port.FullName = "";
+
+                    Ports.Add(port);
+                }
+            }
+
+            SelectedPort = Ports[0].Name;
         }
 
-        public string[] PortNames { get { return _portnames; } private set { _portnames = value; OnPropertyChanged(); } }
+        public ObservableCollection<ComPort> Ports { get; private set; } = new ObservableCollection<ComPort>();
+        public ObservableCollection<ConnectMode> ConnectModes { get; private set; } = new ObservableCollection<ConnectMode>();
 
         public string SelectedPort
         {
@@ -414,8 +442,6 @@ namespace CNC.Core
                 }
             }
         }
-
-        public ObservableCollection<ConnectMode> ConnectModes { get; private set; } = new ObservableCollection<ConnectMode>();
 
         public ConnectMode SelectedMode
         {

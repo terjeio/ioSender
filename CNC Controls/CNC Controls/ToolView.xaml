@@ -23,10 +23,10 @@
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
         <ContentControl Visibility="Collapsed" Content="{StaticResource ProxyElement}"/>
-        <DataGrid x:Name="dgrTools" Grid.Row="0" ItemsSource="{Binding}" Width="Auto" IsReadOnly="True" SelectionMode="Single" SelectionUnit="FullRow" AutoGenerateColumns="False" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"
+        <DataGrid x:Uid="grd_tools" x:Name="dgrTools" Grid.Row="0" ItemsSource="{Binding}" Width="Auto" IsReadOnly="True" SelectionMode="Single" SelectionUnit="FullRow" AutoGenerateColumns="False" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"
                             CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserResizeRows="False" CanUserSortColumns="False" CanUserAddRows="False" SelectionChanged="dgrTools_SelectionChanged">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Tool" Binding="{Binding Code}" Width="50"/>
+                <DataGridTextColumn x:Uid="hdr_tool" Header="Tool" Binding="{Binding Code}" Width="50"/>
                 <DataGridTextColumn Header="X" Binding="{Binding X}" Width="70"/>
                 <DataGridTextColumn Header="Y" Binding="{Binding Y}" Width="70">
                     <DataGridTextColumn.Visibility>
@@ -45,17 +45,17 @@
         </DataGrid>
         <StackPanel Grid.Column="1" HorizontalAlignment="Left" Margin="20,15,0,0" VerticalAlignment="Top">
             <StackPanel Orientation="Horizontal">
-                <Label x:Name="lblTool" Content="Tool:" HorizontalContentAlignment="Right" HorizontalAlignment="Right" Margin="37,0,0,0" VerticalAlignment="Top"/>
+                <Label x:Uid="lbl_tool" x:Name="lblTool" Content="Tool:" HorizontalContentAlignment="Right" HorizontalAlignment="Right" Margin="37,0,0,0" VerticalAlignment="Top"/>
                 <TextBox x:Name="txtTool" HorizontalAlignment="Left" Height="23" TextWrapping="NoWrap" VerticalAlignment="Top" Width="25" IsReadOnly="True"/>
             </StackPanel>
-            <local:CoordValueSetControl x:Name="cvXOffset" Label="X axis:" Tag="X" Value="{Binding Path=offset.X, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" Click="cvOffset_Click"/>
-            <local:CoordValueSetControl x:Name="cvYOffset" Label="Y axis:" Tag="Y" Value="{Binding Path=offset.Y, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" Style="{StaticResource YAxisVisibleStyle}" Click="cvOffset_Click"/>
-            <local:CoordValueSetControl x:Name="cvZOffset" Label="Z axis:" Tag="Z" Value="{Binding Path=offset.Z, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" Click="cvOffset_Click"/>
-            <local:CoordValueSetControl x:Name="cvTipRadius" Label="Tip radius:" Tag="R" Click="cvOffset_Click"/>
+            <local:CoordValueSetControl x:Uid="lbl_xAxis" x:Name="cvXOffset" Label="X axis:" Tag="X" Value="{Binding Path=offset.X, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" Click="cvOffset_Click"/>
+            <local:CoordValueSetControl x:Uid="lbl_yAxis" x:Name="cvYOffset" Label="Y axis:" Tag="Y" Value="{Binding Path=offset.Y, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" Style="{StaticResource YAxisVisibleStyle}" Click="cvOffset_Click"/>
+            <local:CoordValueSetControl x:Uid="lbl_zAxis" x:Name="cvZOffset" Label="Z axis:" Tag="Z" Value="{Binding Path=offset.Z, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" Click="cvOffset_Click"/>
+            <local:CoordValueSetControl x:Uid="lbl_tipRadius" x:Name="cvTipRadius" Label="Tip radius:" Tag="R" IsEnabled="False" Click="cvOffset_Click"/>
             <StackPanel Orientation="Horizontal" Margin="5,5">
-                <Button x:Name="btnCurrPos" Content="Get current position" Margin="3,0" Click="btnCurrPos_Click"/>
-                <Button x:Name="btnClear" Content="Clear all" Click="btnClearAll_Click"/>
-                <Button x:Name="btnSetAll" Content="Set all" Margin="3,0" Click="btnSetAll_Click"/>
+                <Button x:Uid="btn_currPos" x:Name="btnCurrPos" Content="Get current position" Margin="3,0" Click="btnCurrPos_Click"/>
+                <Button x:Uid="btn_clear" x:Name="btnClear" Content="Clear all" Click="btnClearAll_Click"/>
+                <Button x:Uid="btn_setAll" x:Name="btnSetAll" Content="Set all" Margin="3,0" Click="btnSetAll_Click"/>
             </StackPanel>
         </StackPanel>
     </Grid>

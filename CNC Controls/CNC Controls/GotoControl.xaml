@@ -20,8 +20,8 @@
     <Border BorderBrush="DarkGray" BorderThickness="1" CornerRadius="3" Background="#FFE5E5EA">
         <Grid>
             <StackPanel Margin="5,15,25,15">
-                <Button Tag="G28" Content="Goto position 1 (G28)" IsEnabled="{Binding Path=HomedState, Mode=OneWay, Converter={StaticResource IsHomed}}" Focusable="False" HorizontalAlignment="Left" Margin="5,5,0,0" Width="150" VerticalAlignment="Top" Click="button_Click"/>
-                <Button Tag="G30" Content="Goto position 2 (G30)" IsEnabled="{Binding Path=HomedState, Mode=OneWay, Converter={StaticResource IsHomed}}" Focusable="False" HorizontalAlignment="Left" Margin="5,5,0,0" Width="150" VerticalAlignment="Top" Click="button_Click"/>
+                <Button x:Uid="btn_gotoG28" Tag="G28" Content="Goto position 1 (G28)" IsEnabled="{Binding Path=HomedState, Mode=OneWay, Converter={StaticResource IsHomed}}" Focusable="False" HorizontalAlignment="Left" Margin="5,5,0,0" Width="150" VerticalAlignment="Top" Click="button_Click"/>
+                <Button x:Uid="btn_gotoG30" Tag="G30" Content="Goto position 2 (G30)" IsEnabled="{Binding Path=HomedState, Mode=OneWay, Converter={StaticResource IsHomed}}" Focusable="False" HorizontalAlignment="Left" Margin="5,5,0,0" Width="150" VerticalAlignment="Top" Click="button_Click"/>
             </StackPanel>
             <Button Content="×" Focusable="False" Style="{StaticResource SmallXButtonStyle}" VerticalContentAlignment="Top" HorizontalAlignment="Right" Margin="0,0,5,0" VerticalAlignment="Top" Width="14" Height="18" Click="btn_Close"/>
         </Grid>

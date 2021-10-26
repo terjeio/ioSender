@@ -6,16 +6,16 @@
              xmlns:local="clr-namespace:CNC.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="250" d:DesignWidth="250">
-    <GroupBox x:Name="grpJog" Header="UI jogging" HorizontalAlignment="Left" VerticalAlignment="Top" Height="Auto" Width="250">
+    <GroupBox x:Name="grp_uiJog" Header="UI jogging" HorizontalAlignment="Left" VerticalAlignment="Top" Height="Auto" Width="250">
         <StackPanel HorizontalAlignment="Left" Height="Auto" Margin="0,3,0,0" VerticalAlignment="Top" Width="235">
-            <local:NumericField Label="Distance 3:" ColonAt="90" Unit="mm" Format="###0.0##" Value="{Binding Path=JogUiMetric.Distance3, Mode=TwoWay}"/>
-            <local:NumericField Label="Distance 2:" ColonAt="90" Unit="mm" Format="###0.0##" Value="{Binding Path=JogUiMetric.Distance2, Mode=TwoWay}"/>
-            <local:NumericField Label="Distance 1:" ColonAt="90" Unit="mm" Format="###0.0##" Value="{Binding Path=JogUiMetric.Distance1, Mode=TwoWay}"/>
-            <local:NumericField Label="Distance 0:" ColonAt="90" Unit="mm" Format="###0.0##" Value="{Binding Path=JogUiMetric.Distance0, Mode=TwoWay}"/>
-            <local:NumericField Label="Feedrate 3:" ColonAt="90" Unit="mm/min" Format="####0" Value="{Binding Path=JogUiMetric.Feedrate3, Mode=TwoWay}"/>
-            <local:NumericField Label="Feedrate 2:" ColonAt="90" Unit="mm/min" Format="####0" Value="{Binding Path=JogUiMetric.Feedrate2, Mode=TwoWay}"/>
-            <local:NumericField Label="Feedrate 1:" ColonAt="90" Unit="mm/min" Format="####0" Value="{Binding Path=JogUiMetric.Feedrate1, Mode=TwoWay}"/>
-            <local:NumericField Label="Feedrate 0:" ColonAt="90" Unit="mm/min" Format="####0" Value="{Binding Path=JogUiMetric.Feedrate0, Mode=TwoWay}"/>
+            <local:NumericField x:Uid="lbl_distance3" Label="Distance 3:" ColonAt="90" Unit="mm" Format="###0.0##" Value="{Binding Path=JogUiMetric.Distance3, Mode=TwoWay}"/>
+            <local:NumericField x:Uid="lbl_distance2" Label="Distance 2:" ColonAt="90" Unit="mm" Format="###0.0##" Value="{Binding Path=JogUiMetric.Distance2, Mode=TwoWay}"/>
+            <local:NumericField x:Uid="lbl_distance1" Label="Distance 1:" ColonAt="90" Unit="mm" Format="###0.0##" Value="{Binding Path=JogUiMetric.Distance1, Mode=TwoWay}"/>
+            <local:NumericField x:Uid="lbl_distance0" Label="Distance 0:" ColonAt="90" Unit="mm" Format="###0.0##" Value="{Binding Path=JogUiMetric.Distance0, Mode=TwoWay}"/>
+            <local:NumericField x:Uid="lbl_feedrate3" Label="Feedrate 3:" ColonAt="90" Unit="mm/min" Format="####0" Value="{Binding Path=JogUiMetric.Feedrate3, Mode=TwoWay}"/>
+            <local:NumericField x:Uid="lbl_feedrate2" Label="Feedrate 2:" ColonAt="90" Unit="mm/min" Format="####0" Value="{Binding Path=JogUiMetric.Feedrate2, Mode=TwoWay}"/>
+            <local:NumericField x:Uid="lbl_feedrate1" Label="Feedrate 1:" ColonAt="90" Unit="mm/min" Format="####0" Value="{Binding Path=JogUiMetric.Feedrate1, Mode=TwoWay}"/>
+            <local:NumericField x:Uid="lbl_feedrate0" Label="Feedrate 0:" ColonAt="90" Unit="mm/min" Format="####0" Value="{Binding Path=JogUiMetric.Feedrate0, Mode=TwoWay}"/>
         </StackPanel>
     </GroupBox>
 </UserControl>

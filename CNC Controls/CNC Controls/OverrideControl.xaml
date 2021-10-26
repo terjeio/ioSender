@@ -10,7 +10,7 @@
         <local:EncoderModeToColorConverter x:Key="EncoderModeConverter" />
     </UserControl.Resources>
     <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Height="60" VerticalAlignment="Center" Width="180">
-        <Label x:Name="lblOverride" HorizontalContentAlignment="Right" Content="Override" VerticalAlignment="Center" Height="24" Width="56"/>
+        <Label x:Uid="lbl_override" x:Name="lblOverride" HorizontalContentAlignment="Right" Content="Override" VerticalAlignment="Center" Height="24" Width="56"/>
         <TextBox x:Name="txtOverride" TextWrapping="NoWrap" Text="100%" IsReadOnly="True" Height="24" Width="40" VerticalAlignment="Center" HorizontalContentAlignment="Right" VerticalContentAlignment="Center">
             <TextBox.Background>
                 <MultiBinding Converter="{StaticResource EncoderModeConverter}">

@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:CNC.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="140" d:DesignWidth="250">
-    <GroupBox Header="GCode command stripping" HorizontalAlignment="Left" VerticalAlignment="Top" Height="Auto" Width="250">
+    <GroupBox x:Uid="grp_gcodeStrip" Header="GCode command stripping" HorizontalAlignment="Left" VerticalAlignment="Top" Height="Auto" Width="250">
         <Grid Height="116">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="60"/>

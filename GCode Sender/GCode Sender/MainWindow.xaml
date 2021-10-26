@@ -24,21 +24,21 @@
     </Window.DataContext>
     <DockPanel IsEnabled="{Binding Path=IsMPGActive, Converter={StaticResource BooleanConverter}}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
         <Menu IsEnabled="{Binding Path=IsJobRunning, Converter={StaticResource BooleanConverter}}" DockPanel.Dock="Top">
-            <MenuItem x:Name="menuFile" Header="_File">
-                <MenuItem Header="_Load" Click="fileOpenMenuItem_Click"/>
-                <MenuItem x:Name="menuSaveFile" Header="_Save" IsEnabled="false" Click="fileSaveMenuItem_Click"/>
-                <MenuItem x:Name="menuCloseFile" Header="_Close" IsEnabled="false" Click="fileCloseMenuItem_Click"/>
-                <MenuItem x:Name="menuTransform" Header="_Transform" IsEnabled="false" ItemsSource="{Binding Path=UIViewModel.TransformMenuItems, RelativeSource={RelativeSource AncestorType=Window}}"/>
-                <MenuItem x:Name="menuOpenConsole" Header="_Open Console" Click="openConsoleMenuItem_Click"/>
-                <MenuItem Header="_Exit" Click="exitMenuItem_Click"/>
+            <MenuItem x:Uid="mnu_file" x:Name="menuFile" Header="_File">
+                <MenuItem x:Uid="mnu_load" Header="_Load" Click="fileOpenMenuItem_Click"/>
+                <MenuItem x:Uid="mnu_save" x:Name="menuSaveFile" Header="_Save" IsEnabled="false" Click="fileSaveMenuItem_Click"/>
+                <MenuItem x:Uid="mnu_close" x:Name="menuCloseFile" Header="_Close" IsEnabled="false" Click="fileCloseMenuItem_Click"/>
+                <MenuItem x:Uid="mnu_transform" x:Name="menuTransform" Header="_Transform" IsEnabled="false" ItemsSource="{Binding Path=UIViewModel.TransformMenuItems, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                <MenuItem x:Uid="mnu_openConsole" x:Name="menuOpenConsole" Header="_Open Console" Click="openConsoleMenuItem_Click"/>
+                <MenuItem x:Uid="mnu_exit" Header="_Exit" Click="exitMenuItem_Click"/>
             </MenuItem>
-            <MenuItem x:Name="menuCamera" Header="_Camera">
-                <MenuItem Header="_Open" Click="CameraOpen_Click"/>
+            <MenuItem x:Uid="mnu_camera" x:Name="menuCamera" Header="_Camera">
+                <MenuItem x:Uid="mnu_open" Header="_Open" Click="CameraOpen_Click"/>
             </MenuItem>
-            <MenuItem x:Name="menuHelp" Header="_Help">
-                <MenuItem Header="_Wiki" Click="aboutWikiItem_Click"/>
-                <MenuItem Header="Usage _tips" Click="tipsWikiItem_Click"/>
-                <MenuItem Header="_About" Click="aboutMenuItem_Click"/>
+            <MenuItem x:Uid="mnu_help" x:Name="menuHelp" Header="_Help">
+                <MenuItem x:Uid="mnu_wiki" Header="_Wiki" Click="aboutWikiItem_Click"/>
+                <MenuItem x:Uid="mnu_usageTips" Header="Usage _tips" Click="tipsWikiItem_Click"/>
+                <MenuItem x:Uid="mnu_about" Header="_About" Click="aboutMenuItem_Click"/>
             </MenuItem>
         </Menu>
         <ToolBarTray DockPanel.Dock="Top" IsLocked="True">
@@ -76,15 +76,15 @@
             </StatusBarItem>
             <Separator Grid.Column="1" />
             <StatusBarItem Grid.Column="2">
-                <TextBlock Text="{Binding Path=Message}" TextWrapping="NoWrap"/>
+                <TextBlock x:Uid="lbl_message" Text="{Binding Path=Message}" TextWrapping="NoWrap"/>
             </StatusBarItem>
             <Separator Grid.Column="3" />
             <StatusBarItem Grid.Column="4">
-                <TextBlock Text="{Binding Path=RunTime, StringFormat=Run time: \{0\}}" TextWrapping="NoWrap" Padding="2,0"/>
+                <TextBlock x:Uid="lbl_runtime" Text="{Binding Path=RunTime, StringFormat=Run time: \{0\}}" TextWrapping="NoWrap" Padding="2,0"/>
             </StatusBarItem>
             <Separator Grid.Column="5" />
             <StatusBarItem Grid.Column="6">
-                <TextBlock ToolTip="Distance for keyboard step jog (with &lt;CTRL&gt; modifier)." Text="{Binding Path=JogStep, StringFormat=Jog step: \{0\}}" TextWrapping="NoWrap" Margin="2,0" Width="80"/>
+                <TextBlock x:Uid="lbl_jogStep" ToolTip="Distance for keyboard step jog (with &lt;CTRL&gt; modifier)." Text="{Binding Path=JogStep, StringFormat=Jog step: \{0\}}" TextWrapping="NoWrap" Margin="2,0" Width="80"/>
             </StatusBarItem>
         </StatusBar>
         <Canvas DockPanel.Dock="Right" Width="22" VerticalAlignment="Stretch" HorizontalAlignment="Right" ClipToBounds="False" Panel.ZIndex="1">
@@ -103,43 +103,43 @@
             <cnccontrols:THCMonitorControl x:Name="thcControl" Visibility="Hidden" Canvas.Right="22" Canvas.Top="500"/>
         </Canvas>
         <TabControl Background="#FFE5E5E5" DockPanel.Dock="Left" x:Name="tabMode" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Focusable="False" SelectionChanged="TabMode_SelectionChanged">
-            <TabItem x:Name="tabGrbl" Header="Grbl" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <TabItem x:Uid="tab_grbl" x:Name="tabGrbl" Header="Grbl" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                 <local:JobView x:Name="Grbl"/>
             </TabItem>
-            <TabItem x:Name="tabViewer" Header="3D View">
+            <TabItem x:Uid="tab_3DView" x:Name="tabViewer" Header="3D View">
                 <cncviewer:Viewer x:Name="viewer"/>
             </TabItem>
-            <TabItem x:Name="tabProbing" Header="Probing">
+            <TabItem x:Uid="tab_probing" x:Name="tabProbing" Header="Probing">
                 <cncprobingcontrols:ProbingView x:Name="probingView"/>
             </TabItem>
-            <TabItem x:Name="tabSDCard" Header="SD Card">
+            <TabItem x:Uid="tab_sdCard" x:Name="tabSDCard" Header="SD Card">
                 <cnccontrols:SDCardView x:Name="SDCardView" FileSelected="SDCardView_FileSelected"/>
             </TabItem>
-            <TabItem x:Name="tabTurning" Header="Turning">
+            <TabItem x:Uid="tab_turning" x:Name="tabTurning" Header="Turning">
                 <cnclathecontrols:TurningWizard x:Name="turningWizard"/>
             </TabItem>
-            <TabItem x:Name="tabParting" Header="Parting">
+            <TabItem x:Uid="tab_parting" x:Name="tabParting" Header="Parting">
                 <cnclathecontrols:PartingWizard x:Name="partingWizard"/>
             </TabItem>
-            <TabItem x:Name="tabThreading" Header="Threading">
+            <TabItem x:Uid="tab_threading" x:Name="tabThreading" Header="Threading">
                 <cnclathecontrols:ThreadingWizard x:Name="threadingWizard"/>
             </TabItem>
-            <TabItem x:Name="tabOffsets" Header="Offsets">
+            <TabItem x:Uid="tab_offsets" x:Name="tabOffsets" Header="Offsets">
                 <cnccontrols:OffsetView x:Name="offsetControl"/>
             </TabItem>
-            <TabItem x:Name="tabTools" Header="Tools">
+            <TabItem x:Uid="tab_tools" x:Name="tabTools" Header="Tools">
                 <cnccontrols:ToolView x:Name="toolControl"/>
             </TabItem>
-            <TabItem x:Name="tabTrinamic" Header="Trinamic tuner">
+            <TabItem x:Uid="tab_trinamic" x:Name="tabTrinamic" Header="Trinamic tuner">
                 <cnccontrols:TrinamicView x:Name="toolTrinamic"/>
             </TabItem>
-            <TabItem x:Name="tabConfig" Header="Settings: Grbl">
+            <TabItem x:Uid="tab_grblConfig" x:Name="tabConfig" Header="Settings: Grbl">
                 <cnccontrols:GrblConfigView x:Name="configControl"/>
             </TabItem>
-            <TabItem x:Name="tabAppConfig" Header="Settings: App">
+            <TabItem x:Uid="tab_appConfig" x:Name="tabAppConfig" Header="Settings: App">
                 <cnccontrols:AppConfigView x:Name="appConfigControl"/>
             </TabItem>
-            <TabItem x:Name="tabPIDTuner" Header="PID Tuner">
+            <TabItem x:Uid="tab_pidTuner" x:Name="tabPIDTuner" Header="PID Tuner">
                 <cnccontrols:PIDLogView x:Name="toolPIDTuner"/>
             </TabItem>
             <!--

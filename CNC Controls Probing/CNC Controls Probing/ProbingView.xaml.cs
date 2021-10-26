@@ -294,6 +294,8 @@ namespace CNC.Controls.Probing
 
         public void Setup(UIViewModel model, AppConfig profile)
         {
+            if (!model.IsConfigControlInstantiated<ConfigControl>())
+                model.ConfigControls.Add(new ConfigControl());
         }
 
         #endregion

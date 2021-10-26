@@ -8,7 +8,7 @@
              d:DesignHeight="335" d:DesignWidth="400"
              Loaded="control_Loaded">
     <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-        <Button x:Name="button" DockPanel.Dock="Bottom" Content="Reset view" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="75" Click="button_Click"/>
+        <Button x:Uid="resetView" x:Name="button" DockPanel.Dock="Bottom" Content="Reset view" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="75" Click="button_Click"/>
         <Grid DockPanel.Dock="Top">
         <local:Renderer x:Name="gcodeView"/>
         <local:TextOverlayControl x:Name="textOverlay" HorizontalAlignment="Right" Margin="5,5" VerticalAlignment="Top"/>

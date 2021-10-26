@@ -65,16 +65,16 @@
             </StackPanel.Resources>
             <StackPanel Orientation="Horizontal">
                 <local:CsSelectControl/>
-                <GroupBox Header="Workpiece">
-                    <Controls:NumericField Label="Height" Value="{Binding Path=WorkpieceHeight, Mode=TwoWay}" IsEnabled="{Binding Path=ProbeZ}" Margin="0,5,85,0" VerticalAlignment="Top"/>
+                <GroupBox x:Uid="grp_workpiece" Header="Workpiece">
+                    <Controls:NumericField x:Uid="lbl_height" Label="Height" Value="{Binding Path=WorkpieceHeight, Mode=TwoWay}" IsEnabled="{Binding Path=ProbeZ}" Margin="0,5,85,0" VerticalAlignment="Top"/>
                 </GroupBox>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="0,5,0,5">
-                <CheckBox Content="Probe Z" IsChecked="{Binding Path=ProbeZ}" IsEnabled="{Binding ElementName=probez, Path=IsChecked, Converter={StaticResource IsNotRunningConverter}}"/>
-                <CheckBox Content="Preview" Margin="15,0,0,0" IsChecked="{Binding Path=PreviewEnable}"/>
+                <CheckBox x:Uid="lbl_probeZ" Content="Probe Z" IsChecked="{Binding Path=ProbeZ}" IsEnabled="{Binding ElementName=probez, Path=IsChecked, Converter={StaticResource IsNotRunningConverter}}"/>
+                <CheckBox x:Uid="lbl_preview" Content="Preview" Margin="15,0,0,0" IsChecked="{Binding Path=PreviewEnable}"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal">
-                <Grid ToolTip="Click edge, corner or center to select probing action." Width="180" Height="180" Margin="5,10,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <Grid x:Uid="grd_action" ToolTip="Click edge, corner or center to select probing action." Width="180" Height="180" Margin="5,10,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="60" />
                         <RowDefinition Height="60" />
@@ -177,8 +177,8 @@
             </StackPanel>
         </StackPanel>
         <StackPanel Margin="5,0,0,5" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Height="Auto" Width="Auto">
-            <Button Content="Start" IsEnabled="{Binding Path=Grbl.IsJobRunning, Converter={StaticResource IsNotRunningConverter}}" Margin="2,0" Width="75" Click="start_Click"/>
-            <Button Content="Stop" IsEnabled="{Binding Path=Grbl.IsJobRunning}" Margin="2,0" Width="75" Click="stop_Click"/>
+            <Button x:Uid="btn_start" Content="Start" IsEnabled="{Binding Path=Grbl.IsJobRunning, Converter={StaticResource IsNotRunningConverter}}" Margin="2,0" Width="75" Click="start_Click"/>
+            <Button x:Uid="btn_stop" Content="Stop" IsEnabled="{Binding Path=Grbl.IsJobRunning}" Margin="2,0" Width="75" Click="stop_Click"/>
         </StackPanel>
     </Grid>
 </UserControl>

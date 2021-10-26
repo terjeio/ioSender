@@ -7,7 +7,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="515" d:DesignWidth="875">
     <DockPanel>
-        <Button x:Name="btnSave" DockPanel.Dock="Bottom" Content="Save settings" Margin="10,0,0,5" HorizontalAlignment="Left" VerticalAlignment="Top" Width="100" Click="btnSave_Click"/>
+        <Button x:Uid="btn_saveSettings" x:Name="btnSave" DockPanel.Dock="Bottom" Content="Save settings" Margin="10,0,0,5" HorizontalAlignment="Left" VerticalAlignment="Top" Width="100" Click="btnSave_Click"/>
         <ItemsControl x:Name="xx" DockPanel.Dock="Top">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>

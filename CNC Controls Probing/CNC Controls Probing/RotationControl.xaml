@@ -57,24 +57,24 @@
                 </Style>
             </StackPanel.Resources>
             <StackPanel Orientation="Horizontal" Height="70">
-                <GroupBox Header="Workpiece" Visibility="Collapsed">
-                    <Controls:NumericField Label="Distance" Value="{Binding Path=WorkpieceHeight, Mode=TwoWay}" Margin="0,5,85,0" VerticalAlignment="Top"/>
+                <GroupBox x:Uid="grp_workpiece" Header="Workpiece" Visibility="Collapsed">
+                    <Controls:NumericField x:Uid="fld_distance" Label="Distance" Value="{Binding Path=WorkpieceHeight, Mode=TwoWay}" Margin="0,5,85,0" VerticalAlignment="Top"/>
                 </GroupBox>
-                <GroupBox Header="Camera">
-                    <Button Content="Add _position" IsEnabled="{Binding Path=Grbl.IsCameraVisible}" Margin="2,0" Width="75" Height="23" Focusable="False" Click="addPosition_Click"/>
+                <GroupBox x:Uid="grp_camera" Header="Camera">
+                    <Button x:Uid="btn_addPosition" Content="Add _position" IsEnabled="{Binding Path=Grbl.IsCameraVisible}" Margin="2,0" Width="75" Height="23" Focusable="False" Click="addPosition_Click"/>
                 </GroupBox>
-                <GroupBox Header="Rotation center" HorizontalAlignment="Left" Margin="5,0" ToolTip="Click to select rotation center relative to job, if not selected X0,Y0 is used.">
+                <GroupBox x:Uid="grp_RotationCenter" Header="Rotation center" HorizontalAlignment="Left" Margin="5,0" ToolTip="Click to select rotation center relative to job, if not selected X0,Y0 is used.">
                     <StackPanel Orientation="Horizontal">
                         <Controls:OriginControl Value="{Binding Path=Origin, Mode=TwoWay}" IsEnabled="{Binding Path=Grbl.IsFileLoaded}" Margin="5,5,0,0"/>
-                        <Button Content="Use X0,Y0" IsEnabled="{Binding Path=Grbl.IsFileLoaded}" Margin="8,0,5,3" Width="75" Focusable="False" Click="use00_Click" VerticalAlignment="Bottom"/>
+                        <Button x:Uid="btn_useX0Y0" Content="Use X0,Y0" IsEnabled="{Binding Path=Grbl.IsFileLoaded}" Margin="8,0,5,3" Width="75" Focusable="False" Click="use00_Click" VerticalAlignment="Bottom"/>
                     </StackPanel>
                 </GroupBox>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="0,5,0,5">
-                <CheckBox Content="Preview" Margin="15,0,0,0" IsChecked="{Binding Path=PreviewEnable}"/>
+                <CheckBox x:Uid="lbl_preview" Content="Preview" Margin="15,0,0,0" IsChecked="{Binding Path=PreviewEnable}"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal">
-                <Grid ToolTip="Click edge to select probing action." Width="160" Height="160" Margin="5,10,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <Grid x:Uid="grd_action" ToolTip="Click edge to select probing action." Width="160" Height="160" Margin="5,10,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="80" />
                         <RowDefinition Height="80" />
@@ -88,7 +88,7 @@
                     <RadioButton Content="Resources/RotaterAB.png" Grid.Row="1" Grid.Column="0" Style="{StaticResource Flag}" IsChecked="{Binding Path=ProbeEdge, Mode=TwoWay, Converter={StaticResource EnumToEdgeConverter}, ConverterParameter=AB}" />
                     <RadioButton Content="Resources/RotaterCB.png" Grid.Row="1" Grid.Column="1" Style="{StaticResource Flag}" IsChecked="{Binding Path=ProbeEdge, Mode=TwoWay, Converter={StaticResource EnumToEdgeConverter}, ConverterParameter=CB}" />
                 </Grid>
-                <GroupBox Header="Preview" Margin="30,0,0,0" Visibility="{Binding Path=PreviewEnable, Converter={StaticResource ToVisibleConverter}}" VerticalAlignment="Top">
+                <GroupBox x:Uid="hdr_preview" Header="Preview" Margin="30,0,0,0" Visibility="{Binding Path=PreviewEnable, Converter={StaticResource ToVisibleConverter}}" VerticalAlignment="Top">
                     <TextBox IsReadOnly="True" Text="{Binding Path=PreviewText, Mode=OneWay}" TextWrapping="NoWrap" Margin="0,5,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="245" Height="180"
                          FontSize="10" FontFamily="Verdana"
                          ScrollViewer.VerticalScrollBarVisibility="Auto"
@@ -98,9 +98,9 @@
             </StackPanel>
         </StackPanel>
         <StackPanel Margin="5,0,0,5" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Height="Auto" Width="Auto">
-            <Button Content="Start" IsEnabled="{Binding Path=Grbl.IsJobRunning, Converter={StaticResource IsNotRunningConverter}}" Margin="2,0" Width="75" Click="start_Click"/>
-            <Button Content="Stop" IsEnabled="{Binding Path=Grbl.IsJobRunning}" Margin="2,0" Width="75" Click="stop_Click"/>
-            <Button Content="_Apply" IsEnabled="{Binding Path=CanApplyTransform}" Margin="2,0" Width="75" Click="apply_Click"/>
+            <Button x:Uid="btn_start" Content="Start" IsEnabled="{Binding Path=Grbl.IsJobRunning, Converter={StaticResource IsNotRunningConverter}}" Margin="2,0" Width="75" Click="start_Click"/>
+            <Button x:Uid="btn_stop" Content="Stop" IsEnabled="{Binding Path=Grbl.IsJobRunning}" Margin="2,0" Width="75" Click="stop_Click"/>
+            <Button x:Uid="btn_apply" Content="_Apply" IsEnabled="{Binding Path=CanApplyTransform}" Margin="2,0" Width="75" Click="apply_Click"/>
         </StackPanel>
     </Grid>
 </UserControl>

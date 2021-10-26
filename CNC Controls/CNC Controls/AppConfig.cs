@@ -75,6 +75,14 @@ namespace CNC.Controls
     }
 
     [Serializable]
+    public class ProbeConfig : ViewModelBase
+    {
+        private bool _CheckProbeStatus = true;
+
+        public bool CheckProbeStatus { get { return _CheckProbeStatus; } set { _CheckProbeStatus = value; OnPropertyChanged(); } }
+    }
+
+    [Serializable]
     public class CameraConfig : ViewModelBase
     {
         private double _xoffset = 0d, _yoffset = 0d;
@@ -213,6 +221,7 @@ namespace CNC.Controls
         public LatheConfig Lathe { get; set; } = new LatheConfig();
         public CameraConfig Camera { get; set; } = new CameraConfig();
         public GCodeViewerConfig GCodeViewer { get; set; } = new GCodeViewerConfig();
+        public ProbeConfig Probing { get; set; } = new ProbeConfig();
     }
 
     public class AppConfig
@@ -238,6 +247,7 @@ namespace CNC.Controls
         public CameraConfig Camera { get { return Base == null ? null : Base.Camera; } }
         public LatheConfig Lathe { get { return Base == null ? null : Base.Lathe; } }
         public GCodeViewerConfig GCodeViewer { get { return Base == null ? null : Base.GCodeViewer; } }
+        public ProbeConfig Probing { get { return Base == null ? null : Base.Probing; } }
 
         public bool Save(string filename)
         {

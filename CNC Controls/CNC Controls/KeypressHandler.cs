@@ -1,7 +1,7 @@
 ﻿/*
  * KeypressHandler.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.30 / 2021-04-08 / Io Engineering (Terje Io)
+ * v0.35 / 2021-10-20 / Io Engineering (Terje Io)
  *
  */
 
@@ -62,7 +62,7 @@ namespace CNC.Controls
             public Func<Key, bool> Call;
         }
 
-        private bool fullJog = false, preCancel = false;
+        private bool fullJog = false, preCancel = false, softLimits = false;
         private volatile Key[] axisjog = new Key[3] { Key.None, Key.None, Key.None };
         private double[] jogDistance = new double[3] { 0.05, 500.0, 500.0 };
         private double[] jogSpeed = new double[3] { 100.0, 200.0, 500.0 };
@@ -125,13 +125,16 @@ namespace CNC.Controls
             jogSpeed[(int)JogMode.Slow] = AppConfig.Settings.Jog.SlowFeedrate;
             jogSpeed[(int)JogMode.Fast] = AppConfig.Settings.Jog.FastFeedrate;
 
-            if(!GrblInfo.IsGrblHAL)
+            softLimits = GrblSettings.GetInteger(GrblSetting.SoftLimitsEnable) == 1;
+
+            if (!GrblInfo.IsGrblHAL)
                 fullJog = AppConfig.Settings.Jog.KeyboardEnable;
         }
 
         public bool ProcessKeypress(KeyEventArgs e, bool allowJog)
         {
             bool isJogging = IsJogging;
+            double[] dist = new double[3] { 0d, 0d, 0d };
 
             if (e.IsUp && isJogging)
             {
@@ -168,33 +171,33 @@ namespace CNC.Controls
                 switch (e.Key)
                 {
                     case Key.PageUp:
-                        isJogging = axisjog[2] != Key.PageUp;
-                        axisjog[2] = Key.PageUp;
+                        isJogging = axisjog[GrblConstants.Z_AXIS] != Key.PageUp;
+                        axisjog[GrblConstants.Z_AXIS] = Key.PageUp;
                         break;
 
                     case Key.PageDown:
-                        isJogging = axisjog[2] != Key.PageDown;
-                        axisjog[2] = Key.PageDown;
+                        isJogging = axisjog[GrblConstants.Z_AXIS] != Key.PageDown;
+                        axisjog[GrblConstants.Z_AXIS] = Key.PageDown;
                         break;
 
                     case Key.Left:
-                        isJogging = axisjog[0] != Key.Left;
-                        axisjog[0] = Key.Left;
+                        isJogging = axisjog[GrblConstants.X_AXIS] != Key.Left;
+                        axisjog[GrblConstants.X_AXIS] = Key.Left;
                         break;
 
                     case Key.Up:
-                        isJogging = axisjog[1] != Key.Up;
-                        axisjog[1] = Key.Up;
+                        isJogging = axisjog[GrblConstants.Y_AXIS] != Key.Up;
+                        axisjog[GrblConstants.Y_AXIS] = Key.Up;
                         break;
 
                     case Key.Right:
-                        isJogging = axisjog[0] != Key.Right;
-                        axisjog[0] = Key.Right;
+                        isJogging = axisjog[GrblConstants.X_AXIS] != Key.Right;
+                        axisjog[GrblConstants.X_AXIS] = Key.Right;
                         break;
 
                     case Key.Down:
-                        isJogging = axisjog[1] != Key.Down;
-                        axisjog[1] = Key.Down;
+                        isJogging = axisjog[GrblConstants.Y_AXIS] != Key.Down;
+                        axisjog[GrblConstants.Y_AXIS] = Key.Down;
                         break;
                 }
             }
@@ -208,46 +211,56 @@ namespace CNC.Controls
                     for (int i = 0; i < 2; i++) switch (axisjog[i])
                     {
                         case Key.Left:
-                            command += "Z-{0}";
+                            dist[GrblConstants.Z_AXIS] = -1d;
+                            command += "Z-{3}";
                             break;
 
                         case Key.Up:
-                            command += "X-{0}";
+                            dist[GrblConstants.X_AXIS] = -1d;
+                            command += "X-{1}";
                             break;
 
                         case Key.Right:
-                            command += "Z{0}";
+                            dist[GrblConstants.Z_AXIS] = 1d;
+                            command += "Z{3}";
                             break;
 
                         case Key.Down:
-                            command += "X{0}";
+                            dist[GrblConstants.X_AXIS] = 1d;
+                            command += "X{1}";
                             break;
                     }
                 }
                 else for (int i = 0; i < 3; i++) switch (axisjog[i])
                 {
                     case Key.PageUp:
-                        command += "Z{0}";
+                        dist[GrblConstants.Z_AXIS] = 1d;
+                        command += "Z{3}";
                         break;
 
                     case Key.PageDown:
-                        command += "Z-{0}";
+                        dist[GrblConstants.Z_AXIS] = -1d;
+                        command += "Z-{3}";
                         break;
 
                     case Key.Left:
-                        command += "X-{0}";
+                        dist[GrblConstants.X_AXIS] = -1d;
+                        command += "X-{1}";
                         break;
 
                     case Key.Up:
-                        command += "Y{0}";
+                        dist[GrblConstants.Y_AXIS] = 1d;
+                        command += "Y{2}";
                         break;
 
                     case Key.Right:
-                        command += "X{0}";
+                        dist[GrblConstants.X_AXIS] = 1d;
+                        command += "X{1}";
                         break;
 
                     case Key.Down:
-                        command += "Y-{0}";
+                        dist[GrblConstants.Y_AXIS] = -1d;
+                        command += "Y-{2}";
                         break;
                 }
 
@@ -276,10 +289,34 @@ namespace CNC.Controls
                         jogMode = JogMode.None;
                     }
 
-                    if(jogMode != JogMode.None)
-                        SendJogCommand("$J=G91" + string.Format(command + "F{1}",
-                                                        jogDistance[(int)jogMode].ToInvariantString(),
-                                                         jogSpeed[(int)jogMode].ToInvariantString()));
+                    if (jogMode != JogMode.None)
+                    {
+                        if (GrblInfo.IsGrblHAL || !softLimits)
+                        {
+                            var distance = jogDistance[(int)jogMode].ToInvariantString();
+                            SendJogCommand("$J=G91G21" + string.Format(command + "F{0}",
+                                                             jogSpeed[(int)jogMode].ToInvariantString(),
+                                                              distance, distance, distance));
+                        }
+                        else
+                        {
+                            for (int i = 0; i < 3; i++)
+                            {
+                                if (dist[i] != 0d)
+                                {
+                                    if(GrblInfo.HomingDirection.HasFlag(GrblInfo.AxisIndexToFlag(i)))
+                                        dist[i] = dist[i] < 0d ? grbl.MachinePosition.Values[i] : Math.Max(0d, GrblInfo.MaxTravel.Values[i] - grbl.MachinePosition.Values[i] - .5d);
+                                    else
+                                        dist[i] = dist[i] > 0d ? (- grbl.MachinePosition.Values[i] - .5d) : Math.Max(0d, GrblInfo.MaxTravel.Values[i] + grbl.MachinePosition.Values[i] - .5d);
+                                }
+                            }
+                            SendJogCommand("$J=G91G21" + string.Format(command + "F{0}",
+                                                             jogSpeed[(int)jogMode].ToInvariantString(),
+                                                              dist[GrblConstants.X_AXIS].ToInvariantString(),
+                                                               dist[GrblConstants.Y_AXIS].ToInvariantString(),
+                                                                dist[GrblConstants.Z_AXIS].ToInvariantString()));
+                        }
+                    }
 
                     return jogMode != JogMode.None;
                 }

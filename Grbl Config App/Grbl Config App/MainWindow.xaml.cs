@@ -2,7 +2,7 @@
 /*
  * MainWindow.xaml.cs - part of Grbl Code Sender
  *
- * v0.34 / 2021-08-20 / Io Engineering (Terje Io)
+ * v0.35 / 2021-08-21 / Io Engineering (Terje Io)
  *
  */
 
@@ -52,7 +52,7 @@ namespace Grbl_Config_App
 
     public partial class MainWindow : Window
     {
-        private const string version = "2.0.34";
+        private const string version = "2.0.35";
         public static UIViewModel UIViewModel { get; } = new UIViewModel();
 
         public MainWindow()
@@ -81,6 +81,9 @@ namespace Grbl_Config_App
                 GrblInfo.Get();
                 GrblSettings.Load();
             }
+
+            halsettings.IsEnabled = grblsettings.IsEnabled = GrblInfo.IsGrblHAL && GrblInfo.Build >= 20210819;
+            grblalarms.IsEnabled = grblerrors.IsEnabled = GrblInfo.IsGrblHAL && GrblInfo.Build >= 20210823;
 
             configView.Activate(true, ViewType.Startup);
         }
@@ -122,7 +125,8 @@ namespace Grbl_Config_App
                     Filter = "Tab separated file (*.txt)|*.txt",
                     AddExtension = true,
                     DefaultExt = ".txt",
-                    ValidateNames = true
+                    ValidateNames = true,
+                    Title = "Save setting information in grblHAL tab separated format"
                 };
 
                 if (saveDialog.ShowDialog() == true)
@@ -143,7 +147,52 @@ namespace Grbl_Config_App
                     Filter = "Comma separated file (*.csv)|*.csv",
                     AddExtension = true,
                     DefaultExt = ".csv",
-                    ValidateNames = true
+                    ValidateNames = true,
+                    Title = "Save setting information in Grbl .csv format"
+                };
+
+                if (saveDialog.ShowDialog() == true)
+                    g.Backup(saveDialog.FileName);
+            }
+        }
+
+        private void getGrblAlarmsItem_Click(object sender, RoutedEventArgs e)
+        {
+            bool getExtended = GrblInfo.ExtendedProtocol && GrblInfo.Build >= 20200716;
+
+            var g = new Settings();
+
+            if (g.Load(DataContext as GrblViewModel, "$EAG"))
+            {
+                SaveFileDialog saveDialog = new SaveFileDialog()
+                {
+                    Filter = "Comma separated file (*.csv)|*.csv",
+                    AddExtension = true,
+                    DefaultExt = ".csv",
+                    ValidateNames = true,
+                    Title = "Save alarm codes in Grbl .csv format"
+                };
+
+                if (saveDialog.ShowDialog() == true)
+                    g.Backup(saveDialog.FileName);
+            }
+        }
+
+        private void getGrblErrorsItem_Click(object sender, RoutedEventArgs e)
+        {
+            bool getExtended = GrblInfo.ExtendedProtocol && GrblInfo.Build >= 20200716;
+
+            var g = new Settings();
+
+            if (g.Load(DataContext as GrblViewModel, "$EEG"))
+            {
+                SaveFileDialog saveDialog = new SaveFileDialog()
+                {
+                    Filter = "Comma separated file (*.csv)|*.csv",
+                    AddExtension = true,
+                    DefaultExt = ".csv",
+                    ValidateNames = true,
+                    Title = "Save error codes in Grbl .csv format"
                 };
 
                 if (saveDialog.ShowDialog() == true)

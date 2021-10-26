@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:CNC.Controls"
              xmlns:core="clr-namespace:CNC.Core;assembly=CNC.Core"
              mc:Ignorable="d" 
-             d:DesignHeight="65" d:DesignWidth="216">
+             d:DesignHeight="60" d:DesignWidth="216">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -93,7 +93,7 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
-    <GroupBox x:Name="grpSignals" Header="Signals" HorizontalAlignment="Left" VerticalAlignment="Top" Height="60" Width="216">
+    <GroupBox x:Uid="grp_signals" x:Name="grpSignals" Header="Signals" HorizontalAlignment="Left" VerticalAlignment="Top" Height="60" Width="216">
         <DockPanel HorizontalAlignment="Left" VerticalAlignment="Bottom" Height="36" Width="205">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="3,0,0,0" VerticalAlignment="Center" Width="Auto" DockPanel.Dock="Left">
                 <local:SignalControl Label="X" IsSet="{Binding Path=Signals[(core:Signals)LimitX], Mode=OneWay}"/>

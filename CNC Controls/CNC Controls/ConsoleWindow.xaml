@@ -7,6 +7,7 @@
         mc:Ignorable="d"
         ShowActivated="False"
         Background="#FFE5E5E5"
+        x:Uid="dlg_senderConsole"
         Title="Sender Console" Height="500" MinHeight="115" Width="500" MinWidth="350" Icon="App.ico" ShowInTaskbar="False"
         Closing="Window_Closing" WindowStyle="ToolWindow">
     <local:ConsoleControl/>

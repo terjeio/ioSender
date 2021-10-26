@@ -331,7 +331,7 @@ namespace CNC.GCode
                         gcodes.Add(gcode[0] == '(' ? gcode + ')' : gcode);
                         gcode = string.Empty;
                     }
-                    if (c != ')')
+                    if (c > ' ' && c != ')')
                     {
                         inMessage = c == '(';
                         gcode += inMessage ? c : char.ToUpperInvariant(c);

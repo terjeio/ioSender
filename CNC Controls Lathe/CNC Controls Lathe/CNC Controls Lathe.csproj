@@ -33,6 +33,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>App.ico</ApplicationIcon>
+    <Localizable>False</Localizable>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />

@@ -1,7 +1,7 @@
 /*
  * MainWindow.xaml.cs - part of Grbl Code Sender
  *
- * v0.33 / 2021-05-16 / Io Engineering (Terje Io)
+ * v0.35 / 2021-10-26 / Io Engineering (Terje Io)
  *
  */
 
@@ -45,6 +45,8 @@ using CNC.Controls;
 using CNC.Converters;
 using System.Windows.Threading;
 using System.Collections.ObjectModel;
+using System.Globalization;
+using System.Threading;
 #if ADD_CAMERA
 using CNC.Controls.Camera;
 #endif
@@ -54,7 +56,7 @@ namespace GCode_Sender
 
     public partial class MainWindow : Window
     {
-        private const string version = "2.0.34";
+        private const string version = "2.0.35";
         public static MainWindow ui = null;
         public static CNC.Controls.Viewer.Viewer GCodeViewer = null;
         public static UIViewModel UIViewModel { get; } = new UIViewModel();

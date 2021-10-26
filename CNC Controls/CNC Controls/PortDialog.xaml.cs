@@ -1,7 +1,7 @@
 ﻿/*
  * PortDialog.xaml.cs - part of CNC Controls library
  *
- * v0.33 / 2021-05-16 / Io Engineering (Terje Io)
+ * v0.35 / 2021-09-25 / Io Engineering (Terje Io)
  *
  */
 
@@ -64,8 +64,8 @@ namespace CNC.Controls
         {
             bool found = false;
 
-            foreach (string p in prop.Com.PortNames)
-                found = found || p == port;
+            foreach (var p in prop.Com.Ports)
+                found = found || p.Name == port;
 
             return found;
         }
@@ -105,7 +105,7 @@ namespace CNC.Controls
                             Enum.TryParse(values[5], true, out mode);
                             if (mode != Comms.ResetMode.None)
                             {
-                                foreach (ConnectMode m in ((SerialPorts)DataContext).ConnectModes)
+                                foreach (ConnectMode m in prop.Com.ConnectModes)
                                     if (m.Mode == mode)
                                         prop.Com.SelectedMode = m;
                             }

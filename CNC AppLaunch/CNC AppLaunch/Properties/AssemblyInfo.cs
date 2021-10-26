@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Io Engineering")]
-[assembly: AssemblyProduct("CNC AppLaunch")]
+[assembly: AssemblyProduct("ioSender")]
 [assembly: AssemblyCopyright("Copyright ©  2021 Io Engineering")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

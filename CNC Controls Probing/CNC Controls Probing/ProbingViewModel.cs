@@ -1,7 +1,7 @@
 ﻿/*
  * ProbingViewModel.cs - part of CNC Probing library
  *
- * v0.33 / 2021-05-10 / Io Engineering (Terje Io)
+ * v0.35 / 2021-10-19 / Io Engineering (Terje Io)
  *
  */
 
@@ -207,7 +207,7 @@ namespace CNC.Controls.Probing
                     null,
                     a => Grbl.OnWCOUpdated += a,
                     a => Grbl.OnWCOUpdated -= a,
-                    5000);
+                    AppConfig.Settings.Base.PollInterval * 35);
                 }).Start();
             }
 

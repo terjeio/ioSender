@@ -17,8 +17,10 @@
         <Menu DockPanel.Dock="Top">
             <MenuItem x:Name="menuFile" Header="_File">
                 <MenuItem Header="_About" Click="aboutMenuItem_Click"/>
-                <MenuItem Header="Fetch and save grbl_HAL settings info" Click="getHalSettingsItem_Click"/>
-                <MenuItem Header="Fetch and save _Grbl settings info" Click="getGrblSettingsItem_Click"/>
+                <MenuItem x:Name="halsettings"  Header="Fetch and save grbl_HAL settings info" Click="getHalSettingsItem_Click"/>
+                <MenuItem x:Name="grblsettings"  Header="Fetch and save _Grbl settings info" Click="getGrblSettingsItem_Click"/>
+                <MenuItem x:Name="grblalarms"  Header="Fetch and save Grbl a_larm info" Click="getGrblAlarmsItem_Click"/>
+                <MenuItem x:Name="grblerrors"  Header="Fetch and save Grbl e_rror info" Click="getGrblErrorsItem_Click"/>
                 <MenuItem Header="_Exit" Click="exitMenuItem_Click"/>
             </MenuItem>
         </Menu>

@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CNC.Controls"
         mc:Ignorable="d"
-        Title="Sender connection" Height="195" Width="270" Icon="App.ico" ResizeMode="NoResize">
+        x:Uid="dlg_connection"
+        Title="Sender connection" Height="195" Width="400" Icon="App.ico" ResizeMode="NoResize">
     <Window.Resources>
         <Style x:Key="PortErrorStyle" TargetType="local:NumericTextBox">
             <Style.Triggers>
@@ -30,19 +31,21 @@
     </Window.Resources>
     <Grid Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
         <TabControl x:Name="tab" Width="Auto" Height="120" Margin="5,0" VerticalAlignment="Top">
-            <TabItem Header="Serial">
+            <TabItem x:Uid="tab_serial" Header="Serial">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="0,5">
-                        <Label Content="Port:" HorizontalAlignment="Left" HorizontalContentAlignment="Right" Width="80" VerticalAlignment="Center"/>
-                        <ComboBox HorizontalAlignment="Left" VerticalAlignment="Center" Width="150"
+                        <Label  x:Uid="lbl_serialPort" Content="Port:" HorizontalAlignment="Left" HorizontalContentAlignment="Right" Width="80" VerticalAlignment="Center"/>
+                        <ComboBox HorizontalAlignment="Left" VerticalAlignment="Center" Width="285"
                             DropDownOpened="CbxPorts_DropDownOpened"
-                            ItemsSource="{Binding Path=Com.PortNames}"
+                            ItemsSource="{Binding Path=Com.Ports}"
                             SelectedValue="{Binding Path=Com.SelectedPort, Mode=TwoWay}"
+                            DisplayMemberPath="FullName"
+                            SelectedValuePath="Name" 
                          />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Top">
-                        <Label Content="On connect:" HorizontalAlignment="Left" HorizontalContentAlignment="Right" Width="80" VerticalAlignment="Center"/>
-                        <ComboBox HorizontalAlignment="Left" VerticalAlignment="Center" Width="150"
+                        <Label x:Uid="lbl_onConnect" Content="On connect:" HorizontalAlignment="Left" HorizontalContentAlignment="Right" Width="80" VerticalAlignment="Center"/>
+                        <ComboBox HorizontalAlignment="Left" VerticalAlignment="Center" Width="90"
                             ItemsSource="{Binding Path=Com.ConnectModes}"
                             SelectedItem="{Binding Path=Com.SelectedMode, Mode=TwoWay}"
                             DisplayMemberPath="Name"
@@ -51,11 +54,11 @@
                     </StackPanel>
                 </StackPanel>
             </TabItem>
-            <TabItem Header="Network">
+            <TabItem x:Uid="tab_network" Header="Network">
                 <StackPanel>
-                    <CheckBox Content="WebSocket" IsChecked="{Binding Path=IsWebSocket, Mode=TwoWay}" Margin="80,5,0,0"/>
+                    <CheckBox x:Uid="lbl_websocket" Content="WebSocket" IsChecked="{Binding Path=IsWebSocket, Mode=TwoWay}" Margin="80,5,0,0"/>
                     <StackPanel Orientation="Horizontal" Margin="0,5">
-                        <Label Content="Port:" HorizontalAlignment="Left" HorizontalContentAlignment="Right" Width="80"/>
+                        <Label x:Uid="lbl_netPort" Content="Port:" HorizontalAlignment="Left" HorizontalContentAlignment="Right" Width="80"/>
                         <local:NumericTextBox Style="{StaticResource PortErrorStyle}" Format="####0">
                             <local:NumericTextBox.Value>
                                 <Binding Path="NetPort" Mode="TwoWay" ValidatesOnNotifyDataErrors="True" ValidatesOnDataErrors="True" NotifyOnValidationError="True" UpdateSourceTrigger="PropertyChanged">
@@ -67,7 +70,7 @@
                         </local:NumericTextBox>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Top">
-                        <Label Content="IP address:" HorizontalAlignment="Left" HorizontalContentAlignment="Right" Width="80"/>
+                        <Label x:Uid="lbl_ipAddress" Content="IP address:" HorizontalAlignment="Left" HorizontalContentAlignment="Right" Width="80"/>
                         <TextBox Style="{StaticResource Ip4ErrorStyle}" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Bottom" Height="24" Width="95" MaxLength="15">
                             <TextBox.Text>
                                 <Binding Path="IpAddress" Mode="TwoWay" ValidatesOnNotifyDataErrors="True" ValidatesOnDataErrors="True" NotifyOnValidationError="True" UpdateSourceTrigger="PropertyChanged">
@@ -82,8 +85,8 @@
             </TabItem>
         </TabControl>
         <StackPanel Height="23" Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,110,0,5">
-            <Button x:Name="btnOk" Content="Ok" Height="23" Width="70" Click="btnOk_Click"/>
-            <Button x:Name="btnCancel" Content="Cancel" Margin="5,0,0,0" Height="23" Width="70" Click="btnCancel_Click"/>
+            <Button x:Uid="btn_ok" x:Name="btnOk" Content="Ok" Height="23" Width="70" Click="btnOk_Click"/>
+            <Button x:Uid="btn_cancel" x:Name="btnCancel" Content="Cancel" Margin="5,0,0,0" Height="23" Width="70" Click="btnCancel_Click"/>
         </StackPanel>
     </Grid>
 </Window>

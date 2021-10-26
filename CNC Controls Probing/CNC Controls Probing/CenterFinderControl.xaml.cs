@@ -348,7 +348,7 @@ namespace CNC.Controls.Probing
                 }
 
                 if (!ok || pass == 1)
-                    probing.Program.End(ok ? string.Format("Probing completed: X distance {0}, Y distance {1}", X_distance.ToInvariantString(), Y_distance.ToInvariantString())  : "Probing failed");
+                    probing.Program.End(ok ? string.Format("Probing completed: X distance {0}, Y distance {1}", X_distance.ToInvariantString(), Y_distance.ToInvariantString()) : "Probing failed");
             }
 
             return ok;
@@ -373,7 +373,7 @@ namespace CNC.Controls.Probing
                 probing.Program.Add(string.Format("G10L2P{0}{1}", probing.CoordinateSystem, probing.StartPosition.ToString(axisflags)));
         }
 
-private void start_Click(object sender, RoutedEventArgs e)
+        private void start_Click(object sender, RoutedEventArgs e)
         {
             Start((DataContext as ProbingViewModel).PreviewEnable);
         }

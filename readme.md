@@ -10,11 +10,11 @@ Please check out the [Wiki](https://github.com/terjeio/Grbl-GCode-Sender/wiki) f
 
 ---
 
-Second production release 2.0.33, see the [changelog](changelog.md) for details.
+Latest release is 2.0.35, see the [changelog](changelog.md) for details.
 
 ---
 
-A complete rewrite of my [Grbl CNC Controls library](https://github.com/terjeio/Grbl_CNC_Controls) including a sender application on top of these. It supports new features in [grblHAL](https://github.com/terjeio/grblHAL) such as manual tool change and [external MPG](https://github.com/terjeio/GRBL_MPG_DRO_BoosterPack) control - and is one of the reasons for writing this library and app. Other senders I have tried does not play nice when a MPG pendant is connected directly to the Grbl processor card...
+A complete rewrite of my [Grbl CNC Controls library](https://github.com/terjeio/Grbl_CNC_Controls) including a sender application on top of these. It supports new features in [grblHAL](https://github.com/grblHAL) such as manual tool change and [external MPG](https://github.com/terjeio/GRBL_MPG_DRO_BoosterPack) control - and is one of the reasons for writing this library and app. Other senders I have tried does not play nice when a MPG pendant is connected directly to the Grbl processor card...
 
 ---
 
@@ -52,7 +52,7 @@ Lathe mode.
 
 ![Easy configuration](Media/Sender6.png)
 
-Conversational programming for Lathe Mode. Threading requires [grblHAL](https://github.com/terjeio/grblHAL) controller with driver that has spindle sync support.
+Conversational programming for Lathe Mode. Threading requires [grblHAL](https://github.com/grblHAL) controller with driver that has spindle sync support.
 
 ---
-2021-05-16
+2021-10-26

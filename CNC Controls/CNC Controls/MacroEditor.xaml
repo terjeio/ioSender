@@ -5,14 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CNC.Controls"
         mc:Ignorable="d"
+        x:Uid="dlg_macroEditor"
         Title="Macro Editor" Height="260" Width="310" Icon="App.ico" ResizeMode="NoResize" ShowInTaskbar="False"
         WindowStartupLocation="CenterOwner"
         Loaded="Window_Loaded" Closing="Window_Closing">
     <Grid Background="#FFE5E5E5">
         <ComboBox x:Name="cbxMacro" IsEditable="True" ItemsSource="{Binding Path=Macros}" DisplayMemberPath="Name" SelectedValuePath="Id" SelectedItem="{Binding Path=Macro, Mode=TwoWay}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="150"/>
-        <Button Content="Add" IsEnabled="{Binding Path=CanAdd}" HorizontalAlignment="Left" Margin="170,10,0,0" VerticalAlignment="Top" Width="45" Click="btnAdd_Click"/>
+        <Button x:Uid="btn_add" Content="Add" IsEnabled="{Binding Path=CanAdd}" HorizontalAlignment="Left" Margin="170,10,0,0" VerticalAlignment="Top" Width="45" Click="btnAdd_Click"/>
         <TextBox x:Name="textBox" IsEnabled="{Binding Path=CanEdit}" AcceptsReturn="True" HorizontalAlignment="Left" Height="145" Margin="10,37,0,0" TextWrapping="Wrap" Text="{Binding Path=Code, Mode=TwoWay}" VerticalAlignment="Top" Width="272"/>
-        <Button Content="Ok" HorizontalAlignment="Left" Margin="55,187,0,0" VerticalAlignment="Top" Width="75" Click="btnOk_Click"/>
-        <Button Content="Cancel" HorizontalAlignment="Right" Margin="0,187,55,0" VerticalAlignment="Top" Width="75" Click="btnCancel_Click"/>
+        <Button x:Uid="btn_ok" Content="Ok" HorizontalAlignment="Left" Margin="55,187,0,0" VerticalAlignment="Top" Width="75" Click="btnOk_Click"/>
+        <Button x:Uid="btn_cancel" Content="Cancel" HorizontalAlignment="Right" Margin="0,187,55,0" VerticalAlignment="Top" Width="75" Click="btnCancel_Click"/>
     </Grid>
 </Window>

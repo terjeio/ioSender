@@ -8,6 +8,6 @@
         Title="Sender" Height="125" Width="460" ResizeMode="NoResize"
         Closing="Window_Closing" Icon="App.ico">
     <Grid Background="Snow">
-        <Label x:Name="label" Content="MPG mode active, waiting for it to be disabled..." HorizontalAlignment="Center" Margin="0" VerticalAlignment="Center" FontSize="16"/>
+        <Label x:Uid="lbl_mpgModeActive" x:Name="label" Content="MPG mode active, waiting for it to be disabled..." HorizontalAlignment="Center" Margin="0" VerticalAlignment="Center" FontSize="16"/>
     </Grid>
 </Window>

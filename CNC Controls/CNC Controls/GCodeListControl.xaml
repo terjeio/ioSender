@@ -10,9 +10,9 @@
     <DataGrid x:Name="grdGCode" Grid.Row="0" ItemsSource="{Binding}" AllowDrop="True" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" AutoGenerateColumns="False"
                    CanUserSortColumns="false" CanUserResizeRows="False" IsReadOnly="true" DragEnter="grdGCode_Drag" DragOver="grdGCode_Drag" DragLeave="grdGCode_Drag" Drop="grdGCode_Drop">
         <DataGrid.Columns>
-            <DataGridTextColumn Header="Block" Binding="{Binding LineNum}" Width="50" MinWidth="50" MaxWidth="60"/>
+            <DataGridTextColumn x:Uid="hdr_block" Header="Block" Binding="{Binding LineNum}" Width="50" MinWidth="50" MaxWidth="60"/>
             <DataGridTextColumn Header="" Binding="{Binding Sent}" Width="*" MinWidth="30" MaxWidth="60"/>
-            <DataGridTextColumn Header="Data" Binding="{Binding Data}" Width="*" MinWidth="280"/>
+            <DataGridTextColumn x:Uid="hdr_data" Header="Data" Binding="{Binding Data}" Width="*" MinWidth="280"/>
         </DataGrid.Columns>
     </DataGrid>
 </UserControl>

@@ -32,7 +32,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
+    <UICulture>en-US</UICulture>
     <ApplicationIcon>App.ico</ApplicationIcon>
+    <Localizable>False</Localizable>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="RP.Math.Vector3">

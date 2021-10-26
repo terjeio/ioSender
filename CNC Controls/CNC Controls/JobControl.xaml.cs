@@ -1,7 +1,7 @@
 /*
  * JobControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.34 / 2021-07-04 / Io Engineering (Terje Io)
+ * v0.35 / 2021-09-22 / Io Engineering (Terje Io)
  *
  */
 
@@ -75,7 +75,7 @@ namespace CNC.Controls
 
         private struct JobData
         {
-            public int CurrLine, PendingLine, PgmEndLine, ACKPending, serialUsed;
+            public int CurrLine, PendingLine, PgmEndLine, ToolChangeLine, ACKPending, serialUsed;
             public bool Started, Complete, IsSDFile;
             public DataRow CurrentRow, NextRow;
         }
@@ -215,6 +215,7 @@ namespace CNC.Controls
                             job.NextRow = null;
                         else
                         {
+                            job.ToolChangeLine = -1;
                             job.CurrLine = job.PendingLine = job.ACKPending = model.BlockExecuting = 0;
                             job.PgmEndLine = GCode.File.Blocks - 1;
                             if ((sender as GrblViewModel).IsPhysicalFileLoaded)
@@ -389,7 +390,7 @@ namespace CNC.Controls
 
         public void CycleStart()
         {
-            if (grblState.State == GrblStates.Hold || (grblState.State == GrblStates.Run && grblState.Substate == 1))
+            if (grblState.State == GrblStates.Hold || (grblState.State == GrblStates.Run && grblState.Substate == 1) || (grblState.State == GrblStates.Door && grblState.Substate == 0))
                 Comms.com.WriteByte(GrblLegacy.ConvertRTCommand(GrblConstants.CMD_CYCLE_START));
             else if(grblState.State == GrblStates.Idle && model.SDRewind) {
                 streamingHandler.Call(StreamingState.Start, false);
@@ -408,8 +409,8 @@ namespace CNC.Controls
             else if (GCode.File.IsLoaded)
             {
                 model.RunTime = "";
-                model.BlockExecuting = -1;
-                job.ACKPending = job.CurrLine = job.ACKPending = job.serialUsed = 0;
+                job.ToolChangeLine = model.BlockExecuting = -1;
+                job.ACKPending = job.CurrLine = job.serialUsed = 0;
                 job.Started = false;
                 job.NextRow = GCode.File.Data.Rows[0];
                 Comms.com.PurgeQueue();
@@ -466,6 +467,7 @@ namespace CNC.Controls
 
                     //                  grdGCode.DataContext = GCode.File.Data.DefaultView;
                     model.ScrollPosition = 0;
+                    job.ToolChangeLine = -1;
                     job.CurrLine = job.PendingLine = job.ACKPending = model.BlockExecuting = 0;
                     job.PgmEndLine = GCode.File.Blocks - 1;
 
@@ -509,9 +511,12 @@ namespace CNC.Controls
                     if (JobTimer.IsRunning)
                     {
                         model.IsJobRunning = true;
-                        GCode.File.Data.Rows[job.PendingLine]["Sent"] = "ok";
+                        if (job.ToolChangeLine >= 0) {
+                            GCode.File.Data.Rows[job.ToolChangeLine]["Sent"] = "ok";
+                            job.ToolChangeLine = -1;
+                        }
                         SetStreamingHandler(StreamingHandler.SendFile);
-                        SendNextLine();
+                       // SendNextLine();
                     }
                     else
                         SetStreamingHandler(StreamingHandler.Previous);
@@ -892,8 +897,12 @@ namespace CNC.Controls
                         if (grblState.State != GrblStates.Jog)
                         {
                             if (JobTimer.IsRunning)
-                                ResponseReceived("pending");
-                            streamingHandler.Call(StreamingState.ToolChange, false);
+                            {
+                                job.ToolChangeLine = job.PendingLine - 1;
+                                GCode.File.Data.Rows[job.ToolChangeLine]["Sent"] = "pending";
+                          //      ResponseReceived("pending");
+                            }
+                            streamingHandler.Call(StreamingState.ToolChange, true);
                             if (!grblState.MPG)
                                 Comms.com.WriteByte(GrblConstants.CMD_TOOL_ACK);
                         }
@@ -908,7 +917,10 @@ namespace CNC.Controls
                     {
                         if (streamingState == StreamingState.Send)
                             streamingHandler.Call(StreamingState.FeedHold, false);
-                    }
+                        else
+                            btnStart.IsEnabled = false;
+                    } else
+                        btnStart.IsEnabled = true;
                     break;
 
                 case GrblStates.Alarm:
@@ -925,7 +937,14 @@ namespace CNC.Controls
         {
             if (streamingHandler.Count)
             {
-                if (job.ACKPending > 0 && response != "pending")
+                //if(response == "pending")
+                //{
+                //    job.ToolChangeLine = job.PendingLine - 1;
+                //    GCode.File.Data.Rows[job.ToolChangeLine]["Sent"] = response;
+                //    return;
+                //}
+
+                if (job.ACKPending > 0)
                     job.ACKPending--;
 
                 if (!job.IsSDFile && (string)GCode.File.Data.Rows[job.PendingLine]["Sent"] == "*")

@@ -1,7 +1,7 @@
 ﻿/*
  * GCodeJob.cs - part of CNC Controls library
  *
- * v0.28 / 2020-10-19 / Io Engineering (Terje Io)
+ * v0.28 / 2020-10-18 / Io Engineering (Terje Io)
  *
  */
 
@@ -204,8 +204,8 @@ namespace CNC.Core
                         BoundingBox.AddBoundingBox((cmd.Token as GCArc).GetBoundingBox(emu.Plane, new double[]{ cmd.Start.X, cmd.Start.Y, cmd.Start.Z }, emu.DistanceMode == DistanceMode.Incremental));
                     else if (cmd.Token is GCSpline)
                         BoundingBox.AddBoundingBox((cmd.Token as GCSpline).GetBoundingBox(emu.Plane, new double[] { cmd.Start.X, cmd.Start.Y, cmd.Start.Z }, emu.DistanceMode == DistanceMode.Incremental));
-                    else
-                        BoundingBox.AddPoint(cmd.End);
+                    else if(cmd.Token is GCAxisCommand6)
+                        BoundingBox.AddPoint(cmd.End, (cmd.Token as GCAxisCommand6).AxisFlags);
                 }
 
                 BoundingBox.Conclude();
@@ -386,6 +386,26 @@ namespace CNC.Core
 
             Min[2] = Math.Min(Min[2], point.Z);
             Max[2] = Math.Max(Max[2], point.Z);
+        }
+        public void AddPoint(Point3D point, AxisFlags axisflags)
+        {
+            if (axisflags.HasFlag(AxisFlags.X))
+            {
+                Min[0] = Math.Min(Min[0], point.X);
+                Max[0] = Math.Max(Max[0], point.X);
+            }
+
+            if (axisflags.HasFlag(AxisFlags.Y))
+            { 
+                Min[1] = Math.Min(Min[1], point.Y);
+                Max[1] = Math.Max(Max[1], point.Y);
+            }
+
+            if (axisflags.HasFlag(AxisFlags.Z))
+            {
+                Min[2] = Math.Min(Min[2], point.Z);
+                Max[2] = Math.Max(Max[2], point.Z);
+            }
         }
 
         public void AddBoundingBox(GcodeBoundingBox bbox)

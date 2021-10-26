@@ -1,7 +1,7 @@
 ﻿/*
  * Grbl.cs - part of CNC Controls library
  *
- * v0.34 / 2021-08-20 / Io Engineering (Terje Io)
+ * v0.35 / 2021-10-20 / Io Engineering (Terje Io)
  *
  */
 
@@ -687,6 +687,7 @@ namespace CNC.Core
             }
         }
         public static Position TravelResolution { get; private set; } = new Position();
+        public static Position MaxTravel { get; private set; } = new Position();
         public static Signals OptionalSignals { get; private set; } = Signals.Off;
         public static AxisFlags AxisFlags { get; private set; } = AxisFlags.None;
         public static int NumTools { get; private set; } = 0;
@@ -701,6 +702,7 @@ namespace CNC.Core
         public static bool HasPIDLog { get; private set; }
         public static bool HasProbe { get; private set; } = true;
         public static bool HomingEnabled { get; internal set; } = true;
+        public static AxisFlags HomingDirection { get; internal set; } = AxisFlags.None;
         public static bool UseLegacyRTCommands { get; internal set; } = true;
         public static bool MPGMode { get; set; }
         public static bool LatheModeEnabled
@@ -821,7 +823,7 @@ namespace CNC.Core
                 {
                     res = WaitFor.SingleEvent<string>(
                     cancellationToken,
-                    null,
+                    OnLegacyStartup,
                     a => model.OnResponseReceived += a,
                     a => model.OnResponseReceived -= a,
                     1500, () => Comms.com.WriteByte((byte)GrblConstants.CMD_STATUS_REPORT_LEGACY[0]));
@@ -836,9 +838,27 @@ namespace CNC.Core
             return Comms.com.Reply;
         }
 
+        private static void DetectNumAxes (string rt_report)
+        {
+            var s = rt_report.Split('|');
+            if (s.Length > 1)
+            {
+                var pos = s[1].Split(':');
+                if (pos[0] == "MPos" || pos[1] == "WPos")
+                    NumAxes = pos[1].Split(',').Length;
+            }
+        }
+
         private static void OnStartup(string data)
         {
-            ExtendedProtocol = data.StartsWith("<");
+            if ((ExtendedProtocol = data.StartsWith("<")))
+                DetectNumAxes(data);
+        }
+
+        private static void OnLegacyStartup(string data)
+        {
+            if (data.StartsWith("<"))
+                DetectNumAxes(data);
         }
 
         private static void Process(string data)
@@ -1977,11 +1997,15 @@ namespace CNC.Core
                 {
                     stepsmm = GetDouble(GrblSetting.TravelResolutionBase + i);
                     GrblInfo.TravelResolution.Values[i++] = 1d / stepsmm;
+                    GrblInfo.MaxTravel.Values[i++] = GetDouble(GrblSetting.MaxTravelBase + i); ;
                 } while (!double.IsNaN(stepsmm) && i < GrblInfo.TravelResolution.Values.Length);
             }
             else foreach (int i in GrblInfo.AxisFlags.ToIndices()) {
                 GrblInfo.TravelResolution.Values[i] = 1d / GetDouble(GrblSetting.TravelResolutionBase + i);
+                GrblInfo.MaxTravel.Values[i] = GetDouble(GrblSetting.MaxTravelBase + i);
             }
+
+            GrblInfo.HomingDirection = (AxisFlags)GetInteger(GrblSetting.HomingDirMask);
 
             return IsLoaded;
         }

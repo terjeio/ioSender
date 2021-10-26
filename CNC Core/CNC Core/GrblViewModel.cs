@@ -1,7 +1,7 @@
 /*
  * GrblViewModel.cs - part of CNC Controls library
  *
- * v0.34 / 2021-08-12 / Io Engineering (Terje Io)
+ * v0.35 / 2021-10-21 / Io Engineering (Terje Io)
  *
  */
 
@@ -50,7 +50,8 @@ namespace CNC.Core
     public class GrblViewModel : MeasureViewModel
     {
         private string _tool, _message, _WPos, _MPos, _wco, _wcs, _a, _fs, _ov, _pn, _sc, _sd, _fans, _d, _gc, _h, _thcv, _thcs;
-        private string _mdiCommand, _fileName, _rtState, _rtStateEx;
+        private string _mdiCommand, _fileName;
+        private string[] _rtState = new string[3];
         private bool has_wco = false, suspend = false, _hasFans = false;
         private bool _flood, _mist, _fan0, _toolChange, _reset, _isMPos, _isJobRunning, _isProbeSuccess, _pgmEnd, _isParserStateLive, _isTloRefSet;
         private bool _canReset, _isCameraVisible = false, _responseLogVerbose = false;
@@ -171,7 +172,7 @@ namespace CNC.Core
             _streamingState = StreamingState.NoFile;
             _isMPos = _reset = _isJobRunning = _isProbeSuccess = _pgmEnd = _isTloRefSet = false;
             _canReset = true;
-            _pb_avail = _rxb_avail = _rtState = _rtStateEx = string.Empty;
+            _pb_avail = _rxb_avail = _rtState[0] = _rtState[1] = _rtState[2] = string.Empty;
             _mpg = null;
             _line = _pwm = _scrollpos = 0;
             _auxinValue = -2; // No value read (use a nullable type?)
@@ -608,8 +609,7 @@ namespace CNC.Core
                         break;
 
                     case GrblStates.Door:
-                        if (_grblState.Substate > 0)
-                            _grblState.Color = _grblState.Substate == 1 ? Colors.Red : Colors.LightSalmon;
+                        _grblState.Color = _grblState.Substate == 0 ? Colors.LightSalmon :(_grblState.Substate == 1 ? Colors.Red : Colors.Beige);
                         break;
 
                     case GrblStates.Home:
@@ -698,16 +698,14 @@ namespace CNC.Core
         public bool ParseStatus(string data)
         {
             bool changed, wco_present = data.Contains("|WCO:");
+            int rti = data.Contains("|WCO:") ? 1 : (data.Contains("|Ov:") ? 2 : 0);
 
-            if((changed = (wco_present ? _rtStateEx : _rtState) != data)) {
+            if ((changed = (_rtState[rti] != data))) {
 
                 bool pos_changed = false;
                 string[] elements = data.TrimEnd('>').Split('|');
 
-                if(wco_present)
-                    _rtStateEx = data;
-                else
-                    _rtState = data;
+                _rtState[rti] = data;
 
                 if (elements.Length > 1)
                 {
@@ -1025,7 +1023,7 @@ namespace CNC.Core
 
         private bool DataIsEnumeration (string data)
         {
-            return data.StartsWith("[SETTING:") || data.StartsWith("[ERRORCODE:") || data.StartsWith("[ALARMCODE:") || data.StartsWith("[SETTINGGROUP:");
+            return data.StartsWith("[SETTING:") || data.StartsWith("[ERRORCODE:") || data.StartsWith("[ALARMCODE:") || data.StartsWith("[SETTINGGROUP:") || data.StartsWith("[SETTINGDESCR:");
         }
 
         public void DataReceived(string data)
@@ -1053,7 +1051,7 @@ namespace CNC.Core
 
                 SetGRBLState("Alarm", alarm.Length == 2 ? int.Parse(alarm[1]) : -1, false);
             }
-            else if (data.StartsWith("["))
+            else if (data.First() == '[')
             {
                 int sep = data.IndexOf(':');
                 if(sep > 1) switch (data.Substring(1, sep - 1))

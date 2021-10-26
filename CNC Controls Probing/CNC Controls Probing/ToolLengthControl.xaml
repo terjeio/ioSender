@@ -20,33 +20,33 @@
     <Grid>
         <StackPanel Margin="5" HorizontalAlignment="Left" VerticalAlignment="Top">
             <StackPanel Orientation="Horizontal" Margin="10,10,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
-                <CheckBox Content="Probe fixture @ G59.3" IsEnabled="{Binding Path=HasCoordinateSystem9}" IsChecked="{Binding Path=ProbeFixture, Mode=TwoWay}" VerticalAlignment="Center"/>
-                <Label Content="with tool:"></Label>
+                <CheckBox x:Uid="lbl_probeFixture" Content="Probe fixture @ G59.3" IsEnabled="{Binding Path=HasCoordinateSystem9}" IsChecked="{Binding Path=ProbeFixture, Mode=TwoWay}" VerticalAlignment="Center"/>
+                <Label x:Uid="lbl_withTool" Content="with tool:"></Label>
                 <Controls:NumericComboBox Margin="2,2" DisplayMemberPath="Code" SelectedValuePath="Code" ItemsSource="{Binding Path=Grbl.Tools}" SelectedValue="{Binding Path=Tool, Mode=TwoWay}" IsEnabled="{Binding Path=HasToolTable}" Format="##0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="56" Height="22"/>
             </StackPanel>
-            <CheckBox Content="Establish reference offset" IsChecked="{Binding Path=ReferenceToolOffset, Mode=TwoWay}" IsEnabled="{Binding Path=CanReferenceToolOffset}" Margin="10,0,0,0" VerticalAlignment="Center"/>
+            <CheckBox x:Uid="lbl_setRefernecOffset" Content="Establish reference offset" IsChecked="{Binding Path=ReferenceToolOffset, Mode=TwoWay}" IsEnabled="{Binding Path=CanReferenceToolOffset}" Margin="10,0,0,0" VerticalAlignment="Center"/>
             <Border Margin="5,10,0,0" Visibility="{Binding Path=Grbl.IsToolOffsetActive, Converter={StaticResource IsVisibleConverter}}" Background="Salmon" HorizontalAlignment="Left" VerticalAlignment="Center" CornerRadius="2" Width="156" Height="28">
-                <Button Content="Clear tool length offset" HorizontalAlignment="Center" VerticalAlignment="Center" Width="150" Height="22" Click="clearToolOffset_Click"/>
+                <Button x:Uid="lbl_clearToolOffset" Content="Clear tool length offset" HorizontalAlignment="Center" VerticalAlignment="Center" Width="150" Height="22" Click="clearToolOffset_Click"/>
             </Border>
-            <GroupBox Header="Workpiece offset" Visibility="{Binding Path=ProbeFixture, Converter={StaticResource IsNotVisibleConverter}}" Margin="5,5,0,0">
+            <GroupBox x:Uid="grp_workpieceOffset" Header="Workpiece offset" Visibility="{Binding Path=ProbeFixture, Converter={StaticResource IsNotVisibleConverter}}" Margin="5,5,0,0">
                 <StackPanel>
-                    <CheckBox Content="Add offset" IsChecked="{Binding Path=AddAction, Mode=TwoWay}"  Margin="5,7,0,5" VerticalAlignment="Center"/>
+                    <CheckBox x:Uid="lbl_addOffset" Content="Add offset" IsChecked="{Binding Path=AddAction, Mode=TwoWay}"  Margin="5,7,0,5" VerticalAlignment="Center"/>
                     <StackPanel Orientation="Horizontal">
                         <local:CsSelectControl IsEnabled="{Binding Path=AddAction}" Margin="5,0,0,0"/>
-                        <GroupBox Header="Workpiece">
+                        <GroupBox x:Uid="grp_workpiece" Header="Workpiece">
                             <Controls:NumericField Label="Height" Value="{Binding Path=WorkpieceHeight, Mode=TwoWay}" IsEnabled="{Binding Path=AddAction}" Margin="0,5,85,0" VerticalAlignment="Top"/>
                         </GroupBox>
                     </StackPanel>
                 </StackPanel>
             </GroupBox>
             <StackPanel Visibility="{Binding Path=ProbeFixture, Converter={StaticResource IsVisibleConverter}}" Margin="10,5,0,0">
-                <CheckBox Content="Set coordinate system or offset" IsChecked="{Binding Path=AddAction, Mode=TwoWay}" VerticalAlignment="Center"/>
+                <CheckBox x:Uid="lbl_setCoordOrOffset" Content="Set coordinate system or offset" IsChecked="{Binding Path=AddAction, Mode=TwoWay}" VerticalAlignment="Center"/>
                 <local:CsSelectControl IsEnabled="{Binding Path=AddAction}"/>
             </StackPanel>
         </StackPanel>
         <StackPanel Margin="5,0,0,5" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Height="Auto" Width="Auto">
-            <Button Content="Start" IsEnabled="{Binding Path=Grbl.IsJobRunning, Converter={StaticResource IsNotRunningConverter}}" Margin="2,0" Width="75" Click="start_Click"/>
-            <Button Content="Stop" IsEnabled="{Binding Path=Grbl.IsJobRunning}" Margin="2,0" Width="75" Click="stop_Click"/>
+            <Button x:Uid="btn_start" Content="Start" IsEnabled="{Binding Path=Grbl.IsJobRunning, Converter={StaticResource IsNotRunningConverter}}" Margin="2,0" Width="75" Click="start_Click"/>
+            <Button x:Uid="btn_stop" Content="Stop" IsEnabled="{Binding Path=Grbl.IsJobRunning}" Margin="2,0" Width="75" Click="stop_Click"/>
         </StackPanel>
     </Grid>
 </UserControl>

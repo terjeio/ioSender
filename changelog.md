@@ -2,6 +2,24 @@
 
 Executable for development builds available for download [here](http://www.io-engineering.com/downloads/) if you want to participate in testing.
 
+---
+
+2021-10-26: [Release 2.0.35](https://github.com/terjeio/Grbl-GCode-Sender/releases/tag/2.0.35).
+
+* Added support for localization \(translation\) see the [Wiki](https://github.com/terjeio/ioSender/wiki/Localization) for details.
+* Added `-locale` startup parameter for overriding the default language read from the OS.
+* Added sender configuration for not checking probe state before probing @G59.3, if probe is asserted it will result in alarm that has to be cleared.
+* Added signals box to Trinamic tuner.
+* Changed keyboard jogging to always use metric mode.
+* Limit keyboard jog commands to be within machine limits if not handled by the controller.  
+__NOTES:__ Machine has to be homed for this to work properly, N_KEY rollower is not supported neither is fast tapping of keys.  
+grblHAL users should set `$40` to `1` for the best keyboard jogging functionality.
+* Added description to com ports selection drop-down.
+* Improved program limits calculation.
+* Some minor bug fixes.
+
+---
+
 2021-08-20: [Release 2.0.34](https://github.com/terjeio/Grbl-GCode-Sender/releases/tag/2.0.34).
 
 Sender:
@@ -16,6 +34,8 @@ Config app:
 
 * Updated for latest libraries.
 * Added fetch and save of settings information for sender use in Grbl- and grblHAL-format. Requires grblHAL controller build 20210819 or later.
+
+---
 
 2021-05-16: [Release 2.0.33](https://github.com/terjeio/Grbl-GCode-Sender/releases/tag/2.0.33).
 
