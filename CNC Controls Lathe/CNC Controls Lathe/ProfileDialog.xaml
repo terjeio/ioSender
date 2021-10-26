@@ -7,8 +7,8 @@
         xmlns:Controls="clr-namespace:CNC.Controls;assembly=CNC.Controls.WPF" x:Class="CNC.Controls.Lathe.ProfileDialog"
         xmlns:DialogConverters="clr-namespace:CNC.Controls.Lathe"
         mc:Ignorable="d"
-        Title="Lathe Profile" Height="390" Width="430"
-        Loaded="Window_Loaded" Icon="App.ico" ResizeMode="NoResize">
+        Title="Lathe Profile" Height="375" Width="430"
+        Loaded="Window_Loaded" Icon="App.ico" ResizeMode="NoResize" ShowInTaskbar="False" WindowStartupLocation="CenterOwner">
     <Window.Resources>
         <DialogConverters:LatheModeRadiusBoolConverter x:Key="RadiusConverter" />
         <DialogConverters:LatheModeDiameterBoolConverter x:Key="DiameterConverter" />
@@ -38,16 +38,16 @@
                 <Controls:NumericField x:Name="cvZClearance" Label="Z-Axis:" Value="{Binding Path=ZClearance, Mode=TwoWay}"/>
             </StackPanel>
         </GroupBox>
-        <GroupBox x:Name="grpXMode" Header="X-axis" HorizontalAlignment="Left" Margin="22,250,0,0" VerticalAlignment="Top" Height="50" Width="390">
+        <Controls:NumericField x:Name="cvRPM" Label="Spindle:" Format="###0" Value="{Binding Path=RPM, Mode=TwoWay}" Visibility="{Binding Path=rpmVisibility}" Unit="RPM" Margin="216,193,0,0" VerticalAlignment="Top"/>
+        <local:CssControl x:Name="css" IsCssEnabled="{Binding Path=CSS, Mode=TwoWay}" Value="{Binding Path=RPM, Mode=TwoWay}" Visibility="{Binding Path=threadVisibility}" HorizontalAlignment="Left" Margin="26,193,0,0" VerticalAlignment="Top"/>
+        <Controls:NumericField x:Name="cvCSSMaxRPM" Label="Max:" Format="###0" Value="{Binding Path=CSSMaxRPM, Mode=TwoWay}" Unit="RPM" HorizontalAlignment="Left" Margin="216,220,0,0" VerticalAlignment="Top"/>
+        <GroupBox x:Name="grpXMode" Header="X-axis" HorizontalAlignment="Left" Margin="22,245,0,0" VerticalAlignment="Top" Height="50" Width="390">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Height="25" Margin="5,0,0,0" VerticalAlignment="Top" Width="370">
-                <RadioButton x:Name="btnRadius" Content="Radius mode" IsChecked="{Binding Path=xmode, Mode=TwoWay, Converter={StaticResource RadiusConverter}}" IsEnabled="{Binding Path=xmodeenabled}" HorizontalAlignment="Left" Height="18" Margin="20,10,0,0" VerticalAlignment="Top"/>
-                <RadioButton x:Name="btnDiameter" Content="Diameter mode" IsChecked="{Binding Path=xmode, Mode=TwoWay, Converter={StaticResource DiameterConverter}}" IsEnabled="{Binding Path=xmodeenabled}" HorizontalAlignment="Left" Height="18" Margin="20,10,0,0" VerticalAlignment="Top"/>
+                <RadioButton x:Name="btnRadius" Content="Radius mode" IsChecked="{Binding Path=xmode, Mode=TwoWay, Converter={StaticResource RadiusConverter}}" IsEnabled="{Binding Path=xmodeenabled}" HorizontalAlignment="Left" Height="18" Margin="20,6,0,0" VerticalAlignment="Top"/>
+                <RadioButton x:Name="btnDiameter" Content="Diameter mode" IsChecked="{Binding Path=xmode, Mode=TwoWay, Converter={StaticResource DiameterConverter}}" IsEnabled="{Binding Path=xmodeenabled}" HorizontalAlignment="Left" Height="18" Margin="20,6,0,0" VerticalAlignment="Top"/>
             </StackPanel>
         </GroupBox>
-        <Controls:NumericField x:Name="cvRPM" Label="Spindle:" Format="####0" Value="{Binding Path=RPM, Mode=TwoWay}" Visibility="{Binding Path=rpmVisibility}" Unit="RPM" Margin="220,193,0,0" VerticalAlignment="Top"/>
-        <local:CssControl x:Name="css" IsCssEnabled="{Binding Path=CSS, Mode=TwoWay}" Value="{Binding Path=RPM, Mode=TwoWay}" Visibility="{Binding Path=threadVisibility}" HorizontalAlignment="Left" Margin="26,193,0,0" VerticalAlignment="Top"/>
-        <Controls:NumericField x:Name="cvCSSMaxRPM" Label="Max:" Format="#####" Value="{Binding Path=CSSMaxRPM, Mode=TwoWay}" Unit="RPM" HorizontalAlignment="Left" Margin="221,225,0,0" VerticalAlignment="Top"/>
-        <Button x:Name="btnOk" Content="Ok" HorizontalAlignment="Left" Margin="112,315,0,0" VerticalAlignment="Top" Width="75" Click="btnOk_Click"/>
-        <Button x:Name="btnCancel" Content="Cancel" HorizontalAlignment="Left" Margin="212,315,0,0" VerticalAlignment="Top" Width="75" Click="btnCancel_Click"/>
+        <Button x:Name="btnOk" Content="Ok" HorizontalAlignment="Left" Margin="112,305,0,0" VerticalAlignment="Top" Width="75" Click="btnOk_Click"/>
+        <Button x:Name="btnCancel" Content="Cancel" HorizontalAlignment="Left" Margin="212,305,0,0" VerticalAlignment="Top" Width="75" Click="btnCancel_Click"/>
     </Grid>
 </Window>

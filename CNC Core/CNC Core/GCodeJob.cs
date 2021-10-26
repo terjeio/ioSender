@@ -1,13 +1,13 @@
 ﻿/*
  * GCodeJob.cs - part of CNC Controls library
  *
- * v0.02 / 2019-09-31 / Io Engineering (Terje Io)
+ * v0.28 / 2020-10-18 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2019, Io Engineering (Terje Io)
+Copyright (c) 2018-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -44,6 +44,7 @@ using System.IO;
 using System.ComponentModel;
 using System.Windows;
 using CNC.GCode;
+using System.Windows.Media.Media3D;
 
 namespace CNC.Core
 {
@@ -58,7 +59,7 @@ namespace CNC.Core
     {
 //         public SpindleState BBB;
 
-        uint LineNumber = 0;
+        uint LineNumber = 1;
 
         private string filename = string.Empty;
         private DataTable gcode = new DataTable("GCode");
@@ -77,6 +78,7 @@ namespace CNC.Core
             gcode.Columns.Add("Data", typeof(string));
             gcode.Columns.Add("Length", typeof(int));
             gcode.Columns.Add("File", typeof(bool));
+            gcode.Columns.Add("IsComment", typeof(bool));
             gcode.Columns.Add("ProgramEnd", typeof(bool));
             gcode.Columns.Add("Sent", typeof(string));
             gcode.Columns.Add("Ok", typeof(bool));
@@ -94,6 +96,8 @@ namespace CNC.Core
 
         public DataTable Data { get { return gcode; } }
         public bool Loaded { get { return gcode.Rows.Count > 0; } }
+        public bool HeightMapApplied { get; set; }
+
         public List<GCodeToken> Tokens { get { return Parser.Tokens; } }
         public GcodeBoundingBox BoundingBox { get; private set; } = new GcodeBoundingBox();
         public GCodeParser Parser { get; private set; } = new GCodeParser();
@@ -103,35 +107,38 @@ namespace CNC.Core
 
         public bool LoadFile(string filename)
         {
-            bool ok = true, end;
+            bool ok = true, isComment;
 
             FileInfo file = new FileInfo(filename);
 
             StreamReader sr = file.OpenText();
 
-            string s = sr.ReadLine();
+            string block = sr.ReadLine();
 
             AddBlock(filename, Action.New);
 
-            while (s != null)
+            while (block != null)
             {
                 try
                 {
-                    if (Parser.ParseBlock(s.Trim(), false))
+                    block = block.Trim();
+                    if (Parser.ParseBlock(ref block, false, out isComment))
                     {
-                        end = s == "M30" || s == "M2" || s == "M02";
-                        gcode.Rows.Add(new object[] { LineNumber++, s, s.Length + 1, true, end, "", false });
+                        gcode.Rows.Add(new object[] { LineNumber++, block, block.Length + 1, true, isComment, Parser.ProgramEnd, "", false });
                         while (commands.Count > 0)
-                            gcode.Rows.Add(new object[] { LineNumber++, commands.Dequeue(), 20, true, false, "", false });
+                        {
+                            block = commands.Dequeue();
+                            gcode.Rows.Add(new object[] { LineNumber++, block, block.Length + 1, true, false, false, "", false });
+                        }
                     }
-                    s = sr.ReadLine();
+                    block = sr.ReadLine();
                 }
                 catch (Exception e)
                 {
-                    if ((ok = MessageBox.Show(string.Format("Line: {0}\rBlock: \"{1}\"\r\rContinue loading?", LineNumber, s), e.Message, MessageBoxButton.YesNo ) == MessageBoxResult.Yes))
-                        s = sr.ReadLine();
+                    if ((ok = MessageBox.Show(string.Format("Line: {0}\rBlock: \"{1}\"\r\rContinue loading?", LineNumber, block), e.Message, MessageBoxButton.YesNo) == MessageBoxResult.Yes))
+                        block = sr.ReadLine();
                     else
-                        s = null;
+                        block = null;
                 }
             }
 
@@ -161,11 +168,16 @@ namespace CNC.Core
             }
             else if (block != null && block.Trim().Length > 0) try
             {
-                if (Parser.ParseBlock(block.Trim(), false))
+                bool isComment;
+                block = block.Trim();
+                if (Parser.ParseBlock(ref block, false, out isComment))
                 {
-                    gcode.Rows.Add(new object[] { LineNumber++, block, block.Length + 1, true, Parser.ProgramEnd, "", false });
+                    gcode.Rows.Add(new object[] { LineNumber++, block, block.Length + 1, true, isComment, Parser.ProgramEnd, "", false });
                     while (commands.Count > 0)
-                        gcode.Rows.Add(new object[] { LineNumber++, commands.Dequeue(), 20, true, false, "", false });
+                    {
+                        block = commands.Dequeue();
+                        gcode.Rows.Add(new object[] { LineNumber++, block, block.Length + 1, true, false, false, "", false });
+                    }
                 }
             }
             catch //(Exception e)
@@ -177,30 +189,41 @@ namespace CNC.Core
             {
                 gcode.EndLoadData();
 
-        //        GCodeParser.Save(@"d:\tokens.xml", Tokens);
+#if DEBUG
+                System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
+                stopWatch.Start();
+#endif
 
-                foreach (GCodeToken token in Tokens)
+                // Calculate program limits (bounding box)
+
+                GCodeEmulator emu = new GCodeEmulator(true);
+
+                foreach (var cmd in emu.Execute(Tokens))
                 {
-                    //min_feed = Math.Min(min_feed, token.f);
-                    //max_feed = Math.Max(max_feed, token.f);
-                    if(token is GCLinearMotion)
-                        BoundingBox.AddPoint(((GCLinearMotion)token).X, ((GCLinearMotion)token).Y, ((GCLinearMotion)token).Z);
-                    else if (token is GCArc)
-                        BoundingBox.AddPoint(((GCArc)token).X, ((GCArc)token).Y, ((GCArc)token).Z); // Expand...
-                    else if (token is GCCannedDrill)
-                        BoundingBox.AddPoint(((GCCannedDrill)token).X, ((GCCannedDrill)token).Y, ((GCCannedDrill)token).Z);
+                    if(cmd.Token is GCArc)
+                        BoundingBox.AddBoundingBox((cmd.Token as GCArc).GetBoundingBox(emu.Plane, new double[]{ cmd.Start.X, cmd.Start.Y, cmd.Start.Z }, emu.DistanceMode == DistanceMode.Incremental));
+                    else if (cmd.Token is GCSpline)
+                        BoundingBox.AddBoundingBox((cmd.Token as GCSpline).GetBoundingBox(emu.Plane, new double[] { cmd.Start.X, cmd.Start.Y, cmd.Start.Z }, emu.DistanceMode == DistanceMode.Incremental));
+                    else if(cmd.Token is GCAxisCommand6)
+                        BoundingBox.AddPoint(cmd.End, (cmd.Token as GCAxisCommand6).AxisFlags);
                 }
 
-                if (max_feed == double.MinValue)
-                {
-                    min_feed = 0.0;
-                    max_feed = 0.0;
-                }
+                BoundingBox.Conclude();
 
-                BoundingBox.Normalize();
+#if DEBUG
+                stopWatch.Stop();
+#endif
+
+                //GCodeParser.Save(@"d:\tokens.xml", Parser.Tokens);
+                //GCodeParser.Save(@"d:\file.nc", GCodeParser.TokensToGCode(Parser.Tokens));
 
                 FileChanged?.Invoke(filename);
             }
+        }
+
+        public void AddBlock(string block)
+        {
+            AddBlock(block, Action.Add);
         }
 
         public void CloseFile()
@@ -222,11 +245,10 @@ namespace CNC.Core
             min_feed = double.MaxValue;
             max_feed = double.MinValue;
             BoundingBox.Reset();
-            LineNumber = 0;
+            LineNumber = 1;
+            HeightMapApplied = false;
             Parser.Reset();
         }
-
-        // IMPORTANT: block must be terminated with \r
     }
 
     public class ProgramLimits : ViewModelBase
@@ -293,6 +315,7 @@ namespace CNC.Core
     {
         public double[] Min = new double[6];
         public double[] Max = new double[6];
+        public double[] Size = new double[6];
 
         public GcodeBoundingBox()
         {
@@ -308,7 +331,17 @@ namespace CNC.Core
             }
         }
 
-        public void AddPoint(double x, double y, double z)
+        public void Conclude()
+        {
+            for (int i = 0; i < Min.Length; i++)
+            {
+                if (Max[i] == double.MinValue)
+                    Min[i] = Max[i] = 0.0;
+                Size[i] = Math.Abs(Max[i] - Min[i]);
+            }
+        }
+
+        private void AddPoint(double x, double y, double z)
         {
             Min[0] = Math.Min(Min[0], x);
             Max[0] = Math.Max(Max[0], x);
@@ -320,16 +353,65 @@ namespace CNC.Core
             Max[2] = Math.Max(Max[2], z);
         }
 
-        public void Normalize()
+        public void AddPoint(GCPlane plane, double x, double y, double z)
         {
-            if (Max[0] == double.MinValue)
-                Min[0] = Max[0] = 0.0;
+            Min[plane.Axis0] = Math.Min(Min[plane.Axis0], x);
+            Max[plane.Axis0] = Math.Max(Max[plane.Axis0], x);
 
-            if (Max[1] == double.MinValue)
-                Min[1] = Max[1] = 0.0;
+            Min[plane.Axis1] = Math.Min(Min[plane.Axis1], y);
+            Max[plane.Axis1] = Math.Max(Max[plane.Axis1], y);
 
-            if (Max[2] == double.MinValue)
-                Min[2] = Max[2] = 0.0;
+            Min[plane.AxisLinear] = Math.Min(Min[plane.AxisLinear], z);
+            Max[plane.AxisLinear] = Math.Max(Max[plane.AxisLinear], z);
+        }
+        public void AddPoint(GCPlane plane, Point3D point)
+        {
+            Min[plane.Axis0] = Math.Min(Min[plane.Axis0], point.X);
+            Max[plane.Axis0] = Math.Max(Max[plane.Axis0], point.X);
+
+            Min[plane.Axis1] = Math.Min(Min[plane.Axis1], point.Y);
+            Max[plane.Axis1] = Math.Max(Max[plane.Axis1], point.Y);
+
+            Min[plane.AxisLinear] = Math.Min(Min[plane.AxisLinear], point.Z);
+            Max[plane.AxisLinear] = Math.Max(Max[plane.AxisLinear], point.Z);
+        }
+
+        public void AddPoint(Point3D point)
+        {
+            Min[0] = Math.Min(Min[0], point.X);
+            Max[0] = Math.Max(Max[0], point.X);
+
+            Min[1] = Math.Min(Min[1], point.Y);
+            Max[1] = Math.Max(Max[1], point.Y);
+
+            Min[2] = Math.Min(Min[2], point.Z);
+            Max[2] = Math.Max(Max[2], point.Z);
+        }
+        public void AddPoint(Point3D point, AxisFlags axisflags)
+        {
+            if (axisflags.HasFlag(AxisFlags.X))
+            {
+                Min[0] = Math.Min(Min[0], point.X);
+                Max[0] = Math.Max(Max[0], point.X);
+            }
+
+            if (axisflags.HasFlag(AxisFlags.Y))
+            { 
+                Min[1] = Math.Min(Min[1], point.Y);
+                Max[1] = Math.Max(Max[1], point.Y);
+            }
+
+            if (axisflags.HasFlag(AxisFlags.Z))
+            {
+                Min[2] = Math.Min(Min[2], point.Z);
+                Max[2] = Math.Max(Max[2], point.Z);
+            }
+        }
+
+        public void AddBoundingBox(GcodeBoundingBox bbox)
+        {
+            AddPoint(bbox.Min[0], bbox.Min[1], bbox.Min[2]);
+            AddPoint(bbox.Max[0], bbox.Max[1], bbox.Max[2]);
         }
     }
 }

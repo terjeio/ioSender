@@ -1,13 +1,13 @@
 ﻿/*
  * App.xaml.cs - part of Grbl Code Sender
  *
- * v0.02 / 2019-10-02 / Io Engineering (Terje Io)
+ * v0.35 / 2021-09-30 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019, Io Engineering (Terje Io)
+Copyright (c) 2019-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -38,12 +38,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Globalization;
+using System.Threading;
 using System.Windows;
+using System.Windows.Markup;
 
 namespace GCode_Sender
 {
@@ -52,5 +50,30 @@ namespace GCode_Sender
     /// </summary>
     public partial class App : Application
     {
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            string[] args = Environment.GetCommandLineArgs();
+
+            int p = 0, lng = 0;
+            while (p < args.GetLength(0)) switch (args[p++])
+            {
+                case "-locale":
+                    if (p < args.GetLength(0))
+                        lng = p;
+                    break;
+            }
+
+            if (lng > 0)
+            {
+                Thread.CurrentThread.CurrentUICulture =
+                 Thread.CurrentThread.CurrentCulture =
+                  CultureInfo.DefaultThreadCurrentCulture =
+                   CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo(args[lng]); ;
+
+                FrameworkElement.LanguageProperty.OverrideMetadata(typeof(FrameworkElement), new FrameworkPropertyMetadata(XmlLanguage.GetLanguage(CultureInfo.CurrentCulture.IetfLanguageTag)));
+            }
+
+            base.OnStartup(e);
+        }
     }
 }

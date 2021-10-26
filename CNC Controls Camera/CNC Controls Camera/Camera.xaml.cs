@@ -1,13 +1,13 @@
 ﻿/*
- * Camera.xaml.cs - part of CNC Controls library
+ * Camera.xaml.cs - part of CNC Controls Camera library
  *
- * v0.01 / 2019-10-13 / Io Engineering (Terje Io)
+ * v0.33 / 2021-05-04 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2019, Io Engineering (Terje Io) - parts derived from AForge example code
+Copyright (c) 2018-2021, Io Engineering (Terje Io) - parts derived from AForge example code
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -44,30 +44,42 @@ namespace CNC.Controls.Camera
     /// <summary>
     /// Interaction logic for Camera.xaml
     /// </summary>
-    public partial class Camera : Window
+    public partial class Camera : Window, ICamera
     {
         private bool initialOpen = true, userClosing = true;
 
-        public delegate void OpenedHandler();
-        public event OpenedHandler Opened;
+        public event IsVisibilityChangedHandler IsVisibilityChanged;
+        public event CameraMoveOffsetHandler MoveOffset;
 
         public Camera()
         {
             InitializeComponent();
+
+            CNCCamera.MoveOffset += CNCCamera_MoveOffset;
         }
 
-        public CameraControl CameraControl { get { return CNCCamera; } }
-
-        public void ApplySettings(CameraConfig config)
+        private void CNCCamera_MoveOffset(Core.CameraMoveMode Mode, double XOffset, double YOffset)
         {
+            MoveOffset?.Invoke(Mode, XOffset, YOffset);
+        }
+
+        public bool HasCamera { get { return CNCCamera.HasCamera; } }
+        public CameraControl CameraControl { get { return CNCCamera; } }
+        public new bool IsVisible { get { return CNCCamera.IsVisible; } }
+
+        public void Setup(UIViewModel model)
+        {
+            CameraConfig config = AppConfig.Settings.Camera;
+            CameraControl.GuideScale = config.GuideScale;
             CameraControl.XOffset = config.XOffset;
             CameraControl.YOffset = config.YOffset;
             CameraControl.Mode = config.MoveMode;
+
+            model.ConfigControls.Add(new ConfigControl());
         }
 
         public void Open()
         {
-
             if (initialOpen)
             {
                 initialOpen = false;
@@ -77,8 +89,8 @@ namespace CNC.Controls.Camera
 
             Show();
 
-            if(CNCCamera.OpenVideoSource())
-                Opened?.Invoke();
+            if (CNCCamera.OpenVideoSource())
+                IsVisibilityChanged?.Invoke();
         }
 
         public void CloseCamera()
@@ -88,13 +100,15 @@ namespace CNC.Controls.Camera
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if(userClosing)
+            if (userClosing)
             {
                 e.Cancel = true;
                 Hide();
             }
             else
                 CNCCamera.CloseCurrentVideoSource();
+
+            IsVisibilityChanged?.Invoke();
         }
     }
 }

@@ -9,46 +9,56 @@
              mc:Ignorable="d" 
              d:DesignHeight="515" d:DesignWidth="875">
     <UserControl.Resources>
-        <Converters:StringCollectionToTextConverter x:Key="GCodeConverter" />
+        <Controls:StringCollectionToTextConverter x:Key="GCodeConverter"/>
+        <Style x:Key="CNCValue" TargetType="Controls:NumericField">
+            <Setter Property="Format" Value="{Binding Path=Format, Mode=OneWay}"/>
+            <Setter Property="Unit" Value="{Binding Path=Unit, Mode=OneWay}"/>
+        </Style>
     </UserControl.Resources>
     <Grid>
         <local:ProfileControl x:Name="cbxProfile" ItemsSource="{Binding Path=Profiles}" SelectedItem="{Binding Path=Profile, Mode=TwoWay}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Height="30" Margin="20,50,0,0" VerticalAlignment="Top" Width="436">
-            <Controls:NumericField x:Name="cvStart" Label="Start Z:" Value="{Binding Path=ZStart, Mode=TwoWay}" Unit="{Binding Path=Unit, Mode=OneWay}"/>
-            <Controls:NumericField x:Name="cvLength" Label="Length:" Value="{Binding Path=ZLength, Mode=TwoWay}" Unit="{Binding Path=Unit, Mode=OneWay}"/>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Height="30" Margin="10,50,0,0" VerticalAlignment="Top" Width="436">
+            <Controls:NumericField x:Name="cvStart" Label="Start Z:" Value="{Binding Path=ZStart, Mode=TwoWay}" Style="{StaticResource CNCValue}"/>
+            <Controls:NumericField x:Name="cvLength" Label="Length:" Value="{Binding Path=ZLength, Mode=TwoWay}" Style="{StaticResource CNCValue}"/>
         </StackPanel>
-        <GroupBox x:Name="groupBox" Header="Diameter" HorizontalAlignment="Left" Margin="20,85,0,0" VerticalAlignment="Top" Height="95" Width="585">
+        <GroupBox x:Name="groupBox" Header="Diameter" HorizontalAlignment="Left" Margin="10,85,0,0" VerticalAlignment="Top" Height="95" Width="585">
             <StackPanel HorizontalAlignment="Left" Height="Auto" VerticalAlignment="Top" Width="580">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Height="30" VerticalAlignment="Top" Width="580">
-                    <Controls:NumericField x:Name="cvDiameter" Label="Current" Value="{Binding Path=XStart, Mode=TwoWay}" Unit="{Binding Path=Unit, Mode=OneWay}" ToolTip="Current measured diameter of stock."/>
-                    <Controls:NumericField x:Name="cvTargetX" Label="Target" Value="{Binding Path=XTarget, Mode=TwoWay}" Unit="{Binding Path=Unit, Mode=OneWay}"/>
-                    <Controls:NumericField x:Name="cvClearanceX" Label="Clearance" Value="{Binding Path=XClearance, Mode=TwoWay}" Unit="{Binding Path=Unit, Mode=OneWay}"/>
+                    <Controls:NumericField x:Name="cvDiameter" Label="Current" Value="{Binding Path=XStart, Mode=TwoWay}" Style="{StaticResource CNCValue}" ToolTip="Current measured diameter of stock."/>
+                    <Controls:NumericField x:Name="cvTargetX" Label="Target" Value="{Binding Path=XTarget, Mode=TwoWay}" Style="{StaticResource CNCValue}"/>
+                    <Controls:NumericField x:Name="cvClearanceX" Label="Clearance" Value="{Binding Path=XClearance, Mode=TwoWay}" Style="{StaticResource CNCValue}"/>
                 </StackPanel>
                 <local:TaperControl x:Name="taper" Value="{Binding Taper, Mode=TwoWay}" IsTaperEnabled="{Binding IsTaperEnabled, Mode=TwoWay}" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" ToolTip="Degrees from centerline."/>
             </StackPanel>
         </GroupBox>
-        <GroupBox x:Name="groupBox2" Header="Cut depths and feed rates" HorizontalAlignment="Left" Margin="20,185,0,0" VerticalAlignment="Top" Height="95" Width="585">
+        <GroupBox x:Name="groupBox2" Header="Cut depths and feed rates" HorizontalAlignment="Left" Margin="10,185,0,0" VerticalAlignment="Top" Height="95" Width="585">
             <StackPanel HorizontalAlignment="Left" Height="Auto" VerticalAlignment="Top" Width="580">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Height="30" VerticalAlignment="Top" Width="580">
-                    <Controls:NumericField x:Name="cvPassDepth" Label="Pass depth:" Value="{Binding Path=Passdepth, Mode=TwoWay}"  ToolTip="Same for radius and diameter mode."/>
-                    <Controls:NumericField x:Name="cvFeedRate" Label="Feed rate:" Value="{Binding Path=FeedRate, Mode=TwoWay}"/>
-                    <local:SpringPassControl x:Name="springPasses" Value="{Binding Path=SpringPasses, Mode=TwoWay}"/>
+                    <Controls:NumericField x:Name="cvPassDepth" Style="{StaticResource CNCValue}" Label="Pass depth:" Value="{Binding Path=Passdepth, Mode=TwoWay}"  ToolTip="Same for radius and diameter mode."/>
+                    <Controls:NumericField x:Name="cvFeedRate" Label="Feed rate:" Value="{Binding Path=FeedRate, Mode=TwoWay}" Unit="{Binding Path=FeedrateUnit}"/>
+                    <local:SpringPassControl x:Name="springPasses" Value="{Binding Path=SpringPasses, Mode=TwoWay}" IsPassesEnabled="{Binding Path=IsSpringPassesEnabled, Mode=TwoWay}"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Height="30" VerticalAlignment="Top" Width="580">
-                    <Controls:NumericField x:Name="cvPassDepthLast" Label="Last pass:" Value="{Binding Path=PassdepthLastPass, Mode=TwoWay}"/>
-                    <Controls:NumericField x:Name="cvFeedRateLast" Label="Feed rate:" Value="{Binding Path=FeedRateLastPass, Mode=TwoWay}"/>
+                    <Controls:NumericField x:Name="cvPassDepthLast" Style="{StaticResource CNCValue}" Label="Last pass:" Value="{Binding Path=PassdepthLastPass, Mode=TwoWay}"/>
+                    <Controls:NumericField x:Name="cvFeedRateLast" Label="Feed rate:" Value="{Binding Path=FeedRateLastPass, Mode=TwoWay}" Unit="{Binding Path=FeedrateUnit}"/>
                 </StackPanel>
             </StackPanel>
         </GroupBox>
-        <local:CssControl x:Name="css" IsEnabled="{Binding Path=IsCssEnabled, Mode=TwoWay}" Value="{Binding Path=CssSpeed, Mode=TwoWay}"  HorizontalAlignment="Left" Margin="20,285,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="txtGCode" HorizontalAlignment="Left" Height="150" Margin="20,312,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="400">
-            <TextBox.Text>
-                <MultiBinding Converter="{StaticResource GCodeConverter}">
-                    <Binding Path="gCode" Mode="OneWay"/>
-                    <Binding Path="gCode.Count" Mode="OneWay" />
-                </MultiBinding>
-            </TextBox.Text>
-        </TextBox>
-        <Button x:Name="btnCalculate" Content="Calculate" HorizontalAlignment="Left" Margin="20,467,0,0" VerticalAlignment="Top" Width="75" Click="btnCalculate_Click"/>
+        <local:CssControl x:Name="css" IsCssEnabled="{Binding Path=IsCssEnabled, Mode=TwoWay}" Value="{Binding Path=CssSpeed, Mode=TwoWay}" Unit="{Binding Path=CssUnit}" HorizontalAlignment="Left" Margin="10,285,0,0" VerticalAlignment="Top"/>
+        <Grid Margin="10,310,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <TextBox x:Name="txtGCode" HorizontalAlignment="Left" Margin="0,5" TextWrapping="Wrap" VerticalAlignment="Stretch" Width="400">
+                <TextBox.Text>
+                    <MultiBinding Converter="{StaticResource GCodeConverter}">
+                        <Binding Path="gCode" Mode="OneWay"/>
+                        <Binding Path="gCode.Count" Mode="OneWay" />
+                    </MultiBinding>
+                </TextBox.Text>
+            </TextBox>
+            <Button x:Name="btnCalculate" Content="Calculate" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Grid.Row="1" Click="btnCalculate_Click"/>
+        </Grid>
     </Grid>
 </UserControl>

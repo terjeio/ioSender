@@ -1,13 +1,13 @@
 ﻿/*
- * BaseViewModel.cs - part of CNC Controls library
+ * BaseViewModel.cs - part of CNC Controls Lathe library
  *
- * v0.01 / 2019-10-10 / Io Engineering (Terje Io)
+ * v0.03 / 2020-01-28 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019, Io Engineering (Terje Io)
+Copyright (c) 2019-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -37,47 +37,57 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-using CNC.Core;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using CNC.Core;
+using System;
+using System.Globalization;
 
 namespace CNC.Controls.Lathe
 {
-    public class BaseViewModel : ViewModelBase
+    public class BaseViewModel : MeasureViewModel
     {
-        double _rpm, _unitFactor = 1.0, _taper;
+        double _rpm, _taper;
         double _xlen = double.NaN, _xstart = double.NaN, _zlen = double.NaN, _zstart = double.NaN;
         uint _springPasses = 0, _cssSpeed = 0;
-        bool _isMetric = true, _isSpringPassesEnabled = false, _isCssEnabled = false, _isTaperEnabled = false;
-        string _unit = "mm", _passInfo = string.Empty;
+        bool  _isSpringPassesEnabled = false, _isCssEnabled = false, _isTaperEnabled = false;
 
         Thread.Format _format = Thread.Format.LinuxCNC;
 
-  //      private ErrorProperties _error;
         public WizardConfig wz;
 
         public BaseViewModel(string profileName)
         {
-   //         Error = new ErrorProperties();
             gCode = new ObservableCollection<string>();
+            PassData = new ObservableCollection<string>();
             GCodeFormat = Thread.Format.LinuxCNC;
             ZLength = 10;
             ZStart = 0;
 
             wz = new WizardConfig(profileName);
             Profiles = wz.profile.profiles;
+
+            PropertyChanged += BaseViewModel_PropertyChanged;
         }
 
-        public ObservableCollection<string> gCode { get; private set; }
+        private void BaseViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(IsMetric))
+            {
+                Profile = Profile;
+                OnPropertyChanged(nameof(CssUnit));
+            }
+        }
 
-        //public ErrorProperties Error {
-        //    get { return _error; }
-        //    private set { _error = value; OnPropertyChanged(); }
-        //}
+        public string FormatValue (double value)
+        {
+            return Math.Round(value, Precision).ToInvariantString(Format);
+        }
+
+        public string CssUnit { get { return IsMetric ? "m/min" : "ft/min"; } }
+
+        public ObservableCollection<string> gCode { get; private set; }
+        public ObservableCollection<string> PassData { get; private set; }
 
         public ActiveProfile config { get { return wz.ActiveProfile; } }
 
@@ -104,32 +114,6 @@ namespace CNC.Controls.Lathe
         {
             get { return _format; }
             set { _format = value; OnPropertyChanged(); }
-        }
-
-        public bool IsMetric
-        {
-            get { return _isMetric; }
-            set { _isMetric = value; OnPropertyChanged(); }
-        }
-
-        public int Precision { get { return _isMetric ? 3 : 4; } }
-
-        public string Unit
-        {
-            get { return _unit; }
-            set { _unit = value; OnPropertyChanged(); }
-        }
-
-        public double UnitFactor
-        {
-            get { return _unitFactor; }
-            set { _unitFactor = value; OnPropertyChanged(); }
-        }
-
-        public string PassInfo
-        {
-            get { return _passInfo; }
-            set { _passInfo = value; OnPropertyChanged(); }
         }
 
         public double RPM
@@ -267,7 +251,7 @@ namespace CNC.Controls.Lathe
             }
         }
 
-        public bool IsCSSEnabled
+        public bool IsCssEnabled
         {
             get { return _isCssEnabled; }
             set
@@ -370,40 +354,5 @@ namespace CNC.Controls.Lathe
                 }
             }
         }
-
     }
-    /*
-    public class ErrorProperties : ViewModelBase
-    {
-        string _property = string.Empty, _message = string.Empty;
-
-        public void Clear()
-        {
-            Property = Message = string.Empty;
-        }
-        public void Set(string message)
-        {
-            Property = string.Empty;
-            Message = message;
-        }
-        public void Set(string property, string message)
-        {
-            Property = property;
-            Message = message;
-        }
-
-        public bool IsError { get { return !string.IsNullOrEmpty(_message); } }
-
-        public string Property
-        {
-            get { return _property; }
-            set { if (value != _property) { _property = value; OnPropertyChanged(); } }
-        }
-        public string Message
-        {
-            get { return _message; }
-            set { if (value != _message) { _message = value; OnPropertyChanged(); } }
-        }
-    }
-    */
 }

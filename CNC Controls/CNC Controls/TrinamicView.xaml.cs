@@ -1,13 +1,13 @@
-﻿/*
+/*
  * TrinamicView.xaml.cs - part of CNC Controls library
  *
- * v0.01 / 2019-10-27 / Io Engineering (Terje Io)
+ * v0.34 / 2021-08-05 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019, Io Engineering (Terje Io)
+Copyright (c) 2019-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -41,24 +41,26 @@ using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using CNC.Core;
-using CNC.View;
 using System.Windows.Shapes;
 using System.Collections.Generic;
+using System.Threading;
+using System.Windows.Threading;
+using System.ComponentModel;
+using CNC.Core;
+using CNC.GCode;
 
 namespace CNC.Controls
 {
     /// <summary>
     /// Interaction logic for TrinamicView.xaml
     /// </summary>
-    public partial class TrinamicView : UserControl, CNCView
+    public partial class TrinamicView : UserControl, ICNCView
     {
         private int sg_index = 0;
         private bool plot = false, read_status = false;
+        private GrblViewModel model = null;
 
         private List<Line> lines;
-
-        private delegate void StatusCallback(string data);
 
         public TrinamicView()
         {
@@ -69,77 +71,201 @@ namespace CNC.Controls
 
             lines = new List<Line>((int)SGPlot.Width);
 
+            //int lval = 0;
+
             //while (ypos > 0)
             //{
-            //    lbl = new System.Windows.Forms.Label();
-            //    lbl.Location = new System.Drawing.Point(this.SGPlot.Location.X + SGPlot.Width + 5, this.SGPlot.Location.Y + ypos - 10);
-            //    lbl.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            //    lbl.Size = new System.Drawing.Size(32, 20);
-            //    lbl.Text = lval.ToString();
-            //    lbl.ForeColor = lblLoad.ForeColor;
-            //    //   lbl.BackColor = System.Drawing.Color.White;
+            //    Label lbl;
+            //    grid.Children.Add(lbl = new Label
+            //    {
+            //        Margin = new Thickness(40, 30 + ypos, 0, 0),
+            //        Content = lval.ToString(),
+            //        Width = 50,
+            //        Height = 24,
+            //    });
+            //    Grid.SetColumn(lbl, 0);
             //    lval += 100;
-            //    this.Controls.Add(lbl);
             //    ypos -= ydelta;
             //}
 
-            btnGetState.Click += btnGetState_Click;
-            chkEnableSfilt.Checked += chkEnableSfilt_CheckedChanged;
+            AxisEnabled.PropertyChanged += AxisEnabled_PropertyChanged;
         }
 
         #region Methods and properties required by CNCView interface
 
-        public ViewType mode { get { return ViewType.TrinamicTuner; } }
+        public ViewType ViewType { get { return ViewType.TrinamicTuner; } }
+        public bool CanEnable { get { return DataContext == null || !(DataContext as GrblViewModel).IsGCLock; } }
 
         public void Activate(bool activate, ViewType chgMode)
         {
-            Comms.com.WriteCommand(string.Format("M122S{0}H{1}", activate ? 1 : 0, chkEnableSfilt.IsChecked == true ? 1 : 0));
+            Comms.com.WriteString(string.Format("M122S{0}H{1}\r", activate ? 1 : 0, SFiltEnabled == true ? 1 : 0));
+
             if (activate)
-                Comms.com.DataReceived += new DataReceivedHandler(ProcessSGValue);
+            {
+                DataContext = model;
+                model.OnResponseReceived += ProcessSGValue;
+                model.PropertyChanged += OnDataContextPropertyChanged;
+                var sgdetails = GrblSettings.Get(GrblSetting.StallGuardBase + GrblInfo.AxisLetterToIndex(AxisEnabled.Value.ToString()));
+                SGValue = int.Parse(sgdetails.Value);
+                SGValueMin = (int)sgdetails.Min;
+                SGValueMax = (int)sgdetails.Max;
+            }
             else
-                Comms.com.DataReceived -= ProcessSGValue;
+            {
+                model.OnResponseReceived -= ProcessSGValue;
+                model.PropertyChanged -= OnDataContextPropertyChanged;
+                DataContext = null;
+            }
+            model.Poller.SetState(activate ? AppConfig.Settings.Base.PollInterval : 0);
         }
 
         public void CloseFile()
         {
         }
 
+        public void Setup(UIViewModel model, AppConfig profile)
+        {
+        }
+
+        #endregion
+
+        #region dependencyproperties
+
+        private void AxisEnabled_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (AxisEnabled.Value.ToString().Length == 1)
+            {
+                Comms.com.WriteString(string.Format("M122{0}S1\r", AxisEnabled.Value.ToString()));
+                SGValue = GrblSettings.GetInteger(GrblSetting.StallGuardBase + GrblInfo.AxisLetterToIndex(AxisEnabled.Value.ToString()));
+            }
+        }
+
+        public static readonly DependencyProperty SFiltEnabledProperty = DependencyProperty.Register(nameof(SFiltEnabled), typeof(bool), typeof(TrinamicView), new PropertyMetadata(false, new PropertyChangedCallback(OnSFiltEnabledChanged)));
+        public bool SFiltEnabled
+        {
+            get { return (bool)GetValue(SFiltEnabledProperty); }
+            private set { SetValue(SFiltEnabledProperty, value); }
+        }
+        private static void OnSFiltEnabledChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            Comms.com.WriteCommand(string.Format("M122H{0}", (bool)e.NewValue == true ? 1 : 0));
+        }
+
+        public static readonly DependencyProperty AxisEnabledProperty = DependencyProperty.Register(nameof(AxisEnabled), typeof(EnumFlags<AxisFlags>), typeof(TrinamicView), new PropertyMetadata(new EnumFlags<AxisFlags>(AxisFlags.X)));
+        public EnumFlags<AxisFlags> AxisEnabled
+        {
+            get { return (EnumFlags<AxisFlags>)GetValue(AxisEnabledProperty); }
+            private set { SetValue(AxisEnabledProperty, value); }
+        }
+
+        public static readonly DependencyProperty DriverStatusProperty = DependencyProperty.Register(nameof(DriverStatus), typeof(string), typeof(TrinamicView));
+        public string DriverStatus
+        {
+            get { return (string)GetValue(DriverStatusProperty); }
+            set { SetValue(DriverStatusProperty, value); }
+        }
+
+        public static readonly DependencyProperty SGValueMinProperty = DependencyProperty.Register(nameof(SGValueMin), typeof(int), typeof(TrinamicView), new PropertyMetadata(-64));
+        public int SGValueMin
+        {
+            get { return (int)GetValue(SGValueMinProperty); }
+            set { SetValue(SGValueMinProperty, value); }
+        }
+
+        public static readonly DependencyProperty SGValueMaxProperty = DependencyProperty.Register(nameof(SGValueMax), typeof(int), typeof(TrinamicView), new PropertyMetadata(63));
+        public int SGValueMax
+        {
+            get { return (int)GetValue(SGValueMaxProperty); }
+            set { SetValue(SGValueMaxProperty, value); }
+        }
+
+        public static readonly DependencyProperty SGValueProperty = DependencyProperty.Register(nameof(SGValue), typeof(int), typeof(TrinamicView));
+        public int SGValue
+        {
+            get { return (int)GetValue(SGValueProperty); }
+            set { SetValue(SGValueProperty, value); }
+        }
         #endregion
 
         #region UIEvents
 
-        void chkEnableSfilt_CheckedChanged(object sender, EventArgs e)
+        private void TrinamicView_Loaded(object sender, RoutedEventArgs e)
         {
-            Comms.com.WriteCommand(string.Format("M122H{0}", chkEnableSfilt.IsChecked == true ? 1 : 0));
+            if (model == null)
+            {
+                model = DataContext as GrblViewModel;
+                DataContext = null;
+            }
         }
 
         void btnGetState_Click(object sender, EventArgs e)
         {
-            txtStatus.Clear();
+            GetDriverStatus(AxisEnabled.Value.ToString());
+        }
 
-            Comms.com.DataReceived += ProcessStatus;
-            Comms.com.AwaitAck("M122");
-            Comms.com.DataReceived -= ProcessStatus;
+        void btnGetStateAll_Click(object sender, EventArgs e)
+        {
+            GetDriverStatus(string.Empty);
+        }
+
+        private void Slider_LostMouseCapture(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            Comms.com.WriteString(string.Format("M914{0}{1}\r", AxisEnabled.Value.ToString(), SGValue));
+        }
+
+        void btnConfigureSGVal_Click(object sender, EventArgs e)
+        {
+            Comms.com.WriteString(string.Format("${0}={1}\r", (int)(GrblSetting.StallGuardBase + GrblInfo.AxisLetterToIndex(AxisEnabled.Value.ToString())), SGValue));
         }
 
         #endregion
 
-        void mdiControl_CommandGenerated(string command)
+        private void GetDriverStatus (string axis)
         {
-            if (!command.StartsWith("M"))
+            bool? res = null;
+            CancellationToken cancellationToken = new CancellationToken();
+            var model = DataContext as GrblViewModel;
+
+            DriverStatus = "";
+
+            Comms.com.PurgeQueue();
+
+            model.SuspendProcessing = true;
+
+            new Thread(() =>
             {
-                PlotGrid();
-                for (int i = 0; i < lines.Capacity; i++)
-                    lines[i] = null;
-                plot = false;
-            }
-            Comms.com.WriteCommand(command);
+                res = WaitFor.AckResponse<string>(
+                    cancellationToken,
+                    response => ProcessStatus(response),
+                    a => model.OnResponseReceived += a,
+                    a => model.OnResponseReceived -= a,
+                    400, () => Comms.com.WriteCommand("M122" + axis));
+            }).Start();
+
+            while (res == null)
+                EventUtils.DoEvents();
+
+            model.SuspendProcessing = false;
         }
 
+        private void OnDataContextPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (sender is GrblViewModel) switch (e.PropertyName)
+            {
+                case nameof(GrblViewModel.MDI):
+                    if (!(sender as GrblViewModel).MDI.StartsWith("M"))
+                    {
+                        PlotGrid();
+                        sg_index = 0;
+                        lines.Clear();
+                    }
+                    break;
+            }
+        }
+    
         void PlotGrid ()
         {
             SGPlot.Children.Clear();
-
             SGPlot.Children.Add(new Line()
             {
                 X1 = 0d,
@@ -160,8 +286,8 @@ namespace CNC.Controls
                 {
                     X1 = 0d,
                     X2 = SGPlot.Width,
-                    Y1 = SGPlot.Height / 2d,
-                    Y2 = SGPlot.Height / 2d,
+                    Y1 = ypos,
+                    Y2 = ypos,
                     Stroke = Brushes.DarkGray,
                     StrokeThickness = 0.5d,
                     StrokeDashArray = new DoubleCollection() { 2d }
@@ -173,7 +299,7 @@ namespace CNC.Controls
 
         private void AddStatusData(string data)
         {
-            txtStatus.AppendText(data + "\r\n");
+            DriverStatus += (data + "\r\n");
         }
 
         private void ProcessStatus(string data)
@@ -183,7 +309,30 @@ namespace CNC.Controls
             else if (data == "ok")
                 read_status = false;
             else if (read_status)
-                AddStatusData(data);
+                Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.ContextIdle, new System.Action(() => AddStatusData(data)));
+        }
+
+        private void PlotSGValue(int value)
+        {
+            if (lines.Count != (int)SGPlot.Width)
+            {
+                lines.Add(new Line()
+                {
+                    X1 = sg_index == 0 ? 0 : sg_index - 1,
+                    X2 = sg_index,
+                    Y1 = sg_index == 0 ? value : lines[sg_index - 1].Y2,
+                    Y2 = value,
+                    Stroke = Brushes.Blue,
+                });
+
+                SGPlot.Children.Add(lines[sg_index++]);
+            }
+            else
+            {
+                sg_index %= (int)SGPlot.Width;
+                lines[sg_index].Y1 = sg_index == 0 ? value : lines[sg_index - 1].Y2;
+                lines[sg_index++].Y2 = value;
+            }
         }
 
         private void ProcessSGValue(string data)
@@ -194,23 +343,7 @@ namespace CNC.Controls
                 data = data.Substring(sep + 1, data.IndexOf("]") - sep - 1);
 
                 int value = int.Parse(data) / 4;
-
-                if (lines[sg_index] != null)
-                    SGPlot.Children.Remove(lines[sg_index]);
-
-                lines[sg_index] = new Line()
-                {
-                    X1 = sg_index == 0 ? 0 : sg_index - 1,
-                    X2 = sg_index,
-                    Y1 = sg_index == 0 ? value : lines[sg_index - 1].Y2,
-                    Y2 = value,
-                    Stroke = Brushes.Blue,
-                };
-
-                SGPlot.Children.Add(lines[sg_index++]);
-
-                if (++sg_index >= lines.Capacity)
-                    sg_index = 0;
+                Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.ContextIdle, new System.Action(() => PlotSGValue(value)));
             }
         }
     }

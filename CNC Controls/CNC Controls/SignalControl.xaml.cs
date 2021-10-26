@@ -1,13 +1,13 @@
 ﻿/*
  * SignalsControl.xaml.cs - part of CNC Controls library
  *
- * v0.02 / 2019-10-16 / Io Engineering (Terje Io)
+ * v0.14 / 2020-03-16 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2019, Io Engineering (Terje Io)
+Copyright (c) 2018-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -62,7 +62,7 @@ namespace CNC.Controls
         }
         private static void OnIsSetChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ((SignalControl)d).btnLED.Background = (bool)e.NewValue ? LEDOn : LEDOff;
+            (d as SignalControl).btnLED.Background = (bool)e.NewValue ? LEDOn : LEDOff;
         }
 
         public static readonly DependencyProperty LabelProperty = DependencyProperty.Register(nameof(Label), typeof(string), typeof(SignalControl), new PropertyMetadata());
@@ -71,7 +71,6 @@ namespace CNC.Controls
             get { return (string)GetValue(LabelProperty); }
             set { SetValue(LabelProperty, value); }
         }
-
     }
 }
 

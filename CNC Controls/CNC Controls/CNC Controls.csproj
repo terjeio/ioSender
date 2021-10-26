@@ -19,7 +19,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;USEWEBSOCKET</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -27,14 +27,19 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;USEWEBSOCKET</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
+    <UICulture>en-US</UICulture>
     <ApplicationIcon>App.ico</ApplicationIcon>
+    <Localizable>False</Localizable>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="RP.Math.Vector3">
+      <HintPath>..\..\Vector-master\RP.Math.Vector3\bin\Release\RP.Math.Vector3.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -56,8 +61,35 @@
       <DependentUpon>About.xaml</DependentUpon>
     </Compile>
     <Compile Include="AppConfig.cs" />
-    <Compile Include="ConfigView.xaml.cs">
-      <DependentUpon>ConfigView.xaml</DependentUpon>
+    <Compile Include="ArcsToLines.cs" />
+    <Compile Include="BasicConfigControl.xaml.cs">
+      <DependentUpon>BasicConfigControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ConsoleWindow.xaml.cs">
+      <DependentUpon>ConsoleWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="FileActionControl.xaml.cs">
+      <DependentUpon>FileActionControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="GCodeCompress.cs" />
+    <Compile Include="GCodeListControl.xaml.cs">
+      <DependentUpon>GCodeListControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="GCodeRotate.cs" />
+    <Compile Include="GCodeRotateDialog.xaml.cs">
+      <DependentUpon>GCodeRotateDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="GotoControl.xaml.cs">
+      <DependentUpon>GotoControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="GrblConfigView.xaml.cs">
+      <DependentUpon>GrblConfigView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AppConfigView.xaml.cs">
+      <DependentUpon>AppConfigView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ConsoleControl.xaml.cs">
+      <DependentUpon>ConsoleControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Converters.cs" />
     <Compile Include="CoolantControl.xaml.cs">
@@ -75,14 +107,41 @@
     <Compile Include="FeedControl.xaml.cs">
       <DependentUpon>FeedControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ICamera.cs" />
+    <Compile Include="ICNCView.cs" />
+    <Compile Include="IGCodeConverter.cs" />
+    <Compile Include="IGCodeTransformer.cs" />
     <Compile Include="JobControl.xaml.cs">
       <DependentUpon>JobControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="GCode.cs" />
+    <Compile Include="JogConfigControl.xaml.cs">
+      <DependentUpon>JogConfigControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="JogControl.xaml.cs">
+      <DependentUpon>JogControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="JogUiConfigControl.xaml.cs">
+      <DependentUpon>JogUiConfigControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="KeypressHandler.cs" />
+    <Compile Include="LEDControl.xaml.cs">
+      <DependentUpon>LEDControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="LimitsBaseControl.xaml.cs">
       <DependentUpon>LimitsBaseControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="LimitsControl.xaml.cs">
       <DependentUpon>LimitsControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MacroEditor.xaml.cs">
+      <DependentUpon>MacroEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MacroExecuteControl.xaml.cs">
+      <DependentUpon>MacroExecuteControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MacroToolbarControl.xaml.cs">
+      <DependentUpon>MacroToolbarControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="MDIControl.xaml.cs">
       <DependentUpon>MDIControl.xaml</DependentUpon>
@@ -92,19 +151,26 @@
     <Compile Include="OffsetView.xaml.cs">
       <DependentUpon>OffsetView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="OriginControl.xaml.cs">
+      <DependentUpon>OriginControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="OutlineFlyout.xaml.cs">
+      <DependentUpon>OutlineFlyout.xaml</DependentUpon>
+    </Compile>
     <Compile Include="OverrideControl.xaml.cs">
       <DependentUpon>OverrideControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="PIDLogView.xaml.cs">
       <DependentUpon>PIDLogView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="PipeServer.cs" />
     <Compile Include="PortDialog.xaml.cs">
       <DependentUpon>PortDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ProfileData.cs" />
     <Compile Include="SDCardView.xaml.cs">
       <DependentUpon>SDCardView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="SidebarItem.cs" />
     <Compile Include="SignalControl.xaml.cs">
       <DependentUpon>SignalControl.xaml</DependentUpon>
     </Compile>
@@ -117,6 +183,12 @@
     <Compile Include="StatusControl.xaml.cs">
       <DependentUpon>StatusControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="StripGCodeConfigControl.xaml.cs">
+      <DependentUpon>StripGCodeConfigControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="THCMonitorControl.xaml.cs">
+      <DependentUpon>THCMonitorControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ToolView.xaml.cs">
       <DependentUpon>ToolView.xaml</DependentUpon>
     </Compile>
@@ -124,7 +196,11 @@
       <DependentUpon>TrinamicView.xaml</DependentUpon>
     </Compile>
     <Compile Include="UIUtils.cs" />
+    <Compile Include="UIViewModel.cs" />
     <Compile Include="Widget.cs" />
+    <Compile Include="MachinePositionFlyout.xaml.cs">
+      <DependentUpon>MachinePositionFlyout.xaml</DependentUpon>
+    </Compile>
     <Compile Include="WorkParametersControl.xaml.cs">
       <DependentUpon>WorkParametersControl.xaml</DependentUpon>
     </Compile>
@@ -132,11 +208,59 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ConfigView.xaml">
+    <Page Include="BasicConfigControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ConsoleWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FileActionControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="GCodeListControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="GCodeRotateDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="GotoControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="GrblConfigView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AppConfigView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ConsoleControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="CoolantControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="JogConfigControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="JogControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="JogUiConfigControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="LEDControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -145,6 +269,18 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="LimitsControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MacroEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MacroExecuteControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MacroToolbarControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -190,6 +326,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="OriginControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="OutlineFlyout.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="OverrideControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -205,6 +349,10 @@
     <Page Include="SDCardView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="SharedStyles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="SignalControl.xaml">
       <SubType>Designer</SubType>
@@ -222,11 +370,23 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="StripGCodeConfigControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="THCMonitorControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="ToolView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="TrinamicView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MachinePositionFlyout.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -267,6 +427,24 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="App.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Symbols_Stop_32xLG.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\close.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\reload.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\edit.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\open.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\StatusAnnotations_Warning_16xLG_color.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

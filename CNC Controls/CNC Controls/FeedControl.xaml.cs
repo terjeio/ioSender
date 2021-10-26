@@ -1,7 +1,7 @@
 ﻿/*
  * FeedControl.xaml.cs - part of CNC Controls library
  *
- * v0.02 / 2019-10-12 / Io Engineering (Terje Io)
+ * v0.05 / 2020-02-01 / Io Engineering (Terje Io)
  *
  */
 
@@ -64,7 +64,7 @@ namespace CNC.Controls
 
         void override_CommandGenerated(string command)
         {
-            Grbl.MDICommand(DataContext, command);
+            (DataContext as GrblViewModel).ExecuteCommand(command);
         }
     }
 }

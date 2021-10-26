@@ -1,13 +1,13 @@
-﻿/*
+/*
  * ToolView.xaml.cs - part of CNC Controls library
  *
- * v0.01 / 2019-05-31 / Io Engineering (Terje Io)
+ * v0.31 / 2021-04-27 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2019, Io Engineering (Terje Io)
+Copyright (c) 2018-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -40,51 +40,58 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Collections.ObjectModel;
+using System.Linq;
 using CNC.Core;
 using CNC.GCode;
-using CNC.View;
+using System.Threading;
 
 namespace CNC.Controls
 {
-    public partial class ToolView : UserControl, CNCView
+    public partial class ToolView : UserControl, ICNCView
     {
         Tool selectedTool = null;
         private GrblViewModel parameters = new GrblViewModel();
         private volatile bool awaitCoord = false;
+        private Action<string> GotPosition;
 
         public ToolView()
         {
             InitializeComponent();
 
-            parameters.WorkPositionOffset.PropertyChanged += Parameters_PropertyChanged;
+            parameters.PropertyChanged += Parameters_PropertyChanged;
         }
 
         public Position offset { get; private set; } = new Position();
 
         #region Methods and properties required by CNCView interface
 
-        public ViewType mode { get { return ViewType.Tools; } }
+        public ViewType ViewType { get { return ViewType.Tools; } }
+        public bool CanEnable { get { return !(DataContext as GrblViewModel).IsGCLock; } }
 
         public void Activate(bool activate, ViewType chgMode)
         {
             if (activate)
             {
-                GrblWorkParameters.Get();
+                Comms.com.DataReceived += parameters.DataReceived;
 
-                Comms.com.DataReceived += DataReceived;
+                GrblWorkParameters.Get(parameters);
 
-                dgrTools.ItemsSource = GrblWorkParameters.Tools;
+                dgrTools.ItemsSource = new ObservableCollection<Tool>(from tool in GrblWorkParameters.Tools where tool.Code != GrblConstants.NO_TOOL orderby tool.Code select tool);
                 dgrTools.SelectedIndex = 0;
             }
             else
             {
-                Comms.com.DataReceived -= DataReceived;
-
+                Comms.com.DataReceived -= parameters.DataReceived;
                 dgrTools.ItemsSource = null;
             }
         }
 
         public void CloseFile()
+        {
+        }
+
+        public void Setup(UIViewModel model, AppConfig profile)
         {
         }
 
@@ -94,17 +101,14 @@ namespace CNC.Controls
         {
             switch (e.PropertyName)
             {
-                case "Z":
-                    if (parameters.IsMachinePosition)
-                        for (int i = 0; i < offset.Values.Length; i++)
-                            offset.Values[i] = parameters.MachinePosition.Values[i];
-                    else
-                        for (int i = 0; i < offset.Values.Length; i++)
-                            offset.Values[i] = parameters.WorkPosition.Values[i] + parameters.WorkPositionOffset.Values[i];
-                    parameters.WorkPositionOffset.SuspendNotifications = true;
-                    parameters.Clear();
-                    parameters.WorkPositionOffset.SuspendNotifications = false;
-                    awaitCoord = false;
+                case nameof(GrblViewModel.MachinePosition):
+                    if (!(awaitCoord = double.IsNaN(parameters.MachinePosition.Values[0])))
+                    {
+                        offset.Set(parameters.MachinePosition);
+                        parameters.Position.SuspendNotifications = parameters.WorkPositionOffset.SuspendNotifications = true;
+                        parameters.Clear();
+                        parameters.WorkPositionOffset.SuspendNotifications = parameters.Position.SuspendNotifications = false;
+                    }
                     break;
             }
         }
@@ -132,17 +136,10 @@ namespace CNC.Controls
 
                     offset.Values[i] = selectedTool.Values[i];
                 }
+                txtTool.Text = selectedTool.Code;
             }
             else
                 selectedTool = null;
-        }
-
-        void btnClear_Click(object sender, RoutedEventArgs e)
-        {
-            cvXOffset.Value = 0.0d;
-            cvYOffset.Value = 0.0d;
-            cvZOffset.Value = 0.0d;
-    //          cvTipRadius.Value = 0.0d;
         }
 
         // G10 L1 P- axes <R- I- J- Q-> Set Tool Table
@@ -152,8 +149,10 @@ namespace CNC.Controls
 
         void saveOffset(string axis)
         {
-            string s, axes;
-            string xOffset = GrblWorkParameters.ConvertX(GrblWorkParameters.LatheMode, GrblInfo.LatheMode, selectedTool.X).ToInvariantString();
+            string axes;
+            Position newpos = new Position(offset);
+
+            newpos.X = GrblWorkParameters.ConvertX(GrblWorkParameters.LatheMode, GrblParserState.LatheMode, selectedTool.X);
 
             switch (axis)
             {
@@ -162,17 +161,15 @@ namespace CNC.Controls
                     break;
 
                 case "All":
-                    axes = "X{1}Y{2}Z{3}R{4}";
+                    axes = newpos.ToString(GrblInfo.AxisFlags);
                     break;
 
-                default:
-                    axes = (axis + "{" + (GrblInfo.AxisLetterToIndex(axis) + 1).ToString() + "}");
+                default:                    
+                    axes = newpos.ToString(GrblInfo.AxisLetterToFlag(axis));
                     break;
             }
 
-            s = string.Format("G10L1P{0}" + axes, selectedTool.Code, xOffset, selectedTool.Y.ToInvariantString(), selectedTool.Z.ToInvariantString(), selectedTool.R.ToInvariantString());
-
-            Comms.com.WriteCommand(s);
+            Comms.com.WriteCommand(string.Format("G10L1P{0}{1}", selectedTool.Code, axes));
         }
 
         void cvOffset_Click(object sender, RoutedEventArgs e)
@@ -195,10 +192,7 @@ namespace CNC.Controls
                     selectedTool.Values[i] = offset.Values[i];
             }
 
-            string xOffset = GrblWorkParameters.ConvertX(GrblWorkParameters.LatheMode, GrblInfo.LatheMode, cvXOffset.Value).ToInvariantString();
-
-            string s = string.Format("G10L1P{0}X{1}Y{2}Z{3}R{4}", selectedTool.Code, xOffset, cvYOffset.Text, cvZOffset.Text, cvTipRadius.Text);
-            Comms.com.WriteCommand(s);
+            saveOffset("All");
         }
 
         private void btnClearAll_Click(object sender, RoutedEventArgs e)
@@ -208,32 +202,53 @@ namespace CNC.Controls
                 for (var i = 0; i < offset.Values.Length; i++)
                     offset.Values[i] = selectedTool.Values[i] = 0d;
 
-                string xOffset = GrblWorkParameters.ConvertX(GrblWorkParameters.LatheMode, GrblInfo.LatheMode, cvXOffset.Value).ToInvariantString();
-
-                string s = string.Format("G10L1P{0}X{1}Y{2}Z{3}R{4}", selectedTool.Code, xOffset, cvYOffset.Text, cvZOffset.Text, cvTipRadius.Text);
-                Comms.com.WriteCommand(s);
+                saveOffset("All");
             }
         }
 
-        private void btnCurrPos_Click(object sender, RoutedEventArgs e)
+        private void RequestStatus()
         {
-            Comms.com.CommandState = Comms.State.AwaitAck;
-
-            if (double.IsNaN(parameters.WorkPosition.X)) // If not NaN then MPG is polling
+            parameters.Clear();
+            if (double.IsNaN(parameters.WorkPosition.X) || true) // If not NaN then MPG is polling
                 Comms.com.WriteByte(GrblLegacy.ConvertRTCommand(GrblConstants.CMD_STATUS_REPORT_ALL));
+        }
+
+        void btnCurrPos_Click(object sender, RoutedEventArgs e)
+        {
+            bool? res = null;
+            CancellationToken cancellationToken = new CancellationToken();
 
             awaitCoord = true;
 
-            while (awaitCoord)
-                Comms.com.AwaitResponse(); // TODO: add timeout?
+            parameters.OnRealtimeStatusProcessed += DataReceived;
+
+            new Thread(() =>
+            {
+                res = WaitFor.AckResponse<string>(
+                    cancellationToken,
+                    null,
+                    a => GotPosition += a,
+                    a => GotPosition -= a,
+                    1000, () => RequestStatus());
+            }).Start();
+
+            while (res == null)
+                EventUtils.DoEvents();
+
+            parameters.OnRealtimeStatusProcessed -= DataReceived;
         }
 
         #endregion
 
         private void DataReceived(string data)
         {
-            if (data.Length > 1 && data.Substring(0, 1) == "<")
-                parameters.ParseStatus(data.Remove(data.Length - 1));
+            if (awaitCoord)
+            {
+                Thread.Sleep(50);
+                Comms.com.WriteByte(GrblLegacy.ConvertRTCommand(GrblConstants.CMD_STATUS_REPORT));
+            }
+            else
+                GotPosition?.Invoke("ok");
         }
     }
 }

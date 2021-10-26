@@ -1,13 +1,13 @@
 ﻿/*
- * ThreadViewModel.cs - part of CNC Controls library
+ * ThreadViewModel.cs - part of CNC Controls Lathe library
  *
- * v0.01 / 2019-10-31 / Io Engineering (Terje Io)
+ * v0.01 / 2020-01-17 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019, Io Engineering (Terje Io)
+Copyright (c) 2019-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -59,8 +59,19 @@ namespace CNC.Controls.Lathe
             Tool = new ToolProperties();
             Thread = new ThreadProperties();
             GCodeFormat = Lathe.Thread.Format.LinuxCNC;
-            ZLength = 10;
-            ZStart = 0;
+            ZLength = 10d;
+            ZStart = 0d;
+
+            PropertyChanged += ThreadModel_PropertyChanged;
+        }
+
+        private void ThreadModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(IsMetric))
+            {
+                Thread.ThreadSize = Thread.ThreadSize; // Force recalculation of model values
+                ZLength = IsMetric ? 10.0d : 0.5d;
+            }
         }
 
         public InchProperties Inch
@@ -82,7 +93,7 @@ namespace CNC.Controls.Lathe
         }
     }
 
-    public class ThreadProperties : ViewModelBase
+    public class ThreadProperties : MeasureViewModel
     {
 
         private bool _oneLead = false;
@@ -102,7 +113,7 @@ namespace CNC.Controls.Lathe
                 AllowDelete = false,
                 AllowEdit = false
             };
-            Type = Thread.type.First().Key;
+//            Type = Thread.type.First().Key;
 
             CompoundAngles = new List<double>();
             CompoundAngles.Add(0d);
@@ -110,10 +121,22 @@ namespace CNC.Controls.Lathe
             CompoundAngles.Add(29.5d);
             CompoundAngles.Add(30d);
 
-            DepthDegressions = new List<double>();
-            DepthDegressions.Add(0);
-            DepthDegressions.Add(1);
-            DepthDegressions.Add(2);
+            DepthDegressions = new List<string>();
+            DepthDegressions.Add("None");
+            DepthDegressions.Add("1");
+            DepthDegressions.Add("2");
+            _depthDegression = "None";
+
+            PropertyChanged += Thread_PropertyChanged;
+        }
+
+        private void Thread_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if(e.PropertyName == nameof(IsMetric))
+            {
+                OnPropertyChanged(nameof(TpiFormat));
+                OnPropertyChanged(nameof(TpiLabel));
+            }
         }
 
         public EnumFlags<Thread.Side> ESide
@@ -228,23 +251,25 @@ namespace CNC.Controls.Lathe
             set { _tpi = value; OnPropertyChanged(); }
         }
 
-        private string _tpiLabel = "TPI";
-
         public string TpiLabel
         {
-            get { return _tpiLabel; }
-            set { _tpiLabel = value; OnPropertyChanged(); }
+            get { return IsMetric ? "in" : "TPI"; }
         }
 
-        public List<double> DepthDegressions { get; private set; }
+        public string TpiFormat
+        {
+            get { return IsMetric ? GrblConstants.FORMAT_IMPERIAL : "##0"; }
+        }
 
-        private double _depthDegression;
+        public List<string> DepthDegressions { get; private set; }
 
-        public double DepthDegression
+        private string _depthDegression;
+
+        public string DepthDegression
         {
             get { return _depthDegression; }
             set {
-                if (double.IsNaN(value) ? !double.IsNaN(_depthDegression) : _depthDegression != value)
+                if (_depthDegression != value)
                 {
                     _depthDegression = value;
                     OnPropertyChanged();
@@ -322,15 +347,6 @@ namespace CNC.Controls.Lathe
                 }
             }
         }
-
-        private string _sideLabel = "xx";
-
-        public string SideLabel
-        {
-            get { return _sideLabel; }
-            set { if (_sideLabel != value) { _sideLabel = value; OnPropertyChanged(); } }
-        }
-
 
         private double _lead;
         public double Lead

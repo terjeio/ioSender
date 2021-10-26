@@ -1,13 +1,13 @@
-﻿/*
+/*
  * JobView.xaml.cs - part of Grbl Code Sender
  *
- * v0.02 / 2019-10-23 / Io Engineering (Terje Io)
+ * v0.34 / 2021-08-11 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019, Io Engineering (Terje Io)
+Copyright (c) 2019-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -41,180 +41,405 @@ using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using CNC.View;
-using CNC.Core;
 using System.ComponentModel;
 using System.Threading.Tasks;
-using CNC.Controls;
+using System.Threading;
 using System.Windows.Threading;
-#if ADD_CAMERA
-using static CNC.Controls.Camera.CameraControl;
-#endif
+using CNC.Core;
+using CNC.Controls;
 
 namespace GCode_Sender
 {
     /// <summary>
     /// Interaction logic for JobView.xaml
     /// </summary>
-    public partial class JobView : UserControl, CNCView
+    public partial class JobView : UserControl, ICNCView
     {
-        private bool initOK = false;
+        private bool? initOK = null;
+        private bool sdStream = false, resetPending = false;
         private GrblViewModel model;
+        private KeypressHandler keyboard = null;
+        private IInputElement focusedControl = null;
 
-     //   private Viewer viewer = null;
-
-    //    private delegate void GcodeCallback(string data);
         public JobView()
         {
             InitializeComponent();
 
-//            MainWindow.ui.DataContext = model = GCodeSender.Parameters;
-
             DRO.DROEnabledChanged += DRO_DROEnabledChanged;
-
             DataContextChanged += View_DataContextChanged;
-            //    GCodeSender.GotFocus += GCodeSender_GotFocus;
-
-          //  ((INotifyPropertyChanged)DataContext).PropertyChanged += OnDataContextPropertyChanged;
         }
 
         private void View_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            if (e.OldValue != null && e.OldValue is INotifyPropertyChanged)
-                ((INotifyPropertyChanged)e.OldValue).PropertyChanged -= OnDataContextPropertyChanged;
-            if (e.NewValue != null && e.NewValue is INotifyPropertyChanged)
+            if (e.NewValue is GrblViewModel)
             {
                 model = (GrblViewModel)e.NewValue;
                 model.PropertyChanged += OnDataContextPropertyChanged;
+                DataContextChanged -= View_DataContextChanged;
+                //          model.OnGrblReset += Model_OnGrblReset;
             }
         }
 
         private void OnDataContextPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (sender is GrblViewModel) switch(e.PropertyName)
-            {
+            if (sender is GrblViewModel) switch (e.PropertyName)
+                {
                 case nameof(GrblViewModel.GrblState):
-                    if (!initOK && ((GrblViewModel)sender).GrblState.State != GrblStates.Alarm)
-                        InitSystem();
+                    if (!resetPending)
+                    {
+                        if (initOK == false && (sender as GrblViewModel).GrblState.State != GrblStates.Alarm)
+                            Dispatcher.BeginInvoke(new System.Action(() => InitSystem()), DispatcherPriority.ApplicationIdle);
+                    }
+                    break;
+
+                case nameof(GrblViewModel.IsGCLock):
+                        MainWindow.ui.JobRunning = (sender as GrblViewModel).IsJobRunning;
+           //             MainWindow.EnableView(!(sender as GrblViewModel).IsGCLock, ViewType.Probing);
                     break;
 
                 case nameof(GrblViewModel.IsSleepMode):
-                    EnableUI(!((GrblViewModel)sender).IsSleepMode);
+                    EnableUI(!(sender as GrblViewModel).IsSleepMode);
                     break;
 
                 case nameof(GrblViewModel.IsJobRunning):
-                    MainWindow.ui.JobRunning = ((GrblViewModel)sender).IsJobRunning;
+                    MainWindow.ui.JobRunning = (sender as GrblViewModel).IsJobRunning;
+                    if(GrblInfo.ManualToolChange)
+                        GrblCommand.ToolChange = (sender as GrblViewModel).IsJobRunning ? "T{0}M6" : "M61Q{0}";
                     break;
 
+                case nameof(GrblViewModel.IsToolChanging):
+                    MainWindow.ui.JobRunning = (sender as GrblViewModel).IsToolChanging || (sender as GrblViewModel).IsJobRunning;
+                    break;
+
+                case nameof(GrblViewModel.Tool):
+                if (GrblInfo.ManualToolChange && (sender as GrblViewModel).Tool != GrblConstants.NO_TOOL)
+                    GrblWorkParameters.RemoveNoTool();
+                break;
+
                 case nameof(GrblViewModel.GrblReset):
-                    if (((GrblViewModel)sender).GrblReset)
-                        Comms.com.WriteCommand(GrblConstants.CMD_GETPARSERSTATE);
+                    if ((sender as GrblViewModel).IsReady)
+                    {
+                        if (!resetPending && (sender as GrblViewModel).GrblReset)
+                        {
+                            initOK = null;
+                            Dispatcher.BeginInvoke(new System.Action(() => Activate(true, ViewType.GRBL)), DispatcherPriority.ApplicationIdle);
+                        }
+                    }
                     break;
 
                 case nameof(GrblViewModel.ParserState):
-                    if (((GrblViewModel)sender).GrblReset)
+                    if (!resetPending && (sender as GrblViewModel).GrblReset)
                     {
                         EnableUI(true);
-                        ((GrblViewModel)sender).GrblReset = false;
+                        (sender as GrblViewModel).GrblReset = false;
                     }
                     break;
 
                 case nameof(GrblViewModel.FileName):
-                    string filename = ((GrblViewModel)sender).FileName;
+                    string filename = (sender as GrblViewModel).FileName;
                     MainWindow.ui.WindowTitle = filename;
-                    if (filename != string.Empty) {
-                        MainWindow.enableControl(true, ViewType.GCodeViewer);
-                        GCodeSender.EnablePolling(false);
-                        MainWindow.GCodeViewer.Open(filename, GCodeSender.GCode.Tokens);
-                        GCodeSender.EnablePolling(true);
+
+                    if(string.IsNullOrEmpty(filename))
+                        MainWindow.CloseFile();
+                    else if ((sender as GrblViewModel).IsSDCardJob)
+                    {
+                        MainWindow.EnableView(false, ViewType.GCodeViewer);
+                    }
+                    else if (filename.StartsWith("Wizard:"))
+                    {
+                        if (MainWindow.IsViewVisible(ViewType.GCodeViewer))
+                        {
+                            MainWindow.EnableView(true, ViewType.GCodeViewer);
+                            gcodeRenderer.ShowTool = true;
+                            gcodeRenderer.Open(GCode.File.Tokens);
                         }
-                        break;
+                    }
+                    else if (!string.IsNullOrEmpty(filename) && AppConfig.Settings.GCodeViewer.IsEnabled)
+                    {
+                        MainWindow.GCodeViewer.Open(GCode.File.Tokens);
+                        MainWindow.EnableView(true, ViewType.GCodeViewer);
+                        GCodeSender.EnablePolling(false);
+                        gcodeRenderer.ShowTool = true;
+                        gcodeRenderer.Open(GCode.File.Tokens);
+                        GCodeSender.EnablePolling(true);
+                    }
+                    break;
             }
         }
 
-#region Methods required by CNCView interface
+        #region Methods and properties required by CNCView interface
 
-        public ViewType mode { get { return ViewType.GRBL; } }
+        public ViewType ViewType { get { return ViewType.GRBL; } }
+        public bool CanEnable { get { return true; } }
+
+        private void TrapReset(string rws)
+        {
+            resetPending = false;
+        }
+
+        private bool AttemptReset ()
+        {
+            resetPending = true;
+            Comms.com.PurgeQueue();
+
+            bool? res = null;
+            CancellationToken cancellationToken = new CancellationToken();
+
+            new Thread(() =>
+            {
+                res = WaitFor.SingleEvent<string>(
+                    cancellationToken,
+                    s => TrapReset(s),
+                    a => model.OnGrblReset += a,
+                    a => model.OnGrblReset -= a,
+                    AppConfig.Settings.Base.ResetDelay, () => Comms.com.WriteByte(GrblConstants.CMD_RESET));
+            }).Start();
+
+            while (res == null)
+                EventUtils.DoEvents();
+
+            return !resetPending;
+        }
 
         public void Activate(bool activate, ViewType chgMode)
         {
             if (activate)
             {
                 GCodeSender.RewindFile();
-                GCodeSender.SetStreamingState(GCodeSender.GCode.Loaded ? StreamingState.Idle : StreamingState.NoFile);
+                GCodeSender.CallHandler(GCode.File.IsLoaded ? StreamingState.Idle : (model.IsSDCardJob ? StreamingState.Start : StreamingState.NoFile), false);
 
-                if (!initOK)
+                model.ResponseLogFilterOk = AppConfig.Settings.Base.FilterOkResponse;
+
+                if (initOK != true)
                 {
-                    Comms.com.WriteByte(GrblLegacy.ConvertRTCommand(GrblConstants.CMD_STATUS_REPORT));
+                    focusedControl = this;
 
-                    int timeout = 30; // 1.5s
-                    do
-                    {
-                        System.Threading.Thread.Sleep(50);
-                    } while (Comms.com.Reply == "" && --timeout != 0);
+                    var message = model.Message;
+                    model.Message = string.Format("Waiting for controller ({0})...", AppConfig.Settings.Base.PortParams);
 
-                    if (Comms.com.Reply.StartsWith("<Alarm"))
+                    string response = GrblInfo.Startup(model);
+
+                    if (response.StartsWith("<"))
                     {
-                        if (Comms.com.Reply.StartsWith("<Alarm:"))
-                        {
-                            int i = Comms.com.Reply.IndexOf('|');
-                            string s = Comms.com.Reply.Substring(7, i - 7);
-                            if (!"1,2,10".Contains(s)) // Alarm 1, 2 and 10 are critical events
-                                InitSystem();
-                            if (s == "11")
-                                txtStatus.Text = "<Home> to continue.";
-                            else
-                                txtStatus.Text = "<Reset> then <Unlock> to continue.";
+                        if(model.GrblState.State != GrblStates.Unknown) {
+
+                            switch(model.GrblState.State)
+                            {
+                                case GrblStates.Alarm:
+
+                                    model.Poller.SetState(AppConfig.Settings.Base.PollInterval);
+
+                                    switch (model.GrblState.Substate)
+                                    {
+                                        case 1: // Hard limits
+                                            if (!GrblInfo.IsLoaded)
+                                            {
+                                                if (model.LimitTriggered)
+                                                {
+                                                    MessageBox.Show(string.Format("Controller is not able to communicate due to alarm {0}, attempting a soft reset.", model.GrblState.Substate.ToString()), "ioSender");
+                                                    if (AttemptReset())
+                                                        model.ExecuteCommand(GrblConstants.CMD_UNLOCK);
+                                                    else
+                                                    {
+                                                        MessageBox.Show("Controller soft reset failed, exiting.", "ioSender");
+                                                        MainWindow.ui.Close();
+                                                    }
+                                                }
+                                                else if (AttemptReset())
+                                                    model.ExecuteCommand(GrblConstants.CMD_UNLOCK);
+                                            }
+                                            else
+                                                response = string.Empty;
+                                            break;
+
+                                        case 2: // Soft limits
+                                            if (!GrblInfo.IsLoaded)
+                                            {
+                                                MessageBox.Show(string.Format("Controller is not able to communicate due to alarm {0}, attempting a soft reset.", model.GrblState.Substate.ToString()), "ioSender");
+                                                if (AttemptReset())
+                                                    model.ExecuteCommand(GrblConstants.CMD_UNLOCK);
+                                                else
+                                                {
+                                                    MessageBox.Show("Controller soft reset failed, exiting.", "ioSender");
+                                                    MainWindow.ui.Close();
+                                                }
+                                            } else
+                                                response = string.Empty;
+                                            break;
+
+                                        case 10: // EStop
+                                            if (GrblInfo.IsGrblHAL && model.Signals.Value.HasFlag(Signals.EStop))
+                                            {
+                                                MessageBox.Show("E-Stop active! - clear before continuing.", "ioSender", MessageBoxButton.OK, MessageBoxImage.Warning);
+                                                while (!AttemptReset() && model.GrblState.State == GrblStates.Alarm)
+                                                {
+                                                    if (MessageBox.Show("E-Stop still active, exit?", "ioSender", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                                                        MainWindow.ui.Close();
+                                                };
+                                            }
+                                            else
+                                                AttemptReset();
+                                            if (!GrblInfo.IsLoaded)
+                                                model.ExecuteCommand(GrblConstants.CMD_UNLOCK);
+                                            break;
+
+                                        case 11: // Homing required
+                                            if (GrblInfo.IsLoaded)
+                                                response = string.Empty;
+                                            else
+                                                message = "Homing cycle required, <Home> to continue";
+                                            break;
+                                    }
+                                    break;
+
+                                case GrblStates.Tool:
+                                    Comms.com.WriteByte(GrblConstants.CMD_STOP);
+                                    break;
+
+                                case GrblStates.Door:
+                                    if (!GrblInfo.IsLoaded)
+                                    {
+                                        if (MessageBox.Show("Door is open, close door and continue?", "ioSender", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+                                            MainWindow.ui.Close();
+                                        else
+                                        {
+                                            bool exit = false;
+                                            do
+                                            {
+                                                Comms.com.PurgeQueue();
+
+                                                bool? res = null;
+                                                CancellationToken cancellationToken = new CancellationToken();
+
+                                                new Thread(() =>
+                                                {
+                                                    res = WaitFor.SingleEvent<string>(
+                                                        cancellationToken,
+                                                        s => TrapReset(s),
+                                                        a => model.OnGrblReset += a,
+                                                        a => model.OnGrblReset -= a,
+                                                        200, () => Comms.com.WriteByte(GrblConstants.CMD_STATUS_REPORT));
+                                                }).Start();
+
+                                                while (res == null)
+                                                    EventUtils.DoEvents();
+
+                                                if (!(exit = !model.Signals.Value.HasFlag(Signals.SafetyDoor)))
+                                                {
+                                                    if (MessageBox.Show("Door is still open, exit?", "ioSender", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                                                    {
+                                                        exit = true;
+                                                        MainWindow.ui.Close();
+                                                    }
+                                                }
+                                            } while (!exit);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        MessageBox.Show("Door state cannot be cleared with <Reset>", "ioSender", MessageBoxButton.YesNo, MessageBoxImage.Exclamation);
+                                        response = string.Empty;
+                                    }
+                                    break;
+
+                                case GrblStates.Hold:
+                                case GrblStates.Sleep:
+                                    if (MessageBox.Show(string.Format("Controller is in {0} state and cannot respond, try a soft reset?", model.GrblState.State.ToString()),
+                                                         "ioSender", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+                                        MainWindow.ui.Close();
+                                    else if (!AttemptReset())
+                                    {
+                                        MessageBox.Show("Controller soft reset failed, exiting.", "ioSender");
+                                        MainWindow.ui.Close();
+                                    }
+                                    break;
+
+                                case GrblStates.Idle:
+                                    if(response.Contains("|SD:Pending"))
+                                        AttemptReset();
+                                    break;
+                            }
                         }
-                        else
-                            txtStatus.Text = "<Reset> then <Unlock> to continue.";
                     }
-                    else
+
+                    if (response != string.Empty)
                         InitSystem();
+
+                    model.Message = message;
                 }
+
+                if (initOK == null)
+                    initOK = false;
+
                 #if ADD_CAMERA
-                if (MainWindow.Camera != null)
+                if (MainWindow.UIViewModel.Camera != null)
                 {
-                    MainWindow.Camera.CameraControl.MoveOffset += Camera_MoveOffset;
-                    MainWindow.Camera.Opened += Camera_Opened;
+                    MainWindow.UIViewModel.Camera.MoveOffset += Camera_MoveOffset;
+                    MainWindow.UIViewModel.Camera.IsVisibilityChanged += Camera_Opened;
                 }
                 #endif
                 //if (viewer == null)
                 //    viewer = new Viewer();
 
-                if (GCodeSender.GCode.Loaded)
+                if(GCode.File.IsLoaded)
                     MainWindow.ui.WindowTitle = ((GrblViewModel)DataContext).FileName;
 
             }
-            else if(mode != ViewType.Shutdown)
+            else if(ViewType != ViewType.Shutdown)
             {
                 DRO.IsFocusable = false;
                 #if ADD_CAMERA
-                if (MainWindow.Camera != null)
-                    MainWindow.Camera.CameraControl.MoveOffset -= Camera_MoveOffset;
+                if (MainWindow.UIViewModel.Camera != null)
+                    MainWindow.UIViewModel.Camera.MoveOffset -= Camera_MoveOffset;
                 #endif
+                focusedControl = AppConfig.Settings.Base.KeepMdiFocus && Keyboard.FocusedElement is TextBox && (string)(Keyboard.FocusedElement as TextBox).Tag == "MDI"
+                                  ? Keyboard.FocusedElement
+                                  : this;
             }
 
             if (GCodeSender.Activate(activate)) {
                 Task.Delay(500).ContinueWith(t => DRO.EnableFocus());
                 Application.Current.Dispatcher.BeginInvoke(new System.Action(() =>
                 {
-                    Focus();
+                    focusedControl.Focus();
                 }), DispatcherPriority.Render);
             }
         }
 
         public void CloseFile()
         {
-            GCodeSender.CloseFile();
+            gcodeRenderer.Close();
         }
 
-#endregion
+        public void Setup(UIViewModel model, AppConfig profile)
+        {
+        }
+
+        #endregion
+
+        // https://stackoverflow.com/questions/5707143/how-to-get-the-width-height-of-a-collapsed-control-in-wpf
+        private void showProgramLimits()
+        {
+            double height;
+
+            if (limitsControl.Visibility == Visibility.Collapsed)
+            {
+                limitsControl.Visibility = Visibility.Hidden;
+                limitsControl.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+                height = limitsControl.DesiredSize.Height;
+                limitsControl.Visibility = Visibility.Collapsed;
+            }
+            else
+                height = limitsControl.ActualHeight;
+
+            limitsControl.Visibility = (dp.ActualHeight - t1.ActualHeight - t2.ActualHeight + limitsControl.ActualHeight) > height ? Visibility.Visible : Visibility.Collapsed;
+        }
 
 #if ADD_CAMERA
         void Camera_Opened()
         {
-            this.Focus();
+            model.IsCameraVisible = MainWindow.UIViewModel.Camera.IsVisible;
+            Focus();
         }
 
         void Camera_MoveOffset(CameraMoveMode Mode, double XOffset, double YOffset)
@@ -234,7 +459,7 @@ namespace GCode_Sender
                     break;
 
                 case CameraMoveMode.BothAxes:
-                    Grbl.MDICommand(DataContext, string.Format("X{0}Y{1}", XOffset.ToInvariantString("F3"), YOffset.ToInvariantString("F3")));
+                    ((GrblViewModel)DataContext).ExecuteCommand(string.Format("X{0}Y{1}", XOffset.ToInvariantString("F3"), YOffset.ToInvariantString("F3")));
                     break;
             }
 
@@ -244,68 +469,86 @@ namespace GCode_Sender
         private void InitSystem()
         {
             initOK = true;
+            int timeout = 5;
 
-            // TODO: check if grbl is in a state that allows replies
             using (new UIUtils.WaitCursor())
             {
                 GCodeSender.EnablePolling(false);
-                GrblInfo.Get();
-                GrblSettings.Get();
+                while (!GrblInfo.Get())
+                {
+                    if(--timeout == 0)
+                    {
+                        model.Message = "Controller is not responding!";
+                        initOK = false;
+                        return;
+                    }
+                    Thread.Sleep(500);
+                }
+                GrblAlarms.Get();
+                GrblErrors.Get();
+                GrblSettings.Load();
                 GrblParserState.Get();
                 GrblWorkParameters.Get();
                 GCodeSender.EnablePolling(true);
             }
 
-            workParametersControl.ToolChangeCommand = GrblInfo.ManualToolChange ? "T{0}M6" : "T{0}";
+            GrblCommand.ToolChange = GrblInfo.ManualToolChange ? "M61Q{0}" : "T{0}";
 
-            GCodeSender.Config();
+            if (keyboard == null)
+            {
+                keyboard = new KeypressHandler(model);
+                GCodeSender.Configure(keyboard);
+                gcodeRenderer.Configure();
+            }
 
-MainWindow.enableControl(true, ViewType.G76Threading);
-MainWindow.enableControl(true, ViewType.Turning);
+            showProgramLimits();
+
+            if (!AppConfig.Settings.GCodeViewer.IsEnabled)
+                tabGCode.Items.Remove(tab3D);
+
+            if (GrblInfo.NumAxes > 3)
+                limitsControl.Visibility = Visibility.Collapsed;
 
             if (GrblInfo.LatheModeEnabled)
             {
-                DRO.EnableLatheMode();
-                signalsControl.SetLatheMode();
-                MainWindow.enableControl(true, ViewType.Turning);
-                MainWindow.enableControl(true, ViewType.Facing);
-                MainWindow.enableControl(true, ViewType.G76Threading);
+                MainWindow.EnableView(true, ViewType.Turning);
+          //      MainWindow.EnableView(true, ViewType.Parting);
+          //      MainWindow.EnableView(true, ViewType.Facing);
+                MainWindow.EnableView(true, ViewType.G76Threading);
             }
             else
             {
-                DRO.SetNumAxes(GrblInfo.NumAxes);
-                signalsControl.SetNumAxes(GrblInfo.NumAxes);
-       //         MainWindow.showControl(false, ViewType.Turning);
-                MainWindow.showControl(false, ViewType.Facing);
-      //          MainWindow.showControl(false, ViewType.G76Threading);
+                MainWindow.ShowView(false, ViewType.Turning);
+                MainWindow.ShowView(false, ViewType.Parting);
+                MainWindow.ShowView(false, ViewType.Facing);
+                MainWindow.ShowView(false, ViewType.G76Threading);
             }
 
             if (GrblInfo.HasSDCard)
-                MainWindow.enableControl(true, ViewType.SDCard);
+                MainWindow.EnableView(true, ViewType.SDCard);
             else
-                MainWindow.showControl(false, ViewType.SDCard);
+                MainWindow.ShowView(false, ViewType.SDCard);
 
             if (GrblInfo.HasPIDLog)
-                MainWindow.enableControl(true, ViewType.PIDTuner);
+                MainWindow.EnableView(true, ViewType.PIDTuner);
             else
-                MainWindow.showControl(false, ViewType.PIDTuner);
+                MainWindow.ShowView(false, ViewType.PIDTuner);
 
             if (GrblInfo.NumTools > 0)
-                MainWindow.enableControl(true, ViewType.Tools);
+                MainWindow.EnableView(true, ViewType.Tools);
             else
-                MainWindow.showControl(false, ViewType.Tools);
+                MainWindow.ShowView(false, ViewType.Tools);
 
-            MainWindow.enableControl(true, ViewType.Offsets);
-            MainWindow.enableControl(true, ViewType.GRBLConfig);
+            if(GrblInfo.HasProbe && GrblSettings.ReportProbeCoordinates)
+                MainWindow.EnableView(true, ViewType.Probing);
+
+            MainWindow.EnableView(true, ViewType.Offsets);
+            MainWindow.EnableView(true, ViewType.GRBLConfig);
 
             if(!string.IsNullOrEmpty(GrblInfo.TrinamicDrivers))
-                MainWindow.enableControl(true, ViewType.TrinamicTuner);
+                MainWindow.EnableView(true, ViewType.TrinamicTuner);
             else
-                MainWindow.showControl(false, ViewType.TrinamicTuner);
-
-            MainWindow.GCodePush += UserUI_GCodePush;
-
-            txtStatus.Text = "";
+                MainWindow.ShowView(false, ViewType.TrinamicTuner);
         }
 
         void EnableUI(bool enable)
@@ -317,17 +560,11 @@ MainWindow.enableControl(true, ViewType.Turning);
             }
             // disable ui components when in sleep mode
         }
-
-        void UserUI_GCodePush(string gcode, CNC.Core.Action action)
-        {
-            GCodeSender.GCode.AddBlock(gcode, action);
-        }
-
 #region UIevents
 
         void JobView_Load(object sender, EventArgs e)
         {
-            GCodeSender.SetStreamingState(StreamingState.Idle);
+            GCodeSender.CallHandler(StreamingState.Idle, true);
         }
 
         private void JobView_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -336,9 +573,10 @@ MainWindow.enableControl(true, ViewType.Turning);
                 GCodeSender.Focus();
         }
 
-        private void GCodeSender_GotFocus(object sender, EventArgs e)
+        private void JobView_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-          //  Focus();
+            if (GrblInfo.IsLoaded)
+                showProgramLimits();
         }
 
         private void outside_MouseDown(object sender, MouseButtonEventArgs e)
@@ -355,19 +593,24 @@ MainWindow.enableControl(true, ViewType.Turning);
         protected override void OnPreviewKeyDown(KeyEventArgs e)
         {
             if (!(e.Handled = ProcessKeyPreview(e)))
+            {
+                if (Keyboard.Modifiers == (ModifierKeys.Control | ModifierKeys.Shift))
+                    Focus();
+
                 base.OnPreviewKeyDown(e);
+            }
         }
         protected override void OnPreviewKeyUp(KeyEventArgs e)
         {
             if (!(e.Handled = ProcessKeyPreview(e)))
                 base.OnPreviewKeyDown(e);
         }
-        protected bool ProcessKeyPreview(System.Windows.Input.KeyEventArgs e)
+        protected bool ProcessKeyPreview(KeyEventArgs e)
         {
-            if (mdiControl.IsFocused || DRO.IsFocused || spindleControl.IsFocused || workParametersControl.IsFocused)
+            if (keyboard == null)
                 return false;
 
-            return GCodeSender.ProcessKeypress(e);
+            return keyboard.ProcessKeypress(e, !(mdiControl.IsFocused || DRO.IsFocused || spindleControl.IsFocused || workParametersControl.IsFocused));
         }
 
 #endregion

@@ -1,13 +1,13 @@
 ﻿/*
  * NumericTextBox.cs - part of CNC Controls library
  *
- * v0.02 / 2019-10-21 / Io Engineering (Terje Io)
+ * v0.14 / 2020-03-20 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2019, Io Engineering (Terje Io)
+Copyright (c) 2018-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -38,7 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 using System;
-using System.ComponentModel;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
@@ -55,6 +54,9 @@ namespace CNC.Controls
         public NumericTextBox()
         {
             HorizontalContentAlignment = HorizontalAlignment.Right;
+            VerticalContentAlignment = VerticalAlignment.Bottom;
+            Height = 24;
+            TextWrapping = TextWrapping.NoWrap;
         }
 
         public new string Text { get { return base.Text; } set { base.Text = value; } }
@@ -62,7 +64,7 @@ namespace CNC.Controls
         public string DisplayFormat { get { return np.DisplayFormat; } }
 
         public static readonly DependencyProperty ValueProperty =
-            DependencyProperty.Register(nameof(Value), typeof(double), typeof(NumericTextBox), new PropertyMetadata(0.0d, new PropertyChangedCallback(OnValueChanged)));
+            DependencyProperty.Register(nameof(Value), typeof(double), typeof(NumericTextBox), new PropertyMetadata(double.NaN, new PropertyChangedCallback(OnValueChanged)));
         public double Value
         {
             get { return (double)GetValue(ValueProperty); }
@@ -101,6 +103,20 @@ namespace CNC.Controls
             Text = "";
         }
 
+        protected override void OnPreviewKeyUp(KeyEventArgs e)
+        {
+            base.OnPreviewKeyUp(e);
+
+            if (e.Key == Key.Delete || e.Key == Key.Back)
+            {
+                string text = SelectionLength > 0 ? Text.Remove(SelectionStart, SelectionLength) : Text;
+
+                updateText = false;
+                Value = double.Parse(text == "" || text == "." || text == "-" || text == "-." ? "0" : text, np.Styles, CultureInfo.InvariantCulture);
+                updateText = true;
+            }
+        }
+
         protected override void OnPreviewTextInput(TextCompositionEventArgs e)
         {
             TextBox textBox = (TextBox)e.OriginalSource;
@@ -109,7 +125,7 @@ namespace CNC.Controls
             if (!(e.Handled = !NumericProperties.IsStringNumeric(text, np)))
             {
                 updateText = false;
-                Value = double.Parse(text == "" || text == "." ? "0" : text, np.Styles, CultureInfo.InvariantCulture);
+                Value = double.Parse(text == "" || text == "." || text == "-" || text == "-." ? "0" : text, np.Styles, CultureInfo.InvariantCulture);
                 updateText = true;
             }
 

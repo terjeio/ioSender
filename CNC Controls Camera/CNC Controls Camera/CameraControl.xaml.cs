@@ -1,13 +1,13 @@
 ﻿/*
- * CNCCameraControl.xaml.cs - part of CNC Controls library
+ * CameraControl.xaml.cs - part of CNC Controls Camera library
  *
- * v0.01 / 2019-10-13 / Io Engineering (Terje Io)
+ * v0.30 / 2021-04-08 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2019, Io Engineering (Terje Io) - parts derived from AForge example code
+Copyright (c) 2018-2021, Io Engineering (Terje Io) - parts derived from AForge example code
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -37,7 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -58,7 +57,6 @@ namespace CNC.Controls.Camera
     {
         VideoCaptureDevice videoSource = null;
         public FilterInfoCollection LoaclWebCamsCollection;
-        private int cpct = 20;
 
         public delegate void MoveOffsetHandler(CameraMoveMode Mode, double XOffset, double YOffset);
         public event MoveOffsetHandler MoveOffset;
@@ -66,24 +64,77 @@ namespace CNC.Controls.Camera
         private RenderTargetBitmap overlay = null;
         private DrawingVisual visual = null;
         private System.Windows.Media.Pen pen = null;
+        private double _xOffset = 0d, _yOffset = 0d;
 
         public CameraControl()
         {
-            InitializeComponent();
+            DataContext = this;
 
-            XOffset = YOffset = 0.0;
-            Mode = CameraMoveMode.BothAxes;
+            InitializeComponent();
+        }
+
+        private void CameraControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
+                AppConfig.Settings.Camera.PropertyChanged += Base_PropertyChanged;
 
             pen = new System.Windows.Media.Pen(System.Windows.Media.Brushes.Red, 1);
 
-            DataContext = this;
-            Camera = Cameras[0];
-            cbxCamera.SelectedItem = Camera;
+            if (Cameras.Count > 0)
+            {
+                Camera = Cameras[0];
+                cbxCamera.SelectedItem = Camera;
+            }
         }
 
-        public double XOffset { get; set; }
-        public double YOffset { get; set; }
-        public CameraMoveMode Mode { get; set; }
+        private void Base_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            switch(e.PropertyName)
+            {
+                case nameof(AppConfig.Settings.Camera.XOffset):
+                    XOffset = (sender as CameraConfig).XOffset;
+                    break;
+
+                case nameof(AppConfig.Settings.Camera.YOffset):
+                    YOffset = (sender as CameraConfig).YOffset;
+                    break;
+
+                case nameof(AppConfig.Settings.Camera.MoveMode):
+                    Mode = (sender as CameraConfig).MoveMode;
+                    break;
+            }
+        }
+
+        public static readonly DependencyProperty IsMoveEnabledProperty = DependencyProperty.Register(nameof(IsMoveEnabled), typeof(bool), typeof(CameraControl), new PropertyMetadata(false));
+        public bool IsMoveEnabled
+        {
+            get { return (bool)GetValue(IsMoveEnabledProperty); }
+            set { SetValue(IsMoveEnabledProperty, value); }
+        }
+
+        public static readonly DependencyProperty GuideScaleProperty = DependencyProperty.Register(nameof(GuideScale), typeof(int), typeof(CameraControl), new PropertyMetadata(10, new PropertyChangedCallback(OnGuideScaleChanged)));
+        public int GuideScale
+        {
+            get { return (int)GetValue(GuideScaleProperty); }
+            set { SetValue(GuideScaleProperty, value); }
+        }
+        private static void OnGuideScaleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            AppConfig.Settings.Camera.GuideScale = (int)e.NewValue;
+        }
+
+        public double XOffset
+        {
+            get { return _xOffset; }
+            set { _xOffset = value; IsMoveEnabled = _xOffset != 0d || _yOffset != 0d; }
+        }
+        public double YOffset
+        {
+            get { return _yOffset; }
+            set { _yOffset = value; IsMoveEnabled = _xOffset != 0d || _yOffset != 0d; }
+        }
+        public CameraMoveMode Mode { get; set; } = CameraMoveMode.BothAxes;
+        public bool HasCamera { get { return Cameras.Count > 0; } }
         public bool IsCameraOpen { get { return videoSource != null; } }
         public FilterInfoCollection Cameras { get; private set; } = new FilterInfoCollection(FilterCategory.VideoInputDevice);
         public FilterInfo Camera { get; private set; }
@@ -93,8 +144,8 @@ namespace CNC.Controls.Camera
             if (Camera != null)
             {
                 videoSource = new VideoCaptureDevice(Camera.MonikerString);
-                videoSource.NewFrame += videoSource_NewFrame;
                 videoSource.Start();
+                videoSource.NewFrame += videoSource_NewFrame;
             }
 
             return videoSource != null && videoSource.IsRunning;
@@ -137,7 +188,7 @@ namespace CNC.Controls.Camera
                 r.DrawImage(bmp, new Rect(0, 0, bmp.Width, bmp.Height));
                 r.DrawLine(pen, new System.Windows.Point(0, center.Y), new System.Windows.Point(bmp.Width, center.Y));
                 r.DrawLine(pen, new System.Windows.Point(center.X, 0), new System.Windows.Point(center.X, bmp.Height));
-                r.DrawEllipse(null, pen, center, center.Y * cpct / 100d, center.Y * cpct / 100d);
+                r.DrawEllipse(null, pen, center, center.Y * GuideScale / 100d, center.Y * GuideScale / 100d);
             }
             overlay.Render(visual);
         }
@@ -169,7 +220,7 @@ namespace CNC.Controls.Camera
 
         private void sldcircle_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            cpct = (int)sldcircle.Value;
+         //   AppConfig.Settings.Camera.GuideScale = (int)sldcircle.Value;
         }
 
         private void btnMove_Click(object sender, RoutedEventArgs e)

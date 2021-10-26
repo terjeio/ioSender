@@ -1,13 +1,13 @@
-﻿/*
+/*
  * Viewer.xaml.cs - part of CNC Controls library
  *
- * v0.02 / 2019-10-31 / Io Engineering (Terje Io)
+ * v0.33 / 2021-05-16 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019, Io Engineering (Terje Io)
+Copyright (c) 2019-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -40,15 +40,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using System.Collections.Generic;
 using System.Windows.Controls;
 using CNC.GCode;
-using CNC.View;
+using CNC.Core;
 
 namespace CNC.Controls.Viewer
 {
 /// <summary>
 /// Interaction logic for Viewer.xaml
 /// </summary>
-public partial class Viewer : UserControl, CNCView
+public partial class Viewer : UserControl, ICNCView
     {
+        private bool isNew = false, isLoaded = false;
+
         public Viewer()
         {
             InitializeComponent();
@@ -56,43 +58,30 @@ public partial class Viewer : UserControl, CNCView
             gcodeView.ShowBoundingBox = false;
         }
 
-        public int ArcResolution {
-            get { return gcodeView.ArcResolution; }
-            set { gcodeView.ArcResolution = value; }
-        }
-        public double MinDistance
-        {
-            get { return gcodeView.MinDistance; }
-            set { gcodeView.MinDistance = value; }
-        }
-        public bool ShowGrid
-        {
-            get { return gcodeView.ShowGrid; }
-            set { gcodeView.ShowGrid = value; }
-        }
-        public bool ShowAxes
-        {
-            get { return gcodeView.ShowAxes; }
-            set { gcodeView.ShowAxes = value; }
-        }
-        public bool ShowBoundingBox
-        {
-            get { return gcodeView.ShowBoundingBox; }
-            set { gcodeView.ShowBoundingBox = value; }
-        }
+        public ViewType ViewType { get { return ViewType.GCodeViewer; } }
+        public bool CanEnable { get { return true; } }
 
-        public bool ShowViewCube
+        private void SettingsChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            get { return gcodeView.viewport.ShowViewCube; }
-            set { gcodeView.viewport.ShowViewCube = value; }
+            Configure();
         }
-
-        public ViewType mode { get { return ViewType.GCodeViewer; } }
 
         public void Activate(bool activate, ViewType chgMode)
         {
             if (activate)
             {
+                var d = DataContext as GrblViewModel;
+
+                if(GCode.File.Tokens != null && isNew)
+                {
+                    isNew = false;
+                    using (new UIUtils.WaitCursor())
+                    {
+                        gcodeView.ShowPosition();
+                        gcodeView.Render(GCode.File.Tokens);
+                    }
+                }
+
                 gcodeView.ShowPosition();
             }
         }
@@ -101,20 +90,54 @@ public partial class Viewer : UserControl, CNCView
         {
             gcodeView.ClearViewport();
         }
-
-        public void ApplySettings(GCodeViewerConfig config)
+        public void Configure()
         {
-            ArcResolution = config.ArcResolution;
-            MinDistance = config.MinDistance;
-            ShowGrid = config.ShowGrid;
-            ShowAxes = config.ShowAxes;
-            ShowBoundingBox = config.ShowBoundingBox;
-            ShowViewCube = config.ShowViewCube;
+            gcodeView.ArcResolution = AppConfig.Settings.GCodeViewer.ArcResolution;
+            gcodeView.MinDistance = AppConfig.Settings.GCodeViewer.MinDistance;
+            gcodeView.ShowGrid = AppConfig.Settings.GCodeViewer.ShowGrid;
+            gcodeView.ShowAxes = AppConfig.Settings.GCodeViewer.ShowAxes;
+            gcodeView.ShowBoundingBox = AppConfig.Settings.GCodeViewer.ShowBoundingBox;
+            gcodeView.Machine.ShowViewCube = AppConfig.Settings.GCodeViewer.ShowViewCube;
+            gcodeView.Machine.ShowCoordinateSystem = AppConfig.Settings.GCodeViewer.ShowCoordinateSystem;
+            gcodeView.Machine.CutMotionColor = AppConfig.Settings.GCodeViewer.CutMotionColor;
+            gcodeView.Machine.RapidMotionColor = AppConfig.Settings.GCodeViewer.RapidMotionColor;
+            gcodeView.Machine.RetractMotionColor = AppConfig.Settings.GCodeViewer.RetractMotionColor;
+            gcodeView.Machine.ToolOriginColor = AppConfig.Settings.GCodeViewer.ToolOriginColor;
+            gcodeView.Machine.GridColor = AppConfig.Settings.GCodeViewer.GridColor;
+            gcodeView.Machine.CanvasColor = AppConfig.Settings.GCodeViewer.BlackBackground ? System.Windows.Media.Brushes.Black : System.Windows.Media.Brushes.White;
         }
 
-        public void Open(string title, List<GCodeToken> tokens)
+        public void Setup(UIViewModel model, AppConfig profile)
         {
-            gcodeView.Render(tokens);
+            model.ConfigControls.Add(new ConfigControl());
+
+            Configure();
+        }
+
+        public void Open(List<GCodeToken> tokens)
+        {
+            if (!(isNew = !IsVisible))
+            {
+                using (new UIUtils.WaitCursor())
+                {
+                    gcodeView.ShowPosition();
+                    gcodeView.Render(tokens);
+                }
+            }
+        }
+
+        private void button_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            gcodeView.ResetView();
+        }
+
+        private void control_Loaded(object sender, System.Windows.RoutedEventArgs e)
+        {
+            if (!isLoaded && !System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
+            {
+                isLoaded = true;
+                AppConfig.Settings.GCodeViewer.PropertyChanged += SettingsChanged;
+            }
         }
     }
 }

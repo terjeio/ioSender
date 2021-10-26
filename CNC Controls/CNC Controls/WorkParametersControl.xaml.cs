@@ -1,13 +1,13 @@
 ﻿/*
  * WorkParametersControl.xaml.cs - part of CNC Controls library
  *
- * v0.02 / 2019-10-17 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-11 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2019, Io Engineering (Terje Io)
+Copyright (c) 2018-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -37,8 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-using System;
-using System.Data;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -60,7 +58,6 @@ namespace CNC.Controls
 
         #region Properties
 
-        public string ToolChangeCommand { get; set; } = "T{0}";
         public new bool IsFocused { get { return cbxTool.IsFocused || cbxOffset.IsFocused; } }
 
         public static readonly DependencyProperty IsToolChangingProperty = DependencyProperty.Register(nameof(IsToolChanging), typeof(bool), typeof(WorkParametersControl), new PropertyMetadata(false, new PropertyChangedCallback(IsToolChangingChanged)));
@@ -71,8 +68,8 @@ namespace CNC.Controls
         }
         private static void IsToolChangingChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ((WorkParametersControl)d).bgTool.Background = ((bool)e.NewValue ? Brushes.Salmon : ((WorkParametersControl)d).Background);
-            ((WorkParametersControl)d).cbxTool.IsEnabled = !(bool)e.NewValue;
+            (d as WorkParametersControl).bgTool.Background = ((bool)e.NewValue ? Brushes.Salmon : ((WorkParametersControl)d).Background);
+            (d as WorkParametersControl).cbxTool.IsEnabled = !(bool)e.NewValue;
         }
 
         #endregion
@@ -95,13 +92,13 @@ namespace CNC.Controls
         private void cbxOffset_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (e.AddedItems.Count == 1 && ((ComboBox)sender).IsDropDownOpen)
-                Grbl.MDICommand(DataContext, ((CoordinateSystem)e.AddedItems[0]).Code);
+                (DataContext as GrblViewModel).ExecuteCommand(((CoordinateSystem)e.AddedItems[0]).Code);
         }
 
         private void cbxTool_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (e.AddedItems.Count == 1 && ((ComboBox)sender).IsDropDownOpen)
-                Grbl.MDICommand(DataContext, string.Format(ToolChangeCommand, ((Tool)e.AddedItems[0]).Code));
+                (DataContext as GrblViewModel).ExecuteCommand(string.Format(GrblCommand.ToolChange, ((Tool)e.AddedItems[0]).Code));
         }
 
         #endregion

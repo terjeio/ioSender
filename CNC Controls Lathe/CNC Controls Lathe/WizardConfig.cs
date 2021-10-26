@@ -1,13 +1,13 @@
-﻿/*
+/*
  * WizardConfig.cs - part of CNC Controls library for Grbl
  *
- * v0.01 / 2019-06-31 / Io Engineering (Terje Io)
+ * v0.29 / 2021-02-02 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019, Io Engineering (Terje Io)
+Copyright (c) 2019-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -85,7 +85,6 @@ namespace CNC.Controls.Lathe
 
         public double RpmMin { get; private set; }
         public double RpmMax { get; private set; }
-        public bool metric { get; private set; }
         public double XMaxFeedRate { get; private set; }
         public double XAcceleration { get; private set; }
         public double ZMaxFeedRate { get; private set; }
@@ -96,7 +95,7 @@ namespace CNC.Controls.Lathe
 
         private void SetLimits()
         {
-            if (IsLoaded)
+            if (IsLoaded && GrblSettings.IsLoaded)
             {
                 if (!CSS)
                     active.RPM = Math.Min(Math.Max(RPM, RpmMin), RpmMax);
@@ -107,25 +106,24 @@ namespace CNC.Controls.Lathe
 
         public bool Update()
         {
-            if (GrblSettings.Loaded)
+            if (GrblSettings.IsLoaded)
             {
-                XMaxFeedRate = GrblSettings.GetDouble(GrblSetting.AxisSetting_XMaxRate);
-                XAcceleration = GrblSettings.GetDouble(GrblSetting.AxisSetting_XAcceleration);
-                ZMaxFeedRate = GrblSettings.GetDouble(GrblSetting.AxisSetting_ZMaxRate);
-                ZAcceleration = GrblSettings.GetDouble(GrblSetting.AxisSetting_ZAcceleration);
+                XMaxFeedRate = GrblSettings.GetDouble(GrblSetting.MaxFeedRateBase);
+                XAcceleration = GrblSettings.GetDouble(GrblSetting.AccelerationBase);
+                ZMaxFeedRate = GrblSettings.GetDouble(GrblSetting.MaxFeedRateBase + GrblConstants.Z_AXIS);
+                ZAcceleration = GrblSettings.GetDouble(GrblSetting.AccelerationBase + GrblConstants.Z_AXIS);
                 RpmMin = GrblSettings.GetDouble(GrblSetting.RpmMin);
                 RpmMax = GrblSettings.GetDouble(GrblSetting.RpmMax);
 
                 GrblParserState.Get();
 
-                metric = GrblParserState.IsActive("G21") != null;
                 if (!xmodelock)
-                    xmode = GrblInfo.LatheMode;
+                    xmode = GrblParserState.LatheMode;
 
                 SetLimits();
             }
 
-            return GrblSettings.Loaded;
+            return GrblSettings.IsLoaded;
         }
     }
 
@@ -219,7 +217,7 @@ namespace CNC.Controls.Lathe
 
         public LatheProfile(string filename)
         {
-            this.filename = Core.Resources.Path + "\\" + filename;
+            this.filename = Core.Resources.Path + filename;
         }
 
         public ProfileData Add()
@@ -237,10 +235,9 @@ namespace CNC.Controls.Lathe
         public void Save()
         {
             XmlSerializer xs = new XmlSerializer(typeof(ObservableCollection<ProfileData>));
-
-            FileStream fsout = new FileStream(filename, FileMode.Create, FileAccess.Write, FileShare.None);
             try
             {
+                FileStream fsout = new FileStream(filename, FileMode.Create, FileAccess.Write, FileShare.None);
                 using (fsout)
                 {
                     xs.Serialize(fsout, profiles);
@@ -343,64 +340,66 @@ namespace CNC.Controls.Lathe
     public class PassCalc
     {
         private int _passes = 1;
+        private double _distance;
 
         public PassCalc(double distance, double passdepth, double passdepth_last, int precision)
         {
-            this.passdepth = passdepth;
-            this.passdepth_last = passdepth_last;
-            this.distance = Math.Round(Math.Abs(distance), precision);
+            Passdepth = passdepth;
+            PassdepthLast = passdepth_last;
+            _distance = Math.Round(Math.Abs(distance), precision);
 
-            if (this.distance < this.passdepth_last)
-                this.passdepth_last = this.distance;
-
-            else if (this.distance < this.passdepth)
+            if (_distance < PassdepthLast)
             {
-                if (this.passdepth_last > 0.0d)
-                    this._passes++;
-                this.passdepth = this.distance - this.passdepth_last;
+                PassdepthLast = _distance;
+                _distance = 0d;
+            }
+            else if (_distance < (Passdepth + PassdepthLast))
+            {
+                if (PassdepthLast > 0d)
+                    _passes++;
+                Passdepth = _distance = _distance - PassdepthLast;
             }
             else
             {
-                this.distance -= this.passdepth_last;
-                this._passes = (int)Math.Floor(this.distance / this.passdepth);
+                _distance -= PassdepthLast;
+                _passes = (int)Math.Floor(_distance / Passdepth);
 
-                if (this.passdepth * (double)this._passes < this.distance)
+                if (Passdepth * (double)_passes < _distance)
                 {
-                    this._passes++;
-                    this.passdepth = Math.Round(this.distance / (double)this._passes, precision);
+                    _passes++;
+                    Passdepth = Math.Round(_distance / (double)_passes, precision);
                 }
-                this._passes++; // Add last pass
+                _passes++; // Add last pass
             }
 
-            this.DOC = this.passdepth;
+            DOC = Passdepth;
         }
 
-        public int passes { get { return _passes + springpasses; } }
-        public int springpasses { get; set; }
-        public double passdepth { get; private set; }
-        public double passdepth_last { get; private set; }
-        public double distance { get; private set; }
-        public bool IsLastPass { get; private set; }
-        public bool dir { get; private set; }
-        public double DOC { get; private set; }
+        public int Passes { get { return _passes + Springpasses; } }
+        public int Springpasses { get; set; }
+        public double Passdepth { get; private set; }
+        public double PassdepthLast { get; private set; }
         public double Distance { get; private set; }
+        public bool IsLastPass { get; private set; }
+        public bool Dir { get; private set; }
+        public double DOC { get; private set; }
 
         public double GetPassTarget(uint pass, double start, bool negative)
         {
-            if (pass <= passes)
+            if (pass <= Passes)
             {
                 if ((IsLastPass = pass >= _passes))
                 {
-                    this.Distance = distance + passdepth_last;
-                    this.DOC = pass > _passes ? 0.0d : passdepth_last;
+                    Distance = _distance + PassdepthLast;
+                    DOC = pass > _passes ? 0.0d : PassdepthLast;
                 }
                 else if (pass == _passes - 1)
-                    this.Distance = distance;
+                    Distance = _distance;
                 else
-                    this.Distance = Math.Min(passdepth * (double)pass, distance);
+                    Distance = Math.Min(Passdepth * (double)pass, _distance);
             }
 
-            return pass > passes ? double.NaN : (negative ? -this.Distance : this.Distance) + start;
+            return pass > Passes ? double.NaN : (negative ? -Distance : Distance) + start;
         }
     }
 }

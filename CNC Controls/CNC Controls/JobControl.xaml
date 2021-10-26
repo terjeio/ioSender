@@ -5,27 +5,18 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CNC.Controls"
              mc:Ignorable="d" 
-             d:DesignHeight="398" d:DesignWidth="431">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="177*"/>
-            <RowDefinition Height="22*"/>
-        </Grid.RowDefinitions>
-        <DataGrid x:Name="grdGCode" Grid.Row="0" ItemsSource="{Binding}" AllowDrop="True" Width="410" Height="340" AutoGenerateColumns="False" HorizontalAlignment="Left" Margin="3,3,0,0" VerticalAlignment="Top"
-                   DragEnter="grdGCode_Drag" DragOver="grdGCode_Drag" DragLeave="grdGCode_Drag" Drop="grdGCode_Drop">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Line" Binding="{Binding LineNum}" Width="50"/>
-                <DataGridTextColumn Header="" Binding="{Binding Sent}" Width="20"/>
-                <DataGridTextColumn Header="Data" Binding="{Binding Data}" Width="*"/>
-            </DataGrid.Columns>
-        </DataGrid>
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Height="36" Margin="3,3,0,0" Grid.Row="1" VerticalAlignment="Top" Width="411">
-            <Button x:Name="btnStart" Content="Start" Width="71" Height="32" HorizontalAlignment="Left" VerticalAlignment="Center" Click="btnStart_Click"/>
-            <Button x:Name="btnHold" Content="Hold" Width="71" Height="32"  Margin="6,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Click="btnHold_Click"/>
-            <Button x:Name="btnStop" Content="Stop" Width="71" Height="32"  Margin="6,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Click="btnStop_Click"/>
-            <Button x:Name="btnRewind" Content="Rewind" Width="71" Height="32" Margin="6,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Click="btnRewind_Click"/>
-            <Label x:Name="lblRunTime" Content="00:00:00" Height="28" Width="60" Margin="40,0,0,0" HorizontalAlignment="Right" VerticalAlignment="Top"/>
-        </StackPanel>
-
-    </Grid>
+             d:DesignHeight="36" d:DesignWidth="340">
+    <UserControl.Resources>
+        <Style x:Key="JobButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="80" />
+            <Setter Property="Height" Value="36" />
+            <Setter Property="Focusable" Value="False" />
+        </Style>
+    </UserControl.Resources>
+    <StackPanel Orientation="Horizontal">
+        <Button x:Uid="btn_cycleStart" x:Name="btnStart" Content="Cycle Start" ToolTip="Alt+R" Style="{StaticResource JobButtonStyle}" Click="btnStart_Click"/>
+        <Button x:Uid="btn_feedHold" x:Name="btnHold" Content="Feed Hold" ToolTip="Space" Style="{StaticResource JobButtonStyle}" Margin="5,0,0,0" Click="btnHold_Click"/>
+        <Button x:Uid="btn_stop" x:Name="btnStop" Content="Stop" ToolTip="Alt+S" Style="{StaticResource JobButtonStyle}" Margin="5,0,0,0" Click="btnStop_Click"/>
+        <Button x:Uid="btn_rewind" x:Name="btnRewind" Content="Rewind" Style="{StaticResource JobButtonStyle}" Margin="5,0,0,0" Click="btnRewind_Click"/>
+    </StackPanel>
 </UserControl>

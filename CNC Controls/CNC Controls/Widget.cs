@@ -1,13 +1,13 @@
-﻿/*
+/*
  * Widget.cs - part of CNC Controls library for Grbl
  *
- * v0.03 / 2019-10-21 / Io Engineering (Terje Io)
+ * v0.34 / 2021-07-18 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2019, Io Engineering (Terje Io)
+Copyright (c) 2018-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -38,12 +38,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 using System;
-using System.Data;
 using System.Windows;
 using System.Windows.Controls;
 using CNC.Core;
 using System.Windows.Data;
-using static CNC.Controls.WidgetProperties;
+using CNC.GCode;
 
 namespace CNC.Controls
 {
@@ -68,19 +67,9 @@ namespace CNC.Controls
 
     public class WidgetProperties
     {
-        public enum DataTypes
-        {
-            BOOL = 0,
-            BITFIELD,
-            XBITFIELD,
-            RADIOBUTTONS,
-            INTEGER,
-            FLOAT,
-            TEXT
-        };
 
         public int Id { get; private set; }
-        public DataTypes DataType { get; private set; }
+        public GrblSettingDetails.DataTypes DataType { get; private set; }
         public string Label { get; private set; }
         public string Format { get; private set; }
         public string Unit { get; private set; }
@@ -88,38 +77,25 @@ namespace CNC.Controls
         public double Min { get; private set; } = double.NaN;
         public double Max { get; private set; } = double.NaN;
 
-        DataRow properties = null;
+        GrblSettingDetails properties = null;
 
-        public WidgetProperties(DataRow Properties)
+        public void Assign (string value)
         {
-            this.properties = Properties;
-
-            try
-            {
-                DataType = (DataTypes)Enum.Parse(typeof(DataTypes), ((string)Properties["DataType"]).ToUpperInvariant());
-            }
-            catch
-            {
-                DataType = DataTypes.TEXT;
-            }
-
-            Id = (int)Properties["Id"];
-            Format = (string)Properties["DataFormat"];
-            Unit = (string)Properties["Unit"];
-            Label = (string)Properties["Name"];
-            Value = (string)Properties["Value"];
-            Min = (double)Properties["Min"];
-            Max = (double)Properties["Max"];
+            properties.Value = value;
         }
 
-        public void Assign(string value)
+        public WidgetProperties(GrblSettingDetails Properties)
         {
-            if (properties != null)
-            {
-                properties.BeginEdit();
-                properties["Value"] = value;
-                properties.EndEdit();
-            }
+            properties = Properties;
+
+            Id = Properties.Id;
+            DataType = Properties.DataType == GrblSettingDetails.DataTypes.PASSWORD ? GrblSettingDetails.DataTypes.TEXT : Properties.DataType;
+            Format = Properties.Format;
+            Unit = Properties.Unit;
+            Label = Properties.Name;
+            Value = Properties.Value;
+            Min = Properties.Min;
+            Max = Properties.Max;
         }
     }
 
@@ -130,6 +106,7 @@ namespace CNC.Controls
         private const int PPU = 8;
         private bool isEnabled = false, disposed = false, Modified = false, has_unit = true;
         private string orgText;
+        private double labelWidth = 180d;
         private StackPanel components;
         private WidgetViewModel model;
 
@@ -140,7 +117,9 @@ namespace CNC.Controls
         public RadioButton wRadiobutton = null;
         private StackPanel Canvas;
 
-        public Widget(ConfigView View, WidgetProperties widget, StackPanel Canvas)
+        public string BaseValue { get { return widget.Value; } }
+
+        public Widget(GrblConfigView View, WidgetProperties widget, StackPanel Canvas)
         {
             this.Canvas = components = Canvas;
             this.widget = widget;
@@ -152,7 +131,7 @@ namespace CNC.Controls
 
             switch (widget.DataType)
             {
-                case DataTypes.BOOL:
+                case GrblSettingDetails.DataTypes.BOOL:
 
                     wCheckBox = new CheckBox
                     {
@@ -168,13 +147,19 @@ namespace CNC.Controls
                     components.Children.Add(grid);
                     break;
 
-                case DataTypes.BITFIELD:
-                case DataTypes.XBITFIELD:
+                case GrblSettingDetails.DataTypes.BITFIELD:
+                case GrblSettingDetails.DataTypes.XBITFIELD:
+                case GrblSettingDetails.DataTypes.AXISMASK:
                     has_unit = false;
-                    bool axes = widget.Format == "axes";
+                    bool axes = widget.DataType == GrblSettingDetails.DataTypes.AXISMASK || widget.Format == "axes";
                     string[] format = (axes ? "X-Axis,Y-Axis,Z-Axis,A-Axis,B-Axis,C-Axis" : widget.Format).Split(',');
-                    for (int i = 0; i < (axes ? 3 : format.Length); i++)
+                    for (int i = 0; i < (axes ? 6 : format.Length); i++)
                     {
+                        if (axes && !GrblInfo.AxisFlags.HasFlag(GCodeParser.AxisFlag[i]))
+                            continue;
+                        else if (format[i] == "N/A")
+                            continue;
+
                         wCheckBox = new CheckBox
                         {
                             Name = string.Format("_bitmask{0}", i),
@@ -183,7 +168,7 @@ namespace CNC.Controls
                             IsEnabled = false,
                             Tag = 1 << i
                         };
-                        grid = AddGrid(200);
+                        grid = AddGrid(300);
                         if (i == 0)
                         {
                             labelGrid = grid;
@@ -199,7 +184,7 @@ namespace CNC.Controls
                     }
                     break;
 
-                case DataTypes.RADIOBUTTONS:
+                case GrblSettingDetails.DataTypes.RADIOBUTTONS:
                     has_unit = false;
                     string[] rformat = widget.Format.Split(',');
                     for (int i = 0; i < rformat.Length; i++)
@@ -211,7 +196,7 @@ namespace CNC.Controls
                             IsEnabled = false,
                             Tag = i
                         };
-                        grid = AddGrid(200);
+                        grid = AddGrid(300);
                         if (i == 0)
                         {
                             labelGrid = grid;
@@ -227,13 +212,14 @@ namespace CNC.Controls
                     }
                     break;
 
-                case DataTypes.INTEGER:
-                case DataTypes.FLOAT:
+                case GrblSettingDetails.DataTypes.INTEGER:
+                case GrblSettingDetails.DataTypes.FLOAT:
                     wNumericTextBox = new NumericTextBox
                     {
                         Format = widget.Format,
                         Height = 22
                     };
+                    labelWidth = 210;
                     grid = labelGrid = AddGrid(wNumericTextBox.Width + 4);
                     grid.Children.Add(wNumericTextBox);
                     Grid.SetColumn(wNumericTextBox, 1);
@@ -253,9 +239,9 @@ namespace CNC.Controls
                         Min = widget.Min,
                         Max = widget.Max
                     });
-                    wNumericTextBox.Style = View.Resources["ErrorStyle"] as Style;
+                    wNumericTextBox.Style = View.Resources["NumericErrorStyle"] as Style;
                     BindingOperations.SetBinding(wNumericTextBox, NumericTextBox.ValueProperty, binding);
-                    model.NumericValue = dbl.Parse(widget.Value);
+//                    model.NumericValue = dbl.Parse(widget.Value);
                     break;
 
                 default:
@@ -263,15 +249,32 @@ namespace CNC.Controls
                     wTextBox = new TextBox
                     {
                         Name = "tb_name_xxx",
-                        MaxLength = widget.Format.Length
+                        MaxLength = widget.Format.Length,
+                        VerticalContentAlignment = VerticalAlignment.Bottom,
+                        Height = 24
                         //TabIndex = Canvas.Row
                     };
-                    if (widget.DataType == DataTypes.TEXT && widget.Format.StartsWith("x("))
+                    if (widget.DataType == GrblSettingDetails.DataTypes.TEXT && widget.Format.StartsWith("x("))
                     {
                         int length = 8;
                         int.TryParse(widget.Format.Substring(2).Replace(")", ""), out length);
                         wTextBox.MaxLength = length;
                         //  this.wTextBox.Size = new System.Drawing.Size(Math.Min(length * PPU, Canvas.Width - x - 15), 20);
+                    }
+                    else if (widget.DataType == GrblSettingDetails.DataTypes.IP4)
+                    {
+                        wTextBox.MaxLength = 16;
+                        Binding sbinding = new Binding("Text")
+                        {
+                            Source = Canvas.DataContext,
+                            Path = new PropertyPath("TextValue"),
+                            Mode = BindingMode.TwoWay,
+                            UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
+                            ValidatesOnDataErrors = true
+                        };
+                        sbinding.ValidationRules.Add(new IP4ValueRule());
+                        wTextBox.Style = View.Resources["Ip4ErrorStyle"] as Style;
+                        BindingOperations.SetBinding(wTextBox, TextBox.TextProperty, sbinding);
                     }
                     grid = labelGrid = AddGrid();
                     grid.Children.Add(wTextBox);
@@ -282,13 +285,13 @@ namespace CNC.Controls
                     break;
             }
 
-            if (widget.DataType != DataTypes.BOOL && labelGrid != null)
+            if (widget.DataType != GrblSettingDetails.DataTypes.BOOL && labelGrid != null)
             {
                 if (widget.Label != "")
                 {
                     wLabel = new Label
                     {
-                        Width = 180,
+                        Width = labelWidth,
                         Height = 26,
                         HorizontalContentAlignment = HorizontalAlignment.Right,
                         VerticalContentAlignment = VerticalAlignment.Center,
@@ -332,20 +335,20 @@ namespace CNC.Controls
             };
 
             ColumnDefinition c = new ColumnDefinition();
-            c.Width = new GridLength(180);
+            c.Width = new GridLength(labelWidth);
             grid.ColumnDefinitions.Add(c);
             c = new ColumnDefinition();
             c.Width = new GridLength(width);
             grid.ColumnDefinitions.Add(c);
             c = new ColumnDefinition();
-            c.Width = new GridLength(grid.Width - 180 - width);
+            c.Width = new GridLength(Math.Max(1d, grid.Width - labelWidth - width));
             grid.ColumnDefinitions.Add(c);
 
             return grid;
         }
         Grid AddGrid()
         {
-            return AddGrid(120);
+            return AddGrid(120d);
         }
 
         #region Attributes
@@ -358,12 +361,13 @@ namespace CNC.Controls
 
                 switch (widget.DataType)
                 {
-                    case DataTypes.BITFIELD:
+                    case GrblSettingDetails.DataTypes.BITFIELD:
+                    case GrblSettingDetails.DataTypes.AXISMASK:
                         foreach (CheckBox checkBox in UIUtils.FindLogicalChildren<CheckBox>(this.Canvas))
                             checkBox.IsEnabled = isEnabled;
                         break;
 
-                    case DataTypes.XBITFIELD:
+                    case GrblSettingDetails.DataTypes.XBITFIELD:
                         CheckBox firstCheckBox = null;
                         foreach (CheckBox checkBox in UIUtils.FindLogicalChildren<CheckBox>(this.Canvas))
                         {
@@ -377,17 +381,17 @@ namespace CNC.Controls
                             checkBox.IsEnabled = isEnabled && (checkBox == firstCheckBox || firstCheckBox.IsChecked == true);
                         break;
 
-                    case DataTypes.RADIOBUTTONS:
+                    case GrblSettingDetails.DataTypes.RADIOBUTTONS:
                         foreach (RadioButton radioButton in UIUtils.FindLogicalChildren<RadioButton>(this.Canvas))
                             radioButton.IsEnabled = isEnabled;
                         break;
 
-                    case DataTypes.BOOL:
+                    case GrblSettingDetails.DataTypes.BOOL:
                         wCheckBox.IsEnabled = isEnabled;
                         break;
 
-                    case DataTypes.INTEGER:
-                    case DataTypes.FLOAT:
+                    case GrblSettingDetails.DataTypes.INTEGER:
+                    case GrblSettingDetails.DataTypes.FLOAT:
                         wNumericTextBox.IsEnabled = isEnabled;
                         break;
 
@@ -405,8 +409,9 @@ namespace CNC.Controls
                 string value = "";
                 switch (widget.DataType)
                 {
-                    case DataTypes.BITFIELD:
-                    case DataTypes.XBITFIELD:
+                    case GrblSettingDetails.DataTypes.BITFIELD:
+                    case GrblSettingDetails.DataTypes.XBITFIELD:
+                    case GrblSettingDetails.DataTypes.AXISMASK:
                         int val = 0;
                         foreach (CheckBox checkBox in UIUtils.FindLogicalChildren<CheckBox>(this.Canvas))
                         {
@@ -416,7 +421,7 @@ namespace CNC.Controls
                         value = val.ToString();
                         break;
 
-                    case DataTypes.RADIOBUTTONS:
+                    case GrblSettingDetails.DataTypes.RADIOBUTTONS:
                         int rval = 0;
                         foreach (RadioButton radioButton in UIUtils.FindLogicalChildren<RadioButton>(this.Canvas))
                         {
@@ -429,12 +434,12 @@ namespace CNC.Controls
                         value = rval.ToString();
                         break;
 
-                    case DataTypes.INTEGER:
-                    case DataTypes.FLOAT:
+                    case GrblSettingDetails.DataTypes.INTEGER:
+                    case GrblSettingDetails.DataTypes.FLOAT:
                         value = model.NumericValue.ToInvariantString();
                         break;
 
-                    case DataTypes.BOOL:
+                    case GrblSettingDetails.DataTypes.BOOL:
                         value = wCheckBox.IsChecked == true ? "1" : "0";
                         break;
 
@@ -449,25 +454,27 @@ namespace CNC.Controls
                 Modified = false;
                 switch (widget.DataType)
                 {
-                    case DataTypes.BITFIELD:
-                    case DataTypes.XBITFIELD:
+                    case GrblSettingDetails.DataTypes.BITFIELD:
+                    case GrblSettingDetails.DataTypes.XBITFIELD:
+                    case GrblSettingDetails.DataTypes.AXISMASK:
                         int val = int.Parse(value);
                         foreach (CheckBox checkBox in UIUtils.FindLogicalChildren<CheckBox>(this.Canvas))
                             checkBox.IsChecked = (val & (int)checkBox.Tag) != 0;
                         break;
 
-                    case DataTypes.RADIOBUTTONS:
+                    case GrblSettingDetails.DataTypes.RADIOBUTTONS:
                         int rval = int.Parse(value);
                         foreach (RadioButton radioButton in UIUtils.FindLogicalChildren<RadioButton>(this.Canvas))
                             radioButton.IsChecked = rval == (int)radioButton.Tag;
                         break;
 
-                    case DataTypes.BOOL:
-                        this.wCheckBox.IsChecked = value == "1";
+                    case GrblSettingDetails.DataTypes.BOOL:
+                        wCheckBox.IsChecked = value == "1";
                         break;
 
-                    case DataTypes.INTEGER:
-                    case DataTypes.FLOAT:
+                    case GrblSettingDetails.DataTypes.INTEGER:
+                    case GrblSettingDetails.DataTypes.FLOAT:
+                        model.NumericValue = dbl.Parse(value);
                         break;
 
                     default:
@@ -494,7 +501,7 @@ namespace CNC.Controls
 
             switch (widget.DataType)
             {
-                case DataTypes.XBITFIELD:
+                case GrblSettingDetails.DataTypes.XBITFIELD:
                     CheckBox firstCheckBox = null;
                     foreach (CheckBox checkBox in UIUtils.FindLogicalChildren<CheckBox>(Canvas))
                     {
@@ -505,7 +512,7 @@ namespace CNC.Controls
                     }
                     break;
 
-                case DataTypes.RADIOBUTTONS:
+                case GrblSettingDetails.DataTypes.RADIOBUTTONS:
                     foreach (RadioButton radioButton in UIUtils.FindLogicalChildren<RadioButton>(Canvas))
                     {
                         if (radioButton != (RadioButton)sender)
@@ -528,9 +535,13 @@ namespace CNC.Controls
 
             switch (widget.DataType)
             {
-                case DataTypes.INTEGER:
-                case DataTypes.FLOAT:
+                case GrblSettingDetails.DataTypes.INTEGER:
+                case GrblSettingDetails.DataTypes.FLOAT:
                     ok = !Validation.GetHasError(wNumericTextBox);
+                    break;
+
+                case GrblSettingDetails.DataTypes.IP4:
+                    ok = !Validation.GetHasError(wTextBox);
                     break;
             }
 

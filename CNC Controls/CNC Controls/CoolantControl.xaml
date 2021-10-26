@@ -5,14 +5,15 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CNC.Controls"
              mc:Ignorable="d" 
-             d:DesignHeight="65" d:DesignWidth="216">
-    <Grid>
-        <GroupBox x:Name="grpCoolant" Header="Coolant" HorizontalAlignment="Left" VerticalAlignment="Top" Height="65" Width="216">
-            <StackPanel HorizontalAlignment="Left" Height="40" Margin="3,3,0,0" Grid.Row="1" VerticalAlignment="Top" Width="184">
-                <CheckBox x:Name="chkFlood" Content="Flood" IsChecked="{Binding Path=Flood, Mode=OneWay}" HorizontalAlignment="Left" Margin="20,3,0,0" VerticalAlignment="Top" Click="chkBox_Click"/>
-                <CheckBox x:Name="chkMist" Content="Mist" IsChecked="{Binding Path=Mist, Mode=OneWay}"  HorizontalAlignment="Left" Margin="20,3,0,0" VerticalAlignment="Top" Click="chkBox_Click"/>
-            </StackPanel>
-        </GroupBox>
-
-    </Grid>
+             d:DesignHeight="80" d:DesignWidth="216">
+    <UserControl.Resources>
+        <local:BoolToVisibleConverter x:Key="IsVisibleConverter" />
+    </UserControl.Resources>
+    <GroupBox x:Uid="grp_coolant" x:Name="grpCoolant" Header="Coolant" HorizontalAlignment="Left" VerticalAlignment="Top" Width="216">
+        <StackPanel HorizontalAlignment="Left" Margin="3,3,0,0" Grid.Row="1" VerticalAlignment="Top" Width="184">
+            <CheckBox x:Uid="lbl_flood" x:Name="chkFlood" Tag="Flood" Content="Flood" IsChecked="{Binding Path=Flood, Mode=OneWay}" HorizontalAlignment="Left" Margin="20,3,0,0" VerticalAlignment="Top" Click="chkBox_Click"/>
+            <CheckBox x:Uid="lbl_mist" x:Name="chkMist" Tag="Mist" Content="Mist" IsChecked="{Binding Path=Mist, Mode=OneWay}"  HorizontalAlignment="Left" Margin="20,3,0,0" VerticalAlignment="Top" Click="chkBox_Click"/>
+            <CheckBox x:Uid="lbl_fan" x:Name="chkFan" Tag="Fan" Content="Fan" IsChecked="{Binding Path=Fan0, Mode=OneWay}"  Visibility="{Binding Path=HasFans, Mode=OneWay, Converter={StaticResource IsVisibleConverter}}" HorizontalAlignment="Left" Margin="20,3,0,0" VerticalAlignment="Top" Click="chkBox_Click"/>
+        </StackPanel>
+    </GroupBox>
 </UserControl>

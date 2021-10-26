@@ -5,27 +5,33 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:helix="clr-namespace:HelixToolkit.Wpf;assembly=HelixToolkit.Wpf"
              xmlns:local="clr-namespace:CNC.Controls.Viewer"
-             mc:Ignorable="d" 
-             d:DesignHeight="500" d:DesignWidth="500">
-    <Grid>
-        <helix:HelixViewport3D x:Name="viewport" Grid.Column="0" ZoomExtentsWhenLoaded="False" RotateAroundMouseDownPoint="true" ZoomAroundMouseDownPoint="true">
-            <helix:HelixViewport3D.DefaultCamera>
-                <PerspectiveCamera x:Name="camera"
-                        Position="0,0,100" 
-                        LookDirection="0,0,-100" 
+             mc:Ignorable="d"
+             d:DesignHeight="500" d:DesignWidth="500"
+             Loaded="Renderer_Loaded" IsVisibleChanged="Renderer_IsVisibleChanged">
+    <helix:HelixViewport3D x:Name="viewport" Panel.ZIndex="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                           ZoomExtentsWhenLoaded="False" RotateAroundMouseDownPoint="true" ZoomAroundMouseDownPoint="true"
+                           ShowViewCube="{Binding Path=ShowViewCube}"
+                           ShowCoordinateSystem="{Binding Path=ShowCoordinateSystem}"
+                           Background="{Binding Path=CanvasColor}"
+                           AllowDrop="True" DragEnter="viewport_Drag" DragOver="viewport_Drag" DragLeave="viewport_Drag" Drop="viewport_Drop">
+        <helix:HelixViewport3D.Camera>
+            <PerspectiveCamera x:Name="ccamera"
+                        Position="0,100,0" 
+                        LookDirection="0,-100,0" 
                         UpDirection="0,1,0.5" 
                         FieldOfView="61" 
                         NearPlaneDistance="0.001">
-                </PerspectiveCamera>
-            </helix:HelixViewport3D.DefaultCamera>
-            <helix:SunLight/>
-            <helix:SphereVisual3D Center="0,0,0" Radius="0.05" Fill="Blue"/>
-            <helix:PipeVisual3D x:Name="Tool3D" Diameter="1" Point1="0,0,0" Point2="0,0,5" Visible="False" >
-                <helix:PipeVisual3D.Fill>
-                    <SolidColorBrush Color="Gray" Opacity="0.5"/>
-                </helix:PipeVisual3D.Fill>
-            </helix:PipeVisual3D>
-            <helix:GridLinesVisual3D Thickness="0.1" Center="0,0,0" Fill="#FFDADADA" Width="1000" Length="1000" />
-        </helix:HelixViewport3D>
-    </Grid>
+            </PerspectiveCamera>
+        </helix:HelixViewport3D.Camera>
+        <helix:DefaultLights/>
+        <!-->            <helix:TruncatedConeVisual3D Height="5" BaseRadius="0" >
+
+            </helix:TruncatedConeVisual3D> <!-->
+        <helix:LinesVisual3D Thickness="2" Color="{Binding Path=HighlightColor}" Points="{Binding Path=ExecutedLines}"/>
+        <helix:LinesVisual3D Thickness="1" Color="{Binding Path=CutMotionColor}" Points="{Binding Path=CutLines}"/>
+        <helix:LinesVisual3D Thickness="0.5" Color="{Binding Path=RapidMotionColor}" Points="{Binding Path=RapidLines}"/>
+        <helix:LinesVisual3D Thickness="0.5" Color="{Binding Path=RetractMotionColor}" Points="{Binding Path=RetractLines}"/>
+        <helix:LinesVisual3D Thickness="1.5" Color="{Binding Path=ToolOriginColor}" Points="{Binding Path=ToolOrigin}"/>
+        <!-->            <helix:GridLinesVisual3D binding?/> <!-->
+    </helix:HelixViewport3D>
 </UserControl>

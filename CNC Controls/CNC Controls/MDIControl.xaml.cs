@@ -1,13 +1,13 @@
 ﻿/*
  * MDIControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.02 / 2019-09-25 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-17 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2019, Io Engineering (Terje Io)
+Copyright (c) 2018-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -37,9 +37,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-using CNC.Core;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
+using System.Collections.ObjectModel;
+using CNC.Core;
 
 namespace CNC.Controls
 {
@@ -48,15 +50,65 @@ namespace CNC.Controls
         public MDIControl()
         {
             InitializeComponent();
+
+            Commands = new ObservableCollection<string>();
         }
 
-        void btnSend_Click(object sender, RoutedEventArgs e)
+        public new bool IsFocused { get { return txtMDI.IsKeyboardFocusWithin; } }
+
+        public static readonly DependencyProperty CommandProperty = DependencyProperty.Register(nameof(Command), typeof(string), typeof(MDIControl), new PropertyMetadata(""));
+        public string Command
         {
-            if (txtMDI.Text != "")
-                Grbl.MDICommand(DataContext, txtMDI.Text);
+            get { return (string)GetValue(CommandProperty); }
+            set { SetValue(CommandProperty, value); }
         }
 
-        public string Text { get { return txtMDI.Text; } set { txtMDI.Text = value; } }
-        public new bool IsFocused { get { return txtMDI.IsFocused; } }
+        public static readonly DependencyProperty CommandsProperty = DependencyProperty.Register(nameof(Commands), typeof(ObservableCollection<string>), typeof(MDIControl));
+        public ObservableCollection<string> Commands
+        {
+            get { return (ObservableCollection<string>)GetValue(CommandsProperty); }
+            set { SetValue(CommandsProperty, value); }
+        }
+
+        private void txtMDI_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == Key.Return && (DataContext as GrblViewModel).MDICommand.CanExecute(null))
+            {
+                string cmd = (sender as ComboBox).Text;
+                var model = DataContext as GrblViewModel;
+                if (!string.IsNullOrEmpty(cmd) && (Commands.Count == 0 || Commands[0] != cmd))
+                    Commands.Insert(0, cmd);
+                if (model.GrblError != 0)
+                    model.ExecuteCommand("");
+                model.MDICommand.Execute(cmd);
+                (sender as ComboBox).SelectedIndex = -1;
+            }
+        }
+
+        private void txtMDI_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var cmbTextBox = (TextBox)(sender as ComboBox).Template.FindName("PART_EditableTextBox", (sender as ComboBox));
+            if (cmbTextBox != null)
+            {
+                cmbTextBox.Focus();
+                cmbTextBox.CaretIndex = cmbTextBox.Text.Length;
+            }
+        }
+
+        private void Send_Click(object sender, RoutedEventArgs e)
+        {
+            if ((DataContext as GrblViewModel).GrblError != 0)
+                (DataContext as GrblViewModel).ExecuteCommand("");
+
+            if (!string.IsNullOrEmpty(Command) && !Commands.Contains(Command))
+                Commands.Insert(0, Command);
+        }
+
+        private void MDIControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            var mdi = txtMDI.Template.FindName("PART_EditableTextBox", txtMDI) as TextBox;
+            if(mdi != null)
+                mdi.Tag = "MDI";
+        }
     }
 }

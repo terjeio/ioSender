@@ -1,13 +1,13 @@
 ﻿/*
  * StatusControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.02 / 2019-10-04 / Io Engineering (Terje Io)
+ * v0.29 / 2021-01-01 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2019, Io Engineering (Terje Io)
+Copyright (c) 2018-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -37,7 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -61,8 +60,6 @@ namespace CNC.Controls
         {
             InitializeComponent();
 
-       //     DataContextChanged += StatusControl_DataContextChanged;
-
             HomeButtonColor = btnHome.Background;
 
             btnHome.Tag = StatusButton.Home;
@@ -71,63 +68,35 @@ namespace CNC.Controls
             chkCheckMode.Tag = StatusButton.Check;
         }
 
-        private void StatusControl_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
-        {
-            if (e.OldValue != null && e.OldValue is INotifyPropertyChanged)
-                ((INotifyPropertyChanged)e.OldValue).PropertyChanged -= OnDataContextPropertyChanged;
-            if (e.NewValue != null && e.NewValue is INotifyPropertyChanged)
-                ((INotifyPropertyChanged)e.NewValue).PropertyChanged += OnDataContextPropertyChanged;
-        }
-
-        private void OnDataContextPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (sender is GrblViewModel && e.PropertyName == nameof(GrblViewModel.HomedState))
-                SetHomingState(((GrblViewModel)sender).HomedState);
-        }
-
         void btn_Click(object sender, RoutedEventArgs e)
         {
             switch ((StatusButton)((Control)sender).Tag)
             {
                 case StatusButton.Reset:
-                    Grbl.Reset();
+                    var model = (DataContext as GrblViewModel);
+                    if (model.GrblState.State == GrblStates.Alarm && model.GrblState.Substate == 10 && model.Signals.Value.HasFlag(Signals.EStop))
+                        MessageBox.Show("Clear E-Stop before <Reset>", "ioSender",  MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                    else
+                        Grbl.Reset();
                     break;
 
                 case StatusButton.Unlock:
-                    Grbl.MDICommand(DataContext, GrblConstants.CMD_UNLOCK);
+                    (DataContext as GrblViewModel).ExecuteCommand(GrblConstants.CMD_UNLOCK);
                     break;
 
                 case StatusButton.Home:
-                   // ((Control)sender).Background = Brushes.LightSkyBlue;
-                    Grbl.MDICommand(DataContext, GrblConstants.CMD_HOMING);
+                    // ((Control)sender).Background = Brushes.LightSkyBlue;
+                    (DataContext as GrblViewModel).ExecuteCommand(GrblConstants.CMD_HOMING);
                     break;
 
                 case StatusButton.Check:
-                    GrblStates state = ((GrblViewModel)DataContext).GrblState.State;
-                    if(state == GrblStates.Check && ((CheckBox)sender).IsChecked == false)
+                    GrblStates state = (DataContext as GrblViewModel).GrblState.State;
+                    if(state == GrblStates.Check && (sender as CheckBox).IsChecked == false)
                         Grbl.Reset();
-                    else if (state == GrblStates.Idle && ((CheckBox)sender).IsChecked == true)
-                        Grbl.MDICommand(DataContext, GrblConstants.CMD_CHECK);
+                    else if (state == GrblStates.Idle && (sender as CheckBox).IsChecked == true)
+                        (DataContext as GrblViewModel).ExecuteCommand(GrblConstants.CMD_CHECK);
                     break;
             }
-        }
-
-        public void SetHomingState(HomedState state)
-        {
-            //switch (state)
-            //{
-            //    case HomedState.Unknown:
-            //        btnHome.Background = HomeButtonColor;
-            //        break;
-
-            //    case HomedState.NotHomed:
-            //        btnHome.Background = Brushes.LightYellow;
-            //        break;
-
-            //    case HomedState.Homed:
-            //        btnHome.Background = Brushes.LightGreen;
-            //        break;
-            //}
         }
     }
 }

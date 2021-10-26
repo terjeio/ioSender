@@ -5,9 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CNC.Controls"
         mc:Ignorable="d"
-        Title="GCode Sender" Height="125" Width="460" ResizeMode="NoResize"
+        Title="Sender" Height="125" Width="460" ResizeMode="NoResize"
         Closing="Window_Closing" Icon="App.ico">
-    <Grid Background="LightGray">
-        <Label x:Name="label" Content="MPG mode active, waiting for it to be disabled..." HorizontalAlignment="Center" Margin="000,0,0,0" VerticalAlignment="Center"/>
+    <Grid Background="Snow">
+        <Label x:Uid="lbl_mpgModeActive" x:Name="label" Content="MPG mode active, waiting for it to be disabled..." HorizontalAlignment="Center" Margin="0" VerticalAlignment="Center" FontSize="16"/>
     </Grid>
 </Window>

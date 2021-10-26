@@ -7,21 +7,25 @@
         xmlns:cnccore="clr-namespace:CNC.Core;assembly=CNC.Core"
         xmlns:Controls="clr-namespace:CNC.Controls;assembly=CNC.Controls.WPF" x:Class="Grbl_Config_App.MainWindow"
         mc:Ignorable="d"
-        Title="Grbl Config App" Height="600" Width="900"
+        Title="grblHAL/Grbl config ({0})" Height="620" Width="1000" MinHeight="620" MinWidth="1000"
         Loaded="Window_Loaded"
         Closing="Window_Closing" ResizeMode="NoResize" Icon="App.ico">
     <Window.DataContext>
         <cnccore:GrblViewModel />
     </Window.DataContext>
-    <DockPanel>
+    <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
         <Menu DockPanel.Dock="Top">
             <MenuItem x:Name="menuFile" Header="_File">
                 <MenuItem Header="_About" Click="aboutMenuItem_Click"/>
+                <MenuItem x:Name="halsettings"  Header="Fetch and save grbl_HAL settings info" Click="getHalSettingsItem_Click"/>
+                <MenuItem x:Name="grblsettings"  Header="Fetch and save _Grbl settings info" Click="getGrblSettingsItem_Click"/>
+                <MenuItem x:Name="grblalarms"  Header="Fetch and save Grbl a_larm info" Click="getGrblAlarmsItem_Click"/>
+                <MenuItem x:Name="grblerrors"  Header="Fetch and save Grbl e_rror info" Click="getGrblErrorsItem_Click"/>
                 <MenuItem Header="_Exit" Click="exitMenuItem_Click"/>
             </MenuItem>
         </Menu>
-        <Grid Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
-            <Controls:ConfigView x:Name="configView" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+        <Grid Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <Controls:GrblConfigView x:Name="configView" HorizontalAlignment="Left" VerticalAlignment="Top" MinHeight="545"/>
         </Grid>
     </DockPanel>
 </Window>

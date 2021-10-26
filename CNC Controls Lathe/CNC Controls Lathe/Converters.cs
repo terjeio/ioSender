@@ -1,13 +1,13 @@
-﻿/*
- * Converters.cs - part of CNC Controls library
+/*
+ * Converters.cs - part of CNC Controls Lathe library
  *
- * v0.01 / 2019-10-31 / Io Engineering (Terje Io)
+ * v0.29 / 2020-09-17 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019, Io Engineering (Terje Io)
+Copyright (c) 2019-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -44,6 +44,7 @@ using System.Globalization;
 using System.Text;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows;
 using CNC.Core;
 using CNC.GCode;
 
@@ -52,50 +53,22 @@ namespace CNC.Controls.Lathe
     public static class Converters
     {
         public static bool IsMetric = true;
-        public static StringCollectionToTextConverter StringCollectionToTextConverter = new StringCollectionToTextConverter();
         public static CNCMeasureToTextConverter CNCMeasureToTextConverter = new CNCMeasureToTextConverter();
         public static SideToInsideBoolConverter SideToInsideBoolConverter = new SideToInsideBoolConverter();
         public static SideToOutsideBoolConverter SideToOutsideBoolConverter = new SideToOutsideBoolConverter();
         public static SideToIsEnabledConverter SideToIsEnabledConverter = new SideToIsEnabledConverter();
+        public static SideToStringConverter SideToStringConverter = new SideToStringConverter();
         public static ToolToRoundedBoolConverter ToolToRoundedBoolConverter = new ToolToRoundedBoolConverter();
         public static ToolToChamferedBoolConverter ToolToChamferedBoolConverter = new ToolToChamferedBoolConverter();
         public static ToolToLabelStringConverter ToolToLabelStringConverter = new ToolToLabelStringConverter();
         public static TaperTypeToBoolConverter TaperTypeToBoolConverter = new TaperTypeToBoolConverter();
-        public static MultiLineConverter MultiLineConverter = new MultiLineConverter();
-    }
-
-    // Adapted from: https://stackoverflow.com/questions/4353186/binding-observablecollection-to-a-textbox/8847910#8847910
-
-    public class StringCollectionToTextConverter : IMultiValueConverter
-    {
-        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
-        {
-            var data = values[0] as ObservableCollection<string>;
-
-            if (data != null && data.Count > 0)
-            {
-                StringBuilder sb = new StringBuilder();
-                foreach (var s in data)
-                {
-                    sb.AppendLine(s.ToString());
-                }
-                return sb.ToString();
-            }
-            else
-                return String.Empty;
-        }
-
-        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
     }
 
     public class CNCMeasureToTextConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            string result = String.Empty;
+            string result = string.Empty;
             bool isMetric = parameter is bool ? (bool)parameter : Converters.IsMetric;
 
             if (value is double && !double.IsNaN((double)value))
@@ -110,18 +83,41 @@ namespace CNC.Controls.Lathe
         }
     }
 
-    public class SideToInsideBoolConverter : IValueConverter
+    public class CNCMeasureConverter : IMultiValueConverter
     {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            bool result = value is Lathe.Thread.Side && (Lathe.Thread.Side)value == Lathe.Thread.Side.Inside;
+            double result = double.NaN;
+            bool isMetric = parameter is bool ? (bool)parameter : Converters.IsMetric;
+            double f = values.Length > 1 && values[1] is double ? (double)values[1] : (isMetric ? 1.0d : 25.4d);
+
+            if (values[0] is double && !double.IsNaN((double)values[0]))
+                result = Math.Round((double)values[0] / f, f == 1.0d ? 3 : 4);
 
             return result;
         }
 
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            object[] result = new object[2];
+
+            result[0] = value;
+            result[1] = DependencyProperty.UnsetValue;
+
+            return result;
+        }
+    }
+
+    public class SideToInsideBoolConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value is Thread.Side && (Thread.Side)value == Thread.Side.Inside;
+        }
+
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return (bool)value == true ? Lathe.Thread.Side.Inside : Lathe.Thread.Side.Outside;
+            return (bool)value == true ? Thread.Side.Inside : Thread.Side.Outside;
         }
     }
 
@@ -129,14 +125,14 @@ namespace CNC.Controls.Lathe
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            bool result = value is Lathe.Thread.Side && (Lathe.Thread.Side)value == Lathe.Thread.Side.Outside;
+            bool result = value is Thread.Side && (Thread.Side)value == Thread.Side.Outside;
 
             return result;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return (bool)value == true ? Lathe.Thread.Side.Outside : Lathe.Thread.Side.Inside;
+            return (bool)value == true ? Thread.Side.Outside : Thread.Side.Inside;
         }
     }
 
@@ -144,9 +140,21 @@ namespace CNC.Controls.Lathe
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            bool result = value is Lathe.Thread.Side && (Lathe.Thread.Side)value == Lathe.Thread.Side.Both;
+            return value is Thread.Side && (Thread.Side)value == Thread.Side.Both;
+        }
 
-            return result;
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+
+    public class SideToStringConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value is Thread.Side ? ((Thread.Side)value == Thread.Side.Outside ? "Outside diameter:" : "Inside diameter:") : "";
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -159,9 +167,7 @@ namespace CNC.Controls.Lathe
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            bool result = value is Thread.Toolshape && (Thread.Toolshape)value == Thread.Toolshape.Rounded;
-
-            return result;
+            return value is Thread.Toolshape && (Thread.Toolshape)value == Thread.Toolshape.Rounded;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -173,9 +179,7 @@ namespace CNC.Controls.Lathe
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            bool result = value is Thread.Toolshape && (Thread.Toolshape)value == Thread.Toolshape.Chamfer;
-
-            return result;
+            return value is Thread.Toolshape && (Thread.Toolshape)value == Thread.Toolshape.Chamfer;
         }
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
@@ -189,7 +193,7 @@ namespace CNC.Controls.Lathe
             string result = string.Empty;
 
             if (value is Thread.Toolshape)
-                result = (Thread.Toolshape)value == Thread.Toolshape.Rounded ? "Radius r:" : "Chamfer a";
+                result = (Thread.Toolshape)value == Thread.Toolshape.Rounded ? "Radius r:" : "Chamfer a:";
 
             return result;
         }
@@ -203,41 +207,9 @@ namespace CNC.Controls.Lathe
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            bool result = (value is ThreadTaper) && (ThreadTaper)value == ThreadTaper.None;
-
-            return result;
+            return (value is ThreadTaper) && (ThreadTaper)value != ThreadTaper.None;
         }
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    // by  D4rth B4n3 - https://stackoverflow.com/questions/30627368/how-to-create-a-tooltip-to-display-multiple-validation-errors-for-a-single-contr
-    public class MultiLineConverter : IMultiValueConverter
-    {
-        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (!(values[0] is IEnumerable<ValidationError>))
-                return null;
-
-            //string.Join(",", (List<string>)logic.Model.GetErrors(e.PropertyName)));
-
-            var val = values[0] as IEnumerable<ValidationError>;
-
-            string retVal = "";
-
-            foreach (var itm in val)
-            {
-                if (retVal.Length > 0)
-                    retVal += "\n";
-                retVal += itm.ErrorContent;
-
-            }
-            return retVal;
-        }
-
-        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
         }

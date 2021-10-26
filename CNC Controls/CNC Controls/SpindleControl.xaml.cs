@@ -1,13 +1,13 @@
 ﻿/*
  * SpindleControl.xaml.cs - part of CNC Controls library
  *
- * v0.02 / 2019-10-31 / Io Engineering (Terje Io)
+ * v0.21 / 2020-08-03 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2019, Io Engineering (Terje Io)
+Copyright (c) 2018-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -41,13 +41,11 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using CNC.Core;
-using CNC.GCode;
 
 namespace CNC.Controls
 {
     public partial class SpindleControl : UserControl
     {
-        private double _rpm = 0.0d;
         private bool hold = false;
 
         public SpindleControl()
@@ -82,69 +80,44 @@ namespace CNC.Controls
             if (sender is GrblViewModel)switch (e.PropertyName)
             {
                 case nameof(GrblViewModel.GrblState):
-                case nameof(GrblViewModel.SpindleState):
+                case nameof(GrblViewModel.IsJobRunning):
                     var p = (GrblViewModel)sender;
-                    hold = p.IsJobRunning || p.GrblState.State == GrblStates.Hold || p.GrblState.State == GrblStates.Door;
-                    cvRPM.IsEnabled = !hold && p.SpindleState.Value == SpindleState.Off;
+                    hold = p.IsJobRunning && (p.GrblState.State == GrblStates.Hold || p.GrblState.State == GrblStates.Door);
+                    IsSpindleStateEnabled = !p.IsJobRunning || p.GrblState.State == GrblStates.Hold || p.GrblState.State == GrblStates.Door;
                     break;
-
-                case nameof(GrblViewModel.ActualRPM):
-                case nameof(GrblViewModel.ProgrammedRPM):
-                    ProgrammedRPM = ((GrblViewModel)sender).ProgrammedRPM;
-                    if (!double.IsNaN(((GrblViewModel)sender).ActualRPM))
-                        RPM = ((GrblViewModel)sender).ActualRPM;
-                    else
-                        RPM = ProgrammedRPM;
-                break;
             }
         }
 
-        public static readonly DependencyProperty IsSpindleStateEnabledProperty = DependencyProperty.Register(nameof(IsSpindleStateEnabled), typeof(bool), typeof(SpindleControl), new PropertyMetadata(false, new PropertyChangedCallback(IsSpindleStateEnableChanged)));
+        public static readonly DependencyProperty IsSpindleStateEnabledProperty = DependencyProperty.Register(nameof(IsSpindleStateEnabled), typeof(bool), typeof(SpindleControl), new PropertyMetadata(false));
         public bool IsSpindleStateEnabled
         {
             get { return (bool)GetValue(IsSpindleStateEnabledProperty); }
             set { SetValue(IsSpindleStateEnabledProperty, value); }
-        }
-        private static void IsSpindleStateEnableChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            SpindleControl sc = (SpindleControl)d;
-            sc.rbSpindleOff.IsEnabled = sc.rbSpindleCW.IsEnabled = sc.rbSpindleCCW.IsEnabled = sc.cvRPM.IsEnabled = (bool)e.NewValue;
         }
 
         public string SpindleOffCommand { get { return (string)rbSpindleOff.Tag; } set { rbSpindleOff.Tag = value; } }
         public string SpindleCWCommand { get { return (string)rbSpindleCW.Tag; } set { rbSpindleCW.Tag = value; } }
         public string SpindleCCWCommand { get { return (string)rbSpindleCCW.Tag; } set { rbSpindleCCW.Tag = value; } }
 
-        public double RPM
-        {
-            get { return cvRPM.Value; }
-            set { cvRPM.Value = cvRPM.IsReadOnly && value > 0.0d ? value : _rpm; }
-        }
-
-        public double ProgrammedRPM
-        {
-            get { return _rpm; }
-            set { if (value > 0.0f) _rpm = value; }
-        }
-
         public new bool IsFocused { get { return cvRPM.IsFocused; } }
+        public bool SPOr { get { return !(DataContext as GrblViewModel).IsJobRunning || (DataContext as GrblViewModel).GrblState.State == GrblStates.Hold; } }
 
         private void rbSpindle_Click(object sender, RoutedEventArgs e)
         {
-            var p = (GrblViewModel)DataContext;
+            var p = DataContext as GrblViewModel;
 
-            if (p.SpindleState.Value != SpindleState.Off)
-                _rpm = cvRPM.Value;
-
-            if (hold)
-                Grbl.MDICommand(DataContext, ((char)GrblConstants.CMD_SPINDLE_OVR_STOP).ToString());
+            if(p.IsJobRunning && p.GrblState.State == GrblStates.Hold)
+                p.ExecuteCommand(((char)GrblConstants.CMD_SPINDLE_OVR_STOP).ToString());
             else
-                Grbl.MDICommand(DataContext, string.Format((string)((RadioButton)sender).Tag, "S" + cvRPM.Value.ToInvariantString()));
+            {
+                string rpm = p.ProgrammedRPM == 0d ? "S" + p.RPM.ToInvariantString() : "";
+                (DataContext as GrblViewModel).ExecuteCommand(string.Format((string)((RadioButton)sender).Tag, rpm));
+            }
         }
 
         void overrideControl_CommandGenerated(string command)
         {
-            Grbl.MDICommand(DataContext, command);
+            (DataContext as GrblViewModel).ExecuteCommand(command);
         }
     }
 }

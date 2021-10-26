@@ -1,13 +1,13 @@
 ﻿/*
  * PortDialog.xaml.cs - part of CNC Controls library
  *
- * v0.02 / 2019-10-25 / Io Engineering (Terje Io)
+ * v0.35 / 2021-09-25 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019, Io Engineering (Terje Io)
+Copyright (c) 2019-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -39,28 +39,99 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using System.Windows;
 using CNC.Core;
+using System;
+using System.Windows.Controls;
 
 namespace CNC.Controls
 {
     public partial class PortDialog : Window
     {
         private string port = null;
+        private PortProperties prop;
         public PortDialog()
         {
             InitializeComponent();
 
-            DataContext = new SerialPorts();
+            DataContext = prop = new PortProperties();
         }
 
-        public new string ShowDialog()
+        private void CbxPorts_DropDownOpened(object sender, System.EventArgs e)
         {
-            base.ShowDialog();
+            prop.Com.Refresh();
+        }
+
+        private bool PortAvailable(string port)
+        {
+            bool found = false;
+
+            foreach (var p in prop.Com.Ports)
+                found = found || p.Name == port;
+
+            return found;
+        }
+
+        private void parsenet(string uri)
+        {
+            int port = 0;
+            string[] values = uri.Split(':');
+
+            prop.IpAddress = values[0];
+            if (values.Length == 2 && int.TryParse(values[0], out port))
+                prop.NetPort = port;
+            else
+                prop.NetPort = prop.IsWebSocket ? 80 : 23;
+
+            tab.SelectedIndex = 1;
+        }
+
+        public string ShowDialog(string orgport)
+        {
+            if (!string.IsNullOrEmpty(orgport)) {
+
+                if ((prop.IsWebSocket = orgport.ToLower().StartsWith("ws://")))
+                    parsenet(orgport.Substring(5));
+                else if (char.IsDigit(orgport[0])) // We have an IP address
+                    parsenet(orgport);
+                else
+                {
+                    string portname = orgport.Substring(0, orgport.IndexOf(':'));
+                    if (PortAvailable(portname))
+                    {
+                        prop.Com.SelectedPort = portname;
+                        string[] values = orgport.Split(':')[1].Split(',');
+                        if (values.Length > 5)
+                        {
+                            Comms.ResetMode mode = Comms.ResetMode.None;
+                            Enum.TryParse(values[5], true, out mode);
+                            if (mode != Comms.ResetMode.None)
+                            {
+                                foreach (ConnectMode m in prop.Com.ConnectModes)
+                                    if (m.Mode == mode)
+                                        prop.Com.SelectedMode = m;
+                            }
+                        }
+                    }
+                }
+            }
+
+            ShowDialog();
+
             return port;
         }
 
         private void btnOk_Click(object sender, RoutedEventArgs e)
         {
-            port = ((SerialPorts)DataContext).SelectedPort;
+            if (tab.SelectedIndex == 1)
+            {
+                port = string.Format("{0}{1}:{2}", prop.IsWebSocket ? "ws://" : string.Empty, prop.IpAddress, prop.NetPort.ToString());
+            }
+            else
+            {
+                port = prop.Com.SelectedPort;
+                if (prop.Com.SelectedMode.Mode != Comms.ResetMode.None)
+                    port += "!" + prop.Com.SelectedMode.Mode.ToString();
+            }
+
             Close();
         }
 
@@ -68,5 +139,25 @@ namespace CNC.Controls
         {
             Close();
         }
+    }
+
+    class PortProperties : ViewModelBase
+    {
+        bool isWebSocket = false;
+        string ipAddress = "192.168.5.1";
+        int netport = 23;
+
+        public SerialPorts Com { get; private set; } = new SerialPorts();
+        public bool IsWebSocket {
+            get { return isWebSocket; }
+            set {
+                if (isWebSocket != value)
+                    NetPort = value ? 80 : 23;
+                isWebSocket = value;
+                OnPropertyChanged();
+            }
+        }
+        public string IpAddress { get { return ipAddress; } set { ipAddress = value; OnPropertyChanged(); } }
+        public int NetPort { get { return netport; } set { netport = value; OnPropertyChanged(); } }
     }
 }

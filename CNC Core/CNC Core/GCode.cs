@@ -1,13 +1,13 @@
 ﻿/*
  * GCode.cs - part of CNC Controls library
  *
- * v0.02 / 2019-10-31 / Io Engineering (Terje Io)
+ * v0.20 / 2020-05-25 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2019, Io Engineering (Terje Io)
+Copyright (c) 2018-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -38,9 +38,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 using System;
+using System.Xml.Serialization;
+using System.Collections.Generic;
+using System.Windows.Media.Media3D;
+using CNC.Core;
 
 namespace CNC.GCode
 {
+
+    public enum Dialect
+    {
+        Grbl,
+        GrblHAL,
+        LinuxCNC
+    }
 
     [Flags]
     public enum AxisFlags : int
@@ -51,7 +62,34 @@ namespace CNC.GCode
         Z = 1 << 2,
         A = 1 << 3,
         B = 1 << 4,
-        C = 1 << 5
+        C = 1 << 5,
+        XY = 0x03,
+        XZ = 0x05,
+        XYZ = 0x07,
+        All = 0x3F
+    }
+
+    [Flags]
+    public enum IJKFlags : int
+    {
+        None = 0,
+        I = 1 << 0,
+        J = 1 << 1,
+        K = 1 << 2,
+        All = 0x07
+    }
+
+    [Flags]
+
+    public enum ThreadingFlags : int
+    {
+        None = 0,
+        R = 1 << 0,
+        Q = 1 << 1,
+        H = 1 << 2,
+        E = 1 << 3,
+        L = 1 << 4,
+        All = 0x1F
     }
 
     public enum Plane
@@ -64,13 +102,19 @@ namespace CNC.GCode
     public enum DistanceMode
     {
         Absolute,
-        Relative
+        Incremental
     }
 
     public enum IJKMode
     {
         Absolute,
         Incremental
+    }
+
+    public enum Units
+    {
+        Imperial = 0,
+        Metric
     }
 
     [Flags]
@@ -90,12 +134,21 @@ namespace CNC.GCode
         Shower = 1 << 2
     }
 
-    public enum ThreadTaper
+    public enum ToolLengthOffset
     {
-        None,
-        Entry,
-        Exit,
-        Both
+        Cancel = 0,         // G49 (Default: Must be zero)
+        Enable = 1,         // G43
+        EnableDynamic = 2,  // G43.1
+        ApplyAdditional = 3 // G43.2
+    }
+
+    [Flags]
+    public enum ThreadTaper : int
+    {
+        None = 0,
+        Entry = 1 << 0,
+        Exit = 1 << 1,
+        Both = Entry | Exit
     }
 
     [Flags]
@@ -106,12 +159,29 @@ namespace CNC.GCode
         Radius = 2    // Do not change
     }
 
+    public enum Direction
+    {
+        Positive = 0,
+        Negative
+    }
+
+    public enum InputWaitMode
+    {
+        Immediate = 0,
+        Rise,
+        Fall,
+        High,
+        Low
+    }
+
     public enum Commands
     {
         G0,
         G1,
         G2,
         G3,
+        G4,
+        G5,
         G7,
         G8,
         G10,
@@ -146,6 +216,9 @@ namespace CNC.GCode
         G59_1,
         G59_2,
         G59_3,
+        G61,
+        G61_1,
+        G64,
         G73,
         G76,
         G80,
@@ -156,8 +229,8 @@ namespace CNC.GCode
         G86,
         G89,
         G90,
-        G91,
         G90_1,
+        G91,
         G91_1,
         G92,
         G92_1,
@@ -181,19 +254,61 @@ namespace CNC.GCode
         M8,
         M9,
         M30,
+        M48,
         M49,
         M50,
         M51,
+        M52,
         M53,
         M56,
         M61,
+        M62,
+        M63,
+        M64,
+        M65,
+        M66,
+        M67,
+        M68,
         Feedrate,
         SpindleRPM,
         ToolSelect,
-        Dwell,
-        Coolant,
         Comment,
+        UserMCommand,
         Undefined
+    }
+
+    public static class FlagsExtensions
+    {
+        public static IEnumerable<int> ToIndices(this AxisFlags axes)
+        {
+            int i = 0, j = (int)axes;
+            while (j != 0)
+            {
+                if ((j & 0x01) != 0)
+                    yield return i;
+                i++; j >>= 1;
+            }
+        }
+        public static IEnumerable<int> ToIndices(this IJKFlags ijkFlags)
+        {
+            int i = 0, j = (int)ijkFlags;
+            while (j != 0)
+            {
+                if ((j & 0x01) != 0)
+                    yield return i;
+                i++; j >>= 1;
+            }
+        }
+        public static IEnumerable<int> ToIndices(this ThreadingFlags flags)
+        {
+            int i = 0, j = (int)flags;
+            while (j != 0)
+            {
+                if ((j & 0x01) != 0)
+                    yield return i;
+                i++; j >>= 1;
+            }
+        }
     }
 
     public static class GCodeUtils
@@ -234,6 +349,139 @@ namespace CNC.GCode
                 s = line.Replace(" ", "");
 
             return s;
+        }
+    }
+
+    [Serializable]
+    public class Macro : ViewModelBase
+    {
+        string _name;
+
+        [XmlIgnore]
+        public bool IsSession { get; set; }
+
+        public int Id { get;  set; }
+        public string Name { get { return _name; } set { _name = value;  OnPropertyChanged(); } }
+        public string Code { get; set; }
+    }
+
+    public struct Point6D
+    {
+        public double X;
+        public double Y;
+        public double Z;
+        public double A;
+        public double B;
+        public double C;
+
+        public double this [int i]
+        {
+            get
+            {
+                switch(i)
+                {
+                    case 0:
+                        return X;
+                    case 1:
+                        return Y;
+                    case 2:
+                        return Z;
+                    case 3:
+                        return A;
+                    case 4:
+                        return B;
+                    case 5:
+                        return C;
+                    default:
+                        throw new ArgumentException("zyz!", "index");
+                }
+            }
+            set
+            {
+                switch (i)
+                {
+                    case 0:
+                        X = value;
+                        break;
+                    case 1:
+                        Y = value;
+                        break;
+                    case 2:
+                        Z = value;
+                        break;
+                    case 3:
+                        A = value;
+                        break;
+                    case 4:
+                        B = value;
+                        break;
+                    case 5:
+                        C = value;
+                        break;
+                }
+            }
+        }
+
+        public double[] Array  { get { return new[] { X, Y, Z, A, B, C }; } }
+
+        public Point3D Point3D { get { return new Point3D(X, Y, Z); } }
+
+        public void Set (double[] values, AxisFlags axisFlags, bool relative = false)
+        {
+            if (relative)
+                Add(values, axisFlags);
+            else foreach (int i in axisFlags.ToIndices())
+            {
+                switch (i)
+                {
+                    case 0:
+                        X = values[0];
+                        break;
+                    case 1:
+                        Y = values[1];
+                        break;
+                    case 2:
+                        Z = values[2];
+                        break;
+                    case 3:
+                        A = values[3];
+                        break;
+                    case 4:
+                        B = values[4];
+                        break;
+                    case 5:
+                        C = values[5];
+                        break;
+                }
+            }
+        }
+
+        public void Add(double[] values, AxisFlags axisFlags)
+        {
+            foreach (int i in axisFlags.ToIndices())
+            {
+                switch (i)
+                {
+                    case 0:
+                        X += values[0];
+                        break;
+                    case 1:
+                        Y += values[1];
+                        break;
+                    case 2:
+                        Z += values[2];
+                        break;
+                    case 3:
+                        A += values[3];
+                        break;
+                    case 4:
+                        B += values[4];
+                        break;
+                    case 5:
+                        C += values[5];
+                        break;
+                }
+            }
         }
     }
 }

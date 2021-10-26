@@ -1,13 +1,13 @@
-﻿/*
+/*
  * UIUtils.cs - part of CNC Controls library
  *
- * v0.02 / 2019-09-24 / Io Engineering (Terje Io)
+ * v0.28 / 2020-11-15 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2019, Io Engineering (Terje Io)
+Copyright (c) 2018-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -128,13 +128,27 @@ namespace CNC.Controls
             double v = (double)value;
 
             if(!double.IsNaN(Min) && !double.IsNaN(Max) && (v < Min || v > Max))
-                return new ValidationResult(false, $"Invalid input: allowed range is {Min}-{Max}.");
+                return new ValidationResult(false, $"Invalid input: allowed range is {Min} - {Max}.");
 
             if (!double.IsNaN(Min) && v < Min)
                 return new ValidationResult(false, $"Invalid input: minimum allowed value is {Min}.");
 
             if (!double.IsNaN(Max) && v > Max)
                 return new ValidationResult(false, $"Invalid input: maximum allowed value is {Max}.");
+
+            return ValidationResult.ValidResult;
+        }
+    }
+
+    public class IP4ValueRule : ValidationRule
+    {
+        public override ValidationResult Validate(object value, CultureInfo cultureInfo)
+        {
+            string ip4address = (string)value;
+
+            System.Net.IPAddress ip4;
+            if(!System.Net.IPAddress.TryParse(ip4address, out ip4))
+                return new ValidationResult(false, $"Invalid input: not an IP4 address.");
 
             return ValidationResult.ValidResult;
         }
@@ -258,6 +272,8 @@ namespace CNC.Controls
         }
         // End byTodd McQuay
 
+
+
         //public static void GroupBoxCaptionBold(GroupBox groupBox)
         //{
         //    foreach (Control c in groupBox.Controls)
@@ -265,5 +281,61 @@ namespace CNC.Controls
 
         //    groupBox.Font = new Font(groupBox.Font.Name, groupBox.Font.SizeInPoints, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
         //}
+    }
+
+    // By O. R. Mapper, https://stackoverflow.com/questions/10097417/how-do-i-create-an-autoscrolling-textbox
+    public static class TextBoxUtilities
+    {
+        public static readonly DependencyProperty AlwaysScrollToEndProperty = DependencyProperty.RegisterAttached("AlwaysScrollToEnd",
+                                                                                                                  typeof(bool),
+                                                                                                                  typeof(TextBoxUtilities),
+                                                                                                                  new PropertyMetadata(false, AlwaysScrollToEndChanged));
+
+        private static void AlwaysScrollToEndChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            TextBox tb = sender as TextBox;
+            if (tb != null)
+            {
+                bool alwaysScrollToEnd = (e.NewValue != null) && (bool)e.NewValue;
+                if (alwaysScrollToEnd)
+                {
+                    tb.ScrollToEnd();
+                    tb.TextChanged += TextChanged;
+                }
+                else
+                {
+                    tb.TextChanged -= TextChanged;
+                }
+            }
+            else
+            {
+                throw new InvalidOperationException("The attached AlwaysScrollToEnd property can only be applied to TextBox instances.");
+            }
+        }
+
+        public static bool GetAlwaysScrollToEnd(TextBox textBox)
+        {
+            if (textBox == null)
+            {
+                throw new ArgumentNullException("textBox");
+            }
+
+            return (bool)textBox.GetValue(AlwaysScrollToEndProperty);
+        }
+
+        public static void SetAlwaysScrollToEnd(TextBox textBox, bool alwaysScrollToEnd)
+        {
+            if (textBox == null)
+            {
+                throw new ArgumentNullException("textBox");
+            }
+
+            textBox.SetValue(AlwaysScrollToEndProperty, alwaysScrollToEnd);
+        }
+
+        private static void TextChanged(object sender, TextChangedEventArgs e)
+        {
+            ((TextBox)sender).ScrollToEnd();
+        }
     }
 }

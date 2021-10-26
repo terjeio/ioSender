@@ -1,13 +1,13 @@
 ﻿/*
  * DROControl.xaml.cs - part of CNC Controls library
  *
- * v0.02 / 2018-10-17 / Io Engineering (Terje Io)
+ * v0.18 / 2020-05-01 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2019, Io Engineering (Terje Io)
+Copyright (c) 2018-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -43,6 +43,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using CNC.Core;
+using CNC.GCode;
 
 namespace CNC.Controls
 {
@@ -81,15 +82,15 @@ namespace CNC.Controls
 
         private void TxtReadout_GotFocus(object sender, RoutedEventArgs e)
         {
-            if (IsFocusable)
+            if (IsFocusable && !(DataContext as GrblViewModel).IsJobRunning)
             {
-                ((GrblViewModel)DataContext).SuspendPositionNotifications = true;
+                (DataContext as GrblViewModel).SuspendPositionNotifications = true;
 
-                orgpos = ((GrblViewModel)DataContext).Position.Values[(int)((NumericTextBox)(sender)).Tag];
+                orgpos = (DataContext as GrblViewModel).Position.Values[(int)((NumericTextBox)(sender)).Tag];
 
-                background = ((NumericTextBox)(sender)).Background;
-                ((NumericTextBox)(sender)).IsReadOnly = false;
-                ((NumericTextBox)(sender)).Background = Brushes.White;
+                background = (sender as NumericTextBox).Background;
+                (sender as NumericTextBox).IsReadOnly = false;
+                (sender as NumericTextBox).Background = Brushes.White;
 
                 hasFocus = true;
 
@@ -101,12 +102,12 @@ namespace CNC.Controls
         {
             ((NumericTextBox)(sender)).IsReadOnly = true;
 
-            ((GrblViewModel)DataContext).SuspendPositionNotifications = false;
+            (DataContext as GrblViewModel).SuspendPositionNotifications = false;
 
             if (hasFocus)
             {
-                ((NumericTextBox)(sender)).Background = background;
-                ((GrblViewModel)DataContext).Position.Values[(int)((NumericTextBox)(sender)).Tag] = orgpos;
+                (sender as NumericTextBox).Background = background;
+                (DataContext as GrblViewModel).Position.Values[(int)(sender as NumericTextBox).Tag] = orgpos;
             }
 
             hasFocus = false;
@@ -131,7 +132,7 @@ namespace CNC.Controls
 
         void btnZero_Click(object sender, EventArgs e)
         {
-            AxisPositionChanged(GrblInfo.AxisIndexToLetter((int)((Button)sender).Tag), 0.0d);
+            AxisPositionChanged(GrblInfo.AxisIndexToLetter((int)(sender as Button).Tag), 0.0d);
         }
 
         void btnZeroAll_Click(object sender, EventArgs e)
@@ -144,29 +145,12 @@ namespace CNC.Controls
             if (axis == "ALL")
             {
                 string s = "G90G10L20P0";
-                for (int i = 0; i < GrblInfo.NumAxes; i++)
+                foreach (int i in GrblInfo.AxisFlags.ToIndices())
                     s += GrblInfo.AxisIndexToLetter(i) + "{0}";
-                Grbl.MDICommand(DataContext, string.Format(s, position.ToInvariantString("F3")));
+                (DataContext as GrblViewModel).ExecuteCommand(string.Format(s, position.ToInvariantString("F3")));
             }
             else
-                Grbl.MDICommand(DataContext, string.Format("G10L20P0{0}{1}", axis, position.ToInvariantString("F3")));
-        }
-
-        public void EnableLatheMode()
-        {
-            if (axisY.IsVisible)
-            {
-                lblXMode.Visibility = Visibility.Visible;
-                axisY.Visibility = Visibility.Collapsed;
-            }
-        }
-
-        public void SetNumAxes(int numAxes)
-        {
-            numAxes = Math.Min(numAxes, 6);
-
-            foreach (DROBaseControl axis in UIUtils.FindLogicalChildren<DROBaseControl>(this))
-                axis.Visibility = (int)axis.Tag < numAxes ? Visibility.Visible : Visibility.Collapsed;
+                (DataContext as GrblViewModel).ExecuteCommand(string.Format("G10L20P0{0}{1}", axis, position.ToInvariantString("F3")));
         }
     }
 }

@@ -6,22 +6,114 @@
              xmlns:local="clr-namespace:CNC.Controls"
              xmlns:core="clr-namespace:CNC.Core;assembly=CNC.Core"
              mc:Ignorable="d" 
-             d:DesignHeight="65" d:DesignWidth="216">
-    <Grid>
-        <GroupBox x:Name="grpSignals" Header="Signals" HorizontalAlignment="Left" VerticalAlignment="Top" Height="60" Width="216">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Height="35" Margin="3,3,0,0" VerticalAlignment="Top" Width="200">
-                <local:SignalControl x:Name="signalX" Label="X" IsSet="{Binding Path=Signals[(core:Signals)LimitX], Mode=OneWay}" Height="35" Width="18" Padding="0"/>
-                <local:SignalControl x:Name="signalY" Label="Y" IsSet="{Binding Path=Signals[(core:Signals)LimitY], Mode=OneWay}" Height="35" Width="18" Padding="0"/>
-                <local:SignalControl x:Name="signalZ" Label="Z" IsSet="{Binding Path=Signals[(core:Signals)LimitZ], Mode=OneWay}" Height="35" Width="18" Padding="0"/>
-                <local:SignalControl x:Name="signalA" Label="A" IsSet="{Binding Path=Signals[(core:Signals)LimitA], Mode=OneWay}" Height="35" Width="18" Padding="0"/>
-                <local:SignalControl x:Name="signalB" Label="B" IsSet="{Binding Path=Signals[(core:Signals)LimitB], Mode=OneWay}" Height="35" Width="18" Padding="0"/>
-                <local:SignalControl x:Name="signalC" Label="C" IsSet="{Binding Path=Signals[(core:Signals)LimitC], Mode=OneWay}" Height="35" Width="18" Padding="0"/>
-                <local:SignalControl x:Name="signalH" Label="H" IsSet="{Binding Path=Signals[(core:Signals)Hold], Mode=OneWay}" Height="35" Width="18" Padding="0"/>
-                <local:SignalControl x:Name="signalS" Label="S" IsSet="{Binding Path=Signals[(core:Signals)CycleStart], Mode=OneWay}" Height="35" Width="18" Padding="0"/>
-                <local:SignalControl x:Name="signalR" Label="R" IsSet="{Binding Path=Signals[(core:Signals)Reset], Mode=OneWay}" Height="35" Width="18" Padding="0"/>
-                <local:SignalControl x:Name="signalD" Label="D" IsSet="{Binding Path=Signals[(core:Signals)SafetyDoor], Mode=OneWay}" Height="35" Width="18" Padding="0"/>
-                <local:SignalControl x:Name="signalP" Label="P" IsSet="{Binding Path=Signals[(core:Signals)Probe], Mode=OneWay}" Height="35" Width="18" Padding="0"/>
+             d:DesignHeight="60" d:DesignWidth="216">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="SharedStyles.xaml"/>
+                <ResourceDictionary>
+                    <Style TargetType="local:SignalControl">
+                        <Setter Property="Width" Value="18"/>
+                        <Setter Property="Height" Value="35"/>
+                        <Setter Property="VerticalAlignment" Value="Center"/>
+                        <Setter Property="Padding" Value="0"/>
+                    </Style>
+                    <local:IsSignalVisibleConverter x:Key="IsSignalVisibleConverter" />
+                    <Style x:Key="DoorOpenVisibleStyle">
+                        <Setter Property="Control.Visibility">
+                            <Setter.Value>
+                                <MultiBinding Converter="{StaticResource IsSignalVisibleConverter}">
+                                    <Binding Path="OptionalSignals" />
+                                    <Binding>
+                                        <Binding.Source>
+                                            <core:Signals>SafetyDoor</core:Signals>
+                                        </Binding.Source>
+                                    </Binding>
+                                </MultiBinding>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                    <Style x:Key="EStopVisibleStyle">
+                        <Setter Property="Control.Visibility">
+                            <Setter.Value>
+                                <MultiBinding Converter="{StaticResource IsSignalVisibleConverter}">
+                                    <Binding Path="OptionalSignals" />
+                                    <Binding>
+                                        <Binding.Source>
+                                            <core:Signals>EStop</core:Signals>
+                                        </Binding.Source>
+                                    </Binding>
+                                </MultiBinding>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                    <Style x:Key="MotorWarningVisibleStyle">
+                        <Setter Property="Control.Visibility">
+                            <Setter.Value>
+                                <MultiBinding Converter="{StaticResource IsSignalVisibleConverter}">
+                                    <Binding Path="OptionalSignals" />
+                                    <Binding>
+                                        <Binding.Source>
+                                            <core:Signals>MotorWarning</core:Signals>
+                                        </Binding.Source>
+                                    </Binding>
+                                </MultiBinding>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                    <Style x:Key="BlockDeleteVisibleStyle">
+                        <Setter Property="Control.Visibility">
+                            <Setter.Value>
+                                <MultiBinding Converter="{StaticResource IsSignalVisibleConverter}">
+                                    <Binding Path="OptionalSignals" />
+                                    <Binding>
+                                        <Binding.Source>
+                                            <core:Signals>BlockDelete</core:Signals>
+                                        </Binding.Source>
+                                    </Binding>
+                                </MultiBinding>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                    <Style x:Key="OptionalStopVisibleStyle">
+                        <Setter Property="Control.Visibility">
+                            <Setter.Value>
+                                <MultiBinding Converter="{StaticResource IsSignalVisibleConverter}">
+                                    <Binding Path="OptionalSignals" />
+                                    <Binding>
+                                        <Binding.Source>
+                                            <core:Signals>OptionalStop</core:Signals>
+                                        </Binding.Source>
+                                    </Binding>
+                                </MultiBinding>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <GroupBox x:Uid="grp_signals" x:Name="grpSignals" Header="Signals" HorizontalAlignment="Left" VerticalAlignment="Top" Height="60" Width="216">
+        <DockPanel HorizontalAlignment="Left" VerticalAlignment="Bottom" Height="36" Width="205">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="3,0,0,0" VerticalAlignment="Center" Width="Auto" DockPanel.Dock="Left">
+                <local:SignalControl Label="X" IsSet="{Binding Path=Signals[(core:Signals)LimitX], Mode=OneWay}"/>
+                <local:SignalControl Label="Y" IsSet="{Binding Path=Signals[(core:Signals)LimitY], Mode=OneWay}" Style="{StaticResource YAxisVisibleStyle}"/>
+                <local:SignalControl Label="Z" IsSet="{Binding Path=Signals[(core:Signals)LimitZ], Mode=OneWay}" Style="{StaticResource ZAxisVisibleStyle}"/>
+                <local:SignalControl Label="A" IsSet="{Binding Path=Signals[(core:Signals)LimitA], Mode=OneWay}" Style="{StaticResource AAxisVisibleStyle}"/>
+                <local:SignalControl Label="B" IsSet="{Binding Path=Signals[(core:Signals)LimitB], Mode=OneWay}" Style="{StaticResource BAxisVisibleStyle}"/>
+                <local:SignalControl Label="C" IsSet="{Binding Path=Signals[(core:Signals)LimitC], Mode=OneWay}" Style="{StaticResource CAxisVisibleStyle}"/>
             </StackPanel>
-        </GroupBox>
-    </Grid>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,3,0" VerticalAlignment="Center" DockPanel.Dock="Right">
+                <local:SignalControl Label="W" ToolTip="Motor warning" IsSet="{Binding Path=Signals[(core:Signals)MotorWarning], Mode=OneWay}" Style="{StaticResource MotorWarningVisibleStyle}"/>
+                <local:SignalControl Label="B" ToolTip="Block delete" IsSet="{Binding Path=Signals[(core:Signals)BlockDelete], Mode=OneWay}" Style="{StaticResource BlockDeleteVisibleStyle}"/>
+                <local:SignalControl Label="O" ToolTip="Optional stop" IsSet="{Binding Path=Signals[(core:Signals)OptionalStop], Mode=OneWay}" Style="{StaticResource OptionalStopVisibleStyle}"/>
+                <local:SignalControl Label="H" ToolTip="Feed hold" IsSet="{Binding Path=Signals[(core:Signals)Hold], Mode=OneWay}"/>
+                <local:SignalControl Label="S" ToolTip="Cycle start" IsSet="{Binding Path=Signals[(core:Signals)CycleStart], Mode=OneWay}"/>
+                <local:SignalControl Label="R" ToolTip="Reset" IsSet="{Binding Path=Signals[(core:Signals)Reset], Mode=OneWay}"/>
+                <local:SignalControl Label="E" ToolTip="E-Stop" IsSet="{Binding Path=Signals[(core:Signals)EStop], Mode=OneWay}" Style="{StaticResource EStopVisibleStyle}"/>
+                <local:SignalControl Label="D" ToolTip="Safety door" IsSet="{Binding Path=Signals[(core:Signals)SafetyDoor], Mode=OneWay}" Style="{StaticResource DoorOpenVisibleStyle}"/>
+                <local:SignalControl Label="P" ToolTip="Probe" IsSet="{Binding Path=Signals[(core:Signals)Probe], Mode=OneWay}"/>
+            </StackPanel>
+        </DockPanel>
+    </GroupBox>
 </UserControl>

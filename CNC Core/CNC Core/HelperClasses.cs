@@ -1,7 +1,7 @@
 ﻿/*
  * HelperClasses.cs - part of CNC Controls library for Grbl
  *
- * v0.02 / 2019-10-31 / Io Engineering (Terje Io)
+ * v0.27 / 2020-09-26 / Io Engineering (Terje Io)
  *
  */
 
@@ -14,6 +14,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Windows;
 using System.Diagnostics.Contracts;
+using System.Threading;
+using System.Collections.Concurrent;
+using System.Threading.Tasks;
+using System.Diagnostics;
 using CNC.GCode;
 
 namespace CNC.Core
@@ -41,22 +45,27 @@ namespace CNC.Core
             List<string> properties = new List<string>();
 
             foreach (var error in _validationErrors)
-                if(!properties.Contains(error.Key))
+                if (!properties.Contains(error.Key))
                     properties.Add(error.Key);
 
             _validationErrors.Clear();
 
             foreach (var property in properties)
-                if(!string.IsNullOrEmpty(property))
+                if (!string.IsNullOrEmpty(property))
                     RaiseErrorsChanged(property);
         }
         public void SetError(string message)
         {
             _validationErrors.Add(string.Empty, new List<string> { message });
         }
+
         public void SetError(string property, string message)
         {
-            _validationErrors.Add(property, new List<string> { message });
+            ICollection<string> value;
+            if (_validationErrors.TryGetValue(property, out value))
+                value.Add(message);
+            else
+                _validationErrors.Add(property, new List<string> { message });
 
             RaiseErrorsChanged(property);
         }
@@ -183,6 +192,25 @@ namespace CNC.Core
         }
     }
 
+    public static class FileUtils
+    {
+        public static bool IsAllowedFile (string filename, string extensions)
+        {
+            int pos = filename.LastIndexOf('.');
+
+            return pos > 0 && ("," + extensions + ",").Contains("," + filename.Substring(pos + 1).ToLower() + ",");
+        }
+        public static string ExtensionsToFilter(string extensions)
+        {
+            string[] filetypes = extensions.Split(',');
+
+            for (int i = 0; i < filetypes.Length; i++)
+                filetypes[i] = "*." + filetypes[i];
+
+            return string.Join(";", filetypes);
+        }
+    }
+
     // https://stackoverflow.com/questions/17794530/accessing-an-array-in-xaml-with-enums
     public static class StringEnumConversion
     {
@@ -226,14 +254,81 @@ namespace CNC.Core
             var type = typeof(T);
             foreach (var sourceProperty in type.GetProperties())
             {
-                var targetProperty = type.GetProperty(sourceProperty.Name);
-                targetProperty.SetValue(target, sourceProperty.GetValue(source, null), null);
+                if (sourceProperty.CanRead)
+                {
+                    var targetProperty = type.GetProperty(sourceProperty.Name);
+                    if (targetProperty.CanWrite)
+                        targetProperty.SetValue(target, sourceProperty.GetValue(source, null), null);
+                }
             }
             //foreach (var sourceField in type.GetFields())
             //{
             //    var targetField = type.GetField(sourceField.Name);
             //    targetField.SetValue(target, sourceField.GetValue(source));
             //}
+        }
+    }
+    public static class WaitFor
+    {
+        // https://stackoverflow.com/questions/17635440/how-to-wait-for-a-single-event-in-c-with-timeout-and-cancellation
+        public static bool SingleEvent<TEvent>(this CancellationToken token, Action<TEvent> handler, Action<Action<TEvent>> subscribe, Action<Action<TEvent>> unsubscribe, int msTimeout, System.Action initializer = null)
+        {
+            var q = new BlockingCollection<TEvent>();
+            Action<TEvent> add = item => q.TryAdd(item);
+            subscribe(add);
+            try
+            {
+                initializer?.Invoke();
+                TEvent eventResult;
+                if (q.TryTake(out eventResult, msTimeout, token))
+                {
+                    handler?.Invoke(eventResult);
+                    return true;
+                }
+                return false;
+            }
+            finally
+            {
+                unsubscribe(add);
+                q.Dispose();
+            }
+        }
+
+        public static bool AckResponse<TEvent>(this CancellationToken token, Action<TEvent> handler, Action<Action<TEvent>> subscribe, Action<Action<TEvent>> unsubscribe, int msTimeout, System.Action initializer = null)
+        {
+            var q = new BlockingCollection<TEvent>();
+            Action<TEvent> add = item => q.TryAdd(item);
+            subscribe(add);
+            try
+            {
+                initializer?.Invoke();
+                TEvent eventResult;
+                while (q.TryTake(out eventResult, msTimeout, token))
+                {
+                    handler?.Invoke(eventResult);
+                    if((string)(object)eventResult == "ok")
+                        return true;
+                }
+                return false;
+            }
+            finally
+            {
+                unsubscribe(add);
+                q.Dispose();
+            }
+        }
+
+        // https://stackoverflow.com/questions/470256/process-waitforexit-asynchronously
+
+        public static Task WaitForExitAsync(this Process process, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var tcs = new TaskCompletionSource<object>();
+            process.EnableRaisingEvents = true;
+            process.Exited += (sender, args) => tcs.TrySetResult(null);
+            if (cancellationToken != default(CancellationToken))
+                cancellationToken.Register(() => { tcs.TrySetCanceled(); });
+
+            return tcs.Task;
         }
     }
 }

@@ -1,13 +1,13 @@
-﻿/*
+/*
  * TurningWizard.xaml.cs - part of CNC Controls library
  *
- * v0.01 / 2019-10-31 / Io Engineering (Terje Io)
+ * v0.31 / 2021-04-27 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019, Io Engineering (Terje Io)
+Copyright (c) 2019-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -41,39 +41,24 @@ using System;
 using System.Collections.ObjectModel;
 using System.Windows.Controls;
 using CNC.Core;
-using CNC.View;
 
 namespace CNC.Controls.Lathe
 {
     /// <summary>
     /// Interaction logic for TurningWizard.xaml
     /// </summary>
-    public partial class TurningWizard : UserControl, CNCView
+    public partial class TurningWizard : UserControl, ICNCView
     {
         private bool initOk = false, resetProfileBindings = true;
         private double last_rpm = 0d, last_css = 0d;
         private BaseViewModel model;
         private TurningLogic logic = new TurningLogic();
 
-        public event GCodePushHandler GCodePush;
-
         public TurningWizard()
         {
             InitializeComponent();
 
             DataContext = model = logic.Model;
-
-            logic.GCodePush += Logic_GCodePush;
-        }
-
-        public void ApplySettings(LatheConfig config)
-        {
-            model.wz.ApplySettings(config);
-        }
-
-        private void Logic_GCodePush(string gcode, Core.Action action)
-        {
-            GCodePush?.Invoke(gcode, action); // Forward
         }
 
         void TurningWizard_Load(object sender, EventArgs e)
@@ -93,39 +78,43 @@ namespace CNC.Controls.Lathe
 
         public ObservableCollection<string> gCode { get; private set; }
 
-        #region Methods required by CNCView interface
+        #region Methods and properties required by CNCView interface
 
-        public ViewType mode { get { return ViewType.Turning; } }
+        public ViewType ViewType { get { return ViewType.Turning; } }
+        public bool CanEnable { get { return true; } }
 
         public void Activate(bool activate, ViewType chgMode)
         {
-            if (activate && GrblSettings.Loaded)
+            if (activate && GrblSettings.IsLoaded)
             {
                 if (!initOk)
                 {
                     initOk = true;
                     if (config == null)
                     {
-
-                     //   cbxProfile.BindOptions(config, mode);
+                        //   cbxProfile.BindOptions(config, mode);
                     }
-
                     model.config.Update();
-
-                    //if (fMetric != config.metric)
-                    //{
-                    //    fMetric = config.metric;
-                    //    model.IsCSSEnabled = config.css;
-                    //    SetUnitLabels(this, fMetric ? "mm" : "in");
-                    //}
+                    Converters.IsMetric = model.IsMetric = GrblParserState.IsMetric;
+                    model.XStart = model.IsMetric ? 10.0d : 0.5d;
                 }
                 else
+                {
                     model.gCode.Clear();
+                    model.PassData.Clear();
+                }
             }
         }
 
         public void CloseFile()
         {
+        }
+
+        public void Setup(UIViewModel model, AppConfig profile)
+        {
+            this.model.wz.ApplySettings(profile.Lathe);
+            if (!model.IsConfigControlInstantiated<ConfigControl>())
+                model.ConfigControls.Add(new ConfigControl());
         }
 
         #endregion

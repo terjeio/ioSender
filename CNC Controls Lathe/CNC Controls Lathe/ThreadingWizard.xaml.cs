@@ -1,12 +1,12 @@
-﻿/*
- * ThreadingWizard.xaml.cs - part of CNC Controls library for Grbl
+/*
+ * ThreadingWizard.xaml.cs - part of CNC Controls Lathe library
  *
- * v0.01 / 2019-05-27 / Io Engineering (Terje Io)
+ * v0.31 / 2021-04-27 / Io Engineering (Terje Io)
  *
  */
 
 /*
- * Adapted from original code by Stephan Brunker (written in FreeBasic)
+ * Adapted from original code by Stephan Brunker (written in FreeBasic) [r16 - v0.32]
  *
  * Project Homepage:
  * www.sourceforge.net/p/mach3threadinghelper 
@@ -17,7 +17,7 @@
 
 Additional code:
 
-Copyright (c) 2019, Io Engineering (Terje Io)
+Copyright (c) 2019-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -51,18 +51,14 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using CNC.Core;
-using CNC.View;
 using System.Collections.Generic;
-using System.Windows.Media;
-using System.Windows.Documents;
-using System.Windows.Data;
 
 namespace CNC.Controls.Lathe
 {
     /// <summary>
     /// Interaction logic for ThreadingView.xaml
     /// </summary>
-    public partial class ThreadingWizard : UserControl, CNCView
+    public partial class ThreadingWizard : UserControl, ICNCView
     {
         private bool initOk = false, resetProfileBindings = true;
 
@@ -79,16 +75,13 @@ namespace CNC.Controls.Lathe
         {
             InitializeComponent();
 
+            grpOptionsMach3.Visibility = Visibility.Hidden;
+
             logic = new ThreadLogic();
 
             DataContext = model = logic.Model;
 
-            logic.GCodePush += Logic_GCodePush;
             logic.Model.ErrorsChanged += Model_ErrorsChanged;
-        }
-        public void ApplySettings(LatheConfig config)
-        {
-            model.wz.ApplySettings(config);
         }
 
         private void Model_ErrorsChanged(object sender, System.ComponentModel.DataErrorsChangedEventArgs e)
@@ -110,6 +103,7 @@ namespace CNC.Controls.Lathe
             //UIUtils.GroupBoxCaptionBold(grpOptionsLinuxCNC);
             //UIUtils.GroupBoxCaptionBold(grpOptionsMach3);
             //UIUtils.GroupBoxCaptionBold(grpTool);
+     //       logic.ResetUI();
         }
 
         private void Logic_GCodePush(string gcode, Action action)
@@ -117,13 +111,14 @@ namespace CNC.Controls.Lathe
             GCodePush?.Invoke(gcode, action); // Forward
         }
 
-        #region Methods required by CNCView interface
+        #region Methods and properties required by CNCView interface
 
-        public ViewType mode { get { return ViewType.G76Threading; } }
+        public ViewType ViewType { get { return ViewType.G76Threading; } }
+        public bool CanEnable { get { return true; } }
 
         public void Activate(bool activate, ViewType chgMode)
         {
-            if (activate && GrblSettings.Loaded)
+            if (activate && GrblSettings.IsLoaded)
             {
                 if (!initOk)
                 {
@@ -139,12 +134,7 @@ namespace CNC.Controls.Lathe
 
                     model.config.Update();
 
-                    if (model.IsMetric != model.config.metric)
-                    {
-                        model.IsMetric = model.config.metric;
-                        // cbxThreadType_SelectionChanged(null, null);
-                        //  SetUnitLabels(this);
-                    }
+                    Converters.IsMetric = model.IsMetric = GrblParserState.IsMetric;;
                 }
                 else
                     model.gCode.Clear();
@@ -153,6 +143,11 @@ namespace CNC.Controls.Lathe
 
         public void CloseFile()
         {
+        }
+
+        public void Setup(UIViewModel model, AppConfig profile)
+        {
+            this.model.wz.ApplySettings(profile.Lathe);
         }
 
         #endregion
@@ -184,6 +179,16 @@ namespace CNC.Controls.Lathe
 
         private void btnCalculate_Click(object sender, RoutedEventArgs e)
         {
+            if(!model.Thread.CompoundAngles.Contains(cbxCompoundAngle.Value))
+            {
+                model.Thread.CompoundAngles.Add(cbxCompoundAngle.Value);
+                model.Thread.CompoundAngle = cbxCompoundAngle.Value;
+            }
+            if (model.Thread.DepthDegression == null)
+            {
+                model.Thread.DepthDegressions.Add(cbxDepthDegression.Text);
+                model.Thread.DepthDegression = cbxDepthDegression.Text;
+            }
             logic.Calculate();
         }
     }

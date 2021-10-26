@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:CNC.Controls.Camera"
              mc:Ignorable="d" 
              d:DesignHeight="360" d:DesignWidth="500"
-              Background="#FFF0F0F0">
+             Background="#FFF0F0F0" Loaded="CameraControl_Loaded">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="320"/>
@@ -17,8 +17,8 @@
             <ColumnDefinition Width="80"/>
         </Grid.ColumnDefinitions>
         <Image Width="400" Height="300" HorizontalAlignment="Left" Name="frameHolder" VerticalAlignment="Top" Margin="10,10,0,0"/>
-        <Slider x:Name="sldcircle" Orientation="Vertical" HorizontalAlignment="Left" Margin="28,30,0,0" VerticalAlignment="Top" Height="118" Width="30" Grid.Column="1" ValueChanged="sldcircle_ValueChanged" Maximum="100" Minimum="5" LargeChange="10" SmallChange="1"/>
-        <Button x:Name="btnMove" Content="Move offset" HorizontalAlignment="Left" Margin="10,4,0,0" Grid.Row="1" VerticalAlignment="Top" Width="75" Click="btnMove_Click" Height="22"/>
+        <Slider x:Name="sldcircle" Orientation="Vertical" HorizontalAlignment="Left" Value="{Binding Path=GuideScale, Mode=TwoWay}" Margin="28,30,0,0" VerticalAlignment="Top" Height="118" Width="30" Grid.Column="1" ValueChanged="sldcircle_ValueChanged" Maximum="100" Minimum="5" LargeChange="10" SmallChange="1"/>
+        <Button x:Uid="btn_moveOffset" x:Name="btnMove" Content="Move offset" IsEnabled="{Binding Path=IsMoveEnabled}" HorizontalAlignment="Left" Margin="10,4,0,0" Grid.Row="1" VerticalAlignment="Top" Width="75" Click="btnMove_Click" Height="22"/>
         <ComboBox x:Name="cbxCamera" ItemsSource="{Binding Path=Cameras}" DisplayMemberPath="Name" SelectedValuePath="Camera" HorizontalAlignment="Left" Margin="100,4,0,0" Grid.Row="1" VerticalAlignment="Top" Width="300" SelectionChanged="cbxCamera_SelectionChanged" Height="22"/>
     </Grid>
 </UserControl>

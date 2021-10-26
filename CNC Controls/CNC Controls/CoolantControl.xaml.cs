@@ -1,13 +1,13 @@
 ﻿/*
  * CoolantControl.xaml.cs - part of CNC Controls library
  *
- * v0.02 / 2019-09-25 / Io Engineering (Terje Io)
+ * v0.34 / 2021-07-11 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2019, Io Engineering (Terje Io)
+Copyright (c) 2018-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -48,17 +48,16 @@ namespace CNC.Controls
         public CoolantControl()
         {
             InitializeComponent();
-
-            chkFlood.Tag = ((char)GrblConstants.CMD_COOLANT_FLOOD_OVR_TOGGLE).ToString();
-            chkMist.Tag = ((char)GrblConstants.CMD_COOLANT_MIST_OVR_TOGGLE).ToString();
         }
-
-        public string FloodCommand { get { return (string)chkFlood.Tag; } set { chkFlood.Tag = value; } }
-        public string MistCommand { get { return (string)chkMist.Tag; } set { chkMist.Tag = value; } }
 
         private void chkBox_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            Grbl.MDICommand(DataContext, (string)((CheckBox)sender).Tag);
+            if((string)(sender as CheckBox).Tag == "Flood")
+                (DataContext as GrblViewModel).ExecuteCommand(GrblCommand.Flood);
+            else if ((string)(sender as CheckBox).Tag == "Mist")
+                (DataContext as GrblViewModel).ExecuteCommand(GrblCommand.Mist);
+            else
+                (DataContext as GrblViewModel).ExecuteCommand(GrblCommand.Fan);
         }
     }
 }

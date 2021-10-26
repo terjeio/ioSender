@@ -1,13 +1,13 @@
 ﻿/*
- * MPGPending.xaml.cs - part of CNC Controls library for Grbl
+ * MPGPending.xaml.cs - part of CNC Controls library
  *
- * v0.02 / 2019-09-25 / Io Engineering (Terje Io)
+ * v0.05 / 2020-02-10 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019, Io Engineering (Terje Io)
+Copyright (c) 2019-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -44,31 +44,39 @@ namespace CNC.Controls
 {
     public partial class MPGPending : Window
     {
-        private GrblViewModel parameters = new GrblViewModel();
+        private GrblViewModel model;
 
-        public MPGPending()
+        public MPGPending(GrblViewModel model)
         {
-            Cancelled = true;
+            InitializeComponent();
 
-            Comms.com.DataReceived += new DataReceivedHandler(DataReceived);
+            this.model = model;
+
+            model.OnRealtimeStatusProcessed += OnRealtimeStatusProcessed;
         }
-        public bool Cancelled { get; private set; }
+
+        public bool Cancelled { get; private set; } = true;
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            Comms.com.DataReceived -= DataReceived;
+            if (Cancelled)
+            {
+                Comms.com.DataReceived -= model.DataReceived;
+                model.OnRealtimeStatusProcessed -= OnRealtimeStatusProcessed;
+
+                using (new UIUtils.WaitCursor()) // disconnecting from websocket may take some time...
+                {
+                    Comms.com.Close();
+                }
+            }
         }
 
-        private void DataReceived(string data)
+        private void OnRealtimeStatusProcessed(string response)
         {
-            if (data.Length > 1 && data.Substring(0, 1) == "<")
+            if (model.IsMPGActive == false)
             {
-                parameters.ParseStatus(data.Remove(data.Length - 1));
-
-                if(parameters.IsMPGActive == false) {
-                    Cancelled = false;
-                    Close();
-                }
+                Cancelled = false;
+                Close();
             }
         }
     }

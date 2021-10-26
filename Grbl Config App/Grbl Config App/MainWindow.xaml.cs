@@ -2,13 +2,13 @@
 /*
  * MainWindow.xaml.cs - part of Grbl Code Sender
  *
- * v0.03 / 2019-10-27 / Io Engineering (Terje Io)
+ * v0.35 / 2021-08-21 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019, Io Engineering (Terje Io)
+Copyright (c) 2019-2020, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -42,23 +42,31 @@ using System;
 using System.Windows;
 using CNC.Core;
 using CNC.Controls;
-using CNC.View;
+using System.Collections.Generic;
+using System.Threading;
+using System.IO;
+using Microsoft.Win32;
 
 namespace Grbl_Config_App
 {
 
     public partial class MainWindow : Window
     {
-
-        public static AppConfig Profile = new AppConfig();
+        private const string version = "2.0.35";
+        public static UIViewModel UIViewModel { get; } = new UIViewModel();
 
         public MainWindow()
         {
+            CNC.Core.Resources.Path = AppDomain.CurrentDomain.BaseDirectory;
+
             InitializeComponent();
+            Title = string.Format(Title, version);
 
             int res;
-            if ((res = Profile.SetupAndOpen(Title, App.Current.Dispatcher)) != 0)
-                Environment.Exit(res);            
+            if ((res = AppConfig.Settings.SetupAndOpen(Title, (GrblViewModel)DataContext, App.Current.Dispatcher)) != 0)
+                Environment.Exit(res);
+
+            CNC.Core.Grbl.GrblViewModel = (GrblViewModel)DataContext;
         }
 
         #region UIEvents
@@ -71,8 +79,11 @@ namespace Grbl_Config_App
             using (new UIUtils.WaitCursor())
             {
                 GrblInfo.Get();
-                GrblSettings.Get();
+                GrblSettings.Load();
             }
+
+            halsettings.IsEnabled = grblsettings.IsEnabled = GrblInfo.IsGrblHAL && GrblInfo.Build >= 20210819;
+            grblalarms.IsEnabled = grblerrors.IsEnabled = GrblInfo.IsGrblHAL && GrblInfo.Build >= 20210823;
 
             configView.Activate(true, ViewType.Startup);
         }
@@ -80,6 +91,11 @@ namespace Grbl_Config_App
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             configView.Activate(false, ViewType.Shutdown);
+
+            using (new UIUtils.WaitCursor()) // disconnecting from websocket may take some time...
+            {
+               Comms.com.Close();
+            }
         }
 
         private void exitMenuItem_Click(object sender, RoutedEventArgs e)
@@ -89,10 +105,155 @@ namespace Grbl_Config_App
 
         void aboutMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            About about = new About(this);
+            About about = new About(Title) { Owner = Application.Current.MainWindow };
+            about.DataContext = DataContext;
             about.ShowDialog();
         }
 
-        #endregion  
+        #endregion
+
+        private void getHalSettingsItem_Click(object sender, RoutedEventArgs e)
+        {
+            bool getExtended = GrblInfo.ExtendedProtocol && GrblInfo.Build >= 20200716;
+
+            var g = new Settings();
+
+            if(g.Load(DataContext as GrblViewModel, "$ESH"))
+            {
+                SaveFileDialog saveDialog = new SaveFileDialog()
+                {
+                    Filter = "Tab separated file (*.txt)|*.txt",
+                    AddExtension = true,
+                    DefaultExt = ".txt",
+                    ValidateNames = true,
+                    Title = "Save setting information in grblHAL tab separated format"
+                };
+
+                if (saveDialog.ShowDialog() == true)
+                    g.Backup(saveDialog.FileName);
+            }
+        }
+
+        private void getGrblSettingsItem_Click(object sender, RoutedEventArgs e)
+        {
+            bool getExtended = GrblInfo.ExtendedProtocol && GrblInfo.Build >= 20200716;
+
+            var g = new Settings();
+
+            if (g.Load(DataContext as GrblViewModel, "$ESG"))
+            {
+                SaveFileDialog saveDialog = new SaveFileDialog()
+                {
+                    Filter = "Comma separated file (*.csv)|*.csv",
+                    AddExtension = true,
+                    DefaultExt = ".csv",
+                    ValidateNames = true,
+                    Title = "Save setting information in Grbl .csv format"
+                };
+
+                if (saveDialog.ShowDialog() == true)
+                    g.Backup(saveDialog.FileName);
+            }
+        }
+
+        private void getGrblAlarmsItem_Click(object sender, RoutedEventArgs e)
+        {
+            bool getExtended = GrblInfo.ExtendedProtocol && GrblInfo.Build >= 20200716;
+
+            var g = new Settings();
+
+            if (g.Load(DataContext as GrblViewModel, "$EAG"))
+            {
+                SaveFileDialog saveDialog = new SaveFileDialog()
+                {
+                    Filter = "Comma separated file (*.csv)|*.csv",
+                    AddExtension = true,
+                    DefaultExt = ".csv",
+                    ValidateNames = true,
+                    Title = "Save alarm codes in Grbl .csv format"
+                };
+
+                if (saveDialog.ShowDialog() == true)
+                    g.Backup(saveDialog.FileName);
+            }
+        }
+
+        private void getGrblErrorsItem_Click(object sender, RoutedEventArgs e)
+        {
+            bool getExtended = GrblInfo.ExtendedProtocol && GrblInfo.Build >= 20200716;
+
+            var g = new Settings();
+
+            if (g.Load(DataContext as GrblViewModel, "$EEG"))
+            {
+                SaveFileDialog saveDialog = new SaveFileDialog()
+                {
+                    Filter = "Comma separated file (*.csv)|*.csv",
+                    AddExtension = true,
+                    DefaultExt = ".csv",
+                    ValidateNames = true,
+                    Title = "Save error codes in Grbl .csv format"
+                };
+
+                if (saveDialog.ShowDialog() == true)
+                    g.Backup(saveDialog.FileName);
+            }
+        }
+    }
+
+    public class Settings
+    {
+        List<string> settings = new List<string>();
+
+        public bool Load(GrblViewModel model, string cmd)
+        {
+            bool? res = null;
+            CancellationToken cancellationToken = new CancellationToken();
+
+            Comms.com.PurgeQueue();
+
+            model.Silent = true;
+
+                new Thread(() =>
+                {
+                    res = WaitFor.AckResponse<string>(
+                        cancellationToken,
+                        response => ProcessDetail(response),
+                        a => model.OnResponseReceived += a,
+                        a => model.OnResponseReceived -= a,
+                        400, () => Comms.com.WriteCommand(cmd));
+                }).Start();
+
+                while (res == null)
+                    EventUtils.DoEvents();
+
+            return settings.Count > 0;
+        }
+
+        public void Backup(string filename)
+        {
+            if (settings.Count > 0) try
+            {
+                StreamWriter file = new StreamWriter(filename);
+                if (file != null)
+                {
+                    foreach (string s in settings)
+                        file.WriteLine(s);
+
+                    file.Close();
+                }
+            }
+            catch
+            {
+            }
+        }
+
+        private void ProcessDetail(string data)
+        {
+            if (data != "ok")
+            {
+                settings.Add(data);
+            }
+        }
     }
 }

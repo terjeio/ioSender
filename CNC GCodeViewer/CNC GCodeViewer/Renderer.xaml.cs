@@ -1,7 +1,7 @@
-﻿/*
+/*
  * Renderer.xaml.cs - part of CNC Controls library
  *
- * v0.02 / 2019-11-05 / Io Engineering (Terje Io)
+ * v0.33 / 2021-05-15 / Io Engineering (Terje Io)
  *
  */
 
@@ -14,7 +14,7 @@
 
 /*
 
-Copyright (c) 2019, Io Engineering (Terje Io)
+Copyright (c) 2019-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -44,23 +44,30 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#if DEBUG
+//#define DEBUG_ARC_BBOXES
+#endif
+
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Media.Media3D;
 using HelixToolkit.Wpf;
 using CNC.Core;
 using CNC.GCode;
-using System.Collections.ObjectModel;
-using System.Linq;
 
 namespace CNC.Controls.Viewer
 {
+    public enum MoveType
+    {
+        None,
+        Cut,
+        Rapid,
+        Retract
+    }
 
     public static class ex3d
     {
@@ -76,6 +83,88 @@ namespace CNC.Controls.Viewer
         }
     }
 
+    public class Machine : ViewModelBase
+    {
+        GridLinesVisual3D _grid;
+        bool _showViewCube = true, _showCoordSystem = false;
+        BoundingBoxWireFrameVisual3D _bbox;
+        ModelVisual3D _axes = new ModelVisual3D();
+        Point3D _startposition = new Point3D();
+        Point3D _limits = new Point3D();
+        Point3D _toolposition = new Point3D();
+        Point3DCollection _toolorigin, _cutlines, _rapidlines, _retractlines, _executedlines;
+        Color _cutMotion = Colors.Red, _rapidMotion = Colors.LightPink, _retractMotion = Colors.Green, _toolOrigin = Colors.Green, _gridColor = Colors.LightGray, _highlight = Colors.Crimson;
+        SolidColorBrush _canvas = Brushes.White;
+
+        public void Clear()
+        {
+         //   Grid = null;
+         //   BoundingBox = null;
+            ToolOrigin = CutLines = RapidLines = RetractLines = ExecutedLines = null;
+        }
+
+        public void SetStartPosition(double x, double y, double z)
+        {
+            SetStartPosition(new Point3D(x, y, z));
+        }
+
+        public void SetStartPosition(Point3D position)
+        {
+            if (!position.Equals(_startposition))
+            {
+                _startposition.X = position.X;
+                _startposition.Y = position.Y;
+                _startposition.Z = position.Z;
+                OnPropertyChanged(nameof(StartPosition));
+            }
+        }
+
+        public void SetToolPosition(double x, double y, double z)
+        {
+            _toolposition.X = x;
+            _toolposition.Y = y;
+            _toolposition.Z = z;
+            OnPropertyChanged(nameof(ToolPosition));
+        }
+        public void SetLimits(double x, double y, double z)
+        {
+            SetLimits(new Point3D(x, y, z));
+        }
+
+        public void SetLimits(Point3D position)
+        {
+            if (!position.Equals(_limits))
+            {
+                _limits.X = position.X;
+                _limits.Y = position.Y;
+                _limits.Z = position.Z;
+                OnPropertyChanged(nameof(Limits));
+            }
+        }
+
+        public bool ShowViewCube { get { return _showViewCube; } set { _showViewCube = value; OnPropertyChanged(); } }
+        public bool ShowCoordinateSystem { get { return _showCoordSystem; } set { _showCoordSystem = value; OnPropertyChanged(); } }
+        public GridLinesVisual3D Grid { get { return _grid; } set { _grid = value; OnPropertyChanged(); } }
+        public BoundingBoxWireFrameVisual3D BoundingBox { get { return _bbox; } set { _bbox = value; OnPropertyChanged(); } }
+        public ModelVisual3D Axes { get { return _axes; } }
+        public Point3D ToolPosition { get { return _toolposition; } }
+        public Point3DCollection ToolOrigin { get { return _toolorigin; } set { _toolorigin = value; OnPropertyChanged(); } }
+        public Point3DCollection CutLines { get { return _cutlines; } set { _cutlines = value; OnPropertyChanged(); } }
+        public Point3DCollection RapidLines { get { return _rapidlines; } set { _rapidlines = value; OnPropertyChanged(); } }
+        public Point3DCollection RetractLines { get { return _retractlines; } set { _retractlines = value; OnPropertyChanged(); } }
+        public Point3DCollection ExecutedLines { get { return _executedlines; } set { _executedlines = value; OnPropertyChanged(); } }
+        public Point3D StartPosition { get { return _startposition; } }
+        public Point3D Limits { get { return _limits; } }
+
+        public Color CutMotionColor { get { return _cutMotion; } set { _cutMotion = value; OnPropertyChanged(); } }
+        public Color RapidMotionColor { get { return _rapidMotion; } set { _rapidMotion = value; OnPropertyChanged(); } }
+        public Color RetractMotionColor { get { return _retractMotion; } set { _retractMotion = value; OnPropertyChanged(); } }
+        public Color ToolOriginColor { get { return _toolOrigin; } set { _toolOrigin = value; OnPropertyChanged(); } }
+        public Color GridColor { get { return _gridColor; } set { _gridColor = value; OnPropertyChanged(); } }
+        public Color HighlightColor { get { return _highlight; } set { _highlight = value; OnPropertyChanged(); } }
+        public SolidColorBrush CanvasColor { get { return _canvas; } set { _canvas = value; OnPropertyChanged(); } }
+    }
+
     /// <summary>
     /// Interaction logic for UserControl1.xaml
     /// </summary>
@@ -83,319 +172,529 @@ namespace CNC.Controls.Viewer
     {
         private Point3D point0;  // last point
         private Vector3D delta0;  // (dx,dy,dz)
-        private List<LinesVisual3D> trace;
-        private List<LinesVisual3D> position = new List<LinesVisual3D>();
-        private LinesVisual3D path;
-        private double minDistanceSquared;
+        private double minDistanceSquared, _minDistance;
 
-        bool isRelative = false;
+        bool _animateSubscribed = false, renderExecuted = false;
         double[] offsets = new double[6] { 0d, 0d, 0d, 0d, 0d, 0d };
 
-        public SolidColorBrush AxisBrush { get; set; }
+        public SolidColorBrush ToolBrush { get; set; } = Brushes.Red;
+        public SolidColorBrush AxisBrush { get; set; } = Brushes.Gray;
         public double TickSize { get; set; }
-        private GCPlane plane = new GCPlane(Commands.G17, 0);
-        private List<CoordinateSystem> coordinateSystems = new List<CoordinateSystem>();
-        private CoordinateSystem coordinateSystem;
+
+        private GrblViewModel model;
+        private bool _animateTool = false;
+        private bool? isLatheMode = null;
+        private bool isDiameterMode = false;
+        private int cutCount;
+        private MoveType lastType;
+        private IEnumerator<RunAction> job = null;
+        private GCodeEmulator emu = new GCodeEmulator(true);
+        private List<GCodeToken> tokens;
+
+        Point3DCollection cutPoints = new Point3DCollection();
+        Point3DCollection rapidPoints = new Point3DCollection();
+        Point3DCollection retractPoints = new Point3DCollection();
+        Point3DCollection positionPoints = new Point3DCollection();
+
+        TruncatedConeVisual3D tool;
+
+        public Machine Machine { get; set; } = new Machine();
 
         public Renderer()
         {
             InitializeComponent();
 
-            minDistanceSquared = MinDistance * MinDistance;
-            AxisBrush = Brushes.Gray;
-            TickSize = 10;
+            TickSize = 10d;
+            MinDistance = 0.05d;
+            viewport.DataContext = Machine;
+
+            IsVisibleChanged += Renderer_IsVisibleChanged;
+        }
+
+        private void Renderer_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (AnimateTool)
+            {
+                if ((bool)e.NewValue)
+                {
+                    if (!_animateSubscribed)
+                        model.PropertyChanged += Model_PropertyChanged;
+                    _animateSubscribed = true;
+                }
+                else if (_animateSubscribed)
+                {
+                    _animateSubscribed = false;
+                    model.PropertyChanged += Model_PropertyChanged;
+                }
+            }
+        }
+
+        private void Renderer_Loaded(object sender, RoutedEventArgs e)
+        {
+            model = DataContext as GrblViewModel;
+//            viewport.PreviewMouseWheel += Viewport_MouseWheel;
+
+//            if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
+//                AppConfig.Settings.GCodeViewer.PropertyChanged += GCodeViewer_PropertyChanged;
+        }
+
+        double pl = 0d;
+
+        private void Viewport_MouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
+        {
+            ScaleTool();
+
+
+            model.ResponseLog.Add(string.Format("M: {0} {1}", e.Delta, viewport.Camera.LookDirection.Length - pl));
+            pl = viewport.Camera.LookDirection.Length;
+
+            if (e.Delta > 0)
+            {
+                if (viewport.Camera.LookDirection.Length > 100)
+                {
+                }  
+            }
+            else
+            {
+                if (viewport.Camera.LookDirection.Length < 10)
+                {
+
+                }
+            }
+        }
+
+        private void GCodeViewer_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            ArcResolution = AppConfig.Settings.GCodeViewer.ArcResolution;
+            MinDistance = AppConfig.Settings.GCodeViewer.MinDistance;
+            ShowGrid = AppConfig.Settings.GCodeViewer.ShowGrid;
+            ShowAxes = AppConfig.Settings.GCodeViewer.ShowAxes;
+            ShowBoundingBox = AppConfig.Settings.GCodeViewer.ShowBoundingBox;
+            Machine.ShowViewCube = AppConfig.Settings.GCodeViewer.ShowViewCube;
+        }
+
+        private void Model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(GrblViewModel.Position))
+            {
+                Machine.SetToolPosition(model.Position.X / (isDiameterMode ? 2d : 1d), model.Position.Y, model.Position.Z);
+                if (tool != null)
+                    tool.Origin = Machine.ToolPosition;
+            }
+            else if (e.PropertyName == nameof(GrblViewModel.LatheMode))
+                isDiameterMode = model.LatheMode == LatheMode.Diameter;
+            else if (renderExecuted && e.PropertyName == nameof(GrblViewModel.BlockExecuting))
+                RenderExecuting(model.BlockExecuting);
         }
 
         public int ArcResolution { get; set; } = 5;
-        public double MinDistance { get; set; } = 0.05;
+        public double MinDistance { get { return _minDistance; } set { _minDistance = value; minDistanceSquared = _minDistance * _minDistance; } }
         public bool ShowGrid { get; set; } = true;
         public bool ShowAxes { get; set; } = true;
         public bool ShowBoundingBox { get; set; } = true;
+        public bool RenderExecuted { get; set; } = false;
+
+        public bool AnimateTool
+        {
+            get { return _animateTool; }
+            set
+            {
+                if(value != _animateTool && model != null)
+                {
+                    if ((_animateTool = value))
+                    {
+                        Machine.SetToolPosition(model.Position.X, model.Position.Y, model.Position.Z);
+
+                        tool = new TruncatedConeVisual3D();
+                        tool.Height = 3d;
+                        tool.BaseRadius = 0d;
+                        tool.TopRadius = tool.Height / 5d;
+                        tool.TopCap = true;
+                        tool.Origin = Machine.ToolPosition;
+                        tool.Normal = new Vector3D(0d, 0d, 1d);
+                        tool.Fill = ToolBrush;
+                        viewport.Children.Add(tool);
+
+                        _animateSubscribed = true;
+                        model.PropertyChanged += Model_PropertyChanged;
+                    }
+                    else
+                    {
+                        if (tool != null)
+                        {
+                            viewport.Children.Remove(tool);
+                            tool = null;
+                        }
+                        _animateSubscribed = false;
+                        model.PropertyChanged -= Model_PropertyChanged;
+                    }
+                }
+            }
+        }
+
+        private void viewport_Drag(object sender, DragEventArgs e)
+        {
+            GCode.File.Drag(sender, e);
+        }
+
+        private void viewport_Drop(object sender, DragEventArgs e)
+        {
+            GCode.File.Drop(sender, e);
+        }
 
         public void ClearViewport()
         {
-            viewport.Children.Clear();
+            Machine.Clear();
+            cutPoints.Clear();
+            rapidPoints.Clear();
+            retractPoints.Clear();
+            if(job != null)
+            {
+                job.Dispose();
+                job = null;
+                tokens = null;
+            }
+
+            if (Machine.BoundingBox != null)
+                viewport.Children.Remove(Machine.BoundingBox);
+
+            if (Machine.Grid != null)
+                viewport.Children.Remove(Machine.Grid);
+
+            viewport.Children.Remove(Machine.Axes);
+            Machine.Axes.Children.Clear();
+        }
+
+        public void ResetView()
+        {
+            refreshCamera(((GrblViewModel)DataContext).ProgramLimits);
         }
 
         public void ShowPosition()
         {
             GrblViewModel model = (GrblViewModel)DataContext;
 
-            foreach (var path in position)
-                viewport.Children.Remove(path);
+            Machine.ToolOrigin = null;
 
-            position.Clear();
+            positionPoints.Clear();
 
-            double maxX = GrblSettings.GetDouble(GrblSetting.AxisSetting_XMaxTravel);
-            double maxY = GrblSettings.GetDouble(GrblSetting.AxisSetting_YMaxTravel);
-            double maxZ = GrblSettings.GetDouble(GrblSetting.AxisSetting_ZMaxTravel);
+            if (Machine.Limits.X == 0d)
+                Machine.SetLimits(GrblSettings.GetDouble(GrblSetting.MaxTravelBase),
+                                   GrblSettings.GetDouble(GrblSetting.MaxTravelBase + GrblConstants.Y_AXIS),
+                                    GrblSettings.GetDouble(GrblSetting.MaxTravelBase + GrblConstants.Z_AXIS));
 
-            var positionX = new LinesVisual3D();
-            positionX.Color = Colors.Green;
-            positionX.Thickness = 1;
-            positionX.Points.Add(new Point3D(model.ProgramLimits.MinX - 5d, model.Position.Y, model.Position.Z));
-            positionX.Points.Add(new Point3D(maxX, model.Position.Y, model.Position.Z));
-            position.Add(positionX);
+            positionPoints.Add(new Point3D(Math.Min(model.Position.X, model.ProgramLimits.MinX) - 5d, model.Position.Y, model.Position.Z));
+            positionPoints.Add(new Point3D(Machine.Limits.X, model.Position.Y, model.Position.Z));
 
-            var positionY = new LinesVisual3D();
-            positionY.Color = Colors.Green;
-            positionY.Thickness = 1;
-            positionY.Points.Add(new Point3D(model.Position.X, model.ProgramLimits.MinY - 5d, model.Position.Z));
-            positionY.Points.Add(new Point3D(model.Position.X, maxY, model.Position.Z));
-            position.Add(positionY);
+            positionPoints.Add(new Point3D(model.Position.X, Math.Min(model.Position.Y, model.ProgramLimits.MinY) - 5d, model.Position.Z));
+            positionPoints.Add(new Point3D(model.Position.X, Machine.Limits.Y, model.Position.Z));
 
-            var positionZ = new LinesVisual3D();
-            positionZ.Color = Colors.Green;
-            positionZ.Thickness = 1;
-            positionZ.Points.Add(new Point3D(model.Position.X, model.Position.Y, model.ProgramLimits.MinZ - 5d));
-            positionZ.Points.Add(new Point3D(model.Position.X, model.Position.Y, maxZ));
-            position.Add(positionZ);
+            positionPoints.Add(new Point3D(model.Position.X, model.Position.Y, Math.Min(model.Position.Z, model.ProgramLimits.MinZ) - 5d));
+            positionPoints.Add(new Point3D(model.Position.X, model.Position.Y, Machine.Limits.Z));
 
-            foreach (var path in position)
-                viewport.Children.Add(path);
+            Machine.ToolOrigin = positionPoints;
+            var orgpos = Machine.StartPosition;
+            Machine.SetStartPosition(model.Position.X, model.Position.Y, model.Position.Z);
+
+            if (Machine.RapidLines != null && Machine.RapidLines.Count > 0 && Machine.RapidLines[0].Equals(orgpos))
+            {
+                Machine.RapidLines.RemoveAt(0);
+                Machine.RapidLines.Insert(0, Machine.StartPosition);
+            }
+        }
+
+        void ScaleTool ()
+        {
+            if (AnimateTool)
+            {
+              //  tool.Height = Math.Abs(viewport.Camera.LookDirection.Z) / 20d;
+              //  tool.TopRadius = tool.Height / 5d;
+            }
+        }
+
+        void RenderExecuting(int block)
+        {
+            if (block == -1)
+            {
+                if (Machine.ExecutedLines != null)
+                    Machine.ExecutedLines.Clear();
+                if(job != null)
+                {
+                    job.Dispose();
+                    emu.SetStartPosition(Machine.StartPosition);
+                    job = emu.Execute(tokens).GetEnumerator();
+                    job.MoveNext();
+                }
+            }
+            else if (job != null && block > 0)
+            {
+                while (job.Current.Token.LineNumber < block)
+                {
+                    job.MoveNext();
+                    point0 = job.Current.Start;
+
+                    switch (job.Current.Token.Command)
+                    {
+                        case Commands.G1:
+                            AddCutMove(job.Current.End);
+                            break;
+
+                        case Commands.G2:
+                        case Commands.G3:
+                            DrawArc(job.Current.Token as GCArc, point0.ToArray(), emu.Plane, emu.DistanceMode == DistanceMode.Incremental);
+                            break;
+
+                        case Commands.G5:
+                            DrawSpline(job.Current.Token as GCSpline, point0.ToArray());
+                            break;
+                    }
+                }
+            }
+        }
+
+        private double boffset (double w, double wh, double xs, double xm)
+        {
+            double v, vv = xm - Math.Floor(xm);
+
+            v = xs / 2d + wh;
+
+            return v;
         }
 
         public void Render(List<GCodeToken> tokens)
         {
-            var bbox = ((GrblViewModel)DataContext).ProgramLimits;
+            var bbox = (DataContext as GrblViewModel).ProgramLimits;
 
-            double lineThickness = bbox.MaxSize / 1000;
-            double arrowOffset = lineThickness * 30;
-            double labelOffset = lineThickness * 50;
-            bool canned = false;
+            double lineThickness = bbox.MaxSize / 1000d;
+            double arrowOffset = lineThickness * 30d;
+            double labelOffset = lineThickness * 50d;
 
-            //trace.Clear();
-            trace = null;
-            viewport.Children.Clear();
+            ClearViewport();
 
-            coordinateSystems.Clear();
+            this.tokens = tokens;
+            renderExecuted = RenderExecuted && !Machine.HighlightColor.Equals(Machine.CutMotionColor) && _animateSubscribed;
 
-            foreach (CoordinateSystem c in GrblWorkParameters.CoordinateSystems)
-                coordinateSystems.Add(c);
+            if (isLatheMode == null)
+            {
+                if ((isLatheMode = model.LatheMode != LatheMode.Disabled) == true)
+                {
+                    viewport.ModelUpDirection = new Vector3D(0d, -1d, 0d);
+                    if (tool != null)
+                        tool.Normal = new Vector3D(1d, 0d, 0d);
+                }
+                isDiameterMode = model.LatheMode == LatheMode.Diameter;
+            }
 
-            coordinateSystem = coordinateSystems.Where(x => x.Code == GrblParserState.WorkOffset).FirstOrDefault();
+            bool latheMode = isLatheMode == true;
+
+            cutCount = 0;
+            point0 = Machine.StartPosition;
+            lastType = MoveType.None;
+            if (tool != null)
+            {
+                tool.Height = Math.Min(6d, lineThickness * 100d);
+                tool.TopRadius = tool.Height / 5d;
+            }
 
             #region Canvas adorners
 
             if (ShowGrid)
             {
-                viewport.Children.Add(new GridLinesVisual3D()
+                AxisBrush = new SolidColorBrush(Machine.GridColor);
+
+                double wh, h, wm = bbox.SizeX % TickSize, w = Math.Ceiling(bbox.SizeX - bbox.SizeX % TickSize + TickSize * 2d);
+
+                if (model.LatheMode == LatheMode.Disabled)
                 {
-                    Center = new Point3D(bbox.SizeX / 2d - TickSize - bbox.MinX / 2d, bbox.SizeY / 2d - TickSize - bbox.MinY / 2d, 0.0),
-                    MinorDistance = TickSize,
-                    MajorDistance = bbox.MaxSize,
-                    Width = bbox.SizeY + TickSize * 2d,
-                    Length = bbox.SizeX + TickSize * 2d,
-                    Thickness = lineThickness,
-                    Fill = AxisBrush
-                });
+
+                    wh = bbox.SizeY % TickSize;
+                    h = Math.Ceiling(bbox.SizeY - bbox.SizeY % TickSize + TickSize * 2d);
+
+                    Machine.Grid = new GridLinesVisual3D()
+                    {
+                        Center = new Point3D(boffset(bbox.SizeX, bbox.MinX, w, wm) - TickSize, boffset(bbox.SizeY, bbox.MinY, h, wh) - TickSize, 0d),
+                        MinorDistance = 2.5d,
+                        MajorDistance = TickSize,
+                        Width = h,
+                        Length = w,
+                        Thickness = 0.1d,
+                        Fill = AxisBrush,
+                    };
+                }
+                else
+                {
+                    wh = bbox.SizeZ % TickSize;
+                    h = Math.Ceiling(bbox.SizeZ - bbox.SizeZ % TickSize + TickSize * 2d);
+
+                    Machine.Grid = new GridLinesVisual3D()
+                    {
+                        Center = new Point3D(boffset(bbox.SizeX, bbox.MinX, w, wm) - TickSize, 0d, boffset(bbox.SizeZ, bbox.MinZ, h, wh) - TickSize),
+                        MinorDistance = 2.5d,
+                        MajorDistance = TickSize,
+                        Width = w,
+                        Length = h,
+                        Thickness = lineThickness,
+                        Fill = AxisBrush,
+                        LengthDirection = new Vector3D(0d, 0d, 1d),
+                        Normal = new Vector3D(0d, 1d, 0d)
+                    };
+                }
+                viewport.Children.Add(Machine.Grid);
             }
 
             if (ShowAxes)
             {
-                viewport.Children.Add(new ArrowVisual3D() {
-                    Point2 = new Point3D(bbox.SizeX + arrowOffset, 0.0, 0.0),
+                Machine.Axes.Children.Add(new ArrowVisual3D() {
+                    Point2 = new Point3D(bbox.SizeX + arrowOffset, 0d, 0d),
                     Diameter = lineThickness * 5,
                     Fill = AxisBrush
                 });
 
-                viewport.Children.Add(new BillboardTextVisual3D() {
+                Machine.Axes.Children.Add(new BillboardTextVisual3D() {
                     Text = "X",
                     FontWeight = FontWeights.Bold,
                     Foreground = AxisBrush,
-                    Position = new Point3D(bbox.SizeX + labelOffset, 0.0, 0.0)
+                    Position = new Point3D(bbox.SizeX + labelOffset, 0d, 0d)
                 });
 
-                viewport.Children.Add(new ArrowVisual3D() {
-                    Point2 = new Point3D(0.0, bbox.SizeY + arrowOffset, 0.0),
-                    Diameter = lineThickness * 5,
-                    Fill = AxisBrush
-                });
-
-                viewport.Children.Add(new BillboardTextVisual3D()
+                if (bbox.SizeY > 0d)
                 {
-                    Text = "Y",
-                    FontWeight = FontWeights.Bold,
-                    Foreground = AxisBrush,
-                    Position = new Point3D(0.0, bbox.SizeY + labelOffset, 0.0)
-                });
-
-                if (bbox.SizeZ > 0d)
-                {
-                    viewport.Children.Add(new ArrowVisual3D() {
-                        Point1 = new Point3D(0.0, 0.0, bbox.MinZ),
-                        Point2 = new Point3D(0.0, 0.0, bbox.MaxZ + arrowOffset),
-                        Diameter = lineThickness * 5,
+                    Machine.Axes.Children.Add(new ArrowVisual3D()
+                    {
+                        Point2 = new Point3D(0d, bbox.SizeY + arrowOffset, 0d),
+                        Diameter = lineThickness * 5d,
                         Fill = AxisBrush
                     });
 
-                    viewport.Children.Add(new BillboardTextVisual3D()
+                    Machine.Axes.Children.Add(new BillboardTextVisual3D()
+                    {
+                        Text = "Y",
+                        FontWeight = FontWeights.Bold,
+                        Foreground = AxisBrush,
+                        Position = new Point3D(0d, bbox.SizeY + labelOffset, 0d)
+                    });
+                }
+
+                if (bbox.SizeZ > 0d)
+                {
+                    Machine.Axes.Children.Add(new ArrowVisual3D() {
+                        Point1 = latheMode ? new Point3D(0d, 0d, bbox.MaxZ + arrowOffset) : new Point3D(0d, 0d, bbox.MinZ - arrowOffset),
+                        Point2 = latheMode ? new Point3D(0d, 0d, bbox.MinZ - arrowOffset) : new Point3D(0d, 0d, bbox.MaxZ + arrowOffset),
+                        Diameter = lineThickness * 5d,
+                        Fill = AxisBrush,
+                    });
+
+                    Machine.Axes.Children.Add(new BillboardTextVisual3D()
                     {
                         Text = "Z",
                         FontWeight = FontWeights.Bold,
                         Foreground = AxisBrush,
-                        Position = new Point3D(0.0, 0.0, bbox.MaxZ + labelOffset)
+                        Position = new Point3D(0d, 0d, latheMode ? bbox.MinZ - labelOffset : bbox.MaxZ + labelOffset)
                     });
                 }
+
+                viewport.Children.Add(Machine.Axes);
             }
 
             if (ShowBoundingBox && bbox.SizeZ > 0d)
             {
-                viewport.Children.Add(new BoundingBoxWireFrameVisual3D()
+                Machine.BoundingBox = new BoundingBoxWireFrameVisual3D()
                 {
-                    BoundingBox = new Rect3D(bbox.MinX, bbox.MinY, bbox.MinZ, bbox.SizeX, bbox.SizeY, bbox.SizeZ),
+                    BoundingBox = new Rect3D(bbox.MinX, bbox.MinY, bbox.MinZ, bbox.SizeX, Math.Max(0.001d, bbox.SizeY), bbox.SizeZ),
                     Thickness = 1d,
-                    Color = Colors.Gray
-                });
+                    Color = Colors.LightGreen
+                };
+
+                viewport.Children.Add(Machine.BoundingBox);
             }
 
             #endregion
 
-            GCodeToken last = new GCodeToken();
+            emu.SetStartPosition(Machine.StartPosition);
 
-            foreach (GCodeToken token in tokens)
+            foreach (var cmd in emu.Execute(tokens))
             {
-                switch (token.Command)
+                point0 = cmd.Start;
+
+                switch (cmd.Token.Command)
                 {
                     case Commands.G0:
-                        {
-                            GCLinearMotion motion = (GCLinearMotion)token;
-                            var pt = toPoint(motion.Values);
-                            if (last.Command == Commands.G1 && (((GCLinearMotion)last).X != point0.X || ((GCLinearMotion)last).Y != point0.Y))
-                                path.Points.Add(pt);
-                            AddPoint(pt, Colors.Red, 0.5);
-                        }
+                        if(cmd.IsRetract)
+                            AddRetractMove(cmd.End);
+                        else
+                            AddRapidMove(cmd.End);
                         break;
 
                     case Commands.G1:
-                        {
-                            GCLinearMotion motion = (GCLinearMotion)token;
-                            var pt = toPoint(motion.Values);
-                            if (last.Command == Commands.G0 && (((GCLinearMotion)last).X != point0.X || ((GCLinearMotion)last).Y != point0.Y))
-                                path.Points.Add(pt);
-                            AddPoint(point0, Colors.Blue, 1);
-                            AddPoint(pt, Colors.Blue, 1);
-                        }
+                        AddCutMove(cmd.End);
                         break;
 
                     case Commands.G2:
                     case Commands.G3:
-                        GCArc arc = (GCArc)token;
-                        if (arc.IsRadiusMode)
-                            DrawArc(plane, point0.ToArray(), arc.Values, arc.R, arc.IsClocwise);
-                        else
-                            DrawArc(plane, point0.ToArray(), arc.Values, arc.IJKvalues, arc.IJKMode == IJKMode.Absolute, arc.IsClocwise);
-                        break;
+#if DEBUG_ARC_BBOXES
+                        var bb = (cmd.Token as GCArc).GetBoundingBox(emu.Plane, point0.ToArray(), emu.DistanceMode == DistanceMode.Incremental);
 
-                    case Commands.G10:
-                    case Commands.G92:
+                        var abb = new BoundingBoxWireFrameVisual3D()
                         {
-                            if (token is GCCoordinateSystem)
-                            {
-                                CoordinateSystem csys;
-                                GCCoordinateSystem gcsys = (GCCoordinateSystem)token;
-                                if (gcsys.P == 0)
-                                    csys = coordinateSystem;
-                                else
-                                    csys = coordinateSystems.Where(x => x.Code == gcsys.Code).FirstOrDefault();
-                                for (int i = 0; i < 3; i++)
-                                {
-                                    csys.Values[i] = gcsys.Values[i];
-                                    if (gcsys.P == 0)
-                                        offsets[i] = coordinateSystem.Values[i];
-                                }
-                            }
-                        }
+                            BoundingBox = new Rect3D(bb.Min[0], bb.Min[1], bb.Min[2], bb.Size[0], bb.Size[1], bb.Size[2]),
+                            Thickness = .5d,
+                            Color = Colors.Blue
+                        };
+                        viewport.Children.Add(abb);
+#endif
+                        DrawArc(cmd.Token as GCArc, point0.ToArray(), emu.Plane, emu.DistanceMode == DistanceMode.Incremental);
                         break;
 
-                    case Commands.G17:
-                    case Commands.G18:
-                    case Commands.G19:
-                        plane = (GCPlane)token;
-                        break;
-
-                    //case Commands.G20:
-                    //case Commands.G21:
-                    //case Commands.G50:
-                    //case Commands.G51:
-                    //    !! Scaling is taken care of in the parser
-                    //    break;
-
-                    case Commands.G28_1:
-                    case Commands.G30_1:
-                    case Commands.G54:
-                    case Commands.G55:
-                    case Commands.G56:
-                    case Commands.G57:
-                    case Commands.G58:
-                    case Commands.G59:
-                    case Commands.G59_1:
-                    case Commands.G59_2:
-                    case Commands.G59_3:
-                    case Commands.G92_1:
-                        {
-                            string cs = token.Command.ToString().Replace('_', '.');
-                            coordinateSystem = coordinateSystems.Where(x => x.Code == cs).FirstOrDefault();
-                            for (int i = 0; i < 3; i++)
-                                offsets[i] = coordinateSystem.Values[i];
-                            //    CoordinateSystem = GrblWorkParameters.CoordinateSystems();
-                            //GCCoordinateSystem cs = (GCCoordinateSystem)token;
-                            // TODO: handle offsets... Need to read current from grbl
-                        }
-                        break;
-
-                    case Commands.G80:
-                        canned = false;
-                        break;
-
-                    case Commands.G81:
-                        GCCannedDrill drill = (GCCannedDrill)token;
-                        if (!canned)
-                        {
-                            canned = true;
-                            if (point0.Z < drill.R)
-                                AddPoint(toPoint(point0.X, point0.Y, drill.R), Colors.Red, 1);
-                        }
-                        AddPoint(toPoint(drill.X, drill.Y, Math.Max(drill.Z, drill.R)), Colors.Red, 1);
-                        AddPoint(toPoint(drill.Values), Colors.Blue, 1);
-                        AddPoint(toPoint(drill.X, drill.Y, drill.R), Colors.Green, 1);
+                    case Commands.G5:
+                        DrawSpline(cmd.Token as GCSpline, point0.ToArray());
                         break;
                 }
-                last = token;
             }
-            last = null;
 
-            foreach (var path in trace)
-                viewport.Children.Add(path);
-
+            Machine.RapidLines = rapidPoints;
+            Machine.RetractLines = retractPoints;
             refreshCamera(bbox);
 
+            if (RenderExecuted)
+            {
+                Machine.CutLines = new Point3DCollection(cutPoints);
+                cutPoints.Clear();
+                Machine.ExecutedLines = cutPoints;
+                emu.SetStartPosition(Machine.StartPosition);
+                job = emu.Execute(tokens).GetEnumerator();
+                job.MoveNext();
+            } else
+                Machine.CutLines = cutPoints;
         }
+
         public void refreshCamera(ProgramLimits bbox)
         {
-            double zpos = Math.Max(bbox.SizeX, bbox.SizeY) / Math.Tan(60 * Math.PI / 360d);
+            if (model.LatheMode == LatheMode.Disabled)
+            {
 
-            // TODO: set a sensible viewing distance dynamically
-            var position = new Point3D(Math.Max(10d, bbox.SizeX) / 2d, Math.Max(10d, bbox.SizeY) / 2d, zpos);
+                double zpos = Math.Max(5d, Math.Max(bbox.SizeX, bbox.SizeY) / Math.Tan(ccamera.FieldOfView * Math.PI / 360d));
 
-            viewport.Camera.Position = position;
-            viewport.DefaultCamera.Position = position;
+                // TODO: set a sensible viewing distance dynamically
+
+                viewport.Camera.Position = new Point3D((bbox.MaxX + bbox.MinX) / 2d, (bbox.MaxY + bbox.MinY) / 2d, zpos);
+                viewport.Camera.LookDirection = new Vector3D(0d, 0d, -100d);
+                viewport.Camera.UpDirection = new Vector3D(0d, 1d, 0.5d);
+            }
+            else
+            {
+                double ypos = Math.Max(5d, Math.Max(bbox.SizeX, bbox.SizeZ) / Math.Tan(ccamera.FieldOfView * Math.PI / 360d));
+
+                // TODO: set a sensible viewing distance dynamically
+
+                viewport.Camera.Position = new Point3D((bbox.MaxX + bbox.MinX) / 2d, -ypos, (bbox.MaxZ + bbox.MinZ) / 2d);
+                viewport.Camera.LookDirection = new Vector3D(0d, 100d, 0d);
+                viewport.Camera.UpDirection = new Vector3D(-1d, 0d, 0d);
+            }
             //                viewport.CameraController.AddRotateForce(0.001, 0.001); // emulate move camera 
+            ScaleTool();
         }
 
-        //private void DrawLine(LinesVisual3D lines, double x_start, double y_start, double z_start, double x_stop, double y_stop, double z_stop)
-        //{
-        //    lines.Points.Add(new Point3D(x_start, y_start, z_start));
-        //    lines.Points.Add(new Point3D(x_stop, y_stop, z_stop));
-        //}
-
-        //private void DrawLine(LinesVisual3D lines, Point3D start, Point3D end)
-        //{
-        //    lines.Points.Add(start);
-        //    lines.Points.Add(end);
-        //}
-
-        private Point3D toPoint(double[] values)
+        private Point3D toPoint(double[] values, bool isRelative = false)
         {
             Point3D p = new Point3D(values[0], values[1], values[2]);
 
@@ -404,65 +703,50 @@ namespace CNC.Controls.Viewer
 
             return p;
         }
-        private Point3D toPoint(double X, double Y, double Z)
+
+        public void AddRapidMove(Point3D point)
         {
-            Point3D p = new Point3D(X, Y, Z);
-
-            if (isRelative)
-                p.Offset(point0.X, point0.Y, point0.Z);
-
-            return p;
-        }
-
-        public void NewTrace(Point3D point, Color color, double thickness = 1)
-        {
-            path = new LinesVisual3D();
-            path.Color = color;
-            //       path.Points.Add(point);
-            path.Thickness = thickness;
-            trace = new List<LinesVisual3D>();
-            trace.Add(path);
-            //    viewport.Children.Add(path);
-            point0 = point;
-            delta0 = new Vector3D();
-
-            /*
-            if (marker != null)
+            if (cutCount > 1)
             {
-                marker.Origin = point;
-                coords.Position = new Point3D(point.X - labelOffset, point.Y - labelOffset, point.Z + labelOffset);
-                coords.Text = string.Format(coordinateFormat, point.X, point.Y, point.Z);
-            } */
-        }
-        public void NewTrace(double x, double y, double z, Color color, double thickness = 1)
-        {
-            NewTrace(new Point3D(x, y, z), color, thickness);
-        }
-
-        public void AddPoint(Point3D point, Color color, double thickness = -1)
-        {
-            if (trace == null)
-            {
-                NewTrace(point, color, (thickness > 0) ? thickness : 1);
-                return;
+                cutPoints.Add(cutPoints.Last());
+                cutPoints.Add(point);
             }
 
+            if (lastType == MoveType.Cut)
+                delta0 = new Vector3D(0d, 0d, 0d);
 
+            rapidPoints.Add(point0);
+            rapidPoints.Add(point);
+
+            cutCount = 0;
+            lastType = MoveType.Rapid;
+            point0 = point;
+        }
+
+        public void AddRetractMove(Point3D point)
+        {
+            if (cutCount > 1)
+            {
+                cutPoints.Add(cutPoints.Last());
+                cutPoints.Add(point);
+            }
+
+            if (lastType == MoveType.Cut)
+                delta0 = new Vector3D(0d, 0d, 0d);
+
+            retractPoints.Add(point0);
+            retractPoints.Add(point);
+
+            cutCount = 0;
+            lastType = MoveType.Retract;
+            point0 = point;
+        }
+
+        public void AddCutMove(Point3D point)
+        {
             bool sameDir = false;
 
-            if (path.Color != color || (thickness > 0.0 && path.Thickness != thickness))
-            {
-                if (thickness <= 0.0)
-                    thickness = path.Thickness;
-
-                path = new LinesVisual3D();
-                path.Color = color;
-                path.Thickness = thickness;
-
-                trace.Add(path);
-                //  viewport.Children.Add(path);
-            }
-            else
+            if (lastType == MoveType.Cut && minDistanceSquared > 0d)
             {
 
                 // If line segments AB and BC have the same direction (small cross product) then remove point B.
@@ -470,18 +754,24 @@ namespace CNC.Controls.Viewer
                 var delta = new Vector3D(point.X - point0.X, point.Y - point0.Y, point.Z - point0.Z);
                 delta.Normalize();  // use unit vectors (magnitude 1) for the cross product calculations
                 Vector3D cp; double xp2;
-                if (path.Points.Count > (trace.Count == 1 ? 1 : 0))
-                {
+                //if (path.Points.Count > (trace.Count == 1 ? 1 : 0))
+                //{
                     cp = Vector3D.CrossProduct(delta, delta0);
                     xp2 = cp.LengthSquared;
                     sameDir = xp2 > 0d && (xp2 < 0.0005d);  // approx 0.001 seems to be a reasonable threshold from logging xp2 values
                                                             //if (!sameDir) Title = string.Format("xp2={0:F6}", xp2);
-                }
+                //}
 
                 if (sameDir)  // extend the current line segment
                 {
-                    path.Points[path.Points.Count - 1] = point;
+                    //var last = linePoints.Last();
+                    //last.X = point.X;
+                    //last.Y = point.Y;
+                    //last.Z = point.Z;
+                    cutPoints.RemoveAt(cutPoints.Count - 1);
+                    cutPoints.Add(point);
                     delta0 += delta;
+                    cutCount++;
                 }
                 else
                 {
@@ -493,259 +783,29 @@ namespace CNC.Controls.Viewer
 
             if (!sameDir)
             {
-                path.Points.Add(point0);
-                path.Points.Add(point);
+                cutCount = 1;
+                cutPoints.Add(point0);
+                cutPoints.Add(point);
             }
 
+            lastType = MoveType.Cut;
             point0 = point;
-
-            //if (marker != null)
-            //{
-            //    marker.Origin = point;
-            //    coords.Position = new Point3D(point.X - labelOffset, point.Y - labelOffset, point.Z + labelOffset);
-            //    coords.Text = string.Format(coordinateFormat, point.X, point.Y, point.Z);
-            //}
         }
 
-        //-------------
-
-        private void DrawArc(GCPlane plane, double[] start, double[] stop, double radius, bool clockwise)
+        private void DrawArc(GCArc arc, double[] start, GCPlane plane, bool isRelative = false)
         {
-            double[] center = convertRToCenter(plane, start, stop, radius, false, clockwise);
-            List<Point3D> arcpoints = generatePointsAlongArcBDring(plane, start, stop, center, clockwise, 0, ArcResolution); // Dynamic resolution
+            List<Point3D> points = arc.GeneratePoints(plane, start, ArcResolution, isRelative); // Dynamic resolution
 
-            Point3D old_point = arcpoints[0];
-            arcpoints.RemoveAt(0);
-
-            AddPoint(old_point, Colors.Blue);
-
-            foreach (Point3D point in arcpoints)
-                AddPoint(point, Colors.Blue);
+            foreach (Point3D point in points)
+                AddCutMove(point);
         }
 
-        private void DrawArc(GCPlane plane, double[] start, double[] stop, double[] ijkValues, bool absoluteIJKMode, bool clockwise)
+        private void DrawSpline(GCSpline spline, double[] start, bool isRelative = false)
         {
-            double[] center = updateCenterWithCommand(plane, start, ijkValues, absoluteIJKMode);
+            List<Point3D> points = spline.GeneratePoints(start, ArcResolution, isRelative); // Dynamic resolution
 
-            List<Point3D> arcpoints = generatePointsAlongArcBDring(plane, start, stop, center, clockwise, 0d, ArcResolution); // Dynamic resolution
-
-            foreach (Point3D point in arcpoints)
-                AddPoint(point, Colors.Blue);
-        }
-
-        /**
-        * Generates the points along an arc including the start and end points.
-        */
-        public static List<Point3D> generatePointsAlongArcBDring(GCPlane plane, double[] p1, double[] p2, double[] center, bool isCw, double radius, int arcResolution)
-        {
-            double sweep;
-
-            // Calculate radius if necessary.
-            if (radius == 0d)
-                radius = Hypotenuse(p1[plane.Axis0] - center[0], p1[plane.Axis1] - center[1]);
-
-            // Calculate angles from center.
-            double startAngle = getAngle(center, p1[plane.Axis0], p1[plane.Axis1]);
-            double endAngle = getAngle(center, p2[plane.Axis0], p2[plane.Axis1]);
-
-            if (startAngle == endAngle)
-                sweep = Math.PI * 2d;
-
-            else
-            {
-                // Fix semantics, if the angle ends at 0 it really should end at 360.
-                if (endAngle == 0d)
-                    endAngle = Math.PI * 2d;
-
-                // Calculate distance along arc.
-                if (!isCw && endAngle < startAngle)
-                    sweep = ((Math.PI * 2d - startAngle) + endAngle);
-                else if (isCw && endAngle > startAngle)
-                    sweep = ((Math.PI * 2d - endAngle) + startAngle);
-                else
-                    sweep = Math.Abs(endAngle - startAngle);
-            }
-
-            arcResolution = (int)Math.Max(1d, (sweep / (Math.PI * 18d / 180d)));
-
-         //   arcResolution = (int)Math.Ceiling((sweep * radius) / .1d);
-
-            //if (arcDegreeMode && arcPrecision > 0)
-            //{
-            //    numPoints = qMax(1.0, sweep / (M_PI * arcPrecision / 180));
-            //}
-            //else
-            //{
-            //    if (arcPrecision <= 0 && minArcLength > 0)
-            //    {
-            //        arcPrecision = minArcLength;
-            //    }
-            //    numPoints = (int)ceil(arcLength / arcPrecision);
-            //}
-
-            return generatePointsAlongArcBDring(plane, p1, p2, center, isCw, radius, startAngle, sweep, arcResolution);
-        }
-
-        /*
-         * Generates the points along an arc including the start and end points.
-         */
-        public static List<Point3D> generatePointsAlongArcBDring(GCPlane plane, double[] p1,
-                double[] p2, double[] center, bool isCw, double radius,
-                double startAngle, double sweep, int numPoints)
-        {
-
-            Point3D lineEnd = new Point3D();
-            List<Point3D> segments = new List<Point3D>();
-            double angle;
-            double zIncrement = (p2[plane.AxisLinear] - p1[plane.AxisLinear]) / numPoints;
-
-            for (int i = 0; i < numPoints; i++)
-            {
-                if (isCw)
-                    angle = (startAngle - i * sweep / numPoints);
-                else
-                    angle = (startAngle + i * sweep / numPoints);
-
-                if (angle >= Math.PI * 2d)
-                    angle = angle - Math.PI * 2d;
-
-                p1[plane.Axis0] = Math.Cos(angle) * radius + center[0];
-                p1[plane.Axis1] = Math.Sin(angle) * radius + center[1];
-
-                lineEnd.X = p1[0];
-                lineEnd.Y = p1[1];
-                lineEnd.Z = p1[2];
-
-                p1[plane.AxisLinear] += zIncrement;
-
-                segments.Add(lineEnd);
-            }
-
-            lineEnd.X = p2[0];
-            lineEnd.Y = p2[1];
-            lineEnd.Z = p2[2];
-
-            segments.Add(lineEnd);
-
-            return segments;
-        }
-
-        /** 
-        * Return the angle in radians when going from start to end.
-        */
-        public static double getAngle(double[] start, double endX, double endY)
-        {
-            double deltaX = endX - start[0];
-            double deltaY = endY - start[1];
-
-            double angle = 0d;
-
-            if (deltaX != 0d)
-            { // prevent div by 0
-                // it helps to know what quadrant you are in
-                if (deltaX > 0d && deltaY >= 0d)
-                {  // 0 - 90
-                    angle = Math.Atan(deltaY / deltaX);
-                }
-                else if (deltaX < 0d && deltaY >= 0d)
-                { // 90 to 180
-                    angle = Math.PI - Math.Abs(Math.Atan(deltaY / deltaX));
-                }
-                else if (deltaX < 0d && deltaY < 0d)
-                { // 180 - 270
-                    angle = Math.PI + Math.Abs(Math.Atan(deltaY / deltaX));
-                }
-                else if (deltaX > 0d && deltaY < 0d)
-                { // 270 - 360
-                    angle = Math.PI * 2d - Math.Abs(Math.Atan(deltaY / deltaX));
-                }
-            }
-            else
-            {
-                // 90 deg
-                if (deltaY > 0d)
-                {
-                    angle = Math.PI / 2d;
-                }
-                // 270 deg
-                else
-                {
-                    angle = Math.PI * 3d / 2d;
-                }
-            }
-
-            return angle;
-        }
-
-        static public double[] updateCenterWithCommand(GCPlane plane, double[] initial, double[] ijkValues, bool absoluteIJKMode)
-        {
-            double[] newPoint = new double[2];
-
-            if (absoluteIJKMode)
-            {
-                newPoint[0] = ijkValues[plane.Axis0];
-                newPoint[1] = ijkValues[plane.Axis1];
-            }
-            else
-            {
-                newPoint[0] = initial[plane.Axis0] + ijkValues[plane.Axis0];
-                newPoint[1] = initial[plane.Axis1] + ijkValues[plane.Axis1];
-            }
-
-            return newPoint;
-        }
-
-        public static double Hypotenuse(double a, double b)
-        {
-            return Math.Sqrt(a * a + b * b);
-        }
-
-        // Try to create an arc :)
-        public static double[] convertRToCenter(GCPlane plane, double[] start, double[] end, double radius, bool absoluteIJK, bool clockwise)
-        {
-            double[] center = new double[2];
-
-            // This math is copied from GRBL in gcode.c
-            double x = end[plane.Axis0] - start[plane.Axis0];
-            double y = end[plane.Axis1] - start[plane.Axis1];
-
-            double h_x2_div_d = 4d * radius * radius - x * x - y * y;
-            if (h_x2_div_d < 0d)
-            {
-                Console.Write("Error computing arc radius.");
-            }
-
-            h_x2_div_d = (-Math.Sqrt(h_x2_div_d)) / Hypotenuse(x, y);
-
-            if (!clockwise)
-            {
-                h_x2_div_d = -h_x2_div_d;
-            }
-
-            // Special message from gcoder to software for which radius
-            // should be used.
-            if (radius < 0d)
-            {
-                h_x2_div_d = -h_x2_div_d;
-                // TODO: Places that use this need to run ABS on radius.
-                radius = -radius;
-            }
-
-            double offsetX = 0.5d * (x - (y * h_x2_div_d));
-            double offsetY = 0.5d * (y + (x * h_x2_div_d));
-
-            if (!absoluteIJK)
-            {
-                center[0] = start[plane.Axis0] + offsetX;
-                center[1] = start[plane.Axis1] + offsetY;
-            }
-            else
-            {
-                center[0] = offsetX;
-                center[1] = offsetY;
-            }
-
-            return center;
+            foreach (Point3D point in points)
+                AddCutMove(point);
         }
     }
 }
