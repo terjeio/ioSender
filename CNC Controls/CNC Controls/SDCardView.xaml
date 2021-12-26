@@ -8,6 +8,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="515" d:DesignWidth="875"
              Loaded="SDCardView_Loaded">
+<<<<<<< HEAD
     <UserControl.Resources>
         <system:String x:Uid="str_notConnection" x:Key="NoConnection">No connection.</system:String>
         <system:String x:Uid="str_uploading" x:Key="Uploading">Uploading...</system:String>
@@ -19,6 +20,8 @@
         <system:String x:Uid="str_deleteFile" x:Key="DeleteFile">Delete {0}?</system:String>
         <system:String x:Uid="str_illegalName" x:Key="IllegalName">File: {0}\n!,?,~ and SPACE is not supported in filenames, please rename.</system:String>
     </UserControl.Resources>
+=======
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
     <Grid>
         <DataGrid x:Uid="dgr_sdcard" x:Name="dgrSDCard" ItemsSource="{Binding}" IsReadOnly="True" HorizontalAlignment="Left" Margin="30,30,0,0" VerticalAlignment="Top" Height="450" Width="380"
                   SelectionMode="Single" SelectionUnit="FullRow" AutoGenerateColumns="False"
@@ -35,7 +38,10 @@
             <DataGrid.ContextMenu>
                 <ContextMenu x:Name="ctxMenu">
                     <MenuItem x:Uid="mnu_run" Header="Run" Click="Run_Click" />
+<<<<<<< HEAD
                     <MenuItem x:Uid="mnu_downloadRun" Header="D_ownload and run" Click="DownloadRun_Click" />
+=======
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                     <MenuItem x:Uid="mnu_enableRewind" Header="Enable rewind" IsEnabled="{Binding Path=CanRewind}" IsChecked="{Binding Path=Rewind, Mode=TwoWay}" IsCheckable="True" />
                     <MenuItem x:Uid="mnu_delete" Header="Delete" IsEnabled="{Binding Path=CanDelete}" Click="Delete_Click" />
                 </ContextMenu>

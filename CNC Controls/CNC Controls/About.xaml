@@ -5,7 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CNC.Controls"
         mc:Ignorable="d"
+<<<<<<< HEAD
         x:Uid="dlg_about" Title="About" Height="350" Width="350" ResizeMode="NoResize" ShowInTaskbar="False"
+=======
+        x:Uid="dlg_about" Title="About" Height="285" Width="315" ResizeMode="NoResize" ShowInTaskbar="False"
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         WindowStartupLocation="CenterOwner"
         Loaded="About_Load" Icon="App.ico">
     <Window.Resources>
@@ -14,6 +18,7 @@
     <Grid Background="#FFF8F8F8">
         <Grid.RowDefinitions>
             <RowDefinition Height="28"/>
+<<<<<<< HEAD
             <RowDefinition Height="250"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
@@ -25,6 +30,18 @@
                 <Label x:Name="txtGrblNewOpts" Content="-" HorizontalAlignment="Left" Margin="10,0" VerticalAlignment="Bottom" Height="20" Padding="0"/>
                 <Label x:Name="txtGrblConnection" Content="-" HorizontalAlignment="Left" Margin="10,0" VerticalAlignment="Bottom" Height="20" Padding="0"/>
                 <TextBox IsReadOnly="True" HorizontalAlignment="Center" Height="145" Width="310" TextWrapping="Wrap" VerticalAlignment="Top"
+=======
+            <RowDefinition Height="190"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Label x:Name="copyright" Content="©2015-2021 Io Engineering (Terje Io)" HorizontalAlignment="Left" Margin="10,0" VerticalAlignment="Top"/>
+        <GroupBox x:Name="grpGrbl" Header="grbl" HorizontalAlignment="Center" Grid.Row="1" VerticalAlignment="Top" Height="185" Width="290">
+            <StackPanel Orientation="Vertical">
+                <Label x:Name="txtGrblVersion" Content="-" HorizontalAlignment="Left" Margin="10,0" VerticalAlignment="Center" Height="26"/>
+                <Label x:Name="txtGrblOptions" Content="-" HorizontalAlignment="Left" Margin="10,0" VerticalAlignment="Center" Height="26"/>
+                <Label x:Name="txtGrblNewOpts" Content="-" HorizontalAlignment="Left" Margin="10,0" VerticalAlignment="Center" Height="26"/>
+                <TextBox IsReadOnly="True" HorizontalAlignment="Center" Height="80" TextWrapping="Wrap" VerticalAlignment="Top" Width="270"
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                      local:TextBoxUtilities.AlwaysScrollToEnd="True" FontSize="10" FontFamily="Verdana"
                      ScrollViewer.VerticalScrollBarVisibility="Auto">
                     <TextBox.Text>
@@ -36,7 +53,11 @@
                 </TextBox>
             </StackPanel>
         </GroupBox>
+<<<<<<< HEAD
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="2" Margin="0,5,0,5">
+=======
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="2">
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
             <Button x:Uid="btn_ok" x:Name="btnOk" Content="Ok" HorizontalAlignment="Center" VerticalAlignment="Top" Width="85" Click="okButton_Click"/>
             <Button x:Uid="btn_toClipboard" x:Name="btnToClipboard" Content="To Clipboard" ToolTip="Copy grbl version information and settings to clipboard" Margin="5,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Top" Width="85" Click="clbButton_Click"/>
         </StackPanel>

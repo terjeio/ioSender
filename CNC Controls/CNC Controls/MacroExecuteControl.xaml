@@ -2,14 +2,20 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+<<<<<<< HEAD
              xmlns:system="clr-namespace:System;assembly=mscorlib"
+=======
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CNC.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="220" d:DesignWidth="315"
              Loaded="macroExecuteControl_Loaded">
     <UserControl.Resources>
+<<<<<<< HEAD
         <system:String x:Uid="str_macrosFlyout" x:Key="MenuLabel">_Macros</system:String>
+=======
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         <Style x:Key="SmallXButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="Template">
@@ -38,8 +44,13 @@
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
             </ItemsControl>
+<<<<<<< HEAD
             <TextBlock x:Uid="lbl_noMacrosDefined" Text="No macros defined, use Edit button to add." TextWrapping="Wrap" Visibility="{Binding Path=IsMessageVisible, RelativeSource={RelativeSource AncestorType=UserControl}}" HorizontalAlignment="Center" Margin="0,80,0,0" Width="290" VerticalAlignment="Top"/>
             <Button x:Uid="btn_edit" Content="Edit" Padding="5,0" MinWidth="60" Height="25" HorizontalAlignment="Right" Margin="0,0,8,8" VerticalAlignment="Bottom" Click="button_Edit" />
+=======
+            <Label x:Uid="lbl_noMacrosDefined" x:Name="label" Content="No macros defined, use Edit button to add." HorizontalContentAlignment="Center" Visibility="{Binding Path=IsMessageVisible, RelativeSource={RelativeSource AncestorType=UserControl}}" HorizontalAlignment="Center" Margin="0,80,0,0" Width="280" VerticalAlignment="Top"/>
+            <Button x:Uid="btn_edit" x:Name="button" Content="Edit" Width="50" Height="25" HorizontalAlignment="Right" Margin="0,0,8,8" VerticalAlignment="Bottom" Click="button_Edit" />
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
             <Button Content="×" Focusable="False" Style="{StaticResource SmallXButtonStyle}" VerticalContentAlignment="Top" HorizontalAlignment="Left" Margin="297,0,0,0" VerticalAlignment="Top" Width="14" Height="18" Click="btn_Close"/>
         </Grid>
     </Border>

@@ -1,7 +1,11 @@
 ﻿/*
  * GCode.cs - part of CNC Controls library for Grbl
  *
+<<<<<<< HEAD
  * v0.36 / 2021-12-14 / Io Engineering (Terje Io)
+=======
+ * v0.33 / 2021-05-14 / Io Engineering (Terje Io)
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
  *
  */
 
@@ -187,7 +191,11 @@ namespace CNC.Controls
 
         public void Drag(object sender, DragEventArgs e)
         {
+<<<<<<< HEAD
             bool allow = Model != null && GrblParserState.IsLoaded && (Model.StreamingState == StreamingState.Idle || Model.StreamingState == StreamingState.NoFile);
+=======
+            bool allow = Model != null & (Model.StreamingState == StreamingState.Idle || Model.StreamingState == StreamingState.NoFile);
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
 
             if (allow && e.Data.GetDataPresent(DataFormats.FileDrop))
             {

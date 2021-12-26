@@ -1,4 +1,5 @@
 ﻿CNC.Controls.Viewer.g.en-US.resources:viewer.baml,btn_resetView:System.Windows.Controls.ContentControl.Content,Button,True,True,,Reset view
+<<<<<<< HEAD
 CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,fld_arcResolution:CNC.Controls.NumericField.Label,None,False,True,,Arc resolution:
 CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,fld_arcResolution:CNC.Controls.NumericField.Unit,None,False,True,,segments
 CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,fld_minDistance:CNC.Controls.NumericField.Label,None,False,True,,Min distance:
@@ -7,6 +8,8 @@ CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,fld_toolDiameter:CNC.Co
 CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,fld_toolDiameter:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Default tool diameter.
 CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,fld_toolScalePct:CNC.Controls.NumericField.Label,None,False,True,,Tool indicator scale:
 CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,fld_toolScalePct:CNC.Controls.NumericField.Unit,None,False,True,,%
+=======
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
 CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,grp_gcodeViewer:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,GCode Viewer
 CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_blackBackgroud:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Black background
 CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_cutColor:System.Windows.Controls.ContentControl.Content,Label,True,True,,Cut color:
@@ -22,6 +25,7 @@ CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_showCoordSys:System
 CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_showGrid:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Show grid
 CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_showOverlay:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Show text overlay
 CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_showViewCube:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Show ViewCube
+<<<<<<< HEAD
 CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_toolAutoScale:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Auto scale tool
 CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,resetView:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Reset view (Ctrl+V)
 CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,resetView:System.Windows.Controls.ContentControl.Content,Button,True,True,,Resources/ResetView.png
@@ -40,3 +44,6 @@ CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,showXYZMarkers:System.W
 CNC.Controls.Viewer.g.en-US.resources:renderer.baml,str_toolCone:System.String.$Content,None,True,True,,Cone
 CNC.Controls.Viewer.g.en-US.resources:renderer.baml,str_toolCrosshair:System.String.$Content,None,True,True,,Crosshair
 CNC.Controls.Viewer.g.en-US.resources:renderer.baml,str_toolNoShow:System.String.$Content,None,True,True,,No tool
+=======
+CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,resetView:System.Windows.Controls.ContentControl.Content,Button,True,True,,Reset view
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6

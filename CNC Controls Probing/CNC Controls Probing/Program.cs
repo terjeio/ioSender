@@ -1,7 +1,12 @@
 ﻿/*
  * Program.cs - part of CNC Probing library
  *
+<<<<<<< HEAD
  * v0.36 / 2021-11-29 / Io Engineering (Terje Io)
+=======
+ * v0.35 / 2020-10-18 / Io Engineering (Terje Io)
+
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
  *
  */
 
@@ -38,7 +43,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 using System;
+<<<<<<< HEAD
 using System.Windows;
+=======
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
 using System.Collections.Generic;
 using System.Threading;
 using CNC.Core;
@@ -46,6 +54,7 @@ using CNC.GCode;
 
 namespace CNC.Controls.Probing
 {
+<<<<<<< HEAD
     public class LibStrings
     {
         static ResourceDictionary resource = new ResourceDictionary();
@@ -65,6 +74,8 @@ namespace CNC.Controls.Probing
         }
     }
 
+=======
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
     public class Program
     {
         private GrblViewModel Grbl = null;
@@ -124,10 +135,13 @@ namespace CNC.Controls.Probing
                     if (!Silent)
                         probing.Message = Grbl.Message;
                     break;
+<<<<<<< HEAD
 
                 case nameof(GrblViewModel.GrblReset):
                     ResponseReceived("fail");
                     break;
+=======
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
             }
         }
 
@@ -209,13 +223,21 @@ namespace CNC.Controls.Probing
 
             if (ok && !probeConnected)
             {
+<<<<<<< HEAD
                 probing.Message = LibStrings.FindResource("NoProbe");
+=======
+                probing.Message = "Probing failed, probe is not connected";
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                 ok = false;
             }
 
             if (ok && probeAsserted)
             {
+<<<<<<< HEAD
                 probing.Message = LibStrings.FindResource("ProbeAsserted");
+=======
+                probing.Message = "Probing failed, probe signal is asserted";
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                 ok = false;
             }
 
@@ -277,13 +299,21 @@ namespace CNC.Controls.Probing
 
             if (res == true && !(Grbl.GrblState.State == GrblStates.Idle || Grbl.GrblState.State == GrblStates.Tool))
             {
+<<<<<<< HEAD
                 probing.Message = LibStrings.FindResource("FailedNotIdle");
+=======
+                probing.Message = "Probing failed, Grbl is not in idle or tool changing state";
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                 res = false;
             }
 
             if (res == true && !Grbl.IsMachinePositionKnown)
             {
+<<<<<<< HEAD
                 probing.Message = LibStrings.FindResource("FailedNoPos");
+=======
+                probing.Message = "Probing failed, could not establish current machine position";
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                 res = false;
             }
 
@@ -302,7 +332,11 @@ namespace CNC.Controls.Probing
             if (probing.LatchDistance > 0d)
             {
                 _program.Add("!" + probing.RapidCommand + axisLetter + (negative ? "" : "-") + probing.LatchDistance.ToInvariantString());
+<<<<<<< HEAD
                 _program.Add(probing.SlowProbe + axisLetter + (negative ? "-" : "") + Math.Max((probing.LatchDistance * 1.5d), 2d / probing.Grbl.UnitFactor).ToInvariantString());
+=======
+                _program.Add(probing.SlowProbe + axisLetter + (negative ? "-" : "") + probing.ProbeDistance.ToInvariantString());
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
             }
         }
 
@@ -342,7 +376,11 @@ namespace CNC.Controls.Probing
         public void Cancel()
         {
             IsCancelled = true;
+<<<<<<< HEAD
             Comms.com.WriteByte(GrblInfo.IsGrblHAL ? GrblConstants.CMD_STOP : GrblConstants.CMD_RESET);
+=======
+            Comms.com.WriteByte(GrblConstants.CMD_STOP);
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
             if(!_isComplete)
                 ResponseReceived("cancel");
         }
@@ -393,7 +431,11 @@ namespace CNC.Controls.Probing
                 Grbl.IsJobRunning = true;
 
                 if (probing.Message == string.Empty)
+<<<<<<< HEAD
                     probing.Message = LibStrings.FindResource("Probing");
+=======
+                    probing.Message = "Probing...";
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
 
                 cmd_response = string.Empty;
                 Grbl.ExecuteCommand(_program[step]);
@@ -450,14 +492,22 @@ namespace CNC.Controls.Probing
                         {
                             probing.IsSuccess = step == _program.Count && response == "ok";
                             if (!probing.IsSuccess && response != "probe!")
+<<<<<<< HEAD
                                 End(LibStrings.FindResource(Grbl.GrblState.State == GrblStates.Alarm ? "FailedAlarm" : "FailedCancelled"));
+=======
+                                End(Grbl.GrblState.State == GrblStates.Alarm ? "Probing failed with alarm, clear in Grbl tab" : "Probing cancelled/failed");
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                             _isComplete = probing.IsCompleted = true;
                         }
                     }
 
                 }
 
+<<<<<<< HEAD
                 if (probing.Message == LibStrings.FindResource("Probing"))
+=======
+                if (probing.Message == "Probing...")
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                     probing.Message = string.Empty;
             }
 

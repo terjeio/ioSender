@@ -104,6 +104,7 @@
                 <local:SignalControl Label="C" IsSet="{Binding Path=Signals[(core:Signals)LimitC], Mode=OneWay}" Style="{StaticResource CAxisVisibleStyle}"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,3,0" VerticalAlignment="Center" DockPanel.Dock="Right">
+<<<<<<< HEAD
                 <local:SignalControl x:Uid="lbl_signalMotorWarning" Label="W" ToolTip="Motor warning" IsSet="{Binding Path=Signals[(core:Signals)MotorWarning], Mode=OneWay}" Style="{StaticResource MotorWarningVisibleStyle}"/>
                 <local:SignalControl x:Uid="lbl_signalBlockDelete" Label="B" ToolTip="Block delete" IsSet="{Binding Path=Signals[(core:Signals)BlockDelete], Mode=OneWay}" Style="{StaticResource BlockDeleteVisibleStyle}"/>
                 <local:SignalControl x:Uid="lbl_signalOptionalStop" Label="O" ToolTip="Optional stop" IsSet="{Binding Path=Signals[(core:Signals)OptionalStop], Mode=OneWay}" Style="{StaticResource OptionalStopVisibleStyle}"/>
@@ -113,6 +114,17 @@
                 <local:SignalControl x:Uid="lbl_signalEStop" Label="E" ToolTip="E-Stop" IsSet="{Binding Path=Signals[(core:Signals)EStop], Mode=OneWay}" Style="{StaticResource EStopVisibleStyle}"/>
                 <local:SignalControl x:Uid="lbl_signalSafetyDoor" Label="D" ToolTip="Safety door" IsSet="{Binding Path=Signals[(core:Signals)SafetyDoor], Mode=OneWay}" Style="{StaticResource DoorOpenVisibleStyle}"/>
                 <local:SignalControl x:Uid="lbl_signalProbe" Label="P" ToolTip="Probe" IsSet="{Binding Path=Signals[(core:Signals)Probe], Mode=OneWay}"/>
+=======
+                <local:SignalControl Label="W" ToolTip="Motor warning" IsSet="{Binding Path=Signals[(core:Signals)MotorWarning], Mode=OneWay}" Style="{StaticResource MotorWarningVisibleStyle}"/>
+                <local:SignalControl Label="B" ToolTip="Block delete" IsSet="{Binding Path=Signals[(core:Signals)BlockDelete], Mode=OneWay}" Style="{StaticResource BlockDeleteVisibleStyle}"/>
+                <local:SignalControl Label="O" ToolTip="Optional stop" IsSet="{Binding Path=Signals[(core:Signals)OptionalStop], Mode=OneWay}" Style="{StaticResource OptionalStopVisibleStyle}"/>
+                <local:SignalControl Label="H" ToolTip="Feed hold" IsSet="{Binding Path=Signals[(core:Signals)Hold], Mode=OneWay}"/>
+                <local:SignalControl Label="S" ToolTip="Cycle start" IsSet="{Binding Path=Signals[(core:Signals)CycleStart], Mode=OneWay}"/>
+                <local:SignalControl Label="R" ToolTip="Reset" IsSet="{Binding Path=Signals[(core:Signals)Reset], Mode=OneWay}"/>
+                <local:SignalControl Label="E" ToolTip="E-Stop" IsSet="{Binding Path=Signals[(core:Signals)EStop], Mode=OneWay}" Style="{StaticResource EStopVisibleStyle}"/>
+                <local:SignalControl Label="D" ToolTip="Safety door" IsSet="{Binding Path=Signals[(core:Signals)SafetyDoor], Mode=OneWay}" Style="{StaticResource DoorOpenVisibleStyle}"/>
+                <local:SignalControl Label="P" ToolTip="Probe" IsSet="{Binding Path=Signals[(core:Signals)Probe], Mode=OneWay}"/>
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
             </StackPanel>
         </DockPanel>
     </GroupBox>

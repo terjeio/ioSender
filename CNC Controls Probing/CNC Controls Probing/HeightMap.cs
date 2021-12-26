@@ -99,13 +99,21 @@ namespace CNC.Controls.Probing
         private void CreateHeightMap(double gridSizeX, double gridSizeY, Vector2 min, Vector2 max)
         {
             if (min.X == max.X || min.Y == max.Y)
+<<<<<<< HEAD
                 throw new Exception(LibStrings.FindResource("HeigthMapNarrow"));
+=======
+                throw new Exception("Height map can't be infinitely narrow");
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
 
             int pointsX = (int)Math.Ceiling((max.X - min.X) / gridSizeX) + 1;
             int pointsY = (int)Math.Ceiling((max.Y - min.Y) / gridSizeY) + 1;
 
             if (pointsX < 2 || pointsY < 2)
+<<<<<<< HEAD
                 throw new Exception(LibStrings.FindResource("HeigthMapMinSize"));
+=======
+                throw new Exception("Height map must have at least 4 points");
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
 
             Points = new double?[pointsX, pointsY];
 

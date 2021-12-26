@@ -1,7 +1,11 @@
 /*
  * GrblViewModel.cs - part of CNC Controls library
  *
+<<<<<<< HEAD
  * v0.36 / 2021-12-19 / Io Engineering (Terje Io)
+=======
+ * v0.35 / 2021-10-21 / Io Engineering (Terje Io)
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
  *
  */
 
@@ -88,7 +92,10 @@ namespace CNC.Core
 
             Clear();
 
+<<<<<<< HEAD
             Keyboard = new KeypressHandler(this);
+=======
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
             MDICommand = new ActionCommand<string>(ExecuteMDI);
 
             pollThread = new Thread(new ThreadStart(Poller.Run));
@@ -103,17 +110,23 @@ namespace CNC.Core
             AxisScaled.PropertyChanged += AxisScaled_PropertyChanged;
             Position.PropertyChanged += Position_PropertyChanged;
             MachinePosition.PropertyChanged += MachinePosition_PropertyChanged;
+<<<<<<< HEAD
             WorkPositionOffset.PropertyChanged += WorkPositionOffset_PropertyChanged;
+=======
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
             ProbePosition.PropertyChanged += ProbePosition_PropertyChanged;
             ToolOffset.PropertyChanged += ToolOffset_PropertyChanged;
         }
 
+<<<<<<< HEAD
         private void WorkPositionOffset_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(Core.Position))
                 OnPropertyChanged(nameof(WorkPositionOffset));
         }
 
+=======
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         ~GrblViewModel()
         {
             pollThread.Abort();
@@ -227,6 +240,7 @@ namespace CNC.Core
             if ((ok = !(GrblState.State == GrblStates.Tool && !(ucmd.StartsWith("$J=") || ucmd == "$TPW" || ucmd.Contains("G10L20")))))
                 MDI = command;
             else
+<<<<<<< HEAD
                 Message = LibStrings.FindResource("JoggingOnly");
 
             return ok;
@@ -319,11 +333,73 @@ namespace CNC.Core
 
         #region Dependencyproperties
 
+=======
+                Message = "Only jogging and some system commands are allowed when changing tool!";
+
+            return ok;
+        }
+
+        private void ExecuteMDI(string command)
+        {
+            if (!string.IsNullOrEmpty(command) && ApplyCommand(command))
+            {
+                if (command.Length > 1)
+                {
+                    CommandLog.Add(command);
+                    ResponseLog.Add(command);
+                }
+            }
+        }
+
+        public void ExecuteCommand(string command)
+        {
+            if (command != null)
+            {
+                if (command == string.Empty)
+                {
+                    MDI = command;
+                    SetGrblError(0);
+                }
+                else if (ApplyCommand(command))
+                {
+                    if (ResponseLogVerbose && !string.IsNullOrEmpty(command))
+                        ResponseLog.Add(command);
+                }
+            }
+        }
+        public bool ResponseLogVerbose { get { return _responseLogVerbose; } set { _responseLogVerbose = value; OnPropertyChanged(); } }
+        public bool ResponseLogFilterRT { get; set; } = false;
+        public bool ResponseLogFilterOk { get; set; } = false;
+        public bool ResponseLogShowRTAll { get; set; } = false;
+
+        public bool IsReady { get; set; } = false;
+        public bool IsGrblHAL { get { return GrblInfo.IsGrblHAL; } }
+        public string Firmware { get; set; } = string.Empty;
+        public bool SuspendProcessing { get; set; } = false;
+
+        public bool LimitTriggered {
+            get {
+                return Signals.Value.HasFlag(Core.Signals.LimitX) ||
+                        Signals.Value.HasFlag(Core.Signals.LimitY) ||
+                         Signals.Value.HasFlag(Core.Signals.LimitZ) ||
+                          Signals.Value.HasFlag(Core.Signals.LimitA) ||
+                           Signals.Value.HasFlag(Core.Signals.LimitB) ||
+                            Signals.Value.HasFlag(Core.Signals.LimitC);
+            }
+        }
+
+        #region Dependencyproperties
+
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         public ObservableCollection<string> ResponseLog { get; private set; } = new ObservableCollection<string>();
         public ObservableCollection<string> CommandLog { get; private set; } = new ObservableCollection<string>();
 
         public ProgramLimits ProgramLimits { get; private set; } = new ProgramLimits();
+<<<<<<< HEAD
         public string MDI { get { return _mdiCommand; } private set { _mdiCommand = value; OnPropertyChanged(); _mdiCommand = string.Empty; } }
+=======
+        public string MDI { get { string cmd = _mdiCommand; _mdiCommand = string.Empty; return cmd; } private set { _mdiCommand = value; OnPropertyChanged(); } }
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         public ObservableCollection<CoordinateSystem> CoordinateSystems { get { return GrblWorkParameters.CoordinateSystems; } }
         public ObservableCollection<Tool> Tools { get { return GrblWorkParameters.Tools; } }
         public ObservableCollection<string> SystemInfo { get { return GrblInfo.SystemInfo; } }
@@ -441,6 +517,7 @@ namespace CNC.Core
         public int ScrollPosition { get { return _scrollpos; } set { _scrollpos = value;  OnPropertyChanged(); } }
         public double JogStep { get { return _jogStep; } set { _jogStep = value; OnPropertyChanged(); } }
         public GrblEncoderMode OverrideEncoderMode { get { return _encoder_ovr; } set { _encoder_ovr = value; OnPropertyChanged(); } }
+<<<<<<< HEAD
 
         public string RunTime { get { return JobTimer.RunTime; } set { OnPropertyChanged(); } } // Cannot be set...
                                                                                                 // CO2 Laser
@@ -448,6 +525,15 @@ namespace CNC.Core
         public bool Fan0 { get { return _fan0; }  set { _fan0 = value; OnPropertyChanged(); } }
         public int LineNumber { get { return _line; } private set { _line = value; OnPropertyChanged(); } }
 
+=======
+
+        public string RunTime { get { return JobTimer.RunTime; } set { OnPropertyChanged(); } } // Cannot be set...
+                                                                                                // CO2 Laser
+        public bool HasFans { get { return _hasFans; } set { _hasFans = value; OnPropertyChanged(); } }
+        public bool Fan0 { get { return _fan0; }  set { _fan0 = value; OnPropertyChanged(); } }
+        public int LineNumber { get { return _line; } private set { _line = value; OnPropertyChanged(); } }
+
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         public double THCVoltage { get { return _thcVoltage; } private set { _thcVoltage = value; OnPropertyChanged(); } }
         public EnumFlags<THCSignals> THCSignals { get; private set; } = new EnumFlags<THCSignals>(Core.THCSignals.Off);
 
@@ -596,12 +682,18 @@ namespace CNC.Core
                     LatheMode = GrblParserState.LatheMode;
                 if (GrblParserState.IsActive("G51") != null)
                     Set("Sc", GrblParserState.IsActive("G51"));
+<<<<<<< HEAD
                 if (GrblState.State != GrblStates.Check)
                 {
                     OnPropertyChanged();
                     OnPropertyChanged(nameof(IsG92Active));
                     OnPropertyChanged(nameof(IsToolOffsetActive));
                 }
+=======
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(IsG92Active));
+                OnPropertyChanged(nameof(IsToolOffsetActive));
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
             }
         }
 
@@ -741,6 +833,7 @@ namespace CNC.Core
                 }
             }
         }
+<<<<<<< HEAD
 
         public bool ParseStatus(string data)
         {
@@ -749,6 +842,16 @@ namespace CNC.Core
 
             if ((changed = (_rtState[rti] != data) || _grblState.State == GrblStates.Unknown)) {
 
+=======
+
+        public bool ParseStatus(string data)
+        {
+            bool changed, wco_present = data.Contains("|WCO:");
+            int rti = data.Contains("|WCO:") ? 1 : (data.Contains("|Ov:") ? 2 : 0);
+
+            if ((changed = (_rtState[rti] != data))) {
+
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                 bool pos_changed = false;
                 string[] elements = data.TrimEnd('>').Split('|');
 
@@ -991,7 +1094,11 @@ namespace CNC.Core
                 case "SD":
                     if (value != "Pending")
                     {
+<<<<<<< HEAD
                         value = string.Format(LibStrings.FindResource("SdStreamComplete"), value.Split(',')[0]);
+=======
+                        value = string.Format("SD Card streaming {0}% complete", value.Split(',')[0]);
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                         if (SDCardStatus != value)
                             Message = SDCardStatus = value;
                     }
@@ -1143,12 +1250,17 @@ namespace CNC.Core
                     case "MSG":
                         var msg = data.Substring(5).Trim().TrimEnd(']');
                         if (msg == "'$H'|'$X' to unlock")
+<<<<<<< HEAD
                             Message = LibStrings.FindResource(GrblInfo.IsGrblHAL ? "ContUnlock" : "ContHomeUnlock");
+=======
+                            Message = GrblInfo.IsGrblHAL ? "<Unlock> to continue" : "<Home> or <Unlock> to continue";
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                         else if (GrblState.State == GrblStates.Alarm && msg != "Caution: Unlocked")
                         {
                             switch(GrblState.Substate)
                             {
                                 case 10:
+<<<<<<< HEAD
                                     _message = LibStrings.FindResource("ContClearResetUnlock");
                                     break;
                                 case 11:
@@ -1157,18 +1269,36 @@ namespace CNC.Core
 
                                 default:
                                     _message = LibStrings.FindResource("ContResetUnlock");
+=======
+                                    _message = "clear then <Reset> then <Unlock> to continue";
+                                    break;
+                                case 11:
+                                    _message = "<Home> to continue";
+                                    break;
+
+                                default:
+                                    _message = "<Reset> then <Unlock> to continue";
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                                     break;
                             }
                             Message = (msg == "Reset to continue" ? string.Empty : msg + ", ") + _message;
                         }
                         else
                             Message = msg;
+<<<<<<< HEAD
                         if (msg == "Pgm End")
+=======
+                        if (data == "Pgm End")
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                             ProgramEnd = true;
                         break;
                 }
             }
+<<<<<<< HEAD
             else if (data.ToLower().StartsWith("grbl"))
+=======
+            else if (data.StartsWith("Grbl"))
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
             {
                 if(Poller != null)
                     Poller.SetState(0);
@@ -1205,7 +1335,11 @@ namespace CNC.Core
                 }
             }
 
+<<<<<<< HEAD
             if (ResponseLogVerbose || !(data.First() == '<' || data.First() == '$' || data.First() == 'o' || (data.First() == '[' && (data.StartsWith("[GC") || DataIsEnumeration(data)))) || data.StartsWith("error"))
+=======
+            if (ResponseLogVerbose || !(data.First() == '<' || data.First() == '$' || data.First() == 'o' || (data.First() == '[' && DataIsEnumeration(data))) || data.StartsWith("error"))
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
             {
                 if (!(data.First() == '<' && ResponseLogFilterRT))
                 {
@@ -1214,7 +1348,11 @@ namespace CNC.Core
                         var msg = GrblErrors.GetMessage(data.Substring(6));
                         ResponseLog.Add(data + (msg == data ? "" : " - " + msg));
                     }
+<<<<<<< HEAD
                     else if (data == "ok" ? !ResponseLogFilterOk : stateChanged || ResponseLogShowRTAll)
+=======
+                    else if (data == "ok" ? ResponseLogFilterOk : stateChanged || ResponseLogShowRTAll)
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                         ResponseLog.Add(data);
 
                     if (ResponseLog.Count > 200)

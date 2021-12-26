@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+<<<<<<< HEAD
              xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:local="clr-namespace:CNC.Controls"
              mc:Ignorable="d" 
@@ -10,6 +11,13 @@
              Loaded="OutlineFlyout_Loaded">
     <UserControl.Resources>
         <system:String x:Uid="str_outlineFlyout" x:Key="MenuLabel">_Outline</system:String>
+=======
+             xmlns:local="clr-namespace:CNC.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="150" d:DesignWidth="300"
+             Loaded="OutlineFlyout_Loaded">
+    <UserControl.Resources>
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         <Style x:Key="SmallXButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="Template">
@@ -24,8 +32,19 @@
         </Style>
     </UserControl.Resources>
     <Border BorderBrush="DarkGray" BorderThickness="1" CornerRadius="3" Background="#FFE5E5EA">
+<<<<<<< HEAD
         <Grid Height="130">
             <local:OutlineBaseControl/>
+=======
+        <Grid Height="150">
+            <TextBlock HorizontalAlignment="Center" Margin="0,20,0,0" Width="280" VerticalAlignment="Top">
+                <Run x:Uid="txt_line1" Text="Execute moves to outline X and Y program limits."/>
+                <LineBreak/>
+                <Run x:Uid="txt_line2" Text="Ensure tool tip is clear of any obstructions!" Foreground="Red" FontWeight="Bold"/>
+            </TextBlock>
+            <local:NumericField x:Uid="lbl_feedrate" Label="Feed rate:" Value="{Binding Path=FeedRate, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=UserControl}}" Unit="{Binding Path=FeedrateUnit, Mode=OneWay}" Format="###0" HorizontalAlignment="Left" Margin="5,75,0,0" VerticalAlignment="Top"/>
+            <Button x:Uid="btn_go" Content="Go" IsEnabled="{Binding Path=IsFileLoaded}" Width="50" Height="25" HorizontalAlignment="Right" Margin="0,0,8,8" VerticalAlignment="Bottom" Click="button_Go" />
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
             <Button Content="×" Focusable="False" Style="{StaticResource SmallXButtonStyle}" VerticalContentAlignment="Top" HorizontalAlignment="Left" Margin="285,0,0,0" VerticalAlignment="Top" Width="14" Height="18" Click="btn_Close"/>
         </Grid>
     </Border>

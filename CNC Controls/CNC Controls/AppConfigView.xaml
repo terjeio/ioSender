@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+<<<<<<< HEAD
              xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:local="clr-namespace:CNC.Controls"
              mc:Ignorable="d" 
@@ -16,6 +17,17 @@
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <WrapPanel Orientation="Vertical" ItemWidth="315" Margin="5,5,0,5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+=======
+             xmlns:local="clr-namespace:CNC.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="515" d:DesignWidth="875">
+    <DockPanel>
+        <Button x:Uid="btn_saveSettings" x:Name="btnSave" DockPanel.Dock="Bottom" Content="Save settings" Margin="10,0,0,5" HorizontalAlignment="Left" VerticalAlignment="Top" Width="100" Click="btnSave_Click"/>
+        <ItemsControl x:Name="xx" DockPanel.Dock="Top">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Vertical" ItemWidth="255" Margin="5,5,0,5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
         </ItemsControl>

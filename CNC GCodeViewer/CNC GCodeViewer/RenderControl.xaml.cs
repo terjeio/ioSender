@@ -1,7 +1,11 @@
 ﻿/*
  * Renderer.xaml.cs - part of CNC Controls library
  *
+<<<<<<< HEAD
  * v0.36 / 2021-12-25 / Io Engineering (Terje Io)
+=======
+ * v0.33 / 2021-05-15 / Io Engineering (Terje Io)
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
  *
  */
 
@@ -39,15 +43,27 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using System.Collections.Generic;
 using System.Windows.Controls;
+<<<<<<< HEAD
 using System.Windows.Input;
 using CNC.Core;
+=======
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
 using CNC.GCode;
 
 namespace CNC.Controls.Viewer
 {
+<<<<<<< HEAD
     public partial class RenderControl : UserControl
     {
         private static bool keyboardMappingsOk = false;
+=======
+    /// <summary>
+    /// Interaction logic for RenderControl.xaml
+    /// </summary>
+    public partial class RenderControl : UserControl
+    {
+        private bool isLoaded = false;
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
 
         public RenderControl()
         {
@@ -56,12 +72,42 @@ namespace CNC.Controls.Viewer
 
         private void SettingsChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
+<<<<<<< HEAD
             textOverlay.Visibility = AppConfig.Settings.GCodeViewer.ShowTextOverlay ? System.Windows.Visibility.Visible : System.Windows.Visibility.Hidden;
         }
 
         public Machine MachineView
         {
             get { return gcodeView.Machine; }
+=======
+            Configure();
+        }
+
+        public bool ShowTool
+        {
+            get { return gcodeView.AnimateTool; }
+            set { gcodeView.AnimateTool = value; }
+        }
+
+        public void Configure()
+        {
+            gcodeView.ArcResolution = AppConfig.Settings.GCodeViewer.ArcResolution;
+            gcodeView.MinDistance = AppConfig.Settings.GCodeViewer.MinDistance;
+            gcodeView.ShowGrid = AppConfig.Settings.GCodeViewer.ShowGrid;
+            gcodeView.ShowAxes = AppConfig.Settings.GCodeViewer.ShowAxes;
+            gcodeView.ShowBoundingBox = AppConfig.Settings.GCodeViewer.ShowBoundingBox;
+            gcodeView.RenderExecuted = AppConfig.Settings.GCodeViewer.RenderExecuted;
+            gcodeView.Machine.ShowViewCube = AppConfig.Settings.GCodeViewer.ShowViewCube;
+            gcodeView.Machine.ShowCoordinateSystem = AppConfig.Settings.GCodeViewer.ShowCoordinateSystem;
+            gcodeView.Machine.CutMotionColor = AppConfig.Settings.GCodeViewer.CutMotionColor;
+            gcodeView.Machine.RapidMotionColor = AppConfig.Settings.GCodeViewer.RapidMotionColor;
+            gcodeView.Machine.RetractMotionColor = AppConfig.Settings.GCodeViewer.RetractMotionColor;
+            gcodeView.Machine.HighlightColor = AppConfig.Settings.GCodeViewer.HighlightColor;
+            gcodeView.Machine.ToolOriginColor = AppConfig.Settings.GCodeViewer.ToolOriginColor;
+            gcodeView.Machine.GridColor = AppConfig.Settings.GCodeViewer.GridColor;
+            gcodeView.Machine.CanvasColor = AppConfig.Settings.GCodeViewer.BlackBackground ? System.Windows.Media.Brushes.Black : System.Windows.Media.Brushes.White;
+            textOverlay.Visibility = AppConfig.Settings.GCodeViewer.ShowTextOverlay ? System.Windows.Visibility.Visible : System.Windows.Visibility.Hidden;
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         }
 
         public void Close()
@@ -71,6 +117,7 @@ namespace CNC.Controls.Viewer
 
         public void Open(List<GCodeToken> tokens)
         {
+<<<<<<< HEAD
             gcodeView.Render(tokens);
 //            gcodeView.ShowPosition();
         }
@@ -135,6 +182,23 @@ namespace CNC.Controls.Viewer
                 keyboard.AddHandler(Key.G, ModifierKeys.Control, ToggleGrid);
                 keyboard.AddHandler(Key.J, ModifierKeys.Control, ToggleJobEnvelope);
                 keyboard.AddHandler(Key.W, ModifierKeys.Control, ToggleWorkEnvelope);
+=======
+            gcodeView.ShowPosition();
+            gcodeView.Render(tokens);
+        }
+
+        private void button_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            gcodeView.ResetView();
+        }
+
+        private void control_Loaded(object sender, System.Windows.RoutedEventArgs e)
+        {
+            if (!isLoaded && !System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
+            {
+                isLoaded = true;
+                AppConfig.Settings.GCodeViewer.PropertyChanged += SettingsChanged;
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
             }
         }
     }

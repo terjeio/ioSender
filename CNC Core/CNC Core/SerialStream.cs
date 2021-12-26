@@ -1,7 +1,11 @@
 ﻿/*
  * SerialStream.cs - part of CNC Controls library
  *
+<<<<<<< HEAD
  * v0.36 / 2021-12-17 / Io Engineering (Terje Io)
+=======
+ * v0.35 / 2021-09-25 / Io Engineering (Terje Io)
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
  *
  */
 
@@ -51,9 +55,15 @@ namespace CNC.Core
 {
     public class SerialStream : StreamComms
     {
+<<<<<<< HEAD
         private SerialPort serialPort = null;
         private byte[] buffer = new byte[Comms.RXBUFFERSIZE];
         private StringBuilder input = new StringBuilder(Comms.RXBUFFERSIZE);
+=======
+
+        private SerialPort serialPort = null;
+        private StringBuilder input = new StringBuilder(400);
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         private volatile Comms.State state = Comms.State.ACK;
         private Dispatcher Dispatcher { get; set; }
 
@@ -62,6 +72,10 @@ namespace CNC.Core
 #if RESPONSELOG
         StreamWriter log = null;
 #endif
+<<<<<<< HEAD
+=======
+
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         public SerialStream(string PortParams, int ResetDelay, Dispatcher dispatcher)
         {
             Comms.com = this;
@@ -75,7 +89,11 @@ namespace CNC.Core
 
             if (parameter.Count() < 4)
             {
+<<<<<<< HEAD
                 MessageBox.Show(string.Format(LibStrings.FindResource("SerialPortError"), PortParams), "ioSender");
+=======
+                MessageBox.Show("Unable to open serial port: " + PortParams, "ioSender");
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                 System.Environment.Exit(2);
             }
 
@@ -86,11 +104,17 @@ namespace CNC.Core
             serialPort.DataBits = int.Parse(parameter[2]);
             serialPort.StopBits = int.Parse(parameter[3]) == 1 ? StopBits.One : StopBits.Two;
             serialPort.ReceivedBytesThreshold = 1;
+<<<<<<< HEAD
             serialPort.ReadTimeout = 50;
+=======
+            serialPort.ReadTimeout = 5000;
+            serialPort.NewLine = "\r\n";
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
             serialPort.ReadBufferSize = Comms.RXBUFFERSIZE;
             serialPort.WriteBufferSize = Comms.TXBUFFERSIZE;
 
             if (parameter.Count() > 4) switch (parameter[4])
+<<<<<<< HEAD
             {
                 case "P": // Cannot be used With ESP32!
                     serialPort.Handshake = Handshake.RequestToSend;
@@ -100,6 +124,17 @@ namespace CNC.Core
                     serialPort.Handshake = Handshake.XOnXOff;
                     break;
             }
+=======
+                {
+                    case "P": // Cannot be used With ESP32!
+                        serialPort.Handshake = Handshake.RequestToSend;
+                        break;
+
+                    case "X":
+                        serialPort.Handshake = Handshake.XOnXOff;
+                        break;
+                }
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
 
             try
             {
@@ -180,11 +215,16 @@ namespace CNC.Core
 
         public void PurgeQueue()
         {
+<<<<<<< HEAD
             if (serialPort != null)
             {
                 serialPort.DiscardInBuffer();
                 serialPort.DiscardOutBuffer();
             }
+=======
+            serialPort.DiscardInBuffer();
+            serialPort.DiscardOutBuffer();
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
             Reply = string.Empty;
             if (!EventMode)
                 input.Clear();
@@ -249,19 +289,31 @@ namespace CNC.Core
 
         public void WriteByte(byte data)
         {
+<<<<<<< HEAD
             if(serialPort != null)
                 serialPort.BaseStream.Write(new byte[1] { data }, 0, 1);
+=======
+            serialPort.BaseStream.Write(new byte[1] { data }, 0, 1);
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         }
 
         public void WriteBytes(byte[] bytes, int len)
         {
+<<<<<<< HEAD
             serialPort.BaseStream.WriteAsync(bytes, 0, len);
+=======
+            serialPort.BaseStream.Write(bytes, 0, len);
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         }
 
         public void WriteString(string data)
         {
+<<<<<<< HEAD
             byte[] bytes = Encoding.Default.GetBytes(data);
             WriteBytes(bytes, bytes.Length);
+=======
+            serialPort.Write(data);
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         }
 
         public void WriteCommand(string command)
@@ -274,8 +326,12 @@ namespace CNC.Core
             {
                 command += "\r";
                 byte[] bytes = System.Text.Encoding.UTF8.GetBytes(command);
+<<<<<<< HEAD
                 if(serialPort != null)
                     serialPort.BaseStream.Write(bytes, 0, bytes.Length);
+=======
+                serialPort.BaseStream.Write(bytes, 0, bytes.Length);
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
             }
         }
 
@@ -336,11 +392,14 @@ namespace CNC.Core
         {
             int pos = 0;
 
+<<<<<<< HEAD
             //Action<string> addEdge = (s) =>
             //{
             //    DataReceived(s);
             //};
 
+=======
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
             lock (input)
             {
                 input.Append(serialPort.ReadExisting());
@@ -360,13 +419,17 @@ namespace CNC.Core
 #endif
                         if (Reply.Length != 0 && DataReceived != null)
                             Dispatcher.BeginInvoke(DataReceived, Reply);
+<<<<<<< HEAD
                         //                            Dispatcher.Invoke(addEdge, Reply);
+=======
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
 
                         state = Reply == "ok" ? Comms.State.ACK : (Reply.StartsWith("error") ? Comms.State.NAK : Comms.State.DataReceived);
                     }
                 }
                 else
                     ByteReceived?.Invoke(ReadByte());
+<<<<<<< HEAD
 
                 //                if (EventMode)
                 //                {
@@ -399,6 +462,8 @@ namespace CNC.Core
                 //                            ByteReceived?.Invoke(ReadByte());
                 //                    }
                 //                }
+=======
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
             }
         }
     }
@@ -418,6 +483,7 @@ namespace CNC.Core
 
     public class ComPort
     {
+<<<<<<< HEAD
         public ComPort ()
         {
         }
@@ -427,6 +493,8 @@ namespace CNC.Core
             Name = FullName = name;
         }
 
+=======
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         public string Name { get; set; }
         public string FullName { get; set; }
     }
@@ -453,6 +521,7 @@ namespace CNC.Core
         public void Refresh ()
         {
             var _portnames = SerialPort.GetPortNames();
+<<<<<<< HEAD
 
             Ports.Clear();
 
@@ -496,6 +565,31 @@ namespace CNC.Core
                 if (Ports.Count > 0)
                     SelectedPort = Ports[0].Name;
             }
+=======
+            Array.Sort(_portnames);
+
+            Ports.Clear();
+
+            using (var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_PnPEntity WHERE Caption like '%(COM%'"))
+            {
+                var ports = searcher.Get().Cast<ManagementBaseObject>().ToList().Select(p => p["Caption"].ToString());
+                var portList = _portnames.Select(n => ports.FirstOrDefault(s => s.Contains('(' + n + ')'))).ToList();
+                for(int i = 0; i < portList.Count; i++)
+                {
+                    var port = new ComPort();
+                    port.Name = _portnames[i];
+
+                    if (portList[i].Contains('(' + _portnames[i] + ')'))
+                        port.FullName = _portnames[i] + " - " + portList[i].Replace('(' + _portnames[i] + ')', "").Trim();
+                    else
+                        port.FullName = "";
+
+                    Ports.Add(port);
+                }
+            }
+
+            SelectedPort = Ports[0].Name;
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         }
 
         public ObservableCollection<ComPort> Ports { get; private set; } = new ObservableCollection<ComPort>();

@@ -1,5 +1,6 @@
 ﻿CNC.Converters.g.en-US.resources:jobparametersdialog.baml,bn_cancel:System.Windows.Controls.ContentControl.Content,Button,True,True,,Cancel
 CNC.Converters.g.en-US.resources:jobparametersdialog.baml,btn_ok:System.Windows.Controls.ContentControl.Content,Button,True,True,,Ok
+<<<<<<< HEAD
 CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_cutDepth:CNC.Controls.NumericField.Unit,None,False,True,,mm
 CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_cutDepth:CNC.Controls.NumericField.Label,None,False,True,,Cut depth:
 CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_feedrate:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
@@ -12,6 +13,8 @@ CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_rpm:CNC.Controls.N
 CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_rpm:CNC.Controls.NumericField.Unit,None,False,True,,
 CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_toolChange:CNC.Controls.NumericField.Label,None,False,True,,Tool change:
 CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_toolChange:CNC.Controls.NumericField.Unit,None,False,True,,mm
+=======
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
 CNC.Converters.g.en-US.resources:jobparametersdialog.baml,grp_scalingFactors:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Scaling factors
 CNC.Converters.g.en-US.resources:jobparametersdialog.baml,grp_spindle_feed:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Spindle and feed
 CNC.Converters.g.en-US.resources:jobparametersdialog.baml,grp_tool:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Tool

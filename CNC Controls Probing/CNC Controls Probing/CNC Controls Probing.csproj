@@ -130,10 +130,13 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+<<<<<<< HEAD
     <Page Include="LibStrings.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+=======
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
     <Page Include="ProbingView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

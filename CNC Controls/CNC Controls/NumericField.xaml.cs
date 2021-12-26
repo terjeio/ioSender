@@ -1,7 +1,11 @@
 ﻿/*
  * NumericField.xaml.cs - part of CNC Controls library
  *
+<<<<<<< HEAD
  * v0.36 / 2021-11-01 / Io Engineering (Terje Io)
+=======
+ * v0.03 / 2020-01-28 / Io Engineering (Terje Io)
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
  *
  */
 

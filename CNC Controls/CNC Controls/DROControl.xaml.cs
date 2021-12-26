@@ -1,7 +1,11 @@
 ﻿/*
  * DROControl.xaml.cs - part of CNC Controls library
  *
+<<<<<<< HEAD
  * v0.36 / 2021-12-25 / Io Engineering (Terje Io)
+=======
+ * v0.18 / 2020-05-01 / Io Engineering (Terje Io)
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
  *
  */
 

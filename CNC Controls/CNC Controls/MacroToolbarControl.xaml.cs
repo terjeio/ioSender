@@ -1,13 +1,21 @@
 ﻿/*
  * MacroExecuteControl.xaml.cs - part of CNC Controls library
  *
+<<<<<<< HEAD
  * v0.36 / 2021-11-05 / Io Engineering (Terje Io)
+=======
+ * v0.17 / 2020-04-15 / Io Engineering (Terje Io)
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
  *
  */
 
 /*
 
+<<<<<<< HEAD
 Copyright (c) 2020-2021, Io Engineering (Terje Io)
+=======
+Copyright (c) 2020, Io Engineering (Terje Io)
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -70,8 +78,13 @@ namespace CNC.Controls
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             var macro = Macros.FirstOrDefault(o => o.Id == (int)(sender as Button).Tag);
+<<<<<<< HEAD
             if (macro != null && MessageBox.Show(string.Format((string)FindResource("RunMacro"), macro.Name), "ioSender", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                 (DataContext as GrblViewModel).ExecuteMacro(macro.Code);
+=======
+            if (macro != null && MessageBox.Show(string.Format("Run {0} macro?", macro.Name), "Run macro", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                (DataContext as GrblViewModel).ExecuteCommand(macro.Code);
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         }
     }
 }

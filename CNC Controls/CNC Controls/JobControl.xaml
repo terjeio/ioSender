@@ -6,6 +6,7 @@
              xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:local="clr-namespace:CNC.Controls"
              mc:Ignorable="d" 
+<<<<<<< HEAD
              d:DesignHeight="36" d:DesignWidth="400">
     <UserControl.Resources>
         <system:String x:Uid="str_toolchanges" x:Key="JobToolChanges">Job has {0} tool change(s) using M6, only a few Grbl ports supports that.</system:String>
@@ -19,6 +20,12 @@
             <Setter Property="MinWidth" Value="95" />
             <Setter Property="MaxWidth" Value="120" />
             <Setter Property="Padding" Value="5,0" />
+=======
+             d:DesignHeight="36" d:DesignWidth="340">
+    <UserControl.Resources>
+        <Style x:Key="JobButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="80" />
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
             <Setter Property="Height" Value="36" />
             <Setter Property="Focusable" Value="False" />
         </Style>

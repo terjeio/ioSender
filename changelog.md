@@ -4,10 +4,13 @@ Executable for development builds available for download [here](http://www.io-en
 
 ---
 
+<<<<<<< HEAD
 2021-21-26: Release candidate for build 36, changelog will be added later.
 
 ---
 
+=======
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
 2021-10-26: [Release 2.0.35](https://github.com/terjeio/Grbl-GCode-Sender/releases/tag/2.0.35).
 
 * Added support for localization \(translation\) see the [Wiki](https://github.com/terjeio/ioSender/wiki/Localization) for details.

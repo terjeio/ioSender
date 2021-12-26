@@ -1,7 +1,11 @@
 /*
  * Converters.cs - part of CNC Controls library for Grbl
  *
+<<<<<<< HEAD
  * v0.36 / 2021-12-08 / Io Engineering (Terje Io)
+=======
+ * v0.34 / 2021-07-13 / Io Engineering (Terje Io)
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
  *
  */
 
@@ -60,7 +64,10 @@ namespace CNC.Controls
         public static GrblStateToStringConverter GrblStateToStringConverter = new GrblStateToStringConverter();
         public static BlocksToStringConverter BlocksToStringConverter = new BlocksToStringConverter();
         public static GrblStateToBooleanConverter GrblStateToBooleanConverter = new GrblStateToBooleanConverter();
+<<<<<<< HEAD
         public static GrblStateToIsJoggingConverter GrblStateToIsJoggingConverter = new GrblStateToIsJoggingConverter();
+=======
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         public static HomedStateToColorConverter HomedStateToColorConverter = new HomedStateToColorConverter();
         public static IsHomingEnabledConverter IsHomingEnabledConverter = new IsHomingEnabledConverter();
         public static HomedStateToBooleanConverter HomedStateToBooleanConverter = new HomedStateToBooleanConverter();
@@ -75,6 +82,7 @@ namespace CNC.Controls
         public static MultiLineConverter MultiLineConverter = new MultiLineConverter();
         public static PositionToStringConverter PositionToStringConverter = new PositionToStringConverter();
         public static FeedSpeedToStringConverter FeedSpeedToStringConverter = new FeedSpeedToStringConverter();
+<<<<<<< HEAD
 
         internal static string numBlocks = LibStrings.FindResource("NumBlocks");
         internal static string blockOfBlocks = LibStrings.FindResource("BlockOfBlocks");
@@ -92,6 +100,8 @@ namespace CNC.Controls
                 { GrblStates.Door, LibStrings.FindResource("StateDoor") },
                 { GrblStates.Sleep, LibStrings.FindResource("StateSleep") }
             });
+=======
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
     }
 
     // Adapted from: https://stackoverflow.com/questions/4353186/binding-observablecollection-to-a-textbox/8847910#8847910
@@ -144,7 +154,11 @@ namespace CNC.Controls
     {
         public object Convert(object[] value, Type targetType, object parameter, CultureInfo culture)
         {
+<<<<<<< HEAD
             return value[0] is int && value[1] is int ? (string.Format((int)value[1] == 0 ? Converters.numBlocks : Converters.blockOfBlocks, value[1], value[0])) : string.Empty;
+=======
+            return value[0] is int && value[1] is int ? (string.Format((int)value[1] == 0 ? "Blocks: {1}" : "Block: {0}/{1}", value[1], value[0])) : string.Empty;
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
@@ -247,10 +261,17 @@ namespace CNC.Controls
 
             // If ALARM:11 homing is required
             bool result = state == GrblStates.Alarm && ((GrblState)value[0]).Substate == 11;
+<<<<<<< HEAD
 
             // value[1] = IsJobRunning
             // value[2] = IsSleeping
 
+=======
+
+            // value[1] = IsJobRunning
+            // value[2] = IsSleeping
+
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
             if (!result && GrblInfo.HomingEnabled && value.Length > 2 && value[1] is bool && !(bool)value[1] && value[2] is bool && !(bool)value[2])
                 result = state != GrblStates.Unknown && !((GrblState)value[0]).MPG && (state == GrblStates.Idle || state == GrblStates.Alarm || !GrblInfo.IsGrblHAL);
 
@@ -327,12 +348,19 @@ namespace CNC.Controls
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             string result = string.Empty;
+<<<<<<< HEAD
 
             Converters.grblState.Value.TryGetValue(((GrblState)value).State, out result);
             int substate = ((GrblState)value).State == GrblStates.Alarm && ((GrblState)value).LastAlarm > 0 ? ((GrblState)value).LastAlarm : ((GrblState)value).Substate;
 
             if (value is GrblState && ((GrblState)value).State != GrblStates.Unknown) 
                 result = (result == string.Empty ? ((GrblState)value).State.ToString().ToUpper() : result) + (substate == -1 ? "" : (":" + substate.ToString()));
+=======
+            int substate = ((GrblState)value).State == GrblStates.Alarm && ((GrblState)value).LastAlarm > 0 ? ((GrblState)value).LastAlarm : ((GrblState)value).Substate;
+
+            if (value is GrblState && ((GrblState)value).State != GrblStates.Unknown) 
+                result = ((GrblState)value).State.ToString().ToUpper() + (substate == -1 ? "" : (":" + substate.ToString()));
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
 
             return result;
         }
@@ -356,6 +384,7 @@ namespace CNC.Controls
         }
     }
 
+<<<<<<< HEAD
     public class GrblStateToIsJoggingConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
@@ -369,6 +398,8 @@ namespace CNC.Controls
         }
     }
 
+=======
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
     public class LogicalNotConverter : IValueConverter
     {
         public IValueConverter FinalConverter { get; set; }

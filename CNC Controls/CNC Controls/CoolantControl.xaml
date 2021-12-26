@@ -5,11 +5,19 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CNC.Controls"
              mc:Ignorable="d" 
+<<<<<<< HEAD
              d:DesignHeight="80" d:DesignWidth="250">
     <UserControl.Resources>
         <local:BoolToVisibleConverter x:Key="IsVisibleConverter" />
     </UserControl.Resources>
     <GroupBox x:Uid="grp_coolant" x:Name="grpCoolant" Header="Coolant" HorizontalAlignment="Left" VerticalAlignment="Top" Width="250">
+=======
+             d:DesignHeight="80" d:DesignWidth="216">
+    <UserControl.Resources>
+        <local:BoolToVisibleConverter x:Key="IsVisibleConverter" />
+    </UserControl.Resources>
+    <GroupBox x:Uid="grp_coolant" x:Name="grpCoolant" Header="Coolant" HorizontalAlignment="Left" VerticalAlignment="Top" Width="216">
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         <StackPanel HorizontalAlignment="Left" Margin="3,3,0,0" Grid.Row="1" VerticalAlignment="Top" Width="184">
             <CheckBox x:Uid="lbl_flood" x:Name="chkFlood" Tag="Flood" Content="Flood" IsChecked="{Binding Path=Flood, Mode=OneWay}" HorizontalAlignment="Left" Margin="20,3,0,0" VerticalAlignment="Top" Click="chkBox_Click"/>
             <CheckBox x:Uid="lbl_mist" x:Name="chkMist" Tag="Mist" Content="Mist" IsChecked="{Binding Path=Mist, Mode=OneWay}"  HorizontalAlignment="Left" Margin="20,3,0,0" VerticalAlignment="Top" Click="chkBox_Click"/>

@@ -103,6 +103,7 @@ namespace CNC.GCode
     {
         Absolute,
         Incremental
+<<<<<<< HEAD
     }
 
     public enum FeedRateMode
@@ -138,6 +139,8 @@ namespace CNC.GCode
         G87 = 870,
         G88 = 880,
         G89 = 890
+=======
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
     }
 
     public enum IJKMode

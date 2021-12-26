@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+<<<<<<< HEAD
              xmlns:Controls="clr-namespace:CNC.Controls;assembly=CNC.Controls.WPF"
              xmlns:local="clr-namespace:CNC.Controls.Viewer"
              mc:Ignorable="d"
@@ -77,6 +78,14 @@
             <ToggleButton x:Uid="showXYZMarkers" Content="Resources/XYZOn.png" Tag="Resources/XYZOff.png" Style="{StaticResource Flag}" IsChecked="{Binding Path=MachineView.ShowAxes, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" ToolTip="Toggle axes visibility"/>
             <Button x:Uid="saveView" Content="Resources/SaveView.png" Style="{StaticResource BtnImage}" IsEnabled="{Binding Path=IsFileLoaded}" Click="SaveView_Click" ToolTip="Save view"/>
         </StackPanel>
+=======
+             xmlns:local="clr-namespace:CNC.Controls.Viewer"
+             mc:Ignorable="d"
+             d:DesignHeight="335" d:DesignWidth="400"
+             Loaded="control_Loaded">
+    <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <Button x:Uid="resetView" x:Name="button" DockPanel.Dock="Bottom" Content="Reset view" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="75" Click="button_Click"/>
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         <Grid DockPanel.Dock="Top">
         <local:Renderer x:Name="gcodeView"/>
         <local:TextOverlayControl x:Name="textOverlay" HorizontalAlignment="Right" Margin="5,5" VerticalAlignment="Top"/>

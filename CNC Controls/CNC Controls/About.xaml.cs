@@ -1,7 +1,11 @@
 ﻿/*
  * About.xaml.cs - part of CNC Controls library
  *
+<<<<<<< HEAD
  * v0.36 / 2021-11-23 / Io Engineering (Terje Io)
+=======
+ * v0.29 / 2021-01-12 / Io Engineering (Terje Io)
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
  *
  */
 
@@ -44,26 +48,39 @@ namespace CNC.Controls
 {
     public partial class About : Window
     {
+<<<<<<< HEAD
         string version;
+=======
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
 
         public About(string title)
         {
             InitializeComponent();
 
+<<<<<<< HEAD
             Title = version = title;
+=======
+            Title = title;
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         }
 
         private void About_Load(object sender, System.EventArgs e)
         {
+<<<<<<< HEAD
             Title = version;
             if (CNC.Core.Resources.IsLegacyController)
                 Title += " (legacy mode)";
 
+=======
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
             GrblInfo.Get();
             txtGrblVersion.Content = GrblInfo.Version;
             txtGrblOptions.Content = GrblInfo.Options;
             txtGrblNewOpts.Content = GrblInfo.NewOptions;
+<<<<<<< HEAD
             txtGrblConnection.Content = AppConfig.Settings.Base.PortParams;
+=======
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
             grpGrbl.Header = GrblInfo.Firmware;
 
             if (GrblInfo.Identity != "")

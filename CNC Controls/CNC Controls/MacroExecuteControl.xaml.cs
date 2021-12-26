@@ -1,13 +1,21 @@
 /*
  * MacroExecuteControl.xaml.cs - part of CNC Controls library
  *
+<<<<<<< HEAD
  * v0.36 / 2021-11-05 / Io Engineering (Terje Io)
+=======
+ * v0.17 / 2020-04-15 / Io Engineering (Terje Io)
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
  *
  */
 
 /*
 
+<<<<<<< HEAD
 Copyright (c) 2020-2021, Io Engineering (Terje Io)
+=======
+Copyright (c) 2020, Io Engineering (Terje Io)
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -49,7 +57,11 @@ namespace CNC.Controls
     /// <summary>
     /// Interaction logic for MacroExecuteControl.xaml
     /// </summary>
+<<<<<<< HEAD
     public partial class MacroExecuteControl : UserControl, ISidebarControl
+=======
+    public partial class MacroExecuteControl : UserControl
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
     {
 
         public MacroExecuteControl()
@@ -57,7 +69,10 @@ namespace CNC.Controls
             InitializeComponent();
             DataContextChanged += View_DataContextChanged;
         }
+<<<<<<< HEAD
         public string MenuLabel { get { return (string)FindResource("MenuLabel"); } }
+=======
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
 
         private void macroExecuteControl_Loaded(object sender, RoutedEventArgs e)
         {
@@ -114,7 +129,11 @@ namespace CNC.Controls
         private void button_Click(object sender, RoutedEventArgs e)
         {
             CNC.GCode.Macro macro = Macros.FirstOrDefault(o => o.Id == (int)(sender as Button).Tag);
+<<<<<<< HEAD
             (DataContext as GrblViewModel).ExecuteMacro(macro.Code);
+=======
+            (DataContext as GrblViewModel).ExecuteCommand(macro.Code);
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         }
 
         private void btn_Close(object sender, RoutedEventArgs e)

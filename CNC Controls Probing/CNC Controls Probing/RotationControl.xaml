@@ -3,17 +3,23 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+<<<<<<< HEAD
              xmlns:system="clr-namespace:System;assembly=mscorlib"
+=======
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
              xmlns:Controls="clr-namespace:CNC.Controls;assembly=CNC.Controls.WPF"
              xmlns:local="clr-namespace:CNC.Controls.Probing"
              mc:Ignorable="d" Height="370"
              d:DesignHeight="370" d:DesignWidth="500">
     <UserControl.Resources>
+<<<<<<< HEAD
         <system:String x:Uid="str_rotationInstructions" x:Key="Instructions">Click edge in image above to select probing action.\nMove the probe to above the position indicated by green dot before start.</system:String>
         <system:String x:Uid="str_rotationType" x:Key="SelectType">Select edge to probe by clicking on the relevant part of the image above.</system:String>
         <system:String x:Uid="str_rotationInitFailed" x:Key="ProbedAngle">Angle: {0} deg</system:String>
         <system:String x:Uid="str_rotationFailed" x:Key="ProbingFailed">Probing failed</system:String>
         <system:String x:Uid="str_rotationCompleted" x:Key="ProbingCompleted">Probing completed.</system:String>
+=======
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         <Controls:LogicalNotConverter x:Key="IsNotRunningConverter" />
         <Controls:EnumValueToBooleanConverter x:Key="EnumToEdgeConverter" />
         <Controls:BoolToVisibleConverter x:Key="ToVisibleConverter" />

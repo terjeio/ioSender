@@ -1,7 +1,11 @@
 ﻿/*
  * GCodeRotate.cs - part of CNC Controls library for Grbl
  *
+<<<<<<< HEAD
  * v0.36 / 2021-11-01 / Io Engineering (Terje Io)
+=======
+ * v0.33 / 2021-05-17 / Io Engineering (Terje Io)
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
  *
  */
 
@@ -122,10 +126,17 @@ namespace CNC.Controls
                     case Commands.G3:
                         {
                             if (plane.Plane != Plane.XY)
+<<<<<<< HEAD
                                 throw new Exception(LibStrings.FindResource("HasG17G18Arcs"));
 
                             if ((token as GCArc).IsRadiusMode) // for now...
                                 throw new Exception(LibStrings.FindResource("HasRadiusArcs"));
+=======
+                                throw new Exception("GCode contains arcs in XZ or YZ plane (G18/19), can't apply transform. Use 'Arcs to Lines' if you really need this.");
+
+                            if ((token as GCArc).IsRadiusMode) // for now...
+                                throw new Exception("GCode contains radius mode arcs, can't apply transform. Use 'Arcs to Lines' if you really need this.");
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
 
                             var arc = token as GCArc;
 

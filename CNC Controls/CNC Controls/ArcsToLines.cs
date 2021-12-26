@@ -1,7 +1,11 @@
 ﻿/*
  * ArcsToLines.cs - part of CNC Controls library for Grbl
  *
+<<<<<<< HEAD
  * v0.36 / 2021-11-01 / Io Engineering (Terje Io)
+=======
+ * v0.33 / 2021-05-14 / Io Engineering (Terje Io)
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
  *
  */
 
@@ -42,7 +46,10 @@ using System.Collections.Generic;
 using System.Windows.Media.Media3D;
 using CNC.Core;
 using CNC.GCode;
+<<<<<<< HEAD
 using System.Windows;
+=======
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
 
 namespace CNC.Controls
 {
@@ -50,7 +57,11 @@ namespace CNC.Controls
     {
         public void Apply()
         {
+<<<<<<< HEAD
             double arcTolerance = GrblSettings.GetDouble(GrblSetting.ArcTolerance);
+=======
+            double arcTolerance = GrblSettings.GetDouble(GrblSetting.ArcTolerance); 
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
             GCodeEmulator emu = new GCodeEmulator();
             List<GCodeToken> toolPath = new List<GCodeToken>();
 

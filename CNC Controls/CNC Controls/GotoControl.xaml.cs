@@ -1,13 +1,21 @@
 ﻿/*
  * GotoControl.xaml.cs - part of CNC Controls library
  *
+<<<<<<< HEAD
  * v0.36 / 2021-12-01 / Io Engineering (Terje Io)
+=======
+ * v0.10 / 2020-03-09 / Io Engineering (Terje Io)
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
  *
  */
 
 /*
 
+<<<<<<< HEAD
 Copyright (c) 2021, Io Engineering (Terje Io)
+=======
+Copyright (c) 2020, Io Engineering (Terje Io)
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -37,16 +45,41 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+<<<<<<< HEAD
 using System.Windows.Controls;
 
 namespace CNC.Controls
 {
 
+=======
+using System.Windows;
+using System.Windows.Controls;
+using CNC.Core;
+
+namespace CNC.Controls
+{
+    /// <summary>
+    /// Interaction logic for GotoControl.xaml
+    /// </summary>
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
     public partial class GotoControl : UserControl
     {
         public GotoControl()
         {
             InitializeComponent();
         }
+<<<<<<< HEAD
+=======
+
+        private void button_Click(object sender, RoutedEventArgs e)
+        {
+            (DataContext as GrblViewModel).ExecuteCommand((string)(sender as Button).Tag);
+        }
+
+        private void btn_Close(object sender, RoutedEventArgs e)
+        {
+            Visibility = Visibility.Hidden;
+        }
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
     }
 }

@@ -1,7 +1,11 @@
 ﻿/*
  * ProbingViewModel.cs - part of CNC Probing library
  *
+<<<<<<< HEAD
  * v0.36 / 2021-11-29 / Io Engineering (Terje Io)
+=======
+ * v0.35 / 2021-10-19 / Io Engineering (Terje Io)
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
  *
  */
 
@@ -49,7 +53,11 @@ namespace CNC.Controls.Probing
 
     class Probing
     {
+<<<<<<< HEAD
         public static string Command = "G38.3";
+=======
+        public const string Command = "G38.3";
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
     }
 
     public class ProbingViewModel : ViewModelBase
@@ -297,14 +305,24 @@ namespace CNC.Controls.Probing
 
             if(!z_only && XYClearance + ProbeDiameter / 2d > ProbeDistance)
             {
+<<<<<<< HEAD
                 SetError(nameof(XYClearance), LibStrings.FindResource("ErrorProbingDistance"));
                 SetError(nameof(ProbeDistance), LibStrings.FindResource("ErrorProbingDistance"));
+=======
+                SetError(nameof(XYClearance), "Probing distance must be larger than XY Clearance + ½ Probe/tool diameter.");
+                SetError(nameof(ProbeDistance), "Probing distance must be larger than XY Clearance + ½ Probe/tool diameter.");
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
             }
 
             if (LatchDistance >= ProbeDistance)
             {
+<<<<<<< HEAD
                 SetError(nameof(LatchDistance), LibStrings.FindResource("ErrorLatchDistance"));
                 SetError(nameof(ProbeDistance), LibStrings.FindResource("ErrorLatchDistance"));
+=======
+                SetError(nameof(LatchDistance), "Latch distance must be less than Probing distance.");
+                SetError(nameof(ProbeDistance), "Latch distance must be less than Probing distance.");
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
             }
 
             return !HasErrors;

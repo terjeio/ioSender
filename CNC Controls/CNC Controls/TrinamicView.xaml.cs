@@ -1,7 +1,11 @@
 /*
  * TrinamicView.xaml.cs - part of CNC Controls library
  *
+<<<<<<< HEAD
  * v0.36 / 2021-12-19 / Io Engineering (Terje Io)
+=======
+ * v0.34 / 2021-08-05 / Io Engineering (Terje Io)
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
  *
  */
 
@@ -57,7 +61,11 @@ namespace CNC.Controls
     public partial class TrinamicView : UserControl, ICNCView
     {
         private int sg_index = 0;
+<<<<<<< HEAD
         private bool plot = false, read_status = false, grbl_reset = false, driver_reset = false;
+=======
+        private bool plot = false, read_status = false;
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         private GrblViewModel model = null;
 
         private List<Line> lines;
@@ -105,11 +113,18 @@ namespace CNC.Controls
                 DataContext = model;
                 model.OnResponseReceived += ProcessSGValue;
                 model.PropertyChanged += OnDataContextPropertyChanged;
+<<<<<<< HEAD
                 var sgdetails = GrblSettings.Get(grblHALSetting.StallGuardBase + GrblInfo.AxisLetterToIndex(AxisEnabled.Value.ToString()));
                 SGValue = int.Parse(sgdetails.Value);
                 SGValueMin = (int)sgdetails.Min;
                 SGValueMax = (int)sgdetails.Max;
                 grbl_reset = false;
+=======
+                var sgdetails = GrblSettings.Get(GrblSetting.StallGuardBase + GrblInfo.AxisLetterToIndex(AxisEnabled.Value.ToString()));
+                SGValue = int.Parse(sgdetails.Value);
+                SGValueMin = (int)sgdetails.Min;
+                SGValueMax = (int)sgdetails.Max;
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
             }
             else
             {
@@ -137,7 +152,11 @@ namespace CNC.Controls
             if (AxisEnabled.Value.ToString().Length == 1)
             {
                 Comms.com.WriteString(string.Format("M122{0}S1\r", AxisEnabled.Value.ToString()));
+<<<<<<< HEAD
                 SGValue = GrblSettings.GetInteger(grblHALSetting.StallGuardBase + GrblInfo.AxisLetterToIndex(AxisEnabled.Value.ToString()));
+=======
+                SGValue = GrblSettings.GetInteger(GrblSetting.StallGuardBase + GrblInfo.AxisLetterToIndex(AxisEnabled.Value.ToString()));
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
             }
         }
 
@@ -216,7 +235,11 @@ namespace CNC.Controls
 
         void btnConfigureSGVal_Click(object sender, EventArgs e)
         {
+<<<<<<< HEAD
             Comms.com.WriteString(string.Format("${0}={1}\r", (int)(grblHALSetting.StallGuardBase + GrblInfo.AxisLetterToIndex(AxisEnabled.Value.ToString())), SGValue));
+=======
+            Comms.com.WriteString(string.Format("${0}={1}\r", (int)(GrblSetting.StallGuardBase + GrblInfo.AxisLetterToIndex(AxisEnabled.Value.ToString())), SGValue));
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         }
 
         #endregion
@@ -231,7 +254,10 @@ namespace CNC.Controls
 
             Comms.com.PurgeQueue();
 
+<<<<<<< HEAD
             model.Poller.SetState(0);
+=======
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
             model.SuspendProcessing = true;
 
             new Thread(() =>
@@ -241,14 +267,21 @@ namespace CNC.Controls
                     response => ProcessStatus(response),
                     a => model.OnResponseReceived += a,
                     a => model.OnResponseReceived -= a,
+<<<<<<< HEAD
                     800, () => Comms.com.WriteCommand("M122" + axis));
+=======
+                    400, () => Comms.com.WriteCommand("M122" + axis));
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
             }).Start();
 
             while (res == null)
                 EventUtils.DoEvents();
 
             model.SuspendProcessing = false;
+<<<<<<< HEAD
             model.Poller.SetState(AppConfig.Settings.Base.PollInterval);
+=======
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         }
 
         private void OnDataContextPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -256,12 +289,17 @@ namespace CNC.Controls
             if (sender is GrblViewModel) switch (e.PropertyName)
             {
                 case nameof(GrblViewModel.MDI):
+<<<<<<< HEAD
                     if (!(sender as GrblViewModel).MDI.ToUpper().StartsWith("M"))
+=======
+                    if (!(sender as GrblViewModel).MDI.StartsWith("M"))
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                     {
                         PlotGrid();
                         sg_index = 0;
                         lines.Clear();
                     }
+<<<<<<< HEAD
                     //else if ((sender as GrblViewModel).MDI.ToUpper().Replace(" ", "") == "M122I")
                     //     driver_reset = true;
                     break;
@@ -276,6 +314,8 @@ namespace CNC.Controls
                         Comms.com.WriteString(string.Format("M122S1H{0}\r", SFiltEnabled == true ? 1 : 0));
                             grbl_reset = false;
                     }
+=======
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                     break;
             }
         }
@@ -328,7 +368,11 @@ namespace CNC.Controls
             else if (data == "ok")
                 read_status = false;
             else if (read_status)
+<<<<<<< HEAD
                 Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.ContextIdle, addData, data);
+=======
+                Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.ContextIdle, new System.Action(() => AddStatusData(data)));
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         }
 
         private void PlotSGValue(int value)

@@ -1,13 +1,21 @@
 ﻿/*
  * THCMonitorControl.xaml.cs - part of CNC Controls library
  *
+<<<<<<< HEAD
  * v0.36 / 2021-11-01 / Io Engineering (Terje Io)
+=======
+ * v0.27 / 2020-09-11 / Io Engineering (Terje Io)
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
  *
  */
 
 /*
 
+<<<<<<< HEAD
 Copyright (c) 2020-2021, Io Engineering (Terje Io)
+=======
+Copyright (c) 2020, Io Engineering (Terje Io)
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -45,13 +53,20 @@ namespace CNC.Controls
     /// <summary>
     /// Interaction logic for THCMonitorControl.xaml
     /// </summary>
+<<<<<<< HEAD
     public partial class THCMonitorControl : UserControl, ISidebarControl
+=======
+    public partial class THCMonitorControl : UserControl
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
     {
         public THCMonitorControl()
         {
             InitializeComponent();
         }
+<<<<<<< HEAD
         public string MenuLabel { get { return (string)FindResource("MenuLabel"); } }
+=======
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
 
         private void btn_Close(object sender, RoutedEventArgs e)
         {

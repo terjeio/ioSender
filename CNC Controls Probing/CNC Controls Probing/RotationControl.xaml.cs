@@ -1,7 +1,11 @@
 ﻿/*
  * RotationControl.xaml.cs - part of CNC Probing library
  *
+<<<<<<< HEAD
  * v0.36 / 2021-11-01 / Io Engineering (Terje Io)
+=======
+ * v0.33 / 2021-05-14 / Io Engineering (Terje Io)
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
  *
  */
 
@@ -50,6 +54,10 @@ namespace CNC.Controls.Probing
     /// </summary>
     public partial class RotationControl : UserControl, IProbeTab
     {
+<<<<<<< HEAD
+=======
+        private volatile bool isCancelled = false;
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         private double[] af = new double[3];
 
         public RotationControl()
@@ -66,7 +74,11 @@ namespace CNC.Controls.Probing
             if(probing.ProbeEdge == Edge.A || probing.ProbeEdge == Edge.B || probing.ProbeEdge == Edge.C || probing.ProbeEdge == Edge.D)
                 probing.ProbeEdge = Edge.None;
 
+<<<<<<< HEAD
             probing.Instructions = ((string)FindResource("Instructions")).Replace("\\n", "\n");
+=======
+            probing.Instructions = "Click edge in image above to select probing action.\nMove the probe to above the position indicated by green dot before start.";
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         }
 
         public void Start(bool preview = false)
@@ -78,13 +90,22 @@ namespace CNC.Controls.Probing
 
             if (probing.ProbeEdge == Edge.None)
             {
+<<<<<<< HEAD
                 MessageBox.Show((string)FindResource("SelectType"), "Rotation", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+=======
+                MessageBox.Show("Select edge to probe by clicking on the relevant part of the image above.", "Rotation", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                 return;
             }
 
             if (!probing.Program.Init())
                 return;
 
+<<<<<<< HEAD
+=======
+            isCancelled = false;
+
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
             if (preview)
                 probing.StartPosition.Zero();
 
@@ -157,6 +178,10 @@ namespace CNC.Controls.Probing
 
         public void Stop()
         {
+<<<<<<< HEAD
+=======
+            isCancelled = true;
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
             (DataContext as ProbingViewModel).Program.Cancel();
         }
 
@@ -179,7 +204,11 @@ namespace CNC.Controls.Probing
                 getAngle();
             }
 
+<<<<<<< HEAD
             probing.Program.End((string)FindResource(probing.CanApplyTransform ? "ProbingCompleted" : "ProbingFailed"));
+=======
+            probing.Program.End(probing.CanApplyTransform ? "Probing completed" : "Probing failed");
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
 
             if (!probing.Grbl.IsParserStateLive && probing.CoordinateMode == ProbingViewModel.CoordMode.G92)
                 probing.Grbl.ExecuteCommand(GrblConstants.CMD_GETPARSERSTATE);
@@ -204,7 +233,11 @@ namespace CNC.Controls.Probing
             if (probing.ProbeEdge == Edge.CB || probing.ProbeEdge == Edge.AD)
                 angle = -1.0d / angle;
 
+<<<<<<< HEAD
             probing.Grbl.Message = string.Format((string)FindResource("ProbedAngle"), Math.Round(Math.Atan(angle) * 180d / Math.PI, 1).ToString());
+=======
+            probing.Grbl.Message = string.Format("Angle: {0} deg", Math.Round(Math.Atan(angle) * 180d / Math.PI, 1).ToString());
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
 
             return angle;
         }

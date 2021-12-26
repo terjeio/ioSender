@@ -12,6 +12,7 @@ ioSender.g.en-US.resources:mainwindow.baml,mnu_save:System.Windows.Controls.Head
 ioSender.g.en-US.resources:mainwindow.baml,mnu_transform:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Transform
 ioSender.g.en-US.resources:mainwindow.baml,mnu_usageTips:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Usage _tips
 ioSender.g.en-US.resources:mainwindow.baml,mnu_wiki:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Wiki
+<<<<<<< HEAD
 ioSender.g.en-US.resources:mainwindow.baml,str_jogStep:System.String.$Content,None,True,True,,Jog step: {0}
 ioSender.g.en-US.resources:mainwindow.baml,str_mnuArcsToLines:System.String.$Content,None,True,True,,Arcs to lines
 ioSender.g.en-US.resources:mainwindow.baml,str_mnuCompress:System.String.$Content,None,True,True,,Compress (experimental)
@@ -37,11 +38,20 @@ ioSender.g.en-US.resources:jobview.baml,tab_console:System.Windows.Controls.Head
 ioSender.g.en-US.resources:mainwindow.baml,tab_grbl:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Grbl
 ioSender.g.en-US.resources:mainwindow.baml,tab_grblConfig:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Settings: Grbl
 ioSender.g.en-US.resources:mainwindow.baml,tab_jogSidebar:System.Windows.Controls.ContentControl.Content,None,True,True,,_Jog
+=======
+ioSender.g.en-US.resources:mainwindow.baml,tab_3DView:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,3D View
+ioSender.g.en-US.resources:mainwindow.baml,tab_appConfig:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Settings: App
+ioSender.g.en-US.resources:mainwindow.baml,tab_grbl:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Grbl
+ioSender.g.en-US.resources:mainwindow.baml,tab_grblConfig:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Settings: Grbl
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
 ioSender.g.en-US.resources:mainwindow.baml,tab_offsets:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Offsets
 ioSender.g.en-US.resources:mainwindow.baml,tab_parting:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Parting
 ioSender.g.en-US.resources:mainwindow.baml,tab_pidTuner:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,PID Tuner
 ioSender.g.en-US.resources:mainwindow.baml,tab_probing:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Probing
+<<<<<<< HEAD
 ioSender.g.en-US.resources:jobview.baml,tab_program:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Program
+=======
+>>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
 ioSender.g.en-US.resources:mainwindow.baml,tab_sdCard:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,SD Card
 ioSender.g.en-US.resources:mainwindow.baml,tab_threading:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Threading
 ioSender.g.en-US.resources:mainwindow.baml,tab_tools:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,工具
