@@ -1,0 +1,68 @@
+﻿<UserControl x:Class="GCode_Sender.JobView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
+             xmlns:local="clr-namespace:GCode_Sender"
+             xmlns:cnccontrols="clr-namespace:CNC.Controls;assembly=CNC.Controls.WPF"
+             xmlns:cncviewer="clr-namespace:CNC.Controls.Viewer;assembly=CNC.Controls.Viewer"
+             mc:Ignorable="d" 
+             d:DesignHeight="500" d:DesignWidth="875"
+             Focusable="True"
+             Loaded="JobView_Load"
+             IsVisibleChanged="JobView_IsVisibleChanged"
+             FocusVisualStyle="{x:Null}"
+             SizeChanged="JobView_SizeChanged">
+    <UserControl.Resources>
+        <system:String x:Uid="str_msgWait" x:Key="MsgWaiting">Waiting for controller ({0})...</system:String>
+        <system:String x:Uid="str_msgNoCommAlarm" x:Key="MsgNoCommAlarm">Controller is not able to communicate due to alarm {0}, attempting a soft reset.</system:String>
+        <system:String x:Uid="str_msgResetFailed" x:Key="MsgResetFailed">Controller soft reset failed, exiting.</system:String>
+        <system:String x:Uid="str_msgEStop" x:Key="MsgEStop">E-Stop active! - clear before continuing...</system:String>
+        <system:String x:Uid="str_msgEStopExit" x:Key="MsgEStopExit">E-Stop still active, exit?</system:String>
+        <system:String x:Uid="str_msgHome" x:Key="MsgHome">Homing cycle required, &lt;Home&gt; to continue</system:String>
+        <system:String x:Uid="str_msgDoorOpen" x:Key="MsgDoorOpen">Door is open, close door and continue?</system:String>
+        <system:String x:Uid="str_msgDoorExit" x:Key="MsgDoorExit">Door is still open, exit?</system:String>
+        <system:String x:Uid="str_msgDoorPersist" x:Key="MsgDoorPersist">Door state cannot be cleared with &lt;Reset&gt;</system:String>
+        <system:String x:Uid="str_msgNoComm" x:Key="MsgNoComm">Controller is in {0} state and cannot respond, try a soft reset?</system:String>
+        <system:String x:Uid="str_msgResetExit" x:Key="MsgResetExit">Controller soft reset failed, exiting.</system:String>
+        <system:String x:Uid="str_msgNoResponse" x:Key="MsgNoResponse">Controller is not responding!</system:String>
+        <cnccontrols:BoolToVisibleConverter x:Key="IsVisibleConverter" />
+    </UserControl.Resources>
+    <DockPanel Background="Transparent" MouseDown="outside_MouseDown" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal">
+            <cnccontrols:MDIControl x:Name="mdiControl" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            <TextBlock Text="{Binding Path=ParserState}" Visibility="{Binding Path=IsParserStateLive, Converter={StaticResource IsVisibleConverter}}" TextWrapping="NoWrap" Margin="5,0,0,2" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="23"/>
+        </StackPanel>
+        <DockPanel x:Name="dp" DockPanel.Dock="Left" Margin="5,5,5,0" Width="220" HorizontalAlignment="Left" VerticalAlignment="Stretch">
+            <StackPanel x:Name="t1" Height="Auto" HorizontalAlignment="Left" VerticalAlignment="Top" DockPanel.Dock="Top">
+                <cnccontrols:DROControl x:Name="DRO" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <cnccontrols:LimitsControl x:Name="limitsControl" HorizontalAlignment="Left" VerticalAlignment="Top" Visibility="Collapsed"/>
+            </StackPanel>
+            <StackPanel x:Name="t2" Height="Auto" HorizontalAlignment="Left" VerticalAlignment="Bottom" DockPanel.Dock="Bottom">
+                <cnccontrols:SignalsControl x:Name="signalsControl" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <cnccontrols:StatusControl x:Name="statusControl" Margin="0,5,0,0" VerticalAlignment="Bottom"/>
+            </StackPanel>
+        </DockPanel>
+        <StackPanel DockPanel.Dock="Right" Margin="5,5,5,0" Width="250" VerticalAlignment="Stretch">
+            <cnccontrols:WorkParametersControl x:Name="workParametersControl" HorizontalAlignment="Left" VerticalAlignment="Top" IsToolChanging="{Binding IsToolChanging}"/>
+            <cnccontrols:CoolantControl HorizontalAlignment="Left" VerticalAlignment="Top" x:Name="coolantControl"/>
+            <cnccontrols:SpindleControl x:Name="spindleControl" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            <cnccontrols:FeedControl x:Name="feedControl" HorizontalAlignment="Left" VerticalAlignment="Top" />
+        </StackPanel>
+        <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,5,0,0">
+            <cnccontrols:JobControl x:Name="GCodeSender" Margin="0,5,0,0" DockPanel.Dock="Bottom"/>
+            <TabControl x:Name="tabGCode" TabStripPlacement="Bottom" DockPanel.Dock="Top" >
+                <TabItem x:Uid="tab_program" Header="Program">
+                    <cnccontrols:GCodeListControl/>
+                </TabItem>
+                <TabItem x:Uid="tab_3DView" x:Name="tab3D" Header="3D View">
+                    <cncviewer:RenderControl x:Name="gcodeRenderer"/>
+                </TabItem>
+                <TabItem x:Uid="tab_console" x:Name="tabConsole" Header="Console">
+                    <cnccontrols:ConsoleControl/>
+                </TabItem>
+            </TabControl>
+        </DockPanel>
+    </DockPanel>
+</UserControl>

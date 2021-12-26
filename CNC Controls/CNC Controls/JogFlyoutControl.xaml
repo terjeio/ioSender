@@ -1,0 +1,25 @@
+﻿<UserControl x:Class="CNC.Controls.JogFlyoutControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
+             xmlns:local="clr-namespace:CNC.Controls"
+             mc:Ignorable="d"
+             Loaded="JogControl_Loaded" 
+             d:DesignHeight="238" Width="Auto">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <system:String x:Uid="str_jogFlyout" x:Key="MenuLabel">_Jog</system:String>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="SharedStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Border BorderBrush="DarkGray" BorderThickness="1" CornerRadius="3" Background="#FFE5E5EA">
+        <Grid>
+            <local:JogBaseControl x:Name="jogBase"/>
+            <Button Content="×" Focusable="False" Style="{StaticResource SmallXButtonStyle}" VerticalContentAlignment="Top" HorizontalAlignment="Right" Margin="0,0,5,0" VerticalAlignment="Top" Width="14" Height="18" Click="btn_Close"/>
+        </Grid>
+    </Border>
+</UserControl>

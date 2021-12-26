@@ -3,10 +3,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:local="clr-namespace:CNC.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="66" d:DesignWidth="216">
     <UserControl.Resources>
+        <system:String x:Uid="str_clearEStop" x:Key="ClearEStop">Clear E-Stop before &lt;Reset&gt;></system:String>
         <local:GrblStateToColorConverter x:Key="ToColorConverter" />
         <local:GrblStateToStringConverter x:Key="ToStringConverter" />
         <local:HomedStateToColorConverter x:Key="HomedStateConverter" />
@@ -22,10 +24,31 @@
             <Setter Property="Height" Value="36" />
             <Setter Property="Focusable" Value="False" />
         </Style>
+        <Style x:Key="ResetButtonStyle" TargetType="{x:Type Button}">
+            <Setter Property="Background" Value="LightBlue" />
+            <Setter Property="Width" Value="66" />
+            <Setter Property="Height" Value="36" />
+            <Setter Property="Focusable" Value="False" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="Border" Background="{TemplateBinding Background}" BorderThickness="1" BorderBrush="#FF707070" >
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="BorderBrush" Value="Red" TargetName="Border" />
+                                <Setter Property="Background" Value="#FFFF5050" TargetName="Border" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </UserControl.Resources>
     <StackPanel Orientation="Vertical">
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
-            <Label x:Uid="lbl_state" x:Name="lblState" Content="State:" HorizontalContentAlignment="Right" HorizontalAlignment="Left" VerticalAlignment="Center" Height="26" Width="40"/>
+            <Label x:Uid="lbl_state" x:Name="lblState" Content="State:" HorizontalContentAlignment="Right" HorizontalAlignment="Left" VerticalAlignment="Center" Height="26" Width="50"/>
             <TextBox x:Name="txtState" HorizontalAlignment="Left" Height="24" Margin="2,0" TextWrapping="NoWrap" IsReadOnly="True" TextAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center" Width="74"
                      Text="{Binding Path=GrblState, Converter={StaticResource ToStringConverter}}"
                      Background="{Binding Path=GrblState, Converter={StaticResource ToColorConverter}}"
@@ -54,7 +77,7 @@
             <Button x:Uid="btn_unlock" x:Name="btnUnlock" Content="Unlock" ToolTip="Ctrl+U" Style="{StaticResource StatusButtonStyle}" Margin="5,0,0,0" Click="btn_Click"
                 IsEnabled="{Binding Path=IsSleepMode, Converter={StaticResource SleepEnabledConverter}, Mode=OneWay}"
             />
-            <Button x:Uid="btn_reset" x:Name="btnReset" Content="Reset" ToolTip="Ctrl+Shift+R" Style="{StaticResource StatusButtonStyle}" Margin="5,0,0,0" Background="Red" Foreground="White" Click="btn_Click" FontFamily="Segoe UI Semibold" FontSize="14"/>
+            <Button x:Uid="btn_reset" x:Name="btnReset" Content="Reset" ToolTip="Ctrl+Shift+R" Style="{StaticResource ResetButtonStyle}" Margin="5,0,0,0" Background="Red" Foreground="White" Click="btn_Click" FontFamily="Segoe UI Semibold" FontSize="14"/>
         </StackPanel>
     </StackPanel>
 </UserControl>

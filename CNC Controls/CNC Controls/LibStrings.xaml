@@ -1,0 +1,27 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib"
+                    xmlns:local="clr-namespace:CNC.Controls">
+    <system:String x:Uid="str_appconfCreate" x:Key="CreateConfig">Config file not found or invalid, create new?</system:String>
+    <system:String x:Uid="str_appconfCreateFail" x:Key="CreateConfigFail">Could not save config file.</system:String>
+    <system:String x:Uid="str_appconfNoConnect" x:Key="ConnectFailed">Unable to open connection ({0})</system:String>
+    <system:String x:Uid="str_convNumBlocks" x:Key="NumBlocks">Blocks: {1}</system:String>
+    <system:String x:Uid="str_convBlockOfBlocks" x:Key="BlockOfBlocks">Block: {0}/{1}</system:String>
+    <system:String x:Uid="str_rotateG17G18Arcs" x:Key="HasG17G18Arcs">GCode contains arcs in XZ or YZ plane (G18/19), can't apply transform. Use 'Arcs to Lines' if you really need this.</system:String>
+    <system:String x:Uid="str_rotateRadiusArcs" x:Key="HasRadiusArcs">GCode contains radius mode arcs, can't apply transform. Use 'Arcs to Lines' if you really need this.</system:String>
+    <system:String x:Uid="str_validateRange" x:Key="ValAllowedRange">Invalid input: allowed range is {0} - {1}.</system:String>
+    <system:String x:Uid="str_validateMin" x:Key="ValAllowedMin">Invalid input: minimum allowed value is {0}.</system:String>
+    <system:String x:Uid="str_validateMax" x:Key="ValAllowedMax">Invalid input: maximum allowed value is {0}.</system:String>
+    <system:String x:Uid="str_validateNotIP4" x:Key="ValNotIPV4">Invalid input: not an IP4 address..</system:String>
+    <system:String x:Uid="str_grblStateUnknown" x:Key="StateUnknown">UNKNOWN</system:String>
+    <system:String x:Uid="str_grblStateIdle" x:Key="StateIdle">IDLE</system:String>
+    <system:String x:Uid="str_grblStateRun" x:Key="StateRun">RUN</system:String>
+    <system:String x:Uid="str_grblStateTool" x:Key="StateTool">TOOL</system:String>
+    <system:String x:Uid="str_grblStateHold" x:Key="StateHold">HOLD</system:String>
+    <system:String x:Uid="str_grblStateHome" x:Key="StateHome">HOME</system:String>
+    <system:String x:Uid="str_grblStateCheck" x:Key="StateCheck">CHECK</system:String>
+    <system:String x:Uid="str_grblStateJog" x:Key="StateJog">JOG</system:String>
+    <system:String x:Uid="str_grblStateAlarm" x:Key="StateAlarm">ALARM</system:String>
+    <system:String x:Uid="str_grblStateDoor" x:Key="StateDoor">DOOR</system:String>
+    <system:String x:Uid="str_grblStateSleep" x:Key="StateSleep">SLEEP</system:String>
+</ResourceDictionary>

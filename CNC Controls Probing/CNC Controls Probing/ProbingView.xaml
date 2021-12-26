@@ -1,0 +1,128 @@
+﻿<UserControl x:Class="CNC.Controls.Probing.ProbingView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
+             xmlns:Controls="clr-namespace:CNC.Controls;assembly=CNC.Controls.WPF"
+             xmlns:local="clr-namespace:CNC.Controls.Probing"
+             mc:Ignorable="d" 
+             d:DesignHeight="515" d:DesignWidth="900"
+             Loaded="UserControl_Loaded"
+             SizeChanged="ProbingView_SizeChanged">
+    <UserControl.Resources>
+        <system:String x:Uid="str_runMacro" x:Key="RunMacro">Run {0} macro?</system:String>
+        <system:String x:Uid="str_jogActive" x:Key="JogActive">Keyboard jogging active</system:String>
+        <system:String x:Uid="str_jogDisabled" x:Key="JogDisabled">Keyboard jogging disabled</system:String>
+        <Controls:EnumValueToBooleanConverter x:Key="EnumToEnabledConverter" />
+        <Controls:LogicalNotConverter x:Key="IsNotRunningConverter" />
+        <Controls:MultiLineConverter x:Key="ErrorMessageConverter" />
+        <Controls:BoolToVisibleConverter x:Key="IsVisibleConverter" />
+        <Controls:LogicalNotConverter x:Key="IsNotVisibleConverter">
+            <Controls:LogicalNotConverter.FinalConverter>
+                <Controls:BoolToVisibleConverter />
+            </Controls:LogicalNotConverter.FinalConverter>
+        </Controls:LogicalNotConverter>
+        <Style x:Key="ErrorStyle" TargetType="Controls:NumericField">
+            <Style.Triggers>
+                <Trigger Property="Validation.HasError" Value="true">
+                    <Setter Property="Controls:NumericField.ToolTip">
+                        <Setter.Value>
+                            <MultiBinding Converter="{StaticResource ErrorMessageConverter}">
+                                <Binding RelativeSource="{RelativeSource Self}" Path="(Validation.Errors)" />
+                                <Binding RelativeSource="{RelativeSource Self}" Path="(Validation.Errors).Count" />
+                            </MultiBinding>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+                <Trigger Property="Validation.HasError" Value="false">
+                    <Setter Property="ToolTip" Value="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Tooltip2}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+    <DockPanel Background="Transparent" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+        <DockPanel x:Name="dp" DockPanel.Dock="Left" Margin="5,10,5,0" Width="240" HorizontalAlignment="Left" VerticalAlignment="Stretch">
+            <StackPanel x:Name="t1" Height="Auto" HorizontalAlignment="Left" VerticalAlignment="Top" DockPanel.Dock="Top" IsEnabled="{Binding Path=Grbl.IsJobRunning, Converter={StaticResource IsVisibleConverter}}">
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,5" HorizontalAlignment="Stretch">
+                    <Label x:Uid="lbl_profile" x:Name="lblProfile" Content="Profile:" HorizontalContentAlignment="Right" HorizontalAlignment="Right" VerticalAlignment="Center" Height="25" Width="48"/>
+                    <ComboBox x:Name="cbxProfile" IsEditable="True"  HorizontalAlignment="Left" VerticalAlignment="Center" Width="155" Height="22"
+                        ItemsSource="{Binding Path=Profiles}"
+                        SelectedItem="{Binding Path=Profile, Mode=TwoWay}"
+                        DisplayMemberPath="Name"
+                        SelectedValuePath="Id" 
+                    />
+                    <Button x:Uid="btn_addProfile" x:Name="btnAddProfile" Content="..." HorizontalAlignment="Right" VerticalAlignment="Center" Width="22" Height="22" Focusable="False" Click="btnAddProfile_Click" Margin="4,0,0,0">
+                        <Button.ContextMenu>
+                            <ContextMenu x:Name="cm">
+                                <MenuItem x:Uid="mnu_add" x:Name="mnuAdd" Header="Add" Click="mnu_Click"/>
+                                <MenuItem x:Uid="mnu_update" x:Name="mnuUpdate" Header="Update" Click="mnu_Click"/>
+                                <MenuItem x:Uid="mnu_delete" x:Name="mnuDelete" Header="Delete" Click="mnu_Click"/>
+                            </ContextMenu>
+                        </Button.ContextMenu>
+                    </Button>
+                </StackPanel>
+                <GroupBox x:Uid="grp_probeTipOrTool" Header="Probe tip/tool">
+                    <Controls:NumericField x:Uid="fld_diameter" Label="Diameter:" Value="{Binding Path=ProbeDiameter, Mode=TwoWay}" IsEnabled="{Binding Path=ProbeDiameterEnable}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
+                </GroupBox>
+                <GroupBox x:Uid="grp_touchOrFixture" Header="Touch plate/fixture height">
+                    <StackPanel Orientation="Vertical">
+                        <Controls:NumericField x:Uid="fld_touchPlate" Visibility="{Binding Path=ProbeFixture, Converter={StaticResource IsNotVisibleConverter}}"  Label="Touch plate:" Value="{Binding Path=TouchPlateHeight, Mode=TwoWay}" IsEnabled="{Binding Path=TouchPlateHeightEnable}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
+                        <Controls:NumericField x:Uid="fld_fixture" Visibility="{Binding Path=ProbeFixture, Converter={StaticResource IsVisibleConverter}}" Label="Fixture:" Value="{Binding Path=FixtureHeight, Mode=TwoWay}" IsEnabled="{Binding Path=FixtureHeightEnable}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
+                    </StackPanel>
+                </GroupBox>
+                <GroupBox x:Uid="grp_distanceAndSpeed" Header="Probing distances and speed">
+                    <StackPanel Orientation="Vertical">
+                        <Controls:NumericField x:Uid="lbl_rapidsFeed" Label="Rapids feed rate:" ToolTip="Feed rate for rapid moves, set to 0 to use controller setting" Format="###0" Unit="mm/min" Value="{Binding Path=RapidsFeedRate, Mode=TwoWay}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
+                        <Controls:NumericField x:Uid="lbl_searchFeed" Label="Search feed rate:" ToolTip="Feed rate for initial probing move" Unit="mm/min" Format="###0" Value="{Binding Path=ProbeFeedRate, Mode=TwoWay}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
+                        <Controls:NumericField x:Uid="lbl_latchFeed" Label="Latch feed rate:" ToolTip="Feed rate for second slow probing move" Unit="mm/min" Format="###0" Value="{Binding Path=LatchFeedRate, Mode=TwoWay}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
+                        <Controls:NumericField x:Uid="lbl_probingDistance" Label="Probing distance:" Tooltip2="Max. distance for probing moves" Value="{Binding Path=ProbeDistance, Mode=TwoWay}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top" Style="{StaticResource ErrorStyle}"/>
+                        <Controls:NumericField x:Uid="lbl_latchDistance" Label="Latch distance:" Tooltip2="Distance to retract for second slow probing move, set to 0 to skip" Value="{Binding Path=LatchDistance, Mode=TwoWay}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top" Style="{StaticResource ErrorStyle}"/>
+                    </StackPanel>
+                </GroupBox>
+                <GroupBox x:Uid="grp_clearances" Header="Probing clearances">
+                    <StackPanel Orientation="Vertical">
+                        <Controls:NumericField x:Uid="fld_xyClearance" Label="XY Clearance:" Tooltip2="Initial distance away from face to probe" Value="{Binding Path=XYClearance, Mode=TwoWay}" IsEnabled="{Binding Path=XYOffsetEnable}" ColonAt="102" HorizontalAlignment="Left" Margin="0,7,0,0" VerticalAlignment="Top" Style="{StaticResource ErrorStyle}"/>
+                        <Controls:NumericField x:Uid="fld_offset" Label="Offset:" ToolTip="Distance from corner to probe" Value="{Binding Path=Offset, Mode=TwoWay}" IsEnabled="{Binding Path=OffsetEnable}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
+                        <Controls:NumericField x:Uid="fld_depth" Label="Depth:" ToolTip="Z offset from current position where probing will take place" Value="{Binding Depth, Mode=TwoWay}" IsEnabled="{Binding XYOffsetEnable}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
+                    </StackPanel>
+                </GroupBox>
+                <GroupBox x:Uid="grp_prbeProperties" x:Name="probeProperties" Header="Probe XY offsets" Visibility="Collapsed" IsEnabled="{Binding Path=XYOffsetEnable}">
+                    <StackPanel Orientation="Horizontal">
+                        <Controls:NumericField x:Uid="fld_probeOffsetX" Label="X:" ToolTip="X offset from probe to controlled point" Value="{Binding Path=ProbeOffsetX, Mode=TwoWay}" ColonAt="20" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
+                        <Controls:NumericField x:Uid="fld_probeOffsetY" Label="Y:" ToolTip="Y offset from probe to controlled point" Value="{Binding Path=ProbeOffsetY, Mode=TwoWay}" ColonAt="20" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
+                    </StackPanel>
+                </GroupBox>
+                <Button x:Uid="btn_jog" x:Name="Jog" Content="Click to activate keyboard jogging" ToolTip="Ctrl+Shift to activate" Margin="0,5,0,6" Focusable="True" FocusVisualStyle="{x:Null}" GotFocus="Jog_FocusedChanged" LostFocus="Jog_FocusedChanged"/>
+            </StackPanel>
+            <TextBlock Text="{Binding Path=Position, Mode=OneWay}" TextWrapping="NoWrap" Height="25" Width="235" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
+        </DockPanel>
+        <StackPanel DockPanel.Dock="Right" Margin="0,10,0,0" Width="635" HorizontalAlignment="Left" VerticalAlignment="Top">
+            <TabControl x:Name="tab" HorizontalAlignment="Stretch" VerticalAlignment="Top" Width="Auto" Height="410" SelectionChanged="tab_SelectionChanged">
+                <TabItem x:Uid="tab_toolOffset" Header="Tool length offset">
+                    <local:ToolLengthControl HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                </TabItem>
+                <TabItem x:Uid="tab_edgeInternal" Header="Edge finder, external">
+                    <local:EdgeFinderControl HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                </TabItem>
+                <TabItem x:Uid="tab_edgeExternal" Header="Edge finder, internal">
+                    <local:EdgeFinderIntControl HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                </TabItem>
+                <TabItem x:Uid="tab_Rotation" Header="Rotation">
+                    <local:RotationControl HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                </TabItem>
+                <TabItem x:Uid="tab_Center" Header="Center finder">
+                    <local:CenterFinderControl HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                </TabItem>
+                <TabItem x:Uid="tab_heightmap" Header="Height map">
+                    <local:HeightMapControl HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                </TabItem>
+            </TabControl>
+            <TextBlock TextWrapping="Wrap" Height="70" Margin="0,2,0,0" Width="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+            <Run Text="{Binding Path=Instructions, Mode=OneWay}"/>
+            <LineBreak/>
+            <Run x:Uid="txt_warning" Text="Warning! Use with care - incorrect parameters may damage your probe!" Foreground="Red" FontWeight="Bold"/>
+            </TextBlock>
+        </StackPanel>
+    </DockPanel>
+</UserControl>

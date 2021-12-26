@@ -1,7 +1,7 @@
 /*
  * GrblViewModel.cs - part of CNC Controls library
  *
- * v0.35 / 2021-10-21 / Io Engineering (Terje Io)
+ * v0.36 / 2021-12-19 / Io Engineering (Terje Io)
  *
  */
 
@@ -88,6 +88,7 @@ namespace CNC.Core
 
             Clear();
 
+            Keyboard = new KeypressHandler(this);
             MDICommand = new ActionCommand<string>(ExecuteMDI);
 
             pollThread = new Thread(new ThreadStart(Poller.Run));
@@ -102,8 +103,15 @@ namespace CNC.Core
             AxisScaled.PropertyChanged += AxisScaled_PropertyChanged;
             Position.PropertyChanged += Position_PropertyChanged;
             MachinePosition.PropertyChanged += MachinePosition_PropertyChanged;
+            WorkPositionOffset.PropertyChanged += WorkPositionOffset_PropertyChanged;
             ProbePosition.PropertyChanged += ProbePosition_PropertyChanged;
             ToolOffset.PropertyChanged += ToolOffset_PropertyChanged;
+        }
+
+        private void WorkPositionOffset_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(Core.Position))
+                OnPropertyChanged(nameof(WorkPositionOffset));
         }
 
         ~GrblViewModel()
@@ -219,7 +227,7 @@ namespace CNC.Core
             if ((ok = !(GrblState.State == GrblStates.Tool && !(ucmd.StartsWith("$J=") || ucmd == "$TPW" || ucmd.Contains("G10L20")))))
                 MDI = command;
             else
-                Message = "Only jogging and some system commands are allowed when changing tool!";
+                Message = LibStrings.FindResource("JoggingOnly");
 
             return ok;
         }
@@ -247,11 +255,47 @@ namespace CNC.Core
                 }
                 else if (ApplyCommand(command))
                 {
-                    if (ResponseLogVerbose && !string.IsNullOrEmpty(command))
+                    if (ResponseLogVerbose && !string.IsNullOrEmpty(command) && (command.Length > 1 || (!char.IsControl(command[0]) && command[0] < 0x7F)))
                         ResponseLog.Add(command);
                 }
             }
         }
+
+        public void ExecuteMacro(string macro)
+        {
+            if (macro != null && macro != string.Empty)
+            {
+                bool ok = true;
+                var commands = macro.Split('\n');
+
+                var parser = new GCodeParser();
+
+                for(int i = 0; i < commands.Length; i++)
+                {
+                    try
+                    {
+                        parser.ParseBlock(ref commands[i], false);
+                    }
+                    catch (Exception e)
+                    {
+                        if (!(ok = System.Windows.MessageBox.Show(string.Format(LibStrings.FindResource("LoadError").Replace("\\n", "\r"), LineNumber, commands[i]), e.Message, System.Windows.MessageBoxButton.YesNo) == System.Windows.MessageBoxResult.Yes))
+                            break;
+                    }
+                }
+
+                if(ok) foreach (var command in commands)
+                {
+                    if (ApplyCommand(command))
+                    {
+                        if (ResponseLogVerbose && !string.IsNullOrEmpty(command))
+                            ResponseLog.Add(command);
+                    }
+                }
+            }
+        }
+
+        public KeypressHandler Keyboard { get; private set; }
+
         public bool ResponseLogVerbose { get { return _responseLogVerbose; } set { _responseLogVerbose = value; OnPropertyChanged(); } }
         public bool ResponseLogFilterRT { get; set; } = false;
         public bool ResponseLogFilterOk { get; set; } = false;
@@ -279,7 +323,7 @@ namespace CNC.Core
         public ObservableCollection<string> CommandLog { get; private set; } = new ObservableCollection<string>();
 
         public ProgramLimits ProgramLimits { get; private set; } = new ProgramLimits();
-        public string MDI { get { string cmd = _mdiCommand; _mdiCommand = string.Empty; return cmd; } private set { _mdiCommand = value; OnPropertyChanged(); } }
+        public string MDI { get { return _mdiCommand; } private set { _mdiCommand = value; OnPropertyChanged(); _mdiCommand = string.Empty; } }
         public ObservableCollection<CoordinateSystem> CoordinateSystems { get { return GrblWorkParameters.CoordinateSystems; } }
         public ObservableCollection<Tool> Tools { get { return GrblWorkParameters.Tools; } }
         public ObservableCollection<string> SystemInfo { get { return GrblInfo.SystemInfo; } }
@@ -552,9 +596,12 @@ namespace CNC.Core
                     LatheMode = GrblParserState.LatheMode;
                 if (GrblParserState.IsActive("G51") != null)
                     Set("Sc", GrblParserState.IsActive("G51"));
-                OnPropertyChanged();
-                OnPropertyChanged(nameof(IsG92Active));
-                OnPropertyChanged(nameof(IsToolOffsetActive));
+                if (GrblState.State != GrblStates.Check)
+                {
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(IsG92Active));
+                    OnPropertyChanged(nameof(IsToolOffsetActive));
+                }
             }
         }
 
@@ -700,7 +747,7 @@ namespace CNC.Core
             bool changed, wco_present = data.Contains("|WCO:");
             int rti = data.Contains("|WCO:") ? 1 : (data.Contains("|Ov:") ? 2 : 0);
 
-            if ((changed = (_rtState[rti] != data))) {
+            if ((changed = (_rtState[rti] != data) || _grblState.State == GrblStates.Unknown)) {
 
                 bool pos_changed = false;
                 string[] elements = data.TrimEnd('>').Split('|');
@@ -944,7 +991,7 @@ namespace CNC.Core
                 case "SD":
                     if (value != "Pending")
                     {
-                        value = string.Format("SD Card streaming {0}% complete", value.Split(',')[0]);
+                        value = string.Format(LibStrings.FindResource("SdStreamComplete"), value.Split(',')[0]);
                         if (SDCardStatus != value)
                             Message = SDCardStatus = value;
                     }
@@ -1096,32 +1143,32 @@ namespace CNC.Core
                     case "MSG":
                         var msg = data.Substring(5).Trim().TrimEnd(']');
                         if (msg == "'$H'|'$X' to unlock")
-                            Message = GrblInfo.IsGrblHAL ? "<Unlock> to continue" : "<Home> or <Unlock> to continue";
+                            Message = LibStrings.FindResource(GrblInfo.IsGrblHAL ? "ContUnlock" : "ContHomeUnlock");
                         else if (GrblState.State == GrblStates.Alarm && msg != "Caution: Unlocked")
                         {
                             switch(GrblState.Substate)
                             {
                                 case 10:
-                                    _message = "clear then <Reset> then <Unlock> to continue";
+                                    _message = LibStrings.FindResource("ContClearResetUnlock");
                                     break;
                                 case 11:
-                                    _message = "<Home> to continue";
+                                    _message = LibStrings.FindResource("ContHome");
                                     break;
 
                                 default:
-                                    _message = "<Reset> then <Unlock> to continue";
+                                    _message = LibStrings.FindResource("ContResetUnlock");
                                     break;
                             }
                             Message = (msg == "Reset to continue" ? string.Empty : msg + ", ") + _message;
                         }
                         else
                             Message = msg;
-                        if (data == "Pgm End")
+                        if (msg == "Pgm End")
                             ProgramEnd = true;
                         break;
                 }
             }
-            else if (data.StartsWith("Grbl"))
+            else if (data.ToLower().StartsWith("grbl"))
             {
                 if(Poller != null)
                     Poller.SetState(0);
@@ -1158,7 +1205,7 @@ namespace CNC.Core
                 }
             }
 
-            if (ResponseLogVerbose || !(data.First() == '<' || data.First() == '$' || data.First() == 'o' || (data.First() == '[' && DataIsEnumeration(data))) || data.StartsWith("error"))
+            if (ResponseLogVerbose || !(data.First() == '<' || data.First() == '$' || data.First() == 'o' || (data.First() == '[' && (data.StartsWith("[GC") || DataIsEnumeration(data)))) || data.StartsWith("error"))
             {
                 if (!(data.First() == '<' && ResponseLogFilterRT))
                 {
@@ -1167,7 +1214,7 @@ namespace CNC.Core
                         var msg = GrblErrors.GetMessage(data.Substring(6));
                         ResponseLog.Add(data + (msg == data ? "" : " - " + msg));
                     }
-                    else if (data == "ok" ? ResponseLogFilterOk : stateChanged || ResponseLogShowRTAll)
+                    else if (data == "ok" ? !ResponseLogFilterOk : stateChanged || ResponseLogShowRTAll)
                         ResponseLog.Add(data);
 
                     if (ResponseLog.Count > 200)

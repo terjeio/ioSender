@@ -1,0 +1,85 @@
+﻿<UserControl x:Class="CNC.Controls.Viewer.RenderControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:Controls="clr-namespace:CNC.Controls;assembly=CNC.Controls.WPF"
+             xmlns:local="clr-namespace:CNC.Controls.Viewer"
+             mc:Ignorable="d"
+             Loaded="RenderControl_Loaded"
+             d:DesignHeight="335" d:DesignWidth="400">
+    <UserControl.Resources>
+        <Controls:LogicalNotConverter x:Key="IsNotRunningConverter" />
+        <Controls:LogicalNotConverter x:Key="IsNotVisibleConverter">
+            <Controls:LogicalNotConverter.FinalConverter>
+                <Controls:BoolToVisibleConverter />
+            </Controls:LogicalNotConverter.FinalConverter>
+        </Controls:LogicalNotConverter>
+        <Style x:Key="Flag" TargetType="ToggleButton">
+            <Style.Triggers>
+                <Trigger Property="IsChecked" Value="True">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ToggleButton">
+                                <Image Source="{Binding Path=Content, RelativeSource={RelativeSource TemplatedParent}}"/>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+                <Trigger Property="IsChecked" Value="False">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ToggleButton">
+                                <Image Source="{Binding Path=Tag, RelativeSource={RelativeSource TemplatedParent}}"/>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Width" Value="22"/>
+            <Setter Property="Height" Value="22"/>
+            <Setter Property="Margin" Value="3,0,0,0"/>
+        </Style>
+        <Style x:Key="BtnImage" TargetType="Button">
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="True">
+                    <Setter Property="Opacity" Value="1"/>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.5"/>
+                </Trigger>
+            </Style.Triggers>
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Width" Value="22"/>
+            <Setter Property="Height" Value="22"/>
+            <Setter Property="Margin" Value="3,0,0,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Image Source="{Binding Path=Content, RelativeSource={RelativeSource TemplatedParent}}"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+    <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom" HorizontalAlignment="Right">
+            <ComboBox IsEnabled="{Binding Path=IsJobRunning, Converter={StaticResource IsNotRunningConverter}}" Visibility="{Binding Path=LatheModeEnabled, Converter={StaticResource IsNotVisibleConverter}}" ItemsSource="{Binding Path=MachineView.RenderModes, RelativeSource={RelativeSource AncestorType=UserControl}}" DisplayMemberPath="Value" SelectedValuePath="Key" SelectedValue="{Binding Path=MachineView.RenderMode, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" Width="50"/>
+            <ComboBox Margin="3,0,0,0" ItemsSource="{Binding Path=MachineView.ToolModes, RelativeSource={RelativeSource AncestorType=UserControl}}" DisplayMemberPath="Value" SelectedValuePath="Key" SelectedValue="{Binding Path=MachineView.ToolMode, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" Width="80"/>
+            <Button x:Uid="resetView" Content="Resources/ResetView.png" Style="{StaticResource BtnImage}" Click="ResetView_Click" ToolTip="Reset view (Ctrl+V)"/>
+            <Button x:Uid="restoreView" Content="Resources/RestoreView.png" Style="{StaticResource BtnImage}" IsEnabled="{Binding Path=MachineView.CanRestoreView, RelativeSource={RelativeSource AncestorType=UserControl}}" Click="RestoreView_Click" ToolTip="Restore view (Ctrl+R)"/>
+            <ToggleButton x:Uid="showGrid" Content="Resources/GridOn.png" Tag="Resources/GridOff.png" Style="{StaticResource Flag}" IsChecked="{Binding Path=MachineView.ShowGrid, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" ToolTip="Toggle grid visibility (Ctrl+G)"/>
+            <ToggleButton x:Uid="showJobEnvelope" Content="Resources/JobBoxOn.png" Tag="Resources/JobBoxOff.png" Style="{StaticResource Flag}" IsChecked="{Binding Path=MachineView.ShowJobEnvelope, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" ToolTip="Toggle job bounds visibility (Ctrl+J)"/>
+            <ToggleButton x:Uid="showWorkEnvelope" Content="Resources/WorkBoxOn.png" Tag="Resources/WorkBoxOff.png" Style="{StaticResource Flag}" IsChecked="{Binding Path=MachineView.ShowWorkEnvelope, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" ToolTip="Toggle machine work envelope visibility (Ctrl+W)"/>
+            <ToggleButton x:Uid="showXYZMarkers" Content="Resources/XYZOn.png" Tag="Resources/XYZOff.png" Style="{StaticResource Flag}" IsChecked="{Binding Path=MachineView.ShowAxes, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" ToolTip="Toggle axes visibility"/>
+            <Button x:Uid="saveView" Content="Resources/SaveView.png" Style="{StaticResource BtnImage}" IsEnabled="{Binding Path=IsFileLoaded}" Click="SaveView_Click" ToolTip="Save view"/>
+        </StackPanel>
+        <Grid DockPanel.Dock="Top">
+        <local:Renderer x:Name="gcodeView"/>
+        <local:TextOverlayControl x:Name="textOverlay" HorizontalAlignment="Right" Margin="5,5" VerticalAlignment="Top"/>
+        </Grid>
+    </DockPanel>
+</UserControl>

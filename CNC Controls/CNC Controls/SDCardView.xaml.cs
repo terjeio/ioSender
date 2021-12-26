@@ -1,7 +1,7 @@
 /*
  * SDCardView.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.31 / 2021-04-27 / Io Engineering (Terje Io)
+ * v0.36 / 2021-11-10 / Io Engineering (Terje Io)
  *
  */
 
@@ -42,6 +42,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Threading;
+using System.Net;
 using Microsoft.Win32;
 using CNC.Core;
 
@@ -73,7 +74,7 @@ namespace CNC.Controls
             if (activate)
             {
                 GrblSDCard.Load(DataContext as GrblViewModel);
-                CanUpload = GrblInfo.YModemUpload;
+                CanUpload = GrblInfo.UploadProtocol != string.Empty;
                 CanDelete = GrblInfo.Build >= 20210421;
                 CanRewind = GrblInfo.IsGrblHAL;
             }
@@ -139,8 +140,62 @@ namespace CNC.Controls
             RunFile();
         }
 
+        private void AddBlock(string data)
+        {
+            GCode.File.AddBlock(data);
+        }
+
+        private void DownloadRun_Click(object sender, RoutedEventArgs e)
+        {
+            if (currentFile != null && MessageBox.Show(string.Format((string)FindResource("DownloandRun"), (string)currentFile["Name"]), "ioSender", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes) == MessageBoxResult.Yes)
+            {
+                var model = DataContext as GrblViewModel;
+
+                using (new UIUtils.WaitCursor())
+                {
+                    bool? res = null;
+                    CancellationToken cancellationToken = new CancellationToken();
+
+                    Comms.com.PurgeQueue();
+
+                    model.SuspendProcessing = true;
+                    model.Message = string.Format((string)FindResource("Downloading"), (string)currentFile["Name"]);
+
+                    GCode.File.AddBlock((string)currentFile["Name"], CNC.Core.Action.New);
+
+                    new Thread(() =>
+                    {
+                        res = WaitFor.AckResponse<string>(
+                            cancellationToken,
+                            response => AddBlock(response),
+                            a => model.OnResponseReceived += a,
+                            a => model.OnResponseReceived -= a,
+                            400, () => Comms.com.WriteCommand(GrblConstants.CMD_SDCARD_DUMP + (string)currentFile["Name"]));
+                    }).Start();
+
+                    while (res == null)
+                        EventUtils.DoEvents();
+
+                    model.SuspendProcessing = false;
+
+                    GCode.File.AddBlock(string.Empty, CNC.Core.Action.End);
+                }
+
+                model.Message = string.Empty;
+
+                if (Rewind)
+                    Comms.com.WriteCommand(GrblConstants.CMD_SDCARD_REWIND);
+
+                FileSelected?.Invoke("SDCard:" + (string)currentFile["Name"], Rewind);
+                Comms.com.WriteCommand(GrblConstants.CMD_SDCARD_RUN + (string)currentFile["Name"]);
+
+                Rewind = false;
+            }
+        }
+
         private void Upload_Click(object sender, RoutedEventArgs e)
         {
+            bool ok = false;
             string filename = string.Empty;
             OpenFileDialog file = new OpenFileDialog();
 
@@ -155,13 +210,44 @@ namespace CNC.Controls
             {
                 GrblViewModel model = DataContext as GrblViewModel;
 
-                model.Message = "Uploading...";
+                model.Message = (string)FindResource("Uploading");
 
-                YModem ymodem = new YModem();
-                ymodem.DataTransferred += Ymodem_DataTransferred;
-                bool ok = ymodem.Upload(filename);
+                if (GrblInfo.UploadProtocol == "FTP")
+                {
+                    if (GrblInfo.IpAddress == string.Empty)
+                        model.Message = (string)FindResource("NoConnection");
+                    else using(new UIUtils.WaitCursor())
+                    {
+                        model.Message = (string)FindResource("Uploading");
+                        try
+                        {
+                            using (WebClient client = new WebClient())
+                            {
+                                client.Credentials = new NetworkCredential("grblHAL", "grblHAL");
+                                client.UploadFile(string.Format("ftp://{0}/{1}", GrblInfo.IpAddress, filename.Substring(filename.LastIndexOf('\\') + 1)), WebRequestMethods.Ftp.UploadFile, filename);
+                                ok = true;
+                            }
+                        }
+                        catch (WebException ex)
+                        {
+                            model.Message = ex.Message.ToString() + " " + ((FtpWebResponse)ex.Response).StatusDescription;
+                        }
+                        catch (System.Exception ex)
+                        {
+                            model.Message = ex.Message.ToString();
+                        }
+                    }
+                }
+                else
+                {
+                    model.Message = (string)FindResource("Uploading");
+                    YModem ymodem = new YModem();
+                    ymodem.DataTransferred += Ymodem_DataTransferred;
+                    ok = ymodem.Upload(filename);
+                }
 
-                model.Message = ok ? "Transfer done." : "Transfer aborted.";
+                if(!(GrblInfo.UploadProtocol == "FTP" && !ok))
+                    model.Message = (string)FindResource(ok ? "TransferDone" : "TransferAborted");
 
                 GrblSDCard.Load(model);
             }
@@ -170,7 +256,7 @@ namespace CNC.Controls
         private void Ymodem_DataTransferred(long size, long transferred)
         {
             GrblViewModel model = DataContext as GrblViewModel;
-            model.Message = string.Format("Transferred {0} of {1} bytes...", transferred, size);
+            model.Message = string.Format((string)FindResource("Transferring"), transferred, size);
         }
 
         private void Run_Click(object sender, RoutedEventArgs e)
@@ -180,7 +266,7 @@ namespace CNC.Controls
 
         private void Delete_Click(object sender, RoutedEventArgs e)
         {
-            if (MessageBox.Show(string.Format("Delete {0}?", (string)currentFile["Name"]), "SD Card", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes) == MessageBoxResult.Yes)
+            if (MessageBox.Show(string.Format((string)FindResource("DeleteFile"), (string)currentFile["Name"]), "ioSender", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes) == MessageBoxResult.Yes)
             {
                 Comms.com.WriteCommand(GrblConstants.CMD_SDCARD_UNLINK + (string)currentFile["Name"]);
                 GrblSDCard.Load(DataContext as GrblViewModel);
@@ -193,7 +279,7 @@ namespace CNC.Controls
             {
                 if ((bool)currentFile["Invalid"])
                 {
-                    MessageBox.Show(string.Format("File: \"{0}\"\r\r!,?,~ and SPACE is not supported in filenames, please rename.", (string)currentFile["Name"]), "Unsupported characters in filename",
+                    MessageBox.Show(string.Format(((string)FindResource("IllegalName")).Replace("\\n", "\r\r"), (string)currentFile["Name"]), "ioSender",
                                      MessageBoxButton.OK, MessageBoxImage.Error);
                 }
                 else

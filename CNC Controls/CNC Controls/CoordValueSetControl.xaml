@@ -5,11 +5,11 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CNC.Controls"
              mc:Ignorable="d" 
-             d:DesignHeight="30" Width="220">
-    <Grid>
+             d:DesignHeight="30" Width="230">
+    <Grid Width="230">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="177*"/>
-            <ColumnDefinition Width="43*"/>
+            <ColumnDefinition Width="65*"/>
         </Grid.ColumnDefinitions>
         <local:NumericField x:Name="cvValue" HorizontalAlignment="Left" Margin="3,2,0,2" VerticalAlignment="Center" Height="26" Width="170"
             Format="{Binding Path=FormatSigned, Mode=OneWay}"
@@ -17,6 +17,6 @@
             Unit="{Binding Path=Unit, Mode=OneWay}"
             Label="{Binding Path=Label, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=OneWay}"
         />
-        <Button x:Uid="btn_set" x:Name="btnSet" Content="Set" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Width="35" Height="22" Margin="0,4" Click="btnSet_Click"/>
+        <Button x:Uid="btn_set" x:Name="btnSet" Content="Set" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Padding="5,0" Height="22" Margin="0,4" Click="btnSet_Click"/>
     </Grid>
 </UserControl>

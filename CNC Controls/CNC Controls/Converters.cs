@@ -1,7 +1,7 @@
 /*
  * Converters.cs - part of CNC Controls library for Grbl
  *
- * v0.34 / 2021-07-13 / Io Engineering (Terje Io)
+ * v0.36 / 2021-12-08 / Io Engineering (Terje Io)
  *
  */
 
@@ -60,6 +60,7 @@ namespace CNC.Controls
         public static GrblStateToStringConverter GrblStateToStringConverter = new GrblStateToStringConverter();
         public static BlocksToStringConverter BlocksToStringConverter = new BlocksToStringConverter();
         public static GrblStateToBooleanConverter GrblStateToBooleanConverter = new GrblStateToBooleanConverter();
+        public static GrblStateToIsJoggingConverter GrblStateToIsJoggingConverter = new GrblStateToIsJoggingConverter();
         public static HomedStateToColorConverter HomedStateToColorConverter = new HomedStateToColorConverter();
         public static IsHomingEnabledConverter IsHomingEnabledConverter = new IsHomingEnabledConverter();
         public static HomedStateToBooleanConverter HomedStateToBooleanConverter = new HomedStateToBooleanConverter();
@@ -74,6 +75,23 @@ namespace CNC.Controls
         public static MultiLineConverter MultiLineConverter = new MultiLineConverter();
         public static PositionToStringConverter PositionToStringConverter = new PositionToStringConverter();
         public static FeedSpeedToStringConverter FeedSpeedToStringConverter = new FeedSpeedToStringConverter();
+
+        internal static string numBlocks = LibStrings.FindResource("NumBlocks");
+        internal static string blockOfBlocks = LibStrings.FindResource("BlockOfBlocks");
+        internal static Lazy<Dictionary<GrblStates, string>> grblState = new Lazy<Dictionary<GrblStates, string>>(() =>
+            new Dictionary<GrblStates, string> {
+                { GrblStates.Unknown, LibStrings.FindResource("StateUnknown") },
+                { GrblStates.Idle, LibStrings.FindResource("StateIdle") },
+                { GrblStates.Run, LibStrings.FindResource("StateRun") },
+                { GrblStates.Tool, LibStrings.FindResource("StateTool") },
+                { GrblStates.Hold, LibStrings.FindResource("StateHold") },
+                { GrblStates.Home, LibStrings.FindResource("StateHome") },
+                { GrblStates.Check, LibStrings.FindResource("StateCheck") },
+                { GrblStates.Jog, LibStrings.FindResource("StateJog") },
+                { GrblStates.Alarm, LibStrings.FindResource("StateAlarm") },
+                { GrblStates.Door, LibStrings.FindResource("StateDoor") },
+                { GrblStates.Sleep, LibStrings.FindResource("StateSleep") }
+            });
     }
 
     // Adapted from: https://stackoverflow.com/questions/4353186/binding-observablecollection-to-a-textbox/8847910#8847910
@@ -126,7 +144,7 @@ namespace CNC.Controls
     {
         public object Convert(object[] value, Type targetType, object parameter, CultureInfo culture)
         {
-            return value[0] is int && value[1] is int ? (string.Format((int)value[1] == 0 ? "Blocks: {1}" : "Block: {0}/{1}", value[1], value[0])) : string.Empty;
+            return value[0] is int && value[1] is int ? (string.Format((int)value[1] == 0 ? Converters.numBlocks : Converters.blockOfBlocks, value[1], value[0])) : string.Empty;
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
@@ -309,10 +327,12 @@ namespace CNC.Controls
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             string result = string.Empty;
+
+            Converters.grblState.Value.TryGetValue(((GrblState)value).State, out result);
             int substate = ((GrblState)value).State == GrblStates.Alarm && ((GrblState)value).LastAlarm > 0 ? ((GrblState)value).LastAlarm : ((GrblState)value).Substate;
 
             if (value is GrblState && ((GrblState)value).State != GrblStates.Unknown) 
-                result = ((GrblState)value).State.ToString().ToUpper() + (substate == -1 ? "" : (":" + substate.ToString()));
+                result = (result == string.Empty ? ((GrblState)value).State.ToString().ToUpper() : result) + (substate == -1 ? "" : (":" + substate.ToString()));
 
             return result;
         }
@@ -331,6 +351,19 @@ namespace CNC.Controls
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class GrblStateToIsJoggingConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            return value is GrblState && ((GrblState)value).State == GrblStates.Jog;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
         }

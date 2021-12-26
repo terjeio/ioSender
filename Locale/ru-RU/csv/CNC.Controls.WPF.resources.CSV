@@ -1,0 +1,715 @@
+﻿CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,dgr_sdcard:System.Windows.Controls.DataGrid.$Content,None,False,True,,
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,dgr_sdcard:System.Windows.Controls.DataGrid.IsReadOnly,None,False,True,,True
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,dgr_sdcard:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,dgr_sdcard:System.Windows.FrameworkElement.Margin,None,False,True,,"30,30,0,0"
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,dgr_sdcard:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,dgr_sdcard:System.Windows.FrameworkElement.Height,None,False,True,,450
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,dgr_sdcard:System.Windows.FrameworkElement.Width,None,False,True,,380
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,dgr_sdcard:System.Windows.Controls.DataGrid.SelectionMode,None,True,False,,Single
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,dgr_sdcard:System.Windows.Controls.DataGrid.SelectionUnit,None,True,False,,FullRow
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,dgr_sdcard:System.Windows.Controls.DataGrid.AutoGenerateColumns,None,False,True,,False
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,dgr_sdcard:System.Windows.Controls.DataGrid.CanUserReorderColumns,None,False,True,,False
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,dgr_sdcard:System.Windows.Controls.DataGrid.CanUserResizeColumns,None,False,True,,False
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,dgr_sdcard:System.Windows.Controls.DataGrid.CanUserResizeRows,None,False,True,,False
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,dgr_sdcard:System.Windows.Controls.DataGrid.CanUserSortColumns,None,False,True,,False
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,dgr_sdcard:System.Windows.Controls.DataGrid.CanUserAddRows,None,False,True,,False
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,dgr_sdcard:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,"Right click for menu, double click to run file."
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,hdr_name:System.Windows.Controls.DataGridTextColumn.$Content,None,True,True,,
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,hdr_name:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Name
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,hdr_name:System.Windows.Controls.DataGridColumn.Width,None,True,False,,*
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,hdr_size:System.Windows.Controls.DataGridTextColumn.$Content,None,True,True,,
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,hdr_size:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Size
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,hdr_size:System.Windows.Controls.DataGridColumn.Width,None,True,False,,70
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,mnu_run:System.Windows.Controls.MenuItem.$Content,Menu,True,True,,
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,mnu_run:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Run
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,mnu_enableRewind:System.Windows.Controls.MenuItem.$Content,Menu,True,True,,
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,mnu_enableRewind:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Enable rewind
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,mnu_enableRewind:System.Windows.Controls.MenuItem.IsCheckable,None,False,True,,True
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,mnu_delete:System.Windows.Controls.MenuItem.$Content,Menu,True,True,,
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,mnu_delete:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Delete
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,btn_upload:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,btn_upload:System.Windows.Controls.ContentControl.Content,Button,True,True,,Upload
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,btn_upload:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,btn_upload:System.Windows.FrameworkElement.Margin,None,False,True,,"428,460,0,0"
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,btn_upload:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,btn_upload:System.Windows.FrameworkElement.Width,None,False,True,,75
+CNC.Controls.WPF.g.en-US.resources:outlineflyout.baml,txt_line1:System.Windows.Documents.Run.$Content,Text,True,True,,
+CNC.Controls.WPF.g.en-US.resources:outlineflyout.baml,txt_line1:System.Windows.Documents.Run.Text,Text,True,True,,Execute moves to outline X and Y program limits.
+CNC.Controls.WPF.g.en-US.resources:outlineflyout.baml,txt_line2:System.Windows.Documents.Run.$Content,Text,True,True,,
+CNC.Controls.WPF.g.en-US.resources:outlineflyout.baml,txt_line2:System.Windows.Documents.Run.Text,Text,True,True,,Ensure tool tip is clear of any obstructions!
+CNC.Controls.WPF.g.en-US.resources:outlineflyout.baml,txt_line2:System.Windows.Documents.TextElement.Foreground,None,False,True,,\#FFFF0000
+CNC.Controls.WPF.g.en-US.resources:outlineflyout.baml,txt_line2:System.Windows.Documents.TextElement.FontWeight,None,True,True,,Bold
+CNC.Controls.WPF.g.en-US.resources:outlineflyout.baml,lbl_feedrate:CNC.Controls.NumericField.$Content,None,True,True,,
+CNC.Controls.WPF.g.en-US.resources:outlineflyout.baml,lbl_feedrate:CNC.Controls.NumericField.Label,None,True,True,,Feed rate:
+CNC.Controls.WPF.g.en-US.resources:outlineflyout.baml,lbl_feedrate:CNC.Controls.NumericField.Format,None,True,True,,\#\#\#0
+CNC.Controls.WPF.g.en-US.resources:outlineflyout.baml,lbl_feedrate:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:outlineflyout.baml,lbl_feedrate:System.Windows.FrameworkElement.Margin,None,False,True,,"5,75,0,0"
+CNC.Controls.WPF.g.en-US.resources:outlineflyout.baml,lbl_feedrate:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.WPF.g.en-US.resources:outlineflyout.baml,btn_go:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.WPF.g.en-US.resources:outlineflyout.baml,btn_go:System.Windows.Controls.ContentControl.Content,Button,True,True,,Go
+CNC.Controls.WPF.g.en-US.resources:outlineflyout.baml,btn_go:System.Windows.FrameworkElement.Width,None,False,True,,50
+CNC.Controls.WPF.g.en-US.resources:outlineflyout.baml,btn_go:System.Windows.FrameworkElement.Height,None,False,True,,25
+CNC.Controls.WPF.g.en-US.resources:outlineflyout.baml,btn_go:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Right
+CNC.Controls.WPF.g.en-US.resources:outlineflyout.baml,btn_go:System.Windows.FrameworkElement.Margin,None,False,True,,"0,0,8,8"
+CNC.Controls.WPF.g.en-US.resources:outlineflyout.baml,btn_go:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Bottom
+CNC.Controls.WPF.g.en-US.resources:drocontrol.baml,grp_dro:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,DRO
+CNC.Controls.WPF.g.en-US.resources:drocontrol.baml,grp_dro:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Center
+CNC.Controls.WPF.g.en-US.resources:drocontrol.baml,grp_dro:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.WPF.g.en-US.resources:drocontrol.baml,grp_dro:System.Windows.FrameworkElement.Width,None,False,True,,216
+CNC.Controls.WPF.g.en-US.resources:drocontrol.baml,btn_zeroAll:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.WPF.g.en-US.resources:drocontrol.baml,btn_zeroAll:System.Windows.Controls.ContentControl.Content,Button,True,True,,Zero all
+CNC.Controls.WPF.g.en-US.resources:drocontrol.baml,btn_zeroAll:System.Windows.UIElement.Focusable,None,False,True,,False
+CNC.Controls.WPF.g.en-US.resources:drocontrol.baml,btn_zeroAll:System.Windows.FrameworkElement.Height,None,False,True,,28
+CNC.Controls.WPF.g.en-US.resources:drocontrol.baml,btn_zeroAll:System.Windows.FrameworkElement.Width,None,False,True,,180
+CNC.Controls.WPF.g.en-US.resources:drocontrol.baml,btn_zeroAll:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Center
+CNC.Controls.WPF.g.en-US.resources:drocontrol.baml,btn_zeroAll:System.Windows.FrameworkElement.Margin,None,False,True,,"2,3"
+CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,lbl_state:System.Windows.Controls.Label.$Content,Label,True,True,,
+CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,lbl_state:System.Windows.Controls.ContentControl.Content,Label,True,True,,State:
+CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,lbl_state:System.Windows.Controls.Control.HorizontalContentAlignment,None,False,True,,Right
+CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,lbl_state:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,lbl_state:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Center
+CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,lbl_state:System.Windows.FrameworkElement.Height,None,False,True,,26
+CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,lbl_state:System.Windows.FrameworkElement.Width,None,False,True,,40
+CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,lbl_check:System.Windows.Controls.Label.$Content,Label,True,True,,
+CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,lbl_check:System.Windows.Controls.ContentControl.Content,Label,True,True,,Check
+CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,lbl_check:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Center
+CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,lbl_check:System.Windows.FrameworkElement.Height,None,False,True,,26
+CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,btn_home:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,btn_home:System.Windows.Controls.ContentControl.Content,Button,True,True,,Home
+CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,btn_home:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Ctrl+H
+CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,btn_unlock:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,btn_unlock:System.Windows.Controls.ContentControl.Content,Button,True,True,,Unlock
+CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,btn_unlock:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Ctrl+U
+CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,btn_unlock:System.Windows.FrameworkElement.Margin,None,False,True,,"5,0,0,0"
+CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,btn_reset:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,btn_reset:System.Windows.Controls.ContentControl.Content,Button,True,True,,Reset
+CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,btn_reset:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Ctrl+Shift+R
+CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,btn_reset:System.Windows.FrameworkElement.Margin,None,False,True,,"5,0,0,0"
+CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,btn_reset:System.Windows.Controls.Control.Background,None,False,True,,\#FFFF0000
+CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,btn_reset:System.Windows.Controls.Control.Foreground,None,False,True,,\#FFFFFFFF
+CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,btn_reset:System.Windows.Controls.Control.FontFamily,Font,True,True,,Segoe UI Semibold
+CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,btn_reset:System.Windows.Controls.Control.FontSize,None,True,True,,14
+CNC.Controls.WPF.g.en-US.resources:mdicontrol.baml,grp_mdi:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,MDI
+CNC.Controls.WPF.g.en-US.resources:mdicontrol.baml,grp_mdi:System.Windows.FrameworkElement.Margin,None,False,True,,"0,0"
+CNC.Controls.WPF.g.en-US.resources:mdicontrol.baml,grp_mdi:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Center
+CNC.Controls.WPF.g.en-US.resources:mdicontrol.baml,grp_mdi:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.WPF.g.en-US.resources:mdicontrol.baml,btn_send:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.WPF.g.en-US.resources:mdicontrol.baml,btn_send:System.Windows.Controls.ContentControl.Content,Button,True,True,,Send
+CNC.Controls.WPF.g.en-US.resources:mdicontrol.baml,btn_send:System.Windows.UIElement.Focusable,None,False,True,,False
+CNC.Controls.WPF.g.en-US.resources:mdicontrol.baml,btn_send:System.Windows.Controls.Grid.Column,None,False,True,,1
+CNC.Controls.WPF.g.en-US.resources:mdicontrol.baml,btn_send:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Right
+CNC.Controls.WPF.g.en-US.resources:mdicontrol.baml,btn_send:System.Windows.FrameworkElement.Margin,None,False,True,,"3,0"
+CNC.Controls.WPF.g.en-US.resources:mdicontrol.baml,btn_send:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Center
+CNC.Controls.WPF.g.en-US.resources:mdicontrol.baml,btn_send:System.Windows.FrameworkElement.Width,None,False,True,,42
+CNC.Controls.WPF.g.en-US.resources:mdicontrol.baml,btn_send:System.Windows.FrameworkElement.Height,None,False,True,,22
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,grp_kbdJogging:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Keyboard jogging
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,grp_kbdJogging:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,grp_kbdJogging:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,grp_kbdJogging:System.Windows.FrameworkElement.Height,None,False,True,,Auto
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,grp_kbdJogging:System.Windows.FrameworkElement.Width,None,False,True,,250
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,lbl_enable:System.Windows.Controls.CheckBox.$Content,CheckBox,True,True,,
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,lbl_enable:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Enable
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,lbl_enable:System.Windows.FrameworkElement.Margin,None,False,True,,"90,3,0,3"
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_fastFeedrate:CNC.Controls.NumericField.$Content,None,False,True,,
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_fastFeedrate:CNC.Controls.NumericField.Label,None,False,True,,Fast feedrate:
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_fastFeedrate:CNC.Controls.NumericField.ColonAt,None,False,True,,90
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_fastFeedrate:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_fastFeedrate:CNC.Controls.NumericField.Format,None,False,True,,\#\#\#0
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_fastDistance:CNC.Controls.NumericField.$Content,None,False,True,,
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_fastDistance:CNC.Controls.NumericField.Label,None,False,True,,Fast distance:
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_fastDistance:CNC.Controls.NumericField.ColonAt,None,False,True,,90
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_slowFeedrate:CNC.Controls.NumericField.$Content,None,False,True,,
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_slowFeedrate:CNC.Controls.NumericField.Label,None,False,True,,Slow feedrate:
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_slowFeedrate:CNC.Controls.NumericField.ColonAt,None,False,True,,90
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_slowFeedrate:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_slowFeedrate:CNC.Controls.NumericField.Format,None,False,True,,\#\#\#0
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_slowDistance:CNC.Controls.NumericField.$Content,None,False,True,,
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_slowDistance:CNC.Controls.NumericField.Label,None,False,True,,Slow distance:
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_slowDistance:CNC.Controls.NumericField.ColonAt,None,False,True,,90
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_stepFeedrate:CNC.Controls.NumericField.$Content,None,False,True,,
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_stepFeedrate:CNC.Controls.NumericField.Label,None,False,True,,Step feedrate:
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_stepFeedrate:CNC.Controls.NumericField.ColonAt,None,False,True,,90
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_stepFeedrate:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_stepFeedrate:CNC.Controls.NumericField.Format,None,False,True,,\#\#\#0
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_stepDistance:CNC.Controls.NumericField.$Content,None,False,True,,
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_stepDistance:CNC.Controls.NumericField.Label,None,False,True,,Step distance:
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_stepDistance:CNC.Controls.NumericField.ColonAt,None,False,True,,90
+CNC.Controls.WPF.g.en-US.resources:consolecontrol.baml,lbl_verbose:System.Windows.Controls.CheckBox.$Content,CheckBox,True,True,,
+CNC.Controls.WPF.g.en-US.resources:consolecontrol.baml,lbl_verbose:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Verbose
+CNC.Controls.WPF.g.en-US.resources:consolecontrol.baml,lbl_verbose:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:consolecontrol.baml,lbl_verbose:System.Windows.FrameworkElement.Margin,None,False,True,,"10,8,0,0"
+CNC.Controls.WPF.g.en-US.resources:consolecontrol.baml,lbl_verbose:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.WPF.g.en-US.resources:consolecontrol.baml,lbl_filterRT:System.Windows.Controls.CheckBox.$Content,CheckBox,True,True,,
+CNC.Controls.WPF.g.en-US.resources:consolecontrol.baml,lbl_filterRT:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Filter out realtime responses
+CNC.Controls.WPF.g.en-US.resources:consolecontrol.baml,lbl_filterRT:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:consolecontrol.baml,lbl_filterRT:System.Windows.FrameworkElement.Margin,None,False,True,,"10,8,0,0"
+CNC.Controls.WPF.g.en-US.resources:consolecontrol.baml,lbl_filterRT:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.WPF.g.en-US.resources:consolecontrol.baml,lbl_showAll:System.Windows.Controls.CheckBox.$Content,CheckBox,True,True,,
+CNC.Controls.WPF.g.en-US.resources:consolecontrol.baml,lbl_showAll:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Show all realtime responses
+CNC.Controls.WPF.g.en-US.resources:consolecontrol.baml,lbl_showAll:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:consolecontrol.baml,lbl_showAll:System.Windows.FrameworkElement.Margin,None,False,True,,"10,8,0,0"
+CNC.Controls.WPF.g.en-US.resources:consolecontrol.baml,lbl_showAll:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.WPF.g.en-US.resources:consolecontrol.baml,btn_clear:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.WPF.g.en-US.resources:consolecontrol.baml,btn_clear:System.Windows.Controls.ContentControl.Content,Button,True,True,,Clear
+CNC.Controls.WPF.g.en-US.resources:consolecontrol.baml,btn_clear:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Right
+CNC.Controls.WPF.g.en-US.resources:consolecontrol.baml,btn_clear:System.Windows.FrameworkElement.Margin,None,False,True,,"0,5,5,0"
+CNC.Controls.WPF.g.en-US.resources:consolecontrol.baml,btn_clear:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.WPF.g.en-US.resources:consolecontrol.baml,btn_clear:System.Windows.FrameworkElement.Width,None,False,True,,75
+CNC.Controls.WPF.g.en-US.resources:appconfigview.baml,btn_saveSettings:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.WPF.g.en-US.resources:appconfigview.baml,btn_saveSettings:System.Windows.Controls.DockPanel.Dock,Button,True,False,,Bottom
+CNC.Controls.WPF.g.en-US.resources:appconfigview.baml,btn_saveSettings:System.Windows.Controls.ContentControl.Content,Button,True,True,,Save settings
+CNC.Controls.WPF.g.en-US.resources:appconfigview.baml,btn_saveSettings:System.Windows.FrameworkElement.Margin,None,False,True,,"10,0,0,5"
+CNC.Controls.WPF.g.en-US.resources:appconfigview.baml,btn_saveSettings:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:appconfigview.baml,btn_saveSettings:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.WPF.g.en-US.resources:appconfigview.baml,btn_saveSettings:System.Windows.FrameworkElement.Width,None,False,True,,100
+CNC.Controls.WPF.g.en-US.resources:trinamicview.baml,lbl_sgLoad:System.Windows.Controls.Label.$Content,Label,True,True,,
+CNC.Controls.WPF.g.en-US.resources:trinamicview.baml,lbl_sgLoad:System.Windows.Controls.ContentControl.Content,Label,True,True,,Load (SG_RESULT)
+CNC.Controls.WPF.g.en-US.resources:trinamicview.baml,lbl_sgLoad:System.Windows.Controls.Control.Foreground,None,False,True,,\#FF0000FF
+CNC.Controls.WPF.g.en-US.resources:trinamicview.baml,lbl_sgLoad:System.Windows.FrameworkElement.Margin,None,False,True,,"0,0,5,0"
+CNC.Controls.WPF.g.en-US.resources:trinamicview.baml,lbl_sgLoad:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Right
+CNC.Controls.WPF.g.en-US.resources:trinamicview.baml,lbl_sgLoad:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Center
+CNC.Controls.WPF.g.en-US.resources:trinamicview.baml,grp_stallGuard:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,stallGuard
+CNC.Controls.WPF.g.en-US.resources:trinamicview.baml,lbl_stallGuardEnable:System.Windows.Controls.CheckBox.$Content,CheckBox,True,True,,
+CNC.Controls.WPF.g.en-US.resources:trinamicview.baml,lbl_stallGuardEnable:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Enable filter (SFILT)
+CNC.Controls.WPF.g.en-US.resources:trinamicview.baml,lbl_stallGuardEnable:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:trinamicview.baml,lbl_stallGuardEnable:System.Windows.FrameworkElement.Margin,None,False,True,,"5,5,0,0"
+CNC.Controls.WPF.g.en-US.resources:trinamicview.baml,lbl_stallGuardEnable:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.WPF.g.en-US.resources:trinamicview.baml,lbl_configure:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.WPF.g.en-US.resources:trinamicview.baml,lbl_configure:System.Windows.Controls.ContentControl.Content,Button,True,True,,Configure
+CNC.Controls.WPF.g.en-US.resources:trinamicview.baml,lbl_configure:System.Windows.FrameworkElement.Width,None,False,True,,60
+CNC.Controls.WPF.g.en-US.resources:trinamicview.baml,lbl_configure:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Center
+CNC.Controls.WPF.g.en-US.resources:trinamicview.baml,lbl_configure:System.Windows.FrameworkElement.Margin,None,False,True,,"5,0"
+CNC.Controls.WPF.g.en-US.resources:trinamicview.baml,btn_getStatus:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.WPF.g.en-US.resources:trinamicview.baml,btn_getStatus:System.Windows.Controls.ContentControl.Content,Button,True,True,,Get status
+CNC.Controls.WPF.g.en-US.resources:trinamicview.baml,btn_getStatus:System.Windows.FrameworkElement.Width,None,False,True,,130
+CNC.Controls.WPF.g.en-US.resources:trinamicview.baml,btn_getStatus:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:trinamicview.baml,btn_getStatus:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Center
+CNC.Controls.WPF.g.en-US.resources:trinamicview.baml,btn_getStatusAll:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.WPF.g.en-US.resources:trinamicview.baml,btn_getStatusAll:System.Windows.Controls.ContentControl.Content,Button,True,True,,"Get status, all drivers"
+CNC.Controls.WPF.g.en-US.resources:trinamicview.baml,btn_getStatusAll:System.Windows.FrameworkElement.Width,None,False,True,,130
+CNC.Controls.WPF.g.en-US.resources:trinamicview.baml,btn_getStatusAll:System.Windows.FrameworkElement.Margin,None,False,True,,"5,0"
+CNC.Controls.WPF.g.en-US.resources:trinamicview.baml,btn_getStatusAll:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:trinamicview.baml,btn_getStatusAll:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Center
+CNC.Controls.WPF.g.en-US.resources:coordvaluesetcontrol.baml,btn_set:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.WPF.g.en-US.resources:coordvaluesetcontrol.baml,btn_set:System.Windows.Controls.ContentControl.Content,Button,True,True,,Set
+CNC.Controls.WPF.g.en-US.resources:coordvaluesetcontrol.baml,btn_set:System.Windows.Controls.Grid.Column,None,False,True,,1
+CNC.Controls.WPF.g.en-US.resources:coordvaluesetcontrol.baml,btn_set:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:coordvaluesetcontrol.baml,btn_set:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Center
+CNC.Controls.WPF.g.en-US.resources:coordvaluesetcontrol.baml,btn_set:System.Windows.FrameworkElement.Width,None,False,True,,35
+CNC.Controls.WPF.g.en-US.resources:coordvaluesetcontrol.baml,btn_set:System.Windows.FrameworkElement.Height,None,False,True,,22
+CNC.Controls.WPF.g.en-US.resources:coordvaluesetcontrol.baml,btn_set:System.Windows.FrameworkElement.Margin,None,False,True,,"0,4"
+CNC.Controls.WPF.g.en-US.resources:spindlecontrol.baml,grp_spindle:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Spindle
+CNC.Controls.WPF.g.en-US.resources:spindlecontrol.baml,grp_spindle:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:spindlecontrol.baml,grp_spindle:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.WPF.g.en-US.resources:spindlecontrol.baml,grp_spindle:System.Windows.FrameworkElement.Height,None,False,True,,125
+CNC.Controls.WPF.g.en-US.resources:spindlecontrol.baml,grp_spindle:System.Windows.FrameworkElement.Width,None,False,True,,216
+CNC.Controls.WPF.g.en-US.resources:spindlecontrol.baml,lbl_off:System.Windows.Controls.RadioButton.$Content,RadioButton,True,True,,
+CNC.Controls.WPF.g.en-US.resources:spindlecontrol.baml,lbl_off:System.Windows.Controls.ContentControl.Content,RadioButton,True,True,,Off
+CNC.Controls.WPF.g.en-US.resources:spindlecontrol.baml,lbl_off:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:spindlecontrol.baml,lbl_off:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Center
+CNC.Controls.WPF.g.en-US.resources:spindlecontrol.baml,lbl_off:System.Windows.FrameworkElement.Height,None,False,True,,16
+CNC.Controls.WPF.g.en-US.resources:spindlecontrol.baml,lbl_cw:System.Windows.Controls.RadioButton.$Content,RadioButton,True,True,,
+CNC.Controls.WPF.g.en-US.resources:spindlecontrol.baml,lbl_cw:System.Windows.Controls.ContentControl.Content,RadioButton,True,True,,CW
+CNC.Controls.WPF.g.en-US.resources:spindlecontrol.baml,lbl_cw:System.Windows.FrameworkElement.Margin,None,False,True,,"5,0"
+CNC.Controls.WPF.g.en-US.resources:spindlecontrol.baml,lbl_cw:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:spindlecontrol.baml,lbl_cw:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Center
+CNC.Controls.WPF.g.en-US.resources:spindlecontrol.baml,lbl_cw:System.Windows.FrameworkElement.Height,None,False,True,,16
+CNC.Controls.WPF.g.en-US.resources:spindlecontrol.baml,lbl_ccw:System.Windows.Controls.RadioButton.$Content,RadioButton,True,True,,
+CNC.Controls.WPF.g.en-US.resources:spindlecontrol.baml,lbl_ccw:System.Windows.Controls.ContentControl.Content,RadioButton,True,True,,CCW
+CNC.Controls.WPF.g.en-US.resources:spindlecontrol.baml,lbl_ccw:System.Windows.FrameworkElement.Margin,None,False,True,,"5,0"
+CNC.Controls.WPF.g.en-US.resources:spindlecontrol.baml,lbl_ccw:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:spindlecontrol.baml,lbl_ccw:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Center
+CNC.Controls.WPF.g.en-US.resources:spindlecontrol.baml,lbl_ccw:System.Windows.FrameworkElement.Height,None,False,True,,16
+CNC.Controls.WPF.g.en-US.resources:spindlecontrol.baml,lbl_rpm:System.Windows.Controls.Label.$Content,Label,True,True,,
+CNC.Controls.WPF.g.en-US.resources:spindlecontrol.baml,lbl_rpm:System.Windows.Controls.ContentControl.Content,Label,True,True,,RPM
+CNC.Controls.WPF.g.en-US.resources:spindlecontrol.baml,lbl_rpm:System.Windows.Controls.Control.HorizontalContentAlignment,None,False,True,,Right
+CNC.Controls.WPF.g.en-US.resources:spindlecontrol.baml,lbl_rpm:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Center
+CNC.Controls.WPF.g.en-US.resources:spindlecontrol.baml,lbl_rpm:System.Windows.FrameworkElement.Height,None,False,True,,24
+CNC.Controls.WPF.g.en-US.resources:spindlecontrol.baml,lbl_rpm:System.Windows.FrameworkElement.Width,None,False,True,,34
+CNC.Controls.WPF.g.en-US.resources:macroeditor.baml,dlg_macroEditor:System.Windows.Window.Title,Title,True,True,,Macro Editor
+CNC.Controls.WPF.g.en-US.resources:macroeditor.baml,dlg_macroEditor:System.Windows.FrameworkElement.Height,None,False,True,,260
+CNC.Controls.WPF.g.en-US.resources:macroeditor.baml,dlg_macroEditor:System.Windows.FrameworkElement.Width,None,False,True,,310
+CNC.Controls.WPF.g.en-US.resources:macroeditor.baml,dlg_macroEditor:System.Windows.Window.Icon,None,False,True,,App.ico
+CNC.Controls.WPF.g.en-US.resources:macroeditor.baml,dlg_macroEditor:System.Windows.Window.ResizeMode,None,False,True,,NoResize
+CNC.Controls.WPF.g.en-US.resources:macroeditor.baml,dlg_macroEditor:System.Windows.Window.ShowInTaskbar,None,False,True,,False
+CNC.Controls.WPF.g.en-US.resources:macroeditor.baml,dlg_macroEditor:System.Windows.Window.WindowStartupLocation,None,False,True,,CenterOwner
+CNC.Controls.WPF.g.en-US.resources:macroeditor.baml,btn_add:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.WPF.g.en-US.resources:macroeditor.baml,btn_add:System.Windows.Controls.ContentControl.Content,Button,True,True,,Add
+CNC.Controls.WPF.g.en-US.resources:macroeditor.baml,btn_add:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:macroeditor.baml,btn_add:System.Windows.FrameworkElement.Margin,None,False,True,,"170,10,0,0"
+CNC.Controls.WPF.g.en-US.resources:macroeditor.baml,btn_add:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.WPF.g.en-US.resources:macroeditor.baml,btn_add:System.Windows.FrameworkElement.Width,None,False,True,,45
+CNC.Controls.WPF.g.en-US.resources:macroeditor.baml,btn_ok:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.WPF.g.en-US.resources:macroeditor.baml,btn_ok:System.Windows.Controls.ContentControl.Content,Button,True,True,,Ok
+CNC.Controls.WPF.g.en-US.resources:macroeditor.baml,btn_ok:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:macroeditor.baml,btn_ok:System.Windows.FrameworkElement.Margin,None,False,True,,"55,187,0,0"
+CNC.Controls.WPF.g.en-US.resources:macroeditor.baml,btn_ok:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.WPF.g.en-US.resources:macroeditor.baml,btn_ok:System.Windows.FrameworkElement.Width,None,False,True,,75
+CNC.Controls.WPF.g.en-US.resources:macroeditor.baml,btn_cancel:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.WPF.g.en-US.resources:macroeditor.baml,btn_cancel:System.Windows.Controls.ContentControl.Content,Button,True,True,,Cancel
+CNC.Controls.WPF.g.en-US.resources:macroeditor.baml,btn_cancel:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Right
+CNC.Controls.WPF.g.en-US.resources:macroeditor.baml,btn_cancel:System.Windows.FrameworkElement.Margin,None,False,True,,"0,187,55,0"
+CNC.Controls.WPF.g.en-US.resources:macroeditor.baml,btn_cancel:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.WPF.g.en-US.resources:macroeditor.baml,btn_cancel:System.Windows.FrameworkElement.Width,None,False,True,,75
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_distance3:CNC.Controls.NumericField.$Content,None,False,True,,
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_distance3:CNC.Controls.NumericField.Label,None,False,True,,Distance 3:
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_distance3:CNC.Controls.NumericField.ColonAt,None,False,True,,90
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_distance3:CNC.Controls.NumericField.Unit,None,False,True,,mm
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_distance3:CNC.Controls.NumericField.Format,None,False,True,,\#\#\#0.0\#\#
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_distance2:CNC.Controls.NumericField.$Content,None,False,True,,
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_distance2:CNC.Controls.NumericField.Label,None,False,True,,Distance 2:
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_distance2:CNC.Controls.NumericField.ColonAt,None,False,True,,90
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_distance2:CNC.Controls.NumericField.Unit,None,False,True,,mm
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_distance2:CNC.Controls.NumericField.Format,None,False,True,,\#\#\#0.0\#\#
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_distance1:CNC.Controls.NumericField.$Content,None,False,True,,
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_distance1:CNC.Controls.NumericField.Label,None,False,True,,Distance 1:
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_distance1:CNC.Controls.NumericField.ColonAt,None,False,True,,90
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_distance1:CNC.Controls.NumericField.Unit,None,False,True,,mm
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_distance1:CNC.Controls.NumericField.Format,None,False,True,,\#\#\#0.0\#\#
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_distance0:CNC.Controls.NumericField.$Content,None,False,True,,
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_distance0:CNC.Controls.NumericField.Label,None,False,True,,Distance 0:
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_distance0:CNC.Controls.NumericField.ColonAt,None,False,True,,90
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_distance0:CNC.Controls.NumericField.Unit,None,False,True,,mm
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_distance0:CNC.Controls.NumericField.Format,None,False,True,,\#\#\#0.0\#\#
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_feedrate3:CNC.Controls.NumericField.$Content,None,False,True,,
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_feedrate3:CNC.Controls.NumericField.Label,None,False,True,,Feedrate 3:
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_feedrate3:CNC.Controls.NumericField.ColonAt,None,False,True,,90
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_feedrate3:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_feedrate3:CNC.Controls.NumericField.Format,None,False,True,,\#\#\#\#0
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_feedrate2:CNC.Controls.NumericField.$Content,None,False,True,,
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_feedrate2:CNC.Controls.NumericField.Label,None,False,True,,Feedrate 2:
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_feedrate2:CNC.Controls.NumericField.ColonAt,None,False,True,,90
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_feedrate2:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_feedrate2:CNC.Controls.NumericField.Format,None,False,True,,\#\#\#\#0
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_feedrate1:CNC.Controls.NumericField.$Content,None,False,True,,
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_feedrate1:CNC.Controls.NumericField.Label,None,False,True,,Feedrate 1:
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_feedrate1:CNC.Controls.NumericField.ColonAt,None,False,True,,90
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_feedrate1:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_feedrate1:CNC.Controls.NumericField.Format,None,False,True,,\#\#\#\#0
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_feedrate0:CNC.Controls.NumericField.$Content,None,False,True,,
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_feedrate0:CNC.Controls.NumericField.Label,None,False,True,,Feedrate 0:
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_feedrate0:CNC.Controls.NumericField.ColonAt,None,False,True,,90
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_feedrate0:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_feedrate0:CNC.Controls.NumericField.Format,None,False,True,,\#\#\#\#0
+CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,btn_cycleStart:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,btn_cycleStart:System.Windows.Controls.ContentControl.Content,Button,True,True,,Cycle Start
+CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,btn_cycleStart:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Alt+R
+CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,btn_feedHold:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,btn_feedHold:System.Windows.Controls.ContentControl.Content,Button,True,True,,Feed Hold
+CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,btn_feedHold:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Space
+CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,btn_feedHold:System.Windows.FrameworkElement.Margin,None,False,True,,"5,0,0,0"
+CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,btn_stop:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,btn_stop:System.Windows.Controls.ContentControl.Content,Button,True,True,,Stop
+CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,btn_stop:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Alt+S
+CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,btn_stop:System.Windows.FrameworkElement.Margin,None,False,True,,"5,0,0,0"
+CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,btn_rewind:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,btn_rewind:System.Windows.Controls.ContentControl.Content,Button,True,True,,Rewind
+CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,btn_rewind:System.Windows.FrameworkElement.Margin,None,False,True,,"5,0,0,0"
+CNC.Controls.WPF.g.en-US.resources:macroexecutecontrol.baml,lbl_noMacrosDefined:System.Windows.Controls.Label.$Content,Label,True,True,,
+CNC.Controls.WPF.g.en-US.resources:macroexecutecontrol.baml,lbl_noMacrosDefined:System.Windows.Controls.ContentControl.Content,Label,True,True,,"No macros defined, use Edit button to add."
+CNC.Controls.WPF.g.en-US.resources:macroexecutecontrol.baml,lbl_noMacrosDefined:System.Windows.Controls.Control.HorizontalContentAlignment,None,False,True,,Center
+CNC.Controls.WPF.g.en-US.resources:macroexecutecontrol.baml,lbl_noMacrosDefined:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Center
+CNC.Controls.WPF.g.en-US.resources:macroexecutecontrol.baml,lbl_noMacrosDefined:System.Windows.FrameworkElement.Margin,None,False,True,,"0,80,0,0"
+CNC.Controls.WPF.g.en-US.resources:macroexecutecontrol.baml,lbl_noMacrosDefined:System.Windows.FrameworkElement.Width,None,False,True,,280
+CNC.Controls.WPF.g.en-US.resources:macroexecutecontrol.baml,lbl_noMacrosDefined:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.WPF.g.en-US.resources:macroexecutecontrol.baml,btn_edit:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.WPF.g.en-US.resources:macroexecutecontrol.baml,btn_edit:System.Windows.Controls.ContentControl.Content,Button,True,True,,Edit
+CNC.Controls.WPF.g.en-US.resources:macroexecutecontrol.baml,btn_edit:System.Windows.FrameworkElement.Width,None,False,True,,50
+CNC.Controls.WPF.g.en-US.resources:macroexecutecontrol.baml,btn_edit:System.Windows.FrameworkElement.Height,None,False,True,,25
+CNC.Controls.WPF.g.en-US.resources:macroexecutecontrol.baml,btn_edit:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Right
+CNC.Controls.WPF.g.en-US.resources:macroexecutecontrol.baml,btn_edit:System.Windows.FrameworkElement.Margin,None,False,True,,"0,0,8,8"
+CNC.Controls.WPF.g.en-US.resources:macroexecutecontrol.baml,btn_edit:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Bottom
+CNC.Controls.WPF.g.en-US.resources:workparameterscontrol.baml,grp_workparams:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Work Parameters
+CNC.Controls.WPF.g.en-US.resources:workparameterscontrol.baml,grp_workparams:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:workparameterscontrol.baml,grp_workparams:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.WPF.g.en-US.resources:workparameterscontrol.baml,grp_workparams:System.Windows.FrameworkElement.Height,None,False,True,,Auto
+CNC.Controls.WPF.g.en-US.resources:workparameterscontrol.baml,grp_workparams:System.Windows.FrameworkElement.Width,None,False,True,,216
+CNC.Controls.WPF.g.en-US.resources:workparameterscontrol.baml,lbl_offset:System.Windows.Controls.Label.$Content,Label,True,True,,
+CNC.Controls.WPF.g.en-US.resources:workparameterscontrol.baml,lbl_offset:System.Windows.Controls.ContentControl.Content,Label,True,True,,Offset:
+CNC.Controls.WPF.g.en-US.resources:workparameterscontrol.baml,lbl_offset:System.Windows.Controls.Control.HorizontalContentAlignment,None,False,True,,Right
+CNC.Controls.WPF.g.en-US.resources:workparameterscontrol.baml,lbl_offset:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Right
+CNC.Controls.WPF.g.en-US.resources:workparameterscontrol.baml,lbl_offset:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Center
+CNC.Controls.WPF.g.en-US.resources:workparameterscontrol.baml,lbl_offset:System.Windows.FrameworkElement.Height,None,False,True,,26
+CNC.Controls.WPF.g.en-US.resources:workparameterscontrol.baml,lbl_offset:System.Windows.FrameworkElement.Margin,None,False,True,,"0,7"
+CNC.Controls.WPF.g.en-US.resources:workparameterscontrol.baml,lbl_offset:System.Windows.FrameworkElement.Width,None,False,True,,45
+CNC.Controls.WPF.g.en-US.resources:workparameterscontrol.baml,lbl_tool:System.Windows.Controls.Label.$Content,Label,True,True,,
+CNC.Controls.WPF.g.en-US.resources:workparameterscontrol.baml,lbl_tool:System.Windows.Controls.ContentControl.Content,Label,True,True,,Tool:
+CNC.Controls.WPF.g.en-US.resources:workparameterscontrol.baml,lbl_tool:System.Windows.Controls.Grid.Column,None,False,True,,2
+CNC.Controls.WPF.g.en-US.resources:workparameterscontrol.baml,lbl_tool:System.Windows.Controls.Control.HorizontalContentAlignment,None,False,True,,Right
+CNC.Controls.WPF.g.en-US.resources:workparameterscontrol.baml,lbl_tool:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Right
+CNC.Controls.WPF.g.en-US.resources:workparameterscontrol.baml,lbl_tool:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Center
+CNC.Controls.WPF.g.en-US.resources:workparameterscontrol.baml,lbl_tool:System.Windows.FrameworkElement.Height,None,False,True,,26
+CNC.Controls.WPF.g.en-US.resources:workparameterscontrol.baml,lbl_tool:System.Windows.FrameworkElement.Width,None,False,True,,36
+CNC.Controls.WPF.g.en-US.resources:workparameterscontrol.baml,lbl_tlo:CNC.Controls.LEDControl.$Content,None,False,True,,
+CNC.Controls.WPF.g.en-US.resources:workparameterscontrol.baml,lbl_tlo:System.Windows.Controls.Grid.Row,None,False,True,,1
+CNC.Controls.WPF.g.en-US.resources:workparameterscontrol.baml,lbl_tlo:System.Windows.Controls.Grid.Column,None,False,True,,1
+CNC.Controls.WPF.g.en-US.resources:workparameterscontrol.baml,lbl_tlo:CNC.Controls.LEDControl.Label,None,False,True,,TLO
+CNC.Controls.WPF.g.en-US.resources:workparameterscontrol.baml,lbl_tlo:System.Windows.FrameworkElement.Margin,None,False,True,,"10,0,0,0"
+CNC.Controls.WPF.g.en-US.resources:workparameterscontrol.baml,lbl_tlo_refd:CNC.Controls.LEDControl.$Content,None,False,True,,
+CNC.Controls.WPF.g.en-US.resources:workparameterscontrol.baml,lbl_tlo_refd:System.Windows.Controls.Grid.Row,None,False,True,,1
+CNC.Controls.WPF.g.en-US.resources:workparameterscontrol.baml,lbl_tlo_refd:System.Windows.Controls.Grid.ColumnSpan,None,False,True,,2
+CNC.Controls.WPF.g.en-US.resources:workparameterscontrol.baml,lbl_tlo_refd:System.Windows.Controls.Grid.Column,None,False,True,,2
+CNC.Controls.WPF.g.en-US.resources:workparameterscontrol.baml,lbl_tlo_refd:CNC.Controls.LEDControl.Label,None,False,True,,TLO ref&apos;d
+CNC.Controls.WPF.g.en-US.resources:workparameterscontrol.baml,lbl_tlo_refd:System.Windows.FrameworkElement.Margin,None,False,True,,"10,0,0,0"
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,hdr_offset:System.Windows.Controls.DataGridTextColumn.$Content,None,True,True,,
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,hdr_offset:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Offset
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,hdr_offset:System.Windows.Controls.DataGridColumn.Width,None,True,False,,50
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,lbl_offset:System.Windows.Controls.Label.$Content,Label,True,True,,
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,lbl_offset:System.Windows.Controls.ContentControl.Content,Label,True,True,,Offset:
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,lbl_offset:System.Windows.Controls.Control.HorizontalContentAlignment,None,False,True,,Right
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,lbl_offset:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Right
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,lbl_offset:System.Windows.FrameworkElement.Margin,None,False,True,,"29,0,0,0"
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,lbl_offset:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,lbl_xAxis:CNC.Controls.CoordValueSetControl.$Content,None,True,True,,
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,lbl_xAxis:CNC.Controls.CoordValueSetControl.Name,None,True,True,,cvXOffset
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,lbl_xAxis:CNC.Controls.CoordValueSetControl.Click,None,True,True,,cvOffset_Click
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,lbl_xAxis:CNC.Controls.CoordValueSetControl.Label,None,True,True,,X axis:
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,lbl_yAxis:CNC.Controls.CoordValueSetControl.$Content,None,True,True,,
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,lbl_yAxis:CNC.Controls.CoordValueSetControl.Name,None,True,True,,cvYOffset
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,lbl_yAxis:CNC.Controls.CoordValueSetControl.Click,None,True,True,,cvOffset_Click
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,lbl_yAxis:CNC.Controls.CoordValueSetControl.Label,None,True,True,,Y axis:
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,lbl_zAxis:CNC.Controls.CoordValueSetControl.$Content,None,True,True,,
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,lbl_zAxis:CNC.Controls.CoordValueSetControl.Name,None,True,True,,cvZOffset
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,lbl_zAxis:CNC.Controls.CoordValueSetControl.Click,None,True,True,,cvOffset_Click
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,lbl_zAxis:CNC.Controls.CoordValueSetControl.Label,None,True,True,,Z axis:
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,lbl_aAxis:CNC.Controls.CoordValueSetControl.$Content,None,True,True,,
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,lbl_aAxis:CNC.Controls.CoordValueSetControl.Name,None,True,True,,cvAOffset
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,lbl_aAxis:CNC.Controls.CoordValueSetControl.Click,None,True,True,,cvOffset_Click
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,lbl_aAxis:CNC.Controls.CoordValueSetControl.Label,None,True,True,,A axis:
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,lbl_bAxis:CNC.Controls.CoordValueSetControl.$Content,None,True,True,,
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,lbl_bAxis:CNC.Controls.CoordValueSetControl.Name,None,True,True,,cvBOffset
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,lbl_bAxis:CNC.Controls.CoordValueSetControl.Click,None,True,True,,cvOffset_Click
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,lbl_bAxis:CNC.Controls.CoordValueSetControl.Label,None,True,True,,B axis:
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,lbl_cAxis:CNC.Controls.CoordValueSetControl.$Content,None,True,True,,
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,lbl_cAxis:CNC.Controls.CoordValueSetControl.Name,None,True,True,,cvCOffset
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,lbl_cAxis:CNC.Controls.CoordValueSetControl.Click,None,True,True,,cvOffset_Click
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,lbl_cAxis:CNC.Controls.CoordValueSetControl.Label,None,True,True,,C axis:
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,btn_currPos:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,btn_currPos:System.Windows.Controls.ContentControl.Content,Button,True,True,,Get current position
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,btn_currPos:System.Windows.FrameworkElement.Margin,None,False,True,,"3,0"
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,btn_clear:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,btn_clear:System.Windows.Controls.ContentControl.Content,Button,True,True,,Clear all
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,btn_setAll:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,btn_setAll:System.Windows.Controls.ContentControl.Content,Button,True,True,,Set all
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,btn_setAll:System.Windows.FrameworkElement.Margin,None,False,True,,"3,0"
+CNC.Controls.WPF.g.en-US.resources:coolantcontrol.baml,grp_coolant:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Coolant
+CNC.Controls.WPF.g.en-US.resources:coolantcontrol.baml,grp_coolant:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:coolantcontrol.baml,grp_coolant:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.WPF.g.en-US.resources:coolantcontrol.baml,grp_coolant:System.Windows.FrameworkElement.Width,None,False,True,,216
+CNC.Controls.WPF.g.en-US.resources:coolantcontrol.baml,lbl_flood:System.Windows.Controls.CheckBox.$Content,CheckBox,True,True,,
+CNC.Controls.WPF.g.en-US.resources:coolantcontrol.baml,lbl_flood:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Flood
+CNC.Controls.WPF.g.en-US.resources:coolantcontrol.baml,lbl_flood:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:coolantcontrol.baml,lbl_flood:System.Windows.FrameworkElement.Margin,None,False,True,,"20,3,0,0"
+CNC.Controls.WPF.g.en-US.resources:coolantcontrol.baml,lbl_flood:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.WPF.g.en-US.resources:coolantcontrol.baml,lbl_mist:System.Windows.Controls.CheckBox.$Content,CheckBox,True,True,,
+CNC.Controls.WPF.g.en-US.resources:coolantcontrol.baml,lbl_mist:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Mist
+CNC.Controls.WPF.g.en-US.resources:coolantcontrol.baml,lbl_mist:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:coolantcontrol.baml,lbl_mist:System.Windows.FrameworkElement.Margin,None,False,True,,"20,3,0,0"
+CNC.Controls.WPF.g.en-US.resources:coolantcontrol.baml,lbl_mist:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.WPF.g.en-US.resources:coolantcontrol.baml,lbl_fan:System.Windows.Controls.CheckBox.$Content,CheckBox,True,True,,
+CNC.Controls.WPF.g.en-US.resources:coolantcontrol.baml,lbl_fan:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Fan
+CNC.Controls.WPF.g.en-US.resources:coolantcontrol.baml,lbl_fan:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:coolantcontrol.baml,lbl_fan:System.Windows.FrameworkElement.Margin,None,False,True,,"20,3,0,0"
+CNC.Controls.WPF.g.en-US.resources:coolantcontrol.baml,lbl_fan:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,btn_reload:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,btn_reload:System.Windows.Controls.ContentControl.Content,Button,True,True,,Reload
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,btn_reload:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Reload settings from controller.
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,btn_reload:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,btn_reload:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,btn_reload:System.Windows.FrameworkElement.Width,None,False,True,,75
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,btn_save:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,btn_save:System.Windows.Controls.ContentControl.Content,Button,True,True,,Save
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,btn_save:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Save changed settings to controller.
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,btn_save:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,btn_save:System.Windows.FrameworkElement.Margin,None,False,True,,"5,0,0,0"
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,btn_save:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,btn_save:System.Windows.FrameworkElement.Width,None,False,True,,75
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,btn_backup:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,btn_backup:System.Windows.Controls.ContentControl.Content,Button,True,True,,Backup
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,btn_backup:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,btn_backup:System.Windows.FrameworkElement.Margin,None,False,True,,"230,0,0,0"
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,btn_backup:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,btn_backup:System.Windows.FrameworkElement.Width,None,False,True,,75
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,btn_restore:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,btn_restore:System.Windows.Controls.ContentControl.Content,Button,True,True,,Restore
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,btn_restore:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Right
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,btn_restore:System.Windows.FrameworkElement.Margin,None,False,True,,"5,0,0,0"
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,btn_restore:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,btn_restore:System.Windows.FrameworkElement.Width,None,False,True,,75
+CNC.Controls.WPF.g.en-US.resources:gcodelistcontrol.baml,hdr_block:System.Windows.Controls.DataGridTextColumn.$Content,None,True,True,,
+CNC.Controls.WPF.g.en-US.resources:gcodelistcontrol.baml,hdr_block:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Block
+CNC.Controls.WPF.g.en-US.resources:gcodelistcontrol.baml,hdr_block:System.Windows.Controls.DataGridColumn.Width,None,True,False,,50
+CNC.Controls.WPF.g.en-US.resources:gcodelistcontrol.baml,hdr_block:System.Windows.Controls.DataGridColumn.MinWidth,None,False,True,,50
+CNC.Controls.WPF.g.en-US.resources:gcodelistcontrol.baml,hdr_block:System.Windows.Controls.DataGridColumn.MaxWidth,None,False,True,,60
+CNC.Controls.WPF.g.en-US.resources:gcodelistcontrol.baml,hdr_data:System.Windows.Controls.DataGridTextColumn.$Content,None,True,True,,
+CNC.Controls.WPF.g.en-US.resources:gcodelistcontrol.baml,hdr_data:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Data
+CNC.Controls.WPF.g.en-US.resources:gcodelistcontrol.baml,hdr_data:System.Windows.Controls.DataGridColumn.Width,None,True,False,,*
+CNC.Controls.WPF.g.en-US.resources:gcodelistcontrol.baml,hdr_data:System.Windows.Controls.DataGridColumn.MinWidth,None,False,True,,280
+CNC.Controls.WPF.g.en-US.resources:about.baml,dlg_about:System.Windows.Window.Title,Title,True,True,,About
+CNC.Controls.WPF.g.en-US.resources:about.baml,dlg_about:System.Windows.FrameworkElement.Height,None,False,True,,285
+CNC.Controls.WPF.g.en-US.resources:about.baml,dlg_about:System.Windows.FrameworkElement.Width,None,False,True,,315
+CNC.Controls.WPF.g.en-US.resources:about.baml,dlg_about:System.Windows.Window.ResizeMode,None,False,True,,NoResize
+CNC.Controls.WPF.g.en-US.resources:about.baml,dlg_about:System.Windows.Window.ShowInTaskbar,None,False,True,,False
+CNC.Controls.WPF.g.en-US.resources:about.baml,dlg_about:System.Windows.Window.WindowStartupLocation,None,False,True,,CenterOwner
+CNC.Controls.WPF.g.en-US.resources:about.baml,dlg_about:System.Windows.Window.Icon,None,False,True,,App.ico
+CNC.Controls.WPF.g.en-US.resources:about.baml,btn_ok:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.WPF.g.en-US.resources:about.baml,btn_ok:System.Windows.Controls.ContentControl.Content,Button,True,True,,Ok
+CNC.Controls.WPF.g.en-US.resources:about.baml,btn_ok:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Center
+CNC.Controls.WPF.g.en-US.resources:about.baml,btn_ok:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.WPF.g.en-US.resources:about.baml,btn_ok:System.Windows.FrameworkElement.Width,None,False,True,,85
+CNC.Controls.WPF.g.en-US.resources:about.baml,btn_toClipboard:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.WPF.g.en-US.resources:about.baml,btn_toClipboard:System.Windows.Controls.ContentControl.Content,Button,True,True,,To Clipboard
+CNC.Controls.WPF.g.en-US.resources:about.baml,btn_toClipboard:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Copy grbl version information and settings to clipboard
+CNC.Controls.WPF.g.en-US.resources:about.baml,btn_toClipboard:System.Windows.FrameworkElement.Margin,None,False,True,,"5,0,0,0"
+CNC.Controls.WPF.g.en-US.resources:about.baml,btn_toClipboard:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Center
+CNC.Controls.WPF.g.en-US.resources:about.baml,btn_toClipboard:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.WPF.g.en-US.resources:about.baml,btn_toClipboard:System.Windows.FrameworkElement.Width,None,False,True,,85
+CNC.Controls.WPF.g.en-US.resources:mpgpending.baml,lbl_mpgModeActive:System.Windows.Controls.Label.$Content,Label,True,True,,
+CNC.Controls.WPF.g.en-US.resources:mpgpending.baml,lbl_mpgModeActive:System.Windows.Controls.ContentControl.Content,Label,True,True,,"MPG mode active, waiting for it to be disabled..."
+CNC.Controls.WPF.g.en-US.resources:mpgpending.baml,lbl_mpgModeActive:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Center
+CNC.Controls.WPF.g.en-US.resources:mpgpending.baml,lbl_mpgModeActive:System.Windows.FrameworkElement.Margin,None,False,True,,0
+CNC.Controls.WPF.g.en-US.resources:mpgpending.baml,lbl_mpgModeActive:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Center
+CNC.Controls.WPF.g.en-US.resources:mpgpending.baml,lbl_mpgModeActive:System.Windows.Controls.Control.FontSize,None,True,True,,16
+CNC.Controls.WPF.g.en-US.resources:stripgcodeconfigcontrol.baml,grp_gcodeStrip:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,GCode command stripping
+CNC.Controls.WPF.g.en-US.resources:stripgcodeconfigcontrol.baml,grp_gcodeStrip:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:stripgcodeconfigcontrol.baml,grp_gcodeStrip:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.WPF.g.en-US.resources:stripgcodeconfigcontrol.baml,grp_gcodeStrip:System.Windows.FrameworkElement.Height,None,False,True,,Auto
+CNC.Controls.WPF.g.en-US.resources:stripgcodeconfigcontrol.baml,grp_gcodeStrip:System.Windows.FrameworkElement.Width,None,False,True,,250
+CNC.Controls.WPF.g.en-US.resources:feedcontrol.baml,grp_feedrate:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Feed rate
+CNC.Controls.WPF.g.en-US.resources:feedcontrol.baml,grp_feedrate:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:feedcontrol.baml,grp_feedrate:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.WPF.g.en-US.resources:feedcontrol.baml,grp_feedrate:System.Windows.FrameworkElement.Height,None,False,True,,160
+CNC.Controls.WPF.g.en-US.resources:feedcontrol.baml,grp_feedrate:System.Windows.FrameworkElement.Width,None,False,True,,216
+CNC.Controls.WPF.g.en-US.resources:feedcontrol.baml,lbl_rapids:System.Windows.Controls.Label.$Content,Label,True,True,,
+CNC.Controls.WPF.g.en-US.resources:feedcontrol.baml,lbl_rapids:System.Windows.Controls.ContentControl.Content,Label,True,True,,Rapids:
+CNC.Controls.WPF.g.en-US.resources:feedcontrol.baml,lbl_rapids:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:feedcontrol.baml,lbl_rapids:System.Windows.FrameworkElement.Margin,None,False,True,,"5,20,0,2"
+CNC.Controls.WPF.g.en-US.resources:feedcontrol.baml,lbl_rapids:System.Windows.Controls.Grid.Row,None,False,True,,1
+CNC.Controls.WPF.g.en-US.resources:feedcontrol.baml,lbl_rapids:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Center
+CNC.Controls.WPF.g.en-US.resources:feedcontrol.baml,lbl_rapids:System.Windows.Controls.Grid.RowSpan,None,False,True,,2
+CNC.Controls.WPF.g.en-US.resources:feedcontrol.baml,lbl_rapids:System.Windows.FrameworkElement.Height,None,False,True,,26
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,grb_mainConfig:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Main
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,grb_mainConfig:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,grb_mainConfig:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,grb_mainConfig:System.Windows.FrameworkElement.Height,None,False,True,,Auto
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,grb_mainConfig:System.Windows.FrameworkElement.Width,None,False,True,,250
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_resetDelay:CNC.Controls.NumericField.$Content,None,False,True,,
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_resetDelay:CNC.Controls.NumericField.Label,None,False,True,,Reset delay:
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_resetDelay:CNC.Controls.NumericField.ColonAt,None,False,True,,90
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_resetDelay:CNC.Controls.NumericField.Unit,None,False,True,,ms
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_resetDelay:CNC.Controls.NumericField.Format,None,False,True,,\#\#\#0
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_resetDelay:System.Windows.FrameworkElement.Height,None,False,True,,29
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_resetDelay:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Bottom
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_resetDelay:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Delay to allow controller to finish booting before communication starts.
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_pollInterval:CNC.Controls.NumericField.$Content,None,False,True,,
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_pollInterval:CNC.Controls.NumericField.Label,None,False,True,,Poll interval:
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_pollInterval:CNC.Controls.NumericField.ColonAt,None,False,True,,90
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_pollInterval:CNC.Controls.NumericField.Unit,None,False,True,,ms
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_pollInterval:CNC.Controls.NumericField.Format,None,False,True,,\#\#\#0
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_pollInterval:System.Windows.FrameworkElement.Height,None,False,True,,29
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_pollInterval:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Bottom
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_pollInterval:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Time between status request sent to controller.
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_maxBuffer:CNC.Controls.NumericField.$Content,None,False,True,,
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_maxBuffer:CNC.Controls.NumericField.Label,None,False,True,,Max buffer:
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_maxBuffer:CNC.Controls.NumericField.ColonAt,None,False,True,,90
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_maxBuffer:CNC.Controls.NumericField.Unit,None,False,True,,bytes
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_maxBuffer:CNC.Controls.NumericField.Format,None,False,True,,\#\#\#0
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_maxBuffer:System.Windows.FrameworkElement.Height,None,False,True,,29
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_maxBuffer:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Bottom
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_maxBuffer:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Maximum serial buffer size utilized (limited to 90% of reported value).
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_agressiveBuffering:System.Windows.Controls.CheckBox.$Content,CheckBox,True,True,,
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_agressiveBuffering:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Agressive buffering
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_agressiveBuffering:System.Windows.Controls.Control.HorizontalContentAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_agressiveBuffering:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_agressiveBuffering:System.Windows.FrameworkElement.Margin,None,False,True,,"5,0,0,0"
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_agressiveBuffering:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Buffers more than one GCode block in controller for smoother execution. For grblHAL only!
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_keepMdiFocus:System.Windows.Controls.CheckBox.$Content,CheckBox,True,True,,
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_keepMdiFocus:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Keep MDI focus
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_keepMdiFocus:System.Windows.Controls.Control.HorizontalContentAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_keepMdiFocus:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_keepMdiFocus:System.Windows.FrameworkElement.Margin,None,False,True,,"5,0,0,0"
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_keepMdiFocus:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Buffers more than one GCode block in controller for smoother execution. For grblHAL only!
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_FilterOk:System.Windows.Controls.CheckBox.$Content,CheckBox,True,True,,
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_FilterOk:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Filter &quot;ok&quot; response
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_FilterOk:System.Windows.Controls.Control.HorizontalContentAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_FilterOk:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_FilterOk:System.Windows.FrameworkElement.Margin,None,False,True,,"5,0,0,0"
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_FilterOk:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,"Enable if ok responses overwhelm console logging, typically happens when sending lots of short commands."
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_autoCompressGcode:System.Windows.Controls.CheckBox.$Content,CheckBox,True,True,,
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_autoCompressGcode:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Auto-compress gcode on transforms
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_autoCompressGcode:System.Windows.Controls.Control.HorizontalContentAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_autoCompressGcode:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_autoCompressGcode:System.Windows.FrameworkElement.Margin,None,False,True,,"5,0,0,0"
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_autoCompressGcode:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Removes superfluous gcode command elements.
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_restoreWindowSize:System.Windows.Controls.CheckBox.$Content,CheckBox,True,True,,
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_restoreWindowSize:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Restore last window size on startup
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_restoreWindowSize:System.Windows.Controls.Control.HorizontalContentAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_restoreWindowSize:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_restoreWindowSize:System.Windows.FrameworkElement.Margin,None,False,True,,"5,0,0,0"
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_restoreWindowSize:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Restore window size on next startup.
+CNC.Controls.WPF.g.en-US.resources:gotocontrol.baml,btn_gotoG28:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.WPF.g.en-US.resources:gotocontrol.baml,btn_gotoG28:System.Windows.Controls.ContentControl.Content,Button,True,True,,Goto position 1 (G28)
+CNC.Controls.WPF.g.en-US.resources:gotocontrol.baml,btn_gotoG28:System.Windows.UIElement.Focusable,None,False,True,,False
+CNC.Controls.WPF.g.en-US.resources:gotocontrol.baml,btn_gotoG28:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:gotocontrol.baml,btn_gotoG28:System.Windows.FrameworkElement.Margin,None,False,True,,"5,5,0,0"
+CNC.Controls.WPF.g.en-US.resources:gotocontrol.baml,btn_gotoG28:System.Windows.FrameworkElement.Width,None,False,True,,150
+CNC.Controls.WPF.g.en-US.resources:gotocontrol.baml,btn_gotoG28:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.WPF.g.en-US.resources:gotocontrol.baml,btn_gotoG30:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.WPF.g.en-US.resources:gotocontrol.baml,btn_gotoG30:System.Windows.Controls.ContentControl.Content,Button,True,True,,Goto position 2 (G30)
+CNC.Controls.WPF.g.en-US.resources:gotocontrol.baml,btn_gotoG30:System.Windows.UIElement.Focusable,None,False,True,,False
+CNC.Controls.WPF.g.en-US.resources:gotocontrol.baml,btn_gotoG30:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:gotocontrol.baml,btn_gotoG30:System.Windows.FrameworkElement.Margin,None,False,True,,"5,5,0,0"
+CNC.Controls.WPF.g.en-US.resources:gotocontrol.baml,btn_gotoG30:System.Windows.FrameworkElement.Width,None,False,True,,150
+CNC.Controls.WPF.g.en-US.resources:gotocontrol.baml,btn_gotoG30:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.WPF.g.en-US.resources:limitscontrol.baml,grp_programLimits:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Program limits
+CNC.Controls.WPF.g.en-US.resources:limitscontrol.baml,grp_programLimits:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Center
+CNC.Controls.WPF.g.en-US.resources:limitscontrol.baml,grp_programLimits:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.WPF.g.en-US.resources:limitscontrol.baml,grp_programLimits:System.Windows.FrameworkElement.Width,None,False,True,,216
+CNC.Controls.WPF.g.en-US.resources:machinepositionflyout.baml,lbl_machinePosition:System.Windows.Controls.TextBlock.$Content,Text,True,True,,
+CNC.Controls.WPF.g.en-US.resources:machinepositionflyout.baml,lbl_machinePosition:System.Windows.Controls.TextBlock.Text,Text,True,True,,Machine Position
+CNC.Controls.WPF.g.en-US.resources:machinepositionflyout.baml,lbl_machinePosition:System.Windows.FrameworkElement.Margin,None,False,True,,"0,4,0,0"
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,dlg_connection:System.Windows.Window.Title,Title,True,True,,Sender connection
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,dlg_connection:System.Windows.FrameworkElement.Height,None,False,True,,195
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,dlg_connection:System.Windows.FrameworkElement.Width,None,False,True,,400
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,dlg_connection:System.Windows.Window.Icon,None,False,True,,App.ico
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,dlg_connection:System.Windows.Window.ResizeMode,None,False,True,,NoResize
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,tab_serial:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Serial
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,lbl_serialPort:System.Windows.Controls.Label.$Content,Label,True,True,,
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,lbl_serialPort:System.Windows.Controls.ContentControl.Content,Label,True,True,,Port:
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,lbl_serialPort:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,lbl_serialPort:System.Windows.Controls.Control.HorizontalContentAlignment,None,False,True,,Right
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,lbl_serialPort:System.Windows.FrameworkElement.Width,None,False,True,,80
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,lbl_serialPort:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Center
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,lbl_onConnect:System.Windows.Controls.Label.$Content,Label,True,True,,
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,lbl_onConnect:System.Windows.Controls.ContentControl.Content,Label,True,True,,On connect:
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,lbl_onConnect:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,lbl_onConnect:System.Windows.Controls.Control.HorizontalContentAlignment,None,False,True,,Right
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,lbl_onConnect:System.Windows.FrameworkElement.Width,None,False,True,,80
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,lbl_onConnect:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Center
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,tab_network:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Network
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,lbl_websocket:System.Windows.Controls.CheckBox.$Content,CheckBox,True,True,,
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,lbl_websocket:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,WebSocket
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,lbl_websocket:System.Windows.FrameworkElement.Margin,None,False,True,,"80,5,0,0"
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,lbl_netPort:System.Windows.Controls.Label.$Content,Label,True,True,,
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,lbl_netPort:System.Windows.Controls.ContentControl.Content,Label,True,True,,Port:
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,lbl_netPort:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,lbl_netPort:System.Windows.Controls.Control.HorizontalContentAlignment,None,False,True,,Right
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,lbl_netPort:System.Windows.FrameworkElement.Width,None,False,True,,80
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,lbl_ipAddress:System.Windows.Controls.Label.$Content,Label,True,True,,
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,lbl_ipAddress:System.Windows.Controls.ContentControl.Content,Label,True,True,,IP address:
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,lbl_ipAddress:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,lbl_ipAddress:System.Windows.Controls.Control.HorizontalContentAlignment,None,False,True,,Right
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,lbl_ipAddress:System.Windows.FrameworkElement.Width,None,False,True,,80
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,btn_ok:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,btn_ok:System.Windows.Controls.ContentControl.Content,Button,True,True,,Ok
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,btn_ok:System.Windows.FrameworkElement.Height,None,False,True,,23
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,btn_ok:System.Windows.FrameworkElement.Width,None,False,True,,70
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,btn_cancel:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,btn_cancel:System.Windows.Controls.ContentControl.Content,Button,True,True,,Cancel
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,btn_cancel:System.Windows.FrameworkElement.Margin,None,False,True,,"5,0,0,0"
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,btn_cancel:System.Windows.FrameworkElement.Height,None,False,True,,23
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,btn_cancel:System.Windows.FrameworkElement.Width,None,False,True,,70
+CNC.Controls.WPF.g.en-US.resources:gcoderotatedialog.baml,fld_angle:CNC.Controls.NumericField.$Content,None,True,True,,
+CNC.Controls.WPF.g.en-US.resources:gcoderotatedialog.baml,fld_angle:CNC.Controls.NumericField.Name,None,True,True,,Angle
+CNC.Controls.WPF.g.en-US.resources:gcoderotatedialog.baml,fld_angle:CNC.Controls.NumericField.Label,None,True,True,,Angle:
+CNC.Controls.WPF.g.en-US.resources:gcoderotatedialog.baml,fld_angle:CNC.Controls.NumericField.ColonAt,None,True,True,,50
+CNC.Controls.WPF.g.en-US.resources:gcoderotatedialog.baml,fld_angle:CNC.Controls.NumericField.Unit,None,True,True,,degrees
+CNC.Controls.WPF.g.en-US.resources:gcoderotatedialog.baml,fld_angle:CNC.Controls.NumericField.Format,None,True,True,,-\#\#0.\#
+CNC.Controls.WPF.g.en-US.resources:gcoderotatedialog.baml,grp_rotationCenter:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Rotation center
+CNC.Controls.WPF.g.en-US.resources:gcoderotatedialog.baml,grp_rotationCenter:System.Windows.FrameworkElement.Width,None,False,True,,100
+CNC.Controls.WPF.g.en-US.resources:gcoderotatedialog.baml,grp_rotationCenter:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:gcoderotatedialog.baml,grp_rotationCenter:System.Windows.FrameworkElement.Margin,None,False,True,,"10,0"
+CNC.Controls.WPF.g.en-US.resources:gcoderotatedialog.baml,grp_rotationCenter:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,"Click to select rotation center relative to job, if not selected X0,Y0 is used."
+CNC.Controls.WPF.g.en-US.resources:gcoderotatedialog.baml,btn_ok:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.WPF.g.en-US.resources:gcoderotatedialog.baml,btn_ok:System.Windows.Controls.ContentControl.Content,Button,True,True,,Ok
+CNC.Controls.WPF.g.en-US.resources:gcoderotatedialog.baml,btn_ok:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:gcoderotatedialog.baml,btn_ok:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.WPF.g.en-US.resources:gcoderotatedialog.baml,btn_ok:System.Windows.FrameworkElement.Width,None,False,True,,75
+CNC.Controls.WPF.g.en-US.resources:gcoderotatedialog.baml,btn_cancel:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.WPF.g.en-US.resources:gcoderotatedialog.baml,btn_cancel:System.Windows.Controls.ContentControl.Content,Button,True,True,,Cancel
+CNC.Controls.WPF.g.en-US.resources:gcoderotatedialog.baml,btn_cancel:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:gcoderotatedialog.baml,btn_cancel:System.Windows.FrameworkElement.Margin,None,False,True,,"5,0,0,0"
+CNC.Controls.WPF.g.en-US.resources:gcoderotatedialog.baml,btn_cancel:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.WPF.g.en-US.resources:gcoderotatedialog.baml,btn_cancel:System.Windows.FrameworkElement.Width,None,False,True,,75
+CNC.Controls.WPF.g.en-US.resources:overridecontrol.baml,lbl_override:System.Windows.Controls.Label.$Content,Label,True,True,,
+CNC.Controls.WPF.g.en-US.resources:overridecontrol.baml,lbl_override:System.Windows.Controls.Control.HorizontalContentAlignment,None,False,True,,Right
+CNC.Controls.WPF.g.en-US.resources:overridecontrol.baml,lbl_override:System.Windows.Controls.ContentControl.Content,Label,True,True,,Override
+CNC.Controls.WPF.g.en-US.resources:overridecontrol.baml,lbl_override:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Center
+CNC.Controls.WPF.g.en-US.resources:overridecontrol.baml,lbl_override:System.Windows.FrameworkElement.Height,None,False,True,,24
+CNC.Controls.WPF.g.en-US.resources:overridecontrol.baml,lbl_override:System.Windows.FrameworkElement.Width,None,False,True,,56
+CNC.Controls.WPF.g.en-US.resources:consolewindow.baml,dlg_senderConsole:System.Windows.Window.ShowActivated,None,False,True,,False
+CNC.Controls.WPF.g.en-US.resources:consolewindow.baml,dlg_senderConsole:System.Windows.Controls.Control.Background,None,False,True,,\#FFE5E5E5
+CNC.Controls.WPF.g.en-US.resources:consolewindow.baml,dlg_senderConsole:System.Windows.Window.Title,Title,True,True,,Sender Console
+CNC.Controls.WPF.g.en-US.resources:consolewindow.baml,dlg_senderConsole:System.Windows.FrameworkElement.Height,None,False,True,,500
+CNC.Controls.WPF.g.en-US.resources:consolewindow.baml,dlg_senderConsole:System.Windows.FrameworkElement.MinHeight,None,False,True,,115
+CNC.Controls.WPF.g.en-US.resources:consolewindow.baml,dlg_senderConsole:System.Windows.FrameworkElement.Width,None,False,True,,500
+CNC.Controls.WPF.g.en-US.resources:consolewindow.baml,dlg_senderConsole:System.Windows.FrameworkElement.MinWidth,None,False,True,,350
+CNC.Controls.WPF.g.en-US.resources:consolewindow.baml,dlg_senderConsole:System.Windows.Window.Icon,None,False,True,,App.ico
+CNC.Controls.WPF.g.en-US.resources:consolewindow.baml,dlg_senderConsole:System.Windows.Window.ShowInTaskbar,None,False,True,,False
+CNC.Controls.WPF.g.en-US.resources:consolewindow.baml,dlg_senderConsole:System.Windows.Window.WindowStyle,None,True,False,,ToolWindow
+CNC.Controls.WPF.g.en-US.resources:jogcontrol.baml,grp_jogDistance:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Distance
+CNC.Controls.WPF.g.en-US.resources:jogcontrol.baml,grp_jogDistance:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:jogcontrol.baml,grp_jogDistance:System.Windows.FrameworkElement.Margin,None,False,True,,"5,0,0,0"
+CNC.Controls.WPF.g.en-US.resources:jogcontrol.baml,grp_jogDistance:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.WPF.g.en-US.resources:jogcontrol.baml,grp_jogDistance:System.Windows.FrameworkElement.Height,None,False,True,,114
+CNC.Controls.WPF.g.en-US.resources:jogcontrol.baml,grp_jogDistance:System.Windows.FrameworkElement.Width,None,False,True,,80
+CNC.Controls.WPF.g.en-US.resources:jogcontrol.baml,grp_jogFeedrate:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Feed rate
+CNC.Controls.WPF.g.en-US.resources:jogcontrol.baml,grp_jogFeedrate:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:jogcontrol.baml,grp_jogFeedrate:System.Windows.FrameworkElement.Margin,None,False,True,,"5,0,0,4"
+CNC.Controls.WPF.g.en-US.resources:jogcontrol.baml,grp_jogFeedrate:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.WPF.g.en-US.resources:jogcontrol.baml,grp_jogFeedrate:System.Windows.FrameworkElement.Height,None,False,True,,114
+CNC.Controls.WPF.g.en-US.resources:jogcontrol.baml,grp_jogFeedrate:System.Windows.FrameworkElement.Width,None,False,True,,80
+CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,grp_signals:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Signals
+CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,grp_signals:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,grp_signals:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,grp_signals:System.Windows.FrameworkElement.Height,None,False,True,,60
+CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,grp_signals:System.Windows.FrameworkElement.Width,None,False,True,,216
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,grd_tools:System.Windows.Controls.DataGrid.$Content,None,False,True,,
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,grd_tools:System.Windows.Controls.Grid.Row,None,False,True,,0
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,grd_tools:System.Windows.FrameworkElement.Width,None,False,True,,Auto
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,grd_tools:System.Windows.Controls.DataGrid.IsReadOnly,None,False,True,,True
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,grd_tools:System.Windows.Controls.DataGrid.SelectionMode,None,True,False,,Single
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,grd_tools:System.Windows.Controls.DataGrid.SelectionUnit,None,True,False,,FullRow
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,grd_tools:System.Windows.Controls.DataGrid.AutoGenerateColumns,None,False,True,,False
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,grd_tools:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,grd_tools:System.Windows.FrameworkElement.Margin,None,False,True,,"10,10,0,0"
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,grd_tools:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,grd_tools:System.Windows.Controls.DataGrid.CanUserReorderColumns,None,False,True,,False
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,grd_tools:System.Windows.Controls.DataGrid.CanUserResizeColumns,None,False,True,,False
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,grd_tools:System.Windows.Controls.DataGrid.CanUserResizeRows,None,False,True,,False
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,grd_tools:System.Windows.Controls.DataGrid.CanUserSortColumns,None,False,True,,False
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,grd_tools:System.Windows.Controls.DataGrid.CanUserAddRows,None,False,True,,False
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,hdr_tool:System.Windows.Controls.DataGridTextColumn.$Content,None,True,True,,
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,hdr_tool:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Tool
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,hdr_tool:System.Windows.Controls.DataGridColumn.Width,None,True,False,,50
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,lbl_tool:System.Windows.Controls.Label.$Content,Label,True,True,,
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,lbl_tool:System.Windows.Controls.ContentControl.Content,Label,True,True,,Tool:
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,lbl_tool:System.Windows.Controls.Control.HorizontalContentAlignment,None,False,True,,Right
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,lbl_tool:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Right
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,lbl_tool:System.Windows.FrameworkElement.Margin,None,False,True,,"37,0,0,0"
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,lbl_tool:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,lbl_xAxis:CNC.Controls.CoordValueSetControl.$Content,None,True,True,,
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,lbl_xAxis:CNC.Controls.CoordValueSetControl.Name,None,True,True,,cvXOffset
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,lbl_xAxis:CNC.Controls.CoordValueSetControl.Click,None,True,True,,cvOffset_Click
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,lbl_xAxis:CNC.Controls.CoordValueSetControl.Label,None,True,True,,X axis:
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,lbl_yAxis:CNC.Controls.CoordValueSetControl.$Content,None,True,True,,
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,lbl_yAxis:CNC.Controls.CoordValueSetControl.Name,None,True,True,,cvYOffset
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,lbl_yAxis:CNC.Controls.CoordValueSetControl.Click,None,True,True,,cvOffset_Click
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,lbl_yAxis:CNC.Controls.CoordValueSetControl.Label,None,True,True,,Y axis:
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,lbl_zAxis:CNC.Controls.CoordValueSetControl.$Content,None,True,True,,
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,lbl_zAxis:CNC.Controls.CoordValueSetControl.Name,None,True,True,,cvZOffset
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,lbl_zAxis:CNC.Controls.CoordValueSetControl.Click,None,True,True,,cvOffset_Click
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,lbl_zAxis:CNC.Controls.CoordValueSetControl.Label,None,True,True,,Z axis:
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,lbl_tipRadius:CNC.Controls.CoordValueSetControl.$Content,None,True,True,,
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,lbl_tipRadius:CNC.Controls.CoordValueSetControl.Name,None,True,True,,cvTipRadius
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,lbl_tipRadius:CNC.Controls.CoordValueSetControl.Click,None,True,True,,cvOffset_Click
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,lbl_tipRadius:CNC.Controls.CoordValueSetControl.Label,None,True,True,,Tip radius:
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,lbl_tipRadius:System.Windows.UIElement.IsEnabled,None,False,True,,False
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,btn_currPos:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,btn_currPos:System.Windows.Controls.ContentControl.Content,Button,True,True,,Get current position
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,btn_currPos:System.Windows.FrameworkElement.Margin,None,False,True,,"3,0"
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,btn_clear:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,btn_clear:System.Windows.Controls.ContentControl.Content,Button,True,True,,Clear all
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,btn_setAll:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,btn_setAll:System.Windows.Controls.ContentControl.Content,Button,True,True,,Set all
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,btn_setAll:System.Windows.FrameworkElement.Margin,None,False,True,,"3,0"

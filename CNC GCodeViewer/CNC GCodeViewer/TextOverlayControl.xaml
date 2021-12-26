@@ -1,0 +1,41 @@
+﻿<UserControl x:Class="CNC.Controls.Viewer.TextOverlayControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CNC.Controls.Viewer"
+             xmlns:Controls="clr-namespace:CNC.Controls;assembly=CNC.Controls.WPF"
+             mc:Ignorable="d" 
+             Loaded="OnLoaded" Visibility="Collapsed" IsVisibleChanged="OnVisibleChanged"
+             d:DesignHeight="40" d:DesignWidth="200">
+    <UserControl.Resources>
+        <Controls:PositionToStringConverter x:Key="PositionConverter" />
+        <Controls:FeedSpeedToStringConverter x:Key="FeedSpeedConverter" />
+    </UserControl.Resources>
+    <StackPanel Orientation="Vertical">
+        <TextBlock HorizontalAlignment="Right">
+            <TextBlock.Text>
+                <MultiBinding Converter="{StaticResource PositionConverter}">
+                    <Binding Path="Position" Mode="OneWay"/>
+                    <Binding Path="Format" Mode="OneWay"/>
+                </MultiBinding>
+            </TextBlock.Text>
+        </TextBlock>
+        <TextBlock HorizontalAlignment="Right">
+            <TextBlock.Text>
+                <MultiBinding Converter="{StaticResource PositionConverter}">
+                    <Binding Path="MachinePosition" Mode="OneWay"/>
+                    <Binding Path="Format" Mode="OneWay"/>
+                </MultiBinding>
+            </TextBlock.Text>
+        </TextBlock>
+        <TextBlock HorizontalAlignment="Right">
+            <TextBlock.Text>
+                <MultiBinding Converter="{StaticResource FeedSpeedConverter}">
+                    <Binding Path="FeedRate" Mode="OneWay"/>
+                    <Binding Path="RPM" Mode="OneWay"/>
+                </MultiBinding>
+            </TextBlock.Text>
+        </TextBlock>
+    </StackPanel>
+</UserControl>

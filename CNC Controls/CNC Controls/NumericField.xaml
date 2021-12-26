@@ -11,14 +11,14 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="70"/>
             <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="37*"/>
+            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <Label x:Name="label" Content="{Binding Path=Label, RelativeSource={RelativeSource AncestorType=UserControl}}" Grid.Column="0" HorizontalContentAlignment="Right" HorizontalAlignment="Right" Margin="0,1,0,0" VerticalAlignment="Top" Height="26"/>
+        <Label x:Name="label" x:Uid="lbl_NumField" Content="{Binding Path=Label, RelativeSource={RelativeSource AncestorType=UserControl}}" Grid.Column="0" HorizontalContentAlignment="Right" HorizontalAlignment="Right" VerticalAlignment="Center" Height="26"/>
         <local:NumericTextBox x:Name="data" Grid.Column="1" HorizontalAlignment="Left" TextWrapping="NoWrap" VerticalAlignment="Center" UndoLimit="9" Width="64"
             IsReadOnly="{Binding Path=IsReadOnly, RelativeSource={RelativeSource AncestorType=UserControl}}"
             Value="{Binding Path=Value, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
             Format="{Binding Path=Format, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=OneWay}">
         </local:NumericTextBox>
-        <Label x:Name="unit" Content="{Binding Path=Unit, RelativeSource={RelativeSource AncestorType=UserControl}}" Grid.Column="2" HorizontalAlignment="Left" Margin="0,1,0,0" VerticalAlignment="Top" Height="26"/>
+        <Label x:Name="unit" x:Uid="lbl_NumFieldUnit" Content="{Binding Path=Unit, RelativeSource={RelativeSource AncestorType=UserControl}}" Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Center" Height="26" Width="Auto"/>
     </Grid>
 </UserControl>

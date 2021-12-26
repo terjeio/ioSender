@@ -4,23 +4,28 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:helix="clr-namespace:HelixToolkit.Wpf;assembly=HelixToolkit.Wpf"
+                          xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:local="clr-namespace:CNC.Controls.Viewer"
              mc:Ignorable="d"
              d:DesignHeight="500" d:DesignWidth="500"
              Loaded="Renderer_Loaded" IsVisibleChanged="Renderer_IsVisibleChanged">
+    <UserControl.Resources>
+        <system:String x:Uid="str_toolNoShow" x:Key="ToolNone">No tool</system:String>
+        <system:String x:Uid="str_toolCone" x:Key="ToolCone">Cone</system:String>
+        <system:String x:Uid="str_toolCrosshair" x:Key="ToolCrosshair">Crosshair</system:String>
+    </UserControl.Resources>
     <helix:HelixViewport3D x:Name="viewport" Panel.ZIndex="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                            ZoomExtentsWhenLoaded="False" RotateAroundMouseDownPoint="true" ZoomAroundMouseDownPoint="true"
                            ShowViewCube="{Binding Path=ShowViewCube}"
                            ShowCoordinateSystem="{Binding Path=ShowCoordinateSystem}"
                            Background="{Binding Path=CanvasColor}"
-                           AllowDrop="True" DragEnter="viewport_Drag" DragOver="viewport_Drag" DragLeave="viewport_Drag" Drop="viewport_Drop">
+                           AllowDrop="True" DragEnter="viewport_Drag" DragOver="viewport_Drag" DragLeave="viewport_Drag" Drop="viewport_Drop" Orthographic="True">
         <helix:HelixViewport3D.Camera>
             <PerspectiveCamera x:Name="ccamera"
                         Position="0,100,0" 
                         LookDirection="0,-100,0" 
                         UpDirection="0,1,0.5" 
-                        FieldOfView="61" 
-                        NearPlaneDistance="0.001">
+                        FieldOfView=".5">
             </PerspectiveCamera>
         </helix:HelixViewport3D.Camera>
         <helix:DefaultLights/>
@@ -32,6 +37,8 @@
         <helix:LinesVisual3D Thickness="0.5" Color="{Binding Path=RapidMotionColor}" Points="{Binding Path=RapidLines}"/>
         <helix:LinesVisual3D Thickness="0.5" Color="{Binding Path=RetractMotionColor}" Points="{Binding Path=RetractLines}"/>
         <helix:LinesVisual3D Thickness="1.5" Color="{Binding Path=ToolOriginColor}" Points="{Binding Path=ToolOrigin}"/>
+        <helix:LinesVisual3D Thickness="{Binding Path=WorkEnvelope.Thickness}" Color="{Binding Path=WorkEnvelope.Color}" Points="{Binding Path=WorkEnvelope.Points}"/>
+        <helix:LinesVisual3D Thickness="{Binding Path=JobEnvelope.Thickness}" Color="{Binding Path=JobEnvelope.Color}" Points="{Binding Path=JobEnvelope.Points}"/>
         <!-->            <helix:GridLinesVisual3D binding?/> <!-->
     </helix:HelixViewport3D>
 </UserControl>

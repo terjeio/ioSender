@@ -1,0 +1,112 @@
+﻿<UserControl x:Class="CNC.Controls.Probing.RotationControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
+             xmlns:Controls="clr-namespace:CNC.Controls;assembly=CNC.Controls.WPF"
+             xmlns:local="clr-namespace:CNC.Controls.Probing"
+             mc:Ignorable="d" Height="370"
+             d:DesignHeight="370" d:DesignWidth="500">
+    <UserControl.Resources>
+        <system:String x:Uid="str_rotationInstructions" x:Key="Instructions">Click edge in image above to select probing action.\nMove the probe to above the position indicated by green dot before start.</system:String>
+        <system:String x:Uid="str_rotationType" x:Key="SelectType">Select edge to probe by clicking on the relevant part of the image above.</system:String>
+        <system:String x:Uid="str_rotationInitFailed" x:Key="ProbedAngle">Angle: {0} deg</system:String>
+        <system:String x:Uid="str_rotationFailed" x:Key="ProbingFailed">Probing failed</system:String>
+        <system:String x:Uid="str_rotationCompleted" x:Key="ProbingCompleted">Probing completed.</system:String>
+        <Controls:LogicalNotConverter x:Key="IsNotRunningConverter" />
+        <Controls:EnumValueToBooleanConverter x:Key="EnumToEdgeConverter" />
+        <Controls:BoolToVisibleConverter x:Key="ToVisibleConverter" />
+        <local:EnumValueToVisibleConverter x:Key="ZProbeIsVisibleConverter"/>
+        <Style x:Key="ButtonStyleNoHighlighting" TargetType="Button" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid Background="{TemplateBinding Background}">
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal"/>
+                                    <VisualState x:Name="MouseOver"/>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+    <Grid>
+        <StackPanel Orientation="Vertical" Margin="5">
+            <StackPanel.Resources>
+                <Style x:Key="Flag" TargetType="RadioButton">
+                    <Style.Triggers>
+                        <Trigger Property="IsChecked" Value="False">
+                            <Setter Property="Opacity" Value="0.5"/>
+                        </Trigger>
+                    </Style.Triggers>
+                    <Setter Property="Focusable" Value="False"/>
+                    <Setter Property="BorderThickness" Value="0"/>
+                    <Setter Property="Width" Value="80"/>
+                    <Setter Property="Height" Value="80"/>
+                    <Setter Property="GroupName" Value="edge"/>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="RadioButton">
+                                <Border BorderThickness="{TemplateBinding BorderThickness}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                Background="Transparent">
+                                    <Image Source="{Binding Path=Content, RelativeSource={RelativeSource TemplatedParent}}"/>
+                                </Border>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </StackPanel.Resources>
+            <StackPanel Orientation="Horizontal" Height="70">
+                <GroupBox x:Uid="grp_workpiece" Header="Workpiece" Visibility="Collapsed">
+                    <Controls:NumericField x:Uid="fld_distance" Label="Distance" Value="{Binding Path=WorkpieceHeight, Mode=TwoWay}" Margin="0,5,85,0" VerticalAlignment="Top"/>
+                </GroupBox>
+                <GroupBox x:Uid="grp_camera" Header="Camera">
+                    <Button x:Uid="btn_addPosition" Content="Add _position" IsEnabled="{Binding Path=Grbl.IsCameraVisible}" Margin="2,0" Width="75" Height="23" Focusable="False" Click="addPosition_Click"/>
+                </GroupBox>
+                <GroupBox x:Uid="grp_RotationCenter" Header="Rotation center" HorizontalAlignment="Left" Margin="5,0" ToolTip="Click to select rotation center relative to job, if not selected X0,Y0 is used.">
+                    <StackPanel Orientation="Horizontal">
+                        <Controls:OriginControl Value="{Binding Path=Origin, Mode=TwoWay}" IsEnabled="{Binding Path=Grbl.IsFileLoaded}" Margin="5,5,0,0"/>
+                        <Button x:Uid="btn_useX0Y0" Content="Use X0,Y0" IsEnabled="{Binding Path=Grbl.IsFileLoaded}" Margin="8,0,5,3" Width="75" Focusable="False" Click="use00_Click" VerticalAlignment="Bottom"/>
+                    </StackPanel>
+                </GroupBox>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,5,0,5">
+                <CheckBox x:Uid="lbl_preview" Content="Preview" Margin="15,0,0,0" IsChecked="{Binding Path=PreviewEnable}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Grid x:Uid="grd_action" ToolTip="Click edge to select probing action." Width="160" Height="160" Margin="5,10,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="80" />
+                        <RowDefinition Height="80" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="80" />
+                        <ColumnDefinition Width="80" />
+                    </Grid.ColumnDefinitions>
+                    <RadioButton Content="Resources/RotaterAD.png" Style="{StaticResource Flag}" IsChecked="{Binding Path=ProbeEdge, Mode=TwoWay, Converter={StaticResource EnumToEdgeConverter}, ConverterParameter=AD}" />
+                    <RadioButton Content="Resources/RotaterCD.png" Grid.Column="2" Style="{StaticResource Flag}" IsChecked="{Binding Path=ProbeEdge, Mode=TwoWay, Converter={StaticResource EnumToEdgeConverter}, ConverterParameter=CD}" />
+                    <RadioButton Content="Resources/RotaterAB.png" Grid.Row="1" Grid.Column="0" Style="{StaticResource Flag}" IsChecked="{Binding Path=ProbeEdge, Mode=TwoWay, Converter={StaticResource EnumToEdgeConverter}, ConverterParameter=AB}" />
+                    <RadioButton Content="Resources/RotaterCB.png" Grid.Row="1" Grid.Column="1" Style="{StaticResource Flag}" IsChecked="{Binding Path=ProbeEdge, Mode=TwoWay, Converter={StaticResource EnumToEdgeConverter}, ConverterParameter=CB}" />
+                </Grid>
+                <GroupBox x:Uid="hdr_preview" Header="Preview" Margin="30,0,0,0" Visibility="{Binding Path=PreviewEnable, Converter={StaticResource ToVisibleConverter}}" VerticalAlignment="Top">
+                    <TextBox IsReadOnly="True" Text="{Binding Path=PreviewText, Mode=OneWay}" TextWrapping="NoWrap" Margin="0,5,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="245" Height="180"
+                         FontSize="10" FontFamily="Verdana"
+                         ScrollViewer.VerticalScrollBarVisibility="Auto"
+                         ScrollViewer.HorizontalScrollBarVisibility="Auto">
+                    </TextBox>
+                </GroupBox>
+            </StackPanel>
+        </StackPanel>
+        <StackPanel Margin="5,0,0,5" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Height="Auto" Width="Auto">
+            <Button x:Uid="btn_start" Content="Start" IsEnabled="{Binding Path=Grbl.IsJobRunning, Converter={StaticResource IsNotRunningConverter}}" Margin="2,0" Width="75" Click="start_Click"/>
+            <Button x:Uid="btn_stop" Content="Stop" IsEnabled="{Binding Path=Grbl.IsJobRunning}" Margin="2,0" Width="75" Click="stop_Click"/>
+            <Button x:Uid="btn_apply" Content="_Apply" IsEnabled="{Binding Path=CanApplyTransform}" Margin="2,0" Width="75" Click="apply_Click"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

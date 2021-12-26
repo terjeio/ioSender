@@ -1,0 +1,65 @@
+﻿CNC.Converters.g.en-US.resources:jobparametersdialog.baml,grp_zPosition:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Z positions (relative to workpiece surface)
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,grp_zPosition:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,grp_zPosition:System.Windows.FrameworkElement.Margin,None,False,True,,"5,5,0,0"
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,grp_zPosition:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,grp_zPosition:System.Windows.FrameworkElement.Height,None,False,True,,Auto
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,grp_zPosition:System.Windows.FrameworkElement.Width,None,False,True,,280
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_toolChange:CNC.Controls.NumericField.$Content,None,False,True,,
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_toolChange:CNC.Controls.NumericField.Label,None,False,True,,Tool change:
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_toolChange:CNC.Controls.NumericField.ColonAt,None,False,True,,90
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_toolChange:CNC.Controls.NumericField.Unit,None,False,True,,mm
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_toolChange:CNC.Controls.NumericField.Format,None,False,True,,-\#\#\#0.\#\#\#
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_rapids:CNC.Controls.NumericField.$Content,None,False,True,,
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_rapids:CNC.Controls.NumericField.Label,None,False,True,,Rapids:
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_rapids:CNC.Controls.NumericField.ColonAt,None,False,True,,90
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_rapids:CNC.Controls.NumericField.Unit,None,False,True,,mm
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_rapids:CNC.Controls.NumericField.Format,None,False,True,,-\#\#\#0.\#\#\#
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_cutDepth:CNC.Controls.NumericField.$Content,None,False,True,,
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_cutDepth:CNC.Controls.NumericField.Label,None,False,True,,Cut depth:
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_cutDepth:CNC.Controls.NumericField.ColonAt,None,False,True,,90
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_cutDepth:CNC.Controls.NumericField.Unit,None,False,True,,mm
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_cutDepth:CNC.Controls.NumericField.Format,None,False,True,,-\#\#\#0.\#\#\#
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,grp_spindle_feed:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Spindle and feed
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,grp_spindle_feed:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,grp_spindle_feed:System.Windows.FrameworkElement.Margin,None,False,True,,"5,5,0,0"
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,grp_spindle_feed:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,grp_spindle_feed:System.Windows.FrameworkElement.Height,None,False,True,,Auto
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,grp_spindle_feed:System.Windows.FrameworkElement.Width,None,False,True,,280
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_rpm:CNC.Controls.NumericField.$Content,None,False,True,,
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_rpm:CNC.Controls.NumericField.Label,None,False,True,,RPM:
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_rpm:CNC.Controls.NumericField.ColonAt,None,False,True,,90
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_rpm:CNC.Controls.NumericField.Unit,None,False,True,,
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_rpm:CNC.Controls.NumericField.Format,None,False,True,,-\#\#\#0.\#\#\#
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_feedrate:CNC.Controls.NumericField.$Content,None,False,True,,
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_feedrate:CNC.Controls.NumericField.Label,None,False,True,,Feed rate:
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_feedrate:CNC.Controls.NumericField.ColonAt,None,False,True,,90
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_feedrate:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_feedrate:CNC.Controls.NumericField.Format,None,False,True,,-\#\#\#0.\#\#\#
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_plungeRate:CNC.Controls.NumericField.$Content,None,False,True,,
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_plungeRate:CNC.Controls.NumericField.Label,None,False,True,,Plunge rate:
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_plungeRate:CNC.Controls.NumericField.ColonAt,None,False,True,,90
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_plungeRate:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_plungeRate:CNC.Controls.NumericField.Format,None,False,True,,-\#\#\#0.\#\#\#
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,grp_scalingFactors:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Scaling factors
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,grp_scalingFactors:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,grp_scalingFactors:System.Windows.FrameworkElement.Margin,None,False,True,,"5,5,0,0"
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,grp_scalingFactors:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,grp_scalingFactors:System.Windows.FrameworkElement.Height,None,False,True,,Auto
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,grp_scalingFactors:System.Windows.FrameworkElement.Width,None,False,True,,280
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,grp_tool:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Tool
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,grp_tool:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,grp_tool:System.Windows.FrameworkElement.Margin,None,False,True,,"5,5,0,0"
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,grp_tool:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,grp_tool:System.Windows.FrameworkElement.Height,None,False,True,,Auto
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,grp_tool:System.Windows.FrameworkElement.Width,None,False,True,,280
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,btn_ok:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,btn_ok:System.Windows.Controls.ContentControl.Content,Button,True,True,,Ok
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,btn_ok:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,btn_ok:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,btn_ok:System.Windows.FrameworkElement.Width,None,False,True,,75
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,bn_cancel:System.Windows.Controls.Button.$Content,Button,True,True,,
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,bn_cancel:System.Windows.Controls.ContentControl.Content,Button,True,True,,Cancel
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,bn_cancel:System.Windows.FrameworkElement.HorizontalAlignment,None,False,True,,Left
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,bn_cancel:System.Windows.FrameworkElement.Margin,None,False,True,,"5,0,0,0"
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,bn_cancel:System.Windows.FrameworkElement.VerticalAlignment,None,False,True,,Top
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,bn_cancel:System.Windows.FrameworkElement.Width,None,False,True,,75

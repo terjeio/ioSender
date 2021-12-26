@@ -1,7 +1,7 @@
 ﻿/*
  * NumericField.xaml.cs - part of CNC Controls library
  *
- * v0.03 / 2020-01-28 / Io Engineering (Terje Io)
+ * v0.36 / 2021-11-01 / Io Engineering (Terje Io)
  *
  */
 
@@ -90,6 +90,13 @@ namespace CNC.Controls
         {
             get { return (string)GetValue(UnitProperty); }
             set { SetValue(UnitProperty, value); }
+        }
+
+        public static readonly DependencyProperty Tooltip2Property = DependencyProperty.Register(nameof(Tooltip2), typeof(string), typeof(NumericField), new PropertyMetadata(string.Empty));
+        public string Tooltip2
+        {
+            get { return (string)GetValue(Tooltip2Property); }
+            set { SetValue(Tooltip2Property, value); }
         }
 
         public static readonly DependencyProperty IsReadOnlyProperty = DependencyProperty.Register(nameof(IsReadOnly), typeof(bool), typeof(NumericField), new PropertyMetadata());

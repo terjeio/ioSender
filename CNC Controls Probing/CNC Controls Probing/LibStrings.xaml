@@ -1,0 +1,17 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib"
+                    xmlns:local="clr-namespace:CNC.Controls.Probing">
+    <system:String x:Uid="str_probing" x:Key="Probing">Probing...</system:String>
+    <system:String x:Uid="str_probingNoProbe" x:Key="NoProbe">Probing failed, probe is not connected.</system:String>
+    <system:String x:Uid="str_probingProbeAsserted" x:Key="ProbeAsserted">Probing failed, probe signal is asserted.</system:String>
+    <system:String x:Uid="str_probingNotIdle" x:Key="FailedNotIdle">Probing failed, Grbl is not in idle or tool changing state.</system:String>
+    <system:String x:Uid="str_probingNoPos" x:Key="FailedNoPos">Probing failed, could not establish current machine position.</system:String>
+    <system:String x:Uid="str_probingFailedAlarm" x:Key="FailedAlarm">Probing failed with alarm, clear in Grbl tab.</system:String>
+    <system:String x:Uid="str_probingFailedCancelled" x:Key="FailedCancelled">Probing cancelled/failed.</system:String>
+    <system:String x:Uid="str_probingHeigthMapNarrow" x:Key="HeigthMapNarrow">Height map can't be infinitely narrow.</system:String>
+    <system:String x:Uid="str_probingHeigthMapMinSize" x:Key="HeigthMapMinSize">Height map must have at least 4 points.</system:String>
+    <system:String x:Uid="str_probingRadiusArcs" x:Key="HasRadiusArcs">GCode contains arcs in XZ or YZ plane (G18/19), can't apply transform. Use 'Arcs to Lines' if you really need this.</system:String>
+    <system:String x:Uid="str_probingDistanceError" x:Key="ErrorProbingDistance">Probing distance must be larger than XY Clearance + ½ Probe/tool diameter.</system:String>
+    <system:String x:Uid="str_probingLatchDistanceError" x:Key="ErrorLatchDistance">Latch distance must be less than Probing distance.</system:String>
+</ResourceDictionary>

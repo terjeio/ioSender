@@ -79,8 +79,14 @@
     <Compile Include="GCodeRotateDialog.xaml.cs">
       <DependentUpon>GCodeRotateDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="GotoBaseControl.xaml.cs">
+      <DependentUpon>GotoBaseControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="GotoControl.xaml.cs">
       <DependentUpon>GotoControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="GotoFlyoutControl.xaml.cs">
+      <DependentUpon>GotoFlyoutControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="GrblConfigView.xaml.cs">
       <DependentUpon>GrblConfigView.xaml</DependentUpon>
@@ -111,20 +117,26 @@
     <Compile Include="ICNCView.cs" />
     <Compile Include="IGCodeConverter.cs" />
     <Compile Include="IGCodeTransformer.cs" />
+    <Compile Include="ISidebarControl.cs" />
     <Compile Include="JobControl.xaml.cs">
       <DependentUpon>JobControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="GCode.cs" />
+    <Compile Include="JogBaseControl.xaml.cs">
+      <DependentUpon>JogBaseControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="JogConfigControl.xaml.cs">
       <DependentUpon>JogConfigControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="JogControl.xaml.cs">
       <DependentUpon>JogControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="JogFlyoutControl.xaml.cs">
+      <DependentUpon>JogFlyoutControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="JogUiConfigControl.xaml.cs">
       <DependentUpon>JogUiConfigControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="KeypressHandler.cs" />
     <Compile Include="LEDControl.xaml.cs">
       <DependentUpon>LEDControl.xaml</DependentUpon>
     </Compile>
@@ -153,6 +165,12 @@
     </Compile>
     <Compile Include="OriginControl.xaml.cs">
       <DependentUpon>OriginControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="OutlineBaseControl.xaml.cs">
+      <DependentUpon>OutlineBaseControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="OutlineControl.xaml.cs">
+      <DependentUpon>OutlineControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="OutlineFlyout.xaml.cs">
       <DependentUpon>OutlineFlyout.xaml</DependentUpon>
@@ -205,6 +223,26 @@
       <DependentUpon>WorkParametersControl.xaml</DependentUpon>
     </Compile>
     <Page Include="About.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="GotoBaseControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="GotoFlyoutControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="JogBaseControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="JogFlyoutControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="LibStrings.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -327,6 +365,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="OriginControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="OutlineBaseControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="OutlineControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

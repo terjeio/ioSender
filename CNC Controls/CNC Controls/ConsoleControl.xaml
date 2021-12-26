@@ -1,0 +1,33 @@
+﻿<UserControl x:Class="CNC.Controls.ConsoleControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CNC.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="331" d:DesignWidth="400">
+    <UserControl.Resources>
+        <local:StringCollectionToTextConverter x:Key="OcToString" />
+    </UserControl.Resources>
+    <!--> <GroupBox Header="Console" HorizontalAlignment="Center" VerticalAlignment="Top" Width="394" Height="328"> <\!-->
+    <DockPanel VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+        <DockPanel DockPanel.Dock="Top" HorizontalAlignment="Stretch" Margin="0,0,0,5">
+            <CheckBox x:Uid="lbl_verbose" Content="Verbose" IsChecked="{Binding Path=ResponseLogVerbose}" HorizontalAlignment="Left" Margin="10,8,0,0" VerticalAlignment="Top"/>
+            <CheckBox x:Uid="lbl_filterRT" Content="Filter out realtime responses" IsChecked="{Binding Path=ResponseLogFilterRT}" IsEnabled="{Binding Path=ResponseLogVerbose}" HorizontalAlignment="Left" Margin="10,8,0,0" VerticalAlignment="Top"/>
+            <CheckBox x:Uid="lbl_showAll" Content="Show all realtime responses" IsChecked="{Binding Path=ResponseLogShowRTAll}" IsEnabled="{Binding Path=ResponseLogVerbose}" HorizontalAlignment="Left" Margin="10,8,0,0" VerticalAlignment="Top"/>
+            <Button x:Uid="btn_clear" Content="Clear" HorizontalAlignment="Right" Margin="0,5,5,0" VerticalAlignment="Top" Width="75" Click="btn_Clear"/>
+        </DockPanel>
+        <TextBox IsReadOnly="True" TextWrapping="NoWrap" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                 local:TextBoxUtilities.AlwaysScrollToEnd="True" FontSize="10" FontFamily="Verdana"
+                 ScrollViewer.VerticalScrollBarVisibility="Auto"
+                 ScrollViewer.HorizontalScrollBarVisibility="Visible">
+            <TextBox.Text>
+                <MultiBinding Converter="{StaticResource OcToString}">
+                    <Binding Path="ResponseLog" Mode="OneWay"/>
+                    <Binding Path="ResponseLog.Count" Mode="OneWay" />
+                </MultiBinding>
+            </TextBox.Text>
+        </TextBox>
+    </DockPanel>
+    <!--> </GroupBox> </!-->
+</UserControl>

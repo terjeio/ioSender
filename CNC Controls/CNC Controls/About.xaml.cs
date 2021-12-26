@@ -1,7 +1,7 @@
 ﻿/*
  * About.xaml.cs - part of CNC Controls library
  *
- * v0.29 / 2021-01-12 / Io Engineering (Terje Io)
+ * v0.36 / 2021-11-23 / Io Engineering (Terje Io)
  *
  */
 
@@ -44,20 +44,26 @@ namespace CNC.Controls
 {
     public partial class About : Window
     {
+        string version;
 
         public About(string title)
         {
             InitializeComponent();
 
-            Title = title;
+            Title = version = title;
         }
 
         private void About_Load(object sender, System.EventArgs e)
         {
+            Title = version;
+            if (CNC.Core.Resources.IsLegacyController)
+                Title += " (legacy mode)";
+
             GrblInfo.Get();
             txtGrblVersion.Content = GrblInfo.Version;
             txtGrblOptions.Content = GrblInfo.Options;
             txtGrblNewOpts.Content = GrblInfo.NewOptions;
+            txtGrblConnection.Content = AppConfig.Settings.Base.PortParams;
             grpGrbl.Header = GrblInfo.Firmware;
 
             if (GrblInfo.Identity != "")

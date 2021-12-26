@@ -1,7 +1,7 @@
 ﻿/*
  * DROControl.xaml.cs - part of CNC Controls library
  *
- * v0.18 / 2020-05-01 / Io Engineering (Terje Io)
+ * v0.36 / 2021-12-25 / Io Engineering (Terje Io)
  *
  */
 
@@ -53,6 +53,8 @@ namespace CNC.Controls
         private double orgpos;
         private bool hasFocus = false;
         private Brush background = null;
+        private static bool keyboardMappingsOk = false;
+
         public string DisplayFormat { get; private set; }
 
         public delegate void DROEnabledChangedHandler(bool enabled);
@@ -78,6 +80,27 @@ namespace CNC.Controls
         public void EnableFocus()
         {
             IsFocusable = true;
+        }
+
+        private void DRO_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (!keyboardMappingsOk && DataContext is GrblViewModel)
+            {
+                KeypressHandler keyboard = (DataContext as GrblViewModel).Keyboard;
+
+                keyboardMappingsOk = true;
+
+                keyboard.AddHandler(Key.X, ModifierKeys.Control | ModifierKeys.Shift, zeroAxes);
+                keyboard.AddHandler(Key.Y, ModifierKeys.Control | ModifierKeys.Shift, zeroAxes);
+                keyboard.AddHandler(Key.Z, ModifierKeys.Control | ModifierKeys.Shift, zeroAxes);
+                if (GrblInfo.AxisFlags.HasFlag(AxisFlags.A))
+                    keyboard.AddHandler(Key.A, ModifierKeys.Control | ModifierKeys.Shift, zeroAxes);
+                if (GrblInfo.AxisFlags.HasFlag(AxisFlags.B))
+                    keyboard.AddHandler(Key.B, ModifierKeys.Control | ModifierKeys.Shift, zeroAxes);
+                if (GrblInfo.AxisFlags.HasFlag(AxisFlags.C))
+                    keyboard.AddHandler(Key.C, ModifierKeys.Control | ModifierKeys.Shift, zeroAxes);
+                keyboard.AddHandler(Key.D0, ModifierKeys.Control | ModifierKeys.Shift, zeroAxes);
+            }
         }
 
         private void TxtReadout_GotFocus(object sender, RoutedEventArgs e)
@@ -138,6 +161,13 @@ namespace CNC.Controls
         void btnZeroAll_Click(object sender, EventArgs e)
         {
             AxisPositionChanged("ALL", 0.0d);
+        }
+
+        private bool zeroAxes(Key key)
+        {
+            AxisPositionChanged(key == Key.D0 ? "ALL" : key.ToString(), 0d);
+
+            return true;
         }
 
         void AxisPositionChanged(string axis, double position)

@@ -1,7 +1,7 @@
 ﻿/*
- * AppConfig.cs - part of CNC Controls library for Grbl
+ * AppConfig.cs - part of CNC Controls library
  *
- * v0.34 / 2021-07-26 / Io Engineering (Terje Io)
+ * v0.36 / 2021-12-25 / Io Engineering (Terje Io)
  *
  */
 
@@ -47,9 +47,28 @@ using System.Threading;
 using CNC.Core;
 using CNC.GCode;
 using static CNC.GCode.GCodeParser;
+using System.Windows.Media.Media3D;
 
 namespace CNC.Controls
 {
+    public class LibStrings
+    {
+        static ResourceDictionary resource = new ResourceDictionary();
+
+        public static string FindResource(string key)
+        {
+            if(resource.Source == null)
+            try {
+                resource.Source = new Uri("pack://application:,,,/CNC.Controls.WPF;Component/LibStrings.xaml", UriKind.Absolute);
+            }
+            catch
+            {
+            }
+
+            return resource.Source == null || !resource.Contains(key) ? string.Empty : (string)resource[key];
+        }
+    }
+
     [Serializable]
     public class LatheConfig : ViewModelBase
     {
@@ -106,17 +125,20 @@ namespace CNC.Controls
     {
         private bool _isEnabled = true;
         private int _arcResolution = 10;
-        private double _minDistance = 0.05d;
-        private bool _showGrid = true, _showAxes = true, _showBoundingBox = false, _showViewCube = true, _showCoordSystem = false;
-        private bool _showTextOverlay = false, _renderExecuted = false, _blackBackground = false;
+        private double _minDistance = 0.05d, _toolDiameter = 3d;
+        private bool _showGrid = true, _showAxes = true, _showBoundingBox = false, _showViewCube = true, _showCoordSystem = false, _showWorkEnvelope = false;
+        private bool _showTextOverlay = false, _renderExecuted = false, _blackBackground = false, _scaleTool = true;
         Color _cutMotion = Colors.Black, _rapidMotion = Colors.LightPink, _retractMotion = Colors.Green, _toolOrigin = Colors.Green, _grid = Colors.Gray, _highlight = Colors.Crimson;
 
         public bool IsEnabled { get { return _isEnabled; } set { _isEnabled = value; OnPropertyChanged(); } }
         public int ArcResolution { get { return _arcResolution; } set { _arcResolution = value; OnPropertyChanged(); } }
         public double MinDistance { get { return _minDistance; } set { _minDistance = value; OnPropertyChanged(); } }
+        public bool ToolAutoScale { get { return _scaleTool; } set { _scaleTool = value; OnPropertyChanged(); } }
+        public double ToolDiameter { get { return _toolDiameter; } set { _toolDiameter = value; OnPropertyChanged(); } }
         public bool ShowGrid { get { return _showGrid; } set { _showGrid = value; OnPropertyChanged(); } }
         public bool ShowAxes { get { return _showAxes; } set { _showAxes = value; OnPropertyChanged(); } }
         public bool ShowBoundingBox { get { return _showBoundingBox; } set { _showBoundingBox = value; OnPropertyChanged(); } }
+        public bool ShowWorkEnvelope { get { return _showWorkEnvelope; } set { _showWorkEnvelope = value; OnPropertyChanged(); } }
         public bool ShowViewCube { get { return _showViewCube; } set { _showViewCube = value; OnPropertyChanged(); } }
         public bool ShowTextOverlay { get { return _showTextOverlay; } set { _showTextOverlay = value; OnPropertyChanged(); } }
         public bool ShowCoordinateSystem { get { return _showCoordSystem; } set { _showCoordSystem = value; OnPropertyChanged(); } }
@@ -128,7 +150,11 @@ namespace CNC.Controls
         public Color ToolOriginColor { get { return _toolOrigin; } set { _toolOrigin = value; OnPropertyChanged(); } }
         public Color GridColor { get { return _grid; } set { _grid = value; OnPropertyChanged(); } }
         public Color HighlightColor { get { return _highlight; } set { _highlight = value; OnPropertyChanged(); } }
-
+        public int ViewMode { get; set; } = -1;
+        public int ToolVisualizer { get; set; } = 1;
+        public Point3D CameraPosition { get; set; }
+        public Vector3D CameraLookDirection { get; set; }
+        public Vector3D CameraUpDirection { get; set; }
     }
 
     [Serializable]
@@ -168,11 +194,22 @@ namespace CNC.Controls
     [Serializable]
     public class JogConfig : ViewModelBase
     {
-        private bool _kbEnable;
+        public enum JogMode : int
+        {
+            UI = 0,
+            Keypad,
+            KeypadAndUI
+        }
+
+        private bool _kbEnable, _linkStepToUi = true;
+        private JogMode _jogMode = JogMode.UI;
+
         private double _fastFeedrate = 500d, _slowFeedrate = 200d, _stepFeedrate = 100d;
         private double _fastDistance = 500d, _slowDistance = 500d, _stepDistance = 0.05d;
 
+        public JogMode Mode { get { return _jogMode; } set { _jogMode = value; OnPropertyChanged(); } }
         public bool KeyboardEnable { get { return _kbEnable; } set { _kbEnable = value; OnPropertyChanged(); } }
+        public bool LinkStepJogToUI { get { return _linkStepToUi; } set { _linkStepToUi = value; OnPropertyChanged(); } }
         public double FastFeedrate { get { return _fastFeedrate; } set { _fastFeedrate = value; OnPropertyChanged(); } }
         public double SlowFeedrate { get { return _slowFeedrate; } set { _slowFeedrate = value; OnPropertyChanged(); } }
         public double StepFeedrate { get { return _stepFeedrate; } set { _stepFeedrate = value; OnPropertyChanged(); } }
@@ -201,6 +238,7 @@ namespace CNC.Controls
         public bool KeepWindowSize { get { return _saveWindowSize; } set { if (_saveWindowSize != value) { _saveWindowSize = value; OnPropertyChanged(); } } }
         public double WindowWidth { get; set; } = 925;
         public double WindowHeight { get; set; } = 660;
+        public int OutlineFeedRate { get; set; } = 500;
         public int MaxBufferSize { get { return _maxBufferSize < 300 ? 300 : _maxBufferSize; } set { _maxBufferSize = value; OnPropertyChanged(); } }
         public string Editor { get; set; } = "notepad.exe";
         public bool KeepMdiFocus { get { return _keepMdiFocus; } set { _keepMdiFocus = value; OnPropertyChanged(); } }
@@ -314,20 +352,33 @@ namespace CNC.Controls
                 Save();
         }
 
+        private bool isComPort(string port)
+        {
+            return !(port.ToLower().StartsWith("ws://") || char.IsDigit(port[0]));
+        }
+
         private void setPort(string port)
         {
-            Base.PortParams = port;
-            if (!(Base.PortParams.ToLower().StartsWith("ws://") || char.IsDigit(Base.PortParams[0])) && Base.PortParams.IndexOf(':') == -1)
+            if (!(port.ToLower().StartsWith("ws://") || char.IsDigit(port[0])) && port.IndexOf(':') == -1)
             {
-                string[] values = Base.PortParams.Split('!');
-                Base.PortParams = values[0] + ":115200,N,8,1" + (values.Length > 1 ? ",," + values[1] : "");
+                string prop = ":115200,N,8,1";
+                string[] values = port.Split('!');
+                if (isComPort(Base.PortParams))
+                {
+                    var props = Base.PortParams.Substring(Base.PortParams.IndexOf(':')).Split(',');
+                    if(props.Length >= 4)
+                        prop = string.Format("{0},{1},{2},{3}", props[0], props[1], props[2], props[3]);
+                }
+                port = values[0] + prop + (values.Length > 1 ? ",," + values[1] : "");
             }
+            Base.PortParams = port;
         }
 
         public int SetupAndOpen(string appname, GrblViewModel model, System.Windows.Threading.Dispatcher dispatcher)
         {
             int status = 0;
             bool selectPort = false;
+            int jogMode = -1;
             string port = string.Empty;
 
             CNC.Core.Resources.Path = AppDomain.CurrentDomain.BaseDirectory;
@@ -335,7 +386,7 @@ namespace CNC.Controls
             string[] args = Environment.GetCommandLineArgs();
 
             int p = 0;
-            while (p < args.GetLength(0)) switch (args[p++])
+            while (p < args.GetLength(0)) switch (args[p++].ToLowerInvariant())
                 {
                     case "-inifile":
                         CNC.Core.Resources.IniName = GetArg(args, p++);
@@ -349,8 +400,9 @@ namespace CNC.Controls
                         CNC.Core.Resources.ConfigName = GetArg(args, p++);
                         break;
 
-                    case "-language":
-                        CNC.Core.Resources.Language = GetArg(args, p++);
+                    case "-locale":
+                    case "-language": // deprecated
+                        CNC.Core.Resources.Locale = GetArg(args, p++);
                         break;
 
                     case "-port":
@@ -361,6 +413,15 @@ namespace CNC.Controls
                         selectPort = true;
                         break;
 
+                    case "-islegacy":
+                        CNC.Core.Resources.IsLegacyController = true;
+                        break;
+
+                    case "-jogmode":
+                        if (int.TryParse(GetArg(args, p++), out jogMode))
+                            jogMode = Math.Min(Math.Max(jogMode, 0), (int)JogConfig.JogMode.KeypadAndUI);
+                        break;
+
                     default:
                         if (!args[p - 1].EndsWith(".exe") && File.Exists(args[p - 1]))
                             FileName = args[p - 1];
@@ -369,17 +430,20 @@ namespace CNC.Controls
 
             if (!Load(CNC.Core.Resources.IniFile))
             {
-                if (MessageBox.Show("Config file not found or invalid, create new?", appname, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                if (MessageBox.Show(LibStrings.FindResource("CreateConfig"), appname, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                 {
                     if (!Save(CNC.Core.Resources.IniFile))
                     {
-                        MessageBox.Show("Could not save config file.", appname);
+                        MessageBox.Show(LibStrings.FindResource("CreateConfigFail"), appname);
                         status = 1;
                     }
                 }
                 else
                     return 1;
             }
+
+            if (jogMode != -1)
+                Base.Jog.Mode = (JogConfig.JogMode)jogMode;
 
             if (!string.IsNullOrEmpty(port))
                 selectPort = false;
@@ -468,7 +532,7 @@ namespace CNC.Controls
             }
             else if (status != 2)
             {
-                MessageBox.Show(string.Format("Unable to open connection ({0})", Base.PortParams), appname, MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(string.Format(LibStrings.FindResource("ConnectFailed"), Base.PortParams), appname, MessageBoxButton.OK, MessageBoxImage.Error);
                 status = 2;
             }
 

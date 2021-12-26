@@ -1,7 +1,7 @@
 ﻿/*
  * HelperClasses.cs - part of CNC Controls library for Grbl
  *
- * v0.27 / 2020-09-26 / Io Engineering (Terje Io)
+ * v0.36 / 2021-11-06 / Io Engineering (Terje Io)
  *
  */
 
@@ -19,9 +19,28 @@ using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using CNC.GCode;
+using System.IO;
 
 namespace CNC.Core
 {
+    public class LibStrings
+    {
+        static ResourceDictionary resource = new ResourceDictionary();
+
+        public static string FindResource(string key)
+        {
+            if (resource.Source == null)
+                try
+                {
+                    resource.Source = new Uri("pack://application:,,,/CNC.Core;Component/LibStrings.xaml", UriKind.Absolute);
+                }
+                catch
+                {
+                }
+
+            return resource.Source == null || !resource.Contains(key) ? string.Empty : (string)resource[key];
+        }
+    }
     public class ViewModelBase : INotifyPropertyChanged, INotifyDataErrorInfo
     {
         private readonly Dictionary<string, ICollection<string>> _validationErrors = new Dictionary<string, ICollection<string>>();
@@ -208,6 +227,20 @@ namespace CNC.Core
                 filetypes[i] = "*." + filetypes[i];
 
             return string.Join(";", filetypes);
+        }
+
+        public static StreamReader OpenFile(string filename)
+        {
+            StreamReader file = null;
+            try
+            {
+                file = new StreamReader(filename);
+            }
+            catch
+            {
+            }
+
+            return file;
         }
     }
 

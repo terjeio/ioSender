@@ -127,6 +127,33 @@
       <Name>CNC Core</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\GridOn.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\JobBoxOff.png" />
+    <Resource Include="Resources\JobBoxOn.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\WorkBoxOff.png" />
+    <Resource Include="Resources\WorkBoxOn.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\SaveView.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\GridOff.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\ResetView.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\RestoreView.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\XYZOff.png" />
+    <Resource Include="Resources\XYZOn.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

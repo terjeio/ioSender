@@ -1,0 +1,94 @@
+﻿<UserControl x:Class="CNC.Controls.GrblConfigView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
+             xmlns:local="clr-namespace:CNC.Controls"
+             xmlns:cnccore="clr-namespace:CNC.Core;assembly=CNC.Core"
+             mc:Ignorable="d" 
+             d:DesignHeight="515" d:DesignWidth="980"
+             Loaded="ConfigView_Loaded">
+    <UserControl.Resources>
+        <system:String x:Uid="str_saveSettings" x:Key="SaveSettings">Settings changed, save now?</system:String>
+        <system:String x:Uid="str_settingsWritten" x:Key="SettingsWritten">All settings written to {0} in the sender folder.</system:String>
+        <system:String x:Uid="str_settingsError" x:Key="SettingsError">Setting {0} returned {1}, continue?</system:String>
+        <system:String x:Uid="str_settingsTimeout" x:Key="SettingsTimeout">Timed out while setting {0}, continue?</system:String>
+        <system:String x:Uid="str_settingsFail" x:Key="SettingsFail">Bummer...\nContinue loading?</system:String>
+        <system:String x:Uid="str_settingsInvalid" x:Key="SettingsInvalid">The file does not contain any settings.</system:String>
+        <system:String x:Uid="str_settingsRestore" x:Key="SettingsRestore">Restore settings from file</system:String>
+        <Style x:Key="NumericErrorStyle" TargetType="local:NumericTextBox">
+            <Style.Triggers>
+                <Trigger Property="Validation.HasError" Value="true">
+                    <Setter Property="local:NumericTextBox.ToolTip">
+                        <Setter.Value>
+                            <Binding RelativeSource="{RelativeSource Self}" Path="(Validation.Errors)[0].ErrorContent" />
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="Ip4ErrorStyle" TargetType="TextBox">
+            <Style.Triggers>
+                <Trigger Property="Validation.HasError" Value="true">
+                    <Setter Property="TextBox.ToolTip">
+                        <Setter.Value>
+                            <Binding RelativeSource="{RelativeSource Self}" Path="(Validation.Errors)[0].ErrorContent" />
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="ConfigButtonStyle" TargetType="Button">
+            <Setter Property="MinWidth" Value="90" />
+            <Setter Property="MaxWidth" Value="120" />
+            <Setter Property="Padding" Value="5,0" />
+            <Setter Property="VerticalAlignment" Value="Top" />
+        </Style>
+    </UserControl.Resources>
+    <DockPanel>
+        <TreeView x:Name="treeView" HorizontalAlignment="Left" Margin="10,10" VerticalAlignment="Stretch" Width="390" SelectedItemChanged="treeView_SelectedItemChanged">
+            <TreeView.Resources>
+                <HierarchicalDataTemplate DataType="{x:Type cnccore:GrblSettingGroup}" ItemsSource="{Binding Settings}" >
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Name}" />
+                    </StackPanel>
+                </HierarchicalDataTemplate>
+                <DataTemplate DataType="{x:Type cnccore:GrblSettingDetails}" >
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Id}" Margin="0,0,5,0" />
+                        <TextBlock Text="{Binding Name, StringFormat=\{0\}:}" />
+                        <TextBlock Text="{Binding FormattedValue}" Margin="5,0"/>
+                        <TextBlock Text="{Binding Unit}" />
+                    </StackPanel>
+                </DataTemplate>
+            </TreeView.Resources>
+        </TreeView>
+        <DataGrid x:Name="dgrSettings" DockPanel.Dock="Left" ItemsSource="{Binding}" IsReadOnly="True" HorizontalAlignment="Left" Margin="10,10" VerticalAlignment="Stretch" Width="390"
+                  SelectionMode="Single" SelectionUnit="FullRow" AutoGenerateColumns="False" Visibility="Collapsed"
+                  CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserResizeRows="False" CanUserSortColumns="False" CanUserAddRows="False" SelectionChanged="dgrSettings_SelectionChanged">
+            <DataGrid.Columns>
+                <DataGridTextColumn x:Uid="hdr_settingId" Header="Id" Binding="{Binding Id}" Width="50"/>
+                <DataGridTextColumn x:Uid="hdr_settingValue" Header="Value" Binding="{Binding Value}" Width="70"/>
+                <DataGridTextColumn x:Uid="hdr_settingUnit" Header="Unit" Binding="{Binding Unit}" Width="80"/>
+                <DataGridTextColumn x:Uid="hdr_settingName" Header="Name" Binding="{Binding Name}" Width="*"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        <DockPanel x:Name="dpan" DockPanel.Dock="Left">
+            <DockPanel DockPanel.Dock="Bottom" HorizontalAlignment="Stretch" Height="Auto" Margin="10,0,10,10" VerticalAlignment="Top" Width="Auto">
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" Height="Auto" VerticalAlignment="Top">
+                    <Button x:Uid="btn_reload" x:Name="btnReload" Content="Reload" ToolTip="Reload settings from controller." HorizontalAlignment="Left" Style="{StaticResource ConfigButtonStyle}" Click="btnReload_Click"/>
+                    <Button x:Uid="btn_save" x:Name="btnSave" Content="Save" ToolTip="Save changed settings to controller." HorizontalAlignment="Left" Margin="5,0,0,0" VerticalAlignment="Top" Style="{StaticResource ConfigButtonStyle}" Click="btnSave_Click"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" Height="Auto" VerticalAlignment="Top" HorizontalAlignment="Right">
+                    <Button x:Uid="btn_backup" x:Name="btnBackup" Content="Backup" HorizontalAlignment="Left" VerticalAlignment="Top" Style="{StaticResource ConfigButtonStyle}" Click="btnBackup_Click"/>
+                    <Button x:Uid="btn_restore" x:Name="btnRestore" Content="Restore" HorizontalAlignment="Right" Margin="5,0,0,0" VerticalAlignment="Top" Style="{StaticResource ConfigButtonStyle}" Click="btnRestore_Click"/>
+                </StackPanel>
+            </DockPanel>
+            <StackPanel x:Name="details" DockPanel.Dock="Top" HorizontalAlignment="Left" Height="Auto" Margin="5,15,0,0" VerticalAlignment="Top">
+                <StackPanel x:Name="canvas" HorizontalAlignment="Left" Height="Auto" VerticalAlignment="Center" Width="455"/>
+                <TextBox x:Name="txtDescription" Background="#FFF8F8F8" IsReadOnly="True" HorizontalAlignment="Left" Height="225" TextWrapping="Wrap" VerticalAlignment="Top" Width="550"/>
+            </StackPanel>
+        </DockPanel>
+    </DockPanel>
+</UserControl>

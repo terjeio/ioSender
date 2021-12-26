@@ -1,0 +1,21 @@
+﻿<UserControl x:Class="CNC.Controls.GotoBaseControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CNC.Controls"
+             mc:Ignorable="d"
+             Focusable="False"
+             d:DesignHeight="70" d:DesignWidth="140">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <local:HomedStateToBooleanConverter x:Key="IsHomed" />
+            <local:LogicalNotConverter x:Key="LogicalNotConverter" />
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <StackPanel IsEnabled="{Binding Path=IsJobRunning, Converter={StaticResource LogicalNotConverter}}">
+        <Button x:Uid="btn_gotoG28" Tag="G28" Content="Goto position 1 (G28)" Height="28" IsEnabled="{Binding Path=HomedState, Mode=OneWay, Converter={StaticResource IsHomed}}" Focusable="False" HorizontalAlignment="Left" Margin="5,5,0,0" Padding="5,0" VerticalAlignment="Top" Click="button_Click"/>
+        <Button x:Uid="btn_gotoG30" Tag="G30" Content="Goto position 2 (G30)" Height="28" IsEnabled="{Binding Path=HomedState, Mode=OneWay, Converter={StaticResource IsHomed}}" Focusable="False" HorizontalAlignment="Left" Margin="5,5,0,0" Padding="5,0" VerticalAlignment="Top" Click="button_Click"/>
+    </StackPanel>
+</UserControl>

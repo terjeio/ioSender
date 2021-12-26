@@ -1,0 +1,49 @@
+﻿<Window x:Class="CNC.Converters.JobParametersDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:Controls="clr-namespace:CNC.Controls;assembly=CNC.Controls.WPF"
+             xmlns:local="clr-namespace:CNC.Converters"
+             mc:Ignorable="d" 
+             d:DesignHeight="420" d:DesignWidth="300"
+             SizeToContent="WidthAndHeight"
+             Loaded="Window_Loaded" ResizeMode="NoResize" Icon="App.ico">
+    <Window.Resources>
+        <Controls:BoolToVisibleConverter x:Key="IsVisibleConverter" />
+    </Window.Resources>
+
+    <Grid Background="#FFE5E5E5">
+        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Height="Auto" Margin="5,5">
+            <GroupBox x:Uid="grp_zPosition" Header="Z positions (relative to workpiece surface)" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Height="Auto" Width="280">
+                <StackPanel>
+                    <Controls:NumericField x:Uid="fld_toolChange" Label="Tool change:" ColonAt="90" Unit="mm" Format="-###0.###" Value="{Binding Path=ZHome, Mode=TwoWay}"/>
+                    <Controls:NumericField x:Uid="fld_rapids" Label="Rapids:" ColonAt="90" Unit="mm" Format="-###0.###" Value="{Binding Path=ZRapids, Mode=TwoWay}"/>
+                    <Controls:NumericField x:Uid="fld_cutDepth" Label="Cut depth:" ColonAt="90" Unit="mm" Format="-###0.###" Value="{Binding Path=ZMin, Mode=TwoWay}"/>
+                </StackPanel>
+            </GroupBox>
+            <GroupBox x:Uid="grp_spindle_feed" Header="Spindle and feed" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Height="Auto" Width="280">
+                <StackPanel>
+                    <Controls:NumericField x:Uid="fld_rpm" Label="RPM:" ColonAt="90" Unit="" Format="-###0.###" Value="{Binding Path=RPM, Mode=TwoWay}"/>
+                    <Controls:NumericField x:Uid="fld_feedrate" Label="Feed rate:" ColonAt="90" Unit="mm/min" Format="-###0.###" Value="{Binding Path=FeedRate, Mode=TwoWay}"/>
+                    <Controls:NumericField x:Uid="fld_plungeRate" Label="Plunge rate:" ColonAt="90" Unit="mm/min" Format="-###0.###" Value="{Binding Path=PlungeRate, Mode=TwoWay}"/>
+                </StackPanel>
+            </GroupBox>
+            <GroupBox x:Uid="grp_scalingFactors" Header="Scaling factors" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Height="Auto" Width="280">
+                <StackPanel>
+                    <Controls:NumericField Label="X:" ColonAt="90" Unit="" Format="-###0.###" Value="{Binding Path=ScaleX, Mode=TwoWay}" ToolTip="A negative factor flips the output."/>
+                    <Controls:NumericField Label="Y:" ColonAt="90" Unit="" Format="-###0.###" Value="{Binding Path=ScaleY, Mode=TwoWay}" ToolTip="A negative factor flips the output."/>
+                </StackPanel>
+            </GroupBox>
+            <GroupBox x:Uid="grp_tool" Header="Tool" Visibility="{Binding Path=EnableToolSelection, Converter={StaticResource IsVisibleConverter}}" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Height="Auto" Width="280">
+                <StackPanel>
+                    <Controls:NumericField Label="Diameter:" ColonAt="90" Unit="mm" Format="##0.###" Value="{Binding Path=ToolDiameter, Mode=TwoWay}"/>
+                </StackPanel>
+            </GroupBox>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Width="Auto" Margin="0,10">
+                <Button x:Uid="btn_ok" x:Name="btnOk" Content="Ok" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Click="btnOk_Click"/>
+                <Button x:Uid="bn_cancel" x:Name="btnCancel" Content="Cancel" HorizontalAlignment="Left" Margin="5,0,0,0" VerticalAlignment="Top" Width="75" Click="btnCancel_Click"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>

@@ -1,0 +1,25 @@
+﻿<UserControl
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CNC.Controls.Camera"
+             xmlns:Controls="clr-namespace:CNC.Controls;assembly=CNC.Controls.WPF" x:Class="CNC.Controls.Camera.ConfigControl"
+             mc:Ignorable="d" 
+             d:DesignHeight="140" d:DesignWidth="250">
+    <GroupBox x:Uid="grp_camera" x:Name="grpCamera" Header="Camera" HorizontalAlignment="Left" VerticalAlignment="Top" Height="Auto" Width="250">
+        <StackPanel HorizontalAlignment="Left" Height="115" Margin="0,3,0,0" VerticalAlignment="Top" Width="235">
+            <Controls:NumericField x:Uid="fld_xOffset" x:Name="xOffset" Label="X offset:" ColonAt="90" Value="{Binding Path=Camera.XOffset, Mode=TwoWay}"/>
+            <Controls:NumericField x:Uid="fld_yOffset" x:Name="yOffset" Label="Y offset:" ColonAt="90" Value="{Binding Path=Camera.YOffset, Mode=TwoWay}"/>
+            <Grid Height="29">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="90"/>
+                    <ColumnDefinition Width="100*"/>
+                </Grid.ColumnDefinitions>
+                <Label x:Uid="lbl_offsetMotion" Content="Offset motion:" HorizontalAlignment="Right" Margin="0,0,0,0" VerticalAlignment="Top"/>
+                <ComboBox x:Name="comboBox" ItemsSource="{Binding Path=Camera.MoveModes}" SelectedItem="{Binding Path=Camera.MoveMode, Mode=TwoWay}" Grid.Column="1" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top" Width="80"/>
+            </Grid>
+            <Button x:Uid="btn_getPosition" x:Name="getPosition" Content="Get current position" Width="150" Margin="0,4,0,0" Click="getPosition_Click"/>
+        </StackPanel>
+    </GroupBox>
+</UserControl>

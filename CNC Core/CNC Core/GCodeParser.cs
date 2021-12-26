@@ -1,7 +1,7 @@
 ﻿/*
  * GCodeParser.cs - part of CNC Controls library
  *
- * v0.34 / 2021-05-18 / Io Engineering (Terje Io)
+ * v0.36 / 2021-11-17 / Io Engineering (Terje Io)
  *
  */
 
@@ -46,6 +46,7 @@ using System.Windows;
 using System.Windows.Media.Media3D;
 using System.Xml.Serialization;
 using CNC.Core;
+using System.Text;
 
 namespace CNC.GCode
 {
@@ -154,30 +155,6 @@ namespace CNC.GCode
             Q = 1 << 21
         }
 
-        // Modal Group G1: Motion modes
-        private enum MotionMode
-        {
-            Seek = 0,                    // G0 (Default: Must be zero)
-            Linear = 1,                  // G1 (Do not alter value)
-            CwArc = 2,                   // G2 (Do not alter value)
-            CcwArc = 3,                  // G3 (Do not alter value)
-            CubicSpline = 5,             // G5 (Do not alter value)
-            SpindleSynchronized = 33,    // G33 (Do not alter value)
-            DrillChipBreak = 73,         // G73 (Do not alter value)
-            Threading = 76,              // G76 (Do not alter value)
-            CannedCycle81 = 81,          // G81 (Do not alter value)
-            CannedCycle82 = 82,          // G82 (Do not alter value)
-            CannedCycle83 = 83,          // G83 (Do not alter value)
-            CannedCycle85 = 85,          // G85 (Do not alter value)
-            CannedCycle86 = 86,          // G86 (Do not alter value)
-            CannedCycle89 = 89,          // G89 (Do not alter value)
-            ProbeToward = 140,           // G38.2 (Do not alter value)
-            ProbeTowardNoError = 141,    // G38.3 (Do not alter value)
-            ProbeAway = 142,             // G38.4 (Do not alter value)
-            ProbeAwayNoError = 143,      // G38.5 (Do not alter value)
-            None = 80                    // G80 (Do not alter value)
-        }
-
         private enum AxisCommand
         {
             None = 0,
@@ -187,10 +164,22 @@ namespace CNC.GCode
             Scaling
         }
 
+        private struct StrReplace
+        {
+            public int Start, End;
+            public string Val;
+
+            public StrReplace (int start, int end, string val)
+            {
+                Start = start;
+                End = end;
+                Val = val;
+            }
+        }
+
         // Modal Group G8: Tool length offset
 
         const string ignore = "$!~?;";
-        const string collect = "0123456789.+- ";
 
         #endregion
 
@@ -200,6 +189,7 @@ namespace CNC.GCode
         private bool motionModeChanged = false;
         private GCValues gcValues = new GCValues();
         private GCodeToken last_token = new GCodeToken();
+        private NGCExpr ngcexpr;
         private MotionMode motionMode;
 
         private uint coordSystem;
@@ -216,6 +206,7 @@ namespace CNC.GCode
         public GCodeParser()
         {
             Reset();
+            ngcexpr = new NGCExpr(this);
         }
 
         public static CommandIgnoreState IgnoreM6 { get; set; } = CommandIgnoreState.Prompt;
@@ -225,6 +216,8 @@ namespace CNC.GCode
 
         public Dialect Dialect { get; set; } = Dialect.GrblHAL;
         public int Decimals { get; private set; }
+        public string NumFormat { get { return "#0." + "000000".Substring(0, Math.Min(6, Decimals)); } }
+
         public int ToolChanges { get; private set; }
         public bool ProgramEnd { get; private set; }
         public bool HasGoPredefinedPosition { get; private set; }
@@ -238,7 +231,7 @@ namespace CNC.GCode
             gcValues.Clear();
             Tokens.Clear();
             ProgramEnd = HasGoPredefinedPosition = false;
-            motionMode = MotionMode.Seek;
+            motionMode = MotionMode.G0;
             coordSystem = 0;
             demarcCount = 0;
             ToolChanges = 0;
@@ -247,25 +240,12 @@ namespace CNC.GCode
             zorg = feedRate = 0d;
         }
 
-        private string rewrite_block(string remove, List<string> gcodes)
-        {
-            string block = string.Empty;
-
-            foreach (string gcode in gcodes)
-            {
-                if (gcode != remove)
-                    block += gcode;
-            }
-
-            return block == string.Empty ? "(line removed)" : block;
-        }
-
         private bool VerifyIgnore(string code, CommandIgnoreState state)
         {
             bool strip = state == CommandIgnoreState.Strip;
 
             if (!strip && state != CommandIgnoreState.No)
-                strip = MessageBox.Show(string.Format("{0} command found, strip?", code), "Strip command", MessageBoxButton.YesNo) == MessageBoxResult.Yes;
+                strip = MessageBox.Show(string.Format(LibStrings.FindResource("ParserStrip"), code), LibStrings.FindResource("ParserStripHdr"), MessageBoxButton.YesNo) == MessageBoxResult.Yes;
 
             return strip;
         }
@@ -273,6 +253,46 @@ namespace CNC.GCode
         private double ToMetric(double v)
         {
             return IsImperial ? v * 2.54d : v;
+        }
+
+        private string TrimBlock(string block)
+        {
+            bool inComment = false, keep = false;
+            StringBuilder sb = new StringBuilder();
+
+            foreach (char c in block)
+            {
+                switch (c)
+                {
+                    case '\t':
+                    case ' ':
+                        if (inComment || keep)
+                            sb.Append(' ');
+                        break;
+
+                    case '(':
+                        inComment = true;
+                        sb.Append(c);
+                        break;
+
+                    case ')':
+                        inComment = false;
+                        sb.Append(c);
+                        break;
+
+                    case ';':
+                        keep = true;
+                        sb.Append(c);
+                        break;
+
+
+                    default:
+                        sb.Append(c);
+                        break;
+                }
+            }
+
+            return sb.ToString();
         }
 
         public bool ParseBlock(ref string line, bool quiet)
@@ -287,22 +307,24 @@ namespace CNC.GCode
             AxisFlags axisWords = AxisFlags.None;
             IJKFlags ijkWords = IJKFlags.None;
             ModalGroups modalGroups = 0, modalGroup = 0;
+            List<StrReplace> replace = new List<StrReplace>();
 
-            int userMCode = 0;
-            bool isScaling = false, inMessage = false;
-            string gcode = string.Empty, comment = string.Empty, block = line;
+        int userMCode = 0;
+            bool isScaling = false;
+            string comment = string.Empty, block;
             double value;
             AxisCommand axisCommand = AxisCommand.None;
 
-            List<string> gcodes = new List<string>();
+            block = line = TrimBlock(line);
 
-            isComment = false;
+            if (block.Length == 0)
+            {
+                isComment = false;
+                return false;
+            }
 
-            if (block.Length == 0 || block[0] == ';')
-                return block.Length != 0;
-
-            if (block.IndexOf(';') > 0)
-                block = block.Substring(0, block.IndexOf(';'));
+            if ((isComment = block[0] == ';'))
+                return true;
 
             if (block.Length == 0 || ignore.Contains(block[0]) || ProgramEnd)
                 return false;
@@ -318,39 +340,32 @@ namespace CNC.GCode
             }
 
             gcValues.N++;
-
-            block += '\r';
             motionModeChanged = false;
+            isComment = block[0] == '(' && block.LastIndexOf(')') == block.Length - 1 && !block.StartsWith("(MSG");
 
-            foreach (char c in block)
-            {
-                if (!collect.Contains(c) && !(inMessage &= (c != ')')))
-                {
-                    if (gcode.Length > 0)
-                    {
-                        gcodes.Add(gcode[0] == '(' ? gcode + ')' : gcode);
-                        gcode = string.Empty;
-                    }
-                    if (c > ' ' && c != ')')
-                    {
-                        inMessage = c == '(';
-                        gcode += inMessage ? c : char.ToUpperInvariant(c);
-                    }
-                }
-                else if (c > ' ' || inMessage)
-                    gcode += c;
-            }
+            int pos = 0, ppos = 0;
 
-            isComment = gcodes.Count == 1 && gcodes[0].First() == '(' && !gcodes[0].StartsWith("(MSG");
-
-            foreach (string code in gcodes)
+            while(pos < block.Length)
             {
                 wordFlag = 0;
                 modalGroup = 0;
 
-                if (code[0] == 'G')
+                if(block[pos] == ' ')
                 {
-                    value = double.Parse(code.Remove(0, 1), CultureInfo.InvariantCulture);
+                    pos++;
+                    continue;
+                }
+
+                if (char.ToUpperInvariant(block[pos]) == 'G')
+                {
+                    ppos = pos++;
+                    if (ngcexpr.ReadParameter(block, ref pos, out value) != NGCExpr.OpStatus.OK)
+                    {
+                        throw new GCodeException(LibStrings.FindResource("ParserBadExpr"));
+                    }
+                    if (ngcexpr.WasExpression)
+                        replace.Add(new StrReplace(ppos + 1, pos, value.ToInvariantString()));
+
                     int fv = (int)Math.Round((value - Math.Floor(value)) * 10.0, 0);
                     int iv = (int)Math.Floor(value);
 
@@ -362,13 +377,13 @@ namespace CNC.GCode
                         case 3:
                         case 5:
                             if (iv == 5 && Dialect == Dialect.Grbl)
-                                throw new GCodeException("Unsupported command");
+                                throw new GCodeException(LibStrings.FindResource("ParserUnsupportedCmd"));
                             if (axisCommand != AxisCommand.None && cmdNonModal != Commands.G53)
-                                throw new GCodeException("Axis command conflict");
+                                throw new GCodeException(LibStrings.FindResource("ParserAxisError"));
                             modalGroup = ModalGroups.G1;
                             axisCommand = AxisCommand.MotionMode;
-                            motionModeChanged = motionMode != (MotionMode)iv;
-                            motionMode = (MotionMode)iv;
+                            motionModeChanged = motionMode != (MotionMode)(iv * 10);
+                            motionMode = (MotionMode)(iv * 10);
                             break;
 
                         case 4:
@@ -378,7 +393,7 @@ namespace CNC.GCode
 
                         case 10:
                             if (axisCommand != AxisCommand.None)
-                                throw new GCodeException("Axis command conflict");
+                                throw new GCodeException(LibStrings.FindResource("ParserAxisError"));
                             axisCommand = AxisCommand.NonModal;
                             modalGroup = ModalGroups.G0;
                             cmdNonModal = Commands.G10;
@@ -386,7 +401,7 @@ namespace CNC.GCode
 
                         case 28:
                             if (axisCommand != AxisCommand.None)
-                                throw new GCodeException("Axis command conflict");
+                                throw new GCodeException(LibStrings.FindResource("ParserAxisError"));
                             axisCommand = AxisCommand.NonModal;
                             modalGroup = ModalGroups.G0;
                             cmdNonModal = Commands.G28 + fv;
@@ -394,7 +409,7 @@ namespace CNC.GCode
 
                         case 30:
                             if (axisCommand != AxisCommand.None)
-                                throw new GCodeException("Axis command conflict");
+                                throw new GCodeException(LibStrings.FindResource("ParserAxisError"));
                             axisCommand = AxisCommand.NonModal;
                             modalGroup = ModalGroups.G0;
                             cmdNonModal = Commands.G30 + fv;
@@ -402,7 +417,7 @@ namespace CNC.GCode
 
                         case 92:
                             if (axisCommand != AxisCommand.None)
-                                throw new GCodeException("Axis command conflict");
+                                throw new GCodeException(LibStrings.FindResource("ParserAxisError"));
                             axisCommand = AxisCommand.NonModal;
                             modalGroup = ModalGroups.G0;
                             cmdNonModal = Commands.G92 + fv;
@@ -411,7 +426,7 @@ namespace CNC.GCode
                         case 7:
                         case 8:
                             if (Dialect == Dialect.Grbl)
-                                throw new GCodeException("Unsupported command");
+                                throw new GCodeException(LibStrings.FindResource("ParserUnsupportedCmd"));
                             cmdLatheMode = Commands.G7 + (iv - 7);
                             modalGroup = ModalGroups.G15;
                             break;
@@ -427,26 +442,26 @@ namespace CNC.GCode
                         case 21:
                             cmdUnits = Commands.G20 + (iv - 20);
                             modalGroup = ModalGroups.G6;
-                            if(cmdUnits == Commands.G20)
+                            if (cmdUnits == Commands.G20)
                                 Decimals = 4;
                             break;
 
                         case 33:
                         case 76:
                             if (axisCommand != AxisCommand.None)
-                                throw new GCodeException("Axis command conflict");
+                                throw new GCodeException(LibStrings.FindResource("ParserAxisError"));
                             zorg = gcValues.Z;
                             modalGroup = ModalGroups.G1;
                             axisCommand = AxisCommand.MotionMode;
-                            motionMode = (MotionMode)iv;
+                            motionMode = (MotionMode)(iv * 10);
                             break;
 
                         case 38:
                             if (axisCommand != AxisCommand.None)
-                                throw new GCodeException("Axis command conflict");
+                                throw new GCodeException(LibStrings.FindResource("ParserAxisError"));
                             axisCommand = AxisCommand.MotionMode;
                             modalGroup = ModalGroups.G1;
-                            motionMode = MotionMode.ProbeToward + fv;
+                            motionMode = (MotionMode)(value * 10);
                             break;
 
                         case 40:
@@ -465,10 +480,10 @@ namespace CNC.GCode
                         case 50:
                         case 51:
                             if (Dialect != Dialect.GrblHAL)
-                                throw new GCodeException("Unsupported command");
+                                throw new GCodeException(LibStrings.FindResource("ParserUnsupportedCmd"));
                             // NOTE: not NIST
                             if (iv == 51 && axisCommand != AxisCommand.None)
-                                throw new GCodeException("Axis command conflict");
+                                throw new GCodeException(LibStrings.FindResource("ParserAxisError"));
                             modalGroup = ModalGroups.G11;
                             axisCommand = AxisCommand.Scaling;
                             isScaling = iv == 51;
@@ -487,19 +502,19 @@ namespace CNC.GCode
                         case 58:
                         case 59:
                             if (fv > 0 && Dialect == Dialect.Grbl)
-                                throw new GCodeException("Unsupported command");
+                                throw new GCodeException(LibStrings.FindResource("ParserUnsupportedCmd"));
                             coordSystem = (uint)(iv + fv);
                             modalGroup = ModalGroups.G12;
                             break;
 
                         case 61:
                         case 64:
-                            if (VerifyIgnore(code, IgnoreG61G64))
-                                line = rewrite_block(code, gcodes);
+                            if (VerifyIgnore(iv == 61 ? "G61" : "G64", IgnoreG61G64))
+                                replace.Add(new StrReplace(ppos, pos, string.Empty));
                             else
                             {
                                 if (Dialect != Dialect.LinuxCNC && (iv != 61 || fv > 0))
-                                    throw new GCodeException("Unsupported command");
+                                    throw new GCodeException(LibStrings.FindResource("ParserUnsupportedCmd"));
                                 cmdPathMode = iv == 64 ? Commands.G64 : Commands.G61 + fv;
                                 modalGroup = ModalGroups.G13;
                             }
@@ -507,10 +522,10 @@ namespace CNC.GCode
 
                         case 80:
                             //                            if (axisCommand != AxisCommand.None)
-                            //                                throw new GCodeException("Axis command conflict");
+                            //                                throw new GCodeException(LibStrings.FindResource("ParserAxisError"));
                             modalGroup = ModalGroups.G1;
                             axisCommand = AxisCommand.None;
-                            motionMode = MotionMode.None;
+                            motionMode = MotionMode.G80;
                             break;
 
                         case 73:
@@ -521,25 +536,25 @@ namespace CNC.GCode
                         case 86:
                         case 89:
                             if (Dialect == Dialect.Grbl)
-                                throw new GCodeException("Unsupported command");
+                                throw new GCodeException(LibStrings.FindResource("ParserUnsupportedCmd"));
                             if (axisCommand != AxisCommand.None)
-                                throw new GCodeException("Axis command conflict");
+                                throw new GCodeException(LibStrings.FindResource("ParserAxisError"));
                             modalGroup = ModalGroups.G1;
                             axisCommand = AxisCommand.MotionMode;
-                            motionModeChanged = motionMode != (MotionMode)iv;
-                            motionMode = (MotionMode)iv;
+                            motionModeChanged = motionMode != (MotionMode)(iv * 10);
+                            motionMode = (MotionMode)(iv * 10);
                             break;
 
                         case 84:
                         case 87:
                         case 88:
                             if (fv == 0) // test to stop compiler complaining 
-                                throw new GCodeException("Unsupported command");
+                                throw new GCodeException(LibStrings.FindResource("ParserUnsupportedCmd"));
                             break;
 
                         case 90:
                             //if (Dialect != Dialect.LinuxCNC && fv == 1)
-                            //    throw new GCodeException("Unsupported command");
+                            //    throw new GCodeException(LibStrings.FindResource("ParserUnsupportedCmd"));
                             if (fv == 0)
                             {
                                 cmdDistMode = Commands.G90;
@@ -553,7 +568,7 @@ namespace CNC.GCode
                             break;
 
                         case 91:
-                            if(fv == 0)
+                            if (fv == 0)
                             {
                                 cmdDistMode = Commands.G91;
                                 modalGroup = ModalGroups.G3;
@@ -581,7 +596,7 @@ namespace CNC.GCode
                         case 98:
                         case 99:
                             if (Dialect == Dialect.Grbl)
-                                throw new GCodeException("Unsupported command");
+                                throw new GCodeException(LibStrings.FindResource("ParserUnsupportedCmd"));
                             cmdRetractMode = Commands.G98 + (iv - 98);
                             modalGroup = ModalGroups.G10;
                             break;
@@ -589,16 +604,22 @@ namespace CNC.GCode
 
                     if (modalGroup > 0 && modalGroups.HasFlag(modalGroup))
                     {
-                        throw new GCodeException("Modal group violation");
+                        throw new GCodeException(LibStrings.FindResource("ParserModalGrpError"));
                     }
                     else
                         modalGroups |= modalGroup;
                 }
-                else if (code[0] == 'M')
+                else if (char.ToUpperInvariant(block[pos]) == 'M')
                 {
                     #region M-code parsing
+                    ppos = pos++;
+                    if (ngcexpr.ReadParameter(block, ref pos, out value) != NGCExpr.OpStatus.OK)
+                    {
+                        throw new GCodeException(LibStrings.FindResource("ParserBadExpr")); ;
+                    }
+                    if (ngcexpr.WasExpression)
+                        replace.Add(new StrReplace(ppos + 1, pos, value.ToInvariantString()));
 
-                    value = double.Parse(code.Remove(0, 1), CultureInfo.InvariantCulture);
                     int fv = (int)Math.Round((value - Math.Floor(value)) * 10.0, 0);
                     int iv = (int)Math.Floor(value);
 
@@ -620,15 +641,15 @@ namespace CNC.GCode
                             break;
 
                         case 6:
-                            if (VerifyIgnore(code, IgnoreM6))
-                                line = rewrite_block(code, gcodes);
+                            if (VerifyIgnore("M6", IgnoreM6))
+                                replace.Add(new StrReplace(ppos, pos, string.Empty));
                             else
                                 modalGroup = ModalGroups.M6;
                             break;
 
                         case 7:
-                            if (VerifyIgnore(code, IgnoreM7))
-                                line = rewrite_block(code, gcodes);
+                            if (VerifyIgnore("M7", IgnoreM7))
+                                replace.Add(new StrReplace(ppos, pos, string.Empty));
                             else
                             {
                                 CoolantState = CoolantState.Mist;
@@ -637,8 +658,8 @@ namespace CNC.GCode
                             break;
 
                         case 8:
-                            if (VerifyIgnore(code, IgnoreM8))
-                                line = rewrite_block(code, gcodes);
+                            if (VerifyIgnore("M8", IgnoreM8))
+                                replace.Add(new StrReplace(ppos, pos, string.Empty));
                             else
                             {
                                 CoolantState = CoolantState.Flood;
@@ -659,7 +680,7 @@ namespace CNC.GCode
                         case 53:
                         case 56:
                             if (Dialect == Dialect.LinuxCNC && iv == 56)
-                                throw new GCodeException("Unsupported command");
+                                throw new GCodeException(LibStrings.FindResource("ParserUnsupportedCmd"));
                             cmdOverride = iv == 56 ? Commands.M56 : Commands.M48 + (iv - 48);
                             modalGroup = ModalGroups.M9;
                             break;
@@ -681,8 +702,8 @@ namespace CNC.GCode
 
 
                         default:
-//                            if(iv >= 100 && iv < 200)
-                                userMCode = iv;
+                            //                            if(iv >= 100 && iv < 200)
+                            userMCode = iv;
                             modalGroup = ModalGroups.M10; // User defined M-codes
                             break;
                     }
@@ -691,24 +712,38 @@ namespace CNC.GCode
 
                     if (modalGroup > 0 && modalGroups.HasFlag(modalGroup))
                     {
-                        throw new GCodeException("Modal group violation");
+                        throw new GCodeException(LibStrings.FindResource("ParserModalGrpError"));
                     }
                     else
                         modalGroups |= modalGroup;
                 }
-                else if (code[0] == '(' /* && code.Length > 5 && code.Substring(0, 5).ToUpperInvariant() == "(MSG,"*/)
+                else if (block[pos] == '(')
                 {
-                    comment = code;
+                    ngcexpr.ReadComment(block, ref pos, out comment);
                 }
-                else if (code[0] != '(')
+                else if (block[pos] == '#')
+                {
+                    ppos = pos;
+                    ngcexpr.ReadSetParameter(block, ref pos);
+                    replace.Add(new StrReplace(ppos, pos, "(" + block.Substring(ppos, pos - ppos) + ")"));
+                }
+                else if (block[pos] == ';')
+                    pos = block.Length;
+                else
                 {
                     #region Parse Word values
 
                     try
                     {
-                        value = double.Parse(code.Remove(0, 1), CultureInfo.InvariantCulture);
+                        ppos = pos++;
+                        if (ngcexpr.ReadParameter(block, ref pos, out value) != NGCExpr.OpStatus.OK)
+                        {
+                            throw new GCodeException(LibStrings.FindResource("ParserBadExpr"));
+                        }
+                        if (ngcexpr.WasExpression)
+                            replace.Add(new StrReplace(ppos + 1, pos, value.ToInvariantString(NumFormat) + "(" + block.Substring(ppos + 1, pos - ppos - 1) + ")"));
 
-                        switch (code[0])
+                        switch (char.ToUpperInvariant(block[ppos]))
                         {
                             case 'D':
                                 gcValues.D = value;
@@ -731,19 +766,19 @@ namespace CNC.GCode
                                 break;
 
                             case 'I':
-                                gcValues.I = value;
+                                gcValues.I = Math.Round(value, Decimals);
                                 wordFlag = WordFlags.I;
                                 ijkWords |= IJKFlags.I;
                                 break;
 
                             case 'J':
-                                gcValues.J = value;
+                                gcValues.J = Math.Round(value, Decimals);
                                 wordFlag = WordFlags.J;
                                 ijkWords |= IJKFlags.J;
                                 break;
 
                             case 'K':
-                                gcValues.K = value;
+                                gcValues.K = Math.Round(value, Decimals);
                                 wordFlag = WordFlags.K;
                                 ijkWords |= IJKFlags.K;
                                 break;
@@ -784,65 +819,86 @@ namespace CNC.GCode
                                 break;
 
                             case 'X':
-                                if(code.Contains('.'))
-                                    Decimals = Math.Max(Decimals, code.Length - code.IndexOf('.') - 1);
+                                if (!ngcexpr.WasExpression)
+                                {
+                                    string val = block.Substring(ppos + 1, pos - ppos - 1);
+                                    Decimals = Math.Max(Decimals, val.Length - val.IndexOf('.') - 1);
+                                }
                                 wordFlag = WordFlags.X;
                                 axisWords |= GCode.AxisFlags.X;
-                                gcValues.X = value;
+                                gcValues.X = Math.Round(value, Decimals);
                                 break;
 
                             case 'Y':
                                 wordFlag = WordFlags.Y;
                                 axisWords |= GCode.AxisFlags.Y;
-                                gcValues.Y = value;
+                                gcValues.Y = Math.Round(value, Decimals);
                                 break;
 
                             case 'Z':
                                 wordFlag = WordFlags.Z;
                                 axisWords |= GCode.AxisFlags.Z;
-                                gcValues.Z = value;
+                                gcValues.Z = Math.Round(value, Decimals);
                                 break;
 
                             case 'A':
                                 wordFlag = WordFlags.A;
                                 axisWords |= GCode.AxisFlags.A;
-                                gcValues.A = value;
+                                gcValues.A = Math.Round(value, Decimals);
                                 break;
 
                             case 'B':
                                 wordFlag = WordFlags.B;
                                 axisWords |= GCode.AxisFlags.B;
-                                gcValues.B = value;
+                                gcValues.B = Math.Round(value, Decimals);
                                 break;
 
                             case 'C':
                                 wordFlag = WordFlags.C;
                                 axisWords |= GCode.AxisFlags.C;
-                                gcValues.C = value;
+                                gcValues.C = Math.Round(value, Decimals);
                                 break;
 
                             default:
-                                throw new GCodeException("Command word not recognized");
+                                throw new GCodeException(LibStrings.FindResource("ParserCmdUnknown"));
                         }
                     }
                     catch (Exception e)
                     {
-                        throw new GCodeException("Invalid GCode", e);
+                        throw new GCodeException(LibStrings.FindResource("ParserCMDInvalid"), e);
                     }
                     #endregion
                 }
 
                 if (wordFlag > 0 && wordFlags.HasFlag(wordFlag))
                 {
-                    throw new GCodeException("Command word repeated");
+                    throw new GCodeException(LibStrings.FindResource("ParserWordRepeated"));
                 }
                 else
                     wordFlags |= wordFlag;
             }
 
             //
+            // String substitutions: strips specified G- and M-codes, replaces parameters and expressions with actual values
+            //
+            if(replace.Count > 0)
+            {
+                int i = replace.Count;
+                do
+                {
+                    --i;
+                    line = line.Substring(0, replace[i].Start) + replace[i].Val + line.Substring(replace[i].End);
+                } while (i > 0);
+            }
+
+            if (line == String.Empty)
+                line = "(line removed)";
+
+            //
             // 0. Non-specific/common error-checks and miscellaneous setup
             //
+
+            Line = (int)gcValues.N;
 
             //
             // 1. Comments feedback
@@ -860,6 +916,7 @@ namespace CNC.GCode
             // G93, G94, G95
             if (modalGroups.HasFlag(ModalGroups.G5))
             {
+                FeedRateMode = (FeedRateMode)(cmdFeedrateMode - 93);
                 Tokens.Add(new GCodeToken(cmdFeedrateMode, gcValues.N));
             }
 
@@ -879,6 +936,7 @@ namespace CNC.GCode
             // G96, G97
             if (modalGroups.HasFlag(ModalGroups.G14))
             {
+                SpindleRpmMode = cmdSpindleRpmMode == Commands.G97;
                 Tokens.Add(new GCodeToken(cmdSpindleRpmMode, gcValues.N));
             }
 
@@ -892,10 +950,11 @@ namespace CNC.GCode
             //
             if (wordFlags.HasFlag(WordFlags.T))
             {
+                Tool = gcValues.T;
                 Tokens.Add(new GCToolSelect(Commands.ToolSelect, gcValues.N, gcValues.T));
 
                 if (!quiet && ToolChanged != null && !ToolChanged(gcValues.T))
-                    MessageBox.Show(string.Format("Tool {0} not associated with a profile!", gcValues.T.ToString()), "GCode parser", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show(string.Format(LibStrings.FindResource("ParserToolProfile"), gcValues.T.ToString()), "GCode parser", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
 
             if (modalGroups != ModalGroups.G1)
@@ -959,9 +1018,9 @@ namespace CNC.GCode
                         case 66:
                             {
                                 if (wordFlags.HasFlag(WordFlags.P) && wordFlags.HasFlag(WordFlags.E))
-                                    throw new GCodeException("Cannot use both P- and E-word with M66");
+                                    throw new GCodeException(LibStrings.FindResource("ParserM66PandE"));
                                 if (!(wordFlags.HasFlag(WordFlags.P) || wordFlags.HasFlag(WordFlags.E)))
-                                    throw new GCodeException("P- or E-word missing for M66");
+                                    throw new GCodeException(LibStrings.FindResource("ParserM66NoPorE"));
                                 uint l = wordFlags.HasFlag(WordFlags.L) ? (uint)gcValues.L : 0;
                                 double q = wordFlags.HasFlag(WordFlags.Q) ? gcValues.Q : 0d;
                                 if (l <= 4 && (l == 0 && q != 0d))
@@ -995,7 +1054,7 @@ namespace CNC.GCode
                     if (wordFlags.HasFlag(WordFlags.P))
                         Tokens.Add(new GCDwell(gcValues.N, gcValues.P));
                     else
-                        throw new GCodeException("G4 - missing P word");
+                        throw new GCodeException(LibStrings.FindResource("ParserG6NoP"));
                 }
 
                 //
@@ -1125,7 +1184,8 @@ namespace CNC.GCode
                 // G54 - G59, G59.1 - G59.3
                 if (modalGroups.HasFlag(ModalGroups.G12))
                 {
-                    Tokens.Add(new GCodeToken(Commands.G54 + (int)coordSystem - 54, gcValues.N));
+                    CoordSystem = (int)coordSystem - 53;
+                    Tokens.Add(new GCodeToken(Commands.G54 + CoordSystem - 1, gcValues.N));
                 }
 
                 //
@@ -1165,6 +1225,7 @@ namespace CNC.GCode
                 // G98, G99
                 if (modalGroups.HasFlag(ModalGroups.G10))
                 {
+                    RetractOldZ = cmdRetractMode == Commands.G98;
                     Tokens.Add(new GCodeToken(cmdRetractMode, gcValues.N));
                 }
 
@@ -1225,18 +1286,18 @@ namespace CNC.GCode
                             break;
 
                         case Commands.G53:
-                            if (motionMode == MotionMode.Seek || motionMode == MotionMode.Linear)
+                            if (motionMode == MotionMode.G0 || motionMode == MotionMode.G1)
                             {
                                 if (modalGroups.HasFlag(ModalGroups.G1))
-                                    Tokens.Add(new GCAbsLinearMotion(cmdNonModal, motionMode == MotionMode.Seek ? Commands.G0 : Commands.G1, gcValues.N, gcValues.XYZ, AxisFlags.None));
+                                    Tokens.Add(new GCAbsLinearMotion(cmdNonModal, motionMode == MotionMode.G0 ? Commands.G0 : Commands.G1, gcValues.N, gcValues.XYZ, AxisFlags.None));
                                 else
                                 {
-                                    Tokens.Add(new GCAbsLinearMotion(cmdNonModal, motionMode == MotionMode.Seek ? Commands.G0 : Commands.G1, gcValues.N, gcValues.XYZ, axisWords));
+                                    Tokens.Add(new GCAbsLinearMotion(cmdNonModal, motionMode == MotionMode.G0 ? Commands.G0 : Commands.G1, gcValues.N, gcValues.XYZ, axisWords));
                                     axisWords = AxisFlags.None;
                                 }
                             }
                             else
-                                throw new GCodeException("G0 or G1 not active");
+                                throw new GCodeException(LibStrings.FindResource("ParserNoG0orG1"));
                             break;
 
                         case Commands.G28_1:
@@ -1248,12 +1309,25 @@ namespace CNC.GCode
                             break;
 
                         case Commands.G92:
-                            Tokens.Add(new GCCoordinateSystem(cmdNonModal, gcValues.N, 10, gcValues.XYZ, axisWords));
+                            {
+                                var offset = new GCCoordinateSystem(cmdNonModal, gcValues.N, 10, gcValues.XYZ, axisWords);
+                                SetG92Offset(offset);
+                                Tokens.Add(new GCCoordinateSystem(cmdNonModal, gcValues.N, 10, gcValues.XYZ, axisWords));
+                            }
                             break;
 
                         case Commands.G92_1:
+                            G92Clear();
+                            Tokens.Add(new GCodeToken(cmdNonModal, gcValues.N));
+                            break;
+
                         case Commands.G92_2:
+                            G92Active = false;
+                            Tokens.Add(new GCodeToken(cmdNonModal, gcValues.N));
+                            break;
+
                         case Commands.G92_3:
+                            G92Active = true;
                             Tokens.Add(new GCodeToken(cmdNonModal, gcValues.N));
                             break;
                     }
@@ -1270,6 +1344,7 @@ namespace CNC.GCode
             if (modalGroups.HasFlag(ModalGroups.G1) && axisCommand == AxisCommand.None)
             {
                 motionMode = MotionMode.None;
+                RetractOldZ = true;
                 Tokens.Add(new GCodeToken(Commands.G80, gcValues.N));
             }
 
@@ -1277,18 +1352,21 @@ namespace CNC.GCode
             {
                 switch (motionMode)
                 {
-                    case MotionMode.Seek:
+                    case MotionMode.G0:
+                        RetractOldZ = true;
                         Tokens.Add(new GCLinearMotion(Commands.G0, gcValues.N, gcValues.XYZ, axisWords));
                         break;
 
-                    case MotionMode.Linear:
+                    case MotionMode.G1:
                         if (feedRate == 0d)
-                            throw new GCodeException("G1 used when feed rate is not set");
+                            throw new GCodeException(LibStrings.FindResource("ParserG1NoFeed"));
+                        RetractOldZ = true;
                         Tokens.Add(new GCLinearMotion(Commands.G1, gcValues.N, gcValues.XYZ, axisWords));
                         break;
 
-                    case MotionMode.CwArc:
-                    case MotionMode.CcwArc:
+                    case MotionMode.G2:
+                    case MotionMode.G3:
+                        RetractOldZ = true;
                         if (wordFlags.HasFlag(WordFlags.R))
                         {
                             gcValues.IJK[0] = gcValues.IJK[1] = gcValues.IJK[2] = double.NaN;
@@ -1312,16 +1390,16 @@ namespace CNC.GCode
                                     gcValues.IJK[i] = 0d;
                             }
                         }
-                        Tokens.Add(new GCArc(motionMode == MotionMode.CwArc ? Commands.G2 : Commands.G3, gcValues.N, gcValues.XYZ, axisWords, gcValues.IJK, ijkWords, gcValues.R, IJKMode));
+                        Tokens.Add(new GCArc(motionMode == MotionMode.G2 ? Commands.G2 : Commands.G3, gcValues.N, gcValues.XYZ, axisWords, gcValues.IJK, ijkWords, gcValues.R, IJKMode));
                         break;
 
-                    case MotionMode.CubicSpline:
+                    case MotionMode.G5:
                         if (Plane.Plane != GCode.Plane.XY)
-                            throw new GCodeException("Plane not XY");
+                            throw new GCodeException(LibStrings.FindResource("ParserPlaneNotXY"));
                         if (!(wordFlags.HasFlag(WordFlags.P) && wordFlags.HasFlag(WordFlags.Q)))
-                            throw new GCodeException("P and/or Q word missing");
+                            throw new GCodeException(LibStrings.FindResource("ParserNoPandorQ"));
                         if (motionModeChanged && !(wordFlags.HasFlag(WordFlags.I) && wordFlags.HasFlag(WordFlags.J)))
-                            throw new GCodeException("I and/or J word missing");
+                            throw new GCodeException(LibStrings.FindResource("ParserNoIandorJ"));
                         if (!(wordFlags.HasFlag(WordFlags.I) && wordFlags.HasFlag(WordFlags.J)))
                         {
                             gcValues.IJK[0] = -splinePQ[0];
@@ -1346,77 +1424,83 @@ namespace CNC.GCode
                             if (IsScaled)
                                 splinePQ[i] *= scaleFactors[i];
                         }
+                        RetractOldZ = true;
                         Tokens.Add(new GCSpline(Commands.G5, gcValues.N, gcValues.XYZ, axisWords, new double[] { gcValues.IJK[0], gcValues.IJK[1], splinePQ[0], splinePQ[1] }));
                         break;
 
-                    case MotionMode.SpindleSynchronized:
+                    case MotionMode.G33:
+                        RetractOldZ = true;
                         Tokens.Add(new GCSyncMotion(Commands.G33, gcValues.N, gcValues.XYZ, axisWords, gcValues.K));
                         break;
 
-                    case MotionMode.ProbeToward:
+                    case MotionMode.G38_2:
+                        RetractOldZ = true;
                         Tokens.Add(new GCLinearMotion(Commands.G38_2, gcValues.N, gcValues.XYZ, axisWords));
                         break;
 
-                    case MotionMode.ProbeTowardNoError:
+                    case MotionMode.G38_3:
+                        RetractOldZ = true;
                         Tokens.Add(new GCLinearMotion(Commands.G38_3, gcValues.N, gcValues.XYZ, axisWords));
                         break;
 
-                    case MotionMode.ProbeAway:
+                    case MotionMode.G38_4:
+                        RetractOldZ = true;
                         Tokens.Add(new GCLinearMotion(Commands.G38_4, gcValues.N, gcValues.XYZ, axisWords));
                         break;
 
-                    case MotionMode.ProbeAwayNoError:
+                    case MotionMode.G38_5:
+                        RetractOldZ = true;
                         Tokens.Add(new GCLinearMotion(Commands.G38_5, gcValues.N, gcValues.XYZ, axisWords));
                         break;
 
-                    case MotionMode.DrillChipBreak:
+                    case MotionMode.G73:
                         {
                             uint repeats = wordFlags.HasFlag(WordFlags.L) ? (uint)gcValues.L : 1;
                             if (motionModeChanged && !wordFlags.HasFlag(WordFlags.R))
-                                throw new GCodeException("R word missing");
+                                throw new GCodeException(LibStrings.FindResource("ParserNoR"));
                             if (motionModeChanged && !wordFlags.HasFlag(WordFlags.Q) || gcValues.Q <= 0d)
-                                throw new GCodeException("Q word missing or out of range");
+                                throw new GCodeException(LibStrings.FindResource("ParserNoInvalidQ"));
                             Tokens.Add(new GCCannedDrill(Commands.G73, gcValues.N, gcValues.XYZ, axisWords, ToMetric(gcValues.R), repeats, 0d, ToMetric(gcValues.Q)));
                         }
                         break;
 
-                    case MotionMode.Threading:
+                    case MotionMode.G76:
                         {
                             // TODO: add check for mandatory values + sanity
                             ThreadingFlags optFlags = ThreadingFlags.None;
                             double[] optValues = new double[5];
 
                             if(Plane.Plane != GCode.Plane.XZ)
-                                throw new GCodeException("Plane not ZX");
+                                throw new GCodeException(LibStrings.FindResource("ParserPlaneNotZX"));
 
                             if (axisWords != AxisFlags.Z)
-                                throw new GCodeException("Axisword(s) other than Z found");
+                                throw new GCodeException(LibStrings.FindResource("ParserZPlus"));
 
                             if (!wordFlags.HasFlag(WordFlags.P))
-                                throw new GCodeException("P word missing");
+                                throw new GCodeException(LibStrings.FindResource("ParserNoP"));
                             else if(gcValues.P < 0d)
-                                throw new GCodeException("P word negative");
+                                throw new GCodeException(LibStrings.FindResource("ParserNegP"));
 
                             if (!wordFlags.HasFlag(WordFlags.I))
-                                throw new GCodeException("I word missing");
+                                throw new GCodeException(LibStrings.FindResource("ParserNoI"));
 
                             if (!wordFlags.HasFlag(WordFlags.J))
-                                throw new GCodeException("J word missing");
+                                throw new GCodeException(LibStrings.FindResource("ParserNoJ"));
                             else if (gcValues.J < 0d)
-                                throw new GCodeException("J word negative");
+                                throw new GCodeException(LibStrings.FindResource("ParserNegJ"));
 
                             if (!wordFlags.HasFlag(WordFlags.K))
-                                throw new GCodeException("K word missing");
+                                throw new GCodeException(LibStrings.FindResource("ParserNoK"));
                             else if (gcValues.K < 0d)
-                                throw new GCodeException("K word negative");
+                                throw new GCodeException(LibStrings.FindResource("ParserNegK"));
 
                             if(gcValues.K <= gcValues.J)
-                                throw new GCodeException("K word must be greater than J word");
+                                throw new GCodeException(LibStrings.FindResource("ParserKlesseqJ"));
 
                             if (wordFlags.HasFlag(WordFlags.R))
                             {
                                 if(gcValues.R < 1d)
-                                    throw new GCodeException("R word less than 1");
+                                    throw new GCodeException(LibStrings.FindResource("ParseRless1"));
                                 optFlags |= ThreadingFlags.R;
                                 optValues[0] = gcValues.R;
                             }
@@ -1429,13 +1513,13 @@ namespace CNC.GCode
                             {
                                 optFlags |= ThreadingFlags.H;
                                 if (gcValues.H < 0d)
-                                    throw new GCodeException("H word is negative");
+                                    throw new GCodeException(LibStrings.FindResource("ParserNegH"));
                                 optValues[2] = gcValues.H;
                             }
                             if (wordFlags.HasFlag(WordFlags.E))
                             {
                                 if (gcValues.E  > Math.Abs(gcValues.Z - zorg) / 2d)
-                                    throw new GCodeException("E word greater than half the drive line length");
+                                    throw new GCodeException(LibStrings.FindResource("ParserErrE"));
                                 optFlags |= ThreadingFlags.E;
                                 optValues[3] = gcValues.E;
                             }
@@ -1448,19 +1532,19 @@ namespace CNC.GCode
                             if (LatheMode == LatheMode.Diameter)
                                 foreach (int i in ijkWords.ToIndices())
                                     gcValues.IJK[i] /= 2d;
-
+                            RetractOldZ = true;
                             Tokens.Add(new GCThreadingMotion(Commands.G76, gcValues.N, gcValues.P, gcValues.XYZ, axisWords, gcValues.IJK, IJKFlags.All, optValues, optFlags));
                         }
                         break;
 
-                    case MotionMode.CannedCycle81:
+                    case MotionMode.G81:
                         {
                             uint repeats = wordFlags.HasFlag(WordFlags.L) ? (uint)gcValues.L : 1;
                             Tokens.Add(new GCCannedDrill(Commands.G81, gcValues.N, gcValues.XYZ, axisWords, wordFlags.HasFlag(WordFlags.R) ? ToMetric(gcValues.R) : double.NaN, repeats));
                         }
                         break;
 
-                    case MotionMode.CannedCycle82:
+                    case MotionMode.G82:
                         {
                             uint repeats = wordFlags.HasFlag(WordFlags.L) ? (uint)gcValues.L : 1;
                             double dwell = wordFlags.HasFlag(WordFlags.P) ? gcValues.P : 0d;
@@ -1468,23 +1552,23 @@ namespace CNC.GCode
                         }
                         break;
 
-                    case MotionMode.CannedCycle83:
+                    case MotionMode.G83:
                         {
                             uint repeats = wordFlags.HasFlag(WordFlags.L) ? (uint)gcValues.L : 1;
                             if (motionModeChanged && !wordFlags.HasFlag(WordFlags.Q) || gcValues.Q <= 0d)
-                                throw new GCodeException("Q word missing or out of range");
+                                throw new GCodeException(LibStrings.FindResource("ParserNoInvalidQ"));
                             Tokens.Add(new GCCannedDrill(Commands.G83, gcValues.N, gcValues.XYZ, axisWords, wordFlags.HasFlag(WordFlags.R) ? ToMetric(gcValues.R) : double.NaN, repeats, 0d, ToMetric(gcValues.Q)));
                         }
                         break;
 
-                    case MotionMode.CannedCycle85:
+                    case MotionMode.G85:
                         {
                             uint repeats = wordFlags.HasFlag(WordFlags.L) ? (uint)gcValues.L : 1;
                             Tokens.Add(new GCCannedDrill(Commands.G85, gcValues.N, gcValues.XYZ, axisWords, wordFlags.HasFlag(WordFlags.R) ? ToMetric(gcValues.R) : double.NaN, repeats));
                         }
                         break;
 
-                    case MotionMode.CannedCycle86:
+                    case MotionMode.G86:
                         {
                             // error if spindle not running
                             uint repeats = wordFlags.HasFlag(WordFlags.L) ? (uint)gcValues.L : 1;
@@ -1493,14 +1577,16 @@ namespace CNC.GCode
                         }
                         break;
 
-                    case MotionMode.CannedCycle89:
+                    case MotionMode.G89:
                         {
                             uint repeats = wordFlags.HasFlag(WordFlags.L) ? (uint)gcValues.L : 1;
                             double dwell = wordFlags.HasFlag(WordFlags.P) ? gcValues.P : 0d;
-                            Tokens.Add(new GCCannedDrill(Commands.G86, gcValues.N, gcValues.XYZ, axisWords, wordFlags.HasFlag(WordFlags.R) ? ToMetric(gcValues.R) : double.NaN, repeats, dwell));
+                            Tokens.Add(new GCCannedDrill(Commands.G89, gcValues.N, gcValues.XYZ, axisWords, wordFlags.HasFlag(WordFlags.R) ? ToMetric(gcValues.R) : double.NaN, repeats, dwell));
                         }
                         break;
                 }
+
+                MotionMode = motionMode;
             }
 
             //
@@ -2219,7 +2305,7 @@ namespace CNC.GCode
             double h_x2_div_d = 4d * R * R - x * x - y * y;
             if (h_x2_div_d < 0d)
             {
-                Console.Write("Error computing arc radius.");
+                Console.Write(LibStrings.FindResource("ParserRadiusErr"));
             }
 
             h_x2_div_d = (-Math.Sqrt(h_x2_div_d)) / Math.Sqrt(x * x + y * y);

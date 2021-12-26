@@ -1,13 +1,13 @@
 /*
  * UIUtils.cs - part of CNC Controls library
  *
- * v0.28 / 2020-11-15 / Io Engineering (Terje Io)
+ * v0.36 / 2021-12-25 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2020, Io Engineering (Terje Io)
+Copyright (c) 2018-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -128,13 +128,13 @@ namespace CNC.Controls
             double v = (double)value;
 
             if(!double.IsNaN(Min) && !double.IsNaN(Max) && (v < Min || v > Max))
-                return new ValidationResult(false, $"Invalid input: allowed range is {Min} - {Max}.");
+                return new ValidationResult(false, string.Format(LibStrings.FindResource("ValAllowedRange"), Min, Max));
 
             if (!double.IsNaN(Min) && v < Min)
-                return new ValidationResult(false, $"Invalid input: minimum allowed value is {Min}.");
+                return new ValidationResult(false, string.Format(LibStrings.FindResource("ValAllowedMin"), Min));
 
             if (!double.IsNaN(Max) && v > Max)
-                return new ValidationResult(false, $"Invalid input: maximum allowed value is {Max}.");
+                return new ValidationResult(false, string.Format(LibStrings.FindResource("ValAllowedMax"), Max));
 
             return ValidationResult.ValidResult;
         }
@@ -148,7 +148,7 @@ namespace CNC.Controls
 
             System.Net.IPAddress ip4;
             if(!System.Net.IPAddress.TryParse(ip4address, out ip4))
-                return new ValidationResult(false, $"Invalid input: not an IP4 address.");
+                return new ValidationResult(false, (string)LibStrings.FindResource("ValNotIPV4"));
 
             return ValidationResult.ValidResult;
         }
@@ -182,6 +182,21 @@ namespace CNC.Controls
             #endregion
         }
 
+        public static T TryFindParent<T>(DependencyObject current) where T : class
+        {
+            DependencyObject parent = VisualTreeHelper.GetParent(current);
+            if (parent == null)
+                parent = LogicalTreeHelper.GetParent(current);
+
+            if (parent == null)
+                return null;
+
+            if (parent is T)
+                return parent as T;
+            else
+                return TryFindParent<T>(parent);
+        }
+
         public static IEnumerable<T> FindFirstLogicalChildren<T>(DependencyObject depObj) where T : DependencyObject
         {
             if (depObj != null)
@@ -204,6 +219,7 @@ namespace CNC.Controls
                 }
             }
         }
+
         public static IEnumerable<T> FindLogicalChildren<T>(DependencyObject depObj) where T : DependencyObject
         {
             if (depObj != null)

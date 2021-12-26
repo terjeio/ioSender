@@ -1,0 +1,25 @@
+﻿<UserControl x:Class="CNC.Controls.StripGCodeConfigControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CNC.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="140" d:DesignWidth="310">
+    <GroupBox x:Uid="grp_gcodeStrip" Header="GCode command stripping" HorizontalAlignment="Left" VerticalAlignment="Top" Height="Auto" Width="310">
+        <Grid Height="116" Margin="50,0,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="60"/>
+                <ColumnDefinition Width="70*"/>
+            </Grid.ColumnDefinitions>
+            <Label Content="M6:" HorizontalAlignment="Right" Margin="0,6,0,0" VerticalAlignment="Top"/>
+            <ComboBox Grid.Column="1" ItemsSource="{Binding Path=CommandIgnoreStates}" SelectedItem="{Binding Path=IgnoreM6, Mode=TwoWay}" HorizontalAlignment="Left" Margin="3,8,0,0" VerticalAlignment="Top" Width="70"/>
+            <Label Content="M7:" HorizontalAlignment="Right" Margin="0,34,0,0" VerticalAlignment="Top"/>
+            <ComboBox Grid.Column="1" ItemsSource="{Binding Path=CommandIgnoreStates}" SelectedItem="{Binding Path=IgnoreM7, Mode=TwoWay}" HorizontalAlignment="Left" Margin="3,36,0,0" VerticalAlignment="Top" Width="70"/>
+            <Label Content="M8:" HorizontalAlignment="Right" Margin="0,62,0,0" VerticalAlignment="Top"/>
+            <ComboBox Grid.Column="1" ItemsSource="{Binding Path=CommandIgnoreStates}" SelectedItem="{Binding Path=IgnoreM8, Mode=TwoWay}" HorizontalAlignment="Left" Margin="3,64,0,0" VerticalAlignment="Top" Width="70"/>
+            <Label Content="G61/G64:" HorizontalAlignment="Right" Margin="0,92,0,0" VerticalAlignment="Top"/>
+            <ComboBox Grid.Column="1" ItemsSource="{Binding Path=CommandIgnoreStates}" SelectedItem="{Binding Path=IgnoreG61G64, Mode=TwoWay}" HorizontalAlignment="Left" Margin="3,92,0,0" VerticalAlignment="Top" Width="70"/>
+        </Grid>
+    </GroupBox>
+</UserControl>

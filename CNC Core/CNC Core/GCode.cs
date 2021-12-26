@@ -105,6 +105,41 @@ namespace CNC.GCode
         Incremental
     }
 
+    public enum FeedRateMode
+    {
+        InverseTime,    //G93
+        UnitsPerMin,    //G94 - default
+        UnitsPerRev     //G95
+    }
+
+    public enum MotionMode
+    {
+        G0 = 0,
+        G1 = 10,
+        G2 = 20,
+        G3 = 30,
+        G5 = 50,
+        G5_2 = 52,
+        G33 = 330,
+        G38_2 = 382,
+        G38_3 = 383,
+        G38_4 = 384,
+        G38_5 = 385,
+        G73 = 730,
+        G76 = 760,
+        G80 = 800,
+        None = G80,
+        G81 = 810,
+        G82 = 820,
+        G83 = 830,
+        G84 = 840,
+        G85 = 850,
+        G86 = 860,
+        G87 = 870,
+        G88 = 880,
+        G89 = 890
+    }
+
     public enum IJKMode
     {
         Absolute,

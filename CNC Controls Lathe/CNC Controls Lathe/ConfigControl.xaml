@@ -1,0 +1,32 @@
+﻿<UserControl x:Class="CNC.Controls.Lathe.ConfigControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CNC.Controls.Lathe"
+             xmlns:Controls="clr-namespace:CNC.Controls;assembly=CNC.Controls.WPF"
+             mc:Ignorable="d" 
+             d:DesignHeight="140" d:DesignWidth="310">
+    <GroupBox x:Name="grpLathe" Header="Lathe" HorizontalAlignment="Left" VerticalAlignment="Top" Height="Auto" Width="310">
+        <StackPanel HorizontalAlignment="Left" Height="Auto" Margin="0,3,0,0" VerticalAlignment="Top" Width="235">
+            <Grid Height="29">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="140"/>
+                    <ColumnDefinition Width="100*"/>
+                </Grid.ColumnDefinitions>
+                <Label Content="Mode:" HorizontalAlignment="Right" Margin="0,0,0,0" VerticalAlignment="Top"/>
+                <ComboBox ItemsSource="{Binding Path=Lathe.LatheModes}" SelectedItem="{Binding Path=Lathe.XMode, Mode=TwoWay}" Grid.Column="1" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top" Width="80"/>
+            </Grid>
+            <Grid Height="29">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="140"/>
+                    <ColumnDefinition Width="100*"/>
+                </Grid.ColumnDefinitions>
+                <Label Content="Z direction:" HorizontalAlignment="Right" Margin="0,0,0,0" VerticalAlignment="Top"/>
+                <ComboBox ItemsSource="{Binding Path=Lathe.ZDirections}" SelectedItem="{Binding Path=Lathe.ZDirection, Mode=TwoWay}" IsEnabled="{Binding Path=Lathe.IsEnabled, Mode=OneWay}" Grid.Column="1" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top" Width="80"/>
+            </Grid>
+            <Controls:NumericField Label="Feedrate:" ColonAt="140" Unit="mm/min" Format="###0" Value="{Binding Path=Lathe.FeedRate, Mode=TwoWay}" IsEnabled="{Binding Path=Lathe.IsEnabled, Mode=OneWay}"/>
+            <Controls:NumericField Label="Last passdepth:" ColonAt="140" Value="{Binding Path=Lathe.PassDepthLast, Mode=TwoWay}" IsEnabled="{Binding Path=Lathe.IsEnabled, Mode=OneWay}"/>
+        </StackPanel>
+    </GroupBox>
+</UserControl>

@@ -1,0 +1,48 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib"
+                    xmlns:local="clr-namespace:CNC.Core">
+    <system:String x:Uid="str_gcLoadError" x:Key="LoadError">Line: {0}\nBlock: {1}\n\nContinue loading?</system:String>
+    <system:String x:Uid="str_gcParserStrip" x:Key="ParserStrip">{0} command found, strip?</system:String>
+    <system:String x:Uid="str_gcParserStripHdr" x:Key="ParserStripHdr">Strip command</system:String>
+    <system:String x:Uid="str_gcParserBadExpr" x:Key="ParserBadExpr">Bad expression</system:String>
+    <system:String x:Uid="str_gcParserUnsupportedCmd" x:Key="ParserUnsupportedCmd">Unsupported command</system:String>
+    <system:String x:Uid="str_gcParserAxisError" x:Key="ParserAxisError">Axis command conflict</system:String>
+    <system:String x:Uid="str_gcParserModalGrpError" x:Key="ParserModalGrpError">Modal group violation</system:String>
+    <system:String x:Uid="str_gcParserCmdUnknown" x:Key="ParserCmdUnknown">Command word not recognized</system:String>
+    <system:String x:Uid="str_gcParserCMDInvalid" x:Key="ParserCMDInvalid">Invalid GCode</system:String>
+    <system:String x:Uid="str_gcParserWordRepeated" x:Key="ParserWordRepeated">Command word repeated</system:String>
+    <system:String x:Uid="str_gcParserToolProfile" x:Key="ParserToolProfile">Tool {0} not associated with a profile</system:String>
+    <system:String x:Uid="str_gcParserM66PandE" x:Key="ParserM66PandE">Cannot use both P- and E-word with M66</system:String>
+    <system:String x:Uid="str_gcParserM66NoPorE" x:Key="ParserM66NoPorE">P- or E-word missing for M66</system:String>
+    <system:String x:Uid="str_gcParserG6NoP" x:Key="ParserG6NoP">G4 - missing P word</system:String>
+    <system:String x:Uid="str_gcParserNoG0orG1" x:Key="ParserNoG0orG1">G0 or G1 not active</system:String>
+    <system:String x:Uid="str_gcParserG1NoFeed" x:Key="ParserG1NoFeed">G1 used when feed rate is not set</system:String>
+    <system:String x:Uid="str_gcParserPlaneNotXY" x:Key="ParserPlaneNotXY">Plane not XY</system:String>
+    <system:String x:Uid="str_gcParserNoPandorQ" x:Key="ParserNoPandorQ">P and/or Q word missing</system:String>
+    <system:String x:Uid="str_gcParserNoIandorJ" x:Key="ParserNoIandorJ">I and/or J word missing</system:String>
+    <system:String x:Uid="str_gcParserNoR" x:Key="ParserNoR">R word missing</system:String>
+    <system:String x:Uid="str_gcParserPlaneNotZx" x:Key="ParserPlaneNotZX">Plane not ZX</system:String>
+    <system:String x:Uid="str_gcParserZPlus" x:Key="ParserZPlus">Axisword(s) other than Z found</system:String>
+    <system:String x:Uid="str_gcParserNoP" x:Key="ParserNoP">P word missing</system:String>
+    <system:String x:Uid="str_gcParserNegP" x:Key="ParserNegP">P word negative</system:String>
+    <system:String x:Uid="str_gcParserToolNoI" x:Key="ParserNoI">I word missing</system:String>
+    <system:String x:Uid="str_gcParserToolNoJ" x:Key="ParserNoJ">J word missing</system:String>
+    <system:String x:Uid="str_gcParserNegJ" x:Key="ParserNegJ">J word negative</system:String>
+    <system:String x:Uid="str_gcParserNoK" x:Key="ParserNoK">K word missing</system:String>
+    <system:String x:Uid="str_gcParserNegK" x:Key="ParserNegK">K word negative</system:String>
+    <system:String x:Uid="str_gcParserKlesseqJ" x:Key="ParserKlesseqJ">K word must be greater than J word</system:String>
+    <system:String x:Uid="str_gcParserRless1" x:Key="ParseRless1">R word less than 1</system:String>
+    <system:String x:Uid="str_gcParserNegH" x:Key="ParserNegH">H word is negative</system:String>
+    <system:String x:Uid="str_gcParserErrE" x:Key="ParserErrE">E word greater than half the drive line length</system:String>
+    <system:String x:Uid="str_gcParserNoInvalidQ" x:Key="ParserNoInvalidQ">Q word missing or out of range</system:String>
+    <system:String x:Uid="str_gcParserRadiusErr" x:Key="ParserRadiusErr">Error computing arc radius.</system:String>
+    <system:String x:Uid="str_serialPortError" x:Key="SerialPortError">Unable to open serial port: {0}</system:String>
+    <system:String x:Uid="str_joggingOnly" x:Key="JoggingOnly">Only jogging and some system commands are allowed when changing tool!</system:String>
+    <system:String x:Uid="str_sdStreamComplete" x:Key="SdStreamComplete">SD Card streaming {0}% complete</system:String>
+    <system:String x:Uid="str_contUnlock" x:Key="ContUnlock">&lt;Unlock&gt; to continue</system:String>
+    <system:String x:Uid="str_contHomeUnlock" x:Key="ContHomeUnlock">&lt;Home&gt; or &lt;Unlock&gt; to continue</system:String>
+    <system:String x:Uid="str_contClearResetUnlock" x:Key="ContClearResetUnlock">clear then &lt;Reset&gt; then &lt;Unlock&gt; to continue</system:String>
+    <system:String x:Uid="str_contHome" x:Key="ContHome">&lt;Home&gt; to continue</system:String>
+    <system:String x:Uid="str_contResetUnlock" x:Key="ContResetUnlock">&lt;Reset&gt; then &lt;Unlock&gt; to continue</system:String>
+</ResourceDictionary>

@@ -1,0 +1,52 @@
+﻿<UserControl
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CNC.Controls.Viewer"
+             xmlns:Controls="clr-namespace:CNC.Controls;assembly=CNC.Controls.WPF" x:Class="CNC.Controls.Viewer.ConfigControl"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             mc:Ignorable="d" 
+             d:DesignHeight="210" d:DesignWidth="310">
+    <GroupBox x:Uid="grp_gcodeViewer" x:Name="grpGCodeViewer" Header="GCode Viewer" HorizontalAlignment="Left" VerticalAlignment="Top" Height="Auto" Width="310">
+        <StackPanel HorizontalAlignment="Left" Height="Auto" Margin="0,3,0,0" VerticalAlignment="Top">
+            <CheckBox x:Uid="lbl_enable" Content="Enable" Margin="160,2,0,0" IsChecked="{Binding Path=GCodeViewer.IsEnabled, Mode=TwoWay}"/>
+            <Controls:NumericField x:Uid="fld_arcResolution" Label="Arc resolution:" Unit="segments" Format="#0" ColonAt="160" Value="{Binding Path=GCodeViewer.ArcResolution, Mode=TwoWay}" IsEnabled="{Binding Path=GCodeViewer.IsEnabled, Mode=OneWay}"/>
+            <Controls:NumericField x:Uid="fld_minDistance" Label="Min distance:" ColonAt="160" Value="{Binding Path=GCodeViewer.MinDistance, Mode=TwoWay}" IsEnabled="{Binding Path=GCodeViewer.IsEnabled, Mode=OneWay}"/>
+            <Controls:NumericField x:Uid="fld_toolDiameter" Label="Tool diameter:" Unit="mm" Format="###0.0" ColonAt="160" Value="{Binding Path=GCodeViewer.ToolDiameter, Mode=TwoWay}" IsEnabled="{Binding Path=GCodeViewer.IsEnabled, Mode=OneWay}" ToolTip="Default tool diameter." />
+            <StackPanel Orientation="Horizontal" Height="Auto">
+                <Label x:Uid="lbl_cutColor" Content="Cut color:" Width="160" HorizontalContentAlignment="Right"/>
+                <xctk:ColorPicker x:Name="_colorPicker" SelectedColor="{Binding Path=GCodeViewer.CutMotionColor, Mode=TwoWay}" IsEnabled="{Binding Path=GCodeViewer.IsEnabled, Mode=OneWay}" VerticalAlignment="Top" Width="100"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Height="Auto">
+                <Label x:Uid="lbl_rapidsColor" Content="Rapids color:" Width="160" HorizontalContentAlignment="Right"/>
+                <xctk:ColorPicker x:Name="_colorPicker1" SelectedColor="{Binding Path=GCodeViewer.RapidMotionColor, Mode=TwoWay}" IsEnabled="{Binding Path=GCodeViewer.IsEnabled, Mode=OneWay}" VerticalAlignment="Top" Width="100"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Height="Auto">
+                <Label x:Uid="lbl_retractColor" Content="Retract color:" Width="160" HorizontalContentAlignment="Right"/>
+                <xctk:ColorPicker x:Name="_colorPicker2" SelectedColor="{Binding Path=GCodeViewer.RetractMotionColor, Mode=TwoWay}" IsEnabled="{Binding Path=GCodeViewer.IsEnabled, Mode=OneWay}" VerticalAlignment="Top" Width="100"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Height="Auto">
+                <Label x:Uid="lbl_highlightColor" Content="Highlight color:" Width="160" HorizontalContentAlignment="Right"/>
+                <xctk:ColorPicker x:Name="_colorPicker4" SelectedColor="{Binding Path=GCodeViewer.HighlightColor, Mode=TwoWay}" IsEnabled="{Binding Path=GCodeViewer.IsEnabled, Mode=OneWay}" VerticalAlignment="Top" Width="100"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Height="Auto">
+                <Label x:Uid="lbl_gridColor" Content="Grid color:" Width="160" HorizontalContentAlignment="Right"/>
+                <xctk:ColorPicker x:Name="_colorPicker3" SelectedColor="{Binding Path=GCodeViewer.GridColor, Mode=TwoWay}" IsEnabled="{Binding Path=GCodeViewer.IsEnabled, Mode=OneWay}" VerticalAlignment="Top" Width="100"/>
+            </StackPanel>
+            <CheckBox x:Uid="lbl_blackBackgroud" Content="Black background" Margin="5,2,0,0" IsChecked="{Binding Path=GCodeViewer.BlackBackground, Mode=TwoWay}" IsEnabled="{Binding Path=GCodeViewer.IsEnabled, Mode=OneWay}"/>
+            <CheckBox x:Uid="lbl_showGrid" Content="Show grid" Margin="5,2,0,0" IsChecked="{Binding Path=GCodeViewer.ShowGrid, Mode=TwoWay}" IsEnabled="{Binding Path=GCodeViewer.IsEnabled, Mode=OneWay}"/>
+            <CheckBox x:Uid="lbl_showAxes" Content="Show axes" Margin="5,2,0,0" IsChecked="{Binding Path=GCodeViewer.ShowAxes, Mode=TwoWay}" IsEnabled="{Binding Path=GCodeViewer.IsEnabled, Mode=OneWay}"/>
+            <CheckBox  Content="Show work envelope" Margin="5,2,0,0" IsChecked="{Binding Path=GCodeViewer.ShowWorkEnvelope, Mode=TwoWay}" IsEnabled="{Binding Path=GCodeViewer.IsEnabled, Mode=OneWay}"/>
+            <CheckBox x:Uid="lbl_showBbox" Content="Show bounding box" Margin="5,2,0,0" IsChecked="{Binding Path=GCodeViewer.ShowBoundingBox, Mode=TwoWay}" IsEnabled="{Binding Path=GCodeViewer.IsEnabled, Mode=OneWay}"/>
+            <CheckBox x:Uid="lbl_showViewCube" Content="Show ViewCube" Margin="5,2,0,0" IsChecked="{Binding Path=GCodeViewer.ShowViewCube, Mode=TwoWay}" IsEnabled="{Binding Path=GCodeViewer.IsEnabled, Mode=OneWay}"/>
+            <CheckBox x:Uid="lbl_showCoordSys" Content="Show coordinate system" Margin="5,2,0,0" IsChecked="{Binding Path=GCodeViewer.ShowCoordinateSystem, Mode=TwoWay}" IsEnabled="{Binding Path=GCodeViewer.IsEnabled, Mode=OneWay}"/>
+            <CheckBox x:Uid="lbl_showOverlay" Content="Show text overlay" Margin="5,2,0,0" IsChecked="{Binding Path=GCodeViewer.ShowTextOverlay, Mode=TwoWay}" IsEnabled="{Binding Path=GCodeViewer.IsEnabled, Mode=OneWay}"/>
+            <CheckBox x:Uid="lbl_toolAutoScale" Content="Auto scale tool" Margin="5,2,0,0" IsChecked="{Binding Path=GCodeViewer.ToolAutoScale, Mode=TwoWay}" IsEnabled="{Binding Path=GCodeViewer.IsEnabled, Mode=OneWay}"/>
+            <CheckBox x:Uid="lbl_highlightCompleted" Content="Highlight completed cuts" Margin="5,2,0,0" IsChecked="false" IsEnabled="False"/>
+            <!--
+            <CheckBox Content="Highlight completed cuts" Margin="5,2,0,0" IsChecked="{Binding Path=GCodeViewer.RenderExecuted, Mode=TwoWay}" IsEnabled="{Binding Path=GCodeViewer.IsEnabled, Mode=OneWay}"/>
+            -->
+        </StackPanel>
+    </GroupBox>
+</UserControl>

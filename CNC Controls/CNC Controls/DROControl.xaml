@@ -6,7 +6,8 @@
              xmlns:local="clr-namespace:CNC.Controls"
              xmlns:gcode="clr-namespace:CNC.GCode;assembly=CNC.Core"
              mc:Ignorable="d" 
-             d:DesignHeight="216" d:DesignWidth="216">
+             d:DesignHeight="216" d:DesignWidth="216"
+             Loaded="DRO_Loaded">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

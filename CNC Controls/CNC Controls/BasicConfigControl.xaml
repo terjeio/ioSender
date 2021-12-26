@@ -1,0 +1,21 @@
+﻿<UserControl x:Class="CNC.Controls.BasicConfigControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CNC.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="185" d:DesignWidth="310">
+    <GroupBox x:Uid="grb_mainConfig" x:Name="grpBasic" Header="Main" HorizontalAlignment="Left" VerticalAlignment="Top" Height="Auto" Width="310">
+        <StackPanel HorizontalAlignment="Left">
+            <local:NumericField x:Uid="fld_resetDelay" Label="Reset delay:" ColonAt="160" Unit="ms" Format="###0" Value="{Binding Path=ResetDelay, Mode=TwoWay}" Height="29" VerticalAlignment="Bottom" ToolTip="Delay to allow controller to finish booting before communication starts."/>
+            <local:NumericField x:Uid="fld_pollInterval" Label="Poll interval:" ColonAt="160" Unit="ms" Format="###0" Value="{Binding Path=PollInterval, Mode=TwoWay}" Height="29" VerticalAlignment="Bottom" ToolTip="Time between status request sent to controller."/>
+            <local:NumericField x:Uid="fld_maxBuffer" Label="Max buffer:" ColonAt="160" Unit="bytes" Format="###0" Value="{Binding Path=MaxBufferSize, Mode=TwoWay}" Height="29" VerticalAlignment="Bottom" ToolTip="Maximum serial buffer size utilized (limited to 90% of reported value)."/>
+            <CheckBox x:Uid="lbl_agressiveBuffering" Content="Agressive buffering" HorizontalContentAlignment="Left" HorizontalAlignment="Left" Margin="5,0,0,0" IsChecked="{Binding Path=UseBuffering, Mode=TwoWay}" ToolTip="Buffers more than one GCode block in controller for smoother execution. For grblHAL only!"/>
+            <CheckBox x:Uid="lbl_keepMdiFocus" Content="Keep MDI focus" HorizontalContentAlignment="Left" HorizontalAlignment="Left" Margin="5,0,0,0" IsChecked="{Binding Path=KeepMdiFocus, Mode=TwoWay}" ToolTip="Buffers more than one GCode block in controller for smoother execution. For grblHAL only!"/>
+            <CheckBox x:Uid="lbl_FilterOk" Content='Filter "ok" response' HorizontalContentAlignment="Left" HorizontalAlignment="Left" Margin="5,0,0,0" IsChecked="{Binding Path=FilterOkResponse, Mode=TwoWay}" ToolTip="Enable if ok responses overwhelm console logging, typically happens when sending lots of short commands."/>
+            <CheckBox x:Uid="lbl_autoCompressGcode" Content='Auto-compress gcode on transforms' HorizontalContentAlignment="Left" HorizontalAlignment="Left" Margin="5,0,0,0" IsChecked="{Binding Path=AutoCompress, Mode=TwoWay}" ToolTip="Removes superfluous gcode command elements."/>
+            <CheckBox x:Uid="lbl_restoreWindowSize" Content='Restore last window size on startup' HorizontalContentAlignment="Left" HorizontalAlignment="Left" Margin="5,0,0,0" IsChecked="{Binding Path=KeepWindowSize, Mode=TwoWay}" ToolTip="Restore window size on next startup."/>
+        </StackPanel>
+    </GroupBox>
+</UserControl>
