@@ -1,21 +1,13 @@
 /*
  * SidebarItem.cs - part of CNC Controls library for Grbl
  *
-<<<<<<< HEAD
  * v0.36 / 2021-11-01 / Io Engineering (Terje Io)
-=======
- * v0.17 / 2020-04-16 / Io Engineering (Terje Io)
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
  *
  */
 
 /*
 
-<<<<<<< HEAD
 Copyright (c) 2020-2021, Io Engineering (Terje Io)
-=======
-Copyright (c) 2020, Io Engineering (Terje Io)
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -59,7 +51,6 @@ namespace CNC.Controls
         public new Visibility Visibility { get { return view.Visibility; } set { view.Visibility = value; } }
         public new bool IsEnabled { get { return base.IsEnabled; } set { base.IsEnabled = value; } }
 
-<<<<<<< HEAD
         public SidebarItem(ISidebarControl view) : base()
         {
             if (view.MenuLabel.Contains("_"))
@@ -71,19 +62,6 @@ namespace CNC.Controls
                 Content = view.MenuLabel;
 
             this.view = view as UserControl;
-=======
-        public SidebarItem(string name, UserControl view) : base()
-        {
-            if (name.Contains("_"))
-                Content = new AccessText()
-                {
-                    Text = name
-                };
-            else
-                Content = name;
-
-            this.view = view;
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
 
             Width = 75;
             Height = 25;

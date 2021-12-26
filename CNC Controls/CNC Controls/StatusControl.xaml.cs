@@ -1,21 +1,13 @@
 ﻿/*
  * StatusControl.xaml.cs - part of CNC Controls library for Grbl
  *
-<<<<<<< HEAD
  * v0.36 / 2021-11-01 / Io Engineering (Terje Io)
-=======
- * v0.29 / 2021-01-01 / Io Engineering (Terje Io)
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
  *
  */
 
 /*
 
-<<<<<<< HEAD
 Copyright (c) 2018-2021, Io Engineering (Terje Io)
-=======
-Copyright (c) 2018-2020, Io Engineering (Terje Io)
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -83,11 +75,7 @@ namespace CNC.Controls
                 case StatusButton.Reset:
                     var model = (DataContext as GrblViewModel);
                     if (model.GrblState.State == GrblStates.Alarm && model.GrblState.Substate == 10 && model.Signals.Value.HasFlag(Signals.EStop))
-<<<<<<< HEAD
                         MessageBox.Show((string)FindResource("ClearEStop"), "ioSender", MessageBoxButton.OK, MessageBoxImage.Exclamation);
-=======
-                        MessageBox.Show("Clear E-Stop before <Reset>", "ioSender",  MessageBoxButton.OK, MessageBoxImage.Exclamation);
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                     else
                         Grbl.Reset();
                     break;

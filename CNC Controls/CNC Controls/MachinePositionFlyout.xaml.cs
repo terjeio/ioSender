@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 ﻿/*
  * MachinePositionFlyout.xaml.cs - part of CNC Controls library
  *
@@ -38,28 +37,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-=======
-﻿
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
 using System.Windows;
 using System.Windows.Controls;
 
 namespace CNC.Controls
 {
-<<<<<<< HEAD
     public partial class MachinePositionFlyout : UserControl, ISidebarControl
-=======
-    public partial class MachinePositionFlyout : UserControl
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
     {
         public MachinePositionFlyout()
         {
             InitializeComponent();
         }
-<<<<<<< HEAD
         public string MenuLabel { get { return (string)FindResource("MenuLabel"); } }
-=======
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
 
         private void btn_Close(object sender, RoutedEventArgs e)
         {

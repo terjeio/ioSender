@@ -6,16 +6,9 @@
              xmlns:local="clr-namespace:CNC.Controls.Viewer"
              xmlns:Controls="clr-namespace:CNC.Controls;assembly=CNC.Controls.WPF" x:Class="CNC.Controls.Viewer.Viewer"
              mc:Ignorable="d" 
-<<<<<<< HEAD
              d:DesignHeight="515" d:DesignWidth="875">
     <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="WhiteSmoke">
         <Button x:Uid="btn_resetView" Content="Reset view" DockPanel.Dock="Bottom" HorizontalAlignment="Left" Margin="5,0,0,0" VerticalAlignment="Bottom" Padding="5,0" Click="button_Click"/>
-=======
-             d:DesignHeight="515" d:DesignWidth="875"
-             Loaded="control_Loaded">
-    <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="WhiteSmoke">
-        <Button x:Uid="btn_resetView" Content="Reset view" DockPanel.Dock="Bottom" HorizontalAlignment="Left" Margin="5,0,0,0" VerticalAlignment="Bottom" Width="75" Click="button_Click"/>
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         <Grid DockPanel.Dock="Top" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <local:Renderer x:Name="gcodeView" Margin="7,10,0,0"/>
             <Controls:LimitsControl HorizontalAlignment="Left" Margin="5,5" VerticalAlignment="Top"/>

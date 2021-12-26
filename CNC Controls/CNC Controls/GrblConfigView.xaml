@@ -3,17 +3,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-<<<<<<< HEAD
              xmlns:system="clr-namespace:System;assembly=mscorlib"
-=======
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
              xmlns:local="clr-namespace:CNC.Controls"
              xmlns:cnccore="clr-namespace:CNC.Core;assembly=CNC.Core"
              mc:Ignorable="d" 
              d:DesignHeight="515" d:DesignWidth="980"
              Loaded="ConfigView_Loaded">
     <UserControl.Resources>
-<<<<<<< HEAD
         <system:String x:Uid="str_saveSettings" x:Key="SaveSettings">Settings changed, save now?</system:String>
         <system:String x:Uid="str_settingsWritten" x:Key="SettingsWritten">All settings written to {0} in the sender folder.</system:String>
         <system:String x:Uid="str_settingsError" x:Key="SettingsError">Setting {0} returned {1}, continue?</system:String>
@@ -21,8 +17,6 @@
         <system:String x:Uid="str_settingsFail" x:Key="SettingsFail">Bummer...\nContinue loading?</system:String>
         <system:String x:Uid="str_settingsInvalid" x:Key="SettingsInvalid">The file does not contain any settings.</system:String>
         <system:String x:Uid="str_settingsRestore" x:Key="SettingsRestore">Restore settings from file</system:String>
-=======
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         <Style x:Key="NumericErrorStyle" TargetType="local:NumericTextBox">
             <Style.Triggers>
                 <Trigger Property="Validation.HasError" Value="true">
@@ -45,15 +39,12 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
-<<<<<<< HEAD
         <Style x:Key="ConfigButtonStyle" TargetType="Button">
             <Setter Property="MinWidth" Value="90" />
             <Setter Property="MaxWidth" Value="120" />
             <Setter Property="Padding" Value="5,0" />
             <Setter Property="VerticalAlignment" Value="Top" />
         </Style>
-=======
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
     </UserControl.Resources>
     <DockPanel>
         <TreeView x:Name="treeView" HorizontalAlignment="Left" Margin="10,10" VerticalAlignment="Stretch" Width="390" SelectedItemChanged="treeView_SelectedItemChanged">
@@ -77,7 +68,6 @@
                   SelectionMode="Single" SelectionUnit="FullRow" AutoGenerateColumns="False" Visibility="Collapsed"
                   CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserResizeRows="False" CanUserSortColumns="False" CanUserAddRows="False" SelectionChanged="dgrSettings_SelectionChanged">
             <DataGrid.Columns>
-<<<<<<< HEAD
                 <DataGridTextColumn x:Uid="hdr_settingId" Header="Id" Binding="{Binding Id}" Width="50"/>
                 <DataGridTextColumn x:Uid="hdr_settingValue" Header="Value" Binding="{Binding Value}" Width="70"/>
                 <DataGridTextColumn x:Uid="hdr_settingUnit" Header="Unit" Binding="{Binding Unit}" Width="80"/>
@@ -95,21 +85,6 @@
                     <Button x:Uid="btn_restore" x:Name="btnRestore" Content="Restore" HorizontalAlignment="Right" Margin="5,0,0,0" VerticalAlignment="Top" Style="{StaticResource ConfigButtonStyle}" Click="btnRestore_Click"/>
                 </StackPanel>
             </DockPanel>
-=======
-                <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="50"/>
-                <DataGridTextColumn Header="Value" Binding="{Binding Value}" Width="70"/>
-                <DataGridTextColumn Header="Unit" Binding="{Binding Unit}" Width="80"/>
-                <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
-            </DataGrid.Columns>
-        </DataGrid>
-        <DockPanel x:Name="dpan" DockPanel.Dock="Left">
-            <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Stretch" Height="Auto" Margin="10,0,10,10" VerticalAlignment="Top" Width="Auto">
-                <Button x:Uid="btn_reload" x:Name="btnReload" Content="Reload" ToolTip="Reload settings from controller." HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Click="btnReload_Click"/>
-                <Button x:Uid="btn_save" x:Name="btnSave" Content="Save" ToolTip="Save changed settings to controller." HorizontalAlignment="Left" Margin="5,0,0,0" VerticalAlignment="Top" Width="75" Click="btnSave_Click"/>
-                <Button x:Uid="btn_backup" x:Name="btnBackup" Content="Backup" HorizontalAlignment="Left" Margin="230,0,0,0" VerticalAlignment="Top" Width="75" Click="btnBackup_Click"/>
-                <Button x:Uid="btn_restore" x:Name="btnRestore" Content="Restore" HorizontalAlignment="Right" Margin="5,0,0,0" VerticalAlignment="Top" Width="75" Click="btnRestore_Click"/>
-            </StackPanel>
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
             <StackPanel x:Name="details" DockPanel.Dock="Top" HorizontalAlignment="Left" Height="Auto" Margin="5,15,0,0" VerticalAlignment="Top">
                 <StackPanel x:Name="canvas" HorizontalAlignment="Left" Height="Auto" VerticalAlignment="Center" Width="455"/>
                 <TextBox x:Name="txtDescription" Background="#FFF8F8F8" IsReadOnly="True" HorizontalAlignment="Left" Height="225" TextWrapping="Wrap" VerticalAlignment="Top" Width="550"/>

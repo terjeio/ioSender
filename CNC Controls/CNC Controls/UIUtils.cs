@@ -1,21 +1,13 @@
 /*
  * UIUtils.cs - part of CNC Controls library
  *
-<<<<<<< HEAD
  * v0.36 / 2021-12-25 / Io Engineering (Terje Io)
-=======
- * v0.28 / 2020-11-15 / Io Engineering (Terje Io)
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
  *
  */
 
 /*
 
-<<<<<<< HEAD
 Copyright (c) 2018-2021, Io Engineering (Terje Io)
-=======
-Copyright (c) 2018-2020, Io Engineering (Terje Io)
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -136,11 +128,7 @@ namespace CNC.Controls
             double v = (double)value;
 
             if(!double.IsNaN(Min) && !double.IsNaN(Max) && (v < Min || v > Max))
-<<<<<<< HEAD
                 return new ValidationResult(false, string.Format(LibStrings.FindResource("ValAllowedRange"), Min, Max));
-=======
-                return new ValidationResult(false, $"Invalid input: allowed range is {Min} - {Max}.");
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
 
             if (!double.IsNaN(Min) && v < Min)
                 return new ValidationResult(false, string.Format(LibStrings.FindResource("ValAllowedMin"), Min));
@@ -161,20 +149,6 @@ namespace CNC.Controls
             System.Net.IPAddress ip4;
             if(!System.Net.IPAddress.TryParse(ip4address, out ip4))
                 return new ValidationResult(false, (string)LibStrings.FindResource("ValNotIPV4"));
-
-            return ValidationResult.ValidResult;
-        }
-    }
-
-    public class IP4ValueRule : ValidationRule
-    {
-        public override ValidationResult Validate(object value, CultureInfo cultureInfo)
-        {
-            string ip4address = (string)value;
-
-            System.Net.IPAddress ip4;
-            if(!System.Net.IPAddress.TryParse(ip4address, out ip4))
-                return new ValidationResult(false, $"Invalid input: not an IP4 address.");
 
             return ValidationResult.ValidResult;
         }

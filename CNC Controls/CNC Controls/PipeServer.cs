@@ -37,11 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-<<<<<<< HEAD
 // https://www.c-sharpcorner.com/article/aborting-thread-vs-cancelling-task/
 
-=======
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
 using System.IO;
 using System.IO.Pipes;
 using System.Threading.Tasks;

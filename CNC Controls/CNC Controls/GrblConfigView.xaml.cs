@@ -1,11 +1,7 @@
 /*
  * GrblConfigView.xaml.cs - part of CNC Controls library for Grbl
  *
-<<<<<<< HEAD
  * v0.36 / 2021-11-01 / Io Engineering (Terje Io)
-=======
- * v0.34 / 2021-08-05 / Io Engineering (Terje Io)
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
  *
  */
 
@@ -122,11 +118,7 @@ namespace CNC.Controls
 
                     if (GrblSettings.HasChanges())
                     {
-<<<<<<< HEAD
                         if (MessageBox.Show((string)FindResource("SaveSettings"), "ioSender", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.Yes)
-=======
-                        if (MessageBox.Show("Settings changed, save now?", "Controller settings", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.Yes)
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                             GrblSettings.Save();
                     }
                 }
@@ -165,11 +157,7 @@ namespace CNC.Controls
         void btnBackup_Click(object sender, RoutedEventArgs e)
         {
             GrblSettings.Backup(string.Format("{0}settings.txt", Core.Resources.Path));
-<<<<<<< HEAD
             model.Message = string.Format((string)FindResource("SettingsWritten"), "settings.txt");
-=======
-            model.Message = "All settings written to settings.txt in the sender folder.";
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         }
 
         private void ShowSetting(GrblSettingDetails setting, bool assign)
@@ -220,17 +208,10 @@ namespace CNC.Controls
 
                 var details = GrblSettings.Get((GrblSetting)setting.Key);
 
-<<<<<<< HEAD
                 if (MessageBox.Show(string.Format((string)FindResource("SettingsError"), scmd, retval), "ioSender" + (details == null ? "" : " - " + details.Name), MessageBoxButton.YesNo, MessageBoxImage.Exclamation) == MessageBoxResult.No)
                     return false;
             }
             else if (res == false && MessageBox.Show(string.Format((string)FindResource("SettingsTimeout"), scmd), "ioSender", MessageBoxButton.YesNo, MessageBoxImage.Exclamation) == MessageBoxResult.No)
-=======
-                if (MessageBox.Show(string.Format("Setting {0} returned {1}, continue?", scmd, retval), "ioSender" + (details == null ? "" : " - " + details.Name), MessageBoxButton.YesNo, MessageBoxImage.Exclamation) == MessageBoxResult.No)
-                    return false;
-            }
-            else if (res == false && MessageBox.Show(string.Format("Timed out while setting {0} , continue?", scmd), "ioSender", MessageBoxButton.YesNo, MessageBoxImage.Exclamation) == MessageBoxResult.No)
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                 return false;
 
             return true;
@@ -266,11 +247,7 @@ namespace CNC.Controls
                 }
                 catch (Exception e)
                 {
-<<<<<<< HEAD
                     if (MessageBox.Show(((string)FindResource("SettingsFail")).Replace("\\n", "\r\r"), e.Message, MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-=======
-                    if (MessageBox.Show("Bummer...\r\rContinue loading?", e.Message, MessageBoxButton.YesNo) == MessageBoxResult.Yes)
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                         block = sr.ReadLine();
                     else
                     {
@@ -284,11 +261,7 @@ namespace CNC.Controls
             sr.Close();
 
             if (settings.Count == 0)
-<<<<<<< HEAD
                 MessageBox.Show((string)FindResource("SettingsInvalid"));
-=======
-                MessageBox.Show("The file does not contain any settings.", "ioSender");
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
             else
             {
                 bool? res = null;
@@ -317,17 +290,10 @@ namespace CNC.Controls
 
                     if (retval != string.Empty)
                     {
-<<<<<<< HEAD
                         if (MessageBox.Show(string.Format((string)FindResource("SettingsError"), cmd, retval), "ioSender", MessageBoxButton.YesNo, MessageBoxImage.Exclamation) == MessageBoxResult.No)
                             break;
                     }
                     else if (res == false && MessageBox.Show(string.Format((string)FindResource("SettingsTimeout"), cmd), "ioSender", MessageBoxButton.YesNo, MessageBoxImage.Exclamation) == MessageBoxResult.No)
-=======
-                        if (MessageBox.Show(string.Format("Setting {0} returned {1}, continue?", cmd, retval), "ioSender", MessageBoxButton.YesNo, MessageBoxImage.Exclamation) == MessageBoxResult.No)
-                            break;
-                    }
-                    else if (res == false && MessageBox.Show(string.Format("Timed out while setting {0} , continue?", cmd), "ioSender", MessageBoxButton.YesNo, MessageBoxImage.Exclamation) == MessageBoxResult.No)
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                         break;
                 }
 
@@ -376,11 +342,7 @@ namespace CNC.Controls
             OpenFileDialog file = new OpenFileDialog();
 
             file.InitialDirectory = Core.Resources.Path;
-<<<<<<< HEAD
             file.Title = (string)FindResource("SettingsRestore");
-=======
-            file.Title = "Restore settings from file";
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
 
             file.Filter = string.Format("Text files (*.txt)|*.txt");
 

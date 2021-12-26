@@ -1,11 +1,7 @@
 ﻿/*
  * ToolLengthControl.cs - part of CNC Probing library
  *
-<<<<<<< HEAD
  * v0.36 / 2021-12-01 / Io Engineering (Terje Io)
-=======
- * v0.30 / 2021-04-04 / Io Engineering (Terje Io)
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
  *
  */
 
@@ -78,11 +74,7 @@ namespace CNC.Controls.Probing
 
             if (probing.ProbeFixture && !probing.Grbl.AxisHomed.Value.HasFlag(AxisFlags.X | AxisFlags.Y | AxisFlags.Z))
             {
-<<<<<<< HEAD
                 MessageBox.Show((string)FindResource("InitFailed"), "Probing");
-=======
-                MessageBox.Show("Axes must be homed before probing the fixture!", "Probing");
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                 return;
             }
 
@@ -137,15 +129,9 @@ namespace CNC.Controls.Probing
                         pos.Z = probing.WorkpieceHeight + probing.TouchPlateHeight;
 
                     if (probing.CoordinateMode == ProbingViewModel.CoordMode.G92)
-<<<<<<< HEAD
                         probing.WaitForResponse("G92" + pos.ToString(AxisFlags.Z));
                     else
                         probing.WaitForResponse(string.Format("G10L20P{0}{1}", probing.CoordinateSystem, pos.ToString(AxisFlags.Z)));
-=======
-                        probing.Grbl.ExecuteCommand("G92" + pos.ToString(AxisFlags.Z));
-                    else
-                        probing.Grbl.ExecuteCommand(string.Format("G10L20P{0}{1}", probing.CoordinateSystem, pos.ToString(AxisFlags.Z)));
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                 }
                 else if(!probing.ReferenceToolOffset)
                 {
@@ -180,7 +166,6 @@ namespace CNC.Controls.Probing
                 probing.Grbl.ExecuteCommand("$TLR"); // Set tool length offset reference in controller
             }
 
-<<<<<<< HEAD
             if (!probing.Grbl.IsParserStateLive) {
                 if(GrblInfo.IsGrblHAL)
                     probing.Grbl.ExecuteCommand(GrblConstants.CMD_GETPARSERSTATE);
@@ -189,12 +174,6 @@ namespace CNC.Controls.Probing
             }
 
             probing.Program.End((string)FindResource(ok ? "ProbingCompleted" : "ProbingFailed"));
-=======
-            if (!probing.Grbl.IsParserStateLive)
-                probing.Grbl.ExecuteCommand(GrblConstants.CMD_GETPARSERSTATE);
-
-            probing.Program.End(ok ? "Probing completed" : "Probing failed");
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         }
 
         private void clearToolOffset_Click(object sender, RoutedEventArgs e)
@@ -202,17 +181,12 @@ namespace CNC.Controls.Probing
             var model = DataContext as ProbingViewModel;
             model.ReferenceToolOffset = model.CanReferenceToolOffset && !(model.Grbl.IsTloReferenceSet && !double.IsNaN(model.Grbl.TloReference));
             model.Grbl.ExecuteCommand("G49");
-<<<<<<< HEAD
             if(!model.Grbl.IsParserStateLive) {
                 if(GrblInfo.IsGrblHAL)
                     model.Grbl.ExecuteCommand(GrblConstants.CMD_GETPARSERSTATE);
                 else
                     GrblParserState.Get(true);
             }
-=======
-            if(!model.Grbl.IsParserStateLive)
-                model.Grbl.ExecuteCommand(model.Grbl.IsGrblHAL ? GrblConstants.CMD_GETPARSERSTATE : GrblConstants.CMD_GETNGCPARAMETERS);
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         }
         private void start_Click(object sender, RoutedEventArgs e)
         {

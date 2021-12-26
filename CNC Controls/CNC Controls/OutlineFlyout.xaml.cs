@@ -1,11 +1,7 @@
 ﻿/*
  * OutlineFlyout.xaml.cs - part of CNC Controls library
  *
-<<<<<<< HEAD
  * v0.36 / 2021-11-01 / Io Engineering (Terje Io)
-=======
- * v0.29 / 2021-01-30 / Io Engineering (Terje Io)
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
  *
  */
 
@@ -48,31 +44,14 @@ using CNC.Core;
 
 namespace CNC.Controls
 {
-<<<<<<< HEAD
     public partial class OutlineFlyout : UserControl, ISidebarControl
-=======
-    /// <summary>
-    /// Interaction logic for OutlineFlyout.xaml
-    /// </summary>
-    public partial class OutlineFlyout : UserControl
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
     {
         public OutlineFlyout()
         {
             InitializeComponent();
         }
-<<<<<<< HEAD
         public string MenuLabel { get { return (string)FindResource("MenuLabel"); } }
 
-=======
-
-        public static readonly DependencyProperty FeedRateProperty = DependencyProperty.Register(nameof(FeedRate), typeof(int), typeof(OutlineFlyout), new PropertyMetadata(500));
-        public int FeedRate
-        {
-            get { return (int)GetValue(FeedRateProperty); }
-            set { SetValue(FeedRateProperty, value); }
-        }
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
 
         private void OutlineFlyout_Loaded(object sender, RoutedEventArgs e)
         {
@@ -82,39 +61,12 @@ namespace CNC.Controls
         private void OnDataContextPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (sender is GrblViewModel && Visibility == Visibility.Visible) switch (e.PropertyName)
-<<<<<<< HEAD
                 {
                     case nameof(GrblViewModel.StreamingState):
                         if ((sender as GrblViewModel).IsJobRunning)
                             Visibility = Visibility.Hidden;
                         break;
                 }
-=======
-            {
-                case nameof(GrblViewModel.StreamingState):
-                    if ((sender as GrblViewModel).IsJobRunning)
-                        Visibility = Visibility.Hidden;
-                    break;
-            }
-        }
-
-        private void button_Go(object sender, RoutedEventArgs e)
-        {
-            var model = DataContext as GrblViewModel;
-
-            if (model.IsFileLoaded)
-            {
-                string gcode = string.Format("G90G1F{0}\r", FeedRate.ToString());
-
-                gcode += string.Format("X{0}Y{1}\r", model.ProgramLimits.MinX.ToInvariantString(), model.ProgramLimits.MinY.ToInvariantString());
-                gcode += string.Format("Y{0}\r", model.ProgramLimits.MaxY.ToInvariantString());
-                gcode += string.Format("X{0}\r", model.ProgramLimits.MaxX.ToInvariantString());
-                gcode += string.Format("Y{0}\r", model.ProgramLimits.MinY.ToInvariantString());
-                gcode += string.Format("X{0}\r", model.ProgramLimits.MinX.ToInvariantString());
-
-                model.ExecuteCommand(gcode);
-            }
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         }
 
         private void btn_Close(object sender, RoutedEventArgs e)

@@ -6,21 +6,12 @@
              xmlns:local="clr-namespace:CNC.Controls.Lathe"
              xmlns:Controls="clr-namespace:CNC.Controls;assembly=CNC.Controls.WPF"
              mc:Ignorable="d" 
-<<<<<<< HEAD
              d:DesignHeight="140" d:DesignWidth="310">
     <GroupBox x:Name="grpLathe" Header="Lathe" HorizontalAlignment="Left" VerticalAlignment="Top" Height="Auto" Width="310">
         <StackPanel HorizontalAlignment="Left" Height="Auto" Margin="0,3,0,0" VerticalAlignment="Top" Width="235">
             <Grid Height="29">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="140"/>
-=======
-             d:DesignHeight="140" d:DesignWidth="250">
-    <GroupBox x:Name="grpLathe" Header="Lathe" HorizontalAlignment="Left" VerticalAlignment="Top" Height="Auto" Width="250">
-        <StackPanel HorizontalAlignment="Left" Height="Auto" Margin="0,3,0,0" VerticalAlignment="Top" Width="235">
-            <Grid Height="29">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="90"/>
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                     <ColumnDefinition Width="100*"/>
                 </Grid.ColumnDefinitions>
                 <Label Content="Mode:" HorizontalAlignment="Right" Margin="0,0,0,0" VerticalAlignment="Top"/>
@@ -28,23 +19,14 @@
             </Grid>
             <Grid Height="29">
                 <Grid.ColumnDefinitions>
-<<<<<<< HEAD
                     <ColumnDefinition Width="140"/>
-=======
-                    <ColumnDefinition Width="90"/>
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                     <ColumnDefinition Width="100*"/>
                 </Grid.ColumnDefinitions>
                 <Label Content="Z direction:" HorizontalAlignment="Right" Margin="0,0,0,0" VerticalAlignment="Top"/>
                 <ComboBox ItemsSource="{Binding Path=Lathe.ZDirections}" SelectedItem="{Binding Path=Lathe.ZDirection, Mode=TwoWay}" IsEnabled="{Binding Path=Lathe.IsEnabled, Mode=OneWay}" Grid.Column="1" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top" Width="80"/>
             </Grid>
-<<<<<<< HEAD
             <Controls:NumericField Label="Feedrate:" ColonAt="140" Unit="mm/min" Format="###0" Value="{Binding Path=Lathe.FeedRate, Mode=TwoWay}" IsEnabled="{Binding Path=Lathe.IsEnabled, Mode=OneWay}"/>
             <Controls:NumericField Label="Last passdepth:" ColonAt="140" Value="{Binding Path=Lathe.PassDepthLast, Mode=TwoWay}" IsEnabled="{Binding Path=Lathe.IsEnabled, Mode=OneWay}"/>
-=======
-            <Controls:NumericField Label="Feedrate:" ColonAt="90" Unit="mm/min" Format="###0" Value="{Binding Path=Lathe.FeedRate, Mode=TwoWay}" IsEnabled="{Binding Path=Lathe.IsEnabled, Mode=OneWay}"/>
-            <Controls:NumericField Label="Last passdepth:" ColonAt="90" Value="{Binding Path=Lathe.PassDepthLast, Mode=TwoWay}" IsEnabled="{Binding Path=Lathe.IsEnabled, Mode=OneWay}"/>
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         </StackPanel>
     </GroupBox>
 </UserControl>

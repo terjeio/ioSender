@@ -1,11 +1,7 @@
 ﻿/*
  * GCodeJob.cs - part of CNC Controls library
  *
-<<<<<<< HEAD
  * v0.36 / 2021-11-01 / Io Engineering (Terje Io)
-=======
- * v0.28 / 2020-10-18 / Io Engineering (Terje Io)
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
  *
  */
 
@@ -139,11 +135,7 @@ namespace CNC.Core
                 }
                 catch (Exception e)
                 {
-<<<<<<< HEAD
                     if ((ok = MessageBox.Show(string.Format(LibStrings.FindResource("LoadError").Replace("\\n", "\r"), LineNumber, block), e.Message, MessageBoxButton.YesNo) == MessageBoxResult.Yes))
-=======
-                    if ((ok = MessageBox.Show(string.Format("Line: {0}\rBlock: \"{1}\"\r\rContinue loading?", LineNumber, block), e.Message, MessageBoxButton.YesNo) == MessageBoxResult.Yes))
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                         block = sr.ReadLine();
                     else
                         block = null;

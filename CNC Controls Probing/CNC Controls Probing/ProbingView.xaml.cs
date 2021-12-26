@@ -1,11 +1,7 @@
 ﻿/*
  * ProbingView.xaml.cs - part of CNC Probing library
  *
-<<<<<<< HEAD
  * v0.36 / 2021-12-25 / Io Engineering (Terje Io)
-=======
- * v0.31 / 2021-04-27 / Io Engineering (Terje Io)
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
  *
  */
 
@@ -58,19 +54,12 @@ namespace CNC.Controls.Probing
     /// </summary>
     public partial class ProbingView : UserControl, ICNCView
     {
-<<<<<<< HEAD
         private static bool keyboardMappingsOk = false;
 
         private bool jogEnabled = false, probeTriggered = false, probeDisconnected = false, cycleStartSignal = false;
         private ProbingViewModel model = null;
         private ProbingProfiles profiles = new ProbingProfiles();
         private GrblViewModel grbl = null;
-=======
-        private bool jogEnabled = false, probeTriggered = false, probeDisconnected = false, cycleStartSignal = false;
-        private ProbingViewModel model = null;
-        private ProbingProfiles profiles = new ProbingProfiles();
-        private KeypressHandler keyboard = null;
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         private IInputElement focusedControl = null;
 
         public ProbingView()
@@ -82,7 +71,6 @@ namespace CNC.Controls.Probing
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
-<<<<<<< HEAD
             if (!keyboardMappingsOk && DataContext is GrblViewModel)
             {
                 grbl = (DataContext as GrblViewModel);
@@ -94,28 +82,6 @@ namespace CNC.Controls.Probing
                 keyboard.AddHandler(Key.S, ModifierKeys.Alt, StopProbe, this);
                 keyboard.AddHandler(Key.C, ModifierKeys.Alt, ProbeConnectedToggle, this);
 
-=======
-            if (DataContext is GrblViewModel)
-            {
-                if (keyboard == null) {
-                    keyboard = new KeypressHandler(DataContext as GrblViewModel);
-                    keyboard.AddHandler(Key.R, ModifierKeys.Alt, StartProbe);
-                    keyboard.AddHandler(Key.S, ModifierKeys.Alt, StopProbe);
-                    keyboard.AddHandler(Key.C, ModifierKeys.Alt, ProbeConnectedToggle);
-                    keyboard.AddHandler(Key.F1, ModifierKeys.None, FnKeyHandler);
-                    keyboard.AddHandler(Key.F2, ModifierKeys.None, FnKeyHandler);
-                    keyboard.AddHandler(Key.F3, ModifierKeys.None, FnKeyHandler);
-                    keyboard.AddHandler(Key.F4, ModifierKeys.None, FnKeyHandler);
-                    keyboard.AddHandler(Key.F5, ModifierKeys.None, FnKeyHandler);
-                    keyboard.AddHandler(Key.F6, ModifierKeys.None, FnKeyHandler);
-                    keyboard.AddHandler(Key.F7, ModifierKeys.None, FnKeyHandler);
-                    keyboard.AddHandler(Key.F8, ModifierKeys.None, FnKeyHandler);
-                    keyboard.AddHandler(Key.F9, ModifierKeys.None, FnKeyHandler);
-                    keyboard.AddHandler(Key.F10, ModifierKeys.None, FnKeyHandler);
-                    keyboard.AddHandler(Key.F11, ModifierKeys.None, FnKeyHandler);
-                    keyboard.AddHandler(Key.F12, ModifierKeys.None, FnKeyHandler);
-                }
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                 DataContext = model = new ProbingViewModel(DataContext as GrblViewModel, profiles);
             }
         }
@@ -163,15 +129,9 @@ namespace CNC.Controls.Probing
             {
                 int id = int.Parse(key.ToString().Substring(1));
                 var macro = AppConfig.Settings.Macros.FirstOrDefault(o => o.Id == id);
-<<<<<<< HEAD
                 if (macro != null && MessageBox.Show(string.Format((string)FindResource("RunMacro"), macro.Name), "Run macro", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                 {
                     model.Grbl.ExecuteMacro(macro.Code);
-=======
-                if (macro != null && MessageBox.Show(string.Format("Run {0} macro?", macro.Name), "Run macro", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
-                {
-                    model.Grbl.ExecuteCommand(macro.Code);
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                     return true;
                 }
             }
@@ -274,7 +234,6 @@ namespace CNC.Controls.Probing
                 if (!model.Grbl.IsGrblHAL && !AppConfig.Settings.Jog.KeyboardEnable)
                     Jog.Visibility = Visibility.Collapsed;
 
-<<<<<<< HEAD
                 if (GrblInfo.IsGrblHAL)
                 {
                     GrblParserState.Get();
@@ -283,10 +242,6 @@ namespace CNC.Controls.Probing
                 else
                     GrblParserState.Get(true);
 
-=======
-                GrblWorkParameters.Get();
-                GrblParserState.Get(true);
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                 model.DistanceMode = GrblParserState.DistanceMode;
                 model.Tool = model.Grbl.Tool == GrblConstants.NO_TOOL ? "0" : model.Grbl.Tool;
                 model.CanProbe = !model.Grbl.Signals.Value.HasFlag(Signals.Probe);
@@ -301,11 +256,8 @@ namespace CNC.Controls.Probing
                     model.ReferenceToolOffset = false;
                 }
 
-<<<<<<< HEAD
                 Probing.Command = GrblInfo.ReportProbeResult ? "G38.3" : "G38.2";
 
-=======
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                 getView(tab.SelectedItem as TabItem)?.Activate();
 
                 model.Grbl.PropertyChanged += Grbl_PropertyChanged;
@@ -405,33 +357,19 @@ namespace CNC.Controls.Probing
         }
         protected bool ProcessKeyPreview(KeyEventArgs e)
         {
-<<<<<<< HEAD
             if (grbl.Keyboard == null)
                 return false;
 
             return grbl.Keyboard.ProcessKeypress(e, Keyboard.Modifiers == (ModifierKeys.Control | ModifierKeys.Shift) || jogEnabled, this);
-=======
-            if (keyboard == null)
-                return false;
-
-            return keyboard.ProcessKeypress(e, jogEnabled);
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         }
 
         private void Jog_FocusedChanged(object sender, RoutedEventArgs e)
         {
             var btn = sender as Button;
-<<<<<<< HEAD
             if (grbl.Keyboard.IsJogging)
                 grbl.Keyboard.JogCancel();
             jogEnabled = btn.IsFocused && grbl.Keyboard.CanJog;
             btn.Content = (string)FindResource(jogEnabled ? "JogActive" : "JogDisabled");
-=======
-            if (keyboard.IsJogging)
-                keyboard.JogCancel();
-            jogEnabled = btn.IsFocused && keyboard.CanJog;
-            btn.Content = jogEnabled ? "Keyboard jogging active" : "Keyboard jogging disabled";
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         }
 
         private void tab_SelectionChanged(object sender, SelectionChangedEventArgs e)

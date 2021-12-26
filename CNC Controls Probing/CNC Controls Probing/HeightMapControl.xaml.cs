@@ -1,11 +1,7 @@
 ﻿/*
  * HeightMapControl.xaml.cs - part of CNC Probing library
  *
-<<<<<<< HEAD
  * v0.36 / 2021-11-29 / Io Engineering (Terje Io)
-=======
- * v0.33 / 2021-05-09 / Io Engineering (Terje Io)
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
  *
  */
 
@@ -67,11 +63,7 @@ namespace CNC.Controls.Probing
 
         public void Activate()
         {
-<<<<<<< HEAD
             (DataContext as ProbingViewModel).Instructions = ((string)FindResource("Instructions")).Replace("\\n", "\n");
-=======
-            (DataContext as ProbingViewModel).Instructions = "A rapid motion to X0Y0 will be performed before probing the height map starts.\nEnsure the initial Z-position is clear of any obstacles that might be encountered during probing.";
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         }
 
         public void Start(bool preview = false)
@@ -197,11 +189,7 @@ namespace CNC.Controls.Probing
                 probing.HeightMap.MapPoints = mapPoints.Points;
                 probing.HeightMap.HasHeightMap = true;
 
-<<<<<<< HEAD
                 probing.Program.End(ok ? string.Format((string)FindResource("ProbingCompleted"), z_min.ToInvariantString(probing.Grbl.Format), z_max.ToInvariantString(probing.Grbl.Format)) : (string)FindResource("ProbingFailed"));
-=======
-                probing.Program.End(ok ? string.Format("Probing completed: Z min: {0}, Z max: {1}", z_min.ToInvariantString(probing.Grbl.Format), z_max.ToInvariantString(probing.Grbl.Format)) : "Probing failed");
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
             }
         }
 
@@ -307,14 +295,8 @@ namespace CNC.Controls.Probing
             probing.HeightMap.MinY = probing.Grbl.ProgramLimits.MinY;
             probing.HeightMap.MaxX = probing.Grbl.ProgramLimits.MaxX;
             probing.HeightMap.MaxY = probing.Grbl.ProgramLimits.MaxY;
-<<<<<<< HEAD
             //probing.HeightMap.GridSizeLockXY = true;
             //probing.HeightMap.GridSizeX = probing.HeightMap.GridSizeY = 5d;
-=======
-            probing.HeightMap.GridSizeLockXY = true;
-            probing.HeightMap.GridSizeX =
-            probing.HeightMap.GridSizeY = 5d;
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         }
 
         private void viewport_Drag(object sender, DragEventArgs e)

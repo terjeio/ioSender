@@ -5,15 +5,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CNC.Controls"
              mc:Ignorable="d" 
-<<<<<<< HEAD
              d:DesignHeight="140" d:DesignWidth="310">
     <GroupBox x:Uid="grp_gcodeStrip" Header="GCode command stripping" HorizontalAlignment="Left" VerticalAlignment="Top" Height="Auto" Width="310">
         <Grid Height="116" Margin="50,0,0,0">
-=======
-             d:DesignHeight="140" d:DesignWidth="250">
-    <GroupBox x:Uid="grp_gcodeStrip" Header="GCode command stripping" HorizontalAlignment="Left" VerticalAlignment="Top" Height="Auto" Width="250">
-        <Grid Height="116">
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="60"/>
                 <ColumnDefinition Width="70*"/>

@@ -1,11 +1,7 @@
 ﻿/*
  * PortDialog.xaml.cs - part of CNC Controls library
  *
-<<<<<<< HEAD
  * v0.36 / 2021-12-13 / Io Engineering (Terje Io)
-=======
- * v0.35 / 2021-09-25 / Io Engineering (Terje Io)
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
  *
  */
 
@@ -80,11 +76,7 @@ namespace CNC.Controls
             string[] values = uri.Split(':');
 
             prop.IpAddress = values[0];
-<<<<<<< HEAD
             if (values.Length == 2 && int.TryParse(values[1], out port))
-=======
-            if (values.Length == 2 && int.TryParse(values[0], out port))
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                 prop.NetPort = port;
             else
                 prop.NetPort = prop.IsWebSocket ? 80 : 23;
@@ -133,11 +125,7 @@ namespace CNC.Controls
             {
                 port = string.Format("{0}{1}:{2}", prop.IsWebSocket ? "ws://" : string.Empty, prop.IpAddress, prop.NetPort.ToString());
             }
-<<<<<<< HEAD
             else if(prop.Com.Ports.Count > 0)
-=======
-            else
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
             {
                 port = prop.Com.SelectedPort;
                 if (prop.Com.SelectedMode.Mode != Comms.ResetMode.None)

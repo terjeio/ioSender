@@ -65,15 +65,10 @@
     <Compile Include="Comms.cs" />
     <Compile Include="GCodeJob.cs" />
     <Compile Include="GrblViewModel.cs" />
-<<<<<<< HEAD
     <Compile Include="KeypressHandler.cs" />
     <Compile Include="Machine.cs" />
     <Compile Include="MeasureViewModel.cs" />
     <Compile Include="NGCExpr.cs" />
-=======
-    <Compile Include="Machine.cs" />
-    <Compile Include="MeasureViewModel.cs" />
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SerialStream.cs" />
     <Compile Include="TelnetStream.cs" />

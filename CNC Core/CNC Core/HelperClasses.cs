@@ -1,11 +1,7 @@
 ﻿/*
  * HelperClasses.cs - part of CNC Controls library for Grbl
  *
-<<<<<<< HEAD
  * v0.36 / 2021-11-06 / Io Engineering (Terje Io)
-=======
- * v0.27 / 2020-09-26 / Io Engineering (Terje Io)
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
  *
  */
 
@@ -232,7 +228,6 @@ namespace CNC.Core
 
             return string.Join(";", filetypes);
         }
-<<<<<<< HEAD
 
         public static StreamReader OpenFile(string filename)
         {
@@ -247,8 +242,6 @@ namespace CNC.Core
 
             return file;
         }
-=======
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
     }
 
     // https://stackoverflow.com/questions/17794530/accessing-an-array-in-xaml-with-enums

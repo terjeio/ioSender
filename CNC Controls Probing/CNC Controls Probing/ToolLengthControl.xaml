@@ -3,21 +3,15 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-<<<<<<< HEAD
              xmlns:system="clr-namespace:System;assembly=mscorlib"
-=======
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
              xmlns:local="clr-namespace:CNC.Controls.Probing"
              xmlns:Controls="clr-namespace:CNC.Controls;assembly=CNC.Controls.WPF"
              mc:Ignorable="d" Height="370"
              d:DesignHeight="370" d:DesignWidth="510">
     <UserControl.Resources>
-<<<<<<< HEAD
         <system:String x:Uid="str_toolLengthInitFailed" x:Key="InitFailed">Axes must be homed before probing the fixture!</system:String>
         <system:String x:Uid="str_toolLengthFailed" x:Key="ProbingFailed">Probing failed</system:String>
         <system:String x:Uid="str_toolLengthCompleted" x:Key="ProbingCompleted">Probing completed.</system:String>
-=======
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         <Controls:LogicalNotConverter x:Key="IsNotRunningConverter" />
         <Controls:LogicalNotConverter x:Key="IsNotVisibleConverter">
             <Controls:LogicalNotConverter.FinalConverter>
@@ -35,13 +29,8 @@
                 <Controls:NumericComboBox Margin="2,2" DisplayMemberPath="Code" SelectedValuePath="Code" ItemsSource="{Binding Path=Grbl.Tools}" SelectedValue="{Binding Path=Tool, Mode=TwoWay}" IsEnabled="{Binding Path=HasToolTable}" Format="##0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="56" Height="22"/>
             </StackPanel>
             <CheckBox x:Uid="lbl_setRefernecOffset" Content="Establish reference offset" IsChecked="{Binding Path=ReferenceToolOffset, Mode=TwoWay}" IsEnabled="{Binding Path=CanReferenceToolOffset}" Margin="10,0,0,0" VerticalAlignment="Center"/>
-<<<<<<< HEAD
             <Border Margin="5,10,0,0" Visibility="{Binding Path=Grbl.IsToolOffsetActive, Converter={StaticResource IsVisibleConverter}}" Background="Salmon" HorizontalAlignment="Left" VerticalAlignment="Center" CornerRadius="2" Width="186" Height="28">
                 <Button x:Uid="lbl_clearToolOffset" Content="Clear tool length offset" HorizontalAlignment="Center" VerticalAlignment="Center" Width="180" Height="22" Click="clearToolOffset_Click"/>
-=======
-            <Border Margin="5,10,0,0" Visibility="{Binding Path=Grbl.IsToolOffsetActive, Converter={StaticResource IsVisibleConverter}}" Background="Salmon" HorizontalAlignment="Left" VerticalAlignment="Center" CornerRadius="2" Width="156" Height="28">
-                <Button x:Uid="lbl_clearToolOffset" Content="Clear tool length offset" HorizontalAlignment="Center" VerticalAlignment="Center" Width="150" Height="22" Click="clearToolOffset_Click"/>
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
             </Border>
             <GroupBox x:Uid="grp_workpieceOffset" Header="Workpiece offset" Visibility="{Binding Path=ProbeFixture, Converter={StaticResource IsNotVisibleConverter}}" Margin="5,5,0,0">
                 <StackPanel>

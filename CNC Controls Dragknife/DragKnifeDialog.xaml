@@ -14,30 +14,17 @@
         <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Height="Auto" Margin="5,5">
             <GroupBox x:Uid="grp_knife" Header="Knife" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Height="Auto" Width="280">
                 <StackPanel>
-<<<<<<< HEAD
                     <Controls:NumericField x:Uid="fld_tipOffset" Label="Tip offset:" ColonAt="120" Unit="mm" Format="#0.###" Value="{Binding Path=KnifeTipOffset, Mode=TwoWay}"/>
                     <Controls:NumericField x:Uid="fld_cutDepth" Label="Cut depth:" ColonAt="120" Unit="mm" Format="-###0.###" Value="{Binding Path=CutDepth, Mode=TwoWay}"/>
                     <Controls:NumericField x:Uid="fld_swivelAngle" Label="Swivel angle:" ColonAt="120" Unit="deg" Format="##0" Value="{Binding Path=SwivelAngle, Mode=TwoWay}"/>
                     <Controls:NumericField x:Uid="fld_dentLength" Label="Dent length:" ColonAt="120" Unit="mm" Format="###0.###" Value="{Binding Path=DentLength, Mode=TwoWay}"/>
-=======
-                    <Controls:NumericField x:Uid="fld_tipOffset" Label="Tip offset:" ColonAt="90" Unit="mm" Format="#0.###" Value="{Binding Path=KnifeTipOffset, Mode=TwoWay}"/>
-                    <Controls:NumericField x:Uid="fld_cutDepth" Label="Cut depth:" ColonAt="90" Unit="mm" Format="-###0.###" Value="{Binding Path=CutDepth, Mode=TwoWay}"/>
-                    <Controls:NumericField x:Uid="fld_swivelAngle" Label="Swivel angle:" ColonAt="90" Unit="deg" Format="##0" Value="{Binding Path=SwivelAngle, Mode=TwoWay}"/>
-                    <Controls:NumericField x:Uid="fld_dentLength" Label="Dent length:" ColonAt="90" Unit="mm" Format="###0.###" Value="{Binding Path=DentLength, Mode=TwoWay}"/>
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                 </StackPanel>
             </GroupBox>
             <GroupBox x:Uid="grp_retract" Header="Retract" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Height="Auto" Width="280">
                 <StackPanel>
-<<<<<<< HEAD
                     <CheckBox x:Uid="lbl_retractEnable" Content="Retract enable" IsChecked="{Binding Path=RetractEnable, Mode=TwoWay}" Margin="120,5,0,0"/>
                     <Controls:NumericField x:Uid="fld_retractAngle" Label="Retract angle:" ColonAt="120" Unit="deg" Format="##0" Value="{Binding Path=RetractAngle, Mode=TwoWay}"/>
                     <Controls:NumericField x:Uid="fld_retractDepth" Label="Retract depth:" ColonAt="120" Unit="mm/min" Format="-###0.###" Value="{Binding Path=RetractDepth, Mode=TwoWay}"/>
-=======
-                    <CheckBox x:Uid="lbl_retractEnable" Content="Retract enable" IsChecked="{Binding Path=RetractEnable, Mode=TwoWay}" Margin="90,5,0,0"/>
-                    <Controls:NumericField x:Uid="fld_retractAngle" Label="Retract angle:" ColonAt="90" Unit="deg" Format="##0" Value="{Binding Path=RetractAngle, Mode=TwoWay}"/>
-                    <Controls:NumericField x:Uid="fld_retractDepth" Label="Retract depth:" ColonAt="90" Unit="mm/min" Format="-###0.###" Value="{Binding Path=RetractDepth, Mode=TwoWay}"/>
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                 </StackPanel>
             </GroupBox>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Width="Auto" Margin="0,10">

@@ -17,10 +17,6 @@
             Unit="{Binding Path=Unit, Mode=OneWay}"
             Label="{Binding Path=Label, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=OneWay}"
         />
-<<<<<<< HEAD
         <Button x:Uid="btn_set" x:Name="btnSet" Content="Set" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Padding="5,0" Height="22" Margin="0,4" Click="btnSet_Click"/>
-=======
-        <Button x:Uid="btn_set" x:Name="btnSet" Content="Set" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Width="35" Height="22" Margin="0,4" Click="btnSet_Click"/>
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
     </Grid>
 </UserControl>

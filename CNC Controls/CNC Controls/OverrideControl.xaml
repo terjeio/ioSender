@@ -5,21 +5,12 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CNC.Controls"
              mc:Ignorable="d" 
-<<<<<<< HEAD
              d:DesignHeight="60" d:DesignWidth="205">
     <UserControl.Resources>
         <local:EncoderModeToColorConverter x:Key="EncoderModeConverter" />
     </UserControl.Resources>
     <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Height="60" VerticalAlignment="Center" Width="205">
         <Label x:Uid="lbl_override" x:Name="lblOverride" HorizontalContentAlignment="Right" Content="Override" VerticalAlignment="Center" Height="24" Width="80"/>
-=======
-             d:DesignHeight="60" d:DesignWidth="180">
-    <UserControl.Resources>
-        <local:EncoderModeToColorConverter x:Key="EncoderModeConverter" />
-    </UserControl.Resources>
-    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Height="60" VerticalAlignment="Center" Width="180">
-        <Label x:Uid="lbl_override" x:Name="lblOverride" HorizontalContentAlignment="Right" Content="Override" VerticalAlignment="Center" Height="24" Width="56"/>
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         <TextBox x:Name="txtOverride" TextWrapping="NoWrap" Text="100%" IsReadOnly="True" Height="24" Width="40" VerticalAlignment="Center" HorizontalContentAlignment="Right" VerticalContentAlignment="Center">
             <TextBox.Background>
                 <MultiBinding Converter="{StaticResource EncoderModeConverter}">

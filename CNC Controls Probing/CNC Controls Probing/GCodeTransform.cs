@@ -73,11 +73,7 @@ namespace CNC.Controls.Probing
                     case Commands.G3:
                         {
                             if (plane.Plane != Plane.XY)
-<<<<<<< HEAD
                                 throw new Exception(LibStrings.FindResource("HasRadiusArcs"));
-=======
-                                throw new Exception("GCode contains arcs in XZ or YZ plane (G18/19), can't apply transform. Use 'Arcs to Lines' if you really need this.");
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
 
                             var arc = token as GCArc;
                             double[] center = arc.GetCenter(plane, pos.Array);
@@ -371,8 +367,4 @@ namespace CNC.Controls.Probing
             }
         }
     }
-<<<<<<< HEAD
-=======
-
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
 }

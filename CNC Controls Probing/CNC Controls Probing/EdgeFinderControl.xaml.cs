@@ -1,11 +1,7 @@
 ﻿/*
  * EdgeFinderControl.xaml.cs - part of CNC Probing library
  *
-<<<<<<< HEAD
  * v0.36 / 2021-12-01 / Io Engineering (Terje Io)
-=======
- * v0.30 / 2021-04-08 / Io Engineering (Terje Io)
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
  *
  */
 
@@ -84,11 +80,7 @@ namespace CNC.Controls.Probing
 
         public void Activate()
         {
-<<<<<<< HEAD
             (DataContext as ProbingViewModel).Instructions = ((string)FindResource("Instructions")).Replace("\\n", "\n");
-=======
-            (DataContext as ProbingViewModel).Instructions = "Click edge, corner or center in image above to select probing action.\nMove the probe to above the position indicated by green dot before start.";
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         }
 
         public void Start(bool preview = false)
@@ -100,11 +92,7 @@ namespace CNC.Controls.Probing
 
             if (probing.ProbeEdge == Edge.None)
             {
-<<<<<<< HEAD
                 MessageBox.Show((string)FindResource("SelectType"), "Edge finder", MessageBoxButton.OK, MessageBoxImage.Exclamation);
-=======
-                MessageBox.Show("Select edge or corner to probe by clicking on the relevant part of the image above.", "Edge finder", MessageBoxButton.OK, MessageBoxImage.Exclamation);
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                 return;
             }
 
@@ -255,11 +243,7 @@ namespace CNC.Controls.Probing
                 if (double.IsNaN(pos.Z))
                 {
                     probing.Grbl.IsJobRunning = false;
-<<<<<<< HEAD
                     probing.Program.End((string)FindResource("PositionUnknown"));
-=======
-                    probing.Program.End("Probing failed, machine position not known");
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                     return;
                 }
 
@@ -297,11 +281,7 @@ namespace CNC.Controls.Probing
                             pos.X = -probing.ProbeOffsetX;
                             pos.Y = -probing.ProbeOffsetY;
                             pos.Z = probing.WorkpieceHeight + probing.TouchPlateHeight;
-<<<<<<< HEAD
                             probing.WaitForResponse("G92" + pos.ToString(axisflags));
-=======
-                            probing.Grbl.ExecuteCommand("G92" + pos.ToString(axisflags));
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                             if (!isCancelled && axisflags.HasFlag(AxisFlags.Z))
                                 probing.GotoMachinePosition(probing.StartPosition, AxisFlags.Z);
                         }
@@ -311,19 +291,11 @@ namespace CNC.Controls.Probing
                         pos.X += probing.ProbeOffsetX;
                         pos.Y += probing.ProbeOffsetY;
                         pos.Z -= probing.WorkpieceHeight + probing.TouchPlateHeight + probing.Grbl.ToolOffset.Z;
-<<<<<<< HEAD
                         probing.WaitForResponse(string.Format("G10L2P{0}{1}", probing.CoordinateSystem, pos.ToString(axisflags)));
                     }
                 }
 
                 probing.Program.End((string)FindResource(ok ? "ProbingCompleted" : "ProbingFailed"));
-=======
-                        probing.Grbl.ExecuteCommand(string.Format("G10L2P{0}{1}", probing.CoordinateSystem, pos.ToString(axisflags)));
-                    }
-                }
-
-                probing.Program.End(ok ? "Probing completed" : "Probing failed");
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
             }
 
             if (!probing.Grbl.IsParserStateLive && probing.CoordinateMode == ProbingViewModel.CoordMode.G92)

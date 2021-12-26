@@ -1,11 +1,7 @@
 ﻿/*
  * CenterFinderControl.xaml.cs - part of CNC Probing library
  *
-<<<<<<< HEAD
  * v0.36 / 2021-12-01 / Io Engineering (Terje Io)
-=======
- * v0.30 / 2021-04-04 / Io Engineering (Terje Io)
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
  *
  */
 
@@ -80,11 +76,7 @@ namespace CNC.Controls.Probing
 
         public void Activate()
         {
-<<<<<<< HEAD
             (DataContext as ProbingViewModel).Instructions = ((string)FindResource("Instructions")).Replace("\\n", "\n");
-=======
-            (DataContext as ProbingViewModel).Instructions = "Click image above to select probing action.\nPlace the probe above the approximate center of the workpiece before start.";
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         }
 
         private bool CreateProgram(bool preview)
@@ -93,21 +85,13 @@ namespace CNC.Controls.Probing
 
             if (probing.ProbeCenter == Center.None)
             {
-<<<<<<< HEAD
                 MessageBox.Show((string)FindResource("SelectType"), "Center finder", MessageBoxButton.OK, MessageBoxImage.Exclamation);
-=======
-                MessageBox.Show("Select type of probe by clicking on one of the images above.", "Center finder", MessageBoxButton.OK, MessageBoxImage.Exclamation);
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                 return false;
             }
 
             if (!probing.Program.Init())
             {
-<<<<<<< HEAD
                 probing.Message = (string)FindResource("InitFailed");
-=======
-                probing.Message = "Init failed!";
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                 return false;
             }
 
@@ -220,11 +204,7 @@ namespace CNC.Controls.Probing
             }
 
             if(probing.Passes > 1)
-<<<<<<< HEAD
                 probing.Message = string.Format((string)FindResource("ProbingPass"), (probing.Passes - pass + 1), probing.Passes);
-=======
-                probing.Message = string.Format("Probing, pass {0} of {1}...", (probing.Passes - pass + 1), probing.Passes);
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
 
             return true;
         }
@@ -240,13 +220,8 @@ namespace CNC.Controls.Probing
 
             if (probing.WorkpieceSizeX <= 0d && probing.WorkpieceSizeY <= 0d)
             {
-<<<<<<< HEAD
                 probing.SetError(nameof(probing.WorkpieceSizeX), string.Format((string)FindResource("WorkPieceSize"), "X"));
                 probing.SetError(nameof(probing.WorkpieceSizeY), string.Format((string)FindResource("WorkPieceSize"), "Y"));
-=======
-                probing.SetError(nameof(probing.WorkpieceSizeX), "Workpiece X size cannot be 0.");
-                probing.SetError(nameof(probing.WorkpieceSizeY), "Workpiece Y size cannot be 0.");
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                 return;
             }
 
@@ -266,21 +241,13 @@ namespace CNC.Controls.Probing
 
             if (mode != FindMode.Y && probing.ProbeCenter == Center.Inside && probing.WorkpieceSizeX < probing.XYClearance * 2d + probing.ProbeDiameter)
             {
-<<<<<<< HEAD
                 probing.SetError(nameof(probing.WorkpieceSizeX), string.Format((string)FindResource("Clearance"), "X"));
-=======
-                probing.SetError(nameof(probing.WorkpieceSizeX), "Probing XY clearance too large for workpiece X size.");
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                 return;
             }
 
             if (mode != FindMode.X && probing.ProbeCenter == Center.Inside && probing.WorkpieceSizeY < probing.XYClearance * 2d + probing.ProbeDiameter)
             {
-<<<<<<< HEAD
                 probing.SetError(nameof(probing.WorkpieceSizeY), string.Format((string)FindResource("Clearance"), "Y"));
-=======
-                probing.SetError(nameof(probing.WorkpieceSizeY), "Probing XY clearance too large for workpiece Y size.");
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                 return;
             }
 
@@ -317,11 +284,7 @@ namespace CNC.Controls.Probing
             if (probing.IsSuccess && probing.Positions.Count != (mode == FindMode.XY ? 4 : 2))
             {
                 probing.IsSuccess = false;
-<<<<<<< HEAD
                 probing.Program.End((string)FindResource("ProbingFailed"));
-=======
-                probing.Program.End("Probing failed");
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                 return false;
             }
 
@@ -372,11 +335,7 @@ namespace CNC.Controls.Probing
                     {
                         center.X = probing.ProbeOffsetX;
                         center.Y = probing.ProbeOffsetY;
-<<<<<<< HEAD
                         probing.WaitForResponse("G92" + center.ToString(axisflags));
-=======
-                        probing.Grbl.ExecuteCommand("G92" + center.ToString(axisflags));
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                         if (!probing.Grbl.IsParserStateLive)
                             probing.Grbl.ExecuteCommand("$G");
                     }
@@ -384,20 +343,12 @@ namespace CNC.Controls.Probing
                     {
                         center.X += probing.ProbeOffsetX;
                         center.Y += probing.ProbeOffsetY;
-<<<<<<< HEAD
                         probing.WaitForResponse(string.Format("G10L2P{0}{1}", probing.CoordinateSystem, center.ToString(axisflags)));
-=======
-                        probing.Grbl.ExecuteCommand(string.Format("G10L2P{0}{1}", probing.CoordinateSystem, center.ToString(axisflags)));
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                     }
                 }
 
                 if (!ok || pass == 1)
-<<<<<<< HEAD
                     probing.Program.End(ok ? string.Format((string)FindResource("ProbingCompleted"), X_distance.ToInvariantString(), Y_distance.ToInvariantString()) : (string)FindResource("ProbingFailed"));
-=======
-                    probing.Program.End(ok ? string.Format("Probing completed: X distance {0}, Y distance {1}", X_distance.ToInvariantString(), Y_distance.ToInvariantString()) : "Probing failed");
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
             }
 
             return ok;

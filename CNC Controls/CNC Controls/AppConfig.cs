@@ -1,13 +1,7 @@
 ﻿/*
-<<<<<<< HEAD
  * AppConfig.cs - part of CNC Controls library
  *
  * v0.36 / 2021-12-25 / Io Engineering (Terje Io)
-=======
- * AppConfig.cs - part of CNC Controls library for Grbl
- *
- * v0.34 / 2021-07-26 / Io Engineering (Terje Io)
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
  *
  */
 
@@ -53,7 +47,6 @@ using System.Threading;
 using CNC.Core;
 using CNC.GCode;
 using static CNC.GCode.GCodeParser;
-<<<<<<< HEAD
 using System.Windows.Media.Media3D;
 
 namespace CNC.Controls
@@ -79,14 +72,6 @@ namespace CNC.Controls
     [Serializable]
     public class LatheConfig : ViewModelBase
     {
-=======
-
-namespace CNC.Controls
-{
-    [Serializable]
-    public class LatheConfig : ViewModelBase
-    {
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         private bool _isEnabled = false;
         private LatheMode _latheMode = LatheMode.Disabled;
 
@@ -95,7 +80,6 @@ namespace CNC.Controls
 
         [XmlIgnore]
         public LatheMode[] LatheModes { get { return (LatheMode[])Enum.GetValues(typeof(LatheMode)); } }
-<<<<<<< HEAD
 
         [XmlIgnore]
         public Direction[] ZDirections { get { return (Direction[])Enum.GetValues(typeof(Direction)); } }
@@ -103,15 +87,6 @@ namespace CNC.Controls
         [XmlIgnore]
         public bool IsEnabled { get { return _isEnabled; } set { _isEnabled = value; OnPropertyChanged(); } }
 
-=======
-
-        [XmlIgnore]
-        public Direction[] ZDirections { get { return (Direction[])Enum.GetValues(typeof(Direction)); } }
-
-        [XmlIgnore]
-        public bool IsEnabled { get { return _isEnabled; } set { _isEnabled = value; OnPropertyChanged(); } }
-
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         public LatheMode XMode { get { return _latheMode; } set { _latheMode = value; IsEnabled = value != LatheMode.Disabled; } }
         public Direction ZDirection { get; set; } = Direction.Negative;
         public double PassDepthLast { get; set; } = 0.02d;
@@ -150,32 +125,20 @@ namespace CNC.Controls
     {
         private bool _isEnabled = true;
         private int _arcResolution = 10;
-<<<<<<< HEAD
         private double _minDistance = 0.05d, _toolDiameter = 3d;
         private bool _showGrid = true, _showAxes = true, _showBoundingBox = false, _showViewCube = true, _showCoordSystem = false, _showWorkEnvelope = false;
         private bool _showTextOverlay = false, _renderExecuted = false, _blackBackground = false, _scaleTool = true;
-=======
-        private double _minDistance = 0.05d;
-        private bool _showGrid = true, _showAxes = true, _showBoundingBox = false, _showViewCube = true, _showCoordSystem = false;
-        private bool _showTextOverlay = false, _renderExecuted = false, _blackBackground = false;
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         Color _cutMotion = Colors.Black, _rapidMotion = Colors.LightPink, _retractMotion = Colors.Green, _toolOrigin = Colors.Green, _grid = Colors.Gray, _highlight = Colors.Crimson;
 
         public bool IsEnabled { get { return _isEnabled; } set { _isEnabled = value; OnPropertyChanged(); } }
         public int ArcResolution { get { return _arcResolution; } set { _arcResolution = value; OnPropertyChanged(); } }
         public double MinDistance { get { return _minDistance; } set { _minDistance = value; OnPropertyChanged(); } }
-<<<<<<< HEAD
         public bool ToolAutoScale { get { return _scaleTool; } set { _scaleTool = value; OnPropertyChanged(); } }
         public double ToolDiameter { get { return _toolDiameter; } set { _toolDiameter = value; OnPropertyChanged(); } }
         public bool ShowGrid { get { return _showGrid; } set { _showGrid = value; OnPropertyChanged(); } }
         public bool ShowAxes { get { return _showAxes; } set { _showAxes = value; OnPropertyChanged(); } }
         public bool ShowBoundingBox { get { return _showBoundingBox; } set { _showBoundingBox = value; OnPropertyChanged(); } }
         public bool ShowWorkEnvelope { get { return _showWorkEnvelope; } set { _showWorkEnvelope = value; OnPropertyChanged(); } }
-=======
-        public bool ShowGrid { get { return _showGrid; } set { _showGrid = value; OnPropertyChanged(); } }
-        public bool ShowAxes { get { return _showAxes; } set { _showAxes = value; OnPropertyChanged(); } }
-        public bool ShowBoundingBox { get { return _showBoundingBox; } set { _showBoundingBox = value; OnPropertyChanged(); } }
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         public bool ShowViewCube { get { return _showViewCube; } set { _showViewCube = value; OnPropertyChanged(); } }
         public bool ShowTextOverlay { get { return _showTextOverlay; } set { _showTextOverlay = value; OnPropertyChanged(); } }
         public bool ShowCoordinateSystem { get { return _showCoordSystem; } set { _showCoordSystem = value; OnPropertyChanged(); } }
@@ -187,7 +150,6 @@ namespace CNC.Controls
         public Color ToolOriginColor { get { return _toolOrigin; } set { _toolOrigin = value; OnPropertyChanged(); } }
         public Color GridColor { get { return _grid; } set { _grid = value; OnPropertyChanged(); } }
         public Color HighlightColor { get { return _highlight; } set { _highlight = value; OnPropertyChanged(); } }
-<<<<<<< HEAD
         public int ViewMode { get; set; } = -1;
         public int ToolVisualizer { get; set; } = 1;
         public Point3D CameraPosition { get; set; }
@@ -283,87 +245,6 @@ namespace CNC.Controls
         public bool FilterOkResponse { get { return _filterOkResponse; } set { _filterOkResponse = value; OnPropertyChanged(); } }
         public bool AutoCompress { get { return _autoCompress; } set { _autoCompress = value; OnPropertyChanged(); } }
 
-=======
-
-    }
-
-    [Serializable]
-    public class JogUIConfig : ViewModelBase
-    {
-        private int[] _feedrate = new int[4];
-        private double[] _distance = new double[4];
-
-        public JogUIConfig()
-        {
-        }
-
-        public JogUIConfig(int[] feedrate, double[] distance)
-        {
-            for(int i = 0; i < feedrate.Length; i++)
-            {
-                _feedrate[i] = feedrate[i];
-                _distance[i] = distance[i];
-            }
-        }
-
-        [XmlIgnore]
-        public int[] Feedrate { get { return _feedrate; } }
-        public int Feedrate0 { get { return _feedrate[0]; } set { _feedrate[0] = value; OnPropertyChanged(); } }
-        public int Feedrate1 { get { return _feedrate[1]; } set { _feedrate[1] = value; OnPropertyChanged(); } }
-        public int Feedrate2 { get { return _feedrate[2]; } set { _feedrate[2] = value; OnPropertyChanged(); } }
-        public int Feedrate3 { get { return _feedrate[3]; } set { _feedrate[3] = value; OnPropertyChanged(); } }
-
-        [XmlIgnore]
-        public double[] Distance { get { return _distance; } }
-        public double Distance0 { get { return _distance[0]; } set { _distance[0] = value; OnPropertyChanged(); } }
-        public double Distance1 { get { return _distance[1]; } set { _distance[1] = value; OnPropertyChanged(); } }
-        public double Distance2 { get { return _distance[2]; } set { _distance[2] = value; OnPropertyChanged(); } }
-        public double Distance3 { get { return _distance[3]; } set { _distance[3] = value; OnPropertyChanged(); } }
-    }
-
-    [Serializable]
-    public class JogConfig : ViewModelBase
-    {
-        private bool _kbEnable;
-        private double _fastFeedrate = 500d, _slowFeedrate = 200d, _stepFeedrate = 100d;
-        private double _fastDistance = 500d, _slowDistance = 500d, _stepDistance = 0.05d;
-
-        public bool KeyboardEnable { get { return _kbEnable; } set { _kbEnable = value; OnPropertyChanged(); } }
-        public double FastFeedrate { get { return _fastFeedrate; } set { _fastFeedrate = value; OnPropertyChanged(); } }
-        public double SlowFeedrate { get { return _slowFeedrate; } set { _slowFeedrate = value; OnPropertyChanged(); } }
-        public double StepFeedrate { get { return _stepFeedrate; } set { _stepFeedrate = value; OnPropertyChanged(); } }
-        public double FastDistance { get { return _fastDistance; } set { _fastDistance = value; OnPropertyChanged(); } }
-        public double SlowDistance { get { return _slowDistance; } set { _slowDistance = value; OnPropertyChanged(); } }
-        public double StepDistance { get { return _stepDistance; } set { _stepDistance = value; OnPropertyChanged(); } }
-    }
-
-    [Serializable]
-    public class Macros : ViewModelBase
-    {
-        public ObservableCollection<CNC.GCode.Macro> Macro { get; private set; } = new ObservableCollection<CNC.GCode.Macro>();
-    }
-
-    [Serializable]
-    public class Config : ViewModelBase
-    {
-        private int _pollInterval = 200, /* ms*/  _maxBufferSize = 300;
-        private bool _useBuffering = false, _keepMdiFocus = true, _filterOkResponse = false, _saveWindowSize = false, _autoCompress = false;
-        private CommandIgnoreState _ignoreM6 = CommandIgnoreState.No, _ignoreM7 = CommandIgnoreState.No, _ignoreM8 = CommandIgnoreState.No, _ignoreG61G64 = CommandIgnoreState.Strip;
-
-        public int PollInterval { get { return _pollInterval < 100 ? 100 : _pollInterval; } set { _pollInterval = value; OnPropertyChanged(); } }
-        public string PortParams { get; set; } = "COMn:115200,N,8,1";
-        public int ResetDelay { get; set; } = 2000;
-        public bool UseBuffering { get { return _useBuffering; } set { _useBuffering = value; OnPropertyChanged(); } }
-        public bool KeepWindowSize { get { return _saveWindowSize; } set { if (_saveWindowSize != value) { _saveWindowSize = value; OnPropertyChanged(); } } }
-        public double WindowWidth { get; set; } = 925;
-        public double WindowHeight { get; set; } = 660;
-        public int MaxBufferSize { get { return _maxBufferSize < 300 ? 300 : _maxBufferSize; } set { _maxBufferSize = value; OnPropertyChanged(); } }
-        public string Editor { get; set; } = "notepad.exe";
-        public bool KeepMdiFocus { get { return _keepMdiFocus; } set { _keepMdiFocus = value; OnPropertyChanged(); } }
-        public bool FilterOkResponse { get { return _filterOkResponse; } set { _filterOkResponse = value; OnPropertyChanged(); } }
-        public bool AutoCompress { get { return _autoCompress; } set { _autoCompress = value; OnPropertyChanged(); } }
-
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         [XmlIgnore]
         public CommandIgnoreState[] CommandIgnoreStates { get { return (CommandIgnoreState[])Enum.GetValues(typeof(CommandIgnoreState)); } }
         public CommandIgnoreState IgnoreM6 { get { return _ignoreM6; } set { _ignoreM6 = value; OnPropertyChanged(); } }
@@ -466,7 +347,6 @@ namespace CNC.Controls
         }
 
         public void Shutdown()
-<<<<<<< HEAD
         {
             if (Camera.IsDirty)
                 Save();
@@ -475,16 +355,10 @@ namespace CNC.Controls
         private bool isComPort(string port)
         {
             return !(port.ToLower().StartsWith("ws://") || char.IsDigit(port[0]));
-=======
-        {
-            if (Camera.IsDirty)
-                Save();
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         }
 
         private void setPort(string port)
         {
-<<<<<<< HEAD
             if (!(port.ToLower().StartsWith("ws://") || char.IsDigit(port[0])) && port.IndexOf(':') == -1)
             {
                 string prop = ":115200,N,8,1";
@@ -498,14 +372,6 @@ namespace CNC.Controls
                 port = values[0] + prop + (values.Length > 1 ? ",," + values[1] : "");
             }
             Base.PortParams = port;
-=======
-            Base.PortParams = port;
-            if (!(Base.PortParams.ToLower().StartsWith("ws://") || char.IsDigit(Base.PortParams[0])) && Base.PortParams.IndexOf(':') == -1)
-            {
-                string[] values = Base.PortParams.Split('!');
-                Base.PortParams = values[0] + ":115200,N,8,1" + (values.Length > 1 ? ",," + values[1] : "");
-            }
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         }
 
         public int SetupAndOpen(string appname, GrblViewModel model, System.Windows.Threading.Dispatcher dispatcher)
@@ -520,11 +386,7 @@ namespace CNC.Controls
             string[] args = Environment.GetCommandLineArgs();
 
             int p = 0;
-<<<<<<< HEAD
             while (p < args.GetLength(0)) switch (args[p++].ToLowerInvariant())
-=======
-            while (p < args.GetLength(0)) switch (args[p++])
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                 {
                     case "-inifile":
                         CNC.Core.Resources.IniName = GetArg(args, p++);
@@ -538,14 +400,9 @@ namespace CNC.Controls
                         CNC.Core.Resources.ConfigName = GetArg(args, p++);
                         break;
 
-<<<<<<< HEAD
                     case "-locale":
                     case "-language": // deprecated
                         CNC.Core.Resources.Locale = GetArg(args, p++);
-=======
-                    case "-language":
-                        CNC.Core.Resources.Language = GetArg(args, p++);
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                         break;
 
                     case "-port":
@@ -556,7 +413,6 @@ namespace CNC.Controls
                         selectPort = true;
                         break;
 
-<<<<<<< HEAD
                     case "-islegacy":
                         CNC.Core.Resources.IsLegacyController = true;
                         break;
@@ -566,8 +422,6 @@ namespace CNC.Controls
                             jogMode = Math.Min(Math.Max(jogMode, 0), (int)JogConfig.JogMode.KeypadAndUI);
                         break;
 
-=======
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                     default:
                         if (!args[p - 1].EndsWith(".exe") && File.Exists(args[p - 1]))
                             FileName = args[p - 1];
@@ -601,19 +455,11 @@ namespace CNC.Controls
 #if USEWEBSOCKET
                 if (Base.PortParams.ToLower().StartsWith("ws://"))
                     new WebsocketStream(Base.PortParams, dispatcher);
-<<<<<<< HEAD
                 else
 #endif
                 if (char.IsDigit(Base.PortParams[0])) // We have an IP address
                     new TelnetStream(Base.PortParams, dispatcher);
                 else
-=======
-                else
-#endif
-                if (char.IsDigit(Base.PortParams[0])) // We have an IP address
-                    new TelnetStream(Base.PortParams, dispatcher);
-                else
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
 #if USEELTIMA
                     new EltimaStream(Config.PortParams, Config.ResetDelay, dispatcher);
 #else
@@ -652,19 +498,11 @@ namespace CNC.Controls
             if (Comms.com != null && Comms.com.IsOpen)
             {
                 Comms.com.DataReceived += model.DataReceived;
-<<<<<<< HEAD
 
                 CancellationToken cancellationToken = new CancellationToken();
 
                 // Wait 400ms to see if a MPG is polling Grbl...
 
-=======
-
-                CancellationToken cancellationToken = new CancellationToken();
-
-                // Wait 400ms to see if a MPG is polling Grbl...
-
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                 new Thread(() =>
                 {
                     MPGactive = WaitFor.SingleEvent<string>(
@@ -694,11 +532,7 @@ namespace CNC.Controls
             }
             else if (status != 2)
             {
-<<<<<<< HEAD
                 MessageBox.Show(string.Format(LibStrings.FindResource("ConnectFailed"), Base.PortParams), appname, MessageBoxButton.OK, MessageBoxImage.Error);
-=======
-                MessageBox.Show(string.Format("Unable to open connection ({0})", Base.PortParams), appname, MessageBoxButton.OK, MessageBoxImage.Error);
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                 status = 2;
             }
 

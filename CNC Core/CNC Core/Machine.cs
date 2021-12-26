@@ -1,21 +1,13 @@
 ﻿/*
  * Machine.cs - part of CNC Core library
  *
-<<<<<<< HEAD
  * v0.36 / 2021-11-30 / Io Engineering (Terje Io)
-=======
- * v0.18 / 2020-04-20 / Io Engineering (Terje Io)
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
  *
  */
 
 /*
 
-<<<<<<< HEAD
 Copyright (c) 2020-2021, Io Engineering (Terje Io)
-=======
-Copyright (c) 2020, Io Engineering (Terje Io)
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -49,10 +41,7 @@ using System.Collections.Generic;
 using System.Linq;
 using CNC.GCode;
 using System.Windows.Media.Media3D;
-<<<<<<< HEAD
 using System.Globalization;
-=======
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
 
 namespace CNC.Core
 {
@@ -73,7 +62,6 @@ namespace CNC.Core
 
         public void Reset()
         {
-<<<<<<< HEAD
             // Sync with controller
             if (GrblInfo.IsGrblHAL)
             {
@@ -83,8 +71,6 @@ namespace CNC.Core
             else
                 GrblParserState.Get(true);
 
-=======
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
             coordinateSystems.Clear();
             foreach (CoordinateSystem c in GrblWorkParameters.CoordinateSystems)
                 coordinateSystems.Add(c);
@@ -99,7 +85,6 @@ namespace CNC.Core
             g30 = coordinateSystems.Where(x => x.Code == "G30").FirstOrDefault();
             g92 = coordinateSystems.Where(x => x.Code == "G92").FirstOrDefault();
 
-<<<<<<< HEAD
             isRelative = GrblParserState.DistanceMode == DistanceMode.Incremental;
             IsImperial = !GrblParserState.IsMetric;
             CoolantState = GrblParserState.CoolantState;
@@ -122,24 +107,6 @@ namespace CNC.Core
             G92Active = GrblParserState.IsActive("G92") != null;
 
             Line = 0;
-=======
-            LatheMode = GrblParserState.LatheMode;
-            isRelative = GrblParserState.DistanceMode == DistanceMode.Incremental;
-            IsImperial = !GrblParserState.IsMetric;
-
-            // TODO: set from parser state
-            CoolantState = CoolantState.Off;
-            SpindleState = SpindleState.Off;
-            LatheMode = LatheMode.Disabled;
-            DistanceMode = DistanceMode.Absolute;
-            ToolLengthOffset = ToolLengthOffset.Cancel;
-            IJKMode = IJKMode.Incremental;
-            IsScaled = false;
-            Tool = 0;
-            Feedrate = 0d;
-            SelectedTool = null;
-            // end TODO
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
 
             foreach (int i in AxisFlags.All.ToIndices())
             {
@@ -166,7 +133,6 @@ namespace CNC.Core
             }
         }
 
-<<<<<<< HEAD
         public int Line { get; protected set; }
         public int CoordSystem {
             get {
@@ -179,8 +145,6 @@ namespace CNC.Core
         }
         public MotionMode MotionMode { get; protected set; }
         public FeedRateMode FeedRateMode { get; protected set; }
-=======
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         public DistanceMode DistanceMode
         {
             get { return isRelative ? DistanceMode.Incremental : DistanceMode.Absolute; }
@@ -192,10 +156,7 @@ namespace CNC.Core
         public CoolantState CoolantState { get; protected set; }
         public SpindleState SpindleState { get; protected set; }
         public ToolLengthOffset ToolLengthOffset { get; protected set; }
-<<<<<<< HEAD
         public bool SpindleRpmMode { get; protected set; }
-=======
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         public double SpindleRPM { get { return SpindleState == SpindleState.Off ? 0d : _rpm; } }
         public double Feedrate { get; protected set; }
         public int Tool {
@@ -207,7 +168,6 @@ namespace CNC.Core
                     SelectedTool = toolTable.Where(t => t.Code == _tool.ToString()).FirstOrDefault();
             }
         }
-<<<<<<< HEAD
         public bool RetractOldZ { get; protected set; }
         public Tool SelectedTool { get; protected set; }
         public bool IsImperial { get; protected set; }
@@ -251,25 +211,17 @@ namespace CNC.Core
 
             return G92Active;
         }
-=======
-        public Tool SelectedTool { get; protected set; }
-        public bool IsImperial { get; protected set; }
-        public bool IsScaled { get; protected set; }
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
 
         protected void setEndP(double[] values, AxisFlags axisFlags)
         {
             machinePos.Set(values, axisFlags, isRelative);
         }
 
-<<<<<<< HEAD
         public CoordinateSystem GetCoordSystem(int id)
         {
             return coordinateSystems[id];
         }
 
-=======
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         public bool SetCoordinateSystem(GCCoordinateSystem token)
         {
             var csys = coordinateSystems.Where(x => x.Code == token.Code).FirstOrDefault();
@@ -281,14 +233,11 @@ namespace CNC.Core
             return csys != null;
         }
 
-<<<<<<< HEAD
         public double GetToolOffset(int axis)
         {
             return toolOffsets[axis];
         }
 
-=======
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         public bool SetToolOffset(GCToolOffset token)
         {
             var tool = SelectedTool;

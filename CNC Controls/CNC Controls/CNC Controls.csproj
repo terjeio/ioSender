@@ -79,7 +79,6 @@
     <Compile Include="GCodeRotateDialog.xaml.cs">
       <DependentUpon>GCodeRotateDialog.xaml</DependentUpon>
     </Compile>
-<<<<<<< HEAD
     <Compile Include="GotoBaseControl.xaml.cs">
       <DependentUpon>GotoBaseControl.xaml</DependentUpon>
     </Compile>
@@ -89,11 +88,6 @@
     <Compile Include="GotoFlyoutControl.xaml.cs">
       <DependentUpon>GotoFlyoutControl.xaml</DependentUpon>
     </Compile>
-=======
-    <Compile Include="GotoControl.xaml.cs">
-      <DependentUpon>GotoControl.xaml</DependentUpon>
-    </Compile>
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
     <Compile Include="GrblConfigView.xaml.cs">
       <DependentUpon>GrblConfigView.xaml</DependentUpon>
     </Compile>
@@ -123,39 +117,26 @@
     <Compile Include="ICNCView.cs" />
     <Compile Include="IGCodeConverter.cs" />
     <Compile Include="IGCodeTransformer.cs" />
-<<<<<<< HEAD
     <Compile Include="ISidebarControl.cs" />
-=======
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
     <Compile Include="JobControl.xaml.cs">
       <DependentUpon>JobControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="GCode.cs" />
-<<<<<<< HEAD
     <Compile Include="JogBaseControl.xaml.cs">
       <DependentUpon>JogBaseControl.xaml</DependentUpon>
     </Compile>
-=======
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
     <Compile Include="JogConfigControl.xaml.cs">
       <DependentUpon>JogConfigControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="JogControl.xaml.cs">
       <DependentUpon>JogControl.xaml</DependentUpon>
     </Compile>
-<<<<<<< HEAD
     <Compile Include="JogFlyoutControl.xaml.cs">
       <DependentUpon>JogFlyoutControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="JogUiConfigControl.xaml.cs">
       <DependentUpon>JogUiConfigControl.xaml</DependentUpon>
     </Compile>
-=======
-    <Compile Include="JogUiConfigControl.xaml.cs">
-      <DependentUpon>JogUiConfigControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="KeypressHandler.cs" />
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
     <Compile Include="LEDControl.xaml.cs">
       <DependentUpon>LEDControl.xaml</DependentUpon>
     </Compile>
@@ -185,15 +166,12 @@
     <Compile Include="OriginControl.xaml.cs">
       <DependentUpon>OriginControl.xaml</DependentUpon>
     </Compile>
-<<<<<<< HEAD
     <Compile Include="OutlineBaseControl.xaml.cs">
       <DependentUpon>OutlineBaseControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="OutlineControl.xaml.cs">
       <DependentUpon>OutlineControl.xaml</DependentUpon>
     </Compile>
-=======
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
     <Compile Include="OutlineFlyout.xaml.cs">
       <DependentUpon>OutlineFlyout.xaml</DependentUpon>
     </Compile>
@@ -248,7 +226,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-<<<<<<< HEAD
     <Page Include="GotoBaseControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -269,8 +246,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-=======
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
     <Page Include="BasicConfigControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -393,7 +368,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-<<<<<<< HEAD
     <Page Include="OutlineBaseControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -402,8 +376,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-=======
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
     <Page Include="OutlineFlyout.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

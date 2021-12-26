@@ -5,7 +5,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:Controls="clr-namespace:CNC.Controls;assembly=CNC.Controls.WPF"
              xmlns:local="clr-namespace:CNC.Controls.Probing"
-<<<<<<< HEAD
              xmlns:system="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d" Height="370"
              d:DesignHeight="370" d:DesignWidth="500">
@@ -15,11 +14,6 @@
         <system:String x:Uid="str_edgeFinderInitFailed" x:Key="PositionUnknown">Probing failed, machine position not known.</system:String>
         <system:String x:Uid="str_edgeFinderFailed" x:Key="ProbingFailed">Probing failed</system:String>
         <system:String x:Uid="str_edgeFinderCompleted" x:Key="ProbingCompleted">Probing completed.</system:String>
-=======
-             mc:Ignorable="d" Height="370"
-             d:DesignHeight="370" d:DesignWidth="500">
-    <UserControl.Resources>
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         <Controls:LogicalNotConverter x:Key="IsNotRunningConverter" />
         <Controls:EnumValueToBooleanConverter x:Key="EnumToEdgeConverter" />
         <Controls:BoolToVisibleConverter x:Key="ToVisibleConverter" />

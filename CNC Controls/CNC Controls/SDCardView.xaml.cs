@@ -1,11 +1,7 @@
 /*
  * SDCardView.xaml.cs - part of CNC Controls library for Grbl
  *
-<<<<<<< HEAD
  * v0.36 / 2021-11-10 / Io Engineering (Terje Io)
-=======
- * v0.31 / 2021-04-27 / Io Engineering (Terje Io)
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
  *
  */
 
@@ -46,10 +42,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Threading;
-<<<<<<< HEAD
 using System.Net;
-=======
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
 using Microsoft.Win32;
 using CNC.Core;
 
@@ -81,11 +74,7 @@ namespace CNC.Controls
             if (activate)
             {
                 GrblSDCard.Load(DataContext as GrblViewModel);
-<<<<<<< HEAD
                 CanUpload = GrblInfo.UploadProtocol != string.Empty;
-=======
-                CanUpload = GrblInfo.YModemUpload;
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                 CanDelete = GrblInfo.Build >= 20210421;
                 CanRewind = GrblInfo.IsGrblHAL;
             }
@@ -151,7 +140,6 @@ namespace CNC.Controls
             RunFile();
         }
 
-<<<<<<< HEAD
         private void AddBlock(string data)
         {
             GCode.File.AddBlock(data);
@@ -271,42 +259,6 @@ namespace CNC.Controls
             model.Message = string.Format((string)FindResource("Transferring"), transferred, size);
         }
 
-=======
-        private void Upload_Click(object sender, RoutedEventArgs e)
-        {
-            string filename = string.Empty;
-            OpenFileDialog file = new OpenFileDialog();
-
-            file.Filter = string.Format("GCode files ({0})|{0}|Text files (*.txt)|*.txt|All files (*.*)|*.*", FileUtils.ExtensionsToFilter(GCode.FileTypes));
-
-            if (file.ShowDialog() == true)
-            {
-                filename = file.FileName;
-            }
-
-            if (filename != string.Empty)
-            {
-                GrblViewModel model = DataContext as GrblViewModel;
-
-                model.Message = "Uploading...";
-
-                YModem ymodem = new YModem();
-                ymodem.DataTransferred += Ymodem_DataTransferred;
-                bool ok = ymodem.Upload(filename);
-
-                model.Message = ok ? "Transfer done." : "Transfer aborted.";
-
-                GrblSDCard.Load(model);
-            }
-        }
-
-        private void Ymodem_DataTransferred(long size, long transferred)
-        {
-            GrblViewModel model = DataContext as GrblViewModel;
-            model.Message = string.Format("Transferred {0} of {1} bytes...", transferred, size);
-        }
-
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         private void Run_Click(object sender, RoutedEventArgs e)
         {
             RunFile();
@@ -314,11 +266,7 @@ namespace CNC.Controls
 
         private void Delete_Click(object sender, RoutedEventArgs e)
         {
-<<<<<<< HEAD
             if (MessageBox.Show(string.Format((string)FindResource("DeleteFile"), (string)currentFile["Name"]), "ioSender", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes) == MessageBoxResult.Yes)
-=======
-            if (MessageBox.Show(string.Format("Delete {0}?", (string)currentFile["Name"]), "SD Card", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes) == MessageBoxResult.Yes)
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
             {
                 Comms.com.WriteCommand(GrblConstants.CMD_SDCARD_UNLINK + (string)currentFile["Name"]);
                 GrblSDCard.Load(DataContext as GrblViewModel);
@@ -331,11 +279,7 @@ namespace CNC.Controls
             {
                 if ((bool)currentFile["Invalid"])
                 {
-<<<<<<< HEAD
                     MessageBox.Show(string.Format(((string)FindResource("IllegalName")).Replace("\\n", "\r\r"), (string)currentFile["Name"]), "ioSender",
-=======
-                    MessageBox.Show(string.Format("File: \"{0}\"\r\r!,?,~ and SPACE is not supported in filenames, please rename.", (string)currentFile["Name"]), "Unsupported characters in filename",
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                                      MessageBoxButton.OK, MessageBoxImage.Error);
                 }
                 else

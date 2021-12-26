@@ -3,31 +3,21 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-<<<<<<< HEAD
     xmlns:system="clr-namespace:System;assembly=mscorlib"
-=======
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
     xmlns:local="clr-namespace:CNC.Controls.Probing"
     xmlns:Controls="clr-namespace:CNC.Controls;assembly=CNC.Controls.WPF" x:Class="CNC.Controls.Probing.HeightMapControl"
     xmlns:helix="clr-namespace:HelixToolkit.Wpf;assembly=HelixToolkit.Wpf"
     mc:Ignorable="d" Height="370"
     d:DesignHeight="370" d:DesignWidth="600">
     <UserControl.Resources>
-<<<<<<< HEAD
         <system:String x:Uid="str_heightMapInstructions" x:Key="Instructions">A rapid motion to X0Y0 will be performed before probing the height map starts.\nEnsure the initial Z-position is clear of any obstacles that might be encountered during probing.</system:String>
         <system:String x:Uid="str_heightMapFailed" x:Key="ProbingFailed">Probing failed</system:String>
         <system:String x:Uid="str_heightMapCompleted" x:Key="ProbingCompleted">Probing completed: Z min: {0}, Z max: {1}.</system:String>
-=======
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         <Controls:LogicalNotConverter x:Key="IsNotRunningConverter" />
     </UserControl.Resources>
         <Grid>
         <StackPanel Margin="5,5,0,0" Width="250" HorizontalAlignment="Left" VerticalAlignment="Top">
-<<<<<<< HEAD
             <GroupBox x:Uid="grp_probeArea" Header="Area to probe" Height="Auto" HorizontalAlignment="Left" VerticalAlignment="Top">
-=======
-            <GroupBox Header="Area to probe" Height="Auto" HorizontalAlignment="Left" VerticalAlignment="Top">
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                 <StackPanel Margin="5,5,0,0">
                     <StackPanel Orientation="Horizontal">
                         <Controls:NumericField Label="X:" ColonAt="20" Value="{Binding Path=HeightMap.MinX, Mode=TwoWay}" Format="-###0.0##"/>
@@ -37,17 +27,10 @@
                         <Controls:NumericField Label="Y:" ColonAt="20" Value="{Binding Path=HeightMap.MinY, Mode=TwoWay}" Format="-###0.0##"/>
                         <Controls:NumericField x:Uid="lbl_height" Label="H:" ColonAt="25" Value="{Binding Path=HeightMap.Height, Mode=TwoWay}" Format="-###0.0##"/>
                     </StackPanel>
-<<<<<<< HEAD
                     <Button x:Uid="btn_fromLimits" Content="Set from program limits" IsEnabled="{Binding Path=Grbl.IsFileLoaded}" Margin="5,5,0,0" Padding="5,0" HorizontalAlignment="Left" VerticalAlignment="Top" Click="limits_Click"/>
                 </StackPanel>
             </GroupBox>
             <GroupBox x:Uid="grp_gridSize" Header="Gridsize">
-=======
-                    <Button x:Uid="btn_fromLimits" Content="Set from program limits" IsEnabled="{Binding Path=Grbl.IsFileLoaded}" Margin="5,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Click="limits_Click"/>
-                </StackPanel>
-            </GroupBox>
-            <GroupBox Header="Gridsize">
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="30"/>

@@ -1,11 +1,7 @@
 /*
  * AppConfigView.xaml.cs - part of CNC Controls library for Grbl
  *
-<<<<<<< HEAD
  * v0.36 / 2021-12-25 / Io Engineering (Terje Io)
-=======
- * v0.34 / 2021-07-26 / Io Engineering (Terje Io)
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
  *
  */
 /*
@@ -69,23 +65,14 @@ namespace CNC.Controls
             if(activate) foreach(var control in model.ConfigControls) // TODO: use callback!
             {
                 if (control is JogConfigControl) {
-<<<<<<< HEAD
                     if (GrblSettings.GetString(grblHALSetting.JogStepSpeed) != null)
                         control.Visibility = Visibility.Collapsed;
-=======
-                    if (GrblSettings.GetString(GrblSetting.JogStepSpeed) != null)
-                        control.Visibility = Visibility.Hidden;
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                     else
                         (control as JogConfigControl).IsGrbl = !GrblInfo.IsGrblHAL;
                 } else if (control is ICameraConfig && model.Camera != null && !model.Camera.HasCamera)
                     control.Visibility = Visibility.Collapsed;
             }
-<<<<<<< HEAD
             grblmodel.Message = activate ? (string)FindResource("RestartMessage") : string.Empty;
-=======
-            grblmodel.Message = activate ? "A restart is required after changing settings!" : string.Empty;
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         }
 
         public void CloseFile()
@@ -101,17 +88,11 @@ namespace CNC.Controls
                 DataContext = profile.Base;
                 xx.ItemsSource = model.ConfigControls;
                 model.ConfigControls.Add(new BasicConfigControl());
-<<<<<<< HEAD
                 if (AppConfig.Settings.Jog.Mode != JogConfig.JogMode.Keypad)
                     model.ConfigControls.Add(new JogUiConfigControl());
                 if (AppConfig.Settings.Jog.Mode != JogConfig.JogMode.UI)
                     model.ConfigControls.Add(new JogConfigControl());
                 model.ConfigControls.Add(new StripGCodeConfigControl());
-=======
-                model.ConfigControls.Add(new StripGCodeConfigControl());
-                model.ConfigControls.Add(new JogConfigControl());
-                model.ConfigControls.Add(new JogUiConfigControl());
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
             }
         }
 

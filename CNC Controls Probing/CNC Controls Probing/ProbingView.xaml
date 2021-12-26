@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-<<<<<<< HEAD
              xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:Controls="clr-namespace:CNC.Controls;assembly=CNC.Controls.WPF"
              xmlns:local="clr-namespace:CNC.Controls.Probing"
@@ -15,15 +14,6 @@
         <system:String x:Uid="str_runMacro" x:Key="RunMacro">Run {0} macro?</system:String>
         <system:String x:Uid="str_jogActive" x:Key="JogActive">Keyboard jogging active</system:String>
         <system:String x:Uid="str_jogDisabled" x:Key="JogDisabled">Keyboard jogging disabled</system:String>
-=======
-             xmlns:Controls="clr-namespace:CNC.Controls;assembly=CNC.Controls.WPF"
-             xmlns:local="clr-namespace:CNC.Controls.Probing"
-             mc:Ignorable="d" 
-             d:DesignHeight="515" d:DesignWidth="875"
-             Loaded="UserControl_Loaded"
-             SizeChanged="ProbingView_SizeChanged">
-    <UserControl.Resources>
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
         <Controls:EnumValueToBooleanConverter x:Key="EnumToEnabledConverter" />
         <Controls:LogicalNotConverter x:Key="IsNotRunningConverter" />
         <Controls:MultiLineConverter x:Key="ErrorMessageConverter" />
@@ -46,11 +36,7 @@
                     </Setter>
                 </Trigger>
                 <Trigger Property="Validation.HasError" Value="false">
-<<<<<<< HEAD
                     <Setter Property="ToolTip" Value="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Tooltip2}" />
-=======
-                    <Setter Property="ToolTip" Value="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Tag}" />
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                 </Trigger>
             </Style.Triggers>
         </Style>
@@ -90,50 +76,29 @@
                         <Controls:NumericField x:Uid="lbl_rapidsFeed" Label="Rapids feed rate:" ToolTip="Feed rate for rapid moves, set to 0 to use controller setting" Format="###0" Unit="mm/min" Value="{Binding Path=RapidsFeedRate, Mode=TwoWay}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
                         <Controls:NumericField x:Uid="lbl_searchFeed" Label="Search feed rate:" ToolTip="Feed rate for initial probing move" Unit="mm/min" Format="###0" Value="{Binding Path=ProbeFeedRate, Mode=TwoWay}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
                         <Controls:NumericField x:Uid="lbl_latchFeed" Label="Latch feed rate:" ToolTip="Feed rate for second slow probing move" Unit="mm/min" Format="###0" Value="{Binding Path=LatchFeedRate, Mode=TwoWay}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
-<<<<<<< HEAD
                         <Controls:NumericField x:Uid="lbl_probingDistance" Label="Probing distance:" Tooltip2="Max. distance for probing moves" Value="{Binding Path=ProbeDistance, Mode=TwoWay}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top" Style="{StaticResource ErrorStyle}"/>
                         <Controls:NumericField x:Uid="lbl_latchDistance" Label="Latch distance:" Tooltip2="Distance to retract for second slow probing move, set to 0 to skip" Value="{Binding Path=LatchDistance, Mode=TwoWay}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top" Style="{StaticResource ErrorStyle}"/>
-=======
-                        <Controls:NumericField x:Uid="lbl_probingDistance" Label="Probing distance:" Tag="Max. distance for probing moves" Value="{Binding Path=ProbeDistance, Mode=TwoWay}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top" Style="{StaticResource ErrorStyle}"/>
-                        <Controls:NumericField x:Uid="lbl_latchDistance" Label="Latch distance:" Tag="Distance to retract for second slow probing move, set to 0 to skip" Value="{Binding Path=LatchDistance, Mode=TwoWay}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top" Style="{StaticResource ErrorStyle}"/>
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                     </StackPanel>
                 </GroupBox>
                 <GroupBox x:Uid="grp_clearances" Header="Probing clearances">
                     <StackPanel Orientation="Vertical">
-<<<<<<< HEAD
                         <Controls:NumericField x:Uid="fld_xyClearance" Label="XY Clearance:" Tooltip2="Initial distance away from face to probe" Value="{Binding Path=XYClearance, Mode=TwoWay}" IsEnabled="{Binding Path=XYOffsetEnable}" ColonAt="102" HorizontalAlignment="Left" Margin="0,7,0,0" VerticalAlignment="Top" Style="{StaticResource ErrorStyle}"/>
                         <Controls:NumericField x:Uid="fld_offset" Label="Offset:" ToolTip="Distance from corner to probe" Value="{Binding Path=Offset, Mode=TwoWay}" IsEnabled="{Binding Path=OffsetEnable}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
                         <Controls:NumericField x:Uid="fld_depth" Label="Depth:" ToolTip="Z offset from current position where probing will take place" Value="{Binding Depth, Mode=TwoWay}" IsEnabled="{Binding XYOffsetEnable}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
-=======
-                        <Controls:NumericField x:Uid="fld_xyClearance" Label="XY Clearance:" Tag="Initial distance away from face to probe" Value="{Binding Path=XYClearance, Mode=TwoWay}" IsEnabled="{Binding Path=XYOffsetEnable}" ColonAt="102" HorizontalAlignment="Left" Margin="0,7,0,0" VerticalAlignment="Top" Style="{StaticResource ErrorStyle}"/>
-                        <Controls:NumericField x:Uid="fld_offset" Label="Offset:" ToolTip="Distance from corner to probe" Value="{Binding Path=Offset, Mode=TwoWay}" IsEnabled="{Binding Path=OffsetEnable}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
-                        <Controls:NumericField x:Uid="fld_depth" Label="Depth:" ToolTip="Z offset from current position where probing will take place" Value="{Binding Path=Depth, Mode=TwoWay}" IsEnabled="{Binding Path=XYOffsetEnable}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                     </StackPanel>
                 </GroupBox>
                 <GroupBox x:Uid="grp_prbeProperties" x:Name="probeProperties" Header="Probe XY offsets" Visibility="Collapsed" IsEnabled="{Binding Path=XYOffsetEnable}">
                     <StackPanel Orientation="Horizontal">
-<<<<<<< HEAD
                         <Controls:NumericField x:Uid="fld_probeOffsetX" Label="X:" ToolTip="X offset from probe to controlled point" Value="{Binding Path=ProbeOffsetX, Mode=TwoWay}" ColonAt="20" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
                         <Controls:NumericField x:Uid="fld_probeOffsetY" Label="Y:" ToolTip="Y offset from probe to controlled point" Value="{Binding Path=ProbeOffsetY, Mode=TwoWay}" ColonAt="20" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
-=======
-                        <Controls:NumericField Label="X:" ToolTip="X offset from probe to controlled point" Value="{Binding Path=ProbeOffsetX, Mode=TwoWay}" ColonAt="20" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
-                        <Controls:NumericField Label="Y:" ToolTip="Y offset from probe to controlled point" Value="{Binding Path=ProbeOffsetY, Mode=TwoWay}" ColonAt="20" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                     </StackPanel>
                 </GroupBox>
                 <Button x:Uid="btn_jog" x:Name="Jog" Content="Click to activate keyboard jogging" ToolTip="Ctrl+Shift to activate" Margin="0,5,0,6" Focusable="True" FocusVisualStyle="{x:Null}" GotFocus="Jog_FocusedChanged" LostFocus="Jog_FocusedChanged"/>
             </StackPanel>
             <TextBlock Text="{Binding Path=Position, Mode=OneWay}" TextWrapping="NoWrap" Height="25" Width="235" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
         </DockPanel>
-<<<<<<< HEAD
         <StackPanel DockPanel.Dock="Right" Margin="0,10,0,0" Width="635" HorizontalAlignment="Left" VerticalAlignment="Top">
             <TabControl x:Name="tab" HorizontalAlignment="Stretch" VerticalAlignment="Top" Width="Auto" Height="410" SelectionChanged="tab_SelectionChanged">
-=======
-        <StackPanel DockPanel.Dock="Right" Margin="0,10,0,0" Width="615" HorizontalAlignment="Left" VerticalAlignment="Top">
-            <TabControl x:Name="tab" HorizontalAlignment="Stretch" VerticalAlignment="Top" Width="Auto" Height="400" SelectionChanged="tab_SelectionChanged">
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
                 <TabItem x:Uid="tab_toolOffset" Header="Tool length offset">
                     <local:ToolLengthControl HorizontalAlignment="Left" VerticalAlignment="Top"/>
                 </TabItem>
