@@ -1,7 +1,7 @@
 /*
  * JobControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.36 / 2021-12-25 / Io Engineering (Terje Io)
+ * v0.36 / 2021-12-27 / Io Engineering (Terje Io)
  *
  */
 
@@ -383,7 +383,7 @@ namespace CNC.Controls
             {
                 int id = int.Parse(key.ToString().Substring(1));
                 var macro = AppConfig.Settings.Macros.FirstOrDefault(o => o.Id == id);
-                if (macro != null && MessageBox.Show(string.Format("Run {0} macro?", macro.Name), "Run macro", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                if (macro != null && (!macro.ConfirmOnExecute || MessageBox.Show(string.Format("Run {0} macro?", macro.Name), "Run macro", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes))
                 {
                     model.ExecuteCommand(macro.Code);
                     return true;

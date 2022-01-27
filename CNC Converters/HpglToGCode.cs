@@ -1,13 +1,13 @@
 ﻿/*
  * Hpgl2GCode.cs - part of CNC Converters library
  *
- * v0.16 / 2020-04-11 / Io Engineering (Terje Io)
+ * v0.16 / 2022-12-01 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020, Io Engineering (Terje Io)
+Copyright (c) 2020-2022, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -83,22 +83,101 @@ namespace CNC.Converters
             public int seq;
         }
 
-        private double scaleFix = 0.025d, tolerance = 0.03d;
+        private double scaleFix = 0.025d, tolerance = 0.001d;
         private List<HPGLCommand> commands = new List<HPGLCommand>();
+        private List<HPGLCommand> pm0 = new List<HPGLCommand>();
         private List<Vector> vectors = new List<Vector>();
         private List<Polygon> polygons = new List<Polygon>();
         private CNC.Controls.GCode job;
-        private bool isCut = false;
+        private bool isCut = false, inPolygon = false;
         private Point3D lastPos = new Point3D();
         private double lastFeedRate = 0d;
         private JobParametersViewModel settings = new JobParametersViewModel();
 
+        bool isDown = false;
+        Point3D offset = new Point3D(100000d, 100000d, 0d), pos = new Point3D();
+
         public string FileType { get { return "plt"; } }
+
+        private void toVectors (List<HPGLCommand> commands)
+        {
+            vectors.RemoveRange(0, vectors.Count);
+
+            for (int i = 0; i < commands.Count; i++)
+            {
+                var cmd = commands[i];
+
+                try
+                {
+                    switch (cmd.Command)
+                    {
+                        case "IN":
+                            pos.X = cmd.Pos.X = 0d;
+                            pos.Y = cmd.Pos.Y = 0d;
+                            isDown = cmd.isDown = false;
+                            break;
+
+                        case "PU":
+                            if (isDown)
+                            {
+                                cmd.Pos.X = pos.X;
+                                cmd.Pos.Y = pos.Y;
+                                isDown = false;
+                            }
+                            break;
+
+                        case "PD":
+                            if (!isDown)
+                            {
+                                cmd.Pos.X = pos.X;
+                                cmd.Pos.Y = pos.Y;
+                                isDown = true;
+                            }
+                            break;
+
+                        case "PA":
+                            cmd.Pos.X -= offset.X;
+                            cmd.Pos.Y -= offset.Y;
+                            if ((cmd.isDown = isDown))
+                            {
+                                var v = new Vector();
+                                v.IsArc = false;
+                                v.Start = pos;
+                                v.End.X = cmd.Pos.X;
+                                v.End.Y = cmd.Pos.Y;
+                                vectors.Add(v);
+                            }
+                            break;
+
+                        case "AA":
+                            {
+                                cmd.Pos.X = cmd.Pos.X - offset.X;
+                                cmd.Pos.Y = cmd.Pos.Y - offset.X;
+                                if ((cmd.isDown = isDown))
+                                {
+                                    var v = new Vector();
+                                    v.IsArc = true;
+                                    v.Start = pos;
+                                    v.End.X = cmd.Pos.X + (cmd.Pos.X - pos.X);
+                                    v.End.Y = cmd.Pos.Y + (cmd.Pos.Y - pos.Y);
+                                    vectors.Add(v);
+                                }
+                            }
+                            break;
+                    }
+                    pos.X = cmd.Pos.X;
+                    pos.Y = cmd.Pos.Y;
+                }
+                catch
+                {
+                }
+            }
+
+        }
 
         public bool LoadFile(CNC.Controls.GCode job, string filename)
         {
-            bool ok = true, isDown = false;
-            Point3D offset = new Point3D(100000d, 100000d, 0d), pos = new Point3D();
+            bool ok = true;
 
             this.job = job;
 
@@ -128,6 +207,25 @@ namespace CNC.Converters
                         {
                             switch (cmd.Substring(0, 2))
                             {
+                                case "PM":
+                                    if ((inPolygon = dbl.Parse(cmd.Substring(2)) == 0d))
+                                    {
+                                        pm0.Clear();
+                                        HPGLCommand hpgl = new HPGLCommand();
+                                        hpgl.Command = commands.Last().Command;
+                                        hpgl.Pos.X = commands.Last().Pos.X;
+                                        hpgl.Pos.Y = commands.Last().Pos.Y;
+                                        pm0.Add(hpgl);
+                                    }
+                                    else if (pm0.Count > 0)
+                                    {
+                                        Polygon polygon;
+                                        toVectors(pm0);
+                                        if ((polygon = Polygon.findPolygon(vectors, tolerance)) != null)
+                                            polygons.Add(polygon);
+                                    }
+                                    break;
+
                                 case "PT":
                                     scaleFix = 0.025d;
                                     break;
@@ -143,7 +241,10 @@ namespace CNC.Converters
                                             hpgl.Pos.Y = dbl.Parse(args[1]) * scaleFix;
                                             offset.X = Math.Min(offset.X, hpgl.Pos.X);
                                             offset.Y = Math.Min(offset.Y, hpgl.Pos.Y);
-                                            commands.Add(hpgl);
+                                            if(inPolygon)
+                                                pm0.Add(hpgl);
+                                            else
+                                                commands.Add(hpgl);
                                         }
                                     }
                                     break;
@@ -160,6 +261,24 @@ namespace CNC.Converters
                                             hpgl.R = dbl.Parse(args[2]) * scaleFix;
                                             offset.X = Math.Min(offset.X, hpgl.Pos.X);
                                             offset.Y = Math.Min(offset.Y, hpgl.Pos.Y);
+                                            if (inPolygon)
+                                                pm0.Add(hpgl);
+                                            else
+                                                commands.Add(hpgl);
+                                        }
+                                    }
+                                    break;
+
+                                case "PD": 
+                                case "PU":
+                                    {
+                                        HPGLCommand hpgl = new HPGLCommand();
+                                        hpgl.Command = cmd.Substring(0, 2);
+                                        if (inPolygon)
+                                            pm0.Add(hpgl);
+                                        else
+                                        {
+                                            isDown = hpgl.Command == "PD";
                                             commands.Add(hpgl);
                                         }
                                     }
@@ -289,7 +408,8 @@ namespace CNC.Converters
 
                 foreach (var polygon in polygons)
                 {
-                    polygon.Offset((isCut ? -settings.ToolDiameter : settings.ToolDiameter) / 2d);
+                    if(settings.ToolDiameter != 0d)
+                        polygon.Offset((isCut ? -settings.ToolDiameter : settings.ToolDiameter) / 2d);
                     cutPolygon(polygon);
                 }
 

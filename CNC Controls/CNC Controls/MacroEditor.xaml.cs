@@ -1,13 +1,13 @@
 /*
  * MacroEditor.xaml.cs - part of CNC Controls library
  *
- * v0.01 / 2020-01-27 / Io Engineering (Terje Io)
+ * v0.36 / 2021-12-27 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020, Io Engineering (Terje Io)
+Copyright (c) 2020-2021, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -72,11 +72,16 @@ namespace CNC.Controls
 
         void btnOk_Click(object sender, RoutedEventArgs e)
         {
-            if((DataContext as MacroData).Macro != null && (DataContext as MacroData).Code == string.Empty)
-                (DataContext as MacroData).Macros.Remove((DataContext as MacroData).Macro);
+            var macroData = DataContext as MacroData;
 
-            if ((DataContext as MacroData).Macro == null && (DataContext as MacroData).LastMacro != null)
-                (DataContext as MacroData).LastMacro.Name = cbxMacro.Text;
+            if (macroData.Macro != null && macroData.Code == string.Empty)
+                macroData.Macros.Remove(macroData.Macro);
+
+            if (macroData.Macro == null && macroData.LastMacro != null)
+            {
+                macroData.LastMacro.Name = cbxMacro.Text;
+                macroData.LastMacro.ConfirmOnExecute = macroData.ConfirmOnExecute;
+            }
 
             addMacro = null;
 
@@ -130,6 +135,7 @@ namespace CNC.Controls
                 }
                 CanAdd = _macro == null;
                 CanEdit = _macro != null;
+                ConfirmOnExecute = _macro == null || _macro.ConfirmOnExecute;
                 OnPropertyChanged();
             }
         }
@@ -149,6 +155,12 @@ namespace CNC.Controls
         {
             get { return _macro != null ; }
             set { OnPropertyChanged(); }
+        }
+
+        public bool ConfirmOnExecute
+        {
+            get { return _macro == null || _macro.ConfirmOnExecute; }
+            set { if (_macro != null) _macro.ConfirmOnExecute = value; OnPropertyChanged(); }
         }
 
         public string Code

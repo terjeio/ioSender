@@ -102,11 +102,11 @@
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
             </ItemsControl>
-            <cnccontrols:MacroExecuteControl x:Name="macroControl" Visibility="Hidden" Canvas.Right="22" Canvas.Top="0"/>
-            <cnccontrols:GotoFlyoutControl x:Name="gotoControl" Visibility="Hidden" Canvas.Right="22" Canvas.Top="75"/>
-            <cnccontrols:OutlineFlyout x:Name="outlineFlyout" Visibility="Hidden" Canvas.Right="22" Canvas.Top="150"/>
-            <cnccontrols:MachinePositionFlyout x:Name="mposFlyout" Visibility="Hidden" Canvas.Right="22" Canvas.Top="225"/>
-            <cnccontrols:THCMonitorControl x:Name="thcControl" Visibility="Hidden" Canvas.Right="22" Canvas.Top="300"/>
+            <cnccontrols:MacroExecuteControl x:Name="macroControl" Visibility="Hidden" Canvas.Right="22"/>
+            <cnccontrols:GotoFlyoutControl x:Name="gotoControl" Visibility="Hidden" Canvas.Right="22"/>
+            <cnccontrols:OutlineFlyout x:Name="outlineFlyout" Visibility="Hidden" Canvas.Right="22"/>
+            <cnccontrols:MachinePositionFlyout x:Name="mposFlyout" Visibility="Hidden" Canvas.Right="22"/>
+            <cnccontrols:THCMonitorControl x:Name="thcControl" Visibility="Hidden" Canvas.Right="22"/>
         </Canvas>
         <TabControl Background="#FFE5E5E5" DockPanel.Dock="Left" x:Name="tabMode" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Focusable="False" SelectionChanged="TabMode_SelectionChanged">
             <TabControl.Resources>

@@ -7,6 +7,7 @@ using CNC.GCode;
 using RP.Math;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CNC.Controls.Probing
 {
@@ -56,9 +57,10 @@ namespace CNC.Controls.Probing
                         {
                             var motion = token as GCLinearMotion;
 
-                            var m = new Line();
+                            var m = new Line(motion.AxisFlags);
                             m.Start = pos;
                             m.End = pos = ToAbsolute(pos, motion.Values, distanceMode == DistanceMode.Incremental);
+                            m.Rapid = token.Command == Commands.G0;
 
                             foreach (Motion subMotion in m.Split(segmentLength))
                             {
@@ -188,10 +190,21 @@ namespace CNC.Controls.Probing
     }
     class Line : Motion
     {
-        public bool Rapid;
+        public bool Rapid = false;
         // PositionValid[i] is true if the corresponding coordinate of the end position was defined in the file.
         // eg. for a file with "G0 Z15" as the first line, X and Y would still be false
         public bool[] PositionValid = new bool[] { false, false, false };
+
+        public Line()
+        {
+        }
+
+        public Line(AxisFlags axisFlags)
+        {
+            PositionValid[0] = axisFlags.HasFlag(AxisFlags.X);
+            PositionValid[1] = axisFlags.HasFlag(AxisFlags.Y);
+            PositionValid[2] = axisFlags.HasFlag(AxisFlags.Z);
+        }
 
         public override double Length
         {
@@ -208,11 +221,11 @@ namespace CNC.Controls.Probing
 
         public override IEnumerable<Motion> Split(double length)
         {
-            //if (Rapid || PositionValid.Any(isValid => !isValid))  //don't split up rapid or not fully defined motions
-            //{
-            //    yield return this;
-            //    yield break;
-            //}
+            if (Rapid /* || PositionValid.Any(isValid => !isValid)*/)  //don't split up rapid or not fully defined motions
+            {
+                yield return this;
+                yield break;
+            }
 
             int divisions = (int)Math.Ceiling(Length / length);
 

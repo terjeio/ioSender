@@ -10,7 +10,7 @@ Please check out the [Wiki](https://github.com/terjeio/Grbl-GCode-Sender/wiki) f
 
 ---
 
-Latest release is 2.0.35, see the [changelog](changelog.md) for details.
+Latest release is 2.0.36, see the [changelog](changelog.md) for details.
 
 ---
 
@@ -28,6 +28,11 @@ Main screen.
 ![3D view](Media/Sender2.png)
 
 3D view of program, with live update of tool marker.
+<br><br>
+
+![3D view](Media/Sender2_XL.png)
+
+XL version, German translation.
 <br><br>
 
 ![Jog flyout](Media/Sender7.png)
@@ -55,4 +60,4 @@ Lathe mode.
 Conversational programming for Lathe Mode. Threading requires [grblHAL](https://github.com/grblHAL) controller with driver that has spindle sync support.
 
 ---
-2021-10-26
+2022-01-27

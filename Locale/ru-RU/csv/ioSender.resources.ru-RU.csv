@@ -17,18 +17,6 @@ ioSender.g.en-US.resources:mainwindow.baml,str_mnuArcsToLines:System.String.$Con
 ioSender.g.en-US.resources:mainwindow.baml,str_mnuCompress:System.String.$Content,None,True,True,,Сжать (экспериментальная)
 ioSender.g.en-US.resources:mainwindow.baml,str_mnuDragKnife:System.String.$Content,None,True,True,,Добавить перемещение флюгерного ножа
 ioSender.g.en-US.resources:mainwindow.baml,str_mnuRotate:System.String.$Content,None,True,True,,Поворот
-ioSender.g.en-US.resources:jobview.baml,str_msgDoorExit:System.String.$Content,None,True,True,,Дверь не закрыта. Выйти?
-ioSender.g.en-US.resources:jobview.baml,str_msgDoorOpen:System.String.$Content,None,True,True,,Дверь открыта. Закрыть дверь и продолжить?
-ioSender.g.en-US.resources:jobview.baml,str_msgDoorPersist:System.String.$Content,None,True,True,,Состояние двери не сбрасывается коммандой &lt;Сброс&gt;
-ioSender.g.en-US.resources:jobview.baml,str_msgEStop:System.String.$Content,None,True,True,,E-Stop Ативен! - отключите перед продолжением...
-ioSender.g.en-US.resources:jobview.baml,str_msgEStopExit:System.String.$Content,None,True,True,,"E-Stop активен, выйти?"
-ioSender.g.en-US.resources:jobview.baml,str_msgHome:System.String.$Content,None,True,True,,"Необходимо базировать, &lt;База&gt; для продолжения"
-ioSender.g.en-US.resources:jobview.baml,str_msgNoComm:System.String.$Content,None,True,True,,"Контроллер в состоянии {0} и не отвечает, выполнить программый сброс?"
-ioSender.g.en-US.resources:jobview.baml,str_msgNoCommAlarm:System.String.$Content,None,True,True,,"Контроллер в состоянии не отвечает из-за аварии {0}, выполнияем программый сброс."
-ioSender.g.en-US.resources:jobview.baml,str_msgNoResponse:System.String.$Content,None,True,True,,Контроллер не отвечает!
-ioSender.g.en-US.resources:jobview.baml,str_msgResetExit:System.String.$Content,None,True,True,,Сбой программного сброса коньроллера. Выход.
-ioSender.g.en-US.resources:jobview.baml,str_msgResetFailed:System.String.$Content,None,True,True,,Сбой программного сброса коньроллера. Выход.
-ioSender.g.en-US.resources:jobview.baml,str_msgWait:System.String.$Content,None,True,True,,Ожидание контроллера ({0})...
 ioSender.g.en-US.resources:mainwindow.baml,str_runTime:System.String.$Content,None,True,True,,Времы выполнения: {0}
 ioSender.g.en-US.resources:mainwindow.baml,tab_3DView:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,3D Вид
 ioSender.g.en-US.resources:jobview.baml,tab_3DView:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,3D Вид

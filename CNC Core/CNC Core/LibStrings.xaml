@@ -2,7 +2,7 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:system="clr-namespace:System;assembly=mscorlib"
                     xmlns:local="clr-namespace:CNC.Core">
-    <system:String x:Uid="str_gcLoadError" x:Key="LoadError">Line: {0}\nBlock: {1}\n\nContinue loading?</system:String>
+    <system:String x:Uid="str_gcLoadError" x:Key="LoadError">{0}\nLine: {1}\nBlock: {2}\n\nContinue loading?</system:String>
     <system:String x:Uid="str_gcParserStrip" x:Key="ParserStrip">{0} command found, strip?</system:String>
     <system:String x:Uid="str_gcParserStripHdr" x:Key="ParserStripHdr">Strip command</system:String>
     <system:String x:Uid="str_gcParserBadExpr" x:Key="ParserBadExpr">Bad expression</system:String>

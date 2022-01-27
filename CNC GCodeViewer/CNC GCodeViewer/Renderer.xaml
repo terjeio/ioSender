@@ -25,7 +25,7 @@
                         Position="0,100,0" 
                         LookDirection="0,-100,0" 
                         UpDirection="0,1,0.5" 
-                        FieldOfView=".5">
+                        FieldOfView="1">
             </PerspectiveCamera>
         </helix:HelixViewport3D.Camera>
         <helix:DefaultLights/>

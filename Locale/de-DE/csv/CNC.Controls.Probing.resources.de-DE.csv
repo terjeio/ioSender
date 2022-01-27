@@ -32,8 +32,8 @@ CNC.Controls.Probing.g.en-US.resources:probingview.baml,fld_offset:CNC.Controls.
 CNC.Controls.Probing.g.en-US.resources:probingview.baml,fld_offset:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Distanz von der Kante zum Antasten
 CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,fld_passes:CNC.Controls.NumericField.Label,None,False,True,,Durchgänge:
 CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,fld_passes:CNC.Controls.NumericField.Unit,None,False,True,,
-CNC.Controls.Probing.g.en-US.resources:probingview.baml,fld_probeOffsetX:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,X Offset der Tastspitze vom Antastpunkt
 CNC.Controls.Probing.g.en-US.resources:probingview.baml,fld_probeOffsetX:CNC.Controls.NumericField.Label,None,False,True,,X:
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,fld_probeOffsetX:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,X Offset der Tastspitze vom Antastpunkt
 CNC.Controls.Probing.g.en-US.resources:probingview.baml,fld_probeOffsetY:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Y Offset der Tastspitze vom Antastpunkt
 CNC.Controls.Probing.g.en-US.resources:probingview.baml,fld_probeOffsetY:CNC.Controls.NumericField.Label,None,False,True,,Y:
 CNC.Controls.Probing.g.en-US.resources:probingview.baml,fld_touchPlate:CNC.Controls.NumericField.Label,None,False,True,,Tastplatte:

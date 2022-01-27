@@ -1,7 +1,7 @@
 /*
  * SidebarItem.cs - part of CNC Controls library for Grbl
  *
- * v0.36 / 2021-11-01 / Io Engineering (Terje Io)
+ * v0.36 / 2021-12-27 / Io Engineering (Terje Io)
  *
  */
 
@@ -45,6 +45,7 @@ namespace CNC.Controls
 {
     public class SidebarItem : Button
     {
+        private static double top = 0;
         private UserControl view { get; }
         private static UserControl last = null;
 
@@ -66,6 +67,9 @@ namespace CNC.Controls
             Width = 75;
             Height = 25;
             Focusable = false;
+
+            Canvas.SetTop(this.view, top);
+            top += Width;
 
             try
             {

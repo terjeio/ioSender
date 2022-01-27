@@ -46,6 +46,7 @@ CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,btn_unlock:System.Windows.
 CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,btn_unlock:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Strg+U
 CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,btn_upload:System.Windows.Controls.ContentControl.Content,Button,True,True,,Hochladen
 CNC.Controls.WPF.g.en-US.resources:drocontrol.baml,btn_zeroAll:System.Windows.Controls.ContentControl.Content,Button,True,True,,Alles Nullen
+CNC.Controls.WPF.g.en-US.resources:macroeditor.baml,chk_confirm:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Confirm before executing
 CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,dgr_sdcard:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,"Rechtsklick für Menü, Doppelklick zum Ausführen der Datei."
 CNC.Controls.WPF.g.en-US.resources:about.baml,dlg_about:System.Windows.Window.Title,Title,True,True,,Über
 CNC.Controls.WPF.g.en-US.resources:portdialog.baml,dlg_connection:System.Windows.Window.Title,Title,True,True,,Verbindung zum Sender
@@ -216,11 +217,24 @@ CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,str_illegalName:System.String
 CNC.Controls.WPF.g.en-US.resources:jogflyoutcontrol.baml,str_jogFlyout:System.String.$Content,None,True,True,,_Jog
 CNC.Controls.WPF.g.en-US.resources:macroexecutecontrol.baml,str_macrosFlyout:System.String.$Content,None,True,True,,_Macros
 CNC.Controls.WPF.g.en-US.resources:machinepositionflyout.baml,str_mposFlyout:System.String.$Content,None,True,True,,M_Pos
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgDoorExit:System.String.$Content,None,True,True,,"Tür noch geöffnet, beenden?"
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgDoorOpen:System.String.$Content,None,True,True,,"Tür geöffnet, schließen und Fortfahren?"
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgDoorPersist:System.String.$Content,None,True,True,,Tür Status kann nicht gelöscht werden mit &lt;Reset&gt;
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgEStop:System.String.$Content,None,True,True,,E-Stop aktiv! - löschen zu Fortfahren...
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgEStopExit:System.String.$Content,None,True,True,,"E-Stop noch aktiv, beenden?"
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgHome:System.String.$Content,None,True,True,,Referenzfahrt erforderlich &lt;Homen&gt; zum Fortfahren
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgNoComm:System.String.$Content,None,True,True,,"Steuerung in Zustand {0} und reagiert nicht, Neustart durchführen?"
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgNoCommAlarm:System.String.$Content,None,True,True,,"Steuerung reagiert nicht aufgrund Alarm {0}, Neustart wird durchgeführt."
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgNoResponse:System.String.$Content,None,True,True,,Steuerung reagiert nicht!
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgResetExit:System.String.$Content,None,True,True,,"Steuerung Neustart fehlgeschlagen, wird beendet."
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgResetFailed:System.String.$Content,None,True,True,,"Steuerung Neustart fehlgeschlagen, wird beendet."
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgWait:System.String.$Content,None,True,True,,Warte auf Steuerung ({0})...
 CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,str_notConnection:System.String.$Content,None,True,True,,No connection.
 CNC.Controls.WPF.g.en-US.resources:outlineflyout.baml,str_outlineFlyout:System.String.$Content,None,True,True,,_Umriss
 CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,str_pause:System.String.$Content,None,True,True,,Pause
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_rotateG17G18Arcs:System.String.$Content,None,True,True,,Im GCode enthaltene Kreise in XZ- oder YZ-Ebene (G18/19) können nicht umgewandelt werden. Verwenden Sie &apos;Kreisbogen zu Linien&apos; wenn Sie dies wirklich brauchen.
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_rotateRadiusArcs:System.String.$Content,None,True,True,,Im GCode enthaltene Kreise können nicht umgewandelt werden. Verwenden Sie &apos;Kreisbogen zu Linien&apos; wenn Sie dies wirklich brauchen.
+CNC.Controls.WPF.g.en-US.resources:macroexecutecontrol.baml,str_runMacro:System.String.$Content,None,True,True,,Run {0} macro?
 CNC.Controls.WPF.g.en-US.resources:macrotoolbarcontrol.baml,str_runMacro:System.String.$Content,None,True,True,,Macro {0} starten?
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_saveSettings:System.String.$Content,None,True,True,,"Einstellungen geändert, speichern?"
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsError:System.String.$Content,None,True,True,,"Einstellung {0} ergab {1}, weiter?"

@@ -1,13 +1,13 @@
 ﻿/*
  * GCodeJob.cs - part of CNC Controls library
  *
- * v0.36 / 2021-11-01 / Io Engineering (Terje Io)
+ * v0.36 / 2022-01-20 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2020, Io Engineering (Terje Io)
+Copyright (c) 2018-2022, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -135,7 +135,7 @@ namespace CNC.Core
                 }
                 catch (Exception e)
                 {
-                    if ((ok = MessageBox.Show(string.Format(LibStrings.FindResource("LoadError").Replace("\\n", "\r"), LineNumber, block), e.Message, MessageBoxButton.YesNo) == MessageBoxResult.Yes))
+                    if ((ok = MessageBox.Show(string.Format(LibStrings.FindResource("LoadError").Replace("\\n", "\r"), e.Message, LineNumber, block), "ioSender", MessageBoxButton.YesNo) == MessageBoxResult.Yes))
                         block = sr.ReadLine();
                     else
                         block = null;

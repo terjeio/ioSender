@@ -1,7 +1,7 @@
 ﻿/*
  * GCode.cs - part of CNC Controls library
  *
- * v0.20 / 2020-05-25 / Io Engineering (Terje Io)
+ * v0.36 / 2021-12-27 / Io Engineering (Terje Io)
  *
  */
 
@@ -397,6 +397,7 @@ namespace CNC.GCode
 
         public int Id { get;  set; }
         public string Name { get { return _name; } set { _name = value;  OnPropertyChanged(); } }
+        public bool ConfirmOnExecute { get; set; } = true;
         public string Code { get; set; }
     }
 

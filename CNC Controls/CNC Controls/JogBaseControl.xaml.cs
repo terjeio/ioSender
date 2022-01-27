@@ -1,13 +1,13 @@
 ﻿/*
  * JogBaseControl.xaml.cs - part of CNC Controls library
  *
- * v0.36 / 2021-12-26 / Io Engineering (Terje Io)
+ * v0.36 / 2022-01-10 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020-2021, Io Engineering (Terje Io)
+Copyright (c) 2020-2022, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -43,6 +43,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using CNC.Core;
+using CNC.GCode;
 
 namespace CNC.Controls
 {
@@ -52,12 +53,14 @@ namespace CNC.Controls
     public partial class JogBaseControl : UserControl
     {
         private string mode = "G21"; // Metric
-        private bool silent = false;
-        private int distance = 2, feedrate = 2;
+        private bool softLimits = false;
+        private int distance = 2, feedrate = 2, jogAxis = -1;
+        private double limitSwitchesClearance = .5d, position = 0d;
         private KeypressHandler keyboard;
         private static bool keyboardMappingsOk = false;
 
-        private const Key xplus = Key.H, xminus = Key.J, yplus = Key.K, yminus = Key.L, zplus = Key.I, zminus = Key.M;
+
+        private const Key xplus = Key.J, xminus = Key.H, yplus = Key.K, yminus = Key.L, zplus = Key.I, zminus = Key.M, aplus = Key.U, aminus = Key.N;
 
         public JogBaseControl()
         {
@@ -77,12 +80,17 @@ namespace CNC.Controls
             {
                 case nameof(JogViewModel.Distance):
                     if (AppConfig.Settings.Jog.Mode == JogConfig.JogMode.UI || (AppConfig.Settings.Jog.LinkStepJogToUI && JogData.StepSize != JogViewModel.JogStep.Step3))
-                    {
-                        silent = true;
                         (DataContext as GrblViewModel).JogStep = JogData.Distance;
-                        silent = false;
-                    }
                     break;
+            }
+        }
+
+        private void Model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(GrblViewModel.MachinePosition) || e.PropertyName == nameof(GrblViewModel.GrblState))
+            {
+                if ((sender as GrblViewModel).GrblState.State != GrblStates.Jog)
+                    jogAxis = -1;
             }
         }
 
@@ -91,13 +99,19 @@ namespace CNC.Controls
             if (DataContext is GrblViewModel)
             {
                 mode = GrblSettings.GetInteger(GrblSetting.ReportInches) == 0 ? "G21" : "G20";
-                JogData.SetMetric(mode == "G21");
+                softLimits = !(GrblInfo.IsGrblHAL && GrblSettings.GetInteger(grblHALSetting.SoftLimitJogging) == 1) && GrblSettings.GetInteger(GrblSetting.SoftLimitsEnable) == 1;
+                limitSwitchesClearance = GrblSettings.GetDouble(GrblSetting.HomingPulloff);
 
-                if (!GrblInfo.HasFirmwareJog || AppConfig.Settings.Jog.LinkStepJogToUI)
-                    JogData.PropertyChanged += JogData_PropertyChanged;
+                JogData.SetMetric(mode == "G21");
 
                 if (!keyboardMappingsOk)
                 {
+                    if (!GrblInfo.HasFirmwareJog || AppConfig.Settings.Jog.LinkStepJogToUI)
+                        JogData.PropertyChanged += JogData_PropertyChanged;
+
+                    if (softLimits)
+                        (DataContext as GrblViewModel).PropertyChanged += Model_PropertyChanged;
+
                     keyboard = (DataContext as GrblViewModel).Keyboard;
 
                     keyboardMappingsOk = true;
@@ -118,6 +132,10 @@ namespace CNC.Controls
                     keyboard.AddHandler(yminus, ModifierKeys.Control | ModifierKeys.Shift, normalKeyJog, false);
                     keyboard.AddHandler(zplus, ModifierKeys.Control | ModifierKeys.Shift, normalKeyJog, false);
                     keyboard.AddHandler(zminus, ModifierKeys.Control | ModifierKeys.Shift, normalKeyJog, false);
+                    if(GrblInfo.AxisFlags.HasFlag(AxisFlags.A)) {
+                        keyboard.AddHandler(aplus, ModifierKeys.Control | ModifierKeys.Shift, normalKeyJog, false);
+                        keyboard.AddHandler(aminus, ModifierKeys.Control | ModifierKeys.Shift, normalKeyJog, false);
+                    }
 
                     if (AppConfig.Settings.Jog.Mode != JogConfig.JogMode.Keypad)
                     {
@@ -252,6 +270,14 @@ namespace CNC.Controls
                 case yminus:
                     JogCommand(GrblInfo.LatheModeEnabled ? "X+" : "Y-");
                     break;
+
+                case aplus:
+                    JogCommand("A+");
+                    break;
+
+                case aminus:
+                    JogCommand("A-");
+                    break;
             }
 
             return true;
@@ -293,8 +319,63 @@ namespace CNC.Controls
 
         private void JogCommand(string cmd)
         {
-            cmd = cmd == "stop" ? ((char)GrblConstants.CMD_JOG_CANCEL).ToString() : string.Format("$J=G91{0}{1}{2}F{3}", mode, cmd.Replace("+", ""), JogData.Distance.ToInvariantString(), Math.Ceiling(JogData.FeedRate).ToInvariantString());
-            (DataContext as GrblViewModel).ExecuteCommand(cmd);
+            GrblViewModel model = DataContext as GrblViewModel;
+
+            if (cmd == "stop")
+                cmd = ((char)GrblConstants.CMD_JOG_CANCEL).ToString();
+
+            else {
+
+                var distance = cmd[1] == '-' ? -JogData.Distance : JogData.Distance;
+
+                if (softLimits)
+                {
+                    int axis = GrblInfo.AxisLetterToIndex(cmd[0]);
+
+                    if (jogAxis != -1 && axis != jogAxis)
+                        return;
+
+                    if (axis != jogAxis)
+                        position = distance + model.MachinePosition.Values[axis];
+                    else
+                        position += distance;
+
+                    if (GrblInfo.ForceSetOrigin)
+                    {
+                        if (!GrblInfo.HomingDirection.HasFlag(GrblInfo.AxisIndexToFlag(axis)))
+                        {
+                            if (position > 0d)
+                                position = 0d;
+                            else if (position < (-GrblInfo.MaxTravel.Values[axis] + limitSwitchesClearance))
+                                position = (-GrblInfo.MaxTravel.Values[axis] + limitSwitchesClearance);
+                        }
+                        else
+                        {
+                            if (position < 0d)
+                                position = 0d;
+                            else if (position > (GrblInfo.MaxTravel.Values[axis] - limitSwitchesClearance))
+                                position = GrblInfo.MaxTravel.Values[axis] - limitSwitchesClearance;
+                        }
+                    }
+                    else
+                    {
+                        if (position > -limitSwitchesClearance)
+                            position = -limitSwitchesClearance;
+                        else if (position < -(GrblInfo.MaxTravel.Values[axis] - limitSwitchesClearance))
+                            position = -(GrblInfo.MaxTravel.Values[axis] - limitSwitchesClearance);
+                    }
+
+                    if (position == 0d)
+                        return;
+
+                    jogAxis = axis;
+
+                    cmd = string.Format("$J=G53{0}{1}{2}F{3}", mode, cmd.Substring(0, 1), position.ToInvariantString(), Math.Ceiling(JogData.FeedRate).ToInvariantString());
+                } else
+                    cmd = string.Format("$J=G91{0}{1}{2}F{3}", mode, cmd.Substring(0, 1), distance.ToInvariantString(), Math.Ceiling(JogData.FeedRate).ToInvariantString());
+            }
+
+            model.ExecuteCommand(cmd);
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)

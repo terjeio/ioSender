@@ -1,13 +1,13 @@
 ﻿/*
  * Program.cs - part of CNC Probing library
  *
- * v0.36 / 2021-11-29 / Io Engineering (Terje Io)
+ * v0.36 / 2022-01-09 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020, Io Engineering (Terje Io)
+Copyright (c) 2020-2022, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -466,7 +466,8 @@ namespace CNC.Controls.Probing
 
         private void ResponseReceived(string response)
         {
-            cmd_response = response;
+            if(cmd_response != "cancel")
+                cmd_response = response;
         }
 
         public override string ToString()

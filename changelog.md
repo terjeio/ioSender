@@ -2,15 +2,20 @@
 
 Executable for development builds available for download [here](http://www.io-engineering.com/downloads/) if you want to participate in testing.
 
+2022-01-27:
+
+* Fixed nasty bug where crazy motions could happen if a probing sequence was stopped before completion.
+* Improved support for legacy Grbl controllers.
+* Added keyboard jogging for A-axis when enabled. 
+* Added keyboard jogging commands that uses settings from the UI jog panel for speed and distance. Intended for joypad use.
+* Added buttons for controlling 3D-view modes and for saving/restoring current view.
+
 ---
 
-<<<<<<< HEAD
 2021-21-26: Release candidate for build 36, changelog will be added later.
 
 ---
 
-=======
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
 2021-10-26: [Release 2.0.35](https://github.com/terjeio/Grbl-GCode-Sender/releases/tag/2.0.35).
 
 * Added support for localization \(translation\) see the [Wiki](https://github.com/terjeio/ioSender/wiki/Localization) for details.

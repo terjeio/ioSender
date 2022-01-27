@@ -30,6 +30,7 @@ SOFTWARE.
     Changes by Terje Io for GCode Sender
 
     2020-09-20 : Added constructor for separate X and Y grid sizes
+    2022-01-23 : Added check for rapid motions and motion validity
 
 */
 

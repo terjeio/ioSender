@@ -3,7 +3,7 @@ CNC.Core.g.en-US.resources:libstrings.baml,str_contHome:System.String.$Content,N
 CNC.Core.g.en-US.resources:libstrings.baml,str_contHomeUnlock:System.String.$Content,None,True,True,,&lt;Home&gt; or &lt;Unlock&gt; to continue
 CNC.Core.g.en-US.resources:libstrings.baml,str_contResetUnlock:System.String.$Content,None,True,True,,&lt;Reset&gt; then &lt;Unlock&gt; to continue
 CNC.Core.g.en-US.resources:libstrings.baml,str_contUnlock:System.String.$Content,None,True,True,,&lt;Unlock&gt; to continue
-CNC.Core.g.en-US.resources:libstrings.baml,str_gcLoadError:System.String.$Content,None,True,True,,Line: {0}\\nBlock: {1}\\n\\nContinue loading?
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcLoadError:System.String.$Content,None,True,True,,{0}\\nLine: {1}\\nBlock: {2}\\n\\nContinue loading?
 CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserAxisError:System.String.$Content,None,True,True,,Axis command conflict
 CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserBadExpr:System.String.$Content,None,True,True,,Bad expression
 CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserCMDInvalid:System.String.$Content,None,True,True,,Invalid GCode

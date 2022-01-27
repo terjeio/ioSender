@@ -1,7 +1,7 @@
 ﻿/*
  * MacroExecuteControl.xaml.cs - part of CNC Controls library
  *
- * v0.36 / 2021-11-05 / Io Engineering (Terje Io)
+ * v0.36 / 2021-12-27 / Io Engineering (Terje Io)
  *
  */
 
@@ -70,7 +70,7 @@ namespace CNC.Controls
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             var macro = Macros.FirstOrDefault(o => o.Id == (int)(sender as Button).Tag);
-            if (macro != null && MessageBox.Show(string.Format((string)FindResource("RunMacro"), macro.Name), "ioSender", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            if (macro != null && (!macro.ConfirmOnExecute || MessageBox.Show(string.Format((string)FindResource("RunMacro"), macro.Name), "ioSender", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes))
                 (DataContext as GrblViewModel).ExecuteMacro(macro.Code);
         }
     }

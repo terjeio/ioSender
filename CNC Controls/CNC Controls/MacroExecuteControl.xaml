@@ -10,6 +10,7 @@
              Loaded="macroExecuteControl_Loaded">
     <UserControl.Resources>
         <system:String x:Uid="str_macrosFlyout" x:Key="MenuLabel">_Macros</system:String>
+        <system:String x:Uid="str_runMacro" x:Key="RunMacro">Run {0} macro?</system:String>
         <Style x:Key="SmallXButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="Template">

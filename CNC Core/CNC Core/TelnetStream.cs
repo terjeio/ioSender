@@ -1,7 +1,7 @@
 /*
  * TelnetStream.cs - part of CNC Controls library
  *
- * v0.33 / 2021-05-16 / Io Engineering (Terje Io)
+ * v0.36 / 2021-12-30 / Io Engineering (Terje Io)
  *
  */
 
@@ -125,18 +125,18 @@ namespace CNC.Core
 
         public void WriteByte(byte data)
         {
-            ipstream.Write(new byte[1] { data }, 0, 1);
+            ipstream.WriteAsync(new byte[1] { data }, 0, 1);
         }
 
         public void WriteBytes(byte[] bytes, int len)
         {
-            ipstream.Write(bytes, 0, len);
+            ipstream.WriteAsync(bytes, 0, len);
         }
 
         public void WriteString(string data)
         {
             byte[] bytes = Encoding.Default.GetBytes(data);
-            ipstream.Write(bytes, 0, bytes.Length);
+            ipstream.WriteAsync(bytes, 0, bytes.Length);
         }
 
         public void WriteCommand(string command)

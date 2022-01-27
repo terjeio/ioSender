@@ -13,6 +13,18 @@
     <system:String x:Uid="str_validateMin" x:Key="ValAllowedMin">Invalid input: minimum allowed value is {0}.</system:String>
     <system:String x:Uid="str_validateMax" x:Key="ValAllowedMax">Invalid input: maximum allowed value is {0}.</system:String>
     <system:String x:Uid="str_validateNotIP4" x:Key="ValNotIPV4">Invalid input: not an IP4 address..</system:String>
+    <system:String x:Uid="str_msgWait" x:Key="MsgWaiting">Waiting for controller ({0})...</system:String>
+    <system:String x:Uid="str_msgNoCommAlarm" x:Key="MsgNoCommAlarm">Controller is not able to communicate due to alarm {0}, attempting a soft reset.</system:String>
+    <system:String x:Uid="str_msgResetFailed" x:Key="MsgResetFailed">Controller soft reset failed, exiting.</system:String>
+    <system:String x:Uid="str_msgEStop" x:Key="MsgEStop">E-Stop active! - clear before continuing...</system:String>
+    <system:String x:Uid="str_msgEStopExit" x:Key="MsgEStopExit">E-Stop still active, exit?</system:String>
+    <system:String x:Uid="str_msgHome" x:Key="MsgHome">Homing cycle required, &lt;Home&gt; to continue</system:String>
+    <system:String x:Uid="str_msgDoorOpen" x:Key="MsgDoorOpen">Door is open, close door and continue?</system:String>
+    <system:String x:Uid="str_msgDoorExit" x:Key="MsgDoorExit">Door is still open, exit?</system:String>
+    <system:String x:Uid="str_msgDoorPersist" x:Key="MsgDoorPersist">Door state cannot be cleared with &lt;Reset&gt;</system:String>
+    <system:String x:Uid="str_msgNoComm" x:Key="MsgNoComm">Controller is in {0} state and cannot respond, try a soft reset?</system:String>
+    <system:String x:Uid="str_msgResetExit" x:Key="MsgResetExit">Controller soft reset failed, exiting.</system:String>
+    <system:String x:Uid="str_msgNoResponse" x:Key="MsgNoResponse">Controller is not responding!</system:String>
     <system:String x:Uid="str_grblStateUnknown" x:Key="StateUnknown">UNKNOWN</system:String>
     <system:String x:Uid="str_grblStateIdle" x:Key="StateIdle">IDLE</system:String>
     <system:String x:Uid="str_grblStateRun" x:Key="StateRun">RUN</system:String>

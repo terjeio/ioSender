@@ -1,13 +1,13 @@
 ﻿/*
  * Grbl.cs - part of CNC Controls library
  *
- * v0.36 / 2021-12-17 / Io Engineering (Terje Io)
+ * v0.36 / 2022-01-20 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2021, Io Engineering (Terje Io)
+Copyright (c) 2018-2022, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -249,6 +249,7 @@ namespace CNC.Core
         StepperDeenergizeMask = 37,
         SpindlePPR = 38,
         EnableLegacyRTCommands = 39,
+        SoftLimitJogging = 40,
         HomingLocateCycles = 43,
         HomingCycle_1 = 44,
         HomingCycle_2 = 45,
@@ -935,9 +936,36 @@ namespace CNC.Core
             if(!Resources.IsLegacyController)
                 IsGrblHAL = IsGrblHAL || Firmware == "grblHAL";
 
-            model.Keyboard.IsContinuousJogggingEnabled = IsGrblHAL;
+            return res == true;
+        }
+
+        internal static void OnSettingsLoaded (GrblViewModel model)
+        {
+            model.IsMetric = GrblSettings.GetInteger(GrblSetting.ReportInches) != 1;
+            model.Keyboard.IsContinuousJoggingEnabled = IsGrblHAL;
             model.Keyboard.SoftLimits = GrblSettings.GetInteger(GrblSetting.SoftLimitsEnable) == 1;
             model.Keyboard.LimitSwitchesClearance = GrblSettings.GetDouble(GrblSetting.HomingPulloff);
+            model.GrblState = model.GrblState; // Temporary hack to enable the Home button when homing is enabled
+
+            HomingDirection = (AxisFlags)GrblSettings.GetInteger(GrblSetting.HomingDirMask);
+
+            if (AxisFlags == AxisFlags.None)
+            {
+                int i = 0;
+                double stepsmm;
+                do
+                {
+                    stepsmm = GrblSettings.GetDouble(GrblSetting.TravelResolutionBase + i);
+                    TravelResolution.Values[i++] = 1d / stepsmm;
+                    MaxTravel.Values[i++] = GrblSettings.GetDouble(GrblSetting.MaxTravelBase + i); ;
+                } while (!double.IsNaN(stepsmm) && i < TravelResolution.Values.Length);
+            }
+            else foreach (int i in AxisFlags.ToIndices())
+            {
+                TravelResolution.Values[i] = 1d / GrblSettings.GetDouble(GrblSetting.TravelResolutionBase + i);
+                MaxTravel.Values[i] = GrblSettings.GetDouble(GrblSetting.MaxTravelBase + i);
+            }
+
             if (HasFirmwareJog)
             {
                 double val;
@@ -954,8 +982,6 @@ namespace CNC.Core
                 if (!(val = GrblSettings.GetDouble(grblHALSetting.JogFastSpeed)).Equals(double.NaN))
                     model.Keyboard.JogFeedrates[(int)KeypressHandler.JogMode.Fast] = val;
             }
-
-            return res == true;
         }
 
         public static bool Get()
@@ -2439,27 +2465,7 @@ namespace CNC.Core
             if(!GrblInfo.IsGrblHAL)
                 ReportProbeCoordinates = true;
 
-            model.IsMetric = GetInteger(GrblSetting.ReportInches) != 1;
-
-            model.GrblState = model.GrblState; // Temporary hack to enable the Home button when homing is enabled
-
-            GrblInfo.HomingDirection = (AxisFlags)GetInteger(GrblSetting.HomingDirMask);
-
-            if (GrblInfo.AxisFlags == AxisFlags.None)
-            {
-                int i = 0;
-                double stepsmm;
-                do
-                {
-                    stepsmm = GetDouble(GrblSetting.TravelResolutionBase + i);
-                    GrblInfo.TravelResolution.Values[i++] = 1d / stepsmm;
-                    GrblInfo.MaxTravel.Values[i++] = GetDouble(GrblSetting.MaxTravelBase + i); ;
-                } while (!double.IsNaN(stepsmm) && i < GrblInfo.TravelResolution.Values.Length);
-            }
-            else foreach (int i in GrblInfo.AxisFlags.ToIndices()) {
-                GrblInfo.TravelResolution.Values[i] = 1d / GetDouble(GrblSetting.TravelResolutionBase + i);
-                GrblInfo.MaxTravel.Values[i] = GetDouble(GrblSetting.MaxTravelBase + i);
-            }
+            GrblInfo.OnSettingsLoaded(model);
 
             return IsLoaded;
         }

@@ -1,13 +1,13 @@
 ﻿/*
  * AppConfig.cs - part of CNC Controls library
  *
- * v0.36 / 2021-12-25 / Io Engineering (Terje Io)
+ * v0.36 / 2022-01-23 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2021, Io Engineering (Terje Io)
+Copyright (c) 2019-2022, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -542,6 +542,219 @@ namespace CNC.Controls
         private string GetArg(string[] args, int i)
         {
             return i < args.GetLength(0) ? args[i] : null;
+        }
+    }
+
+    public class Controller
+    {
+        GrblViewModel model;
+
+        public enum RestartResult
+        {
+            Ok = 0,
+            NoResponse,
+            Close,
+            Exit
+        }
+
+        public Controller (GrblViewModel model)
+        {
+            this.model = model;
+        }
+
+        public bool ResetPending { get; private set; } = false;
+        public string Message { get; private set; }
+
+        public RestartResult Restart ()
+        {
+            Message = model.Message;
+            model.Message = string.Format(LibStrings.FindResource("MsgWaiting"), AppConfig.Settings.Base.PortParams);
+
+            string response = GrblInfo.Startup(model);
+
+            if (response.StartsWith("<"))
+            {
+                if (model.GrblState.State != GrblStates.Unknown)
+                {
+
+                    switch (model.GrblState.State)
+                    {
+                        case GrblStates.Alarm:
+
+                            model.Poller.SetState(AppConfig.Settings.Base.PollInterval);
+
+                            switch (model.GrblState.Substate)
+                            {
+                                case 1: // Hard limits
+                                    if (!GrblInfo.IsLoaded)
+                                    {
+                                        if (model.LimitTriggered)
+                                        {
+                                            MessageBox.Show(string.Format(LibStrings.FindResource("MsgNoCommAlarm"), model.GrblState.Substate.ToString()), "ioSender");
+                                            if (AttemptReset())
+                                                model.ExecuteCommand(GrblConstants.CMD_UNLOCK);
+                                            else
+                                            {
+                                                MessageBox.Show(LibStrings.FindResource("MsgResetFailed"), "ioSender");
+                                                return RestartResult.Close;
+                                            }
+                                        }
+                                        else if (AttemptReset())
+                                            model.ExecuteCommand(GrblConstants.CMD_UNLOCK);
+                                    }
+                                    else
+                                        response = string.Empty;
+                                    break;
+
+                                case 2: // Soft limits
+                                    if (!GrblInfo.IsLoaded)
+                                    {
+                                        MessageBox.Show(string.Format(LibStrings.FindResource("MsgNoCommAlarm"), model.GrblState.Substate.ToString()), "ioSender");
+                                        if (AttemptReset())
+                                            model.ExecuteCommand(GrblConstants.CMD_UNLOCK);
+                                        else
+                                        {
+                                            MessageBox.Show(LibStrings.FindResource("MsgResetFailed"), "ioSender");
+                                            return RestartResult.Close;
+                                        }
+                                    }
+                                    else
+                                        response = string.Empty;
+                                    break;
+
+                                case 10: // EStop
+                                    if (GrblInfo.IsGrblHAL && model.Signals.Value.HasFlag(Signals.EStop))
+                                    {
+                                        MessageBox.Show(LibStrings.FindResource("MsgEStop"), "ioSender", MessageBoxButton.OK, MessageBoxImage.Warning);
+                                        while (!AttemptReset() && model.GrblState.State == GrblStates.Alarm)
+                                        {
+                                            if (MessageBox.Show(LibStrings.FindResource("MsgEStopExit"), "ioSender", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                                                return RestartResult.Close;
+                                        };
+                                    }
+                                    else
+                                        AttemptReset();
+                                    if (!GrblInfo.IsLoaded)
+                                        model.ExecuteCommand(GrblConstants.CMD_UNLOCK);
+                                    break;
+
+                                case 11: // Homing required
+                                    if (GrblInfo.IsLoaded)
+                                        response = string.Empty;
+                                    else
+                                        Message = LibStrings.FindResource("MsgHome");
+                                    break;
+                            }
+                            break;
+
+                        case GrblStates.Tool:
+                            Comms.com.WriteByte(GrblConstants.CMD_STOP);
+                            break;
+
+                        case GrblStates.Door:
+                            if (!GrblInfo.IsLoaded)
+                            {
+                                if (MessageBox.Show(LibStrings.FindResource("MsgDoorOpen"), "ioSender", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+                                    return RestartResult.Close;
+                                else
+                                {
+                                    bool exit = false;
+                                    do
+                                    {
+                                        Comms.com.PurgeQueue();
+
+                                        bool? res = null;
+                                        CancellationToken cancellationToken = new CancellationToken();
+
+                                        new Thread(() =>
+                                        {
+                                            res = WaitFor.SingleEvent<string>(
+                                                cancellationToken,
+                                                s => TrapReset(s),
+                                                a => model.OnGrblReset += a,
+                                                a => model.OnGrblReset -= a,
+                                                200, () => Comms.com.WriteByte(GrblConstants.CMD_STATUS_REPORT));
+                                        }).Start();
+
+                                        while (res == null)
+                                            EventUtils.DoEvents();
+
+                                        if (!(exit = !model.Signals.Value.HasFlag(Signals.SafetyDoor)))
+                                        {
+                                            if (MessageBox.Show(LibStrings.FindResource("MsgDoorExit"), "ioSender", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                                            {
+                                                exit = true;
+                                                return RestartResult.Close;
+                                            }
+                                        }
+                                    } while (!exit);
+                                }
+                            }
+                            else
+                            {
+                                MessageBox.Show(LibStrings.FindResource("MsgDoorPersist"), "ioSender", MessageBoxButton.YesNo, MessageBoxImage.Exclamation);
+                                response = string.Empty;
+                            }
+                            break;
+
+                        case GrblStates.Hold:
+                        case GrblStates.Sleep:
+                            if (MessageBox.Show(string.Format(LibStrings.FindResource("MsgNoComm"), model.GrblState.State.ToString()),
+                                                    "ioSender", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+                                return RestartResult.Close;
+                            else if (!AttemptReset())
+                            {
+                                MessageBox.Show(LibStrings.FindResource("MsgResetExit"), "ioSender");
+                                return RestartResult.Close;
+                            }
+                            break;
+
+                        case GrblStates.Idle:
+                            if (response.Contains("|SD:Pending"))
+                                AttemptReset();
+                            break;
+                    }
+                }
+            }
+            else
+            {
+                MessageBox.Show(response == string.Empty
+                                    ? "No respone received from controller, exiting."
+                                    : string.Format("Unexpected response received from controller: \"{0}\", exiting.", response),
+                                    "ioSender", MessageBoxButton.OK, MessageBoxImage.Stop);
+                return RestartResult.Exit;
+            }
+
+            return response == string.Empty ? RestartResult.NoResponse : RestartResult.Ok;
+        }
+
+        private void TrapReset(string rws)
+        {
+            ResetPending = false;
+        }
+
+        private bool AttemptReset()
+        {
+            ResetPending = true;
+            Comms.com.PurgeQueue();
+
+            bool? res = null;
+            CancellationToken cancellationToken = new CancellationToken();
+
+            new Thread(() =>
+            {
+                res = WaitFor.SingleEvent<string>(
+                    cancellationToken,
+                    s => TrapReset(s),
+                    a => model.OnGrblReset += a,
+                    a => model.OnGrblReset -= a,
+                    AppConfig.Settings.Base.ResetDelay, () => Comms.com.WriteByte(GrblConstants.CMD_RESET));
+            }).Start();
+
+            while (res == null)
+                EventUtils.DoEvents();
+
+            return !ResetPending;
         }
     }
 }

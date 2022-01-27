@@ -12,7 +12,7 @@ using System.Windows;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Io Engineering")]
 [assembly: AssemblyProduct("CNC Controls")]
-[assembly: AssemblyCopyright("Copyright ©  2021 Io Engineering")]
+[assembly: AssemblyCopyright("Copyright © 2022 Io Engineering")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: NeutralResourcesLanguage("en-US", UltimateResourceFallbackLocation.Satellite)]

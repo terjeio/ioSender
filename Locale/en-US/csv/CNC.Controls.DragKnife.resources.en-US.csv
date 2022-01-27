@@ -1,7 +1,6 @@
 ﻿CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,btn_cancel:System.Windows.Controls.ContentControl.Content,Button,True,True,,Cancel
 CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,btn_ok:System.Windows.Controls.ContentControl.Content,Button,True,True,,Ok
 CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,dlg_dragKnife:System.Windows.Window.Title,Title,True,True,,Drag knife parameters
-<<<<<<< HEAD
 CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,fld_cutDepth:CNC.Controls.NumericField.Label,None,False,True,,Cut depth:
 CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,fld_cutDepth:CNC.Controls.NumericField.Unit,None,False,True,,mm
 CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,fld_dentLength:CNC.Controls.NumericField.Unit,None,False,True,,mm
@@ -14,8 +13,6 @@ CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,fld_swivelAngle:CN
 CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,fld_swivelAngle:CNC.Controls.NumericField.Unit,None,False,True,,deg
 CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,fld_tipOffset:CNC.Controls.NumericField.Unit,None,False,True,,mm
 CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,fld_tipOffset:CNC.Controls.NumericField.Label,None,False,True,,Tip offset:
-=======
->>>>>>> 19fdd92047b4cf80b9621a803d965739e89ec2a6
 CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,grp_knife:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Knife
 CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,grp_retract:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Retract
 CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,lbl_retractEnable:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Retract enable

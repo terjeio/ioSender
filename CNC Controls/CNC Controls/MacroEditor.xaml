@@ -3,17 +3,25 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:system="clr-namespace:System;assembly=mscorlib"
         xmlns:local="clr-namespace:CNC.Controls"
         mc:Ignorable="d"
         x:Uid="dlg_macroEditor"
-        Title="Macro Editor" Height="260" Width="310" Icon="App.ico" ResizeMode="NoResize" ShowInTaskbar="False"
+        Title="Macro Editor" Height="275" Width="310" Icon="App.ico" ResizeMode="NoResize" ShowInTaskbar="False"
         WindowStartupLocation="CenterOwner"
         Loaded="Window_Loaded" Closing="Window_Closing">
     <Grid Background="#FFE5E5E5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40*"/>
+            <RowDefinition Height="25*"/>
+            <RowDefinition Height="185*"/>
+            <RowDefinition Height="46*"/>
+        </Grid.RowDefinitions>
         <ComboBox x:Name="cbxMacro" IsEditable="True" ItemsSource="{Binding Path=Macros}" DisplayMemberPath="Name" SelectedValuePath="Id" SelectedItem="{Binding Path=Macro, Mode=TwoWay}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="150"/>
         <Button x:Uid="btn_add" Content="Add" IsEnabled="{Binding Path=CanAdd}" HorizontalAlignment="Left" Margin="170,10,0,0" VerticalAlignment="Top" Width="45" Click="btnAdd_Click"/>
-        <TextBox x:Name="textBox" IsEnabled="{Binding Path=CanEdit}" AcceptsReturn="True" HorizontalAlignment="Left" Height="145" Margin="10,37,0,0" TextWrapping="Wrap" Text="{Binding Path=Code, Mode=TwoWay}" VerticalAlignment="Top" Width="272"/>
-        <Button x:Uid="btn_ok" Content="Ok" HorizontalAlignment="Left" Margin="55,187,0,0" VerticalAlignment="Top" Width="75" Click="btnOk_Click"/>
-        <Button x:Uid="btn_cancel" Content="Cancel" HorizontalAlignment="Right" Margin="0,187,55,0" VerticalAlignment="Top" Width="75" Click="btnCancel_Click"/>
+        <CheckBox x:Uid="chk_confirm" Content="Confirm before executing" IsChecked="{Binding Path=ConfirmOnExecute}" IsEnabled="{Binding Path=CanEdit}" Margin="10,3,0,0" Grid.Row="1"/>
+        <TextBox x:Name="textBox" IsEnabled="{Binding Path=CanEdit}" AcceptsReturn="True" HorizontalAlignment="Left" Height="145" Margin="10,0,0,0" TextWrapping="Wrap" Text="{Binding Path=Code, Mode=TwoWay}" VerticalAlignment="Top" Width="272" Grid.Row="2"/>
+        <Button x:Uid="btn_ok" Content="Ok" HorizontalAlignment="Left" Margin="55,5,0,0" VerticalAlignment="Top" Width="75" Click="btnOk_Click" Grid.Row="3"/>
+        <Button x:Uid="btn_cancel" Content="Cancel" HorizontalAlignment="Right" Margin="0,5,55,0" VerticalAlignment="Top" Width="75" Click="btnCancel_Click" Grid.Row="3"/>
     </Grid>
 </Window>

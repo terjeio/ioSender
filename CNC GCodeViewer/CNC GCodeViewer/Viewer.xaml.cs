@@ -69,8 +69,8 @@ namespace CNC.Controls.Viewer
                     isNew = false;
                     using (new UIUtils.WaitCursor())
                     {
-                        gcodeView.ShowPosition();
                         gcodeView.Render(GCode.File.Tokens);
+                        gcodeView.ShowPosition();
                     }
                 }
 

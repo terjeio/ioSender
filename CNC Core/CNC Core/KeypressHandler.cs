@@ -1,13 +1,13 @@
 ﻿/*
  * KeypressHandler.xaml.cs - part of CNC Controls library
  *
- * v0.36 / 2021-12-25 / Io Engineering (Terje Io)
+ * v0.36 / 2022-01-10 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020-2021, Io Engineering (Terje Io)
+Copyright (c) 2020-2022, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+using CNC.GCode;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -64,8 +65,9 @@ namespace CNC.Core
             public Func<Key, bool> Call;
         }
 
+        private int N_AXIS = 3;
         private bool preCancel = false, allowJog = true;
-        private volatile Key[] axisjog = new Key[3] { Key.None, Key.None, Key.None };
+        private volatile Key[] axisjog = new Key[4] { Key.None, Key.None, Key.None, Key.None };
         private JogMode jogMode = JogMode.None;
         private GrblViewModel grbl;
         private List<KeypressHandlerFn> handlers = new List<KeypressHandlerFn>();
@@ -90,7 +92,7 @@ namespace CNC.Core
         public double LimitSwitchesClearance { get; set; } = .5d;
         public bool SoftLimits { get; set; } = false;
         public bool IsJoggingEnabled { get; set; } = true;
-        public bool IsContinuousJogggingEnabled { get; set; }
+        public bool IsContinuousJoggingEnabled { get; set; }
         public bool IsRepeating { get; private set; } = false;
         public bool CanJog2 { get { return grbl.GrblState.State == GrblStates.Idle || grbl.GrblState.State == GrblStates.Tool || grbl.GrblState.State == GrblStates.Jog; } }
         public bool CanJog { get { return allowJog && (grbl.GrblState.State == GrblStates.Idle || grbl.GrblState.State == GrblStates.Tool || grbl.GrblState.State == GrblStates.Jog); } }
@@ -99,7 +101,7 @@ namespace CNC.Core
         public bool ProcessKeypress(KeyEventArgs e, bool allowJog, UserControl context = null)
         {
             bool isJogging = IsJogging, jogkeyPressed = false;
-            double[] dist = new double[3] { 0d, 0d, 0d };
+            double[] dist = new double[4] { 0d, 0d, 0d, 0d };
 
             if (e.IsUp && isJogging)
             {
@@ -107,7 +109,7 @@ namespace CNC.Core
 
                 isJogging = false;
 
-                for (int i = 0; i < 3; i++)
+                for (int i = 0; i < N_AXIS; i++)
                 {
                     if (axisjog[i] == e.Key)
                     {
@@ -134,6 +136,8 @@ namespace CNC.Core
                 // Do not respond to autorepeats!
                 if (e.IsRepeat)
                     return true;
+
+                N_AXIS = GrblInfo.AxisFlags.HasFlag(AxisFlags.A) ? 4 : 3;
 
                 switch (e.Key)
                 {
@@ -165,6 +169,21 @@ namespace CNC.Core
                     case Key.Down:
                         isJogging = axisjog[GrblConstants.Y_AXIS] != Key.Down;
                         axisjog[GrblConstants.Y_AXIS] = Key.Down;
+                        break;
+
+                    case Key.Home:
+                        if(N_AXIS == 4) {
+                            isJogging = axisjog[GrblConstants.A_AXIS] != Key.Home;
+                            axisjog[GrblConstants.A_AXIS] = Key.Home;
+                        }
+                        break;
+
+                    case Key.End:
+                        if (N_AXIS == 4)
+                        {
+                            isJogging = axisjog[GrblConstants.A_AXIS] != Key.End;
+                            axisjog[GrblConstants.A_AXIS] = Key.End;
+                        }
                         break;
                 }
             }
@@ -200,7 +219,7 @@ namespace CNC.Core
                             break;
                     }
                 }
-                else for (int i = 0; i < 3; i++) switch (axisjog[i])
+                else for (int i = 0; i < N_AXIS; i++) switch (axisjog[i])
                 {
                     case Key.PageUp:
                         dist[GrblConstants.Z_AXIS] = 1d;
@@ -231,19 +250,29 @@ namespace CNC.Core
                         dist[GrblConstants.Y_AXIS] = -1d;
                         command += "Y-{2}";
                         break;
+
+                    case Key.Home:
+                        dist[GrblConstants.A_AXIS] = 1d;
+                        command += "A{4}";
+                        break;
+
+                    case Key.End:
+                        dist[GrblConstants.A_AXIS] = -1d;
+                        command += "A-{4}";
+                        break;
                 }
 
                 if ((isJogging = command != string.Empty))
                 {
                     if ((Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
                     {
-                        for (int i = 0; i < 3; i++)
+                        for (int i = 0; i < N_AXIS; i++)
                             axisjog[i] = Key.None;
                         preCancel = !(jogMode == JogMode.Step || jogMode == JogMode.None);
                         jogMode = JogMode.Step;
                         JogDistances[(int)jogMode] = grbl.JogStep;
                     }
-                    else if (IsContinuousJogggingEnabled)
+                    else if (IsContinuousJoggingEnabled)
                     {
                         preCancel = true;
                         if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
@@ -253,7 +282,7 @@ namespace CNC.Core
                     }
                     else
                     {
-                        for (int i = 0; i < 3; i++)
+                        for (int i = 0; i < N_AXIS; i++)
                             axisjog[i] = Key.None;
                         jogMode = JogMode.None;
                     }
@@ -265,15 +294,18 @@ namespace CNC.Core
                             var distance = JogDistances[(int)jogMode].ToInvariantString();
                             SendJogCommand("$J=G91G21" + string.Format(command + "F{0}",
                                                              JogFeedrates[(int)jogMode].ToInvariantString(),
-                                                              distance, distance, distance));
+                                                              distance, distance, distance, distance));
                         }
                         else
                         {
-                            for (int i = 0; i < 3; i++)
+                            for (int i = 0; i < N_AXIS; i++)
                             {
                                 if (dist[i] != 0d)
                                 {
                                     dist[i] = grbl.MachinePosition.Values[i] + JogDistances[(int)jogMode] * dist[i];
+
+                                    if (i == GrblConstants.A_AXIS && GrblInfo.MaxTravel.Values[GrblConstants.A_AXIS] == 0d)
+                                        continue;
 
                                     if (GrblInfo.ForceSetOrigin)
                                     {
@@ -305,7 +337,8 @@ namespace CNC.Core
                                                              JogFeedrates[(int)jogMode].ToInvariantString(),
                                                               dist[GrblConstants.X_AXIS].ToInvariantString(),
                                                                dist[GrblConstants.Y_AXIS].ToInvariantString(),
-                                                                dist[GrblConstants.Z_AXIS].ToInvariantString()));
+                                                                dist[GrblConstants.Z_AXIS].ToInvariantString(),
+                                                                 dist[GrblConstants.A_AXIS].ToInvariantString()));
                         }
                     }
 

@@ -1,7 +1,7 @@
 /*
  * Renderer.xaml.cs - part of CNC Controls library
  *
- * v0.36 / 2021-12-24 / Io Engineering (Terje Io)
+ * v0.36 / 2021-12-30 / Io Engineering (Terje Io)
  *
  */
 
@@ -301,6 +301,8 @@ namespace CNC.Controls.Viewer
         public int ArcResolution { get; set; } = 5;
         public double MinDistance { get { return _minDistance; } set { _minDistance = value; minDistanceSquared = _minDistance * _minDistance; } }
         public bool RenderExecuted { get; set; } = false;
+        public bool IsJobLoaded { get { return !(tokens == null || tokens.Count == 0); } }
+
         public Machine Machine { get; set; }
         public SolidColorBrush ToolBrush { get; set; } = Brushes.Red;
         public SolidColorBrush AxisBrush { get; set; } = Brushes.Gray;
@@ -339,11 +341,13 @@ namespace CNC.Controls.Viewer
 
         private void Machine_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
+            if (!IsJobLoaded)
+                return;
+
             switch (e.PropertyName) {
 
                 case nameof(Machine.RenderMode):
-                    if(tokens != null)
-                        Render(tokens, (lastMode == RenderMode.Mode3D || lastMode == RenderMode.Mode2DXY) ? !(Machine.RenderMode == RenderMode.Mode3D || Machine.RenderMode == RenderMode.Mode2DXY) : lastMode != Machine.RenderMode);
+                    Render(tokens, (lastMode == RenderMode.Mode3D || lastMode == RenderMode.Mode2DXY) ? !(Machine.RenderMode == RenderMode.Mode3D || Machine.RenderMode == RenderMode.Mode2DXY) : lastMode != Machine.RenderMode);
                     lastMode = Machine.RenderMode;
                     if(Machine.ToolMode == ToolVisualizerType.Crosshair)
                         ShowCrosshairTool();
@@ -379,7 +383,8 @@ namespace CNC.Controls.Viewer
                             positionPoints.Clear();
                             if (tool != null)
                             {
-                                viewport.Children.Add(tool);
+                                if(!viewport.Children.Contains(tool))
+                                    viewport.Children.Add(tool);
                                 ShowConeTool();
                             }
                             break;
@@ -423,7 +428,7 @@ namespace CNC.Controls.Viewer
         private void GCodeViewer_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             Configure();
-            if(tokens != null)
+            if(IsJobLoaded)
                 Render(tokens);
         }
 
@@ -466,7 +471,8 @@ namespace CNC.Controls.Viewer
 
         private void MouseWheel_Preview(object sender, System.Windows.Input.MouseWheelEventArgs e)
         {
-            ShowConeTool();
+            if(IsJobLoaded)
+                ShowConeTool();
             //model.ResponseLog.Add(string.Format("M: {0} {1} {2}", e.Delta, viewport.Camera.Position.Z, viewport.Camera.LookDirection.Z));
             //pl = viewport.Camera.LookDirection.Length;
 
@@ -561,10 +567,13 @@ namespace CNC.Controls.Viewer
                 viewport.Camera.Position = AppConfig.Settings.GCodeViewer.CameraPosition;
                 viewport.Camera.LookDirection = AppConfig.Settings.GCodeViewer.CameraLookDirection;
                 viewport.Camera.UpDirection = AppConfig.Settings.GCodeViewer.CameraUpDirection;
-                Machine.RenderMode = (RenderMode)AppConfig.Settings.GCodeViewer.ViewMode;
-                if (Machine.ToolMode != (ToolVisualizerType)AppConfig.Settings.GCodeViewer.ToolVisualizer)
-                    Machine.ToolMode = (ToolVisualizerType)AppConfig.Settings.GCodeViewer.ToolVisualizer;
-                AnimateTool();
+                if (IsJobLoaded)
+                {
+                    Machine.RenderMode = (RenderMode)AppConfig.Settings.GCodeViewer.ViewMode;
+                    if (Machine.ToolMode != (ToolVisualizerType)AppConfig.Settings.GCodeViewer.ToolVisualizer)
+                        Machine.ToolMode = (ToolVisualizerType)AppConfig.Settings.GCodeViewer.ToolVisualizer;
+                    AnimateTool();
+                }
             }
         }
 
@@ -634,6 +643,9 @@ namespace CNC.Controls.Viewer
                 Machine.Axes = null;
             }
             axes.Children.Clear();
+
+            if (tool != null && viewport.Children.Contains(tool))
+                viewport.Children.Remove(tool);
         }
 
         public void ResetView()
@@ -654,7 +666,8 @@ namespace CNC.Controls.Viewer
         private void AnimateTool()
         {
             Machine.SetToolPosition(model.Position.X, model.Position.Y, model.Position.Z);
-            switch (Machine.ToolMode)
+
+            if (IsJobLoaded) switch (Machine.ToolMode)
             {
                 case ToolVisualizerType.Cone:
                     ShowConeTool();
@@ -670,7 +683,7 @@ namespace CNC.Controls.Viewer
         {
             if (toolAutoScale)
             {
-                tool.Height = Math.Abs(viewport.Camera.Position.DistanceTo(Machine.ToolPosition)) / 2500d;
+                tool.Height = Math.Abs(viewport.Camera.Position.DistanceTo(Machine.ToolPosition)) / 1250d / ccamera.FieldOfView;
                 tool.TopRadius = tool.Height / 5d;
             }
             tool.Origin = Machine.ToolPosition;
@@ -678,8 +691,7 @@ namespace CNC.Controls.Viewer
 
         private void ShowCrosshairTool ()
         {
-//            Machine.ToolOrigin = null;
-
+            //            Machine.ToolOrigin = null;
             positionPoints.Clear();
 
             Action<Point3D, Point3D> addLine = (p, q) =>
@@ -846,18 +858,14 @@ namespace CNC.Controls.Viewer
             return travel;
         }
 
-        public void Render(List<GCodeToken> tokens, bool refreshCamera = true)
+        public void showAdorners (ProgramLimits bbox)
         {
-            var bbox = (DataContext as GrblViewModel).ProgramLimits;
-
             double lineThickness = bbox.MaxSize / 1000d;
             double arrowOffset = lineThickness * 30d;
             double labelOffset = lineThickness * 50d;
 
-            ClearViewport();
-
-            this.tokens = tokens;
-            renderExecuted = RenderExecuted && !Machine.HighlightColor.Equals(Machine.CutMotionColor) && _animateSubscribed;
+            AxisBrush = new SolidColorBrush(Machine.GridColor);
+            gridWidth = gridsz(GrblInfo.MaxTravel.X);
 
             if (isLatheMode == null)
             {
@@ -871,15 +879,6 @@ namespace CNC.Controls.Viewer
             }
 
             bool latheMode = isLatheMode == true;
-
-            cutCount = 0;
-            point0 = Machine.StartPosition;
-            lastType = MoveType.None;
-
-            #region Canvas adorners
-
-            AxisBrush = new SolidColorBrush(Machine.GridColor);
-            gridWidth = gridsz(GrblInfo.MaxTravel.X);
 
             if (model.LatheMode == LatheMode.Disabled)
             {
@@ -974,13 +973,15 @@ namespace CNC.Controls.Viewer
                 };
             }
 
-            axes.Children.Add(new ArrowVisual3D() {
+            axes.Children.Add(new ArrowVisual3D()
+            {
                 Point2 = new Point3D(bbox.SizeX + arrowOffset, 0d, 0d),
                 Diameter = lineThickness * 5,
                 Fill = AxisBrush
             });
 
-            axes.Children.Add(new BillboardTextVisual3D() {
+            axes.Children.Add(new BillboardTextVisual3D()
+            {
                 Text = "X",
                 FontWeight = FontWeights.Bold,
                 Foreground = AxisBrush,
@@ -1007,7 +1008,8 @@ namespace CNC.Controls.Viewer
 
             if (bbox.SizeZ > 0d)
             {
-                axes.Children.Add(new ArrowVisual3D() {
+                axes.Children.Add(new ArrowVisual3D()
+                {
                     Point1 = latheMode ? new Point3D(0d, 0d, bbox.MaxZ + arrowOffset) : new Point3D(0d, 0d, bbox.MinZ - arrowOffset),
                     Point2 = latheMode ? new Point3D(0d, 0d, bbox.MinZ - arrowOffset) : new Point3D(0d, 0d, bbox.MaxZ + arrowOffset),
                     Diameter = lineThickness * 5d,
@@ -1026,7 +1028,7 @@ namespace CNC.Controls.Viewer
             if (Machine.ShowAxes)
                 viewport.Children.Add(Machine.Axes = axes);
 
-            if(Machine.ShowGrid)
+            if (Machine.ShowGrid)
                 viewport.Children.Add(Machine.Grid = grid);
 
             jobEnvelope.BoundingBox = new Rect3D(bbox.MinX, bbox.MinY, bbox.MinZ, bbox.SizeX, Math.Max(0.001d, bbox.SizeY), bbox.SizeZ);
@@ -1037,7 +1039,23 @@ namespace CNC.Controls.Viewer
             if (Machine.ShowWorkEnvelope)
                 Machine.WorkEnvelope = workEnvelope;
 
-            #endregion
+            Machine.ToolMode = Machine.ToolMode;
+        }
+
+        public void Render(List<GCodeToken> tokens, bool refreshCamera = true)
+        {
+            var bbox = (DataContext as GrblViewModel).ProgramLimits;
+
+            ClearViewport();
+
+            this.tokens = tokens;
+            renderExecuted = RenderExecuted && !Machine.HighlightColor.Equals(Machine.CutMotionColor) && _animateSubscribed;
+
+            cutCount = 0;
+            point0 = Machine.StartPosition;
+            lastType = MoveType.None;
+
+            showAdorners(bbox);
 
             emu.SetStartPosition(Machine.StartPosition);
 
