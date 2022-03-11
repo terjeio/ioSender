@@ -5,8 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CNC.Controls"
              mc:Ignorable="d" 
-             d:DesignHeight="150" d:DesignWidth="250">
-    <GroupBox x:Uid="grp_outline" x:Name="grpOutline" Header="Outline" HorizontalAlignment="Left" VerticalAlignment="Top" Width="250" Height="150">
+             d:DesignHeight="125" d:DesignWidth="250">
+    <GroupBox x:Uid="grp_outline" x:Name="grpOutline" Header="Outline" HorizontalAlignment="Left" VerticalAlignment="Top" Width="250" Height="125">
         <local:OutlineBaseControl/>
     </GroupBox>
 </UserControl>

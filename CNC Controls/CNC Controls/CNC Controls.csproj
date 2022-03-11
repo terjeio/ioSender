@@ -68,8 +68,14 @@
     <Compile Include="ConsoleWindow.xaml.cs">
       <DependentUpon>ConsoleWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ErrorsAndAlarms.xaml.cs">
+      <DependentUpon>ErrorsAndAlarms.xaml</DependentUpon>
+    </Compile>
     <Compile Include="FileActionControl.xaml.cs">
       <DependentUpon>FileActionControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="GCodeWrapDialog.xaml.cs">
+      <DependentUpon>GCodeWrapDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="GCodeCompress.cs" />
     <Compile Include="GCodeListControl.xaml.cs">
@@ -79,6 +85,7 @@
     <Compile Include="GCodeRotateDialog.xaml.cs">
       <DependentUpon>GCodeRotateDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="GCodeWrap.cs" />
     <Compile Include="GotoBaseControl.xaml.cs">
       <DependentUpon>GotoBaseControl.xaml</DependentUpon>
     </Compile>
@@ -87,6 +94,9 @@
     </Compile>
     <Compile Include="GotoFlyoutControl.xaml.cs">
       <DependentUpon>GotoFlyoutControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="GrblAlarmList.xaml.cs">
+      <DependentUpon>GrblAlarmList.xaml</DependentUpon>
     </Compile>
     <Compile Include="GrblConfigView.xaml.cs">
       <DependentUpon>GrblConfigView.xaml</DependentUpon>
@@ -112,6 +122,9 @@
     </Compile>
     <Compile Include="FeedControl.xaml.cs">
       <DependentUpon>FeedControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="GrblErrorList.xaml.cs">
+      <DependentUpon>GrblErrorList.xaml</DependentUpon>
     </Compile>
     <Compile Include="ICamera.cs" />
     <Compile Include="ICNCView.cs" />
@@ -226,11 +239,27 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="ErrorsAndAlarms.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="GCodeWrapDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="GotoBaseControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="GotoFlyoutControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="GrblAlarmList.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="GrblErrorList.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

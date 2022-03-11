@@ -1,13 +1,13 @@
 ﻿/*
  * Camera.xaml.cs - part of CNC Controls Camera library
  *
- * v0.33 / 2021-05-04 / Io Engineering (Terje Io)
+ * v0.37 / 2022-03-02 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2021, Io Engineering (Terje Io) - parts derived from AForge example code
+Copyright (c) 2018-2022, Io Engineering (Terje Io) - parts derived from AForge example code
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -66,6 +66,7 @@ namespace CNC.Controls.Camera
         public bool HasCamera { get { return CNCCamera.HasCamera; } }
         public CameraControl CameraControl { get { return CNCCamera; } }
         public new bool IsVisible { get { return CNCCamera.IsVisible; } }
+        public bool IsMoveEnabled { get { return CNCCamera.IsMoveEnabled; } set { CNCCamera.IsMoveEnabled = value && (CNCCamera.XOffset != 0d || CNCCamera.YOffset != 0d); } }
 
         public void Setup(UIViewModel model)
         {
@@ -88,6 +89,8 @@ namespace CNC.Controls.Camera
             }
 
             Show();
+
+            CameraControl.MoveCameraToSpindlePosition = AppConfig.Settings.Camera.InitialMoveToSpindle;
 
             if (CNCCamera.OpenVideoSource())
                 IsVisibilityChanged?.Invoke();

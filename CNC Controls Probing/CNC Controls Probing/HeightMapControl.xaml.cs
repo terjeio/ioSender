@@ -1,13 +1,13 @@
 ﻿/*
  * HeightMapControl.xaml.cs - part of CNC Probing library
  *
- * v0.36 / 2021-11-29 / Io Engineering (Terje Io)
+ * v0.37 / 2022-03-09 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020, Io Engineering (Terje Io)
+Copyright (c) 2020-2022, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -61,9 +61,10 @@ namespace CNC.Controls.Probing
 
         public ProbingType ProbingType { get { return ProbingType.HeightMap; } }
 
-        public void Activate()
+        public void Activate(bool activate)
         {
-            (DataContext as ProbingViewModel).Instructions = ((string)FindResource("Instructions")).Replace("\\n", "\n");
+            if(activate)
+                (DataContext as ProbingViewModel).Instructions = ((string)FindResource("Instructions")).Replace("\\n", "\n");
         }
 
         public void Start(bool preview = false)
@@ -189,8 +190,12 @@ namespace CNC.Controls.Probing
                 probing.HeightMap.MapPoints = mapPoints.Points;
                 probing.HeightMap.HasHeightMap = true;
 
-                probing.Program.End(ok ? string.Format((string)FindResource("ProbingCompleted"), z_min.ToInvariantString(probing.Grbl.Format), z_max.ToInvariantString(probing.Grbl.Format)) : (string)FindResource("ProbingFailed"));
+                if(ok)
+                    probing.Program.End(string.Format((string)FindResource("ProbingCompleted"), z_min.ToInvariantString(probing.Grbl.Format), z_max.ToInvariantString(probing.Grbl.Format)));
             }
+
+            if(!ok)
+                probing.Program.End((string)FindResource("ProbingFailed"));
         }
 
         public void Load (string fileName)

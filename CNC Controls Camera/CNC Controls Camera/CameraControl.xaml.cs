@@ -1,13 +1,13 @@
 ﻿/*
  * CameraControl.xaml.cs - part of CNC Controls Camera library
  *
- * v0.30 / 2021-04-08 / Io Engineering (Terje Io)
+ * v0.37 / 2022-03-02 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2021, Io Engineering (Terje Io) - parts derived from AForge example code
+Copyright (c) 2018-2022, Io Engineering (Terje Io) - parts derived from AForge example code
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -68,9 +68,9 @@ namespace CNC.Controls.Camera
 
         public CameraControl()
         {
-            DataContext = this;
-
             InitializeComponent();
+
+            DataContext = this;
         }
 
         private void CameraControl_Loaded(object sender, RoutedEventArgs e)
@@ -83,6 +83,12 @@ namespace CNC.Controls.Camera
             if (Cameras.Count > 0)
             {
                 Camera = Cameras[0];
+                if (AppConfig.Settings.Camera.SelectedCamera != string.Empty)
+                {
+                    foreach (FilterInfo camera in Cameras)
+                        if (camera.MonikerString == AppConfig.Settings.Camera.SelectedCamera)
+                            Camera = camera;
+                }
                 cbxCamera.SelectedItem = Camera;
             }
         }
@@ -123,6 +129,15 @@ namespace CNC.Controls.Camera
             AppConfig.Settings.Camera.GuideScale = (int)e.NewValue;
         }
 
+        public static readonly DependencyProperty MoveCameraToSpindlePositionProperty = DependencyProperty.Register(nameof(MoveCameraToSpindlePosition), typeof(bool), typeof(CameraControl), new PropertyMetadata(false));
+        public bool MoveCameraToSpindlePosition
+        {
+            get { return (bool)GetValue(MoveCameraToSpindlePositionProperty); }
+            set { SetValue(MoveCameraToSpindlePositionProperty, value); }
+        }
+
+        public GrblViewModel grbl {  get { return Grbl.GrblViewModel;  } }
+
         public double XOffset
         {
             get { return _xOffset; }
@@ -139,16 +154,23 @@ namespace CNC.Controls.Camera
         public FilterInfoCollection Cameras { get; private set; } = new FilterInfoCollection(FilterCategory.VideoInputDevice);
         public FilterInfo Camera { get; private set; }
 
-        public bool OpenVideoSource()
+        public bool OpenVideoSource(FilterInfo camera)
         {
-            if (Camera != null)
+            CloseCurrentVideoSource();
+
+            if (camera != null)
             {
-                videoSource = new VideoCaptureDevice(Camera.MonikerString);
+                videoSource = new VideoCaptureDevice(camera.MonikerString);
                 videoSource.Start();
                 videoSource.NewFrame += videoSource_NewFrame;
             }
 
             return videoSource != null && videoSource.IsRunning;
+        }
+
+        public bool OpenVideoSource()
+        {
+            return IsCameraOpen || OpenVideoSource(Camera);
         }
 
         public void CloseCurrentVideoSource()
@@ -158,8 +180,8 @@ namespace CNC.Controls.Camera
                 videoSource.NewFrame -= videoSource_NewFrame;
                 videoSource.SignalToStop();
 
-                // wait ~ 3 seconds
-                for (int i = 0; i < 30; i++)
+                // wait ~5 seconds
+                for (int i = 0; i < 50; i++)
                 {
                     if (!videoSource.IsRunning)
                         break;
@@ -225,15 +247,36 @@ namespace CNC.Controls.Camera
 
         private void btnMove_Click(object sender, RoutedEventArgs e)
         {
-            MoveOffset?.Invoke(Mode, XOffset, YOffset);
+            if (!AppConfig.Settings.Camera.ConfirmMove || MessageBox.Show(UIUtils.TryFindParent<Window>(this), (string)FindResource(MoveCameraToSpindlePosition ? "MoveCameraTo" : "MoveSpindleTo"), "ioSender", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            {
+                if (MoveCameraToSpindlePosition)
+                {
+                    MoveCameraToSpindlePosition = false;
+                    MoveOffset?.Invoke(Mode, -XOffset, -YOffset);
+                }
+                else
+                    MoveOffset?.Invoke(Mode, XOffset, YOffset);
+            }
+        }
+
+        private void btnPublish_Click(object sender, RoutedEventArgs e)
+        {
+            Position pos = new Position(Grbl.GrblViewModel.MachinePosition);
+
+            pos.X += XOffset;
+            pos.Y += YOffset;
+
+            Grbl.GrblViewModel.CameraProbed(pos);
         }
 
         private void cbxCamera_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if(((ComboBox)sender).IsDropDownOpen)
+            if(((ComboBox)sender).IsDropDownOpen && e.AddedItems.Count == 1)
             {
                 CloseCurrentVideoSource();
-                OpenVideoSource();
+                OpenVideoSource(e.AddedItems[0] as FilterInfo);
+                AppConfig.Settings.Camera.SelectedCamera = (e.AddedItems[0] as FilterInfo).MonikerString;
+                AppConfig.Settings.Save();
             }
         }
     }

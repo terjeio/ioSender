@@ -1,7 +1,7 @@
 ﻿/*
  * JogBaseControl.xaml.cs - part of CNC Controls library
  *
- * v0.36 / 2022-01-10 / Io Engineering (Terje Io)
+ * v0.37 / 2022-02-27 / Io Engineering (Terje Io)
  *
  */
 
@@ -58,7 +58,6 @@ namespace CNC.Controls
         private double limitSwitchesClearance = .5d, position = 0d;
         private KeypressHandler keyboard;
         private static bool keyboardMappingsOk = false;
-
 
         private const Key xplus = Key.J, xminus = Key.H, yplus = Key.K, yminus = Key.L, zplus = Key.I, zminus = Key.M, aplus = Key.U, aminus = Key.N;
 
@@ -118,45 +117,157 @@ namespace CNC.Controls
 
                     if (AppConfig.Settings.Jog.Mode == JogConfig.JogMode.UI)
                     {
-                        keyboard.AddHandler(Key.PageUp, ModifierKeys.None, cursorKeyJog, false);
-                        keyboard.AddHandler(Key.PageDown, ModifierKeys.None, cursorKeyJog, false);
-                        keyboard.AddHandler(Key.Left, ModifierKeys.None, cursorKeyJog, false);
-                        keyboard.AddHandler(Key.Up, ModifierKeys.None, cursorKeyJog, false);
-                        keyboard.AddHandler(Key.Right, ModifierKeys.None, cursorKeyJog, false);
-                        keyboard.AddHandler(Key.Down, ModifierKeys.None, cursorKeyJog, false);
+                        keyboard.AddHandler(Key.PageUp, ModifierKeys.None, CursorJogZplus, false);
+                        keyboard.AddHandler(Key.PageDown, ModifierKeys.None, CursorJogZminus, false);
+                        keyboard.AddHandler(Key.Left, ModifierKeys.None, CursorJogXminus, false);
+                        keyboard.AddHandler(Key.Up, ModifierKeys.None, CursorJogYplus, false);
+                        keyboard.AddHandler(Key.Right, ModifierKeys.None, CursorJogXplus, false);
+                        keyboard.AddHandler(Key.Down, ModifierKeys.None, CursorJogYminus, false);
                     }
 
-                    keyboard.AddHandler(xplus, ModifierKeys.Control | ModifierKeys.Shift, normalKeyJog, false);
-                    keyboard.AddHandler(xminus, ModifierKeys.Control | ModifierKeys.Shift, normalKeyJog, false);
-                    keyboard.AddHandler(yplus, ModifierKeys.Control | ModifierKeys.Shift, normalKeyJog, false);
-                    keyboard.AddHandler(yminus, ModifierKeys.Control | ModifierKeys.Shift, normalKeyJog, false);
-                    keyboard.AddHandler(zplus, ModifierKeys.Control | ModifierKeys.Shift, normalKeyJog, false);
-                    keyboard.AddHandler(zminus, ModifierKeys.Control | ModifierKeys.Shift, normalKeyJog, false);
+                    keyboard.AddHandler(xplus, ModifierKeys.Control | ModifierKeys.Shift, KeyJogXplus, false);
+                    keyboard.AddHandler(xminus, ModifierKeys.Control | ModifierKeys.Shift, KeyJogXminus, false);
+                    keyboard.AddHandler(yplus, ModifierKeys.Control | ModifierKeys.Shift, KeyJogYplus, false);
+                    keyboard.AddHandler(yminus, ModifierKeys.Control | ModifierKeys.Shift, KeyJogYminus, false);
+                    keyboard.AddHandler(zplus, ModifierKeys.Control | ModifierKeys.Shift, KeyJogZplus, false);
+                    keyboard.AddHandler(zminus, ModifierKeys.Control | ModifierKeys.Shift, KeyJogZminus, false);
                     if(GrblInfo.AxisFlags.HasFlag(AxisFlags.A)) {
-                        keyboard.AddHandler(aplus, ModifierKeys.Control | ModifierKeys.Shift, normalKeyJog, false);
-                        keyboard.AddHandler(aminus, ModifierKeys.Control | ModifierKeys.Shift, normalKeyJog, false);
+                        keyboard.AddHandler(aplus, ModifierKeys.Control | ModifierKeys.Shift, KeyJogAplus, false);
+                        keyboard.AddHandler(aminus, ModifierKeys.Control | ModifierKeys.Shift, KeyJogAminus, false);
                     }
 
                     if (AppConfig.Settings.Jog.Mode != JogConfig.JogMode.Keypad)
                     {
-                        keyboard.AddHandler(Key.End, ModifierKeys.None, endJog, false);
+                        keyboard.AddHandler(Key.End, ModifierKeys.None, EndJog, false);
 
-                        keyboard.AddHandler(Key.NumPad0, ModifierKeys.Control, adjustJog);
-                        keyboard.AddHandler(Key.NumPad1, ModifierKeys.Control, adjustJog);
-                        keyboard.AddHandler(Key.NumPad2, ModifierKeys.Control, adjustJog);
-                        keyboard.AddHandler(Key.NumPad3, ModifierKeys.Control, adjustJog);
-                        keyboard.AddHandler(Key.NumPad4, ModifierKeys.Control, adjustJog);
-                        keyboard.AddHandler(Key.NumPad5, ModifierKeys.Control, adjustJog);
-                        keyboard.AddHandler(Key.NumPad6, ModifierKeys.Control, adjustJog);
-                        keyboard.AddHandler(Key.NumPad7, ModifierKeys.Control, adjustJog);
+                        keyboard.AddHandler(Key.NumPad0, ModifierKeys.Control, JogStep0);
+                        keyboard.AddHandler(Key.NumPad1, ModifierKeys.Control, JogStep1);
+                        keyboard.AddHandler(Key.NumPad2, ModifierKeys.Control, JogStep2);
+                        keyboard.AddHandler(Key.NumPad3, ModifierKeys.Control, JogStep3);
+                        keyboard.AddHandler(Key.NumPad4, ModifierKeys.Control, JogFeed0);
+                        keyboard.AddHandler(Key.NumPad5, ModifierKeys.Control, JogFeed1);
+                        keyboard.AddHandler(Key.NumPad6, ModifierKeys.Control, JogFeed2);
+                        keyboard.AddHandler(Key.NumPad7, ModifierKeys.Control, JogFeed3);
 
-                        keyboard.AddHandler(Key.NumPad2, ModifierKeys.None, adjustJog2);
-                        keyboard.AddHandler(Key.NumPad4, ModifierKeys.None, adjustJog2);
-                        keyboard.AddHandler(Key.NumPad6, ModifierKeys.None, adjustJog2);
-                        keyboard.AddHandler(Key.NumPad8, ModifierKeys.None, adjustJog2);
+                        keyboard.AddHandler(Key.NumPad2, ModifierKeys.None, FeedDec);
+                        keyboard.AddHandler(Key.NumPad4, ModifierKeys.None, StepDec);
+                        keyboard.AddHandler(Key.NumPad6, ModifierKeys.None, StepInc);
+                        keyboard.AddHandler(Key.NumPad8, ModifierKeys.None, FeedInc);
                     }
                 }
             }
+        }
+
+        private bool KeyJogXplus(Key key)
+        {
+            if (keyboard.CanJog2 && !keyboard.IsRepeating)
+                JogCommand(GrblInfo.LatheModeEnabled ? "Z+" : "X+");
+
+            return true;
+        }
+
+        private bool KeyJogXminus(Key key)
+        {
+            if (keyboard.CanJog2 && !keyboard.IsRepeating)
+                JogCommand(GrblInfo.LatheModeEnabled ? "Z-" : "X-");
+
+            return true;
+        }
+
+        private bool KeyJogYplus(Key key)
+        {
+            if (keyboard.CanJog2 && !keyboard.IsRepeating)
+                JogCommand(GrblInfo.LatheModeEnabled ? "X-" : "Y+");
+
+            return true;
+        }
+
+        private bool KeyJogYminus(Key key)
+        {
+            if (keyboard.CanJog2 && !keyboard.IsRepeating)
+                JogCommand(GrblInfo.LatheModeEnabled ? "X+" : "Y-");
+
+            return true;
+        }
+
+        private bool KeyJogZplus(Key key)
+        {
+            if (keyboard.CanJog2 && !keyboard.IsRepeating && !GrblInfo.LatheModeEnabled)
+                JogCommand("Z+");
+
+            return true;
+        }
+
+        private bool KeyJogZminus(Key key)
+        {
+            if (keyboard.CanJog2 && !keyboard.IsRepeating && !GrblInfo.LatheModeEnabled)
+                JogCommand("Z-");
+
+            return true;
+        }
+
+        private bool KeyJogAplus(Key key)
+        {
+            if (keyboard.CanJog2 && !keyboard.IsRepeating)
+                JogCommand("A+");
+
+            return true;
+        }
+
+        private bool KeyJogAminus(Key key)
+        {
+            if (keyboard.CanJog2 && !keyboard.IsRepeating)
+                JogCommand("A-");
+
+            return true;
+        }
+
+        private bool CursorJogXplus(Key key)
+        {
+            if (keyboard.CanJog && !keyboard.IsRepeating)
+                JogCommand(GrblInfo.LatheModeEnabled ? "Z+" : "X+");
+
+            return true;
+        }
+
+        private bool CursorJogXminus(Key key)
+        {
+            if (keyboard.CanJog && !keyboard.IsRepeating)
+                JogCommand(GrblInfo.LatheModeEnabled ? "Z-" : "X-");
+
+            return true;
+        }
+
+        private bool CursorJogYplus(Key key)
+        {
+            if (keyboard.CanJog && !keyboard.IsRepeating)
+                JogCommand(GrblInfo.LatheModeEnabled ? "X-" : "Y+");
+
+            return true;
+        }
+
+        private bool CursorJogYminus(Key key)
+        {
+            if (keyboard.CanJog && !keyboard.IsRepeating)
+                JogCommand(GrblInfo.LatheModeEnabled ? "X+" : "Y-");
+
+            return true;
+        }
+
+        private bool CursorJogZplus(Key key)
+        {
+            if (keyboard.CanJog && !keyboard.IsRepeating && !GrblInfo.LatheModeEnabled)
+                JogCommand("Z+");
+
+            return true;
+        }
+
+        private bool CursorJogZminus(Key key)
+        {
+            if (keyboard.CanJog && !keyboard.IsRepeating && !GrblInfo.LatheModeEnabled)
+                JogCommand("Z-");
+
+            return true;
         }
 
         private void distance_Click(object sender, RoutedEventArgs e)
@@ -169,7 +280,7 @@ namespace CNC.Controls
             feedrate = int.Parse((string)(sender as RadioButton).Tag);
         }
 
-        private bool endJog(Key key)
+        private bool EndJog(Key key)
         {
             if(!keyboard.IsRepeating && keyboard.IsJogging)
                 JogCommand("stop");
@@ -177,144 +288,85 @@ namespace CNC.Controls
             return keyboard.IsJogging;
         }
 
-        private bool adjustJog(Key key)
+        private bool JogStep0(Key key)
         {
-            switch (key)
-            {
-                case Key.NumPad0:
-                    JogData.StepSize = JogViewModel.JogStep.Step0;
-                    return true;
-
-                case Key.NumPad1:
-                    JogData.StepSize = JogViewModel.JogStep.Step1;
-                    return true;
-
-                case Key.NumPad2:
-                    JogData.StepSize = JogViewModel.JogStep.Step2;
-                    return true;
-
-                case Key.NumPad3:
-                    JogData.StepSize = JogViewModel.JogStep.Step3;
-                    return true;
-
-                case Key.NumPad4:
-                    JogData.Feed = JogViewModel.JogFeed.Feed0;
-                    return true;
-
-                case Key.NumPad5:
-                    JogData.Feed = JogViewModel.JogFeed.Feed1;
-                    return true;
-
-                case Key.NumPad6:
-                    JogData.Feed = JogViewModel.JogFeed.Feed2;
-                    return true;
-
-                case Key.NumPad7:
-                    JogData.Feed = JogViewModel.JogFeed.Feed3;
-                    return true;
-            }
+            JogData.StepSize = JogViewModel.JogStep.Step0;
 
             return true;
         }
 
-        private bool adjustJog2(Key key)
+        private bool JogStep1(Key key)
         {
-            switch (key)
-            {
-                case Key.NumPad2:
-                    JogData.FeedDec();
-                    return true;
-
-                case Key.NumPad4:
-                    JogData.StepDec();
-                    return true;
-
-                case Key.NumPad6:
-                    JogData.StepInc();
-                    return true;
-
-                case Key.NumPad8:
-                    JogData.FeedInc();
-                    return true;
-            }
+            JogData.StepSize = JogViewModel.JogStep.Step1;
 
             return true;
         }
 
-        private bool normalKeyJog(Key key)
+        private bool JogStep2(Key key)
         {
-            if (keyboard.CanJog2 && !keyboard.IsRepeating) switch (key)
-            {
-                case zplus:
-                    if (!GrblInfo.LatheModeEnabled)
-                        JogCommand("Z+");
-                    break;
-
-                case zminus:
-                    if (!GrblInfo.LatheModeEnabled)
-                        JogCommand("Z-");
-                    break;
-
-                case xminus:
-                    JogCommand(GrblInfo.LatheModeEnabled ? "Z-" : "X-");
-                    break;
-
-                case yplus:
-                    JogCommand(GrblInfo.LatheModeEnabled ? "X-" : "Y+");
-                    break;
-
-                case xplus:
-                    JogCommand(GrblInfo.LatheModeEnabled ? "Z+" : "X+");
-                    break;
-
-                case yminus:
-                    JogCommand(GrblInfo.LatheModeEnabled ? "X+" : "Y-");
-                    break;
-
-                case aplus:
-                    JogCommand("A+");
-                    break;
-
-                case aminus:
-                    JogCommand("A-");
-                    break;
-            }
+            JogData.StepSize = JogViewModel.JogStep.Step2;
 
             return true;
         }
 
-        private bool cursorKeyJog(Key key)
+        private bool JogStep3(Key key)
         {
-            if(keyboard.CanJog && !keyboard.IsRepeating) switch (key)
-            {
-                case Key.PageUp:
-                    if (!GrblInfo.LatheModeEnabled)
-                        JogCommand("Z+");
-                    break;
+            JogData.StepSize = JogViewModel.JogStep.Step3;
 
-                case Key.PageDown:
-                    if (!GrblInfo.LatheModeEnabled)
-                        JogCommand("Z-");
-                    break;
+            return true;
+        }
 
-                case Key.Left:
-                    JogCommand(GrblInfo.LatheModeEnabled ? "Z-" : "X-");
-                    break;
+        private bool JogFeed0(Key key)
+        {
+            JogData.Feed = JogViewModel.JogFeed.Feed0;
 
-                case Key.Up:
-                    JogCommand(GrblInfo.LatheModeEnabled ? "X-" : "Y+");
-                    break;
+            return true;
+        }
 
-                case Key.Right:
-                    JogCommand(GrblInfo.LatheModeEnabled ? "Z+" : "X+");
-                    break;
+        private bool JogFeed1(Key key)
+        {
+            JogData.Feed = JogViewModel.JogFeed.Feed1;
 
-                case Key.Down:
-                    JogCommand(GrblInfo.LatheModeEnabled ? "X+" : "Y-");
-                    break;
-            }
+            return true;
+        }
+        private bool JogFeed2(Key key)
+        {
+            JogData.Feed = JogViewModel.JogFeed.Feed2;
 
-            return keyboard.CanJog;
+            return true;
+        }
+        private bool JogFeed3(Key key)
+        {
+            JogData.Feed = JogViewModel.JogFeed.Feed3;
+
+            return true;
+        }
+
+        private bool FeedDec(Key key)
+        {
+            JogData.FeedDec();
+
+            return true;
+        }
+        private bool FeedInc(Key key)
+        {
+            JogData.FeedInc();
+
+            return true;
+        }
+
+        private bool StepDec(Key key)
+        {
+            JogData.StepDec();
+
+            return true;
+        }
+
+        private bool StepInc(Key key)
+        {
+            JogData.StepInc();
+
+            return true;
         }
 
         private void JogCommand(string cmd)

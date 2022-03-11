@@ -1,13 +1,13 @@
 /*
  * GrblViewModel.cs - part of CNC Controls library
  *
- * v0.36 / 2021-12-19 / Io Engineering (Terje Io)
+ * v0.37 / 2022-03-02 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2021, Io Engineering (Terje Io)
+Copyright (c) 2019-2022, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -54,7 +54,7 @@ namespace CNC.Core
         private string[] _rtState = new string[3];
         private bool has_wco = false, suspend = false, _hasFans = false;
         private bool _flood, _mist, _fan0, _toolChange, _reset, _isMPos, _isJobRunning, _isProbeSuccess, _pgmEnd, _isParserStateLive, _isTloRefSet;
-        private bool _canReset, _isCameraVisible = false, _responseLogVerbose = false;
+        private bool _canReset, _isCameraVisible = false, _responseLogVerbose = false, _isProbing = false;
         private bool? _mpg;
         private int _pwm, _line, _scrollpos, _blocks = 0, _executingBlock = 0, _auxinValue = -2;
         private double _feedrate = 0d;
@@ -79,6 +79,7 @@ namespace CNC.Core
         public Action<string> OnGrblReset;
         public Action<string> OnRealtimeStatusProcessed;
         public Action<string> OnWCOUpdated;
+        public Action<Position> OnCameraProbe;
 
         public delegate void GrblResetHandler();
 
@@ -219,6 +220,11 @@ namespace CNC.Core
 
         public ICommand MDICommand { get; private set; }
 
+        public void CameraProbed(Position position)
+        {
+            OnCameraProbe?.Invoke(position);
+        }
+
         private bool ApplyCommand(string command)
         {
             bool ok;
@@ -274,11 +280,12 @@ namespace CNC.Core
                 {
                     try
                     {
+                        commands[i] = commands[i].Replace("\r", "");
                         parser.ParseBlock(ref commands[i], false);
                     }
                     catch (Exception e)
                     {
-                        if (!(ok = System.Windows.MessageBox.Show(string.Format(LibStrings.FindResource("LoadError").Replace("\\n", "\r"), LineNumber, commands[i]), e.Message, System.Windows.MessageBoxButton.YesNo) == System.Windows.MessageBoxResult.Yes))
+                        if (!(ok = System.Windows.MessageBox.Show(string.Format(LibStrings.FindResource("LoadError").Replace("\\n", "\r"), e.Message, i + 1, commands[i]), "ioSender", System.Windows.MessageBoxButton.YesNo) == System.Windows.MessageBoxResult.Yes))
                             break;
                     }
                 }
@@ -353,6 +360,7 @@ namespace CNC.Core
         public bool IsG92Active { get { return GrblParserState.IsActive("G92") != null; } }
         public bool IsToolOffsetActive { get { return IsGrblHAL ? GrblParserState.IsActive("G49") == null : !(double.IsNaN(ToolOffset.Z) || ToolOffset.Z == 0d); } }
         public bool IsJobRunning { get { return _isJobRunning; } set { if (_isJobRunning != value) { _isJobRunning = value; OnPropertyChanged(); } } }
+        public bool IsProbing { get { return _isProbing; } set { _isProbing = value; OnPropertyChanged(); } }
         public bool ProgramEnd { get { return _pgmEnd; } set { _pgmEnd = value; if(_pgmEnd) OnPropertyChanged(); } }
         public int GrblError { get { return _grblState.Error; } set { _grblState.Error = value; OnPropertyChanged(); } }
         public StreamingState StreamingState { get { return _streamingState; } set { if (_streamingState != value) { _streamingState = value; OnPropertyChanged(); } } }
@@ -704,25 +712,23 @@ namespace CNC.Core
             Message = error == 0 ? string.Empty : GrblErrors.GetMessage(error.ToString());
         }
 
-        public bool ParseGCStatus(string data)
+        public void ParseGCStatus(string data)
         {
-            GrblParserState.Process(data);
-            if (GrblParserState.IsLoaded)
+            if (GrblParserState.Process(data) && GrblParserState.IsLoaded)
                 ParserState = data.Substring(4).TrimEnd(']');
-
-            return GrblParserState.IsLoaded;
         }
 
         public bool ParseProbeStatus(string data)
         {
             string[] values = data.TrimEnd(']').Split(':');
-            if (values.Length == 3)
+            if (values.Length == 3 && ProbePosition.Parse(values[1]))
             {
-                ProbePosition.Parse(values[1]);
                 IsProbeSuccess = values[2] == "1";
                 for (int i = 0; i < GrblInfo.NumAxes; i++)
                     GrblWorkParameters.ProbePosition.Values[i] = ProbePosition.Values[i];
             }
+            else
+                IsProbeSuccess = false;
 
             return IsProbeSuccess && values.Length == 3;
         }
@@ -730,9 +736,8 @@ namespace CNC.Core
         public void ParseHomedStatus(string data)
         {
             string[] values = data.TrimEnd(']').Split(':');
-            if (values.Length == 3)
+            if (values.Length == 3 && HomePosition.Parse(values[1]))
             {
-                HomePosition.Parse(values[1]);
                 AxisHomed.Value = (AxisFlags)int.Parse(values[2]);
                 for (int i = 0; i < GrblInfo.NumAxes; i++)
                 {

@@ -1,7 +1,7 @@
 ﻿/*
  * Grbl.cs - part of CNC Controls library
  *
- * v0.36 / 2022-01-20 / Io Engineering (Terje Io)
+ * v0.37 / 2022-03-10 / Io Engineering (Terje Io)
  *
  */
 
@@ -652,19 +652,31 @@ namespace CNC.Core
             OnPropertyChanged(e.PropertyName);
         }
 
-        public void Parse(string values)
+        public bool Parse(string values)
         {
-            bool changed = false;
-            double[] position = dbl.ParseList(values); 
-            for (var i = 0; i < position.Length; i++) {
-                if (double.IsNaN(Values[i]) ? !double.IsNaN(position[i]) : Values[i] != position[i])
+            bool changed = false, ok = false;
+
+            try
+            {
+                double[] position = dbl.ParseList(values);
+
+                for (var i = 0; i < position.Length; i++)
                 {
-                    Values[i] = position[i];
-                    changed = true;
+                    if (double.IsNaN(Values[i]) ? !double.IsNaN(position[i]) : Values[i] != position[i])
+                    {
+                        Values[i] = position[i];
+                        changed = true;
+                    }
                 }
+
+                if (changed)
+                    OnPropertyChanged("Position");
+
+                ok = true;
             }
-            if(changed)
-                OnPropertyChanged("Position");
+            catch { }
+
+            return ok;
         }
 
         public string ToString(AxisFlags axisflags, int precision = 3)
@@ -1304,9 +1316,9 @@ namespace CNC.Core
             return value;
         }
 
-        public static void Process(string data)
+        public static bool Process(string data)
         {
-            if (data.StartsWith("[GC:"))
+            if (data.StartsWith("[GC:")) try
             {
                 state.Clear();
                 string[] s = data.Substring(4).TrimEnd(']').Split(' ');
@@ -1522,7 +1534,10 @@ namespace CNC.Core
                         }
                     }
                 }
+                return true;
             }
+            catch { }
+            return false;
         }
     }
 
@@ -1744,7 +1759,9 @@ namespace CNC.Core
 
     public class GrblErrors
     {
-        private static Dictionary<string, string> messages = new Dictionary<string, string>();
+        private static Dictionary<int, string> messages = new Dictionary<int, string>();
+
+        public static Dictionary<int, string> List { get { return messages; } }
 
         public static bool Get()
         {
@@ -1794,14 +1811,17 @@ namespace CNC.Core
 
                         while (line != null)
                         {
+                            int key;
                             string[] columns = line.Split(',');
 
-                            if (columns.Length == 3)
-                            {
-                                if (!noload && messages.TryGetValue(columns[0], out msg))
-                                    messages.Remove(columns[0]);
+                            columns[0].Replace("\"", "");
 
-                                 messages.Add(columns[0], columns[2]);
+                            if (columns.Length == 3 && int.TryParse(columns[0], out key))
+                            {
+                                if (!noload && messages.TryGetValue(key, out msg))
+                                    messages.Remove(key);
+
+                                messages.Add(key, columns[1] + ": " + columns[2]);
                             }
 
                             line = file.ReadLine();
@@ -1823,10 +1843,16 @@ namespace CNC.Core
             if (data.StartsWith("[ERRORCODE:"))
             {
                 var details = data.Substring(11).TrimEnd(']').Split('|');
-                if(details.Length == 3)
-                    messages.Add(details[0], details[2] == string.Empty ? details[1] : details[2]);
-                else
-                    messages.Add(details[0], details[1]);
+                try
+                {
+                    if (details.Length == 3)
+                        messages.Add(int.Parse(details[0]), details[2] == string.Empty ? details[1] : details[2]);
+                    else
+                        messages.Add(int.Parse(details[0]), details[1]);
+                }
+                catch
+                {
+                }
             }
         }
 
@@ -1835,25 +1861,33 @@ namespace CNC.Core
 
         }
 
-        public static string GetMessage(string key)
+        public static string GetMessage(string code)
         {
             string message = null;
 
-            if (messages != null)
-                messages.TryGetValue(key, out message);
+            try
+            {
+                if (messages != null)
+                    messages.TryGetValue(int.Parse(code), out message);
+            }
+            catch
+            {
+            }
 
-            return message == null ? string.Format("error:{0}", key) : message;
+            return message == null ? string.Format("error:{0}", code) : message;
         }
     }
 
     public class GrblAlarms
     {
-        private static Dictionary<string, string> messages = new Dictionary<string, string>();
+        private static Dictionary<int, string> messages = new Dictionary<int, string>();
 
         public static bool Get()
         {
             return Grbl.GrblViewModel != null && Get(Grbl.GrblViewModel);
         }
+
+        public static Dictionary<int, string> List { get { return messages; } }
 
         public static bool Get(GrblViewModel model)
         {
@@ -1898,14 +1932,17 @@ namespace CNC.Core
 
                         while (line != null)
                         {
+                            int key;
                             string[] columns = line.Split(',');
 
-                            if (columns.Length == 3)
-                            {
-                                if (!noload && messages.TryGetValue(columns[0], out msg))
-                                    messages.Remove(columns[0]);
+                            columns[0].Replace("\"", "");
 
-                                messages.Add(columns[0], columns[1] + ": " + columns[2]);
+                            if (columns.Length == 3 && int.TryParse(columns[0], out key))
+                            {
+                                if (!noload && messages.TryGetValue(key, out msg))
+                                    messages.Remove(key);
+
+                                messages.Add(key, columns[1] + ": " + columns[2]);
                             }
 
                             line = file.ReadLine();
@@ -1927,21 +1964,33 @@ namespace CNC.Core
             if (data.StartsWith("[ALARMCODE:"))
             {
                 var details = data.Substring(11).TrimEnd(']').Split('|');
-                if(details.Length == 3)
-                    messages.Add(details[0], details[1] == string.Empty ? details[2] : details[1] + ": " + details[2]);
-                else
-                    messages.Add(details[0], details[1]);
+                try
+                {
+                    if (details.Length == 3)
+                        messages.Add(int.Parse(details[0]), details[1] == string.Empty ? details[2] : details[1] + ": " + details[2]);
+                    else
+                        messages.Add(int.Parse(details[0]), details[1]);
+                }
+                catch
+                {
+                }
             }
         }
 
-        public static string GetMessage(string key)
+        public static string GetMessage(string code)
         {
             string message = "";
 
-            if (messages != null)
-                messages.TryGetValue(key, out message);
+            try
+            {
+                if (messages != null)
+                    messages.TryGetValue(int.Parse(code), out message);
+            }
+            catch
+            {
+            }
 
-            return message == "" ? string.Format("Alarm {0}", key) : message;
+            return message == "" ? string.Format("Alarm {0}", code) : message;
         }
     }
 

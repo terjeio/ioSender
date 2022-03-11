@@ -1,13 +1,13 @@
 ﻿/*
  * IProbeTab.cs - part of CNC Probing library
  *
- * v0.27 / 2020-09-18 / Io Engineering (Terje Io)
+ * v0.37 / 2022-02-21 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020, Io Engineering (Terje Io)
+Copyright (c) 2020-2022, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -53,7 +53,7 @@ namespace CNC.Controls.Probing
     public interface IProbeTab
     {
         ProbingType ProbingType { get; }
-        void Activate();
+        void Activate(bool activate);
         void Start(bool preview = false);
         void Stop();
     }

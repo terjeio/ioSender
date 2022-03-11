@@ -11,7 +11,10 @@
         <system:String x:Uid="msg_restart" x:Key="RestartMessage">A restart is required after changing settings!</system:String>
     </UserControl.Resources>
     <DockPanel>
-        <Button x:Uid="btn_saveSettings" x:Name="btnSave" DockPanel.Dock="Bottom" Content="Save settings" Margin="10,0,0,5" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="5,0" Click="btnSave_Click"/>
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal">
+            <Button x:Uid="btn_saveSettings" x:Name="btnSave" Content="Save settings" Margin="5" Padding="5,0" Click="btnSave_Click"/>
+            <Button x:Uid="btn_saveKeyMap" x:Name="btnSaveKeyMap" Content="Save keymappings" Margin="5" Padding="5,0" Click="btnSaveKeyMap_Click"/>
+        </StackPanel>
         <ItemsControl x:Name="xx" DockPanel.Dock="Top">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>

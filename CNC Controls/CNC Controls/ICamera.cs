@@ -1,12 +1,12 @@
 ﻿/*
  * ICamera.cs - part of CNC Controls library for Grbl
  *
- * v0.33 / 2021-05-04 / Io Engineering (Terje Io)
+ * v0.37 / 2022-02-21 / Io Engineering (Terje Io)
  *
  */
 /*
 
-Copyright (c) 2020-2021, Io Engineering (Terje Io)
+Copyright (c) 2020-2022, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -50,6 +50,7 @@ namespace CNC.Controls
 
         bool HasCamera { get; }
         bool IsVisible { get; }
+        bool IsMoveEnabled { get; set; }
 
         void Open();
         void Close();

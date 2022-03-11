@@ -1,13 +1,13 @@
 ﻿/*
  * ProbingView.xaml.cs - part of CNC Probing library
  *
- * v0.36 / 2021-12-25 / Io Engineering (Terje Io)
+ * v0.37 / 2022-02-21 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020-2021, Io Engineering (Terje Io)
+Copyright (c) 2020-2022, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -83,6 +83,28 @@ namespace CNC.Controls.Probing
                 keyboard.AddHandler(Key.C, ModifierKeys.Alt, ProbeConnectedToggle, this);
 
                 DataContext = model = new ProbingViewModel(DataContext as GrblViewModel, profiles);
+
+                grbl.OnCameraProbe += addCameraPosition;
+            }
+        }
+
+        private void addCameraPosition(Position position)
+        {
+            if (grbl.IsProbing)
+            {
+                if(model.CameraPositions == 0)
+                {
+                    model.PreviewText = string.Empty;
+                    model.PreviewEnable = true;
+                }
+
+                model.Positions.Add(position);
+                var positions = model.CameraPositions = model.Positions.Count;
+
+                if(positions == model.CameraPositions) // model.CameraPositions may have been changed elsewhere!
+                    model.PreviewText += (model.PreviewText == string.Empty ? string.Empty : "\n") + string.Format((string)FindResource("CameraPosition"), model.CameraPositions, position.X.ToInvariantString(), position.Y.ToInvariantString());
+
+                Jog.Focus();
             }
         }
 
@@ -212,7 +234,7 @@ namespace CNC.Controls.Probing
 
         public void Activate(bool activate, ViewType chgMode)
         {
-            if (activate)
+            if ((grbl.IsProbing = activate))
             {
                 if (model.CoordinateSystems.Count == 0)
                 {
@@ -258,7 +280,7 @@ namespace CNC.Controls.Probing
 
                 Probing.Command = GrblInfo.ReportProbeResult ? "G38.3" : "G38.2";
 
-                getView(tab.SelectedItem as TabItem)?.Activate();
+                getView(tab.SelectedItem as TabItem)?.Activate(true);
 
                 model.Grbl.PropertyChanged += Grbl_PropertyChanged;
 
@@ -271,6 +293,7 @@ namespace CNC.Controls.Probing
             else
             {
                 model.Grbl.PropertyChanged -= Grbl_PropertyChanged;
+                getView(tab.SelectedItem as TabItem)?.Activate(false);
 
                 if (!model.Grbl.IsGCLock)
                 {
@@ -368,7 +391,7 @@ namespace CNC.Controls.Probing
             var btn = sender as Button;
             if (grbl.Keyboard.IsJogging)
                 grbl.Keyboard.JogCancel();
-            jogEnabled = btn.IsFocused && grbl.Keyboard.CanJog;
+            jogEnabled = btn.IsFocused && grbl.Keyboard.CanJog2;
             btn.Content = (string)FindResource(jogEnabled ? "JogActive" : "JogDisabled");
         }
 
@@ -376,9 +399,10 @@ namespace CNC.Controls.Probing
         {
             if (Equals(e.OriginalSource, sender))
             {
-                var view = getView(((sender as TabControl).SelectedItem as TabItem));
-                if (view != null)
+                if (e.AddedItems.Count == 1)
                 {
+                    var view = getView(e.AddedItems[0] as TabItem);
+                    model.Positions.Clear();
                     model.ProbingType = view.ProbingType;
                     model.Message = string.Empty;
                     model.PreviewEnable = false;
@@ -386,7 +410,10 @@ namespace CNC.Controls.Probing
                     if (GrblInfo.IsGrblHAL)
                         Comms.com.WriteByte(GrblConstants.CMD_STATUS_REPORT_ALL);
 
-                    view.Activate();
+                    if(e.RemovedItems.Count == 1)
+                        getView(e.RemovedItems[0] as TabItem).Activate(false);
+
+                    view.Activate(true);
                 }
                 e.Handled = true;
             }

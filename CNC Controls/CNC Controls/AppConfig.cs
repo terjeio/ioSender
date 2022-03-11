@@ -1,7 +1,7 @@
 ﻿/*
  * AppConfig.cs - part of CNC Controls library
  *
- * v0.36 / 2022-01-23 / Io Engineering (Terje Io)
+ * v0.37 / 2022-03-02 / Io Engineering (Terje Io)
  *
  */
 
@@ -44,10 +44,10 @@ using System.Windows;
 using System.Collections.ObjectModel;
 using System.Windows.Media;
 using System.Threading;
+using System.Windows.Media.Media3D;
 using CNC.Core;
 using CNC.GCode;
 using static CNC.GCode.GCodeParser;
-using System.Windows.Media.Media3D;
 
 namespace CNC.Controls
 {
@@ -104,19 +104,24 @@ namespace CNC.Controls
     [Serializable]
     public class CameraConfig : ViewModelBase
     {
+        private string _camera = string.Empty;
         private double _xoffset = 0d, _yoffset = 0d;
         private int _guideScale = 10;
+        private bool _moveToSpindle = false, _confirmMove = false;
         private CameraMoveMode _moveMode = CameraMoveMode.BothAxes;
 
         [XmlIgnore]
-        internal bool IsDirty { get; private set; } = false;
+        internal bool IsDirty { get; set; } = false;
 
         [XmlIgnore]
         public CameraMoveMode[] MoveModes { get { return (CameraMoveMode[])Enum.GetValues(typeof(CameraMoveMode)); } }
 
+        public string SelectedCamera { get { return _camera; } set { _camera = value; IsDirty = true; OnPropertyChanged(); } }
         public double XOffset { get { return _xoffset; } set { _xoffset = value; OnPropertyChanged(); } }
         public double YOffset { get { return _yoffset; } set { _yoffset = value; OnPropertyChanged(); } }
         public int GuideScale { get { return _guideScale; } set { _guideScale = value; IsDirty = true; OnPropertyChanged(); } }
+        public bool InitialMoveToSpindle { get { return _moveToSpindle; } set { _moveToSpindle = value; IsDirty = true; OnPropertyChanged(); } }
+        public bool ConfirmMove { get { return _confirmMove; } set { _confirmMove = value; IsDirty = true; OnPropertyChanged(); } }
         public CameraMoveMode MoveMode { get { return _moveMode; } set { _moveMode = value; OnPropertyChanged(); } }
     }
 
@@ -315,6 +320,7 @@ namespace CNC.Controls
 
         public bool Save()
         {
+            Camera.IsDirty = false;
             return configfile != null && Save(configfile);
         }
 

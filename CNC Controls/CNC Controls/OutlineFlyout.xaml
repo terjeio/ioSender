@@ -6,7 +6,7 @@
              xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:local="clr-namespace:CNC.Controls"
              mc:Ignorable="d" 
-             d:DesignHeight="130" d:DesignWidth="300" MaxWidth="300"
+             d:DesignHeight="120" d:DesignWidth="300" MaxWidth="300"
              Loaded="OutlineFlyout_Loaded">
     <UserControl.Resources>
         <system:String x:Uid="str_outlineFlyout" x:Key="MenuLabel">_Outline</system:String>
@@ -24,8 +24,8 @@
         </Style>
     </UserControl.Resources>
     <Border BorderBrush="DarkGray" BorderThickness="1" CornerRadius="3" Background="#FFE5E5EA">
-        <Grid Height="130">
-            <local:OutlineBaseControl/>
+        <Grid Height="120">
+            <local:OutlineBaseControl Margin="0,15,0,0"/>
             <Button Content="×" Focusable="False" Style="{StaticResource SmallXButtonStyle}" VerticalContentAlignment="Top" HorizontalAlignment="Left" Margin="285,0,0,0" VerticalAlignment="Top" Width="14" Height="18" Click="btn_Close"/>
         </Grid>
     </Border>

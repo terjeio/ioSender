@@ -1,13 +1,13 @@
 ﻿/*
  * DROControl.xaml.cs - part of CNC Controls library
  *
- * v0.36 / 2021-12-25 / Io Engineering (Terje Io)
+ * v0.37 / 2022-02-27 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2020, Io Engineering (Terje Io)
+Copyright (c) 2018-2022, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -47,7 +47,6 @@ using CNC.GCode;
 
 namespace CNC.Controls
 {
-
     public partial class DROControl : UserControl
     {
         private double orgpos;
@@ -90,16 +89,16 @@ namespace CNC.Controls
 
                 keyboardMappingsOk = true;
 
-                keyboard.AddHandler(Key.X, ModifierKeys.Control | ModifierKeys.Shift, zeroAxes);
-                keyboard.AddHandler(Key.Y, ModifierKeys.Control | ModifierKeys.Shift, zeroAxes);
-                keyboard.AddHandler(Key.Z, ModifierKeys.Control | ModifierKeys.Shift, zeroAxes);
+                keyboard.AddHandler(Key.X, ModifierKeys.Control | ModifierKeys.Shift, ZeroX);
+                keyboard.AddHandler(Key.Y, ModifierKeys.Control | ModifierKeys.Shift, ZeroY);
+                keyboard.AddHandler(Key.Z, ModifierKeys.Control | ModifierKeys.Shift, ZeroZ);
                 if (GrblInfo.AxisFlags.HasFlag(AxisFlags.A))
-                    keyboard.AddHandler(Key.A, ModifierKeys.Control | ModifierKeys.Shift, zeroAxes);
+                    keyboard.AddHandler(Key.A, ModifierKeys.Control | ModifierKeys.Shift, ZeroA);
                 if (GrblInfo.AxisFlags.HasFlag(AxisFlags.B))
-                    keyboard.AddHandler(Key.B, ModifierKeys.Control | ModifierKeys.Shift, zeroAxes);
+                    keyboard.AddHandler(Key.B, ModifierKeys.Control | ModifierKeys.Shift, ZeroB);
                 if (GrblInfo.AxisFlags.HasFlag(AxisFlags.C))
-                    keyboard.AddHandler(Key.C, ModifierKeys.Control | ModifierKeys.Shift, zeroAxes);
-                keyboard.AddHandler(Key.D0, ModifierKeys.Control | ModifierKeys.Shift, zeroAxes);
+                    keyboard.AddHandler(Key.C, ModifierKeys.Control | ModifierKeys.Shift, ZeroC);
+                keyboard.AddHandler(Key.D0, ModifierKeys.Control | ModifierKeys.Shift, ZeroAxes);
             }
         }
 
@@ -163,9 +162,47 @@ namespace CNC.Controls
             AxisPositionChanged("ALL", 0.0d);
         }
 
-        private bool zeroAxes(Key key)
+        private bool ZeroAxes(Key key)
         {
-            AxisPositionChanged(key == Key.D0 ? "ALL" : key.ToString(), 0d);
+            AxisPositionChanged("ALL", 0d);
+
+            return true;
+        }
+
+        private bool ZeroX(Key key)
+        {
+            AxisPositionChanged("X", 0d);
+
+            return true;
+        }
+
+        private bool ZeroY(Key key)
+        {
+            AxisPositionChanged("Y", 0d);
+
+            return true;
+        }
+        private bool ZeroZ(Key key)
+        {
+            AxisPositionChanged("Z", 0d);
+
+            return true;
+        }
+        private bool ZeroA(Key key)
+        {
+            AxisPositionChanged("A", 0d);
+
+            return true;
+        }
+        private bool ZeroB(Key key)
+        {
+            AxisPositionChanged("B", 0d);
+
+            return true;
+        }
+        private bool ZeroC(Key key)
+        {
+            AxisPositionChanged("C", 0d);
 
             return true;
         }
@@ -184,5 +221,3 @@ namespace CNC.Controls
         }
     }
 }
-
-

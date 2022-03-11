@@ -22,6 +22,7 @@ CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,btn_stop:System.
 CNC.Controls.Probing.g.en-US.resources:edgefindercontrol.baml,btn_stop:System.Windows.Controls.ContentControl.Content,Button,True,True,,Стоп
 CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,btn_stop:System.Windows.Controls.ContentControl.Content,Button,True,True,,Стоп
 CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,btn_stop:System.Windows.Controls.ContentControl.Content,Button,True,True,,Стоп
+CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,btn_useCamera:System.Windows.Controls.ContentControl.Content,Button,True,True,,Use camera positions
 CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,btn_useX0Y0:System.Windows.Controls.ContentControl.Content,Button,True,True,,"Использ. X0,Y0"
 CNC.Controls.Probing.g.en-US.resources:probingview.baml,fld_depth:CNC.Controls.NumericField.Label,None,False,True,,Глубина:
 CNC.Controls.Probing.g.en-US.resources:probingview.baml,fld_depth:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Смещение места измерения по Z от текущей позиции.
@@ -108,6 +109,7 @@ CNC.Controls.Probing.g.en-US.resources:probingview.baml,mnu_add:System.Windows.C
 CNC.Controls.Probing.g.en-US.resources:probingview.baml,mnu_delete:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Удалить
 CNC.Controls.Probing.g.en-US.resources:probingview.baml,mnu_update:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Обновить
 CNC.Controls.Probing.g.en-US.resources:csselectcontrol.baml,set_coord:System.Windows.Controls.ContentControl.Content,RadioButton,True,True,,Система координат:
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,str_cameraPosition:System.String.$Content,None,True,True,,"Camera position {0}, X: {1}, Y: {2}"
 CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,str_centerFinderClearance:System.String.$Content,None,True,True,,Зазор измерения XY слишком велик для детали размера {0}.
 CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,str_centerFinderCompleted:System.String.$Content,None,True,True,,"Измерение завершено: размер X  {0}, разменр Y {1}."
 CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,str_centerFinderFailed:System.String.$Content,None,True,True,,Ошибка озмерения
@@ -131,12 +133,14 @@ CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,str_heightMapFailed
 CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,str_heightMapInstructions:System.String.$Content,None,True,True,,"Быстрое перемнщение в X0Y0 перед началом измерения карты высот.\\nУбедитесть, что позиция по Z установлена в положение, свободнгое от препятствий."
 CNC.Controls.Probing.g.en-US.resources:probingview.baml,str_jogActive:System.String.$Content,None,True,True,,Перемещение клавиатурой активно
 CNC.Controls.Probing.g.en-US.resources:probingview.baml,str_jogDisabled:System.String.$Content,None,True,True,,Перемещение клавиатурой отключено
+CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,str_positionsRequired:System.String.$Content,None,True,True,,{0} probe positions are required.
 CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probing:System.String.$Content,None,True,True,,Измерение...
 CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probingDistanceError:System.String.$Content,None,True,True,,Дистанция измерения должна быть более зазора XY + ½ диаметра щупа.
 CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probingFailedAlarm:System.String.$Content,None,True,True,,"Авария при измерении, сбросьте на закладке Grbl."
 CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probingFailedCancelled:System.String.$Content,None,True,True,,Измерение прервано/ошибка.
 CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probingHeigthMapMinSize:System.String.$Content,None,True,True,,Карта высот должна содержать минимум 4 точки.
 CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probingHeigthMapNarrow:System.String.$Content,None,True,True,,Карта высот не может быть бесконечно узкой.
+CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probingIllegalPosition:System.String.$Content,None,True,True,,"Illegal probe position, try again."
 CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probingLatchDistanceError:System.String.$Content,None,True,True,,Дистанция фиксации должна быть меньше дистанции измерения.
 CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probingNoPos:System.String.$Content,None,True,True,,"Ошибка озмерения, текущяя позиция не известна."
 CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probingNoProbe:System.String.$Content,None,True,True,,"Ошибка озмерения, датчик не подключен."

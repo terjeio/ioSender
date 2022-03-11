@@ -1,7 +1,9 @@
 ﻿ioSender.g.en-US.resources:mainwindow.baml,lbl_jogStep:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Расстояние для пошагового перемещения клавиатурой (+&lt;CTRL&gt;).
 ioSender.g.en-US.resources:mainwindow.baml,mnu_about:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_О програме
+ioSender.g.en-US.resources:mainwindow.baml,mnu_briefTour:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,A _brief tour
 ioSender.g.en-US.resources:mainwindow.baml,mnu_camera:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Камера
 ioSender.g.en-US.resources:mainwindow.baml,mnu_close:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Закрыть
+ioSender.g.en-US.resources:mainwindow.baml,mnu_errorsAndAlarms:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Error and alarm codes
 ioSender.g.en-US.resources:mainwindow.baml,mnu_exit:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Выход
 ioSender.g.en-US.resources:mainwindow.baml,mnu_file:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Файл
 ioSender.g.en-US.resources:mainwindow.baml,mnu_help:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Справка
@@ -11,12 +13,25 @@ ioSender.g.en-US.resources:mainwindow.baml,mnu_openConsole:System.Windows.Contro
 ioSender.g.en-US.resources:mainwindow.baml,mnu_save:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Сохранить
 ioSender.g.en-US.resources:mainwindow.baml,mnu_transform:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Преобразовать
 ioSender.g.en-US.resources:mainwindow.baml,mnu_usageTips:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Заметки по использованию
+ioSender.g.en-US.resources:mainwindow.baml,mnu_videoTutorials:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Video tutorials
 ioSender.g.en-US.resources:mainwindow.baml,mnu_wiki:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Wiki
 ioSender.g.en-US.resources:mainwindow.baml,str_jogStep:System.String.$Content,None,True,True,,Шаг перемешений : {0}
 ioSender.g.en-US.resources:mainwindow.baml,str_mnuArcsToLines:System.String.$Content,None,True,True,,Дуги в отрезки
 ioSender.g.en-US.resources:mainwindow.baml,str_mnuCompress:System.String.$Content,None,True,True,,Сжать (экспериментальная)
 ioSender.g.en-US.resources:mainwindow.baml,str_mnuDragKnife:System.String.$Content,None,True,True,,Добавить перемещение флюгерного ножа
 ioSender.g.en-US.resources:mainwindow.baml,str_mnuRotate:System.String.$Content,None,True,True,,Поворот
+ioSender.g.en-US.resources:jobview.baml,str_msgDoorExit:System.String.$Content,None,True,True,,"Door is still open, exit?"
+ioSender.g.en-US.resources:jobview.baml,str_msgDoorOpen:System.String.$Content,None,True,True,,"Door is open, close door and continue?"
+ioSender.g.en-US.resources:jobview.baml,str_msgDoorPersist:System.String.$Content,None,True,True,,Door state cannot be cleared with &lt;Reset&gt;
+ioSender.g.en-US.resources:jobview.baml,str_msgEStop:System.String.$Content,None,True,True,,E-Stop active! - clear before continuing...
+ioSender.g.en-US.resources:jobview.baml,str_msgEStopExit:System.String.$Content,None,True,True,,"E-Stop still active, exit?"
+ioSender.g.en-US.resources:jobview.baml,str_msgHome:System.String.$Content,None,True,True,,"Homing cycle required, &lt;Home&gt; to continue"
+ioSender.g.en-US.resources:jobview.baml,str_msgNoComm:System.String.$Content,None,True,True,,"Controller is in {0} state and cannot respond, try a soft reset?"
+ioSender.g.en-US.resources:jobview.baml,str_msgNoCommAlarm:System.String.$Content,None,True,True,,"Controller is not able to communicate due to alarm {0}, attempting a soft reset."
+ioSender.g.en-US.resources:jobview.baml,str_msgNoResponse:System.String.$Content,None,True,True,,Controller is not responding!
+ioSender.g.en-US.resources:jobview.baml,str_msgResetExit:System.String.$Content,None,True,True,,"Controller soft reset failed, exiting."
+ioSender.g.en-US.resources:jobview.baml,str_msgResetFailed:System.String.$Content,None,True,True,,"Controller soft reset failed, exiting."
+ioSender.g.en-US.resources:jobview.baml,str_msgWait:System.String.$Content,None,True,True,,Waiting for controller ({0})...
 ioSender.g.en-US.resources:mainwindow.baml,str_runTime:System.String.$Content,None,True,True,,Времы выполнения: {0}
 ioSender.g.en-US.resources:mainwindow.baml,tab_3DView:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,3D Вид
 ioSender.g.en-US.resources:jobview.baml,tab_3DView:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,3D Вид

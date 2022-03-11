@@ -36,4 +36,6 @@
     <system:String x:Uid="str_grblStateAlarm" x:Key="StateAlarm">ALARM</system:String>
     <system:String x:Uid="str_grblStateDoor" x:Key="StateDoor">DOOR</system:String>
     <system:String x:Uid="str_grblStateSleep" x:Key="StateSleep">SLEEP</system:String>
+    <system:String x:Uid="str_settingsSaved" x:Key="SettingsSaved">Settings saved.</system:String>
+    <system:String x:Uid="str_keymappingsSaved" x:Key="KeymappingsSaved">Keymappings saved to {0}</system:String>
 </ResourceDictionary>

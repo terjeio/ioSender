@@ -1,7 +1,7 @@
 /*
  * JobView.xaml.cs - part of Grbl Code Sender
  *
- * v0.36 / 2022-01-20 / Io Engineering (Terje Io)
+ * v0.37 / 2022-02-27 / Io Engineering (Terje Io)
  *
  */
 
@@ -56,7 +56,7 @@ namespace GCode_Sender
     public partial class JobView : UserControl, ICNCView
     {
         private bool? initOK = null;
-        private bool sdStream = false;
+        private bool isBooted = false;
         private GrblViewModel model;
         private IInputElement focusedControl = null;
         private Controller Controller = null;
@@ -87,7 +87,7 @@ namespace GCode_Sender
                 case nameof(GrblViewModel.GrblState):
                     if (!Controller.ResetPending)
                     {
-                        if (initOK == false && (sender as GrblViewModel).GrblState.State != GrblStates.Alarm)
+                        if (isBooted && initOK == false && (sender as GrblViewModel).GrblState.State != GrblStates.Alarm)
                             Dispatcher.BeginInvoke(new System.Action(() => InitSystem()), DispatcherPriority.ApplicationIdle);
                     }
                     break;
@@ -155,8 +155,8 @@ namespace GCode_Sender
                     }
                     else if (!string.IsNullOrEmpty(filename) && AppConfig.Settings.GCodeViewer.IsEnabled)
                     {
-                        MainWindow.GCodeViewer.Open(GCode.File.Tokens);
-                        MainWindow.EnableView(true, ViewType.GCodeViewer);
+//                        MainWindow.GCodeViewer.Open(GCode.File.Tokens);
+//                        MainWindow.EnableView(true, ViewType.GCodeViewer);
                         GCodeSender.EnablePolling(false);
                         gcodeRenderer.Open(GCode.File.Tokens);
                         GCodeSender.EnablePolling(true);
@@ -189,6 +189,8 @@ namespace GCode_Sender
                     switch (Controller.Restart())
                     {
                         case Controller.RestartResult.Ok:
+                            if (!isBooted)
+                                Dispatcher.BeginInvoke(new System.Action(() => OnBooted()), DispatcherPriority.ApplicationIdle);
                             initOK = InitSystem();
                             break;
 
@@ -207,27 +209,42 @@ namespace GCode_Sender
                 if (initOK == null)
                     initOK = false;
 
-                #if ADD_CAMERA
+#if ADD_CAMERA
                 if (MainWindow.UIViewModel.Camera != null)
                 {
                     MainWindow.UIViewModel.Camera.MoveOffset += Camera_MoveOffset;
                     MainWindow.UIViewModel.Camera.IsVisibilityChanged += Camera_Opened;
+                    MainWindow.UIViewModel.Camera.IsMoveEnabled = true;
                 }
-                #endif
+#endif
                 //if (viewer == null)
                 //    viewer = new Viewer();
 
                 if(GCode.File.IsLoaded)
                     MainWindow.ui.WindowTitle = ((GrblViewModel)DataContext).FileName;
 
+                model.Keyboard.JogStepDistance = AppConfig.Settings.Jog.LinkStepJogToUI ? AppConfig.Settings.JogUiMetric.Distance0 : AppConfig.Settings.Jog.StepDistance;
+                model.Keyboard.JogDistances[(int)KeypressHandler.JogMode.Slow] = AppConfig.Settings.Jog.SlowDistance;
+                model.Keyboard.JogDistances[(int)KeypressHandler.JogMode.Fast] = AppConfig.Settings.Jog.FastDistance;
+                model.Keyboard.JogFeedrates[(int)KeypressHandler.JogMode.Step] = AppConfig.Settings.Jog.StepFeedrate;
+                model.Keyboard.JogFeedrates[(int)KeypressHandler.JogMode.Slow] = AppConfig.Settings.Jog.SlowFeedrate;
+                model.Keyboard.JogFeedrates[(int)KeypressHandler.JogMode.Fast] = AppConfig.Settings.Jog.FastFeedrate;
+
+                model.Keyboard.IsJoggingEnabled = AppConfig.Settings.Jog.Mode != JogConfig.JogMode.UI;
+
+                if (!GrblInfo.IsGrblHAL)
+                    model.Keyboard.IsContinuousJoggingEnabled = AppConfig.Settings.Jog.KeyboardEnable;
             }
             else if(ViewType != ViewType.Shutdown)
             {
                 DRO.IsFocusable = false;
-                #if ADD_CAMERA
+#if ADD_CAMERA
                 if (MainWindow.UIViewModel.Camera != null)
+                {
                     MainWindow.UIViewModel.Camera.MoveOffset -= Camera_MoveOffset;
-                #endif
+                    MainWindow.UIViewModel.Camera.IsMoveEnabled = false;
+                }
+#endif
                 focusedControl = focusedControl = AppConfig.Settings.Base.KeepMdiFocus &&
                                   Keyboard.FocusedElement is TextBox &&
                                    (Keyboard.FocusedElement as TextBox).Tag is string &&
@@ -273,7 +290,7 @@ namespace GCode_Sender
                 height = limitsControl.ActualHeight;
 
             limitsControl.Visibility = (dp.ActualHeight - t1.ActualHeight - t2.ActualHeight + limitsControl.ActualHeight) > height ? Visibility.Visible : Visibility.Collapsed;
-            outlineControl.Visibility = rhGrid.ActualHeight > 625 ? Visibility.Visible : Visibility.Collapsed;
+            coolantControl.Visibility = rhGrid.ActualHeight > 600 ? Visibility.Visible : Visibility.Collapsed;
             gotoControl.Visibility = rhGrid.ActualHeight > 575 ? Visibility.Visible : Visibility.Collapsed;
         }
 
@@ -308,6 +325,19 @@ namespace GCode_Sender
             Comms.com.WriteString("G90\r"); // reset to previous or G80 to cancel motion mode?   
         }
 #endif
+
+        private void OnBooted()
+        {
+            isBooted = true;
+            string filename = CNC.Core.Resources.Path + string.Format("KeyMap{0}.xml", (int)AppConfig.Settings.Jog.Mode);
+
+            if (System.IO.File.Exists(filename))
+                model.Keyboard.LoadMappings(filename);
+
+            if (GrblInfo.NumAxes > 3)
+                GCode.File.AddTransformer(typeof(GCodeWrapViewModel), "Wrap to rotary (WIP)", MainWindow.UIViewModel.TransformMenuItems);
+        }
+
         private bool InitSystem()
         {
             initOK = true;

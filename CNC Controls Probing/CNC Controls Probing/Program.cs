@@ -374,6 +374,7 @@ namespace CNC.Controls.Probing
                 string response;
 
                 step = 0;
+                probing.CameraPositions = 0;
                 probing.Positions.Clear();
                 probing.Machine.Clear();
 

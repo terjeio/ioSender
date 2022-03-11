@@ -66,9 +66,6 @@
                 <GroupBox x:Uid="grp_workpiece" Header="Workpiece" Visibility="Collapsed">
                     <Controls:NumericField x:Uid="fld_distance" Label="Distance" Value="{Binding Path=WorkpieceHeight, Mode=TwoWay}" Margin="0,5,85,0" VerticalAlignment="Top"/>
                 </GroupBox>
-                <GroupBox x:Uid="grp_camera" Header="Camera">
-                    <Button x:Uid="btn_addPosition" Content="Add _position" IsEnabled="{Binding Path=Grbl.IsCameraVisible}" Margin="2,0" Width="75" Height="23" Focusable="False" Click="addPosition_Click"/>
-                </GroupBox>
                 <GroupBox x:Uid="grp_RotationCenter" Header="Rotation center" HorizontalAlignment="Left" Margin="5,0" ToolTip="Click to select rotation center relative to job, if not selected X0,Y0 is used.">
                     <StackPanel Orientation="Horizontal">
                         <Controls:OriginControl Value="{Binding Path=Origin, Mode=TwoWay}" IsEnabled="{Binding Path=Grbl.IsFileLoaded}" Margin="5,5,0,0"/>

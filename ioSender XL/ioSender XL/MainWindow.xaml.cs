@@ -1,7 +1,7 @@
 /*
  * MainWindow.xaml.cs - part of Grbl Code Sender
  *
- * v0.36 / 2022-01-27 / Io Engineering (Terje Io)
+ * v0.37 / 2022-03-11 / Io Engineering (Terje Io)
  *
  */
 
@@ -56,7 +56,7 @@ namespace GCode_Sender
 
     public partial class MainWindow : Window
     {
-        private const string version = "2.0.36";
+        private const string version = "2.0.37";
         public static MainWindow ui = null;
         public static CNC.Controls.Viewer.Viewer GCodeViewer = null;
         public static UIViewModel UIViewModel { get; } = new UIViewModel();
@@ -70,7 +70,7 @@ namespace GCode_Sender
             InitializeComponent();
 
             ui = this;
-            GCodeViewer = viewer;
+//            GCodeViewer = viewer;
             Title = string.Format(Title, version);
 
             int res;
@@ -242,6 +242,21 @@ namespace GCode_Sender
             System.Diagnostics.Process.Start("https://github.com/terjeio/ioSender/wiki/Usage-tips");
         }
 
+        void briefTour_Click(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start("https://www.grbl.org/single-post/one-sender-to-rule-them-all");
+        }
+
+        void videoTutorials_Click(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start("https://youtube.com/playlist?list=PLnSV6o2cRxM5mQQe4ec5cS2J8jBsEciY3");
+        }
+
+        void errorAndAlarms_Click(object sender, EventArgs e)
+        {
+            new ErrorsAndAlarms(BaseWindowTitle) { Owner = Application.Current.MainWindow }.Show();
+        }
+
         void aboutMenuItem_Click(object sender, EventArgs e)
         {
             About about = new About(BaseWindowTitle) { Owner = Application.Current.MainWindow };
@@ -260,7 +275,6 @@ namespace GCode_Sender
                 }
             }
         }
-
 
         private void Pipe_FileTransfer(string filename)
         {

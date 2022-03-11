@@ -1,13 +1,13 @@
 ﻿/*
  * App.xaml.cs - part of Grbl Code Sender
  *
- * v0.36 / 2021-11-19 / Io Engineering (Terje Io)
+ * v0.37 / 2021-02-20 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2021, Io Engineering (Terje Io)
+Copyright (c) 2019-2022, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -97,6 +97,7 @@ namespace GCode_Sender
             args.Handled = true;
 
             MessageBox.Show("Unhandled exception occured: " + (args.Exception as Exception).Message, "DispatcherException");
+            Environment.Exit(-1);
         }
 
         private void TaskSchedulerOnUnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs args)

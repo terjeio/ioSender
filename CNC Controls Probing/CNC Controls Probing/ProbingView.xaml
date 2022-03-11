@@ -14,6 +14,7 @@
         <system:String x:Uid="str_runMacro" x:Key="RunMacro">Run {0} macro?</system:String>
         <system:String x:Uid="str_jogActive" x:Key="JogActive">Keyboard jogging active</system:String>
         <system:String x:Uid="str_jogDisabled" x:Key="JogDisabled">Keyboard jogging disabled</system:String>
+        <system:String x:Uid="str_cameraPosition" x:Key="CameraPosition">Camera position {0}, X: {1}, Y: {2}</system:String>
         <Controls:EnumValueToBooleanConverter x:Key="EnumToEnabledConverter" />
         <Controls:LogicalNotConverter x:Key="IsNotRunningConverter" />
         <Controls:MultiLineConverter x:Key="ErrorMessageConverter" />

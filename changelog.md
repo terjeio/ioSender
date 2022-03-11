@@ -2,7 +2,21 @@
 
 Executable for development builds available for download [here](http://www.io-engineering.com/downloads/) if you want to participate in testing.
 
-2022-01-27:
+2022-03-11: [Release 2.0.35](https://github.com/terjeio/Grbl-GCode-Sender/releases/tag/2.0.37).
+
+* Added list of controller alarm and error codes to _Help_ menu.
+* Added link to tutorial videos to  _Help_ menu. By @S2000Stefan
+* Added link to guided tour blog post to  _Help_ menu. By @phil-barret
+* Improved camera handling, can now be used for center probing. New camera settings options added to _App: Settings_ tab.
+* Fixed bugs in height map probing causing intermittent application hang.
+* Added mapping of G-code to rotary axis to _File > Transform_ menu. Experimental.
+* Modified _Grbl_ tab layout in XL version to always show _Outline_ box.
+* Added support for custom keyboard shorcut mappings, current mappings can be exported from the _App: Settings_ tab.
+* General "hardening" of code.
+
+---
+
+2022-01-27: [Release 2.0.35](https://github.com/terjeio/Grbl-GCode-Sender/releases/tag/2.0.36).
 
 * Fixed nasty bug where crazy motions could happen if a probing sequence was stopped before completion.
 * Improved support for legacy Grbl controllers.

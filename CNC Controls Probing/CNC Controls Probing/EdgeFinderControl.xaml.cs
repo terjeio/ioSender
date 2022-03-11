@@ -1,13 +1,13 @@
 ﻿/*
  * EdgeFinderControl.xaml.cs - part of CNC Probing library
  *
- * v0.36 / 2021-12-01 / Io Engineering (Terje Io)
+ * v0.37 / 2022-02-21 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020-2021, Io Engineering (Terje Io)
+Copyright (c) 2020-2022, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -78,9 +78,10 @@ namespace CNC.Controls.Probing
 
         public ProbingType ProbingType { get { return ProbingType.EdgeFinderExternal; } }
 
-        public void Activate()
+        public void Activate(bool activate)
         {
-            (DataContext as ProbingViewModel).Instructions = ((string)FindResource("Instructions")).Replace("\\n", "\n");
+            if(activate)
+                (DataContext as ProbingViewModel).Instructions = ((string)FindResource("Instructions")).Replace("\\n", "\n");
         }
 
         public void Start(bool preview = false)

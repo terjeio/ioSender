@@ -45,6 +45,9 @@
             <MenuItem x:Uid="mnu_help" x:Name="menuHelp" Header="_Help">
                 <MenuItem x:Uid="mnu_wiki" Header="_Wiki" Click="aboutWikiItem_Click"/>
                 <MenuItem x:Uid="mnu_usageTips" Header="Usage _tips" Click="tipsWikiItem_Click"/>
+                <MenuItem x:Uid="mnu_briefTour" Header="A _brief tour" Click="briefTour_Click"/>
+                <MenuItem x:Uid="mnu_videoTutorials" Header="_Video tutorials" Click="videoTutorials_Click"/>
+                <MenuItem x:Uid="mnu_errorsAndAlarms" Header="_Error and alarm codes" Click="errorAndAlarms_Click"/>
                 <MenuItem x:Uid="mnu_about" Header="_About" Click="aboutMenuItem_Click"/>
             </MenuItem>
         </Menu>
@@ -119,9 +122,11 @@
             <TabItem x:Uid="tab_grbl" x:Name="tabGrbl" Header="Grbl" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                 <local:JobView x:Name="Grbl"/>
             </TabItem>
+            <!---
             <TabItem x:Uid="tab_3DView" x:Name="tabViewer" Header="3D View">
                 <cncviewer:Viewer x:Name="viewer"/>
             </TabItem>
+            -->
             <TabItem x:Uid="tab_probing" x:Name="tabProbing" Header="Probing">
                 <cncprobingcontrols:ProbingView x:Name="probingView"/>
             </TabItem>

@@ -1,13 +1,13 @@
 /*
  * JobControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.36 / 2021-12-27 / Io Engineering (Terje Io)
+ * v0.37 / 2022-02-27 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2021, Io Engineering (Terje Io)
+Copyright (c) 2018-2022, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -169,10 +169,10 @@ namespace CNC.Controls
                     keyboard.AddHandler(Key.F11, ModifierKeys.None, FnKeyHandler);
                     keyboard.AddHandler(Key.F12, ModifierKeys.None, FnKeyHandler);
 
-                    keyboard.AddHandler(Key.OemMinus, ModifierKeys.Control, feedRateDown);
-                    keyboard.AddHandler(Key.OemPlus, ModifierKeys.Control, feedRateUp);
-                    keyboard.AddHandler(Key.OemMinus, ModifierKeys.Shift | ModifierKeys.Control, feedRateDownFine);
-                    keyboard.AddHandler(Key.OemPlus, ModifierKeys.Shift | ModifierKeys.Control, feedRateUpFine);
+                    keyboard.AddHandler(Key.OemMinus, ModifierKeys.Control, FeedRateDown);
+                    keyboard.AddHandler(Key.OemPlus, ModifierKeys.Control, FeedRateUp);
+                    keyboard.AddHandler(Key.OemMinus, ModifierKeys.Shift | ModifierKeys.Control, FeedRateDownFine);
+                    keyboard.AddHandler(Key.OemPlus, ModifierKeys.Shift | ModifierKeys.Control, FeedRateUpFine);
                 }
 
                 GCodeParser.IgnoreM6 = AppConfig.Settings.Base.IgnoreM6;
@@ -316,25 +316,25 @@ namespace CNC.Controls
 
         #region Keyboard shortcut handlers
 
-        private bool feedRateUpFine(Key key)
+        private bool FeedRateUpFine(Key key)
         {
             Comms.com.WriteByte((byte)GrblConstants.CMD_FEED_OVR_FINE_PLUS);
             return true;
         }
 
-        private bool feedRateDownFine(Key key)
+        private bool FeedRateDownFine(Key key)
         {
             Comms.com.WriteByte((byte)GrblConstants.CMD_FEED_OVR_FINE_MINUS);
             return true;
         }
 
-        private bool feedRateUp(Key key)
+        private bool FeedRateUp(Key key)
         {
             Comms.com.WriteByte((byte)GrblConstants.CMD_FEED_OVR_COARSE_PLUS);
             return true;
         }
 
-        private bool feedRateDown(Key key)
+        private bool FeedRateDown(Key key)
         {
             Comms.com.WriteByte((byte)GrblConstants.CMD_FEED_OVR_COARSE_MINUS);
             return true;
@@ -486,7 +486,29 @@ namespace CNC.Controls
 
         public void SendRTCommand(string command)
         {
-            Comms.com.WriteByte((byte)command[0]);
+            var b = Convert.ToInt32(command[0]);
+
+            if(b > 255) switch(b)
+            { 
+                case 8222:
+                    b = GrblConstants.CMD_SAFETY_DOOR;
+                    break;
+
+                case 8225:
+                    b = GrblConstants.CMD_STATUS_REPORT_ALL;
+                    break;
+
+                case 710:
+                    b = GrblConstants.CMD_OPTIONAL_STOP_TOGGLE;
+                    break;
+
+                case 8240:
+                    b = GrblConstants.CMD_SINGLE_BLOCK_TOGGLE;
+                    break;
+            }
+
+            if(b <= 255)
+                Comms.com.WriteByte((byte)b);
         }
 
         private void SendCommand(string command)

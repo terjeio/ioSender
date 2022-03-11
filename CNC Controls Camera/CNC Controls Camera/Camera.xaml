@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CNC.Controls.Camera"
         mc:Ignorable="d"
-        Title="Sender" Height="390" Width="504"
+        Title="Sender" Height="414" Width="504"
         Topmost="True"
         Closing="Window_Closing" Icon="App.ico" ShowInTaskbar="False" ResizeMode="NoResize">
     <Window.TaskbarItemInfo>

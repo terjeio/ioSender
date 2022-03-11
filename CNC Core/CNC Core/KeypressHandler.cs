@@ -1,7 +1,7 @@
 ﻿/*
  * KeypressHandler.xaml.cs - part of CNC Controls library
  *
- * v0.36 / 2022-01-10 / Io Engineering (Terje Io)
+ * v0.37 / 2022-02-27 / Io Engineering (Terje Io)
  *
  */
 
@@ -37,12 +37,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-using CNC.GCode;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Xml.Serialization;
+using CNC.GCode;
 
 namespace CNC.Core
 {
@@ -56,13 +58,21 @@ namespace CNC.Core
             None // must be last!
         }
 
+        [XmlType(TypeName = "KeyMapping")]
         public class KeypressHandlerFn
         {
-            public Key key;
-            public ModifierKeys modifiers;
-            public bool onUp;
+            [XmlIgnore]
+            internal string method, dummy;
+
+            public Key Key;
+            public ModifierKeys Modifiers;
+            public bool OnUp;
+            [XmlIgnore]
             public UserControl context;
+            [XmlIgnore]
             public Func<Key, bool> Call;
+            public string Context { get { return context == null ? "null" : context.Name; } set { dummy = value; } }
+            public string Method { get { return Call.Method.ReflectedType.Name + "." +  Call.Method.Name; } set { method = value; } }
         }
 
         private int N_AXIS = 3;
@@ -74,11 +84,11 @@ namespace CNC.Core
 
         public void AddHandler(Key key, ModifierKeys modifiers, Func<Key, bool> handler, UserControl context = null, bool onUp = true)
         {
-            handlers.Add(new KeypressHandlerFn(){key = key, modifiers = modifiers, Call = handler, context = context, onUp = onUp });
+            handlers.Add(new KeypressHandlerFn(){Key = key, Modifiers = modifiers, Call = handler, context = context, OnUp = onUp });
         }
         public void AddHandler(Key key, ModifierKeys modifiers, Func<Key, bool> handler, bool onUp)
         {
-            handlers.Add(new KeypressHandlerFn() { key = key, modifiers = modifiers, Call = handler, context = null, onUp = onUp });
+            handlers.Add(new KeypressHandlerFn() { Key = key, Modifiers = modifiers, Call = handler, context = null, OnUp = onUp });
         }
 
         public KeypressHandler(GrblViewModel model)
@@ -97,6 +107,67 @@ namespace CNC.Core
         public bool CanJog2 { get { return grbl.GrblState.State == GrblStates.Idle || grbl.GrblState.State == GrblStates.Tool || grbl.GrblState.State == GrblStates.Jog; } }
         public bool CanJog { get { return allowJog && (grbl.GrblState.State == GrblStates.Idle || grbl.GrblState.State == GrblStates.Tool || grbl.GrblState.State == GrblStates.Jog); } }
         public bool IsJogging { get { return jogMode != JogMode.None || grbl.GrblState.State == GrblStates.Jog; } }
+
+        public bool SaveMappings (string filename)
+        {
+            if (handlers.Count == 0)
+                return false;
+
+            bool ok = false;
+
+            XmlSerializer xs = new XmlSerializer(typeof(List<KeypressHandlerFn>), new XmlRootAttribute("KeyMappings"));
+
+            try
+            {
+                FileStream fsout = new FileStream(filename, FileMode.Create, FileAccess.Write, FileShare.None);
+                using (fsout)
+                {
+                    var keymappings = handlers.Where(x => x.Method != "JobControl.FnKeyHandler").ToList();
+                    xs.Serialize(fsout, keymappings);
+                    ok = true;
+                }
+            }
+            catch
+            {
+            }
+
+            return ok;
+        }
+
+        public bool LoadMappings(string filename)
+        {
+            if (handlers.Count == 0)
+                return false;
+
+            bool ok = false;
+            List<KeypressHandlerFn> keymappings = new List<KeypressHandlerFn>();
+            XmlSerializer xs = new XmlSerializer(typeof(List<KeypressHandlerFn>), new XmlRootAttribute("KeyMappings"));
+
+            try
+            {
+                StreamReader reader = new StreamReader(filename);
+                keymappings = (List<KeypressHandlerFn>)xs.Deserialize(reader);
+                reader.Close();
+
+                foreach(var keymap in keymappings)
+                {
+                    var map = handlers.Where(x => x.Method == keymap.method).FirstOrDefault();
+                    if(map != null)
+                    {
+                        map.Key = keymap.Key;
+                        map.Modifiers = keymap.Modifiers;
+                    }
+                }
+
+                ok = true;
+            }
+            catch
+            {
+                System.Windows.MessageBox.Show("keymap file is corrupt!", "ioSender", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+            }
+
+            return ok;
+        }
 
         public bool ProcessKeypress(KeyEventArgs e, bool allowJog, UserControl context = null)
         {
@@ -350,24 +421,24 @@ namespace CNC.Core
 
             if (Keyboard.Modifiers == ModifierKeys.Alt)
             {
-                var handler = handlers.Where(k => k.modifiers == Keyboard.Modifiers && k.key == e.SystemKey && k.onUp == e.IsUp && k.context == context).FirstOrDefault();
+                var handler = handlers.Where(k => k.Modifiers == Keyboard.Modifiers && k.Key == e.SystemKey && k.OnUp == e.IsUp && k.context == context).FirstOrDefault();
                 if (handler != null)
                     return handler.Call(e.SystemKey);
                 else
                 {
-                    handler = handlers.Where(k => k.modifiers == Keyboard.Modifiers && k.key == e.SystemKey && k.onUp == e.IsUp && k.context == null).FirstOrDefault();
+                    handler = handlers.Where(k => k.Modifiers == Keyboard.Modifiers && k.Key == e.SystemKey && k.OnUp == e.IsUp && k.context == null).FirstOrDefault();
                     if (handler != null)
                         return handler.Call(e.SystemKey);
                 }
             }
             else if (Keyboard.Modifiers == ModifierKeys.None || Keyboard.Modifiers == ModifierKeys.Control || Keyboard.Modifiers == (ModifierKeys.Control | ModifierKeys.Shift))
             {
-                var handler = handlers.Where(k => k.modifiers == Keyboard.Modifiers && k.key == e.Key && k.onUp == e.IsUp && k.context == context).FirstOrDefault();
+                var handler = handlers.Where(k => k.Modifiers == Keyboard.Modifiers && k.Key == e.Key && k.OnUp == e.IsUp && k.context == context).FirstOrDefault();
                 if (handler != null)
                     return handler.Call(e.Key);
                 else
                 {
-                    handler = handlers.Where(k => k.modifiers == Keyboard.Modifiers && k.key == e.Key && k.onUp == e.IsUp && k.context == null).FirstOrDefault();
+                    handler = handlers.Where(k => k.Modifiers == Keyboard.Modifiers && k.Key == e.Key && k.OnUp == e.IsUp && k.context == null).FirstOrDefault();
                     if (handler != null)
                         return handler.Call(e.Key);
                 }

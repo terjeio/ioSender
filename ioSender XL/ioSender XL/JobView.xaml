@@ -55,13 +55,13 @@
             </Grid.RowDefinitions>
             <cnccontrols:JogControl x:Name="jogControl" Grid.Row="0" Grid.ColumnSpan="2" Margin="5,0,0,0" MinWidth="510" Width="510"/>
             <StackPanel Grid.Row="1" Margin="5,0,0,0" Width="250" VerticalAlignment="Stretch">
-                <cnccontrols:CoolantControl HorizontalAlignment="Left" VerticalAlignment="Top" x:Name="coolantControl"/>
-                <cnccontrols:SpindleControl x:Name="spindleControl" HorizontalAlignment="Left" VerticalAlignment="Top"/>
                 <cnccontrols:OutlineControl x:Name="outlineControl"/>
+                <cnccontrols:SpindleControl x:Name="spindleControl"/>
+                <cnccontrols:CoolantControl x:Name="coolantControl"/>
             </StackPanel>
             <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,0,0,5" Width="250" VerticalAlignment="Stretch">
-                <cnccontrols:WorkParametersControl x:Name="workParametersControl" HorizontalAlignment="Left" VerticalAlignment="Top" IsToolChanging="{Binding IsToolChanging}"/>
-                <cnccontrols:FeedControl x:Name="feedControl" HorizontalAlignment="Left" VerticalAlignment="Top" />
+                <cnccontrols:WorkParametersControl x:Name="workParametersControl" IsToolChanging="{Binding IsToolChanging}"/>
+                <cnccontrols:FeedControl x:Name="feedControl"/>
                 <cnccontrols:GotoControl x:Name="gotoControl"/>
             </StackPanel>
         </Grid>

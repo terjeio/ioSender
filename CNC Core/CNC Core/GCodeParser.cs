@@ -1,13 +1,13 @@
 ﻿/*
  * GCodeParser.cs - part of CNC Controls library
  *
- * v0.36 / 2021-11-17 / Io Engineering (Terje Io)
+ * v0.37 / 2022-02-22 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2021, Io Engineering (Terje Io)
+Copyright (c) 2019-2022, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -917,7 +917,7 @@ namespace CNC.GCode
             if (modalGroups.HasFlag(ModalGroups.G5))
             {
                 FeedRateMode = (FeedRateMode)(cmdFeedrateMode - 93);
-                Tokens.Add(new GCodeToken(cmdFeedrateMode, gcValues.N));
+                Tokens.Add(new GCFeedRateMode(cmdFeedrateMode, gcValues.N));
             }
 
             //
@@ -1620,6 +1620,7 @@ namespace CNC.GCode
                         typeof(GCCannedDrill),
                         typeof(GCPlane),
                         typeof(GCDistanceMode),
+                        typeof(GCFeedRateMode),
                         typeof(GCIJKMode),
                         typeof(GCUnits),
                         typeof(GCLatheMode),
@@ -2841,6 +2842,11 @@ namespace CNC.GCode
             Feedrate = feedrate;
         }
 
+        public GCFeedrate(uint lnr, double feedrate) : base(Commands.Feedrate, lnr)
+        {
+            Feedrate = feedrate;
+        }
+
         public double Feedrate { get; set; }
 
         public new string ToString()
@@ -2938,7 +2944,27 @@ namespace CNC.GCode
         {
         }
 
+        public GCDistanceMode(uint lnr, DistanceMode distanceMode) : base(distanceMode == DistanceMode.Absolute ? Commands.G90 : Commands.G91, lnr)
+        {
+        }
+
         public DistanceMode DistanceMode { get { return Command == Commands.G90 ? DistanceMode.Absolute : DistanceMode.Incremental; } }
+    }
+
+    public class GCFeedRateMode : GCodeToken
+    {
+        public GCFeedRateMode()
+        { }
+
+        public GCFeedRateMode(Commands command, uint lnr) : base(command, lnr)
+        {
+        }
+
+        public GCFeedRateMode(uint lnr, FeedRateMode feedRateMode) : base(feedRateMode == FeedRateMode.UnitsPerMin ? Commands.G94 : (feedRateMode == FeedRateMode.InverseTime ? Commands.G93 : Commands.G95), lnr)
+        {
+        }
+
+        public FeedRateMode FeedRateMode { get { return Command == Commands.G94 ? FeedRateMode.UnitsPerMin : (Command == Commands.G93 ? FeedRateMode.InverseTime : FeedRateMode.UnitsPerRev); } }
     }
 
     public class GCIJKMode : GCodeToken

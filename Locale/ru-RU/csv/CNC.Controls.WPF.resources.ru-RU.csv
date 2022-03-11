@@ -3,6 +3,7 @@ CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,btn_backup:System.Windows
 CNC.Controls.WPF.g.en-US.resources:portdialog.baml,btn_cancel:System.Windows.Controls.ContentControl.Content,Button,True,True,,Отмена
 CNC.Controls.WPF.g.en-US.resources:gcoderotatedialog.baml,btn_cancel:System.Windows.Controls.ContentControl.Content,Button,True,True,,Отмена
 CNC.Controls.WPF.g.en-US.resources:macroeditor.baml,btn_cancel:System.Windows.Controls.ContentControl.Content,Button,True,True,,Отмена
+CNC.Controls.WPF.g.en-US.resources:gcodewrapdialog.baml,btn_cancel:System.Windows.Controls.ContentControl.Content,Button,True,True,,Cancel
 CNC.Controls.WPF.g.en-US.resources:consolecontrol.baml,btn_clear:System.Windows.Controls.ContentControl.Content,Button,True,True,,Очистить
 CNC.Controls.WPF.g.en-US.resources:offsetview.baml,btn_clear:System.Windows.Controls.ContentControl.Content,Button,True,True,,Очистить все
 CNC.Controls.WPF.g.en-US.resources:toolview.baml,btn_clear:System.Windows.Controls.ContentControl.Content,Button,True,True,,Очистить все
@@ -25,6 +26,7 @@ CNC.Controls.WPF.g.en-US.resources:portdialog.baml,btn_ok:System.Windows.Control
 CNC.Controls.WPF.g.en-US.resources:about.baml,btn_ok:System.Windows.Controls.ContentControl.Content,Button,True,True,,Ok
 CNC.Controls.WPF.g.en-US.resources:gcoderotatedialog.baml,btn_ok:System.Windows.Controls.ContentControl.Content,Button,True,True,,Ok
 CNC.Controls.WPF.g.en-US.resources:macroeditor.baml,btn_ok:System.Windows.Controls.ContentControl.Content,Button,True,True,,Ok
+CNC.Controls.WPF.g.en-US.resources:gcodewrapdialog.baml,btn_ok:System.Windows.Controls.ContentControl.Content,Button,True,True,,Ok
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,btn_reload:System.Windows.Controls.ContentControl.Content,Button,True,True,,Перечитать
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,btn_reload:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Перечитать настройки из контроллера.
 CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,btn_reset:System.Windows.Controls.ContentControl.Content,Button,True,True,,Сброс
@@ -33,6 +35,7 @@ CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,btn_restore:System.Window
 CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,btn_rewind:System.Windows.Controls.ContentControl.Content,Button,True,True,,В начало
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,btn_save:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Применить изменения в контроллер.
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,btn_save:System.Windows.Controls.ContentControl.Content,Button,True,True,,Сохранить
+CNC.Controls.WPF.g.en-US.resources:appconfigview.baml,btn_saveKeyMap:System.Windows.Controls.ContentControl.Content,Button,True,True,,Save keymappings
 CNC.Controls.WPF.g.en-US.resources:appconfigview.baml,btn_saveSettings:System.Windows.Controls.ContentControl.Content,Button,True,True,,Сохранить настройки
 CNC.Controls.WPF.g.en-US.resources:mdicontrol.baml,btn_send:System.Windows.Controls.ContentControl.Content,Button,True,True,,Отправить
 CNC.Controls.WPF.g.en-US.resources:coordvaluesetcontrol.baml,btn_set:System.Windows.Controls.ContentControl.Content,Button,True,True,,Уст.
@@ -55,6 +58,7 @@ CNC.Controls.WPF.g.en-US.resources:consolewindow.baml,dlg_senderConsole:System.W
 CNC.Controls.WPF.g.en-US.resources:portdialog.baml,dlg_title:System.Windows.Window.Title,Title,True,True,,Подключение контроллера
 CNC.Controls.WPF.g.en-US.resources:gcoderotatedialog.baml,fld_angle:CNC.Controls.NumericField.Unit,None,True,True,,градусы
 CNC.Controls.WPF.g.en-US.resources:gcoderotatedialog.baml,fld_angle:CNC.Controls.NumericField.Label,None,True,True,,Угол:
+CNC.Controls.WPF.g.en-US.resources:gcodewrapdialog.baml,fld_diameter:CNC.Controls.NumericField.Label,None,True,True,,Diameter:
 CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_fastDistance:CNC.Controls.NumericField.Label,None,False,True,,Расстояние Быстро:
 CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_fastFeedrate:CNC.Controls.NumericField.Label,None,False,True,,Подача Быстро:
 CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_fastFeedrate:CNC.Controls.NumericField.Unit,None,False,True,,мм/мин
@@ -93,8 +97,12 @@ CNC.Controls.WPF.g.en-US.resources:trinamicview.baml,grp_stallGuard:System.Windo
 CNC.Controls.WPF.g.en-US.resources:jogcontrol.baml,grp_uijog:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Jogging
 CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,grp_uiJogging:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Экранный пульт
 CNC.Controls.WPF.g.en-US.resources:workparameterscontrol.baml,grp_workparams:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Параметры Обработки
+CNC.Controls.WPF.g.en-US.resources:grblalarmlist.baml,hdr_alarmCode:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Code
+CNC.Controls.WPF.g.en-US.resources:grblalarmlist.baml,hdr_alarmMessage:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Message
 CNC.Controls.WPF.g.en-US.resources:gcodelistcontrol.baml,hdr_block:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Блокировать
 CNC.Controls.WPF.g.en-US.resources:gcodelistcontrol.baml,hdr_data:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Данные
+CNC.Controls.WPF.g.en-US.resources:grblerrorlist.baml,hdr_errorCode:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Code
+CNC.Controls.WPF.g.en-US.resources:grblerrorlist.baml,hdr_errorMessage:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Message
 CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,hdr_name:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Имя
 CNC.Controls.WPF.g.en-US.resources:offsetview.baml,hdr_offset:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Смещение
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,hdr_settingId:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Id
@@ -178,6 +186,8 @@ CNC.Controls.WPF.g.en-US.resources:workparameterscontrol.baml,lbl_tool:System.Wi
 CNC.Controls.WPF.g.en-US.resources:toolview.baml,lbl_tool:System.Windows.Controls.ContentControl.Content,Label,True,True,,Инструмент:
 CNC.Controls.WPF.g.en-US.resources:consolecontrol.baml,lbl_verbose:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Подробный
 CNC.Controls.WPF.g.en-US.resources:portdialog.baml,lbl_websocket:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Web порт
+CNC.Controls.WPF.g.en-US.resources:gcodewrapdialog.baml,lbl_wrapSource:System.Windows.Controls.ContentControl.Content,Label,True,True,,Wrap:
+CNC.Controls.WPF.g.en-US.resources:gcodewrapdialog.baml,lbl_wrapTarget:System.Windows.Controls.ContentControl.Content,Label,True,True,,to:
 CNC.Controls.WPF.g.en-US.resources:toolview.baml,lbl_xAxis:CNC.Controls.CoordValueSetControl.Label,None,True,True,,Ось X:
 CNC.Controls.WPF.g.en-US.resources:offsetview.baml,lbl_xAxis:CNC.Controls.CoordValueSetControl.Label,None,True,True,,Ось X:
 CNC.Controls.WPF.g.en-US.resources:toolview.baml,lbl_yAxis:CNC.Controls.CoordValueSetControl.Label,None,True,True,,Ось Y:
@@ -215,6 +225,7 @@ CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_grblStateTool:System.Stri
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_grblStateUnknown:System.String.$Content,None,True,True,,НЕОПРЕД.
 CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,str_illegalName:System.String.$Content,None,True,True,,"Файл: {0}\\n!,?,~ и ПРОБЕЛ не поддерживаются в имени файла, пожалуйста переименуйте."
 CNC.Controls.WPF.g.en-US.resources:jogflyoutcontrol.baml,str_jogFlyout:System.String.$Content,None,True,True,,_Пульт
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_keymappingsSaved:System.String.$Content,None,True,True,,Keymappings saved to {0}
 CNC.Controls.WPF.g.en-US.resources:macroexecutecontrol.baml,str_macrosFlyout:System.String.$Content,None,True,True,,_Макрос
 CNC.Controls.WPF.g.en-US.resources:machinepositionflyout.baml,str_mposFlyout:System.String.$Content,None,True,True,,Маш._координаты
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgDoorExit:System.String.$Content,None,True,True,,Дверь не закрыта. Выйти?
@@ -241,6 +252,7 @@ CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsError:System.
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsFail:System.String.$Content,None,True,True,,Ошибка...\\nПродолжить загрузку?
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsInvalid:System.String.$Content,None,True,True,,Файл не содержит параметров настройки.
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsRestore:System.String.$Content,None,True,True,,Восстановить настройки из файла
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_settingsSaved:System.String.$Content,None,True,True,,Settings saved.
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsTimeout:System.String.$Content,None,True,True,,"Превышено время при установке {0}, продолжить?"
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsWritten:System.String.$Content,None,True,True,,Все установки записаны в {0} в папке программы.
 CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,str_stop:System.String.$Content,None,True,True,,Стоп
@@ -256,7 +268,10 @@ CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_validateMax:System.String
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_validateMin:System.String.$Content,None,True,True,,Ошибка ввода: min. значение {0}.
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_validateNotIP4:System.String.$Content,None,True,True,,Ошибка ввода: неверный формат IP4 адреса..
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_validateRange:System.String.$Content,None,True,True,,Ошибка ввода: Разрешенный диапазон {0} - {1}.
+CNC.Controls.WPF.g.en-US.resources:errorsandalarms.baml,tab_alarms:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Alarm codes
+CNC.Controls.WPF.g.en-US.resources:errorsandalarms.baml,tab_errors:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Error codes
 CNC.Controls.WPF.g.en-US.resources:portdialog.baml,tab_network:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Сеть
 CNC.Controls.WPF.g.en-US.resources:portdialog.baml,tab_serial:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Последовательный порт
 CNC.Controls.WPF.g.en-US.resources:outlinebasecontrol.baml,txt_line1:System.Windows.Documents.Run.Text,Text,True,True,,Объехать по контуру обработки в плоскости X-Y.
 CNC.Controls.WPF.g.en-US.resources:outlinebasecontrol.baml,txt_line2:System.Windows.Documents.Run.Text,Text,True,True,,"Убедитесь, что на пути инструмента нет препятствий!"
+CNC.Controls.WPF.g.en-US.resources:errorsandalarms.baml,wnd_errorsAndAlarms:System.Windows.Window.Title,Title,True,True,,Controller error and alarm codes

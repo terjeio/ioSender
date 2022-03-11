@@ -1,13 +1,13 @@
 ﻿/*
  * ProbingViewModel.cs - part of CNC Probing library
  *
- * v0.36 / 2021-11-29 / Io Engineering (Terje Io)
+ * v0.37 / 2022-02-21 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020-2021, Io Engineering (Terje Io)
+Copyright (c) 2020-2022, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -358,6 +358,7 @@ namespace CNC.Controls.Probing
         public string SlowProbe { get { return string.Format(Probing.Command + "F{0}", LatchFeedRate.ToInvariantString()); } }
         public string Instructions { get { return _instructions; } set { _instructions = value; OnPropertyChanged(); } }
         public string Position { get { return _position; } set { if (_position != value) { _position = value; OnPropertyChanged(); }  } }
+        public int CameraPositions { get { return _positions.Count;} set { OnPropertyChanged(); } }
 
         public int Passes { get { return _passes; } set { _passes = value; OnPropertyChanged(); } }
         public int CoordinateSystem { get { return _coordinateSystem; } set { _coordinateSystem = value; OnPropertyChanged(); } }
@@ -492,7 +493,14 @@ namespace CNC.Controls.Probing
                     _enablePreview = value;
                     OnPropertyChanged();
                     if (!_enablePreview)
+                    {
                         PreviewText = string.Empty;
+                        if(CameraPositions > 0)
+                        {
+                            CameraPositions = 0;
+                            Positions.Clear();
+                        }
+                    }
                 }
             }
         }

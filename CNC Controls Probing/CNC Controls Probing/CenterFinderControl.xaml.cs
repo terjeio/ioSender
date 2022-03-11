@@ -1,13 +1,13 @@
 ﻿/*
  * CenterFinderControl.xaml.cs - part of CNC Probing library
  *
- * v0.36 / 2021-12-01 / Io Engineering (Terje Io)
+ * v0.37 / 2022-02-21 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020-2021, Io Engineering (Terje Io)
+Copyright (c) 2020-2022, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -74,9 +74,53 @@ namespace CNC.Controls.Probing
 
         public ProbingType ProbingType { get { return ProbingType.CenterFinder; } }
 
-        public void Activate()
+        public void Activate(bool activate)
         {
-            (DataContext as ProbingViewModel).Instructions = ((string)FindResource("Instructions")).Replace("\\n", "\n");
+            var probing = DataContext as ProbingViewModel;
+
+            if (activate)
+            {
+                probing.Instructions = ((string)FindResource("Instructions")).Replace("\\n", "\n");
+                probing.PropertyChanged += Probing_PropertyChanged;
+            } else
+                probing.PropertyChanged -= Probing_PropertyChanged;
+        }
+
+        private void Probing_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(ProbingViewModel.CameraPositions))
+            {
+                var probing = DataContext as ProbingViewModel;
+                bool ok = probing.CameraPositions <= 1 || !probing.Positions[probing.CameraPositions - 1].Equals(probing.Positions[probing.CameraPositions - 2]);
+
+                if(ok) switch (probing.CameraPositions)
+                {
+                    case 2:
+                        if(mode == FindMode.Y)
+                            ok = probing.Positions[1].X == probing.Positions[0].X && probing.Positions[1].Y > probing.Positions[0].Y;
+                        else
+                            ok = probing.Positions[1].X > probing.Positions[0].X && probing.Positions[1].Y == probing.Positions[0].Y;
+                        break;
+
+                    case 3:
+                        ok = !probing.Positions[2].Equals(probing.Positions[0]) && probing.Positions[2].X != probing.Positions[1].X;
+                        break;
+
+                    case 4:
+                        ok = !probing.Positions[3].Equals(probing.Positions[0]) &&
+                                !probing.Positions[3].Equals(probing.Positions[1]) &&
+                                probing.Positions[3].X == probing.Positions[2].X &&
+                                probing.Positions[3].Y > probing.Positions[2].Y;
+                        break;
+                }
+
+                if (!ok)
+                {
+                    MessageBox.Show(LibStrings.FindResource("IllegalPosition"), "ioSender", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                    probing.RemoveLastPosition();
+                } else
+                    probing.CanApplyTransform = probing.CameraPositions == (mode == FindMode.XY ? 4 : 2);
+            }
         }
 
         private bool CreateProgram(bool preview)
@@ -376,6 +420,25 @@ namespace CNC.Controls.Probing
         private void start_Click(object sender, RoutedEventArgs e)
         {
             Start((DataContext as ProbingViewModel).PreviewEnable);
+        }
+
+        private void camera_Click(object sender, RoutedEventArgs e)
+        {
+            var probing = DataContext as ProbingViewModel;
+
+            if (probing.ProbeCenter == Center.None)
+            {
+                MessageBox.Show((string)FindResource("SelectType"), "Center finder", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                return;
+            }
+
+            if (probing.Positions.Count == (mode == FindMode.XY ? 4 : 2))
+            {
+                probing.IsSuccess = true;
+                OnCompleted();
+                probing.Positions.Clear();
+                probing.CanApplyTransform = probing.PreviewEnable = false;
+            }
         }
 
         private void stop_Click(object sender, RoutedEventArgs e)

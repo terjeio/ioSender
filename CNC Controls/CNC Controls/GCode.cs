@@ -1,13 +1,13 @@
 ﻿/*
  * GCode.cs - part of CNC Controls library for Grbl
  *
- * v0.36 / 2021-12-14 / Io Engineering (Terje Io)
+ * v0.37 / 2022-02-27 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2021, Io Engineering (Terje Io)
+Copyright (c) 2018-2022, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -151,6 +151,11 @@ namespace CNC.Controls
             return ok;
         }
 
+        public bool HasTransformer(Type converter)
+        {
+            return Transformers.Where(x => x.Type == converter).FirstOrDefault().Type == converter;
+        }
+
         private void TransformMenu_Click(object sender, RoutedEventArgs e)
         {
             Transform((int)(sender as MenuItem).Tag);
@@ -279,7 +284,6 @@ namespace CNC.Controls
                         {
                             foreach (DataRow line in Program.Data.Rows)
                                 stream.WriteLine((string)line["Data"]);
-
                         }
                     }
                 }

@@ -17,6 +17,7 @@
         <system:String x:Uid="str_centerFinderClearance" x:Key="Clearance">Probing XY clearance too large for workpiece {0} size.</system:String>
         <system:String x:Uid="str_centerFinderFailed" x:Key="ProbingFailed">Probing failed</system:String>
         <system:String x:Uid="str_centerFinderCompleted" x:Key="ProbingCompleted">Probing completed: X distance {0}, Y distance {1}.</system:String>
+        <system:String x:Uid="str_positionsRequired" x:Key="PositionsRequired">{0} probe positions are required.</system:String>
         <Controls:MultiLineConverter x:Key="ErrorMessageConverter" />
         <Controls:LogicalNotConverter x:Key="IsNotRunningConverter" />
         <Controls:BoolToVisibleConverter x:Key="ToVisibleConverter" />
@@ -88,6 +89,7 @@
         <StackPanel Margin="5,0,0,5" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Height="Auto" Width="Auto">
             <Button x:Uid="btn_start" Content="Start" IsEnabled="{Binding Path=Grbl.IsJobRunning, Converter={StaticResource IsNotRunningConverter}}" Margin="2,0" Width="75" Click="start_Click"/>
             <Button x:Uid="btn_stop" Content="Stop" IsEnabled="{Binding Path=Grbl.IsJobRunning}" Margin="2,0" Width="75" Click="stop_Click"/>
+            <Button x:Uid="btn_useCamera" Content="Use camera positions" IsEnabled="{Binding Path=CanApplyTransform}" Margin="2,0" Padding="4,0" Click="camera_Click"/>
         </StackPanel>
         <CheckBox x:Uid="lbl_preview" Content="Preview" Margin="365,10,0,0" IsChecked="{Binding Path=PreviewEnable}"/>
         <GroupBox x:Uid="grp_preview" Header="Preview" Margin="365,30,0,0" Visibility="{Binding Path=PreviewEnable, Converter={StaticResource ToVisibleConverter}}" VerticalAlignment="Top">

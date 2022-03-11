@@ -6,23 +6,23 @@
              xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:local="clr-namespace:CNC.Controls"
              mc:Ignorable="d" Loaded="OutlineControl_Loaded"
-             d:DesignHeight="130" d:DesignWidth="250">
+             d:DesignHeight="100" d:DesignWidth="250">
     <UserControl.Resources>
         <ResourceDictionary>
             <local:LogicalNotConverter x:Key="LogicalNotConverter" />
         </ResourceDictionary>
     </UserControl.Resources>
-    <Grid Height="130" IsEnabled="{Binding Path=IsJobRunning, Converter={StaticResource LogicalNotConverter}}">
+    <Grid Height="100" IsEnabled="{Binding Path=IsJobRunning, Converter={StaticResource LogicalNotConverter}}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="180"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <TextBlock TextWrapping="Wrap" HorizontalAlignment="Center" Margin="5,15,4,0" Width="Auto" VerticalAlignment="Top" Grid.ColumnSpan="2">
+        <TextBlock TextWrapping="Wrap" HorizontalAlignment="Center" Margin="5,0,4,0" Width="Auto" VerticalAlignment="Top" Grid.ColumnSpan="2">
             <Run x:Uid="txt_line1" Text="Execute moves to outline X and Y program limits."/>
             <LineBreak/>
             <Run x:Uid="txt_line2" Text="Ensure tool tip is clear of any obstructions!" Foreground="Red" FontWeight="Bold"/>
         </TextBlock>
-        <local:NumericField x:Uid="lbl_feedrate" Label="Feed rate:" Value="{Binding Path=FeedRate, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=UserControl}}" Unit="{Binding Path=FeedrateUnit, Mode=OneWay}" Format="###0" HorizontalAlignment="Left" Margin="5,95,0,0" VerticalAlignment="Top"/>
-        <Button x:Uid="btn_go" Content="Go" IsEnabled="{Binding Path=IsFileLoaded}" Grid.Column="1" Width="50" Height="25" HorizontalAlignment="Right" Margin="0,95,8,0" VerticalAlignment="Top" Click="button_Go" />
+        <local:NumericField x:Uid="lbl_feedrate" Label="Feed rate:" Value="{Binding Path=FeedRate, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=UserControl}}" Unit="{Binding Path=FeedrateUnit, Mode=OneWay}" Format="###0" HorizontalAlignment="Left" Margin="5,70,0,0" VerticalAlignment="Top"/>
+        <Button x:Uid="btn_go" Content="Go" IsEnabled="{Binding Path=IsFileLoaded}" Grid.Column="1" Width="50" Height="25" HorizontalAlignment="Right" Margin="0,70,8,0" VerticalAlignment="Top" Click="button_Go" />
     </Grid>
 </UserControl>

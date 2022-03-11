@@ -14,4 +14,5 @@
     <system:String x:Uid="str_probingRadiusArcs" x:Key="HasRadiusArcs">GCode contains arcs in XZ or YZ plane (G18/19), can't apply transform. Use 'Arcs to Lines' if you really need this.</system:String>
     <system:String x:Uid="str_probingDistanceError" x:Key="ErrorProbingDistance">Probing distance must be larger than XY Clearance + ½ Probe/tool diameter.</system:String>
     <system:String x:Uid="str_probingLatchDistanceError" x:Key="ErrorLatchDistance">Latch distance must be less than Probing distance.</system:String>
+    <system:String x:Uid="str_probingIllegalPosition" x:Key="IllegalPosition">Illegal probe position, try again.</system:String>
 </ResourceDictionary>
