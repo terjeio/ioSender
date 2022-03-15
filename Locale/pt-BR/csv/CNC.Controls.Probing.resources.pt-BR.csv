@@ -1,0 +1,165 @@
+﻿CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,btn_addPosition:System.Windows.Controls.ContentControl.Content,Button,True,True,,Adicionar _posição
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,btn_addProfile:System.Windows.Controls.ContentControl.Content,Button,True,True,,...
+CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,btn_apply:System.Windows.Controls.ContentControl.Content,Button,True,True,,_Aplicar
+CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,btn_apply:System.Windows.Controls.ContentControl.Content,Button,True,True,,_Aplicar
+CNC.Controls.Probing.g.en-US.resources:csselectcontrol.baml,btn_clear:System.Windows.Controls.ContentControl.Content,Button,True,True,,Limpar
+CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,btn_fromLimits:System.Windows.Controls.ContentControl.Content,Button,True,True,,Definir a partir dos limites do programa
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,btn_jog:System.Windows.Controls.ContentControl.Content,Button,True,True,,Clique para ativar o movimento da sonda a partir do teclado
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,btn_jog:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Ctrl+Shift para ativar
+CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,btn_load:System.Windows.Controls.ContentControl.Content,Button,True,True,,_Carregar
+CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,btn_probe:System.Windows.Controls.ContentControl.Content,Button,True,True,,_Sonda
+CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,btn_save:System.Windows.Controls.ContentControl.Content,Button,True,True,,_Salvar
+CNC.Controls.Probing.g.en-US.resources:csselectcontrol.baml,btn_setG92:System.Windows.Controls.ContentControl.Content,RadioButton,True,True,,Definir offset (G92)
+CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,btn_start:System.Windows.Controls.ContentControl.Content,Button,True,True,,Iniciar
+CNC.Controls.Probing.g.en-US.resources:edgefindercontrol.baml,btn_start:System.Windows.Controls.ContentControl.Content,Button,True,True,,Iniciar
+CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,btn_start:System.Windows.Controls.ContentControl.Content,Button,True,True,,Iniciar
+CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,btn_start:System.Windows.Controls.ContentControl.Content,Button,True,True,,Iniciar
+CNC.Controls.Probing.g.en-US.resources:edgefinderintcontrol.baml,btn_start:System.Windows.Controls.ContentControl.Content,Button,True,True,,Iniciar
+CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,btn_start:System.Windows.Controls.ContentControl.Content,Button,True,True,,Iniciar
+CNC.Controls.Probing.g.en-US.resources:edgefinderintcontrol.baml,btn_stop:System.Windows.Controls.ContentControl.Content,Button,True,True,,Parar
+CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,btn_stop:System.Windows.Controls.ContentControl.Content,Button,True,True,,Parar
+CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,btn_stop:System.Windows.Controls.ContentControl.Content,Button,True,True,,Parar
+CNC.Controls.Probing.g.en-US.resources:edgefindercontrol.baml,btn_stop:System.Windows.Controls.ContentControl.Content,Button,True,True,,Parar
+CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,btn_stop:System.Windows.Controls.ContentControl.Content,Button,True,True,,Parar
+CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,btn_stop:System.Windows.Controls.ContentControl.Content,Button,True,True,,Parar
+CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,btn_useCamera:System.Windows.Controls.ContentControl.Content,Button,True,True,,Usar posições da camera
+CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,btn_useX0Y0:System.Windows.Controls.ContentControl.Content,Button,True,True,,"Usar X0,Y0"
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,fld_depth:CNC.Controls.NumericField.Label,None,False,True,,Profundidade:
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,fld_depth:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Offset de Z da sonda para o ponto controlado
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,fld_diameter:CNC.Controls.NumericField.Label,None,False,True,,Diametro:
+CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,fld_distance:CNC.Controls.NumericField.Label,None,False,True,,Distancia
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,fld_fixture:CNC.Controls.NumericField.Label,None,False,True,,Acessório:
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,fld_offset:CNC.Controls.NumericField.Label,None,False,True,,Offset:
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,fld_offset:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Distancia de um canto até a sonda
+CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,fld_passes:CNC.Controls.NumericField.Label,None,False,True,,Passadas:
+CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,fld_passes:CNC.Controls.NumericField.Unit,None,False,True,,
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,fld_probeOffsetX:CNC.Controls.NumericField.Label,None,False,True,,X:
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,fld_probeOffsetX:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Offset de X da sonda para o ponto controlado
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,fld_probeOffsetY:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Offset de Y da sonda para o ponto controlado
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,fld_probeOffsetY:CNC.Controls.NumericField.Label,None,False,True,,Y:
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,fld_touchPlate:CNC.Controls.NumericField.Label,None,False,True,,Placa de toque:
+CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,fld_xSize:CNC.Controls.NumericField.Label,None,False,True,,X tamanho:
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,fld_xyClearance:CNC.Controls.NumericField.Label,None,False,True,,XY Clearance:
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,fld_xyClearance:CNC.Controls.NumericField.Tooltip2,None,False,True,,Initial distance away from face to probe
+CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,fld_ySize:CNC.Controls.NumericField.Label,None,False,True,,Y tamanho:
+CNC.Controls.Probing.g.en-US.resources:edgefindercontrol.baml,grd_action:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,"Selecione borda, canto ou centro desejado."
+CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,grd_action:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Selecione a borda desejada para iniciar a sondagem.
+CNC.Controls.Probing.g.en-US.resources:edgefinderintcontrol.baml,grd_action:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,"Selecione borda, canto ou centro desejado."
+CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,grd_action:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Clique para selecionar o tipo de sondagem.
+CNC.Controls.Probing.g.en-US.resources:csselectcontrol.baml,grp_action:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Ação
+CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,grp_camera:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Camera
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,grp_clearances:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Probing clearances
+CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,grp_dimensions:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Dimensões da peça de trabalho
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,grp_distanceAndSpeed:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Distancia de sondagem e velocidade
+CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,grp_gridSize:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Tamanho do grid
+CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,grp_passes:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Passadas
+CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,grp_passes:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Mais de uma passada é geralmente necessária para se obter uma medida precisa.
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,grp_prbeProperties:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Probe XY offsets
+CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,grp_preview:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Preview
+CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,grp_probeArea:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Área de sondagem
+CNC.Controls.Probing.g.en-US.resources:configcontrol.baml,grp_probeConfig:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Sondagem
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,grp_probeTipOrTool:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Probe tip/tool
+CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,grp_RotationCenter:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,"Clique para selecionar o centro de rotação relativo ao objeto, se não selecionado, X0,Y0 será usado."
+CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,grp_RotationCenter:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Centro de rotação
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,grp_touchOrFixture:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Altura da placa de toque/acessório
+CNC.Controls.Probing.g.en-US.resources:edgefindercontrol.baml,grp_workpiece:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Peça de trabalho
+CNC.Controls.Probing.g.en-US.resources:edgefinderintcontrol.baml,grp_workpiece:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Peça de trabalho
+CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,grp_workpiece:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Peça de trabalho
+CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,grp_workpiece:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Peça de trabalho
+CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,grp_workpieceOffset:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Offset da peça de trabalho
+CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,hdr_preview:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Preview
+CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,lbl_addOffset:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Adicionar deslocamento (offset)
+CNC.Controls.Probing.g.en-US.resources:configcontrol.baml,lbl_chkProbeStatus:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Verifique o status da sonda antes de iniciar (G59.3)
+CNC.Controls.Probing.g.en-US.resources:configcontrol.baml,lbl_chkProbeStatus:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Um alarme será ativado pelo controle se não estiver ligado e a sonda verificada.
+CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,lbl_clearToolOffset:System.Windows.Controls.ContentControl.Content,Button,True,True,,Limpar o deslocamento do tamanho da ferramenta
+CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,lbl_height:CNC.Controls.NumericField.Label,None,False,True,,H:
+CNC.Controls.Probing.g.en-US.resources:edgefinderintcontrol.baml,lbl_height:CNC.Controls.NumericField.Label,None,False,True,,Altura
+CNC.Controls.Probing.g.en-US.resources:edgefindercontrol.baml,lbl_height:CNC.Controls.NumericField.Label,None,False,True,,Altura
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,lbl_latchDistance:CNC.Controls.NumericField.Label,None,False,True,,Latch distance:
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,lbl_latchDistance:CNC.Controls.NumericField.Tooltip2,None,False,True,,"Distancia para retrair para a segunda movimentação devagar da sonda, colocar como 0 para pular"
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,lbl_latchFeed:CNC.Controls.NumericField.Label,None,False,True,,Latch feed rate:
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,lbl_latchFeed:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,lbl_latchFeed:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Feed rate para o segundo movimento devagar da sonda
+CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,lbl_lock:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Destravar e definir o tamanho X ou Y como 0 para realizar a sondagem em apenas uma direção.
+CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,lbl_lock:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Travar
+CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,lbl_lock:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Travar
+CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,lbl_pause:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Pausar antes de fazer a sondagem
+CNC.Controls.Probing.g.en-US.resources:edgefindercontrol.baml,lbl_preview:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Preview
+CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,lbl_preview:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Preview
+CNC.Controls.Probing.g.en-US.resources:edgefinderintcontrol.baml,lbl_preview:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Preview
+CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,lbl_preview:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Preview
+CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,lbl_probeFixture:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Probe fixture @ G59.3
+CNC.Controls.Probing.g.en-US.resources:edgefindercontrol.baml,lbl_probeZ:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Probe Z
+CNC.Controls.Probing.g.en-US.resources:edgefinderintcontrol.baml,lbl_probeZ:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Probe Z
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,lbl_probingDistance:CNC.Controls.NumericField.Label,None,False,True,,Distancia de sondagem:
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,lbl_probingDistance:CNC.Controls.NumericField.Tooltip2,None,False,True,,Distancia máxima para movimentos de sondagem
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,lbl_profile:System.Windows.Controls.ContentControl.Content,Label,True,True,,Perfil:
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,lbl_rapidsFeed:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,"Feed rate para movimentos rapidos, colocar como 0 para utilizar a opção do controlador"
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,lbl_rapidsFeed:CNC.Controls.NumericField.Label,None,False,True,,Feedrate do movimento rápido:
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,lbl_rapidsFeed:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,lbl_searchFeed:CNC.Controls.NumericField.Label,None,False,True,,Search feed rate:
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,lbl_searchFeed:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,lbl_searchFeed:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Feed rate para movimento inicial da sonda
+CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,lbl_setCoordOrOffset:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Definir o sistema de coordenadas ou offset
+CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,lbl_setRefernecOffset:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Estabelecer deslocamento de referencia
+CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,lbl_setZ0AtX0Y0:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Definir Z = 0 em X0Y0:
+CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,lbl_width:CNC.Controls.NumericField.Label,None,False,True,,W:
+CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,lbl_withTool:System.Windows.Controls.ContentControl.Content,Label,True,True,,com ferramenta:
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,mnu_add:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Adicionar
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,mnu_delete:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Deletar
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,mnu_update:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Atualizar
+CNC.Controls.Probing.g.en-US.resources:csselectcontrol.baml,set_coord:System.Windows.Controls.ContentControl.Content,RadioButton,True,True,,Definir sistema de coordenadas:
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,str_cameraPosition:System.String.$Content,None,True,True,,"Posição da camera {0}, X: {1}, Y: {2}"
+CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,str_centerFinderClearance:System.String.$Content,None,True,True,,Probing XY clearance muito grande para o tamanho do objeto {0}.
+CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,str_centerFinderCompleted:System.String.$Content,None,True,True,,"Sondagem completa.: distancia X {0}, distancia Y {1}."
+CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,str_centerFinderFailed:System.String.$Content,None,True,True,,Sondagem falhou
+CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,str_centerFinderInitFailed:System.String.$Content,None,True,True,,Inicialização falhou!
+CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,str_CenterFinderInstructions:System.String.$Content,None,True,True,,Selecione na imagem a cima a ação desejada.\\nColoque a sonda acima do centro aproximado do objeto antes de começar.
+CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,str_centerFinderPass:System.String.$Content,None,True,True,,"Sondagem, passada {0} de {1}..."
+CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,str_centerFinderType:System.String.$Content,None,True,True,,Selecione o tipo de sondagem clicando em uma das opções acima.
+CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,str_centerFinderWpSize:System.String.$Content,None,True,True,,Peça de trabalho {0} tamanho não pode ser 0.
+CNC.Controls.Probing.g.en-US.resources:edgefindercontrol.baml,str_edgeFinderCompleted:System.String.$Content,None,True,True,,Sondagem completa.
+CNC.Controls.Probing.g.en-US.resources:edgefindercontrol.baml,str_edgeFinderFailed:System.String.$Content,None,True,True,,Sondagem falhou
+CNC.Controls.Probing.g.en-US.resources:edgefindercontrol.baml,str_edgeFinderInitFailed:System.String.$Content,None,True,True,,"Sondagem falhou, posição de máquina desconhecida."
+CNC.Controls.Probing.g.en-US.resources:edgefindercontrol.baml,str_EdgeFinderInstructions:System.String.$Content,None,True,True,,"Selecione borda, canto ou centro desejado na imagem acima.\\nMova a sonda acima do ponto verde para iniciar."
+CNC.Controls.Probing.g.en-US.resources:edgefindercontrol.baml,str_edgeFinderType:System.String.$Content,None,True,True,,Selecione a borda ou canto para realizar a sondagem ao clicar na parte desejada na imagem acima.
+CNC.Controls.Probing.g.en-US.resources:edgefinderintcontrol.baml,str_edgeIntFinderCompleted:System.String.$Content,None,True,True,,Sondagem completa.
+CNC.Controls.Probing.g.en-US.resources:edgefinderintcontrol.baml,str_edgeIntFinderFailed:System.String.$Content,None,True,True,,Sondagem falhou
+CNC.Controls.Probing.g.en-US.resources:edgefinderintcontrol.baml,str_edgeIntFinderInitFailed:System.String.$Content,None,True,True,,"Sondagem falhou, posição de máquina desconhecida."
+CNC.Controls.Probing.g.en-US.resources:edgefinderintcontrol.baml,str_edgeIntFinderInstructions:System.String.$Content,None,True,True,,"Selecione borda, canto ou centro desejado na imagem acima.\\nMova a sonda acima do ponto verde para iniciar."
+CNC.Controls.Probing.g.en-US.resources:edgefinderintcontrol.baml,str_edgeIntFinderType:System.String.$Content,None,True,True,,Selecione a borda ou canto para realizar a sondagem ao clicar na parte desejada na imagem acima.
+CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,str_heightMapCompleted:System.String.$Content,None,True,True,,"Sondagem completa.: Z min: {0}, Z max: {1}."
+CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,str_heightMapFailed:System.String.$Content,None,True,True,,Sondagem falhou
+CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,str_heightMapInstructions:System.String.$Content,None,True,True,,Um movimento rápido até X0Y0 será feito antes da sondagem de nível começar.\\nGaranta que a posição inicial Z não irá colidir com nenhum obstáculo que pode ser encontrado durante a sondagem.
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,str_jogActive:System.String.$Content,None,True,True,,Jogging com teclado está ativo
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,str_jogDisabled:System.String.$Content,None,True,True,,Jogging com teclado desativado
+CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,str_positionsRequired:System.String.$Content,None,True,True,,{0} posições da sonda são necessárias.
+CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probing:System.String.$Content,None,True,True,,Sondando...
+CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probingDistanceError:System.String.$Content,None,True,True,,Distancia de sondagem deve ser maior que XY Clearance + ½ do diametro da Sonda/ferramenta.
+CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probingFailedAlarm:System.String.$Content,None,True,True,,"Sondagem falhou com alarme, limpar na aba Grbl."
+CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probingFailedCancelled:System.String.$Content,None,True,True,,Sondagem cancelada/falhou.
+CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probingHeigthMapMinSize:System.String.$Content,None,True,True,,Mapa de alturas deve ter pelo menos 4 pontos.
+CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probingHeigthMapNarrow:System.String.$Content,None,True,True,,Mapa de alturas não pode ser infinitamente estreito.
+CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probingIllegalPosition:System.String.$Content,None,True,True,,"Posição de sonda inválida, tente novamente."
+CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probingLatchDistanceError:System.String.$Content,None,True,True,,Latch distance deve ser menor que a Probing distance.
+CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probingNoPos:System.String.$Content,None,True,True,,"Sondagem falhou, não foi possível estabelecer a posição de máquina atual."
+CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probingNoProbe:System.String.$Content,None,True,True,,"Sondagem falhou, sonda não está conectada."
+CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probingNotIdle:System.String.$Content,None,True,True,,"Sondagem falhou, Grbl não está em estado inativo ou de mudança de ferramenta."
+CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probingProbeAsserted:System.String.$Content,None,True,True,,"Sondagem falhou, sinal de sonda está determinada."
+CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probingRadiusArcs:System.String.$Content,None,True,True,,"GCode contem arcos nos planos XZ ou YZ (G18/19), não é possível aplicar tranformação. Use &apos;Arcos para Linhas&apos; se isto é realmente necessário."
+CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,str_rotationCompleted:System.String.$Content,None,True,True,,Sondagem completa.
+CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,str_rotationFailed:System.String.$Content,None,True,True,,Sondagem falhou
+CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,str_rotationInitFailed:System.String.$Content,None,True,True,,Angulo: {0} graus
+CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,str_rotationInstructions:System.String.$Content,None,True,True,,Selecionar uma borda na imagem acima para inciar a sondagem.\\nMova a sonda acima do ponto verde antes de iniciar.
+CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,str_rotationType:System.String.$Content,None,True,True,,Seleciona a borda para realizar a sondagem na parte desejada na imagem acima.
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,str_runMacro:System.String.$Content,None,True,True,,Executar {0} macro?
+CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,str_toolLengthCompleted:System.String.$Content,None,True,True,,Sondagem completa.
+CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,str_toolLengthFailed:System.String.$Content,None,True,True,,Sondagem falhou
+CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,str_toolLengthInitFailed:System.String.$Content,None,True,True,,Os eixos devem ser iniciados (home) antes de sondar o acessório!
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,tab_Center:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Centralizar
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,tab_edgeExternal:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,"Encontra bordar, interno"
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,tab_edgeInternal:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,"Encontra bordas, externo"
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,tab_heightmap:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Mapa de alturas
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,tab_Rotation:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Rotatição
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,tab_toolOffset:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Deslocamento do comprimento da ferramente
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,txt_warning:System.Windows.Documents.Run.Text,Text,True,True,,Aviso! Use com cuidado - parametros incorretos podem danificar sua sonda!

@@ -1,0 +1,17 @@
+﻿<UserControl x:Class="CNC.Controls.GrblAlarmList"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CNC.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300" Loaded="UserControl_Loaded">
+    <DataGrid x:Name="dgrAlarms" ItemsSource="{Binding}" IsReadOnly="True" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                  SelectionMode="Single" SelectionUnit="FullRow" AutoGenerateColumns="False"
+                  CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserResizeRows="False" CanUserSortColumns="False" CanUserAddRows="False">
+        <DataGrid.Columns>
+            <DataGridTextColumn x:Uid="hdr_alarmCode" Header="Code" Binding="{Binding Key}" Width="40"/>
+            <DataGridTextColumn x:Uid="hdr_alarmMessage" Header="Message" Binding="{Binding Value}" Width="70*"/>
+        </DataGrid.Columns>
+    </DataGrid>
+</UserControl>

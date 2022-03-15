@@ -1,0 +1,17 @@
+﻿<Window x:Class="CNC.Controls.ErrorsAndAlarms"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CNC.Controls"
+        mc:Ignorable="d"
+        x:Uid="wnd_errorsAndAlarms" Title="Controller error and alarm codes" Height="500" Width="750" MinHeight="100" MinWidth="150" Icon="App.ico">
+    <TabControl>
+        <TabItem x:Uid="tab_errors" Header="Error codes">
+            <local:GrblErrorList/>
+        </TabItem>
+        <TabItem x:Uid="tab_alarms" Header="Alarm codes">
+            <local:GrblAlarmList/>
+        </TabItem>
+    </TabControl>
+</Window>

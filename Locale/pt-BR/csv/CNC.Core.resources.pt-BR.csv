@@ -1,0 +1,43 @@
+﻿CNC.Core.g.en-US.resources:libstrings.baml,str_contClearResetUnlock:System.String.$Content,None,True,True,,limpar então &lt;Reiniciar&gt; então &lt;Desbloquear&gt; para prosseguir
+CNC.Core.g.en-US.resources:libstrings.baml,str_contHome:System.String.$Content,None,True,True,,&lt;Início;&gt; para prosseguir
+CNC.Core.g.en-US.resources:libstrings.baml,str_contHomeUnlock:System.String.$Content,None,True,True,,&lt;Início&gt; or &lt;Destravar&gt; para prosseguir
+CNC.Core.g.en-US.resources:libstrings.baml,str_contResetUnlock:System.String.$Content,None,True,True,,&lt;Reiniciar&gt; então &lt;Destravar&gt; para prosseguir
+CNC.Core.g.en-US.resources:libstrings.baml,str_contUnlock:System.String.$Content,None,True,True,,&lt;Destravar&gt; para prosseguir
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcLoadError:System.String.$Content,None,True,True,,{0}\\nLinha: {1}\\nBloco: {2}\\n\\nContinuar carregando?
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserAxisError:System.String.$Content,None,True,True,,Conflito de comando de eixo
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserBadExpr:System.String.$Content,None,True,True,,Expressão inexistente
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserCMDInvalid:System.String.$Content,None,True,True,,GCode inválido
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserCmdUnknown:System.String.$Content,None,True,True,,Comando não reconhecido
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserErrE:System.String.$Content,None,True,True,,Palavra E maior que a metade do tamanho da linha do drive
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserG1NoFeed:System.String.$Content,None,True,True,,G1 usado quando o feed rate não foi definido
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserG6NoP:System.String.$Content,None,True,True,,G4 - faltando o código P
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserKlesseqJ:System.String.$Content,None,True,True,,K word deve ser maior que a J word
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserM66NoPorE:System.String.$Content,None,True,True,,P- ou E-word faltando para M66
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserM66PandE:System.String.$Content,None,True,True,,Não é possível utilizar códigos P- e E- ao mesmo tempo com M66
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserModalGrpError:System.String.$Content,None,True,True,,Violação de grupo modal
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNegH:System.String.$Content,None,True,True,,Código H é negativo
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNegJ:System.String.$Content,None,True,True,,J word negativa
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNegK:System.String.$Content,None,True,True,,K word negativa
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNegP:System.String.$Content,None,True,True,,P word negativa
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNoG0orG1:System.String.$Content,None,True,True,,G0 ou G1 não está ativo
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNoIandorJ:System.String.$Content,None,True,True,,Código I e/ou J faltando
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNoInvalidQ:System.String.$Content,None,True,True,,Q word faltando ou fora dos limites
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNoK:System.String.$Content,None,True,True,,K word faltando
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNoP:System.String.$Content,None,True,True,,P word faltando
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNoPandorQ:System.String.$Content,None,True,True,,P e/ou Q word faltando
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNoR:System.String.$Content,None,True,True,,R word faltando
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserPlaneNotXY:System.String.$Content,None,True,True,,Plano não é XY
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserPlaneNotZx:System.String.$Content,None,True,True,,Plano não é ZX
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserRadiusErr:System.String.$Content,None,True,True,,Erro computando o raio do arco.
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserRless1:System.String.$Content,None,True,True,,R word menor que 1
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserStrip:System.String.$Content,None,True,True,,"{0} comando encontrado, strip?"
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserStripHdr:System.String.$Content,None,True,True,,Strip command
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserToolNoI:System.String.$Content,None,True,True,,Código I falta
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserToolNoJ:System.String.$Content,None,True,True,,J word faltando
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserToolProfile:System.String.$Content,None,True,True,,Ferramenta {0} não está associada com um perfil
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserUnsupportedCmd:System.String.$Content,None,True,True,,Comando não suportado
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserWordRepeated:System.String.$Content,None,True,True,,Comando repetido
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserZPlus:System.String.$Content,None,True,True,,Axisword(s) other than Z found
+CNC.Core.g.en-US.resources:libstrings.baml,str_joggingOnly:System.String.$Content,None,True,True,,Somente movimentar e alguns comandos de sistema são possíveis quando trocando de ferramenta!
+CNC.Core.g.en-US.resources:libstrings.baml,str_sdStreamComplete:System.String.$Content,None,True,True,,SD Card streaming {0}% complete
+CNC.Core.g.en-US.resources:libstrings.baml,str_serialPortError:System.String.$Content,None,True,True,,Não foi possível abrir a porta serial: {0}

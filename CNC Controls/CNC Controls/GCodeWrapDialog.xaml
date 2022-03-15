@@ -1,0 +1,44 @@
+﻿<Window x:Class="CNC.Controls.GCodeWrapDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CNC.Controls"
+        mc:Ignorable="d"
+        Title="Wrap parameters" Height="150" Width="200"
+        SizeToContent="WidthAndHeight" ResizeMode="NoResize" MinWidth="190"
+        Loaded="Window_Loaded" Icon="App.ico">
+    <Grid Background="#FFE5E5E5">
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top" Height="Auto" Margin="5,5">
+            <local:NumericField x:Uid="fld_diameter" x:Name="Diameter" Label="Diameter:" Format="-##0.###" Value="{Binding Path=Diameter, Mode=TwoWay}"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="70"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Label x:Uid="lbl_wrapSource" Content="Wrap:" HorizontalAlignment="Right" HorizontalContentAlignment="Right" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0"/>
+                <ComboBox HorizontalAlignment="Left" VerticalAlignment="Center" Width="80" Grid.Row="0" Grid.Column="1"
+                    ItemsSource="{Binding Path=SourceAxes}"
+                    SelectedValue="{Binding Path=SourceAxis, Mode=TwoWay}"
+                    DisplayMemberPath="Name"
+                    SelectedValuePath="AxisId" Margin="0,2"
+                />
+                <Label x:Uid="lbl_wrapTarget" Content="to:" HorizontalAlignment="Right" HorizontalContentAlignment="Right" VerticalAlignment="Center" Grid.Row="1" Grid.Column="0"/>
+                <ComboBox HorizontalAlignment="Left" VerticalAlignment="Center" Width="80" Grid.Row="1" Grid.Column="1"
+                    ItemsSource="{Binding Path=TargetAxes}"
+                    SelectedValue="{Binding Path=TargetAxis, Mode=TwoWay}"
+                    DisplayMemberPath="Name"
+                    SelectedValuePath="AxisId" Margin="0,2"
+                />
+            </Grid>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom" Width="Auto" Margin="0,10,0,0">
+                <Button x:Uid="btn_ok" x:Name="btnOk" Content="Ok" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Click="btnOk_Click"/>
+                <Button x:Uid="btn_cancel" x:Name="btnCancel" Content="Cancel" HorizontalAlignment="Left" Margin="5,0,0,0" VerticalAlignment="Top" Width="75" Click="btnCancel_Click"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>

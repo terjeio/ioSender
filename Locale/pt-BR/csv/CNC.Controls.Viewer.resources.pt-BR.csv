@@ -1,0 +1,41 @@
+﻿CNC.Controls.Viewer.g.en-US.resources:viewer.baml,btn_resetView:System.Windows.Controls.ContentControl.Content,Button,True,True,,Reiniciar view
+CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,fld_arcResolution:CNC.Controls.NumericField.Label,None,False,True,,Resolução do arco:
+CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,fld_arcResolution:CNC.Controls.NumericField.Unit,None,False,True,,segmentos
+CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,fld_minDistance:CNC.Controls.NumericField.Label,None,False,True,,Distancia mínima:
+CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,fld_toolDiameter:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Diametro padrão do equipamento.
+CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,fld_toolDiameter:CNC.Controls.NumericField.Label,None,False,True,,Diametro da ferramenta:
+CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,fld_toolDiameter:CNC.Controls.NumericField.Unit,None,False,True,,mm
+CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,fld_toolScalePct:CNC.Controls.NumericField.Unit,None,False,True,,%
+CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,grp_gcodeViewer:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Visualizador GCode
+CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_blackBackgroud:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Fundo preto
+CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_cutColor:System.Windows.Controls.ContentControl.Content,Label,True,True,,Cor de corte:
+CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_enable:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Habilitar
+CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_gridColor:System.Windows.Controls.ContentControl.Content,Label,True,True,,Cor do grid:
+CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_highlightColor:System.Windows.Controls.ContentControl.Content,Label,True,True,,Cor de realce:
+CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_highlightCompleted:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Realçar cortes finalizado
+CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_rapidsColor:System.Windows.Controls.ContentControl.Content,Label,True,True,,Cor do movimento rápido:
+CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_retractColor:System.Windows.Controls.ContentControl.Content,Label,True,True,,Cor de retração:
+CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_showAxes:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Mostrar eixos
+CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_showBbox:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Mostrar caixa de limites
+CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_showCoordSys:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Mostrar sistema de coordenadas
+CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_showGrid:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Mostar grid
+CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_showOverlay:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Mostrar overlay de texto
+CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_showViewCube:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Mostrar ViewCube
+CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_toolAutoScale:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Ferramento de escala automática
+CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,resetView:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Reiniciar view (Ctrl+V)
+CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,resetView:System.Windows.Controls.ContentControl.Content,Button,True,True,,Resources/ResetView.png
+CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,restoreView:System.Windows.Controls.ContentControl.Content,Button,True,True,,Resources/RestoreView.png
+CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,restoreView:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Restaurar view (Ctrl+R)
+CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,saveView:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Salvar view
+CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,saveView:System.Windows.Controls.ContentControl.Content,Button,True,True,,Resources/SaveView.png
+CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,showGrid:System.Windows.Controls.ContentControl.Content,Button,True,True,,Resources/GridOn.png
+CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,showGrid:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Ligar/Desligar visibilidade do grid(Ctrl+G)
+CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,showJobEnvelope:System.Windows.Controls.ContentControl.Content,Button,True,True,,Resources/JobBoxOn.png
+CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,showJobEnvelope:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Ligar/Desligar área de trabalho (Ctrl+J)
+CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,showWorkEnvelope:System.Windows.Controls.ContentControl.Content,Button,True,True,,Resources/WorkBoxOn.png
+CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,showWorkEnvelope:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Ligar/Desligar work envelope (Ctrl+W)
+CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,showXYZMarkers:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Ligar/Desligar visibilidade do eixo
+CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,showXYZMarkers:System.Windows.Controls.ContentControl.Content,Button,True,True,,Resources/XYZOn.png
+CNC.Controls.Viewer.g.en-US.resources:renderer.baml,str_toolCone:System.String.$Content,None,True,True,,Cone
+CNC.Controls.Viewer.g.en-US.resources:renderer.baml,str_toolCrosshair:System.String.$Content,None,True,True,,Crosshair
+CNC.Controls.Viewer.g.en-US.resources:renderer.baml,str_toolNoShow:System.String.$Content,None,True,True,,Sem ferramenta

@@ -1,0 +1,18 @@
+﻿CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,btn_cancel:System.Windows.Controls.ContentControl.Content,Button,True,True,,Cancelar
+CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,btn_ok:System.Windows.Controls.ContentControl.Content,Button,True,True,,Ok
+CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,dlg_dragKnife:System.Windows.Window.Title,Title,True,True,,Parametros da faca de arrasto
+CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,fld_cutDepth:CNC.Controls.NumericField.Label,None,False,True,,Profundidade do corte:
+CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,fld_cutDepth:CNC.Controls.NumericField.Unit,None,False,True,,mm
+CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,fld_dentLength:CNC.Controls.NumericField.Unit,None,False,True,,mm
+CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,fld_dentLength:CNC.Controls.NumericField.Label,None,False,True,,Comprimento da cavidade:
+CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,fld_retractAngle:CNC.Controls.NumericField.Label,None,False,True,,Angulo de retração:
+CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,fld_retractAngle:CNC.Controls.NumericField.Unit,None,False,True,,graus
+CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,fld_retractDepth:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
+CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,fld_retractDepth:CNC.Controls.NumericField.Label,None,False,True,,Profundidade de retração:
+CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,fld_swivelAngle:CNC.Controls.NumericField.Label,None,False,True,,Angulo de giro:
+CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,fld_swivelAngle:CNC.Controls.NumericField.Unit,None,False,True,,graus
+CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,fld_tipOffset:CNC.Controls.NumericField.Unit,None,False,True,,mm
+CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,fld_tipOffset:CNC.Controls.NumericField.Label,None,False,True,,Offset da ponta:
+CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,grp_knife:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Faca
+CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,grp_retract:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Retração
+CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,lbl_retractEnable:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Habilitar retração
