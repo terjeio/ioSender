@@ -25,6 +25,8 @@
     <system:String x:Uid="str_msgNoComm" x:Key="MsgNoComm">Controller is in {0} state and cannot respond, try a soft reset?</system:String>
     <system:String x:Uid="str_msgResetExit" x:Key="MsgResetExit">Controller soft reset failed, exiting.</system:String>
     <system:String x:Uid="str_msgNoResponse" x:Key="MsgNoResponse">Controller is not responding!</system:String>
+    <system:String x:Uid="str_msgNoResponseExit" x:Key="MsgNoResponseExit">No response received from controller, exiting.</system:String>
+    <system:String x:Uid="str_msgBadResponseExit" x:Key="MsgBadResponseExit">Unexpected response received from controller: {0}, exiting.</system:String>
     <system:String x:Uid="str_grblStateUnknown" x:Key="StateUnknown">UNKNOWN</system:String>
     <system:String x:Uid="str_grblStateIdle" x:Key="StateIdle">IDLE</system:String>
     <system:String x:Uid="str_grblStateRun" x:Key="StateRun">RUN</system:String>

@@ -1,13 +1,13 @@
 ﻿/*
  * NumericTextBox.cs - part of CNC Controls library
  *
- * v0.14 / 2020-03-20 / Io Engineering (Terje Io)
+ * v0.38 / 2022-06-13 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2020, Io Engineering (Terje Io)
+Copyright (c) 2018-2022, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -67,7 +67,7 @@ namespace CNC.Controls
             DependencyProperty.Register(nameof(Value), typeof(double), typeof(NumericTextBox), new PropertyMetadata(double.NaN, new PropertyChangedCallback(OnValueChanged)));
         public double Value
         {
-            get { return (double)GetValue(ValueProperty); }
+            get { double v = (double)GetValue(ValueProperty); return v == double.NaN ? 0d : v; }
             set { SetValue(ValueProperty, value); }
         }
         private static void OnValueChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -98,9 +98,9 @@ namespace CNC.Controls
         public new void Clear()
         {
             updateText = false;
-            Value = 0.0d;
+            Value = double.NaN;
             updateText = true;
-            Text = "";
+            Text = string.Empty;
         }
 
         protected override void OnPreviewKeyUp(KeyEventArgs e)
@@ -112,7 +112,7 @@ namespace CNC.Controls
                 string text = SelectionLength > 0 ? Text.Remove(SelectionStart, SelectionLength) : Text;
 
                 updateText = false;
-                Value = double.Parse(text == "" || text == "." || text == "-" || text == "-." ? "0" : text, np.Styles, CultureInfo.InvariantCulture);
+                Value = double.Parse(text == string.Empty || text == "." || text == "-" || text == "-." ? "0" : text, np.Styles, CultureInfo.InvariantCulture);
                 updateText = true;
             }
         }
@@ -130,6 +130,24 @@ namespace CNC.Controls
             }
 
             base.OnPreviewTextInput(e);
+        }
+
+        protected override void OnTextChanged(TextChangedEventArgs e)
+        {
+            double val = 0d;
+            if (double.TryParse(Text == string.Empty ? "NaN" : Text, np.Styles, CultureInfo.InvariantCulture, out val))
+            {
+                if (!IsReadOnly && IsEnabled)
+                {
+                    updateText = false;
+                    Value = val;
+                    updateText = true;
+                }
+
+                base.OnTextChanged(e);
+            }
+            else
+                Text = Math.Round(Value, (np.Precision)).ToString(np.DisplayFormat, CultureInfo.InvariantCulture);
         }
     }
 }

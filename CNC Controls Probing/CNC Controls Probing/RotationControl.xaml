@@ -17,7 +17,8 @@
         <Controls:LogicalNotConverter x:Key="IsNotRunningConverter" />
         <Controls:EnumValueToBooleanConverter x:Key="EnumToEdgeConverter" />
         <Controls:BoolToVisibleConverter x:Key="ToVisibleConverter" />
-        <local:EnumValueToVisibleConverter x:Key="ZProbeIsVisibleConverter"/>
+        <local:OriginToBooleanConverter x:Key="UseX0Y0Converter" />
+        <local:EnumValueToVisibleConverter x:Key="ZProbeIsVisibleConverter" />
         <Style x:Key="ButtonStyleNoHighlighting" TargetType="Button" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
             <Setter Property="Template">
                 <Setter.Value>
@@ -69,7 +70,7 @@
                 <GroupBox x:Uid="grp_RotationCenter" Header="Rotation center" HorizontalAlignment="Left" Margin="5,0" ToolTip="Click to select rotation center relative to job, if not selected X0,Y0 is used.">
                     <StackPanel Orientation="Horizontal">
                         <Controls:OriginControl Value="{Binding Path=Origin, Mode=TwoWay}" IsEnabled="{Binding Path=Grbl.IsFileLoaded}" Margin="5,5,0,0"/>
-                        <Button x:Uid="btn_useX0Y0" Content="Use X0,Y0" IsEnabled="{Binding Path=Grbl.IsFileLoaded}" Margin="8,0,5,3" Width="75" Focusable="False" Click="use00_Click" VerticalAlignment="Bottom"/>
+                        <CheckBox x:Uid="chk_useX0Y0" Content="Use X0,Y0" Margin="8,30,5,3" IsEnabled="{Binding Path=Grbl.IsFileLoaded}" IsChecked="{Binding Path=Origin, Mode=TwoWay, Converter={StaticResource UseX0Y0Converter}}"/>
                     </StackPanel>
                 </GroupBox>
             </StackPanel>
@@ -77,7 +78,7 @@
                 <CheckBox x:Uid="lbl_preview" Content="Preview" Margin="15,0,0,0" IsChecked="{Binding Path=PreviewEnable}"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal">
-                <Grid x:Uid="grd_action" ToolTip="Click edge to select probing action." Width="160" Height="160" Margin="5,10,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <Grid x:Name="grd_action" x:Uid="grd_action" ToolTip="Click edge to select probing action." Width="160" Height="160" Margin="5,10,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="80" />
                         <RowDefinition Height="80" />

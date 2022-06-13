@@ -1,7 +1,7 @@
 ﻿/*
  * AppConfig.cs - part of CNC Controls library
  *
- * v0.37 / 2022-03-02 / Io Engineering (Terje Io)
+ * v0.38 / 2022-04-20 / Io Engineering (Terje Io)
  *
  */
 
@@ -725,8 +725,8 @@ namespace CNC.Controls
             else
             {
                 MessageBox.Show(response == string.Empty
-                                    ? "No respone received from controller, exiting."
-                                    : string.Format("Unexpected response received from controller: \"{0}\", exiting.", response),
+                                    ? LibStrings.FindResource("MsgNoResponseExit")
+                                    : string.Format(LibStrings.FindResource("MsgBadResponseExit"), response),
                                     "ioSender", MessageBoxButton.OK, MessageBoxImage.Stop);
                 return RestartResult.Exit;
             }

@@ -1,7 +1,7 @@
 ﻿/*
  * GCodeParser.cs - part of CNC Controls library
  *
- * v0.37 / 2022-02-22 / Io Engineering (Terje Io)
+ * v0.38 / 2022-05-08 / Io Engineering (Terje Io)
  *
  */
 
@@ -2118,6 +2118,20 @@ namespace CNC.GCode
             return center;
         }
 
+        private int getQuadrant(double angle)
+        {
+            int q = 4;
+            double da = Math.PI * 2d;
+
+            while ((da - Math.PI / 2d) > angle)
+            {
+                q--;
+                da -= Math.PI / 2d;
+            }
+
+            return q;
+        }
+
         public GcodeBoundingBox GetBoundingBox(GCPlane plane, double[] start, bool isRelative = false)
         {
             GcodeBoundingBox bbox = new GcodeBoundingBox();
@@ -2143,11 +2157,13 @@ namespace CNC.GCode
                 double y1 = Math.Min(start[plane.Axis1], end[plane.Axis1]);
                 double x2 = Math.Max(start[plane.Axis0], end[plane.Axis0]);
                 double y2 = Math.Max(start[plane.Axis1], end[plane.Axis1]);
-                int q = 4;
 
                 // Fix semantics, if the angle ends at 0 it really should end at 360.
-                if (endAngle == 0d)
-                    endAngle = Math.PI * 2d;
+                //if (endAngle == 0d)
+                //    endAngle = Math.PI * 2d;
+
+                //if (startAngle == Math.PI * 2d)
+                //    startAngle = 0d;
 
                 // Calculate distance along arc.
                 if (!IsClocwise && endAngle < startAngle)
@@ -2160,49 +2176,58 @@ namespace CNC.GCode
                 bbox.AddPoint(plane, x1, y1, z1);
                 bbox.AddPoint(plane, x2, y2, z2);
 
-                double da = Math.PI * 2d;
+                int q = getQuadrant(startAngle);
 
-                while ((da - Math.PI / 2d) >= startAngle)
+                if (q != getQuadrant(endAngle))
                 {
-                    q--;
-                    da -= Math.PI / 2d;
-                }
+                    double da = Math.PI / 2d * q;
 
-                sweep -= da - startAngle;
+                  //  sweep -= da - startAngle;
 
-                while (sweep >= 0d)
-                {
-                    switch (q)
+                    while (sweep > 0d)
                     {
-                        case 0:
-                            bbox.AddPoint(plane, center[0] + r, y1, z1);
-                            bbox.AddPoint(plane, center[0] + r, y2, z2);
-                            q = IsClocwise ? 3 : 1;
-                            break;
+                        switch (q)
+                        {
+                            case 1:
+                                if(IsClocwise)
+                                    bbox.AddPoint(plane, center[0] + r, center[1], z1);
+                                else
+                                    bbox.AddPoint(plane, center[0], center[1] + r, z1);
+                                q = IsClocwise ? 4 : 2;
+                                break;
 
-                        case 1:
-                            bbox.AddPoint(plane, x1, center[1] + r, z1);
-                            bbox.AddPoint(plane, x2, center[1] + r, z2);
-                            q = IsClocwise ? 0 : 2;
-                            break;
+                            case 2:
+                                if (IsClocwise)
+                                    bbox.AddPoint(plane, center[0], center[1] + r, z1);
+                                else
+                                    bbox.AddPoint(plane, center[0] - r, center[1], z1);
+                                q = IsClocwise ? 1 : 3;
+                                break;
 
-                        case 2:
-                            bbox.AddPoint(plane, center[0] - r, y1, z1);
-                            bbox.AddPoint(plane, center[0] - r, y2, z2);
-                            q = IsClocwise ? 1 : 3;
-                            break;
+                            case 3:
+                                if (IsClocwise)
+                                    bbox.AddPoint(plane, center[0] - r, center[1], z1);
+                                else
+                                    bbox.AddPoint(plane, center[0], center[1] - r, z1);
+                                q = IsClocwise ? 2 : 4;
+                                break;
 
+                            case 4:
+                                if (IsClocwise)
+                                    bbox.AddPoint(plane, center[0], center[1] - r, z1);
+                                else
+                                    bbox.AddPoint(plane, center[0] + r, center[1], z1);
+                                q = IsClocwise ? 3 : 1;
+                                break;
 
-                        case 3:
-                            bbox.AddPoint(plane, x1, center[1] - r, z1);
-                            bbox.AddPoint(plane, x2, center[1] - r, z2);
-                            q = IsClocwise ? 2 : 0;
-                            break;
+                            case 0:
+                                break;
+
+                        }
+                        sweep -= Math.PI / 2d;
                     }
-                    sweep -= Math.PI / 2d;
                 }
             }
-
             bbox.Conclude();
 
             return bbox;

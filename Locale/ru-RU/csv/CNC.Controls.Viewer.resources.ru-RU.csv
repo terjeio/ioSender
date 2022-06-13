@@ -1,10 +1,10 @@
-﻿CNC.Controls.Viewer.g.en-US.resources:viewer.baml,btn_resetView:System.Windows.Controls.ContentControl.Content,Button,True,True,,Очистить отображение
+﻿CNC.Controls.Viewer.g.en-US.resources:viewer.baml,btn_resetView:System.Windows.Controls.ContentControl.Content,Button,True,True,,Сброс вид
 CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,fld_arcResolution:CNC.Controls.NumericField.Label,None,False,True,,Разрешение дуг:
 CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,fld_arcResolution:CNC.Controls.NumericField.Unit,None,False,True,,сегментов
 CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,fld_minDistance:CNC.Controls.NumericField.Label,None,False,True,,Min. дистанция:
-CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,fld_toolDiameter:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Default tool diameter.
-CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,fld_toolDiameter:CNC.Controls.NumericField.Label,None,False,True,,Tool diameter:
-CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,fld_toolDiameter:CNC.Controls.NumericField.Unit,None,False,True,,mm
+CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,fld_toolDiameter:CNC.Controls.NumericField.Unit,None,False,True,,мм
+CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,fld_toolDiameter:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Диаметр инструмента по умолчанию
+CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,fld_toolDiameter:CNC.Controls.NumericField.Label,None,False,True,,Диаметр инструмента:
 CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,fld_toolScalePct:CNC.Controls.NumericField.Unit,None,False,True,,%
 CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,grp_gcodeViewer:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Просмотр G-Code
 CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_blackBackgroud:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Черный фон
@@ -15,27 +15,27 @@ CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_highlightColor:Syst
 CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_highlightCompleted:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Выделить выполненное
 CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_rapidsColor:System.Windows.Controls.ContentControl.Content,Label,True,True,,Цвет быстрых переходов:
 CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_retractColor:System.Windows.Controls.ContentControl.Content,Label,True,True,,Цвет отвода:
-CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_showAxes:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Показать Оси
+CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_showAxes:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Оси
 CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_showBbox:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Границы обработки
 CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_showCoordSys:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Система координат:
 CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_showGrid:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Сетка
 CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_showOverlay:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Текстовые данные
 CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_showViewCube:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,ViewCube
-CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_toolAutoScale:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Auto scale tool
-CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,resetView:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Очистить отображение (Ctrl+V)
+CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_toolAutoScale:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Масштаб. инструмент
+CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,resetView:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Установить вид по-умолчанию (Ctrl+V)
 CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,resetView:System.Windows.Controls.ContentControl.Content,Button,True,True,,Resources/ResetView.png
+CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,restoreView:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Восстановить вид (Ctrl+R)
 CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,restoreView:System.Windows.Controls.ContentControl.Content,Button,True,True,,Resources/RestoreView.png
-CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,restoreView:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Restore view (Ctrl+R)
-CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,saveView:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Save view
 CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,saveView:System.Windows.Controls.ContentControl.Content,Button,True,True,,Resources/SaveView.png
+CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,saveView:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Сохранить настройки отображения
+CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,showGrid:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Переключить отображение сетки (Ctrl+G)
 CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,showGrid:System.Windows.Controls.ContentControl.Content,Button,True,True,,Resources/GridOn.png
-CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,showGrid:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Toggle grid visibility (Ctrl+G)
+CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,showJobEnvelope:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Переключить отображение границ обработки (Ctrl+J)
 CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,showJobEnvelope:System.Windows.Controls.ContentControl.Content,Button,True,True,,Resources/JobBoxOn.png
-CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,showJobEnvelope:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Toggle job bounds visibility (Ctrl+J)
+CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,showWorkEnvelope:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Переключить отображение рабочего поля (Ctrl+W)
 CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,showWorkEnvelope:System.Windows.Controls.ContentControl.Content,Button,True,True,,Resources/WorkBoxOn.png
-CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,showWorkEnvelope:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Toggle machine work envelope visibility (Ctrl+W)
-CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,showXYZMarkers:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Toggle axes visibility
+CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,showXYZMarkers:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Переключить отображение осей
 CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,showXYZMarkers:System.Windows.Controls.ContentControl.Content,Button,True,True,,Resources/XYZOn.png
-CNC.Controls.Viewer.g.en-US.resources:renderer.baml,str_toolCone:System.String.$Content,None,True,True,,Cone
-CNC.Controls.Viewer.g.en-US.resources:renderer.baml,str_toolCrosshair:System.String.$Content,None,True,True,,Crosshair
-CNC.Controls.Viewer.g.en-US.resources:renderer.baml,str_toolNoShow:System.String.$Content,None,True,True,,No tool
+CNC.Controls.Viewer.g.en-US.resources:renderer.baml,str_toolCone:System.String.$Content,None,True,True,,Конус
+CNC.Controls.Viewer.g.en-US.resources:renderer.baml,str_toolCrosshair:System.String.$Content,None,True,True,,Перекрестие
+CNC.Controls.Viewer.g.en-US.resources:renderer.baml,str_toolNoShow:System.String.$Content,None,True,True,,Не отображ.

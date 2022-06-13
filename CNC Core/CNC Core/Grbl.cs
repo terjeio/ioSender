@@ -1,7 +1,7 @@
 ﻿/*
  * Grbl.cs - part of CNC Controls library
  *
- * v0.37 / 2022-03-10 / Io Engineering (Terje Io)
+ * v0.38 / 2022-06-01 / Io Engineering (Terje Io)
  *
  */
 
@@ -553,21 +553,39 @@ namespace CNC.Core
 
         private void init()
         {
-            Clear();
+            for (var i = 0; i < Values.Length; i++)
+                Values[i] = double.NaN;
+
             Name = GetType().Name;
             Values.PropertyChanged += Values_PropertyChanged;
         }
 
         public void Clear()
         {
+            bool changed = false;
+
             for (var i = 0; i < Values.Length; i++)
+            {
+                changed |= !Values[i].Equals(double.NaN);
                 Values[i] = double.NaN;
+            }
+
+            if (changed)
+                OnPropertyChanged(nameof(Position));
         }
 
         public void Zero()
         {
+            bool changed = false;
+
             for (var i = 0; i < Values.Length; i++)
+            {
+                changed |= !Values[i].Equals(0d);
                 Values[i] = 0d;
+            }
+
+            if (changed)
+                OnPropertyChanged(nameof(Position));
         }
 
         public static Position operator +(Position b, Position c)
@@ -835,7 +853,7 @@ namespace CNC.Core
                     if(!LatheModeEnabled || i != 1)
                         PositionFormatString += AxisIndexToLetter(i) + ": {" + i.ToString() + "}  ";
                 }
-                if (LatheModeEnabled)
+                if (LatheModeEnabled && _numAxes == 3)
                 {
                     flags &= ~0x02;
                     _numAxes--;
@@ -868,7 +886,7 @@ namespace CNC.Core
         public static bool LatheModeEnabled
         {
             get { return GrblParserState.LatheMode != LatheMode.Disabled; }
-            set { if (value && GrblParserState.LatheMode == LatheMode.Disabled) { GrblParserState.LatheMode = LatheMode.Radius; NumAxes = 3; } }
+            set { if (value && GrblParserState.LatheMode == LatheMode.Disabled) { GrblParserState.LatheMode = LatheMode.Radius; } }
         }
         public static ObservableCollection<string> SystemInfo { get; private set; } = new ObservableCollection<string>();
         public static bool IsLoaded { get; private set; }
@@ -908,7 +926,7 @@ namespace CNC.Core
         public static bool Get(GrblViewModel model)
         {
             bool? res = null;
-            bool getExtended = !Resources.IsLegacyController && ExtendedProtocol && Build >= 20201109;
+            bool getExtended = !Resources.IsLegacyController && ExtendedProtocol; // && Build >= 20201109;
             CancellationToken cancellationToken = new CancellationToken();
 
             PollGrbl.Suspend();
@@ -933,13 +951,13 @@ namespace CNC.Core
             model.Silent = false;
             PollGrbl.Resume();
 
+            model.NumAxes = NumAxes;
             model.AxisEnabledFlags = AxisFlags;
             model.LatheModeEnabled = LatheModeEnabled;
             model.OptionalSignals.Value = OptionalSignals;
-
             IsLoaded = res == true;
 
-            if(IsGrblHAL) // For now...
+            if (IsGrblHAL) // For now...
                 Firmware = "grblHAL";
 
             model.Firmware = Firmware;
@@ -1053,8 +1071,18 @@ namespace CNC.Core
             if (s.Length > 1)
             {
                 var pos = s[1].Split(':');
-                if (pos[0] == "MPos" || pos[1] == "WPos")
+                if ((pos[0] == "MPos" || pos[0] == "WPos") && NumAxes != pos[1].Split(',').Length)
+                {
                     NumAxes = pos[1].Split(',').Length;
+                    if (Grbl.GrblViewModel != null)
+                    {
+                        Grbl.GrblViewModel.NumAxes = NumAxes;
+                        Grbl.GrblViewModel.AxisEnabledFlags = AxisFlags;
+                        Grbl.GrblViewModel.ClearPosition();
+                        Grbl.GrblViewModel.LatheModeEnabled = LatheModeEnabled;
+                        Grbl.GrblViewModel.ParseStatus(rt_report);
+                    }
+                }
             }
         }
 
@@ -1100,8 +1128,12 @@ namespace CNC.Core
                             PlanBufferSize = int.Parse(s[1], CultureInfo.InvariantCulture);
                         if (s.Length > 2)
                             SerialBufferSize = int.Parse(s[2], CultureInfo.InvariantCulture);
-                        if (s.Length > 3)
+                        if (s.Length > 3 && NumAxes != int.Parse(s[3], CultureInfo.InvariantCulture))
+                        {
                             NumAxes = int.Parse(s[3], CultureInfo.InvariantCulture);
+                            if (Grbl.GrblViewModel != null)
+                                Grbl.GrblViewModel.ClearPosition();
+                        }
                         if (s.Length > 4)
                             NumTools = int.Parse(s[4], CultureInfo.InvariantCulture);
                         break;
@@ -2684,6 +2716,8 @@ namespace CNC.Core
 
                         case GrblSetting.StatusReportMask:
                             {
+                                if (String.IsNullOrEmpty(valuepair[1])) // FluidNC workaround
+                                    valuepair[1] = "0";                 // for missing parameter value
                                 var value = int.Parse(valuepair[1]);
                                 Grbl.GrblViewModel.IsParserStateLive = (value & (1 << 9)) != 0;
                                 GrblInfo.ReportProbeResult = ReportProbeCoordinates = (value & (1 << 7)) != 0;

@@ -1,7 +1,7 @@
 /*
  * MainWindow.xaml.cs - part of Grbl Code Sender
  *
- * v0.37 / 2022-03-11 / Io Engineering (Terje Io)
+ * v0.38 / 2022-06-13 / Io Engineering (Terje Io)
  *
  */
 
@@ -56,7 +56,7 @@ namespace GCode_Sender
 
     public partial class MainWindow : Window
     {
-        private const string version = "2.0.37";
+        private const string version = "2.0.38";
         public static MainWindow ui = null;
         public static CNC.Controls.Viewer.Viewer GCodeViewer = null;
         public static UIViewModel UIViewModel { get; } = new UIViewModel();
@@ -154,6 +154,8 @@ namespace GCode_Sender
 #endif
             if (!AppConfig.Settings.GCodeViewer.IsEnabled)
                 ShowView(false, ViewType.GCodeViewer);
+
+            UIViewModel.ConfigControls.Add(new CNC.Controls.Viewer.ConfigControl());
 
             xx.ItemsSource = UIViewModel.SidebarItems;
             UIViewModel.SidebarItems.Add(new SidebarItem(macroControl));

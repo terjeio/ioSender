@@ -99,7 +99,7 @@
             <TextBlock Text="{Binding Path=Position, Mode=OneWay}" TextWrapping="NoWrap" Height="25" Width="235" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
         </DockPanel>
         <StackPanel DockPanel.Dock="Right" Margin="0,10,0,0" Width="635" HorizontalAlignment="Left" VerticalAlignment="Top">
-            <TabControl x:Name="tab" HorizontalAlignment="Stretch" VerticalAlignment="Top" Width="Auto" Height="410" SelectionChanged="tab_SelectionChanged">
+            <TabControl x:Name="tab" HorizontalAlignment="Stretch" VerticalAlignment="Top" Width="Auto" Height="Auto" SelectionChanged="tab_SelectionChanged">
                 <TabItem x:Uid="tab_toolOffset" Header="Tool length offset">
                     <local:ToolLengthControl HorizontalAlignment="Left" VerticalAlignment="Top"/>
                 </TabItem>

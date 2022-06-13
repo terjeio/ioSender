@@ -1,13 +1,13 @@
 ﻿/*
  * GCodeRotateDialog.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.33 / 2021-05-14 / Io Engineering (Terje Io)
+ * v0.38 / 2022-05-08 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2021, Io Engineering (Terje Io)
+Copyright (c) 2021-2022, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -125,23 +125,23 @@ namespace CNC.Controls
                             break;
 
                         case OriginControl.Origin.Center:
-                            offset = new RP.Math.Vector3(limits.MaxX / 2d, limits.MaxY / 2d, 0d);
+                            offset = new RP.Math.Vector3(limits.MinX + limits.SizeX / 2d, limits.MinY + limits.SizeY / 2d, 0d);
                             break;
 
                         case OriginControl.Origin.AB:
-                            offset = new RP.Math.Vector3(limits.MaxX / 2d, limits.MinY, 0d);
+                            offset = new RP.Math.Vector3(limits.MinX + limits.SizeX / 2d, limits.MinY, 0d);
                             break;
 
                         case OriginControl.Origin.AD:
-                            offset = new RP.Math.Vector3(limits.MinX, limits.MaxY / 2d, 0d);
+                            offset = new RP.Math.Vector3(limits.MinX, limits.MinY + limits.SizeY / 2d, 0d);
                             break;
 
                         case OriginControl.Origin.CB:
-                            offset = new RP.Math.Vector3(limits.MaxX, limits.MaxY / 2d, 0d);
+                            offset = new RP.Math.Vector3(limits.MaxX, limits.MinY + limits.SizeY / 2d, 0d);
                             break;
 
                         case OriginControl.Origin.CD:
-                            offset = new RP.Math.Vector3(limits.MaxX / 2d, limits.MaxY, 0d);
+                            offset = new RP.Math.Vector3(limits.MinX + limits.SizeX / 2d, limits.MaxY, 0d);
                             break;
 
                         default: // Origin.None -> 0,0

@@ -1,7 +1,7 @@
 /*
  * GrblViewModel.cs - part of CNC Controls library
  *
- * v0.37 / 2022-03-02 / Io Engineering (Terje Io)
+ * v0.38 / 2022-06-01 / Io Engineering (Terje Io)
  *
  */
 
@@ -42,8 +42,8 @@ using System.Linq;
 using System.Windows.Media;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
-using CNC.GCode;
 using System.Threading;
+using CNC.GCode;
 
 namespace CNC.Core
 {
@@ -193,13 +193,7 @@ namespace CNC.Core
             GrblState = _grblState;
             IsMPGActive = null; //??
 
-            has_wco = false;
-            _MPos = _WPos = _wco = _h = string.Empty;
-            Position.Clear();
-            MachinePosition.Clear();
-            WorkPosition.Clear();
-            WorkPositionOffset.Clear();
-            ProgramLimits.Clear();
+            ClearPosition();
 
             Set("Pn", string.Empty);
             Set("A", string.Empty);
@@ -214,6 +208,17 @@ namespace CNC.Core
                 LatheMode = LatheMode.Radius;
 
             _thcv = _thcs = string.Empty;
+        }
+
+        public void ClearPosition()
+        {
+            has_wco = false;
+            _MPos = _WPos = _wco = _h = string.Empty;
+            MachinePosition.Clear();
+            WorkPosition.Clear();
+            WorkPositionOffset.Clear();
+            Position.Clear();
+            ProgramLimits.Clear();
         }
 
         public PollGrbl Poller { get; } = new PollGrbl();
@@ -416,7 +421,7 @@ namespace CNC.Core
                 if (_latheMode != value)
                 {
                     _latheMode = value;
-                    if(_latheMode != LatheMode.Disabled)
+                    if(_latheMode != LatheMode.Disabled && NumAxes == 3)
                     {
                         Position.Y = MachinePosition.Y = WorkPosition.Y = WorkPositionOffset.Y = 0d;
                     }
@@ -768,11 +773,8 @@ namespace CNC.Core
                     {
                         pair = elements[i].Split(':');
 
-                        if (pair.Length == 2)
-                        {
-                            if(Set(pair[0], pair[1]))
-                                pos_changed = true;
-                        }
+                        if (pair.Length == 2 && Set(pair[0], pair[1]))
+                            pos_changed = true;
                     }
 
                     if (!data.Contains("|Pn:"))
@@ -888,13 +890,13 @@ namespace CNC.Core
                     if (_fs != value)
                     {
                         _fs = value;
-                        if (_fs == "")
+                        if (_fs == string.Empty)
                         {
                             FeedRate = ProgrammedRPM = 0d;
                             if (!double.IsNaN(ActualRPM))
                                 ActualRPM = 0d;
                         }
-                        else
+                        else try
                         {
                             double[] values = dbl.ParseList(_fs);
                             if (_feedrate != values[0])
@@ -904,6 +906,7 @@ namespace CNC.Core
                             if (values.Length > 2 && _rpmActual != values[2])
                                 ActualRPM = values[2];
                         }
+                        catch { }
                     }
                     break;
 
@@ -911,7 +914,7 @@ namespace CNC.Core
                     if (_fs != value)
                     {
                         _fs = value;
-                        if (_fs == "")
+                        if (_fs == string.Empty)
                         {
                             FeedRate = ProgrammedRPM = 0d;
                             if (!double.IsNaN(ActualRPM))
@@ -953,7 +956,7 @@ namespace CNC.Core
                         _ov = value;
                         if (_ov == string.Empty)
                             FeedOverride = RapidsOverride = RPMOverride = 100d;
-                        else
+                        else try 
                         {
                             double[] values = dbl.ParseList(_ov);
                             if (_feedOverride != values[0])
@@ -963,6 +966,7 @@ namespace CNC.Core
                             if (_rpmOverride != values[2])
                                 RPMOverride = values[2];
                         }
+                        catch { }
                     }
                     break;
 

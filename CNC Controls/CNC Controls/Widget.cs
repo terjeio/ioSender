@@ -1,13 +1,13 @@
 /*
  * Widget.cs - part of CNC Controls library for Grbl
  *
- * v0.34 / 2021-07-18 / Io Engineering (Terje Io)
+ * v0.38 / 2022-03-21 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2021, Io Engineering (Terje Io)
+Copyright (c) 2018-2022, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -81,7 +81,7 @@ namespace CNC.Controls
 
         public void Assign (string value)
         {
-            properties.Value = value;
+            properties.Value = Value = value;
         }
 
         public WidgetProperties(GrblSettingDetails Properties)

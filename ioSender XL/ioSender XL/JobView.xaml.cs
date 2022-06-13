@@ -1,7 +1,7 @@
 /*
  * JobView.xaml.cs - part of Grbl Code Sender
  *
- * v0.37 / 2022-02-27 / Io Engineering (Terje Io)
+ * v0.38 / 2022-02-27 / Io Engineering (Terje Io)
  *
  */
 
@@ -303,7 +303,11 @@ namespace GCode_Sender
 
         void Camera_MoveOffset(CameraMoveMode Mode, double XOffset, double YOffset)
         {
-            Comms.com.WriteString("G91G0\r"); // Enter relative G0 mode - set scale to 1.0?
+            GrblParserState.Get();
+            CNC.GCode.Units units = GrblParserState.Units;
+            CNC.GCode.DistanceMode distanceMode = GrblParserState.DistanceMode;
+
+            Comms.com.WriteString("G91G0\r"); // Enter relative metric G0 mode - set scale to 1.0?
 
             switch (Mode)
             {
@@ -322,7 +326,11 @@ namespace GCode_Sender
                     break;
             }
 
-            Comms.com.WriteString("G90\r"); // reset to previous or G80 to cancel motion mode?   
+            if (distanceMode != CNC.GCode.DistanceMode.Incremental)
+                Comms.com.WriteString("G90\r");
+
+            if (units != CNC.GCode.Units.Metric)
+                Comms.com.WriteString("G20\r");
         }
 #endif
 
@@ -380,9 +388,6 @@ namespace GCode_Sender
 
             if (!AppConfig.Settings.GCodeViewer.IsEnabled)
                 tabGCode.Items.Remove(tab3D);
-
-            if (GrblInfo.NumAxes > 3)
-                limitsControl.Visibility = Visibility.Collapsed;
 
             if (GrblInfo.LatheModeEnabled)
             {

@@ -1,7 +1,7 @@
 ﻿/*
  * RotationControl.xaml.cs - part of CNC Probing library
  *
- * v0.37 / 2022-02-21 / Io Engineering (Terje Io)
+ * v0.38 / 2022-05-01 / Io Engineering (Terje Io)
  *
  */
 
@@ -79,7 +79,11 @@ namespace CNC.Controls.Probing
             {
                 var probing = DataContext as ProbingViewModel;
 
-                probing.CanApplyTransform = probing.CameraPositions == 2;
+                if (probing.CameraPositions == 1 && probing.ProbeEdge == Edge.None)
+                    probing.PreviewText += ((string)grd_action.ToolTip).Replace('.', '!');
+
+                if ((probing.CanApplyTransform = probing.CameraPositions == 2 && probing.ProbeEdge != Edge.None))
+                    getAngle();
             }
         }
 
@@ -183,16 +187,14 @@ namespace CNC.Controls.Probing
 
         private void OnCompleted()
         {
-            bool ok;
-
             var probing = DataContext as ProbingViewModel;
 
-            if ((probing.CanApplyTransform = probing.IsSuccess && probing.Positions.Count == 2))
-            {
-                getAngle();
-            }
+            probing.CanApplyTransform = probing.IsSuccess && probing.Positions.Count == 2;
 
             probing.Program.End((string)FindResource(probing.CanApplyTransform ? "ProbingCompleted" : "ProbingFailed"));
+
+            if (probing.CanApplyTransform)
+                getAngle();
 
             if (!probing.Grbl.IsParserStateLive && probing.CoordinateMode == ProbingViewModel.CoordMode.G92)
                 probing.Grbl.ExecuteCommand(GrblConstants.CMD_GETPARSERSTATE);
@@ -208,7 +210,7 @@ namespace CNC.Controls.Probing
             probing.Program.Clear();
         }
 
-        private double getAngle ()
+        private double getAngle()
         {
             var probing = DataContext as ProbingViewModel;
 
@@ -217,7 +219,7 @@ namespace CNC.Controls.Probing
             if (probing.ProbeEdge == Edge.CB || probing.ProbeEdge == Edge.AD)
                 angle = -1.0d / angle;
 
-            probing.Grbl.Message = string.Format((string)FindResource("ProbedAngle"), Math.Round(Math.Atan(angle) * 180d / Math.PI, 1).ToString());
+            probing.Grbl.Message = string.Format((string)FindResource("ProbedAngle"), Math.Round(Math.Atan(angle) * 180d / Math.PI, 3).ToInvariantString());
 
             return angle;
         }
@@ -230,10 +232,6 @@ namespace CNC.Controls.Probing
         private void stop_Click(object sender, RoutedEventArgs e)
         {
             Stop();
-        }
-        private void use00_Click(object sender, RoutedEventArgs e)
-        {
-            (DataContext as ProbingViewModel).Origin = OriginControl.Origin.None;
         }
 
         private void apply_Click(object sender, RoutedEventArgs e)

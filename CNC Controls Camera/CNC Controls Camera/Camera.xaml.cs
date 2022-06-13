@@ -1,7 +1,7 @@
 ﻿/*
  * Camera.xaml.cs - part of CNC Controls Camera library
  *
- * v0.37 / 2022-03-02 / Io Engineering (Terje Io)
+ * v0.38 / 2022-04-20 / Io Engineering (Terje Io)
  *
  */
 
@@ -108,8 +108,8 @@ namespace CNC.Controls.Camera
                 e.Cancel = true;
                 Hide();
             }
-            else
-                CNCCamera.CloseCurrentVideoSource();
+
+            CNCCamera.CloseCurrentVideoSource();
 
             IsVisibilityChanged?.Invoke();
         }

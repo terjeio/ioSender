@@ -2,7 +2,18 @@
 
 Executable for development builds available for download [here](http://www.io-engineering.com/downloads/) if you want to participate in testing.
 
-2022-03-11: [Release 2.0.35](https://github.com/terjeio/Grbl-GCode-Sender/releases/tag/2.0.37).
+2022-06-12: [Release 2.0.38](https://github.com/terjeio/Grbl-GCode-Sender/releases/tag/2.0.38).
+
+* Added paste support for numeric input fields.
+* Improved rotation support.
+* Fixed bounding box calulation for arcs.
+* Improved number of axes detection and handling. Now supports > 3 axis lathe configurations.
+* General "hardening" of code.
+* Translation updates.
+
+---
+
+2022-03-11: [Release 2.0.37](https://github.com/terjeio/Grbl-GCode-Sender/releases/tag/2.0.37).
 
 * Added list of controller alarm and error codes to _Help_ menu.
 * Added link to tutorial videos to  _Help_ menu. By @S2000Stefan

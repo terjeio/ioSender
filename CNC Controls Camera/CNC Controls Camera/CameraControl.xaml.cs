@@ -1,7 +1,7 @@
 ﻿/*
  * CameraControl.xaml.cs - part of CNC Controls Camera library
  *
- * v0.37 / 2022-03-02 / Io Engineering (Terje Io)
+ * v0.38 / 2022-04-20 / Io Engineering (Terje Io)
  *
  */
 
@@ -250,12 +250,12 @@ namespace CNC.Controls.Camera
             if (!AppConfig.Settings.Camera.ConfirmMove || MessageBox.Show(UIUtils.TryFindParent<Window>(this), (string)FindResource(MoveCameraToSpindlePosition ? "MoveCameraTo" : "MoveSpindleTo"), "ioSender", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
                 if (MoveCameraToSpindlePosition)
-                {
-                    MoveCameraToSpindlePosition = false;
                     MoveOffset?.Invoke(Mode, -XOffset, -YOffset);
-                }
                 else
                     MoveOffset?.Invoke(Mode, XOffset, YOffset);
+
+                if (AppConfig.Settings.Camera.InitialMoveToSpindle)
+                    MoveCameraToSpindlePosition = !MoveCameraToSpindlePosition;
             }
         }
 
