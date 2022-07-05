@@ -1,7 +1,7 @@
 /*
  * Converters.cs - part of CNC Controls library for Grbl
  *
- * v0.36 / 2021-12-08 / Io Engineering (Terje Io)
+ * v0.39 / 2022-06-24 / Io Engineering (Terje Io)
  *
  */
 
@@ -375,7 +375,7 @@ namespace CNC.Controls
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            bool result = (value is bool ? !(bool)value : ((value is int) ? (int)value == 0 : false)) || value == null;
+            bool result = (value is bool ? !(bool)value : ((value is bool?) ? (bool?)value != true : ((value is int) ? (int)value == 0 : false))) || value == null;
 
             return FinalConverter == null ? result : FinalConverter.Convert(result, targetType, parameter, culture);
         }

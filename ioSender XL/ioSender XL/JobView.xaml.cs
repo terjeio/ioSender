@@ -1,7 +1,7 @@
 /*
  * JobView.xaml.cs - part of Grbl Code Sender
  *
- * v0.38 / 2022-02-27 / Io Engineering (Terje Io)
+ * v0.39 / 2022-06-24 / Io Engineering (Terje Io)
  *
  */
 
@@ -85,7 +85,7 @@ namespace GCode_Sender
             if (sender is GrblViewModel) switch (e.PropertyName)
                 {
                 case nameof(GrblViewModel.GrblState):
-                    if (!Controller.ResetPending)
+                    if (Controller != null && !Controller.ResetPending)
                     {
                         if (isBooted && initOK == false && (sender as GrblViewModel).GrblState.State != GrblStates.Alarm)
                             Dispatcher.BeginInvoke(new System.Action(() => InitSystem()), DispatcherPriority.ApplicationIdle);

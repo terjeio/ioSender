@@ -1,7 +1,7 @@
 /*
  * GrblViewModel.cs - part of CNC Controls library
  *
- * v0.38 / 2022-06-01 / Io Engineering (Terje Io)
+ * v0.39 / 2022-06-24 / Io Engineering (Terje Io)
  *
  */
 
@@ -755,7 +755,7 @@ namespace CNC.Core
         public bool ParseStatus(string data)
         {
             bool changed, wco_present = data.Contains("|WCO:");
-            int rti = data.Contains("|WCO:") ? 1 : (data.Contains("|Ov:") ? 2 : 0);
+            int rti = data.Contains("|WCO:") || data.Contains("|MPG:") ? 1 : (data.Contains("|Ov:") ? 2 : 0);
 
             if ((changed = (_rtState[rti] != data) || _grblState.State == GrblStates.Unknown)) {
 

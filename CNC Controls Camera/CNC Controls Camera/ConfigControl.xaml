@@ -6,8 +6,8 @@
              xmlns:local="clr-namespace:CNC.Controls.Camera"
              xmlns:Controls="clr-namespace:CNC.Controls;assembly=CNC.Controls.WPF" x:Class="CNC.Controls.Camera.ConfigControl"
              mc:Ignorable="d" 
-             d:DesignHeight="160" d:DesignWidth="250">
-    <GroupBox x:Uid="grp_camera" x:Name="grpCamera" Header="Camera" HorizontalAlignment="Left" VerticalAlignment="Top" Height="Auto" Width="250">
+             d:DesignHeight="160" d:DesignWidth="310">
+    <GroupBox x:Uid="grp_camera" x:Name="grpCamera" Header="Camera" HorizontalAlignment="Left" VerticalAlignment="Top" Height="Auto" Width="310">
         <StackPanel HorizontalAlignment="Left" Height="Auto" Margin="0,3,0,0" VerticalAlignment="Top" Width="235">
             <CheckBox x:Uid="chk_moveToSpindle" Content="Inital move to spindle" IsChecked="{Binding Path=Camera.InitialMoveToSpindle, Mode=TwoWay}" Margin="90,0,0,0"/>
             <CheckBox x:Uid="chk_confirmMove" Content="Confirm move" IsChecked="{Binding Path=Camera.ConfirmMove, Mode=TwoWay}" Margin="90,0,0,0"/>

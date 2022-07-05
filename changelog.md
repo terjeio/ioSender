@@ -1,5 +1,13 @@
 ## ioSender changelog
 
+2022-07-05: [Release 2.0.39](https://github.com/terjeio/Grbl-GCode-Sender/releases/tag/2.0.39).
+
+* Fixed MPG mode switching issue, "hardened" code.
+* Removed dependency on XCeed WPF toolkit. WPF toolkit issue [#1598}(https://github.com/xceedsoftware/wpftoolkit/issues/1598) and sender issue [#231](https://github.com/terjeio/ioSender/issues/231).
+* UI color selection for 3D viewer disabled. Color changes has to be done by editing _App.cofig_ until a new color picker is found or made.
+
+---
+
 Executable for development builds available for download [here](http://www.io-engineering.com/downloads/) if you want to participate in testing.
 
 2022-06-12: [Release 2.0.38](https://github.com/terjeio/Grbl-GCode-Sender/releases/tag/2.0.38).
