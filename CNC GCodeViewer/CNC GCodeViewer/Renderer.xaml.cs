@@ -1,7 +1,7 @@
 /*
  * Renderer.xaml.cs - part of CNC Controls library
  *
- * v0.36 / 2021-12-30 / Io Engineering (Terje Io)
+ * v0.40 / 2022-07-12 / Io Engineering (Terje Io)
  *
  */
 
@@ -14,7 +14,7 @@
 
 /*
 
-Copyright (c) 2019-2021, Io Engineering (Terje Io)
+Copyright (c) 2019-2022, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -832,7 +832,11 @@ namespace CNC.Controls.Viewer
                             break;
 
                         case Commands.G5:
-                            DrawSpline(job.Current.Token as GCSpline, point0.ToArray());
+                            DrawCubicSpline(job.Current.Token as GCCubicSpline, point0.ToArray());
+                            break;
+
+                        case Commands.G5_1:
+                            DrawQuadraticSpline(job.Current.Token as GCQuadraticSpline, point0.ToArray());
                             break;
                     }
                 }
@@ -1093,7 +1097,11 @@ namespace CNC.Controls.Viewer
                         break;
 
                     case Commands.G5:
-                        DrawSpline(cmd.Token as GCSpline, point0.ToArray());
+                        DrawCubicSpline(cmd.Token as GCCubicSpline, point0.ToArray());
+                        break;
+
+                    case Commands.G5_1:
+                        DrawQuadraticSpline(cmd.Token as GCQuadraticSpline, point0.ToArray());
                         break;
                 }
             }
@@ -1291,7 +1299,7 @@ namespace CNC.Controls.Viewer
                 {
                     if ((point - point0).LengthSquared < minDistanceSquared)
                         return;  // less than min distance from last point
-                    delta0 = delta;
+              //      delta0 = delta;
                 }
             }
 
@@ -1334,7 +1342,15 @@ namespace CNC.Controls.Viewer
                 AddCutMove(point);
         }
 
-        private void DrawSpline(GCSpline spline, double[] start, bool isRelative = false)
+        private void DrawCubicSpline(GCCubicSpline spline, double[] start, bool isRelative = false)
+        {
+            List<Point3D> points = spline.GeneratePoints(start, ArcResolution, isRelative); // Dynamic resolution
+
+            foreach (Point3D point in points)
+                AddCutMove(point);
+        }
+
+        private void DrawQuadraticSpline(GCQuadraticSpline spline, double[] start, bool isRelative = false)
         {
             List<Point3D> points = spline.GeneratePoints(start, ArcResolution, isRelative); // Dynamic resolution
 

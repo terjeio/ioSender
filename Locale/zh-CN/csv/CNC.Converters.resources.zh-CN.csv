@@ -1,9 +1,9 @@
 ﻿CNC.Converters.g.en-US.resources:jobparametersdialog.baml,bn_cancel:System.Windows.Controls.ContentControl.Content,Button,True,True,,取消
 CNC.Converters.g.en-US.resources:jobparametersdialog.baml,btn_ok:System.Windows.Controls.ContentControl.Content,Button,True,True,,Ok
 CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_cutDepth:CNC.Controls.NumericField.Unit,None,False,True,,mm
-CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_cutDepth:CNC.Controls.NumericField.Label,None,False,True,,Cut depth:
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_cutDepth:CNC.Controls.NumericField.Label,None,False,True,,铣削深度：
 CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_feedrate:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
-CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_feedrate:CNC.Controls.NumericField.Label,None,False,True,,Feed rate:
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_feedrate:CNC.Controls.NumericField.Label,None,False,True,,进给速度：
 CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_plungeRate:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
 CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_plungeRate:CNC.Controls.NumericField.Label,None,False,True,,Plunge rate:
 CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_rapids:CNC.Controls.NumericField.Unit,None,False,True,,mm
@@ -11,8 +11,8 @@ CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_rapids:CNC.Control
 CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_rpm:CNC.Controls.NumericField.Label,None,False,True,,RPM:
 CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_rpm:CNC.Controls.NumericField.Unit,None,False,True,,
 CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_toolChange:CNC.Controls.NumericField.Unit,None,False,True,,mm
-CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_toolChange:CNC.Controls.NumericField.Label,None,False,True,,Tool change:
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_toolChange:CNC.Controls.NumericField.Label,None,False,True,,刀具长度:
 CNC.Converters.g.en-US.resources:jobparametersdialog.baml,grp_scalingFactors:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Scaling factors
 CNC.Converters.g.en-US.resources:jobparametersdialog.baml,grp_spindle_feed:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Spindle and feed
-CNC.Converters.g.en-US.resources:jobparametersdialog.baml,grp_tool:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Tool
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,grp_tool:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,刀具
 CNC.Converters.g.en-US.resources:jobparametersdialog.baml,grp_zPosition:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Z positions (relative to workpiece surface)

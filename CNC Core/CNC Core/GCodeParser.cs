@@ -1,7 +1,7 @@
 ﻿/*
  * GCodeParser.cs - part of CNC Controls library
  *
- * v0.38 / 2022-05-08 / Io Engineering (Terje Io)
+ * v0.40 / 2022-07-14 / Io Engineering (Terje Io)
  *
  */
 
@@ -376,14 +376,17 @@ namespace CNC.GCode
                         case 2:
                         case 3:
                         case 5:
-                            if (iv == 5 && Dialect == Dialect.Grbl)
-                                throw new GCodeException(LibStrings.FindResource("ParserUnsupportedCmd"));
-                            if (axisCommand != AxisCommand.None && cmdNonModal != Commands.G53)
-                                throw new GCodeException(LibStrings.FindResource("ParserAxisError"));
-                            modalGroup = ModalGroups.G1;
-                            axisCommand = AxisCommand.MotionMode;
-                            motionModeChanged = motionMode != (MotionMode)(iv * 10);
-                            motionMode = (MotionMode)(iv * 10);
+                            {
+                                if (iv == 5 && Dialect == Dialect.Grbl)
+                                    throw new GCodeException(LibStrings.FindResource("ParserUnsupportedCmd"));
+                                if (axisCommand != AxisCommand.None && cmdNonModal != Commands.G53)
+                                    throw new GCodeException(LibStrings.FindResource("ParserAxisError"));
+                                modalGroup = ModalGroups.G1;
+                                axisCommand = AxisCommand.MotionMode;
+                                MotionMode newMode = (iv == 5 && fv == 1) ? MotionMode.G5_1 : (MotionMode)(iv * 10);
+                                motionModeChanged = motionMode != newMode;
+                                motionMode = newMode;
+                            }
                             break;
 
                         case 4:
@@ -1390,7 +1393,13 @@ namespace CNC.GCode
                                     gcValues.IJK[i] = 0d;
                             }
                         }
-                        Tokens.Add(new GCArc(motionMode == MotionMode.G2 ? Commands.G2 : Commands.G3, gcValues.N, gcValues.XYZ, axisWords, gcValues.IJK, ijkWords, gcValues.R, IJKMode));
+                        if (wordFlags.HasFlag(WordFlags.P)) {
+                            if(Dialect == Dialect.Grbl)
+                                throw new GCodeException(LibStrings.FindResource("ParserCMDInvalid"));
+                            if(gcValues.P <= 0d)
+                                throw new GCodeException(LibStrings.FindResource("ParserCMDInvalid"));
+                        }
+                        Tokens.Add(new GCArc(motionMode == MotionMode.G2 ? Commands.G2 : Commands.G3, gcValues.N, gcValues.XYZ, axisWords, gcValues.IJK, ijkWords, gcValues.R, wordFlags.HasFlag(WordFlags.P) ? (int)gcValues.P : 0, IJKMode));
                         break;
 
                     case MotionMode.G5:
@@ -1425,7 +1434,23 @@ namespace CNC.GCode
                                 splinePQ[i] *= scaleFactors[i];
                         }
                         RetractOldZ = true;
-                        Tokens.Add(new GCSpline(Commands.G5, gcValues.N, gcValues.XYZ, axisWords, new double[] { gcValues.IJK[0], gcValues.IJK[1], splinePQ[0], splinePQ[1] }));
+                        Tokens.Add(new GCCubicSpline(Commands.G5, gcValues.N, gcValues.XYZ, axisWords, new double[] { gcValues.IJK[0], gcValues.IJK[1], splinePQ[0], splinePQ[1] }));
+                        break;
+
+                    case MotionMode.G5_1:
+                        if (Plane.Plane != GCode.Plane.XY)
+                            throw new GCodeException(LibStrings.FindResource("ParserPlaneNotXY"));
+                        if (!(wordFlags.HasFlag(WordFlags.I) && wordFlags.HasFlag(WordFlags.J)))
+                            throw new GCodeException(LibStrings.FindResource("ParserNoIandorJ"));
+                        for (int i = 0; i < 2; i++)
+                        {
+                            if (IsImperial)
+                                gcValues.IJK[i] *= 25.4d;
+                            if (IsScaled)
+                                gcValues.IJK[i] *= scaleFactors[i];
+                        }
+                        RetractOldZ = true;
+                        Tokens.Add(new GCQuadraticSpline(Commands.G5_1, gcValues.N, gcValues.XYZ, axisWords, new double[] { gcValues.IJK[0], gcValues.IJK[1] }));
                         break;
 
                     case MotionMode.G33:
@@ -1614,7 +1639,8 @@ namespace CNC.GCode
                         typeof(GCLinearMotion),
                         typeof(GCAbsLinearMotion),
                         typeof(GCArc),
-                        typeof(GCSpline),
+                        typeof(GCCubicSpline),
+                        typeof(GCQuadraticSpline),
                         typeof(GCSyncMotion),
                         typeof(GCThreadingMotion),
                         typeof(GCCannedDrill),
@@ -1760,12 +1786,17 @@ namespace CNC.GCode
 
                     case Commands.G5:
                         if (compress && lastMotion.Command == token.Command)
-                            block += (token as GCSpline).ToString().Substring(2);
+                            block += (token as GCCubicSpline).ToString().Substring(2);
                         else
                         {
                             lastMotion = token;
-                            block += (token as GCSpline).ToString();
+                            block += (token as GCCubicSpline).ToString();
                         }
+                        break;
+
+                    case Commands.G5_1:
+                        lastMotion = token;
+                        block += (token as GCQuadraticSpline).ToString();
                         break;
 
                     case Commands.G4:
@@ -2059,7 +2090,7 @@ namespace CNC.GCode
         public GCArc()
         { }
 
-        public GCArc(Commands cmd, uint lnr, double[] xyz_values, AxisFlags axisFlags, double[] ijk_values, IJKFlags ijkFlags, double r, IJKMode ijkMode) : base(cmd, lnr, xyz_values, axisFlags)
+        public GCArc(Commands cmd, uint lnr, double[] xyz_values, AxisFlags axisFlags, double[] ijk_values, IJKFlags ijkFlags, double r, int p, IJKMode ijkMode) : base(cmd, lnr, xyz_values, axisFlags)
         {
             Array.Copy(ijk_values, IJKvalues, 3);
             Array.Copy(Values, end, 3);
@@ -2067,6 +2098,8 @@ namespace CNC.GCode
             IJKMode = ijkMode;
             if((IjkFlags = ijkFlags) == IJKFlags.None)
                 R = this.r = r;
+
+            P = p;
         }
 
         public IJKFlags IjkFlags { get; set; }
@@ -2077,6 +2110,7 @@ namespace CNC.GCode
         public double J { get { return IJKvalues[1]; } set { IJKvalues[1] = value; } }
         public double K { get { return IJKvalues[2]; } set { IJKvalues[2] = value; } }
         public double R { get; set; }
+        public int P { get; set; }
 
         public IJKMode IJKMode { get; set; }
         public bool IsRadiusMode { get { return double.IsNaN(I) && double.IsNaN(J) && double.IsNaN(K); } }
@@ -2090,6 +2124,9 @@ namespace CNC.GCode
                 s += "R" + R.ToInvariantString();
             else foreach(int i in IjkFlags.ToIndices())
                 s += GCodeParser.IjkFlag[i].ToString() + IJKvalues[i].ToInvariantString();
+
+            if (P > 0)
+                s += 'P' + P.ToString();
 
             return s;
         }
@@ -2145,7 +2182,7 @@ namespace CNC.GCode
             double z1 = Math.Min(start[plane.AxisLinear], end[plane.AxisLinear]);
             double z2 = Math.Max(start[plane.AxisLinear], end[plane.AxisLinear]);
 
-            if (startAngle == endAngle)
+            if (startAngle == endAngle || P > 1)
             {
                 bbox.AddPoint(plane, center[0] - r, center[1] - r, z1);
                 bbox.AddPoint(plane, center[0] + r, center[1] + r, z2);
@@ -2373,14 +2410,16 @@ namespace CNC.GCode
         public List<Point3D> GeneratePoints(GCPlane plane, double[] start, double arcResolution, bool isRelative = false)
         {
             double sweep;
+            int numPoints;
+            List<Point3D> pts = new List<Point3D>();
 
             // Calculate angles from center.
             double startAngle = GetStartAngle(plane, start, isRelative);
             double endAngle = GetEndAngle(plane, start, isRelative);
+            double delta_linear = end[plane.AxisLinear] - start[plane.AxisLinear];
 
             if (startAngle == endAngle)
                 sweep = Math.PI * 2d;
-
             else
             {
                 // Fix semantics, if the angle ends at 0 it really should end at 360.
@@ -2396,26 +2435,41 @@ namespace CNC.GCode
                     sweep = Math.Abs(endAngle - startAngle);
             }
 
-            int numPoints;
+            if (P > 1)
+            {
+                int passes = P - 1;
+                double arc_travel = Math.PI * 2d * passes + sweep;
+
+                if (arcResolution > 1d)
+                    numPoints = (int)arcResolution;
+                else
+                    numPoints = (int)Math.Floor(Math.Abs(0.5d * Math.PI * 2d * r) / Math.Sqrt(arcResolution * (2.0f * r - arcResolution)));
+
+                while(passes-- > 0)
+                    pts.AddRange(generatePointsAlongArcBDring(plane, start, start, startAngle, Math.PI * 2d, numPoints, delta_linear / arc_travel * 2d * Math.PI / numPoints, false));
+
+                delta_linear = end[plane.AxisLinear] - start[plane.AxisLinear];
+            }
 
             if (arcResolution > 1d)
                 numPoints = (int)Math.Max(8d, sweep * arcResolution / (Math.PI * 2d));
             else
                 numPoints = (int)Math.Floor(Math.Abs(0.5d * sweep * r) / Math.Sqrt(arcResolution * (2.0f * r - arcResolution)));
 
-            return generatePointsAlongArcBDring(plane, start, startAngle, sweep, numPoints);
+            pts.AddRange(generatePointsAlongArcBDring(plane, start, end, startAngle, sweep, numPoints, delta_linear / numPoints, true));
+
+            return pts;
         }
 
         /*
          * Generates the points along an arc including the start and end points.
          */
-        private List<Point3D> generatePointsAlongArcBDring(GCPlane plane, double[] start, double startAngle, double sweep, int numPoints)
+        private List<Point3D> generatePointsAlongArcBDring(GCPlane plane, double[] start, double[] end, double startAngle, double sweep, int numPoints, double zIncrement, bool lastTurn)
         {
 
             Point3D lineEnd = new Point3D();
             List<Point3D> segments = new List<Point3D>();
             double angle;
-            double zIncrement = (end[plane.AxisLinear] - start[plane.AxisLinear]) / numPoints;
 
             for (int i = 0; i < numPoints; i++)
             {
@@ -2439,66 +2493,29 @@ namespace CNC.GCode
                 segments.Add(lineEnd);
             }
 
-            lineEnd.X = end[0];
-            lineEnd.Y = end[1];
-            lineEnd.Z = end[2];
+            if (lastTurn)
+            {
+                lineEnd.X = end[0];
+                lineEnd.Y = end[1];
+                lineEnd.Z = end[2];
 
-            segments.Add(lineEnd);
+                segments.Add(lineEnd);
+            }
 
             return segments;
         }
     }
 
-    public class GCSpline : GCAxisCommand3
+    static public class GCSpline
     {
-
-        public GCSpline()
-        { }
-
-        public GCSpline(Commands cmd, uint lnr, double[] xyz_values, AxisFlags axisFlags, double[] ijpq_values) : base(cmd, lnr, xyz_values, axisFlags)
-        {
-            Array.Copy(ijpq_values, IJPQKvalues, 4);
-        }
-
-        [XmlIgnore]
-        public double[] IJPQKvalues { get; set; } = new double[4];
-        public double I { get { return IJPQKvalues[0]; } set { IJPQKvalues[0] = value; } }
-        public double J { get { return IJPQKvalues[1]; } set { IJPQKvalues[1] = value; } }
-        public double P { get { return IJPQKvalues[2]; } set { IJPQKvalues[2] = value; } }
-        public double Q { get { return IJPQKvalues[3]; } set { IJPQKvalues[3] = value; } }
-
-
-        public new string ToString()
-        {
-            string s = base.ToString();
-
-            s += "I" + I.ToInvariantString() + "J" + J.ToInvariantString() + "P" + P.ToInvariantString() + "Q" + Q.ToInvariantString();
-
-            return s;
-        }
-
-        public GcodeBoundingBox GetBoundingBox(GCPlane plane, double[] start, bool isRelative = false)
-        {
-            GcodeBoundingBox bbox = new GcodeBoundingBox();
-
-            bbox.AddPoint(plane, start[0], start[1], Z);
-            bbox.AddPoint(plane, X, Y, Z);
-
-            bbox.Conclude();
-
-            return bbox;
-        }
-
-        public List<Point3D> GeneratePoints(double[] start, double arcResolution, bool isRelative = false)
+        public static List<Point3D> GeneratePoints(double[] start, Point first, Point second, double[] end, double arcResolution, bool isRelative = false)
         {
             Point bez_target = new Point(start[0], start[1]);
             List<Point3D> segments = new List<Point3D>();
-            Point first = new Point(start[0] + I, start[1] + J);
-            Point second = new Point(X + P, Y + Q);
 
             double t = 0d, step = 0.1d;
 
-            while(t < 1d)
+            while (t < 1d)
             {
                 // First try to reduce the step in order to make it sufficiently
                 // close to a linear interpolation.
@@ -2508,8 +2525,8 @@ namespace CNC.GCode
                 if (new_t > 1d)
                     new_t = 1d;
 
-                double new_pos0 = eval_bezier(start[0], first.X, second.X, X, new_t),
-                       new_pos1 = eval_bezier(start[1], first.Y, second.Y, Y, new_t);
+                double new_pos0 = eval_bezier(start[0], first.X, second.X, end[0], new_t),
+                       new_pos1 = eval_bezier(start[1], first.Y, second.Y, end[1], new_t);
 
                 if (arcResolution > 1d) // TODO: fix!
                     arcResolution = 0.002d;
@@ -2521,8 +2538,8 @@ namespace CNC.GCode
                     //                break;
 
                     double candidate_t = 0.5f * (t + new_t),
-                           candidate_pos0 = eval_bezier(start[0], first.X, second.X, X, candidate_t),
-                           candidate_pos1 = eval_bezier(start[1], first.Y, second.Y, Y, candidate_t),
+                           candidate_pos0 = eval_bezier(start[0], first.X, second.X, end[0], candidate_t),
+                           candidate_pos1 = eval_bezier(start[1], first.Y, second.Y, end[1], candidate_t),
                            interp_pos0 = 0.5f * (bez_target.X + new_pos0),
                            interp_pos1 = 0.5f * (bez_target.Y + new_pos1);
 
@@ -2535,26 +2552,26 @@ namespace CNC.GCode
                     did_reduce = true;
                 }
 
-                if(!did_reduce) while(new_t - t >= (.002d))
-                {
+                if (!did_reduce) while (new_t - t >= (.002d))
+                    {
 
-                    double candidate_t = t + 2d * (new_t - t);
+                        double candidate_t = t + 2d * (new_t - t);
 
-                    if (candidate_t >= 1.0f)
-                        break;
+                        if (candidate_t >= 1.0f)
+                            break;
 
-                    double candidate_pos0 = eval_bezier(start[0], first.X, second.X, X, candidate_t),
-                           candidate_pos1 = eval_bezier(start[1], first.Y, second.Y, Y, candidate_t),
-                           interp_pos0 = 0.5f * (bez_target.X + candidate_pos0),
-                           interp_pos1 = 0.5f * (bez_target.Y + candidate_pos1);
+                        double candidate_pos0 = eval_bezier(start[0], first.X, second.X, end[0], candidate_t),
+                               candidate_pos1 = eval_bezier(start[1], first.Y, second.Y, end[1], candidate_t),
+                               interp_pos0 = 0.5f * (bez_target.X + candidate_pos0),
+                               interp_pos1 = 0.5f * (bez_target.Y + candidate_pos1);
 
-                    if (dist1(new_pos0, new_pos1, interp_pos0, interp_pos1) > (.1d))
-                        break;
+                        if (dist1(new_pos0, new_pos1, interp_pos0, interp_pos1) > (.1d))
+                            break;
 
-                    new_t = candidate_t;
-                    new_pos0 = candidate_pos0;
-                    new_pos1 = candidate_pos1;
-                }
+                        new_t = candidate_t;
+                        new_pos0 = candidate_pos0;
+                        new_pos1 = candidate_pos1;
+                    }
 
                 step = new_t - t;
                 t = new_t;
@@ -2562,18 +2579,18 @@ namespace CNC.GCode
                 bez_target.X = new_pos0;
                 bez_target.Y = new_pos1;
 
-                segments.Add(new Point3D(bez_target.X, bez_target.Y, Z));
+                segments.Add(new Point3D(bez_target.X, bez_target.Y, end[2]));
             }
 
             return segments;
         }
 
-        private double interp(double a, double b, double t)
+        private static double interp(double a, double b, double t)
         {
             return (1d - t) * a + t * b;
         }
 
-        private double eval_bezier(double a, double b, double c, double d, double t)
+        private static double eval_bezier(double a, double b, double c, double d, double t)
         {
             double iab = interp(a, b, t),
                    ibc = interp(b, c, t),
@@ -2588,9 +2605,107 @@ namespace CNC.GCode
          * We approximate Euclidean distance with the sum of the coordinates
          * offset (so-called "norm 1"), which is quicker to compute.
          */
-        private double dist1(double x1, double y1, double x2, double y2)
+        private static double dist1(double x1, double y1, double x2, double y2)
         {
             return Math.Abs(x1 - x2) + Math.Abs(y1 - y2);
+        }
+    }
+
+
+    public class GCCubicSpline : GCAxisCommand3
+    {
+        public GCCubicSpline()
+        { }
+
+        public GCCubicSpline(Commands cmd, uint lnr, double[] xyz_values, AxisFlags axisFlags, double[] ijpq_values) : base(cmd, lnr, xyz_values, axisFlags)
+        {
+            Array.Copy(ijpq_values, IJPQKvalues, 4);
+        }
+
+        [XmlIgnore]
+        public double[] IJPQKvalues { get; set; } = new double[4];
+        public double I { get { return IJPQKvalues[0]; } set { IJPQKvalues[0] = value; } }
+        public double J { get { return IJPQKvalues[1]; } set { IJPQKvalues[1] = value; } }
+        public double P { get { return IJPQKvalues[2]; } set { IJPQKvalues[2] = value; } }
+        public double Q { get { return IJPQKvalues[3]; } set { IJPQKvalues[3] = value; } }
+
+        public new string ToString()
+        {
+            string s = base.ToString();
+
+            s += "I" + I.ToInvariantString() + "J" + J.ToInvariantString() + "P" + P.ToInvariantString() + "Q" + Q.ToInvariantString();
+
+            return s;
+        }
+
+        public GcodeBoundingBox GetBoundingBox(GCPlane plane, double[] start, bool isRelative = false)
+        {
+            GcodeBoundingBox bbox = new GcodeBoundingBox();
+
+            List<Point3D> points = GeneratePoints(start, 0.01d, isRelative);
+
+            bbox.AddPoint(plane, start[0], start[1], Z);
+
+            foreach (Point3D p in points)
+                bbox.AddPoint(plane, p.X, p.Y, Z);
+
+            bbox.Conclude();
+
+            return bbox;
+        }
+
+        public List<Point3D> GeneratePoints(double[] start, double arcResolution, bool isRelative = false)
+        {
+            return GCSpline.GeneratePoints(start, new Point(start[0] + I, start[1] + J), new Point(X + P, Y + Q), Values, arcResolution);
+        }
+    }
+
+    public class GCQuadraticSpline : GCAxisCommand3
+    {
+        public GCQuadraticSpline()
+        { }
+
+        public GCQuadraticSpline(Commands cmd, uint lnr, double[] xyz_values, AxisFlags axisFlags, double[] ij_values) : base(cmd, lnr, xyz_values, axisFlags)
+        {
+            Array.Copy(ij_values, IJvalues, 2);
+        }
+
+        [XmlIgnore]
+        public double[] IJvalues { get; set; } = new double[2];
+        public double I { get { return IJvalues[0]; } set { IJvalues[0] = value; } }
+        public double J { get { return IJvalues[1]; } set { IJvalues[1] = value; } }
+
+        public new string ToString()
+        {
+            string s = base.ToString();
+
+            s += "I" + I.ToInvariantString() + "J" + J.ToInvariantString();
+
+            return s;
+        }
+
+        public GcodeBoundingBox GetBoundingBox(GCPlane plane, double[] start, bool isRelative = false)
+        {
+            GcodeBoundingBox bbox = new GcodeBoundingBox();
+
+            List<Point3D> points = GeneratePoints(start, 0.01d, isRelative);
+
+            bbox.AddPoint(plane, start[0], start[1], Z);
+
+            foreach (Point3D p in points)
+                bbox.AddPoint(plane, p.X, p.Y, Z);
+ 
+            bbox.Conclude();
+
+            return bbox;
+        }
+
+        public List<Point3D> GeneratePoints(double[] start, double arcResolution, bool isRelative = false)
+        {
+            Point first = new Point(start[0] + (I * 2d) / 3d, start[1] + (J * 2d) / 3d);
+            Point second = new Point(X + ((start[0] + I - X) *2d / 3d), Y + ((start[1] + J - Y) * 2d / 3d));
+
+            return GCSpline.GeneratePoints(start, first, second, Values, arcResolution);
         }
     }
 

@@ -1,7 +1,7 @@
 ﻿/*
  * GCodeEmulator.cs - part of CNC Controls library
  *
- * v0.33 / 2021-05-16 / Io Engineering (Terje Io)
+ * v0.40 / 2022-07-12 / Io Engineering (Terje Io)
  *
  */
 
@@ -110,7 +110,15 @@ namespace CNC.Core
                     // G5: Cubic Spline
                     case Commands.G5:
                         {
-                            var spline = token as GCSpline;
+                            var spline = token as GCCubicSpline;
+                            setEndP(spline.Values, spline.AxisFlags);
+                        }
+                        break;
+
+                    // G5: Quadratic Spline
+                    case Commands.G5_1:
+                        {
+                            var spline = token as GCQuadraticSpline;
                             setEndP(spline.Values, spline.AxisFlags);
                         }
                         break;

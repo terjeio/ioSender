@@ -1,10 +1,19 @@
 ## ioSender changelog
 
+2022-07-18: [Release 2.0.39](https://github.com/terjeio/Grbl-GCode-Sender/releases/tag/2.0.40).
+
+* Fix for incorrect rendering of paths consisting of many small moves. Issue #235
+* Fixed spindle RPM entry not working when spindle is running. Issue #236
+* Added retries on startup if unexpected data received from controller.
+* Added parser/rendering support for G5.1 splines and [multi turn G2/G3 arcs](http://linuxcnc.org/docs/html/gcode/g-code.html#gcode:g2-g3) controlled by P word. Requires grblHAL controller with support for those commands \(not yet released\).
+
+---
+
 2022-07-05: [Release 2.0.39](https://github.com/terjeio/Grbl-GCode-Sender/releases/tag/2.0.39).
 
 * Fixed MPG mode switching issue, "hardened" code.
 * Removed dependency on XCeed WPF toolkit. WPF toolkit issue [#1598}(https://github.com/xceedsoftware/wpftoolkit/issues/1598) and sender issue [#231](https://github.com/terjeio/ioSender/issues/231).
-* UI color selection for 3D viewer disabled. Color changes has to be done by editing _App.cofig_ until a new color picker is found or made.
+* UI color selection for 3D viewer disabled. Color changes has to be done by editing _App.config_ until a new color picker is found or made.
 
 ---
 

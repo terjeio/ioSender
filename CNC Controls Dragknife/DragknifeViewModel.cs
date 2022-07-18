@@ -1,7 +1,7 @@
 ﻿/*
  * DragKnifeViewModel.cs - part of CNC Controls DragKnife library for Grbl
  *
- * v0.33 / 2021-05-14 / Io Engineering (Terje Io)
+ * v0.40 / 2022-07-12 / Io Engineering (Terje Io)
  *
  */
 
@@ -171,7 +171,7 @@ namespace CNC.Controls.DragKnife
                     StartDirection = dir;
                     end = end1;
                     var arcdir = n1.X * n2.Y - n1.Y * n2.X;
-                    newToolPath.Add(new GCArc(arcdir < 0d ? Commands.G2 : Commands.G3, lnr++, ToPos(end), AxisFlags.XY, ToPos(dir), IJKFlags.I | IJKFlags.J, 0d, IJKMode.Incremental));
+                    newToolPath.Add(new GCArc(arcdir < 0d ? Commands.G2 : Commands.G3, lnr++, ToPos(end), AxisFlags.XY, ToPos(dir), IJKFlags.I | IJKFlags.J, 0d, 0, IJKMode.Incremental));
                 }
                 if (cp2.Magnitude > _knifeTipOffset)
                     end = polyLine[i].P2 + n2 * _knifeTipOffset;
@@ -231,7 +231,7 @@ namespace CNC.Controls.DragKnife
                         var arcdir = n1.X * n2.Y - n1.Y * n2.X;
                         //                        newToolPath.Add(new GCArc(arcdir < 0d ? Commands.G2 : Commands.G3, lnr++, ToPos(polyLine[i + 1].P1 + offset2), AxisFlags.XY, ToPos(dir), IJKFlags.I | IJKFlags.J, 0d, IJKMode.Incremental));
                         //newToolPath.Add(new GCArc(arcdir < 0d ? Commands.G2 : Commands.G3, lnr++, ToPos(polyLine[i].P1 + offset2), AxisFlags.XY, ToPos(dir), IJKFlags.I | IJKFlags.J, 0d, IJKMode.Incremental));
-                        newToolPath.Add(new GCArc(arcdir < 0d ? Commands.G2 : Commands.G3, lnr++, ToPos(polyLine[i + 1].P1 + offset2), AxisFlags.XY, ToPos(dir), IJKFlags.I | IJKFlags.J, 0d, IJKMode.Incremental));
+                        newToolPath.Add(new GCArc(arcdir < 0d ? Commands.G2 : Commands.G3, lnr++, ToPos(polyLine[i + 1].P1 + offset2), AxisFlags.XY, ToPos(dir), IJKFlags.I | IJKFlags.J, 0d, 0, IJKMode.Incremental));
                     }
 
                 }

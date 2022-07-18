@@ -1,12 +1,12 @@
-﻿CNC.Controls.Camera.g.en-US.resources:configcontrol.baml,btn_getPosition:System.Windows.Controls.ContentControl.Content,Button,True,True,,Get current position
-CNC.Controls.Camera.g.en-US.resources:cameracontrol.baml,btn_moveOffset:System.Windows.Controls.ContentControl.Content,Button,True,True,,Move offset
+﻿CNC.Controls.Camera.g.en-US.resources:configcontrol.baml,btn_getPosition:System.Windows.Controls.ContentControl.Content,Button,True,True,,获取当前位置
+CNC.Controls.Camera.g.en-US.resources:cameracontrol.baml,btn_moveOffset:System.Windows.Controls.ContentControl.Content,Button,True,True,,移动偏移
 CNC.Controls.Camera.g.en-US.resources:cameracontrol.baml,btn_useAsProbe:System.Windows.Controls.ContentControl.Content,Button,True,True,,Use as probe position
-CNC.Controls.Camera.g.en-US.resources:configcontrol.baml,chk_confirmMove:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Confirm move
-CNC.Controls.Camera.g.en-US.resources:configcontrol.baml,chk_moveToSpindle:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Inital move to spindle
+CNC.Controls.Camera.g.en-US.resources:configcontrol.baml,chk_confirmMove:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,确认移动
+CNC.Controls.Camera.g.en-US.resources:configcontrol.baml,chk_moveToSpindle:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,初始移动到主轴
 CNC.Controls.Camera.g.en-US.resources:configcontrol.baml,fld_xOffset:CNC.Controls.NumericField.Label,None,False,True,,X offset:
 CNC.Controls.Camera.g.en-US.resources:configcontrol.baml,fld_yOffset:CNC.Controls.NumericField.Label,None,False,True,,Y offset:
 CNC.Controls.Camera.g.en-US.resources:configcontrol.baml,grp_camera:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,相机
 CNC.Controls.Camera.g.en-US.resources:cameracontrol.baml,lbl_cameraToSpindlePosition:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,camera to spindle
-CNC.Controls.Camera.g.en-US.resources:configcontrol.baml,lbl_offsetMotion:System.Windows.Controls.ContentControl.Content,Label,True,True,,Offset motion:
-CNC.Controls.Camera.g.en-US.resources:cameracontrol.baml,str_moveCameraTo:System.String.$Content,None,True,True,,Move camera to spindle position?
-CNC.Controls.Camera.g.en-US.resources:cameracontrol.baml,str_moveSpindleTo:System.String.$Content,None,True,True,,Move spindle to camera position?
+CNC.Controls.Camera.g.en-US.resources:configcontrol.baml,lbl_offsetMotion:System.Windows.Controls.ContentControl.Content,Label,True,True,,偏移运动：
+CNC.Controls.Camera.g.en-US.resources:cameracontrol.baml,str_moveCameraTo:System.String.$Content,None,True,True,,将相机移动到主轴位置？
+CNC.Controls.Camera.g.en-US.resources:cameracontrol.baml,str_moveSpindleTo:System.String.$Content,None,True,True,,将主轴移动到相机位置？

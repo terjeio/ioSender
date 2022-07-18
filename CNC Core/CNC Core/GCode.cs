@@ -1,13 +1,13 @@
 ﻿/*
  * GCode.cs - part of CNC Controls library
  *
- * v0.36 / 2021-12-27 / Io Engineering (Terje Io)
+ * v0.40 / 2022-07-12 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2020, Io Engineering (Terje Io)
+Copyright (c) 2018-2022, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -119,6 +119,7 @@ namespace CNC.GCode
         G2 = 20,
         G3 = 30,
         G5 = 50,
+        G5_1 = 51,
         G5_2 = 52,
         G33 = 330,
         G38_2 = 382,
@@ -217,6 +218,7 @@ namespace CNC.GCode
         G3,
         G4,
         G5,
+        G5_1,
         G7,
         G8,
         G10,

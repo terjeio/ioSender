@@ -1,13 +1,13 @@
 ﻿/*
  * ArcsToLines.cs - part of CNC Controls library for Grbl
  *
- * v0.36 / 2021-11-01 / Io Engineering (Terje Io)
+ * v0.40 / 2022-07-12 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020-2021, Io Engineering (Terje Io)
+Copyright (c) 2020-2022, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -85,7 +85,25 @@ namespace CNC.Controls
 
                         case Commands.G5:
                             {
-                                var spline = cmd.Token as GCSpline;
+                                var spline = cmd.Token as GCCubicSpline;
+                                lnroffset++;
+                                lnr = spline.LineNumber;
+                                toolPath.Add(new GCComment(Commands.Comment, spline.LineNumber + lnroffset, "Spline to lines start: " + spline.ToString()));
+
+                                List<Point3D> points = spline.GeneratePoints(ToPos(cmd.Start, emu.IsImperial), arcTolerance, emu.DistanceMode == DistanceMode.Incremental); // Dynamic resolution
+                                foreach (Point3D point in points)
+                                {
+                                    lnroffset++;
+                                    toolPath.Add(new GCLinearMotion(Commands.G1, spline.LineNumber + lnroffset, ToPos(point, emu.IsImperial), AxisFlags.XYZ));
+                                }
+                                lnroffset++;
+                                toolPath.Add(new GCComment(Commands.Comment, lnr, "Spline to lines end"));
+                            }
+                            break;
+
+                        case Commands.G5_1:
+                            {
+                                var spline = cmd.Token as GCQuadraticSpline;
                                 lnroffset++;
                                 lnr = spline.LineNumber;
                                 toolPath.Add(new GCComment(Commands.Comment, spline.LineNumber + lnroffset, "Spline to lines start: " + spline.ToString()));

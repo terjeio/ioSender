@@ -1,49 +1,49 @@
-﻿ioSender.g.en-US.resources:mainwindow.baml,lbl_jogStep:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Distance for keyboard step jog (with &lt;CTRL&gt; modifier).
-ioSender.g.en-US.resources:mainwindow.baml,mnu_about:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_About
-ioSender.g.en-US.resources:mainwindow.baml,mnu_briefTour:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,A _brief tour
-ioSender.g.en-US.resources:mainwindow.baml,mnu_camera:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Camera
-ioSender.g.en-US.resources:mainwindow.baml,mnu_close:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Close
-ioSender.g.en-US.resources:mainwindow.baml,mnu_errorsAndAlarms:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Error and alarm codes
-ioSender.g.en-US.resources:mainwindow.baml,mnu_exit:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Exit
-ioSender.g.en-US.resources:mainwindow.baml,mnu_file:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_File
-ioSender.g.en-US.resources:mainwindow.baml,mnu_help:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Help
-ioSender.g.en-US.resources:mainwindow.baml,mnu_load:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Load
-ioSender.g.en-US.resources:mainwindow.baml,mnu_open:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Open
-ioSender.g.en-US.resources:mainwindow.baml,mnu_openConsole:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Open Console
-ioSender.g.en-US.resources:mainwindow.baml,mnu_save:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Save
-ioSender.g.en-US.resources:mainwindow.baml,mnu_transform:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Transform
+﻿ioSender.g.en-US.resources:mainwindow.baml,lbl_jogStep:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,键盘控制手动进给的距离（使用 &lt;CTRL&gt; 修饰符）。
+ioSender.g.en-US.resources:mainwindow.baml,mnu_about:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_关于
+ioSender.g.en-US.resources:mainwindow.baml,mnu_briefTour:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,简短的游览
+ioSender.g.en-US.resources:mainwindow.baml,mnu_camera:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_相机
+ioSender.g.en-US.resources:mainwindow.baml,mnu_close:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_关闭
+ioSender.g.en-US.resources:mainwindow.baml,mnu_errorsAndAlarms:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_错误和警报代码
+ioSender.g.en-US.resources:mainwindow.baml,mnu_exit:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_退出
+ioSender.g.en-US.resources:mainwindow.baml,mnu_file:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_文件
+ioSender.g.en-US.resources:mainwindow.baml,mnu_help:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_帮助
+ioSender.g.en-US.resources:mainwindow.baml,mnu_load:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_加载
+ioSender.g.en-US.resources:mainwindow.baml,mnu_open:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_打开
+ioSender.g.en-US.resources:mainwindow.baml,mnu_openConsole:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_打开控制台
+ioSender.g.en-US.resources:mainwindow.baml,mnu_save:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_保存
+ioSender.g.en-US.resources:mainwindow.baml,mnu_transform:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_转换
 ioSender.g.en-US.resources:mainwindow.baml,mnu_usageTips:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Usage _tips
-ioSender.g.en-US.resources:mainwindow.baml,mnu_videoTutorials:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Video tutorials
-ioSender.g.en-US.resources:mainwindow.baml,mnu_wiki:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Wiki
-ioSender.g.en-US.resources:mainwindow.baml,str_jogStep:System.String.$Content,None,True,True,,Jog step: {0}
-ioSender.g.en-US.resources:mainwindow.baml,str_mnuArcsToLines:System.String.$Content,None,True,True,,Arcs to lines
-ioSender.g.en-US.resources:mainwindow.baml,str_mnuCompress:System.String.$Content,None,True,True,,Compress (experimental)
-ioSender.g.en-US.resources:mainwindow.baml,str_mnuDragKnife:System.String.$Content,None,True,True,,Add drag knife moves
+ioSender.g.en-US.resources:mainwindow.baml,mnu_videoTutorials:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_视频教程
+ioSender.g.en-US.resources:mainwindow.baml,mnu_wiki:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_文档
+ioSender.g.en-US.resources:mainwindow.baml,str_jogStep:System.String.$Content,None,True,True,,手动进给距离：{0}
+ioSender.g.en-US.resources:mainwindow.baml,str_mnuArcsToLines:System.String.$Content,None,True,True,,弧线到线
+ioSender.g.en-US.resources:mainwindow.baml,str_mnuCompress:System.String.$Content,None,True,True,,压缩（实验）
+ioSender.g.en-US.resources:mainwindow.baml,str_mnuDragKnife:System.String.$Content,None,True,True,,添加拖刀动作
 ioSender.g.en-US.resources:mainwindow.baml,str_mnuRotate:System.String.$Content,None,True,True,,Rotate
 ioSender.g.en-US.resources:jobview.baml,str_msgDoorExit:System.String.$Content,None,True,True,,"Door is still open, exit?"
 ioSender.g.en-US.resources:jobview.baml,str_msgDoorOpen:System.String.$Content,None,True,True,,"Door is open, close door and continue?"
 ioSender.g.en-US.resources:jobview.baml,str_msgDoorPersist:System.String.$Content,None,True,True,,Door state cannot be cleared with &lt;Reset&gt;
-ioSender.g.en-US.resources:jobview.baml,str_msgEStop:System.String.$Content,None,True,True,,E-Stop active! - clear before continuing...
-ioSender.g.en-US.resources:jobview.baml,str_msgEStopExit:System.String.$Content,None,True,True,,"E-Stop still active, exit?"
+ioSender.g.en-US.resources:jobview.baml,str_msgEStop:System.String.$Content,None,True,True,,急停激活！ - 在继续之前解除...
+ioSender.g.en-US.resources:jobview.baml,str_msgEStopExit:System.String.$Content,None,True,True,,急停仍然被按下，是否退出？
 ioSender.g.en-US.resources:jobview.baml,str_msgHome:System.String.$Content,None,True,True,,"Homing cycle required, &lt;Home&gt; to continue"
-ioSender.g.en-US.resources:jobview.baml,str_msgNoComm:System.String.$Content,None,True,True,,"Controller is in {0} state and cannot respond, try a soft reset?"
-ioSender.g.en-US.resources:jobview.baml,str_msgNoCommAlarm:System.String.$Content,None,True,True,,"Controller is not able to communicate due to alarm {0}, attempting a soft reset."
-ioSender.g.en-US.resources:jobview.baml,str_msgNoResponse:System.String.$Content,None,True,True,,Controller is not responding!
-ioSender.g.en-US.resources:jobview.baml,str_msgResetExit:System.String.$Content,None,True,True,,"Controller soft reset failed, exiting."
-ioSender.g.en-US.resources:jobview.baml,str_msgResetFailed:System.String.$Content,None,True,True,,"Controller soft reset failed, exiting."
+ioSender.g.en-US.resources:jobview.baml,str_msgNoComm:System.String.$Content,None,True,True,,控制器处于 {0} 状态且无法响应，尝试软复位？
+ioSender.g.en-US.resources:jobview.baml,str_msgNoCommAlarm:System.String.$Content,None,True,True,,由于警报 {0}，控制器无法通信，正在尝试软复位。
+ioSender.g.en-US.resources:jobview.baml,str_msgNoResponse:System.String.$Content,None,True,True,,控制器没有响应！
+ioSender.g.en-US.resources:jobview.baml,str_msgResetExit:System.String.$Content,None,True,True,,控制器软复位失败，退出。
+ioSender.g.en-US.resources:jobview.baml,str_msgResetFailed:System.String.$Content,None,True,True,,控制器软复位失败，退出。
 ioSender.g.en-US.resources:jobview.baml,str_msgWait:System.String.$Content,None,True,True,,Waiting for controller ({0})...
 ioSender.g.en-US.resources:mainwindow.baml,str_runTime:System.String.$Content,None,True,True,,Run time: {0}
-ioSender.g.en-US.resources:mainwindow.baml,tab_3DView:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,3D View
-ioSender.g.en-US.resources:jobview.baml,tab_3DView:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,3D View
+ioSender.g.en-US.resources:mainwindow.baml,tab_3DView:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,3D刀路
+ioSender.g.en-US.resources:jobview.baml,tab_3DView:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,3D刀路
 ioSender.g.en-US.resources:mainwindow.baml,tab_appConfig:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Settings: App
 ioSender.g.en-US.resources:jobview.baml,tab_console:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Console
 ioSender.g.en-US.resources:mainwindow.baml,tab_grbl:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Grbl
 ioSender.g.en-US.resources:mainwindow.baml,tab_grblConfig:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Settings: Grbl
-ioSender.g.en-US.resources:mainwindow.baml,tab_jogSidebar:System.Windows.Controls.ContentControl.Content,None,True,True,,_Jog
-ioSender.g.en-US.resources:mainwindow.baml,tab_offsets:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Offsets
+ioSender.g.en-US.resources:mainwindow.baml,tab_jogSidebar:System.Windows.Controls.ContentControl.Content,None,True,True,,_手动进给
+ioSender.g.en-US.resources:mainwindow.baml,tab_offsets:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,偏移量
 ioSender.g.en-US.resources:mainwindow.baml,tab_parting:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Parting
 ioSender.g.en-US.resources:mainwindow.baml,tab_pidTuner:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,PID Tuner
-ioSender.g.en-US.resources:mainwindow.baml,tab_probing:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Probing
+ioSender.g.en-US.resources:mainwindow.baml,tab_probing:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,探测
 ioSender.g.en-US.resources:jobview.baml,tab_program:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Program
 ioSender.g.en-US.resources:mainwindow.baml,tab_sdCard:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,SD Card
 ioSender.g.en-US.resources:mainwindow.baml,tab_threading:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Threading

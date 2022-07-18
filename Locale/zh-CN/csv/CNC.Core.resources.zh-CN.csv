@@ -4,40 +4,40 @@ CNC.Core.g.en-US.resources:libstrings.baml,str_contHomeUnlock:System.String.$Con
 CNC.Core.g.en-US.resources:libstrings.baml,str_contResetUnlock:System.String.$Content,None,True,True,,&lt;Reset&gt; then &lt;Unlock&gt; to continue
 CNC.Core.g.en-US.resources:libstrings.baml,str_contUnlock:System.String.$Content,None,True,True,,&lt;Unlock&gt; to continue
 CNC.Core.g.en-US.resources:libstrings.baml,str_gcLoadError:System.String.$Content,None,True,True,,{0}\\nLine: {1}\\nBlock: {2}\\n\\nContinue loading?
-CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserAxisError:System.String.$Content,None,True,True,,Axis command conflict
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserAxisError:System.String.$Content,None,True,True,,轴指令冲突
 CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserBadExpr:System.String.$Content,None,True,True,,Bad expression
-CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserCMDInvalid:System.String.$Content,None,True,True,,Invalid GCode
-CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserCmdUnknown:System.String.$Content,None,True,True,,Command word not recognized
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserCMDInvalid:System.String.$Content,None,True,True,,无效的 G 代码
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserCmdUnknown:System.String.$Content,None,True,True,,命令字无法识别
 CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserErrE:System.String.$Content,None,True,True,,E word greater than half the drive line length
-CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserG1NoFeed:System.String.$Content,None,True,True,,G1 used when feed rate is not set
-CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserG6NoP:System.String.$Content,None,True,True,,G4 - missing P word
-CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserKlesseqJ:System.String.$Content,None,True,True,,K word must be greater than J word
-CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserM66NoPorE:System.String.$Content,None,True,True,,P- or E-word missing for M66
-CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserM66PandE:System.String.$Content,None,True,True,,Cannot use both P- and E-word with M66
-CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserModalGrpError:System.String.$Content,None,True,True,,Modal group violation
-CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNegH:System.String.$Content,None,True,True,,H word is negative
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserG1NoFeed:System.String.$Content,None,True,True,,进给速度未设定时使用 G1
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserG6NoP:System.String.$Content,None,True,True,,G4 - 缺少 P 字
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserKlesseqJ:System.String.$Content,None,True,True,,K字必须大于J字
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserM66NoPorE:System.String.$Content,None,True,True,,M66 缺少 P 或 E 字
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserM66PandE:System.String.$Content,None,True,True,,M66 不能同时使用 P 字和 E 字
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserModalGrpError:System.String.$Content,None,True,True,,模态组违规
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNegH:System.String.$Content,None,True,True,,H字为负
 CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNegJ:System.String.$Content,None,True,True,,J word negative
-CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNegK:System.String.$Content,None,True,True,,K word negative
-CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNegP:System.String.$Content,None,True,True,,P word negative
-CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNoG0orG1:System.String.$Content,None,True,True,,G0 or G1 not active
-CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNoIandorJ:System.String.$Content,None,True,True,,I and/or J word missing
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNegK:System.String.$Content,None,True,True,,K字否定
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNegP:System.String.$Content,None,True,True,,P字否定
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNoG0orG1:System.String.$Content,None,True,True,,G0 或 G1 未激活
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNoIandorJ:System.String.$Content,None,True,True,,I 和/或 J 字缺失
 CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNoInvalidQ:System.String.$Content,None,True,True,,Q word missing or out of range
-CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNoK:System.String.$Content,None,True,True,,K word missing
-CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNoP:System.String.$Content,None,True,True,,P word missing
-CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNoPandorQ:System.String.$Content,None,True,True,,P and/or Q word missing
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNoK:System.String.$Content,None,True,True,,K字缺失
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNoP:System.String.$Content,None,True,True,,P字缺失
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNoPandorQ:System.String.$Content,None,True,True,,P 和/或 Q 字缺失
 CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNoR:System.String.$Content,None,True,True,,R word missing
 CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserPlaneNotXY:System.String.$Content,None,True,True,,Plane not XY
 CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserPlaneNotZx:System.String.$Content,None,True,True,,Plane not ZX
-CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserRadiusErr:System.String.$Content,None,True,True,,Error computing arc radius.
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserRadiusErr:System.String.$Content,None,True,True,,计算圆弧半径时出错。
 CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserRless1:System.String.$Content,None,True,True,,R word less than 1
 CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserStrip:System.String.$Content,None,True,True,,"{0} command found, strip?"
 CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserStripHdr:System.String.$Content,None,True,True,,Strip command
-CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserToolNoI:System.String.$Content,None,True,True,,I word missing
-CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserToolNoJ:System.String.$Content,None,True,True,,J word missing
-CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserToolProfile:System.String.$Content,None,True,True,,Tool {0} not associated with a profile
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserToolNoI:System.String.$Content,None,True,True,,I 缺失
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserToolNoJ:System.String.$Content,None,True,True,,J字缺失
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserToolProfile:System.String.$Content,None,True,True,,工具 {0} 未与配置文件关联
 CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserUnsupportedCmd:System.String.$Content,None,True,True,,Unsupported command
-CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserWordRepeated:System.String.$Content,None,True,True,,Command word repeated
-CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserZPlus:System.String.$Content,None,True,True,,Axisword(s) other than Z found
-CNC.Core.g.en-US.resources:libstrings.baml,str_joggingOnly:System.String.$Content,None,True,True,,Only jogging and some system commands are allowed when changing tool!
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserWordRepeated:System.String.$Content,None,True,True,,命令字重复
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserZPlus:System.String.$Content,None,True,True,,找到除 Z 以外的轴代码
+CNC.Core.g.en-US.resources:libstrings.baml,str_joggingOnly:System.String.$Content,None,True,True,,换刀时只允许点动和部分系统指令！
 CNC.Core.g.en-US.resources:libstrings.baml,str_sdStreamComplete:System.String.$Content,None,True,True,,SD Card streaming {0}% complete
 CNC.Core.g.en-US.resources:libstrings.baml,str_serialPortError:System.String.$Content,None,True,True,,Unable to open serial port: {0}

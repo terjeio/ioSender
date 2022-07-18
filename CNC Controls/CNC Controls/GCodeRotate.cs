@@ -1,13 +1,13 @@
 ﻿/*
  * GCodeRotate.cs - part of CNC Controls library for Grbl
  *
- * v0.36 / 2021-11-01 / Io Engineering (Terje Io)
+ * v0.40 / 2022-07-12 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2021, Io Engineering (Terje Io)
+Copyright (c) 2021-2022, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -140,18 +140,28 @@ namespace CNC.Controls
 
                             pos = target;
 
-                            toolPath.Add(new GCArc(arc.Command, arc.LineNumber, pos.Array, arc.AxisFlags, targetijk.Array, arc.IjkFlags, arc.R, arc.IJKMode));
+                            toolPath.Add(new GCArc(arc.Command, arc.LineNumber, pos.Array, arc.AxisFlags, targetijk.Array, arc.IjkFlags, arc.R, arc.P, arc.IJKMode));
                         }
                         break;
 
                     case Commands.G5:
                         {
-                            var spline = token as GCSpline;
+                            var spline = token as GCCubicSpline;
                             pos = new Vector3(spline.X, spline.Y, 0d).RotateZ(offset.X, offset.Y, angle).Round(precision);
                             var ij = new Vector3(spline.I, spline.J, 0d).RotateZ(offset.X, offset.Y, angle).Round(precision);
                             var pq = new Vector3(spline.P, spline.Q, 0d).RotateZ(offset.X, offset.Y, angle).Round(precision);
 
-                            toolPath.Add(new GCSpline(spline.Command, spline.LineNumber, pos.Array, spline.AxisFlags, new double[] { ij.X, ij.Y, pq.X, pq.Y }));
+                            toolPath.Add(new GCCubicSpline(spline.Command, spline.LineNumber, pos.Array, spline.AxisFlags, new double[] { ij.X, ij.Y, pq.X, pq.Y }));
+                        }
+                        break;
+
+                    case Commands.G5_1:
+                        {
+                            var spline = token as GCQuadraticSpline;
+                            pos = new Vector3(spline.X, spline.Y, 0d).RotateZ(offset.X, offset.Y, angle).Round(precision);
+                            var ij = new Vector3(spline.I, spline.J, 0d).RotateZ(offset.X, offset.Y, angle).Round(precision);
+
+                            toolPath.Add(new GCQuadraticSpline(spline.Command, spline.LineNumber, pos.Array, spline.AxisFlags, new double[] { ij.X, ij.Y }));
                         }
                         break;
 

@@ -1,7 +1,7 @@
 ﻿/*
  * Grbl.cs - part of CNC Controls library
  *
- * v0.38 / 2022-06-01 / Io Engineering (Terje Io)
+ * v0.40 / 2022-07-16 / Io Engineering (Terje Io)
  *
  */
 
@@ -1022,22 +1022,31 @@ namespace CNC.Core
         public static string Startup(GrblViewModel model)
         {
             bool? res = null;
+            int retries = 10;
 
             PollGrbl.Suspend();
             CancellationToken cancellationToken = new CancellationToken();
 
-            new Thread(() =>
+            while (retries-- > 0)
             {
-                res = WaitFor.SingleEvent<string>(
-                cancellationToken,
-                OnStartup,
-                a => model.OnResponseReceived += a,
-                a => model.OnResponseReceived -= a,
-                250, () => Comms.com.WriteByte(GrblConstants.CMD_STATUS_REPORT_ALL));
-            }).Start();
+                res = null;
 
-            while (res == null)
-                EventUtils.DoEvents();
+                new Thread(() =>
+                {
+                    res = WaitFor.SingleEvent<string>(
+                    cancellationToken,
+                    OnStartup,
+                    a => model.OnResponseReceived += a,
+                    a => model.OnResponseReceived -= a,
+                    250, () => Comms.com.WriteByte(GrblConstants.CMD_STATUS_REPORT_ALL));
+                }).Start();
+
+                while (res == null)
+                    EventUtils.DoEvents();
+
+                if (Comms.com.Reply.StartsWith("<"))
+                    retries = 0;
+            }
 
             if (!ExtendedProtocol)
             {

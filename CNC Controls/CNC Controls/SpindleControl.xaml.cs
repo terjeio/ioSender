@@ -1,13 +1,13 @@
 ﻿/*
  * SpindleControl.xaml.cs - part of CNC Controls library
  *
- * v0.21 / 2020-08-03 / Io Engineering (Terje Io)
+ * v0.40 / 2022-07-16 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2020, Io Engineering (Terje Io)
+Copyright (c) 2018-2022, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -41,13 +41,12 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using CNC.Core;
+using System.Windows.Input;
 
 namespace CNC.Controls
 {
     public partial class SpindleControl : UserControl
     {
-        private bool hold = false;
-
         public SpindleControl()
         {
             InitializeComponent();
@@ -64,6 +63,7 @@ namespace CNC.Controls
             overrideControl.CoarseMinusCommand = GrblConstants.CMD_SPINDLE_OVR_COARSE_MINUS;
             overrideControl.CoarsePlusCommand = GrblConstants.CMD_SPINDLE_OVR_COARSE_PLUS;
 
+            cvRPM.PreviewKeyUp += txtPos_KeyPress;
             overrideControl.CommandGenerated += overrideControl_CommandGenerated;
         }
 
@@ -81,8 +81,7 @@ namespace CNC.Controls
             {
                 case nameof(GrblViewModel.GrblState):
                 case nameof(GrblViewModel.IsJobRunning):
-                    var p = (GrblViewModel)sender;
-                    hold = p.IsJobRunning && (p.GrblState.State == GrblStates.Hold || p.GrblState.State == GrblStates.Door);
+                    var p = sender as GrblViewModel;
                     IsSpindleStateEnabled = !p.IsJobRunning || p.GrblState.State == GrblStates.Hold || p.GrblState.State == GrblStates.Door;
                     break;
             }
@@ -101,6 +100,14 @@ namespace CNC.Controls
 
         public new bool IsFocused { get { return cvRPM.IsFocused; } }
         public bool SPOr { get { return !(DataContext as GrblViewModel).IsJobRunning || (DataContext as GrblViewModel).GrblState.State == GrblStates.Hold; } }
+
+        private void txtPos_KeyPress(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter && !(DataContext as GrblViewModel).IsJobRunning)
+            {
+                (DataContext as GrblViewModel).ExecuteCommand(string.Format("S{0}", (sender as NumericTextBox).Value));
+            }
+        }
 
         private void rbSpindle_Click(object sender, RoutedEventArgs e)
         {

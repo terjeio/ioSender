@@ -101,7 +101,7 @@ namespace CNC.Controls.Probing
 
                                 Vector3 target = new Vector3(Math.Round(subMotion.End.X, precision), Math.Round(subMotion.End.Y, precision), Math.Round(subMotion.End.Z + map.InterpolateZ(subMotion.End.X, subMotion.End.Y), precision));
 
-                                newToolPath.Add(new GCArc(arc.Command, lnr++, target.Array, arc.AxisFlags | AxisFlags.Z, ijk, arc.IjkFlags, arc.R, arc.IJKMode));
+                                newToolPath.Add(new GCArc(arc.Command, lnr++, target.Array, arc.AxisFlags | AxisFlags.Z, ijk, arc.IjkFlags, arc.R, arc.P, arc.IJKMode));
                             }
                         }
                         break;
