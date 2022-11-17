@@ -1,7 +1,7 @@
 ﻿/*
  * RotationControl.xaml.cs - part of CNC Probing library
  *
- * v0.38 / 2022-05-01 / Io Engineering (Terje Io)
+ * v0.41 / 2022-11-13 / Io Engineering (Terje Io)
  *
  */
 
@@ -99,6 +99,9 @@ namespace CNC.Controls.Probing
                 MessageBox.Show((string)FindResource("SelectType"), "Rotation", MessageBoxButton.OK, MessageBoxImage.Exclamation);
                 return;
             }
+
+            if (!probing.VerifyProbe())
+                return;
 
             if (!probing.Program.Init())
                 return;

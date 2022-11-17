@@ -20,6 +20,7 @@
                         <Setter Property="Width" Value="60"/>
                         <Setter Property="Height" Value="60"/>
                         <Setter Property="Focusable" Value="False"/>
+                        <Setter Property="Content" Value="xx"/>
                     </Style>
                 </ResourceDictionary>
                 <ResourceDictionary>
@@ -33,6 +34,8 @@
                     <local:LogicalNotConverter x:Key="LogicalNotConverter" />
                     <local:LogicalOrConverter x:Key="LogicalOrConverter"/>
                     <local:GrblStateToIsJoggingConverter x:Key ="IsJoggingConverter"/>
+                    <local:AxisLetterToJogPlusConverter x:Key="JogPlusConverter"/>
+                    <local:AxisLetterToJogMinusConverter x:Key="JogMinusConverter"/>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
@@ -108,16 +111,28 @@
                 </StackPanel>
             </StackPanel>
             <StackPanel Style="{StaticResource AAxisVisibleStyle}" VerticalAlignment="Center" Margin="5,0,0,0">
-                <Button Content="A+" Style="{StaticResource JogButtonStyle}" Click="Button_Click"/>
-                <Button Content="A-" Style="{StaticResource JogButtonStyle}" Margin="0,70,0,0" Click="Button_Click"/>
+                <Button Content="{Binding Path=AxisLetter.A, Converter={StaticResource JogPlusConverter}, Mode=OneWay}" Style="{StaticResource JogButtonStyle}" Click="Button_Click"/>
+                <Button Content="{Binding Path=AxisLetter.A, Converter={StaticResource JogMinusConverter}, Mode=OneWay}" Style="{StaticResource JogButtonStyle}" Margin="0,70,0,0" Click="Button_Click"/>
             </StackPanel>
             <StackPanel Style="{StaticResource BAxisVisibleStyle}" VerticalAlignment="Center" Margin="5,0,0,0">
-                <Button Content="B+" Style="{StaticResource JogButtonStyle}" Click="Button_Click"/>
-                <Button Content="B-" Style="{StaticResource JogButtonStyle}" Margin="0,70,0,0" Click="Button_Click"/>
+                <Button Content="{Binding Path=AxisLetter.B, Converter={StaticResource JogPlusConverter}, Mode=OneWay}" Style="{StaticResource JogButtonStyle}" Click="Button_Click"/>
+                <Button Content="{Binding Path=AxisLetter.B, Converter={StaticResource JogMinusConverter}, Mode=OneWay}" Style="{StaticResource JogButtonStyle}" Margin="0,70,0,0" Click="Button_Click"/>
             </StackPanel>
             <StackPanel Style="{StaticResource CAxisVisibleStyle}" VerticalAlignment="Center" Margin="5,0,0,0">
-                <Button Content="C+" Style="{StaticResource JogButtonStyle}" Click="Button_Click"/>
-                <Button Content="C-" Style="{StaticResource JogButtonStyle}" Margin="0,70,0,0" Click="Button_Click"/>
+                <Button Content="{Binding Path=AxisLetter.C, Converter={StaticResource JogPlusConverter}, Mode=OneWay}" Style="{StaticResource JogButtonStyle}" Click="Button_Click"/>
+                <Button Content="{Binding Path=AxisLetter.C, Converter={StaticResource JogMinusConverter}, Mode=OneWay}" Style="{StaticResource JogButtonStyle}" Margin="0,70,0,0" Click="Button_Click"/>
+            </StackPanel>
+            <StackPanel Style="{StaticResource UAxisVisibleStyle}" VerticalAlignment="Center" Margin="5,0,0,0">
+                <Button Content="U+" Style="{StaticResource JogButtonStyle}" Click="Button_Click"/>
+                <Button Content="U-" Style="{StaticResource JogButtonStyle}" Margin="0,70,0,0" Click="Button_Click"/>
+            </StackPanel>
+            <StackPanel Style="{StaticResource VAxisVisibleStyle}" VerticalAlignment="Center" Margin="5,0,0,0">
+                <Button Content="V+" Style="{StaticResource JogButtonStyle}" Click="Button_Click"/>
+                <Button Content="V-" Style="{StaticResource JogButtonStyle}" Margin="0,70,0,0" Click="Button_Click"/>
+            </StackPanel>
+            <StackPanel Style="{StaticResource WAxisVisibleStyle}" VerticalAlignment="Center" Margin="5,0,0,0">
+                <Button Content="W+" Style="{StaticResource JogButtonStyle}" Click="Button_Click"/>
+                <Button Content="W-" Style="{StaticResource JogButtonStyle}" Margin="0,70,0,0" Click="Button_Click"/>
             </StackPanel>
         </StackPanel>
     </Grid>

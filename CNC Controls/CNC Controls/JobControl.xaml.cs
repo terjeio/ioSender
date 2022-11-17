@@ -1,7 +1,7 @@
 /*
  * JobControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.37 / 2022-02-27 / Io Engineering (Terje Io)
+ * v0.41 / 2022-09-06 / Io Engineering (Terje Io)
  *
  */
 
@@ -247,8 +247,8 @@ namespace CNC.Controls
                         streamingHandler.Call(model.IsSDCardJob ? StreamingState.JobFinished : StreamingState.NoFile, model.IsSDCardJob);
                     else if(JobTimer.IsRunning && !job.Complete)
                         streamingHandler.Call(StreamingState.JobFinished, true);
-                        if (!model.IsParserStateLive)
-                            SendCommand(GrblConstants.CMD_GETPARSERSTATE);
+                    if (!model.IsParserStateLive)
+                        SendCommand(GrblConstants.CMD_GETPARSERSTATE);
                     break;
 
                 case nameof(GrblViewModel.FileName):
@@ -297,6 +297,9 @@ namespace CNC.Controls
                 initOK = true;
                 serialSize = Math.Min(AppConfig.Settings.Base.MaxBufferSize, (int)(GrblInfo.SerialBufferSize * 0.9f)); // size should be less than hardware handshake HWM
                 GCode.File.Parser.Dialect = GrblInfo.IsGrblHAL ? Dialect.GrblHAL : Dialect.Grbl;
+
+                if(GrblInfo.HasRTC)
+                    SendCommand("$RTC=" + DateTime.Now.ToLocalTime().ToString("s"));
             }
 
             EnablePolling(activate);

@@ -1,0 +1,43 @@
+﻿CNC.Core.g.en-US.resources:libstrings.baml,str_contClearResetUnlock:System.String.$Content,None,True,True,,"Очистити,  &lt;Скинути&gt;, &lt;Розблок.&gt; для продовження"
+CNC.Core.g.en-US.resources:libstrings.baml,str_contHome:System.String.$Content,None,True,True,,&lt;База&gt; для продовження
+CNC.Core.g.en-US.resources:libstrings.baml,str_contHomeUnlock:System.String.$Content,None,True,True,,&lt;База&gt; або &lt;Розблок&gt; для продовження
+CNC.Core.g.en-US.resources:libstrings.baml,str_contResetUnlock:System.String.$Content,None,True,True,,&lt;Сброс&gt; і &lt;Розблок&gt; для продовження
+CNC.Core.g.en-US.resources:libstrings.baml,str_contUnlock:System.String.$Content,None,True,True,,&lt;Розблок&gt; для продовження
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcLoadError:System.String.$Content,None,True,True,,Строка: {0}\\nБлок: {1}\\n\\nПродовжити завантаження?
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserAxisError:System.String.$Content,None,True,True,,Конфликт команд осі
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserBadExpr:System.String.$Content,None,True,True,,Помилка у виразі
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserCMDInvalid:System.String.$Content,None,True,True,,Помилковий GCode
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserCmdUnknown:System.String.$Content,None,True,True,,Команда не розпізнана
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserErrE:System.String.$Content,None,True,True,,Параметер E больше за половину хода осі.
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserG1NoFeed:System.String.$Content,None,True,True,,G1 - подача не встановлена
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserG6NoP:System.String.$Content,None,True,True,,G4 - відсутній параметр P
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserKlesseqJ:System.String.$Content,None,True,True,,Параметр K повинен бути більше за J!
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserM66NoPorE:System.String.$Content,None,True,True,,Параметер P або E Відсутній в M66
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserM66PandE:System.String.$Content,None,True,True,,Одночасну використання параметрів P- та E- для M66 неможливе
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserModalGrpError:System.String.$Content,None,True,True,,Порушення модальної группи
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNegH:System.String.$Content,None,True,True,,Від'ємний параметр H
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNegJ:System.String.$Content,None,True,True,,Від'ємний параметр J
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNegK:System.String.$Content,None,True,True,,Від'ємний параметр K!
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNegP:System.String.$Content,None,True,True,,Від'ємний параметер P!
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNoG0orG1:System.String.$Content,None,True,True,,G0 або G1 не активні
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNoIandorJ:System.String.$Content,None,True,True,,Відсутній параметр I и/або J
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNoInvalidQ:System.String.$Content,None,True,True,,Параметр Q відсутній або поза діапазоном
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNoK:System.String.$Content,None,True,True,,Відсутній параметр K
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNoP:System.String.$Content,None,True,True,,Відсутній параметр P
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNoPandorQ:System.String.$Content,None,True,True,,Відсутній параметр P та/або Q
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNoR:System.String.$Content,None,True,True,,Відсутній параметр R
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserPlaneNotXY:System.String.$Content,None,True,True,,Площина не XY
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserPlaneNotZx:System.String.$Content,None,True,True,,Площина не ZX
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserRadiusErr:System.String.$Content,None,True,True,,Помилка розрахунку радіуса дуги.
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserRless1:System.String.$Content,None,True,True,,Параметр R меньше 1
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserStrip:System.String.$Content,None,True,True,,команда {0} не знайдена. Видалити?
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserStripHdr:System.String.$Content,None,True,True,,Обрізати комманди
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserToolNoI:System.String.$Content,None,True,True,,Відсутній параметр I
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserToolNoJ:System.String.$Content,None,True,True,,Відсутній параметр J
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserToolProfile:System.String.$Content,None,True,True,,Інструмент {0} не пов'язаний з зондом
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserUnsupportedCmd:System.String.$Content,None,True,True,,Команда не підтримується
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserWordRepeated:System.String.$Content,None,True,True,,Повторна команда
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserZPlus:System.String.$Content,None,True,True,,Команда доступна тільки для осі Z!
+CNC.Core.g.en-US.resources:libstrings.baml,str_joggingOnly:System.String.$Content,None,True,True,,Під час зміни інструмента дозволені лише команди переміщення та деякі системні!
+CNC.Core.g.en-US.resources:libstrings.baml,str_sdStreamComplete:System.String.$Content,None,True,True,,Трансляція з карти SD {0}% закіньчена
+CNC.Core.g.en-US.resources:libstrings.baml,str_serialPortError:System.String.$Content,None,True,True,,Неможливо відкрити COM порт: {0}

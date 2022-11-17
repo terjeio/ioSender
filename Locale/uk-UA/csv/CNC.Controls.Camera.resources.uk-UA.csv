@@ -1,0 +1,12 @@
+﻿CNC.Controls.Camera.g.en-US.resources:configcontrol.baml,btn_getPosition:System.Windows.Controls.ContentControl.Content,Button,True,True,,Поточна позиція
+CNC.Controls.Camera.g.en-US.resources:cameracontrol.baml,btn_moveOffset:System.Windows.Controls.ContentControl.Content,Button,True,True,,Перемістити
+CNC.Controls.Camera.g.en-US.resources:cameracontrol.baml,btn_useAsProbe:System.Windows.Controls.ContentControl.Content,Button,True,True,,Позиція зонда
+CNC.Controls.Camera.g.en-US.resources:configcontrol.baml,chk_confirmMove:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Подтверджувати переміщення
+CNC.Controls.Camera.g.en-US.resources:configcontrol.baml,chk_moveToSpindle:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Початкове переміщення до шпінделя.
+CNC.Controls.Camera.g.en-US.resources:configcontrol.baml,fld_xOffset:CNC.Controls.NumericField.Label,None,False,True,,Зміщення X:
+CNC.Controls.Camera.g.en-US.resources:configcontrol.baml,fld_yOffset:CNC.Controls.NumericField.Label,None,False,True,,Зміщення Y:
+CNC.Controls.Camera.g.en-US.resources:configcontrol.baml,grp_camera:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Камера
+CNC.Controls.Camera.g.en-US.resources:cameracontrol.baml,lbl_cameraToSpindlePosition:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Камера у поз. шпінделя
+CNC.Controls.Camera.g.en-US.resources:configcontrol.baml,lbl_offsetMotion:System.Windows.Controls.ContentControl.Content,Label,True,True,,Зміщення координат:
+CNC.Controls.Camera.g.en-US.resources:cameracontrol.baml,str_moveCameraTo:System.String.$Content,None,True,True,,Перемістити камеру в позицію шпінделя?
+CNC.Controls.Camera.g.en-US.resources:cameracontrol.baml,str_moveSpindleTo:System.String.$Content,None,True,True,,Перемістити шпіндель в позицію камери?

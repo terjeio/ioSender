@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CNC.Controls"
         mc:Ignorable="d"
-        x:Uid="dlg_about" Title="About" Height="350" Width="350" ResizeMode="NoResize" ShowInTaskbar="False"
+        x:Uid="dlg_about" Title="About" Height="350" Width="450" ResizeMode="NoResize" ShowInTaskbar="False"
         WindowStartupLocation="CenterOwner"
         Loaded="About_Load" Icon="App.ico">
     <Window.Resources>
@@ -17,14 +17,14 @@
             <RowDefinition Height="250"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Label x:Name="copyright" Content="©2015-2021 Io Engineering (Terje Io)" HorizontalAlignment="Left" Margin="10,0" VerticalAlignment="Top"/>
+        <Label x:Name="copyright" Content="©2015-2022 Io Engineering (Terje Io)" HorizontalAlignment="Left" Margin="10,0" VerticalAlignment="Top"/>
         <GroupBox x:Name="grpGrbl" Header="grbl" HorizontalAlignment="Center" Grid.Row="1" VerticalAlignment="Top">
             <StackPanel Orientation="Vertical">
                 <Label x:Name="txtGrblVersion" Content="-" HorizontalAlignment="Left" Margin="10,0,5,0" VerticalAlignment="Bottom" Height="20" Padding="0"/>
                 <Label x:Name="txtGrblOptions" Content="-" HorizontalAlignment="Left" Margin="10,0" VerticalAlignment="Bottom" Height="20" Padding="0"/>
                 <Label x:Name="txtGrblNewOpts" Content="-" HorizontalAlignment="Left" Margin="10,0" VerticalAlignment="Bottom" Height="20" Padding="0"/>
                 <Label x:Name="txtGrblConnection" Content="-" HorizontalAlignment="Left" Margin="10,0" VerticalAlignment="Bottom" Height="20" Padding="0"/>
-                <TextBox IsReadOnly="True" HorizontalAlignment="Center" Height="145" Width="310" TextWrapping="Wrap" VerticalAlignment="Top"
+                <TextBox IsReadOnly="True" HorizontalAlignment="Center" Height="145" Width="410" TextWrapping="Wrap" VerticalAlignment="Top"
                      local:TextBoxUtilities.AlwaysScrollToEnd="True" FontSize="10" FontFamily="Verdana"
                      ScrollViewer.VerticalScrollBarVisibility="Auto">
                     <TextBox.Text>

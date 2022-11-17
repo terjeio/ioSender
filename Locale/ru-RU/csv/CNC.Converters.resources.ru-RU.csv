@@ -4,8 +4,8 @@ CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_cutDepth:CNC.Contr
 CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_cutDepth:CNC.Controls.NumericField.Label,None,False,True,,Глубина:
 CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_feedrate:CNC.Controls.NumericField.Unit,None,False,True,,мм/мин
 CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_feedrate:CNC.Controls.NumericField.Label,None,False,True,,Подача:
-CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_plungeRate:CNC.Controls.NumericField.Unit,None,False,True,,мм/мин
 CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_plungeRate:CNC.Controls.NumericField.Label,None,False,True,,Скорость погружения:
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_plungeRate:CNC.Controls.NumericField.Unit,None,False,True,,мм/мин
 CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_rapids:CNC.Controls.NumericField.Unit,None,False,True,,мм
 CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_rapids:CNC.Controls.NumericField.Label,None,False,True,,Быстро:
 CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_rpm:CNC.Controls.NumericField.Label,None,False,True,,Об/мин:

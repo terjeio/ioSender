@@ -1,13 +1,13 @@
 ﻿/*
  * SerialStream.cs - part of CNC Controls library
  *
- * v0.36 / 2021-12-17 / Io Engineering (Terje Io)
+ * v0.41 / 2022-09-25 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2021, Io Engineering (Terje Io)
+Copyright (c) 2018-2022, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -434,6 +434,7 @@ namespace CNC.Core
     public class SerialPorts : ViewModelBase
     {
         string _selected = string.Empty;
+        string _baud = "115200";
         private ConnectMode _mode = null;
 
         public SerialPorts()
@@ -442,6 +443,11 @@ namespace CNC.Core
 
             if (Ports.Count > 0)
                 _selected = Ports[0].Name;
+
+            Baud.Add(_baud);
+            Baud.Add("230400");
+            Baud.Add("460800");
+            Baud.Add("921600");
 
             ConnectModes.Add(new ConnectMode(Comms.ResetMode.None, "No action"));
             ConnectModes.Add(new ConnectMode(Comms.ResetMode.DTR, "Toggle DTR"));
@@ -472,7 +478,7 @@ namespace CNC.Core
                     var portList = _portnames.Select(n => ports.FirstOrDefault(s => s.Contains('(' + n + ')'))).ToList();
                     foreach (var fullname in portList)
                     {
-                        var name = fullname.Substring(fullname.IndexOf("(COM") + 1).TrimEnd(')');
+                        var name = fullname.Substring(fullname.IndexOf("(COM") + 1).Trim().TrimEnd(')');
                         var port = new ComPort(name);
 
                         port.FullName = name + " - " + fullname.Replace('(' + name + ')', string.Empty).Trim();
@@ -500,6 +506,7 @@ namespace CNC.Core
 
         public ObservableCollection<ComPort> Ports { get; private set; } = new ObservableCollection<ComPort>();
         public ObservableCollection<ConnectMode> ConnectModes { get; private set; } = new ObservableCollection<ConnectMode>();
+        public ObservableCollection<string> Baud { get; private set; } = new ObservableCollection<string>();
 
         public string SelectedPort
         {
@@ -509,6 +516,19 @@ namespace CNC.Core
                 if (_selected != value)
                 {
                     _selected = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public string SelectedBaud
+        {
+            get { return _baud; }
+            set
+            {
+                if (_baud != value)
+                {
+                    _baud = value;
                     OnPropertyChanged();
                 }
             }

@@ -23,15 +23,15 @@
                 MinValue="{Binding Path=ProgramLimits.MinZ, Mode=OneWay}"
                 MaxValue="{Binding Path=ProgramLimits.MaxZ, Mode=OneWay}"
             />
-            <local:LimitsBaseControl x:Name="axisA" Label="A" Style="{StaticResource AAxisVisibleStyle}"
+            <local:LimitsBaseControl x:Name="axisA" Label="{Binding Path=AxisLetter.A, Mode=OneWay}" Style="{StaticResource AAxisVisibleStyle}"
                 MinValue="{Binding Path=ProgramLimits.MinA, Mode=OneWay}"
                 MaxValue="{Binding Path=ProgramLimits.MaxA, Mode=OneWay}"
             />
-            <local:LimitsBaseControl x:Name="axisB" Label="B" Style="{StaticResource BAxisVisibleStyle}"
+            <local:LimitsBaseControl x:Name="axisB" Label="{Binding Path=AxisLetter.B, Mode=OneWay}" Style="{StaticResource BAxisVisibleStyle}"
                 MinValue="{Binding Path=ProgramLimits.MinB, Mode=OneWay}"
                 MaxValue="{Binding Path=ProgramLimits.MaxB, Mode=OneWay}"
             />
-            <local:LimitsBaseControl x:Name="axisC" Label="C" Style="{StaticResource CAxisVisibleStyle}"
+            <local:LimitsBaseControl x:Name="axisC" Label="{Binding Path=AxisLetter.C, Mode=OneWay}" Style="{StaticResource CAxisVisibleStyle}"
                 MinValue="{Binding Path=ProgramLimits.MinC, Mode=OneWay}"
                 MaxValue="{Binding Path=ProgramLimits.MaxC, Mode=OneWay}"
             />

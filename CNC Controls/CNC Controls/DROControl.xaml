@@ -35,17 +35,29 @@
                 Value="{Binding Path=Position.Z, Mode=TwoWay}"
                 IsScaled="{Binding Path=AxisScaled[(gcode:AxisFlags)Z], Mode=OneWay}"
             />
-            <local:DROBaseControl x:Name="axisA" Label="A" Style="{StaticResource AAxisVisibleStyle}"
+            <local:DROBaseControl x:Name="axisA" Label="{Binding Path=AxisLetter.A, Mode=OneWay}" Style="{StaticResource AAxisVisibleStyle}"
                 Value="{Binding Path=Position.A, Mode=TwoWay}"
                 IsScaled="{Binding Path=AxisScaled[(gcode:AxisFlags)A], Mode=OneWay}"
             />
-            <local:DROBaseControl x:Name="axisB" Label="B" Style="{StaticResource BAxisVisibleStyle}"
+            <local:DROBaseControl x:Name="axisB" Label="{Binding Path=AxisLetter.B, Mode=OneWay}" Style="{StaticResource BAxisVisibleStyle}"
                 Value="{Binding Path=Position.B, Mode=TwoWay}"
                 IsScaled="{Binding Path=AxisScaled[(gcode:AxisFlags)B], Mode=OneWay}"
             />
-            <local:DROBaseControl x:Name="axisC" Label="C" Style="{StaticResource CAxisVisibleStyle}"
+            <local:DROBaseControl x:Name="axisC" Label="{Binding Path=AxisLetter.C, Mode=OneWay}" Style="{StaticResource CAxisVisibleStyle}"
                 Value="{Binding Path=Position.C, Mode=TwoWay}"
                 IsScaled="{Binding Path=AxisScaled[(gcode:AxisFlags)C], Mode=OneWay}"
+            />
+            <local:DROBaseControl x:Name="axisU" Label="U" Style="{StaticResource UAxisVisibleStyle}"
+                Value="{Binding Path=Position.U, Mode=TwoWay}"
+                IsScaled="{Binding Path=AxisScaled[(gcode:AxisFlags)U], Mode=OneWay}"
+            />
+            <local:DROBaseControl x:Name="axisV" Label="V" Style="{StaticResource VAxisVisibleStyle}"
+                Value="{Binding Path=Position.V, Mode=TwoWay}"
+                IsScaled="{Binding Path=AxisScaled[(gcode:AxisFlags)V], Mode=OneWay}"
+            />
+            <local:DROBaseControl x:Name="axisW" Label="W" Style="{StaticResource WAxisVisibleStyle}"
+                Value="{Binding Path=Position.W, Mode=TwoWay}"
+                IsScaled="{Binding Path=AxisScaled[(gcode:AxisFlags)W], Mode=OneWay}"
             />
             <Button x:Uid="btn_zeroAll" x:Name="btnZeroAll" Content="Zero all" IsEnabled="{Binding Path=IsJobRunning, Converter={StaticResource BooleanConverter}}" Focusable="False" Height="28" Width="180" HorizontalAlignment="Center" Margin="2,3" Click="btnZeroAll_Click"/>
         </StackPanel>

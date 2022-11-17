@@ -1,7 +1,7 @@
 ﻿/*
  * DROControl.xaml.cs - part of CNC Controls library
  *
- * v0.37 / 2022-02-27 / Io Engineering (Terje Io)
+ * v0.41 / 2022-09-25 / Io Engineering (Terje Io)
  *
  */
 
@@ -65,7 +65,6 @@ namespace CNC.Controls
 
             foreach (DROBaseControl axis in UIUtils.FindLogicalChildren<DROBaseControl>(this))
             {
-                axis.Tag = GrblInfo.AxisLetterToIndex(axis.Label);
                 axis.txtReadout.GotFocus += TxtReadout_GotFocus;
                 axis.txtReadout.LostFocus += txtPos_LostFocus;
                 axis.txtReadout.PreviewKeyUp += txtPos_KeyPress;
@@ -99,6 +98,9 @@ namespace CNC.Controls
                 if (GrblInfo.AxisFlags.HasFlag(AxisFlags.C))
                     keyboard.AddHandler(Key.C, ModifierKeys.Control | ModifierKeys.Shift, ZeroC);
                 keyboard.AddHandler(Key.D0, ModifierKeys.Control | ModifierKeys.Shift, ZeroAxes);
+
+                foreach (DROBaseControl axis in UIUtils.FindLogicalChildren<DROBaseControl>(this))
+                    axis.Tag = GrblInfo.AxisLetterToIndex(axis.Label);
             }
         }
 
@@ -190,19 +192,19 @@ namespace CNC.Controls
         }
         private bool ZeroA(Key key)
         {
-            AxisPositionChanged("A", 0d);
+            AxisPositionChanged(GrblInfo.AxisIndexToLetter(3), 0d);
 
             return true;
         }
         private bool ZeroB(Key key)
         {
-            AxisPositionChanged("B", 0d);
+            AxisPositionChanged(GrblInfo.AxisIndexToLetter(4), 0d);
 
             return true;
         }
         private bool ZeroC(Key key)
         {
-            AxisPositionChanged("C", 0d);
+            AxisPositionChanged(GrblInfo.AxisIndexToLetter(5), 0d);
 
             return true;
         }

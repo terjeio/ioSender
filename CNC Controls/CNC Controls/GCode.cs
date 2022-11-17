@@ -1,7 +1,7 @@
 ﻿/*
  * GCode.cs - part of CNC Controls library for Grbl
  *
- * v0.37 / 2022-02-27 / Io Engineering (Terje Io)
+ * v0.41 / 2022-07-19 / Io Engineering (Terje Io)
  *
  */
 
@@ -57,6 +57,7 @@ namespace CNC.Controls
         {
             public Type Type;
             public string FileType;
+            public string FileExtensions;
         }
         private struct GCodeTransformer
         {
@@ -65,7 +66,6 @@ namespace CNC.Controls
         }
 
         public const string FileTypes = "cnc,nc,ncc,ngc,gcode,tap";
-        private string conversionTypes = string.Empty;
 
         private GCodeJob Program { get; set; } = new GCodeJob();
         private List<GCodeConverter> Converters = new List<GCodeConverter>();
@@ -118,16 +118,22 @@ namespace CNC.Controls
 
         public GrblViewModel Model { get; set; }
 
-        public bool AddConverter(Type converter, string filetype)
+        public bool AddConverter(Type converter, string filetype, string fileextensions)
         {
             bool ok = converter.GetInterface("CNC.Controls.IGCodeConverter") != null;
             if (ok)
-            {
-                Converters.Add(new GCodeConverter { Type = converter, FileType = "." + filetype });
-                conversionTypes += (conversionTypes == string.Empty ? "" : ",") + filetype;
-            }
+                Converters.Add(new GCodeConverter { Type = converter, FileType = filetype, FileExtensions = fileextensions });
 
             return ok;
+        }
+
+        private string getConversionTypes ()
+        {
+            string types = string.Empty;
+            foreach (var converter in Converters)
+                types += (types == string.Empty ? "" : ",") + converter.FileExtensions;
+
+            return types;
         }
 
         public bool AddTransformer(Type converter, string name, ObservableCollection<MenuItem> menu)
@@ -197,7 +203,7 @@ namespace CNC.Controls
             if (allow && e.Data.GetDataPresent(DataFormats.FileDrop))
             {
                 string[] files = (string[])e.Data.GetData(DataFormats.FileDrop, false);
-                allow = files.Count() == 1 && FileUtils.IsAllowedFile(files[0].ToLower(), FileTypes + (conversionTypes == string.Empty ? "" : "," + conversionTypes) + ",txt");
+                allow = files.Count() == 1 && FileUtils.IsAllowedFile(files[0].ToLower(), FileTypes + (getConversionTypes() == string.Empty ? "" : "," + getConversionTypes()) + ",txt");
             }
 
             e.Handled = true;
@@ -225,7 +231,10 @@ namespace CNC.Controls
             string filename = string.Empty;
             OpenFileDialog file = new OpenFileDialog();
 
-            string conversionFilter = conversionTypes == string.Empty ? string.Empty : string.Format("Other files ({0})|{0}|", FileUtils.ExtensionsToFilter(conversionTypes));
+            string conversionFilter = string.Empty; //conversionTypes == string.Empty ? string.Empty : string.Format("Other files ({0})|{0}|", FileUtils.ExtensionsToFilter(conversionTypes));
+
+            foreach (var converter in Converters)
+                conversionFilter += string.Format("{0} ({1})|{1}|", converter.FileType, FileUtils.ExtensionsToFilter(converter.FileExtensions));
 
             file.Filter = string.Format("GCode files ({0})|{0}|{1}Text files (*.txt)|*.txt|All files (*.*)|*.*", FileUtils.ExtensionsToFilter(FileTypes), conversionFilter);
 
@@ -244,11 +253,15 @@ namespace CNC.Controls
         {
             foreach (var converter in Converters)
             {
-                if (filename.EndsWith(converter.FileType))
-                {
-                    var loader = (IGCodeConverter)Activator.CreateInstance(converter.Type);
-                    loader.LoadFile(File, filename);
-                    return;
+                var filetypes = converter.FileExtensions.Split(',');
+
+                foreach (var filetype in filetypes) {
+                    if (filename.EndsWith(filetype))
+                    {
+                        var loader = (IGCodeConverter)Activator.CreateInstance(converter.Type);
+                        loader.LoadFile(File, filename);
+                        return;
+                    }
                 }
             }
 

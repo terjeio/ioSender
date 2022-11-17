@@ -1,7 +1,7 @@
 ﻿/*
  * GCodeJob.cs - part of CNC Controls library
  *
- * v0.40 / 2022-07-12 / Io Engineering (Terje Io)
+ * v0.41 / 2022-09-23 / Io Engineering (Terje Io)
  *
  */
 
@@ -206,8 +206,8 @@ namespace CNC.Core
                         BoundingBox.AddBoundingBox((cmd.Token as GCCubicSpline).GetBoundingBox(emu.Plane, new double[] { cmd.Start.X, cmd.Start.Y, cmd.Start.Z }, emu.DistanceMode == DistanceMode.Incremental));
                     else if (cmd.Token is GCQuadraticSpline)
                         BoundingBox.AddBoundingBox((cmd.Token as GCQuadraticSpline).GetBoundingBox(emu.Plane, new double[] { cmd.Start.X, cmd.Start.Y, cmd.Start.Z }, emu.DistanceMode == DistanceMode.Incremental));
-                    else if (cmd.Token is GCAxisCommand6)
-                        BoundingBox.AddPoint(cmd.End, (cmd.Token as GCAxisCommand6).AxisFlags);
+                    else if (cmd.Token is GCAxisCommand9)
+                        BoundingBox.AddPoint(cmd.End, (cmd.Token as GCAxisCommand9).AxisFlags);
                 }
 
                 BoundingBox.Conclude();
@@ -299,6 +299,10 @@ namespace CNC.Core
         public double MinA { get { return MinValues[3]; } set { MinValues[3] = value; } }
         public double MinB { get { return MinValues[4]; } set { MinValues[4] = value; } }
         public double MinC { get { return MinValues[5]; } set { MinValues[5] = value; } }
+        public double MinU { get { return MinValues[6]; } set { MinValues[6] = value; } }
+        public double MinV { get { return MinValues[7]; } set { MinValues[7] = value; } }
+        public double MinW { get { return MinValues[8]; } set { MinValues[8] = value; } }
+
         public CoordinateValues<double> MaxValues { get; private set; } = new CoordinateValues<double>();
         public double MaxX { get { return MaxValues[0]; } set { MaxValues[0] = value; } }
         public double MaxY { get { return MaxValues[1]; } set { MaxValues[1] = value; } }
@@ -306,6 +310,9 @@ namespace CNC.Core
         public double MaxA { get { return MaxValues[3]; } set { MaxValues[3] = value; } }
         public double MaxB { get { return MaxValues[4]; } set { MaxValues[4] = value; } }
         public double MaxC { get { return MaxValues[5]; } set { MaxValues[5] = value; } }
+        public double MaxU { get { return MaxValues[6]; } set { MaxValues[6] = value; } }
+        public double MaxV { get { return MaxValues[7]; } set { MaxValues[7] = value; } }
+        public double MaxW { get { return MaxValues[8]; } set { MaxValues[8] = value; } }
 
         public double SizeX { get { return MaxX - MinX; } }
         public double SizeY { get { return MaxY - MinY; } }
@@ -417,4 +424,3 @@ namespace CNC.Core
         }
     }
 }
-

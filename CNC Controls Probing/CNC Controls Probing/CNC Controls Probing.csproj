@@ -81,6 +81,9 @@
     </Compile>
     <Compile Include="HeightMapViewModel.cs" />
     <Compile Include="IProbeTab.cs" />
+    <Compile Include="ProbeVerify.xaml.cs">
+      <DependentUpon>ProbeVerify.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ProbingConfig.cs" />
     <Compile Include="ProbingView.xaml.cs">
       <DependentUpon>ProbingView.xaml</DependentUpon>
@@ -131,6 +134,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="LibStrings.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ProbeVerify.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -187,6 +194,9 @@
     <Resource Include="Resources\RotaterAD.png" />
     <Resource Include="Resources\RotaterCB.png" />
     <Resource Include="Resources\RotaterCD.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\App.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

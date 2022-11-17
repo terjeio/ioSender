@@ -1,13 +1,13 @@
 ﻿/*
  * WebsocketStream.cs - part of CNC Controls library
  *
- * v0.31 / 2021-04-23 / Io Engineering (Terje Io)
+ * v0.41 / 2022-09-03 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2021, Io Engineering (Terje Io)
+Copyright (c) 2018-2022, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -135,10 +135,13 @@ namespace CNC.Core
         {
             state = Comms.State.AwaitAck;
 
-            if (command.Length > 1 || command == GrblConstants.CMD_PROGRAM_DEMARCATION)
+            if (command.Length == 1 && command != GrblConstants.CMD_PROGRAM_DEMARCATION)
+                WriteByte((byte)command.ToCharArray()[0]);
+            else
+            {
                 command += "\r";
-
-            WriteString(command);
+                WriteString(command);
+            }
         }
 
         public void AwaitAck()
@@ -189,6 +192,7 @@ namespace CNC.Core
             websocket.OnClose -= OnClose;
             websocket = null;
         }
+
         private int gp()
         {
             int pos = 0; bool found = false;

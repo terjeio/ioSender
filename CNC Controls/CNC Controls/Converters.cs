@@ -1,13 +1,13 @@
 /*
  * Converters.cs - part of CNC Controls library for Grbl
  *
- * v0.39 / 2022-06-24 / Io Engineering (Terje Io)
+ * v0.41 / 2022-09-24 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2021, Io Engineering (Terje Io)
+Copyright (c) 2019-2022, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -75,6 +75,8 @@ namespace CNC.Controls
         public static MultiLineConverter MultiLineConverter = new MultiLineConverter();
         public static PositionToStringConverter PositionToStringConverter = new PositionToStringConverter();
         public static FeedSpeedToStringConverter FeedSpeedToStringConverter = new FeedSpeedToStringConverter();
+        public static AxisLetterToJogPlusConverter AxisLetterToJogPlusConverter = new AxisLetterToJogPlusConverter();
+        public static AxisLetterToJogMinusConverter AxisLetterToJogMinusConverter = new AxisLetterToJogMinusConverter();
 
         internal static string numBlocks = LibStrings.FindResource("NumBlocks");
         internal static string blockOfBlocks = LibStrings.FindResource("BlockOfBlocks");
@@ -140,6 +142,41 @@ namespace CNC.Controls
         }
     }
 
+    public class AxisLetterToJogPlusConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            string result = string.Empty;
+
+            if (value is string)
+                result = (string)value + "+";
+
+            return result;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+    public class AxisLetterToJogMinusConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            string result = string.Empty;
+
+            if (value is string)
+                result = (string)value + "-";
+
+            return result;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class BlocksToStringConverter : IMultiValueConverter
     {
         public object Convert(object[] value, Type targetType, object parameter, CultureInfo culture)
@@ -187,6 +224,42 @@ namespace CNC.Controls
                                            (value[0] as Position).A.ToInvariantString(format),
                                             (value[0] as Position).B.ToInvariantString(format),
                                              (value[0] as Position).C.ToInvariantString(format));
+                    break;
+
+                case 7:
+                    res = string.Format(GrblInfo.PositionFormatString,
+                                        (value[0] as Position).X.ToInvariantString(format),
+                                         (value[0] as Position).Y.ToInvariantString(format),
+                                          (value[0] as Position).Z.ToInvariantString(format),
+                                           (value[0] as Position).A.ToInvariantString(format),
+                                            (value[0] as Position).B.ToInvariantString(format),
+                                             (value[0] as Position).C.ToInvariantString(format),
+                                              (value[0] as Position).U.ToInvariantString(format));
+                    break;
+
+                case 8:
+                    res = string.Format(GrblInfo.PositionFormatString,
+                                        (value[0] as Position).X.ToInvariantString(format),
+                                         (value[0] as Position).Y.ToInvariantString(format),
+                                          (value[0] as Position).Z.ToInvariantString(format),
+                                           (value[0] as Position).A.ToInvariantString(format),
+                                            (value[0] as Position).B.ToInvariantString(format),
+                                             (value[0] as Position).C.ToInvariantString(format),
+                                              (value[0] as Position).U.ToInvariantString(format),
+                                               (value[0] as Position).V.ToInvariantString(format));
+                    break;
+
+                case 9:
+                    res = string.Format(GrblInfo.PositionFormatString,
+                                        (value[0] as Position).X.ToInvariantString(format),
+                                         (value[0] as Position).Y.ToInvariantString(format),
+                                          (value[0] as Position).Z.ToInvariantString(format),
+                                           (value[0] as Position).A.ToInvariantString(format),
+                                            (value[0] as Position).B.ToInvariantString(format),
+                                             (value[0] as Position).C.ToInvariantString(format),
+                                              (value[0] as Position).U.ToInvariantString(format),
+                                               (value[0] as Position).V.ToInvariantString(format),
+                                                (value[0] as Position).W.ToInvariantString(format));
                     break;
 
                 default:

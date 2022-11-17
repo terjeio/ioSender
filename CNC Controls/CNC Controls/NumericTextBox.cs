@@ -1,7 +1,7 @@
 ﻿/*
  * NumericTextBox.cs - part of CNC Controls library
  *
- * v0.38 / 2022-06-13 / Io Engineering (Terje Io)
+ * v0.41 / 2022-08-11 / Io Engineering (Terje Io)
  *
  */
 
@@ -112,7 +112,7 @@ namespace CNC.Controls
                 string text = SelectionLength > 0 ? Text.Remove(SelectionStart, SelectionLength) : Text;
 
                 updateText = false;
-                Value = double.Parse(text == string.Empty || text == "." || text == "-" || text == "-." ? "0" : text, np.Styles, CultureInfo.InvariantCulture);
+                Value = double.Parse(text == string.Empty || text == "." ? "0" : (text == "-" || text == "-." ? "-0" : text), np.Styles, CultureInfo.InvariantCulture);
                 updateText = true;
             }
         }
@@ -125,7 +125,7 @@ namespace CNC.Controls
             if (!(e.Handled = !NumericProperties.IsStringNumeric(text, np)))
             {
                 updateText = false;
-                Value = double.Parse(text == "" || text == "." || text == "-" || text == "-." ? "0" : text, np.Styles, CultureInfo.InvariantCulture);
+                Value = double.Parse(text == "" || text == "." ? "0" : (text == "-" || text == "-." ? "-0" : text), np.Styles, CultureInfo.InvariantCulture);
                 updateText = true;
             }
 
@@ -145,6 +145,18 @@ namespace CNC.Controls
                 }
 
                 base.OnTextChanged(e);
+            }
+            else if(Text == "" || Text == ".")
+            {
+                updateText = false;
+                Value = 0d;
+                updateText = true;
+            }
+            else if (Text == "-" || Text == "-.")
+            {
+                updateText = false;
+                Value = -0d;
+                updateText = true;
             }
             else
                 Text = Math.Round(Value, (np.Precision)).ToString(np.DisplayFormat, CultureInfo.InvariantCulture);

@@ -1,11 +1,27 @@
 ## ioSender changelog
 
-2022-07-18: [Release 2.0.39](https://github.com/terjeio/Grbl-GCode-Sender/releases/tag/2.0.40).
+2022-11-17: [Release 2.0.41](https://github.com/terjeio/Grbl-GCode-Sender/releases/tag/2.0.41).
+
+* Fix for incorrect handling of negative values entered in DRO. Issue #240.
+* Fix for incorrect handling of odd com port names \(with leading spaces\). Issue #230.
+* Now sets Real Time Clock \(RTC\) on connect to controllers that has a RTC.
+* Added support for up to 9 axes \(XYZABCUVW\) and remapping of ABC to UVW. Part of fix for [iMXRT1062 issue #43](https://github.com/grblHAL/iMXRT1062/issues/43).
+* Fixed bug that caused multi-pass center finder probing to sometimes fail.
+* Added baud rate selection to connection dialog.
+* Added support for LightBurn clusters \(when enabled in the controller\).
+* Added option for verifying probe connection before commencing a probe sequence.
+* Added _Measure_ option to some probing tabs, this logs probed coordinate to the console for now. Further functionality planned.
+* Added DRO view to Probing tab. Persistent in XL version, dependent on main window width in standard version.
+
+---
+
+2022-07-18: [Release 2.0.40](https://github.com/terjeio/Grbl-GCode-Sender/releases/tag/2.0.40).
 
 * Fix for incorrect rendering of paths consisting of many small moves. Issue #235
 * Fixed spindle RPM entry not working when spindle is running. Issue #236
 * Added retries on startup if unexpected data received from controller.
-* Added parser/rendering support for G5.1 splines and [multi turn G2/G3 arcs](http://linuxcnc.org/docs/html/gcode/g-code.html#gcode:g2-g3) controlled by P word. Requires grblHAL controller with support for those commands \(not yet released\).
+* Added parser/rendering support for G5.1 splines and [multi turn G2/G3 arcs](http://linuxcnc.org/docs/html/gcode/g-code.html#gcode:g2-g3) controlled by P word.
+Requires grblHAL controller with support for those commands \(not yet released\).
 
 ---
 

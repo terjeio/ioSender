@@ -1,7 +1,7 @@
 ﻿/*
  * HeightMapControl.xaml.cs - part of CNC Probing library
  *
- * v0.37 / 2022-03-09 / Io Engineering (Terje Io)
+ * v0.41 / 2022-11-13 / Io Engineering (Terje Io)
  *
  */
 
@@ -75,7 +75,11 @@ namespace CNC.Controls.Probing
             if (!probing.ValidateInput(true))
                 return;
 
-            probing.WaitForIdle(string.Format("G90G0X{0}Y{1}", probing.HeightMap.MinX.ToInvariantString(), probing.HeightMap.MinY.ToInvariantString()));
+            if (!probing.WaitForIdle(string.Format("G90G0X{0}Y{1}", probing.HeightMap.MinX.ToInvariantString(), probing.HeightMap.MinY.ToInvariantString())))
+                return;
+
+            if (!probing.VerifyProbe())
+                return;
 
             if (!probing.Program.Init())
                 return;

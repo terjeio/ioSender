@@ -1,4 +1,4 @@
-## ioSender - a gcode sender for grblHAL or grbl  
+## ioSender - a gcode sender for grblHAL and Grbl controllers
 
 ---
 
@@ -10,7 +10,7 @@ Please check out the [Wiki](https://github.com/terjeio/Grbl-GCode-Sender/wiki) f
 
 ---
 
-Latest release is 2.0.40, see the [changelog](changelog.md) for details.
+Latest release is 2.0.41, see the [changelog](changelog.md) for details. 
 
 ---
 
@@ -37,7 +37,7 @@ XL version, German translation.
 
 ![Jog flyout](Media/Sender7.png)
 
-Jogging flyout, supports up to 6 axes. The sender also supports keyboard jogging with \<Shift\> \(speed\) and \<Ctrl\> \(distance\) modifiers.
+Jogging flyout, supports up to 9 axes. The sender also supports keyboard jogging with \<Shift\> \(speed\) and \<Ctrl\> \(distance\) modifiers.
 <br><br>
 
 ![Easy configuration](Media/Sender3.png)
@@ -60,4 +60,4 @@ Lathe mode.
 Conversational programming for Lathe Mode. Threading requires [grblHAL](https://github.com/grblHAL) controller with driver that has spindle sync support.
 
 ---
-2022-07-18
+2022-09-25

@@ -1,7 +1,7 @@
 /*
  * Widget.cs - part of CNC Controls library for Grbl
  *
- * v0.38 / 2022-03-21 / Io Engineering (Terje Io)
+ * v0.41 / 2022-09-23 / Io Engineering (Terje Io)
  *
  */
 
@@ -117,6 +117,18 @@ namespace CNC.Controls
         public RadioButton wRadiobutton = null;
         private StackPanel Canvas;
 
+        private string AxisLabels ()
+        {
+            string labels = string.Empty;
+
+            for(int i = 0; i < GrblInfo.NumAxes; i++)
+            {
+                labels += (labels == string.Empty ? "" : ",") + GrblInfo.AxisIndexToLetter(i) + " axis";
+            }
+
+            return labels;
+        }
+
         public string BaseValue { get { return widget.Value; } }
 
         public Widget(GrblConfigView View, WidgetProperties widget, StackPanel Canvas)
@@ -152,7 +164,7 @@ namespace CNC.Controls
                 case GrblSettingDetails.DataTypes.AXISMASK:
                     has_unit = false;
                     bool axes = widget.DataType == GrblSettingDetails.DataTypes.AXISMASK || widget.Format == "axes";
-                    string[] format = (axes ? "X-Axis,Y-Axis,Z-Axis,A-Axis,B-Axis,C-Axis" : widget.Format).Split(',');
+                    string[] format = (axes ? AxisLabels() : widget.Format).Split(',');
                     for (int i = 0; i < (axes ? 6 : format.Length); i++)
                     {
                         if (axes && !GrblInfo.AxisFlags.HasFlag(GCodeParser.AxisFlag[i]))

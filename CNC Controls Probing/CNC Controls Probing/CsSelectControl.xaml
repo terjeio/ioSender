@@ -6,22 +6,25 @@
              xmlns:Controls="clr-namespace:CNC.Controls;assembly=CNC.Controls.WPF"
              xmlns:local="clr-namespace:CNC.Controls.Probing"
              mc:Ignorable="d" 
-             d:DesignHeight="80" d:DesignWidth="230">
+             d:DesignHeight="105" d:DesignWidth="230">
     <UserControl.Resources>
         <Controls:EnumValueToBooleanConverter x:Key="EnumToCheckedConverter" />
         <Controls:BoolToVisibleConverter x:Key="IsVisibleConverter" />
     </UserControl.Resources>
-    <GroupBox x:Uid="grp_action" Header="Action" Height="85">
-        <StackPanel Orientation="Vertical" Margin="2,5,0,0">
+    <GroupBox x:Uid="grp_action" Header="Action">
+        <StackPanel Orientation="Vertical" Margin="2,3,0,0">
             <DockPanel>
                 <RadioButton x:Uid="set_coord" Content="Set coordinate system:" IsChecked="{Binding Path=CoordinateMode, Mode=TwoWay, Converter={StaticResource EnumToCheckedConverter}, ConverterParameter=G10}" VerticalAlignment="Center"/>
                 <ComboBox x:Name="cbxOffset" Margin="3,0" DisplayMemberPath="Code" SelectedValuePath="Id" ItemsSource="{Binding Path=CoordinateSystems}" SelectedValue="{Binding Path=CoordinateSystem, Mode=TwoWay}" HorizontalAlignment="Right" VerticalAlignment="Center" Width="55" Height="22"/>
             </DockPanel>
-            <DockPanel Margin="0,5,0,0" Width="Auto" Height="30">
+            <DockPanel Margin="0,2,0,0" Width="Auto" Height="30">
                 <RadioButton x:Uid="btn_setG92" Content="Set offset (G92)" IsChecked="{Binding Path=CoordinateMode, Mode=TwoWay, Converter={StaticResource EnumToCheckedConverter}, ConverterParameter=G92}" VerticalAlignment="Center"/>
                 <Border Visibility="{Binding Path=Grbl.IsG92Active, Converter={StaticResource IsVisibleConverter}}" Background="Salmon" HorizontalAlignment="Right" VerticalAlignment="Center" CornerRadius="2" Width="61" Height="28">
                     <Button x:Uid="btn_clear" Content="Clear" HorizontalAlignment="Center" VerticalAlignment="Center" Width="55" Height="22" Click="ClearG92_Click"/>
                 </Border>
+            </DockPanel>
+            <DockPanel Visibility="{Binding Path=AllowMeasure, Converter={StaticResource IsVisibleConverter}}" Margin="0,5,0,0" Width="Auto" Height="19">
+                <RadioButton x:Uid="btn_setMeasure" Content="Measure" IsChecked="{Binding Path=CoordinateMode, Mode=TwoWay, Converter={StaticResource EnumToCheckedConverter}, ConverterParameter=Measure}" VerticalAlignment="Center"/>
             </DockPanel>
         </StackPanel>
     </GroupBox>

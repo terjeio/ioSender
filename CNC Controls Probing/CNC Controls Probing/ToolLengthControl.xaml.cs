@@ -1,7 +1,7 @@
 ﻿/*
  * ToolLengthControl.cs - part of CNC Probing library
  *
- * v0.37 / 2022-02-21 / Io Engineering (Terje Io)
+ * v0.41 / 2022-11-13 / Io Engineering (Terje Io)
  *
  */
 
@@ -80,6 +80,9 @@ namespace CNC.Controls.Probing
                 MessageBox.Show((string)FindResource("InitFailed"), "Probing");
                 return;
             }
+
+            if (!probing.VerifyProbe())
+                return;
 
             if (!probing.Program.Init(AppConfig.Settings.Probing.CheckProbeStatus || !probing.ProbeFixture))
                 return;

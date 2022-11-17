@@ -1,7 +1,7 @@
 ﻿/*
  * ProbingViewModel.cs - part of CNC Probing library
  *
- * v0.37 / 2022-02-21 / Io Engineering (Terje Io)
+ * v0.41 / 2022-11-13 / Io Engineering (Terje Io)
  *
  */
 
@@ -43,6 +43,8 @@ using System.Threading;
 using System.Collections.ObjectModel;
 using CNC.Core;
 using CNC.GCode;
+using System.Diagnostics;
+using System.Windows;
 
 namespace CNC.Controls.Probing
 {
@@ -52,12 +54,29 @@ namespace CNC.Controls.Probing
         public static string Command = "G38.3";
     }
 
+    public class Measurement : ViewModelBase
+    {
+        public void Add(Position position, AxisFlags axisFlags, ProbingType probingType)
+        {
+            Position = position;
+            AxisFlags = axisFlags;
+            ProbingType = probingType;
+
+            OnPropertyChanged();
+        }
+
+        public Position Position { get; private set; } = new Position();
+        public ProbingType ProbingType { get; private set; } = ProbingType.None;
+        public AxisFlags AxisFlags { get; private set; } = AxisFlags.None;
+    }
+
     public class ProbingViewModel : ViewModelBase
     {
         public enum CoordMode
         {
             G10 = 0,
-            G92
+            G92,
+            Measure
         }
 
         private string _message = string.Empty, _tool = string.Empty, _instructions = string.Empty, _position = string.Empty, _probeProgram = string.Empty;
@@ -73,7 +92,7 @@ namespace CNC.Controls.Probing
         private bool _canProbe = false, _isComplete = false, _isSuccess = false, _probeZ = false, _useFixture = false;
         private bool _hasToolTable = false, _hasCs9 = false, _addAction = false, _isPaused = false, _isCorner = false;
         private bool isCancelled = false, wasZselected = false, _referenceToolOffset = true, _workpieceLockXY = true;
-        private bool _enablePreview = false, _canApplyTransform = false;
+        private bool _enablePreview = false, _canApplyTransform = false, _allowMeasure = false;
         private OriginControl.Origin _origin = OriginControl.Origin.None;
         private GrblViewModel _grblmodel = null;
         private List<string> _program = new List<string>();
@@ -101,6 +120,13 @@ namespace CNC.Controls.Probing
             Profile = profile.Profiles[0];
 
             HeightMap.PropertyChanged += HeightMap_PropertyChanged;
+            Measurement.PropertyChanged += Measurement_PropertyChanged;
+        }
+
+        private void Measurement_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            var m = sender as Measurement;
+            Grbl.ResponseLog.Add("Measured: " + (m.Position - Grbl.WorkPositionOffset).ToString(m.AxisFlags) + " " + m.ProbingType.ToString());
         }
 
         private void HeightMap_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -122,6 +148,23 @@ namespace CNC.Controls.Probing
 
         public void Cancel ()
         {
+        }
+
+        public bool VerifyProbe ()
+        {
+            bool probeOk = ProbeVerified || Grbl.Signals.Value.HasFlag(Signals.Probe);
+
+            if (!probeOk)
+            {
+                new ProbeVerify(this).ShowDialog();
+                if (!ProbeVerified)
+                    ProbeVerified = MessageBox.Show(LibStrings.FindResource("NoVerifyContinue"), "ioSender", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No) == MessageBoxResult.Yes;
+
+                if (ProbeVerified)
+                    Grbl.Message = LibStrings.FindResource("VerifyStart");
+            }
+
+            return probeOk;
         }
 
         public bool WaitForResponse(string command)
@@ -151,42 +194,56 @@ namespace CNC.Controls.Probing
         {
             bool? res = null;
 
-            if (Grbl.ResponseLogVerbose)
-                Grbl.ResponseLog.Add(command);
-
-            new Thread(() =>
+            if (command != string.Empty)
             {
-                res = WaitFor.AckResponse<string>(
-                cancellationToken,
-                null,
-                a => Grbl.OnResponseReceived += a,
-                a => Grbl.OnResponseReceived -= a,
-                1000, () => Grbl.ExecuteCommand(command));
-            }).Start();
+                if (Grbl.ResponseLogVerbose)
+                    Grbl.ResponseLog.Add(command);
 
-            while (res == null)
-                EventUtils.DoEvents();
-
-            if (res == true)
-                res = null;
-
-            while (res == null)
-            {
                 new Thread(() =>
                 {
-                    res = WaitFor.SingleEvent<string>(
+                    res = WaitFor.AckResponse<string>(
                     cancellationToken,
                     null,
                     a => Grbl.OnResponseReceived += a,
                     a => Grbl.OnResponseReceived -= a,
-                    5000);
+                    1000, () => Grbl.ExecuteCommand(command));
                 }).Start();
 
                 while (res == null)
                     EventUtils.DoEvents();
+            }
 
-                if (Grbl.GrblState.State != GrblStates.Idle)
+            if (Grbl.GrblState.State != GrblStates.Idle && Grbl.GrblState.State != GrblStates.Alarm)
+            {
+                Stopwatch timer = new Stopwatch();
+                timer.Start();
+
+                if (res == true)
                     res = null;
+
+                while (res == null)
+                {
+                    new Thread(() =>
+                    {
+                        res = WaitFor.SingleEvent<string>(
+                        cancellationToken,
+                        null,
+                        a => Grbl.OnResponseReceived += a,
+                        a => Grbl.OnResponseReceived -= a,
+                        5000);
+                    }).Start();
+
+                    while (res == null)
+                        EventUtils.DoEvents();
+
+                    if (timer.Elapsed.Seconds > 120)
+                        break;
+
+                    if (Grbl.GrblState.State != GrblStates.Idle)
+                        res = null;
+                }
+
+                timer.Stop();
             }
 
             return res == true;
@@ -354,6 +411,7 @@ namespace CNC.Controls.Probing
                 OnPropertyChanged(nameof(TouchPlateHeightEnable));
             }
         }
+        public bool ProbeVerified { get; set; } = false;
         public string FastProbe { get { return string.Format(Probing.Command + "F{0}", ProbeFeedRate.ToInvariantString()); } }
         public string SlowProbe { get { return string.Format(Probing.Command + "F{0}", LatchFeedRate.ToInvariantString()); } }
         public string Instructions { get { return _instructions; } set { _instructions = value; OnPropertyChanged(); } }
@@ -431,6 +489,8 @@ namespace CNC.Controls.Probing
         public bool FixtureHeightEnable { get { return _probingType == ProbingType.ToolLength && _useFixture /*&& !ReferenceToolOffset && !Grbl.IsTloReferenceSet*/; } }
         public bool TouchPlateHeightEnable { get { return _probingType == ProbingType.ToolLength ? !_useFixture : (_probingType == ProbingType.EdgeFinderExternal || _probingType == ProbingType.EdgeFinderInternal ? _probeZ : _probingType == ProbingType.HeightMap); } }
         public bool CanApplyTransform { get { return _canApplyTransform; } set { _canApplyTransform = value; OnPropertyChanged(); } }
+        public bool AllowMeasure { get { return _allowMeasure; } set { _allowMeasure = value; OnPropertyChanged(); } }
+        public Measurement Measurement { get; private set; } = new Measurement();
 
         public string Message
         {

@@ -1,7 +1,7 @@
 ﻿/*
  * GCode.cs - part of CNC Controls library
  *
- * v0.40 / 2022-07-12 / Io Engineering (Terje Io)
+ * v0.41 / 2022-09-18 / Io Engineering (Terje Io)
  *
  */
 
@@ -63,6 +63,9 @@ namespace CNC.GCode
         A = 1 << 3,
         B = 1 << 4,
         C = 1 << 5,
+        U = 1 << 6,
+        V = 1 << 7,
+        W = 1 << 8,
         XY = 0x03,
         XZ = 0x05,
         XYZ = 0x07,
@@ -411,6 +414,9 @@ namespace CNC.GCode
         public double A;
         public double B;
         public double C;
+        public double U;
+        public double V;
+        public double W;
 
         public double this [int i]
         {
@@ -430,6 +436,12 @@ namespace CNC.GCode
                         return B;
                     case 5:
                         return C;
+                    case 6:
+                        return U;
+                    case 7:
+                        return V;
+                    case 8:
+                        return W;
                     default:
                         throw new ArgumentException("zyz!", "index");
                 }
@@ -456,11 +468,20 @@ namespace CNC.GCode
                     case 5:
                         C = value;
                         break;
+                    case 6:
+                        U = value;
+                        break;
+                    case 7:
+                        U = value;
+                        break;
+                    case 8:
+                        W = value;
+                        break;
                 }
             }
         }
 
-        public double[] Array  { get { return new[] { X, Y, Z, A, B, C }; } }
+        public double[] Array  { get { return new[] { X, Y, Z, A, B, C, U, V, W }; } }
 
         public Point3D Point3D { get { return new Point3D(X, Y, Z); } }
 
@@ -490,6 +511,15 @@ namespace CNC.GCode
                     case 5:
                         C = values[5];
                         break;
+                    case 6:
+                        U = values[6];
+                        break;
+                    case 7:
+                        V = values[7];
+                        break;
+                    case 8:
+                        W = values[8];
+                        break;
                 }
             }
         }
@@ -517,6 +547,15 @@ namespace CNC.GCode
                         break;
                     case 5:
                         C += values[5];
+                        break;
+                    case 6:
+                        U += values[6];
+                        break;
+                    case 7:
+                        V += values[7];
+                        break;
+                    case 8:
+                        W += values[8];
                         break;
                 }
             }

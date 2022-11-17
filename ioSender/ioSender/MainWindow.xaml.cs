@@ -1,7 +1,7 @@
 /*
  * MainWindow.xaml.cs - part of Grbl Code Sender
  *
- * v0.40 / 2022-06-12 / Io Engineering (Terje Io)
+ * v0.41 / 2022-09-14 / Io Engineering (Terje Io)
  *
  */
 
@@ -56,7 +56,7 @@ namespace GCode_Sender
 
     public partial class MainWindow : Window
     {
-        private const string version = "2.0.40";
+        private const string version = "2.0.41";
         public static MainWindow ui = null;
         public static CNC.Controls.Viewer.Viewer GCodeViewer = null;
         public static UIViewModel UIViewModel { get; } = new UIViewModel();
@@ -181,9 +181,9 @@ namespace GCode_Sender
             }
 
             IGCodeConverter c = new Excellon2GCode();
-            GCode.File.AddConverter(c.GetType(), c.FileType);
+            GCode.File.AddConverter(c.GetType(), c.FileType, c.FileExtensions);
             c = new HpglToGCode();
-            GCode.File.AddConverter(c.GetType(), c.FileType);
+            GCode.File.AddConverter(c.GetType(), c.FileType, c.FileExtensions);
 
             GCode.File.AddTransformer(typeof(GCodeRotateViewModel), (string)FindResource("MenuRotate"), UIViewModel.TransformMenuItems);
             GCode.File.AddTransformer(typeof(ArcsToLines), (string)FindResource("MenuArcsToLines"), UIViewModel.TransformMenuItems);

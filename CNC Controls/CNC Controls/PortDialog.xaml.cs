@@ -1,13 +1,13 @@
 ﻿/*
  * PortDialog.xaml.cs - part of CNC Controls library
  *
- * v0.36 / 2021-12-13 / Io Engineering (Terje Io)
+ * v0.41 / 2022-09-25 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2021, Io Engineering (Terje Io)
+Copyright (c) 2019-2022, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -99,6 +99,12 @@ namespace CNC.Controls
                     {
                         prop.Com.SelectedPort = portname;
                         string[] values = orgport.Split(':')[1].Split(',');
+
+                        if (!prop.Com.Baud.Contains(values[0]))
+                            prop.Com.Baud.Add(values[0]);
+
+                        prop.Com.SelectedBaud = values[0];
+
                         if (values.Length > 5)
                         {
                             Comms.ResetMode mode = Comms.ResetMode.None;
@@ -127,9 +133,9 @@ namespace CNC.Controls
             }
             else if(prop.Com.Ports.Count > 0)
             {
-                port = prop.Com.SelectedPort;
+                port = prop.Com.SelectedPort + ":" + prop.Com.SelectedBaud + ",N,8,1";
                 if (prop.Com.SelectedMode.Mode != Comms.ResetMode.None)
-                    port += "!" + prop.Com.SelectedMode.Mode.ToString();
+                    port += ",," + prop.Com.SelectedMode.Mode.ToString();
             }
 
             Close();

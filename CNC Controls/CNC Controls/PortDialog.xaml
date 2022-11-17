@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:CNC.Controls"
         mc:Ignorable="d"
         x:Uid="dlg_connection"
-        Title="Sender connection" Height="195" Width="400" Icon="App.ico" ResizeMode="NoResize">
+        Title="Sender connection" Height="198" Width="400" Icon="App.ico" ResizeMode="NoResize">
     <Window.Resources>
         <Style x:Key="PortErrorStyle" TargetType="local:NumericTextBox">
             <Style.Triggers>
@@ -30,10 +30,10 @@
         </Style>
     </Window.Resources>
     <Grid Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
-        <TabControl x:Name="tab" Width="Auto" Height="120" Margin="5,0" VerticalAlignment="Top">
+        <TabControl x:Name="tab" Width="Auto" Height="125" Margin="5,0" VerticalAlignment="Top">
             <TabItem x:Uid="tab_serial" Header="Serial">
                 <StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="0,5">
+                    <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
                         <Label  x:Uid="lbl_serialPort" Content="Port:" HorizontalAlignment="Left" HorizontalContentAlignment="Right" Width="80" VerticalAlignment="Center"/>
                         <ComboBox HorizontalAlignment="Left" VerticalAlignment="Center" Width="285"
                             DropDownOpened="CbxPorts_DropDownOpened"
@@ -43,7 +43,14 @@
                             SelectedValuePath="Name" 
                          />
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Top">
+                    <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                        <Label  x:Uid="lbl_serialBaud" Content="Baud rate:" HorizontalAlignment="Left" HorizontalContentAlignment="Right" Width="80" VerticalAlignment="Center"/>
+                        <ComboBox HorizontalAlignment="Left" VerticalAlignment="Center" Width="90"
+                            ItemsSource="{Binding Path=Com.Baud}"
+                            SelectedValue="{Binding Path=Com.SelectedBaud, Mode=TwoWay}"
+                         />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="0,4,0,0">
                         <Label x:Uid="lbl_onConnect" Content="On connect:" HorizontalAlignment="Left" HorizontalContentAlignment="Right" Width="80" VerticalAlignment="Center"/>
                         <ComboBox HorizontalAlignment="Left" VerticalAlignment="Center" Width="90"
                             ItemsSource="{Binding Path=Com.ConnectModes}"

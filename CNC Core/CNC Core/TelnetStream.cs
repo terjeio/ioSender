@@ -1,7 +1,7 @@
 /*
  * TelnetStream.cs - part of CNC Controls library
  *
- * v0.36 / 2021-12-30 / Io Engineering (Terje Io)
+ * v0.41 / 2022-09-03 / Io Engineering (Terje Io)
  *
  */
 
@@ -143,10 +143,13 @@ namespace CNC.Core
         {
             state = Comms.State.AwaitAck;
 
-            if (command.Length > 1 || command == GrblConstants.CMD_PROGRAM_DEMARCATION)
+            if (command.Length == 1 && command != GrblConstants.CMD_PROGRAM_DEMARCATION)
+                WriteByte((byte)command.ToCharArray()[0]);
+            else
+            {
                 command += "\r";
-
-            WriteString(command);
+                WriteString(command);
+            }
         }
 
         public void AwaitAck()

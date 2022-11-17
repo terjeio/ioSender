@@ -85,4 +85,46 @@
             </Setter.Value>
         </Setter>
     </Style>
+    <Style x:Key="UAxisVisibleStyle">
+        <Setter Property="Control.Visibility">
+            <Setter.Value>
+                <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
+                    <Binding Path="AxisEnabledFlags" />
+                    <Binding>
+                        <Binding.Source>
+                            <gcode:AxisFlags>U</gcode:AxisFlags>
+                        </Binding.Source>
+                    </Binding>
+                </MultiBinding>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="VAxisVisibleStyle">
+        <Setter Property="Control.Visibility">
+            <Setter.Value>
+                <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
+                    <Binding Path="AxisEnabledFlags" />
+                    <Binding>
+                        <Binding.Source>
+                            <gcode:AxisFlags>V</gcode:AxisFlags>
+                        </Binding.Source>
+                    </Binding>
+                </MultiBinding>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="WAxisVisibleStyle">
+        <Setter Property="Control.Visibility">
+            <Setter.Value>
+                <MultiBinding Converter="{StaticResource IsAxisVisibleConverter}">
+                    <Binding Path="AxisEnabledFlags" />
+                    <Binding>
+                        <Binding.Source>
+                            <gcode:AxisFlags>W</gcode:AxisFlags>
+                        </Binding.Source>
+                    </Binding>
+                </MultiBinding>
+            </Setter.Value>
+        </Setter>
+    </Style>
 </ResourceDictionary>

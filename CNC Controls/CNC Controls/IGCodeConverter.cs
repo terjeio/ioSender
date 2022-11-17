@@ -1,13 +1,13 @@
 ﻿/*
  * IGCodeConverter.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.15 / 2020-04-08 / Io Engineering (Terje Io)
+ * v0.41 / 2022-07-19 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2020, Io Engineering (Terje Io)
+Copyright (c) 2018-2022, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -42,6 +42,7 @@ namespace CNC.Controls
     public interface IGCodeConverter
     {
         string FileType { get; }
+        string FileExtensions { get; }
         bool LoadFile(CNC.Controls.GCode job, string filename);
     }
 }

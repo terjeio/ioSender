@@ -1,13 +1,13 @@
 ﻿/*
  * Excellon2GCode.cs - part of CNC Converters library
  *
- * v0.16 / 2020-04-11 / Io Engineering (Terje Io)
+ * v0.41 / 2022-07-19 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020, Io Engineering (Terje Io)
+Copyright (c) 2020-2022, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -68,7 +68,7 @@ namespace CNC.Converters
             G05
         }
 
-        private bool isDrillMode = false, isMetric = true;
+        private bool isDrillMode = true, isMetric = true;
         private bool? isHeader = null;
         private List<JobParametersViewModel.Tool> tools = new List<JobParametersViewModel.Tool>();
         private List<ExcellonCommand> commands = new List<ExcellonCommand>();
@@ -76,7 +76,8 @@ namespace CNC.Converters
         private Point3D lastPos = new Point3D();
         private JobParametersViewModel settings = new JobParametersViewModel();
 
-        public string FileType { get { return "drl"; } }
+        public string FileType { get { return "Excellon files"; } }
+        public string FileExtensions { get { return "drl,xln"; } }
 
         // M48 Start header
         // M71 metric
@@ -89,6 +90,7 @@ namespace CNC.Converters
         public bool LoadFile(CNC.Controls.GCode job, string filename)
         {
             bool ok = true, leadingZeros = false;
+            double scaleFactor = 0d;
             JobParametersViewModel.Tool tool = new JobParametersViewModel.Tool { Id = 0, Diameter = 0d };
 
             this.job = job;
@@ -117,26 +119,30 @@ namespace CNC.Converters
 
                         else if (isHeader == true)
                         {
-                            switch (s)
+                            var hdr = s.Split(',');
+
+                            switch (hdr[0])
                             {
                                 case "METRIC":
                                     isMetric = true;
-                                    leadingZeros = false;
-                                    break;
-
-                                case "METRIC,TZ":
-                                    isMetric = true;
-                                    leadingZeros = true;
+                                    leadingZeros = hdr.Length > 1 && hdr[1] == "TZ";
+                                    if (hdr.Length > 2)
+                                    {
+                                        var scale = hdr[2].Split('.');
+                                        if(scale.Length == 2)
+                                            scaleFactor = dbl.Parse("1" + scale[1]);
+                                    }
                                     break;
 
                                 case "INCH":
                                     isMetric = false;
-                                    leadingZeros = false;
-                                    break;
-
-                                case "INCH,TZ":
-                                    isMetric = false;
-                                    leadingZeros = true;
+                                    leadingZeros = hdr.Length > 1 && hdr[1] == "TZ";
+                                    if (hdr.Length > 2)
+                                    {
+                                        var scale = hdr[2].Split('.');
+                                        if (scale.Length == 2)
+                                            scaleFactor = dbl.Parse("1" + scale[1]);
+                                    }
                                     break;
 
                                 case "%":
@@ -177,7 +183,7 @@ namespace CNC.Converters
                                         int g85pos = s.IndexOf("G85");
                                         string args = g85pos >= 0 ? s.Substring(0, g85pos) : s;
                                         int ypos = args.IndexOf('Y');
-                                        double factor = leadingZeros ? (ypos == 8 ? 1000d : 10000d) : 1.0;
+                                        double factor = scaleFactor == 0d ? (leadingZeros ? (ypos == 8 ? 1000d : 10000d) : 1.0) : scaleFactor;
                                         var cmd = new ExcellonCommand();
                                         cmd.Command = g85pos >= 0 ? "Slot" : "Drill";
                                         cmd.tool = tool.Id;

@@ -1,7 +1,7 @@
 ﻿/*
  * CenterFinderControl.xaml.cs - part of CNC Probing library
  *
- * v0.37 / 2022-02-21 / Io Engineering (Terje Io)
+ * v0.41 / 2022-11-13 / Io Engineering (Terje Io)
  *
  */
 
@@ -80,6 +80,7 @@ namespace CNC.Controls.Probing
 
             if (activate)
             {
+                probing.AllowMeasure = true;
                 probing.Instructions = ((string)FindResource("Instructions")).Replace("\\n", "\n");
                 probing.PropertyChanged += Probing_PropertyChanged;
             } else
@@ -135,7 +136,7 @@ namespace CNC.Controls.Probing
 
             if (!probing.Program.Init())
             {
-                probing.Message = (string)FindResource("InitFailed");
+                probing.Message = (string)FindResource("InitFailed") + " " + probing.Message;
                 return false;
             }
 
@@ -295,6 +296,9 @@ namespace CNC.Controls.Probing
                 return;
             }
 
+            if (!probing.VerifyProbe())
+                return;
+
             pass = preview ? 1 : probing.Passes;
 
             if (CreateProgram(preview))
@@ -310,8 +314,11 @@ namespace CNC.Controls.Probing
                     else
                     {
                         probing.Program.Execute(true);
-                        OnCompleted();
+                        if(OnCompleted())
+                            probing.WaitForIdle(string.Empty);
                     }
+
+
                 } while (--pass != 0 && CreateProgram(preview));
             }
         }
@@ -375,19 +382,27 @@ namespace CNC.Controls.Probing
 
                 if (ok && pass == 1)
                 {
-                    if (probing.CoordinateMode == ProbingViewModel.CoordMode.G92)
+                    switch(probing.CoordinateMode)
                     {
-                        center.X = probing.ProbeOffsetX;
-                        center.Y = probing.ProbeOffsetY;
-                        probing.WaitForResponse("G92" + center.ToString(axisflags));
-                        if (!probing.Grbl.IsParserStateLive)
-                            probing.Grbl.ExecuteCommand("$G");
-                    }
-                    else
-                    {
-                        center.X += probing.ProbeOffsetX;
-                        center.Y += probing.ProbeOffsetY;
-                        probing.WaitForResponse(string.Format("G10L2P{0}{1}", probing.CoordinateSystem, center.ToString(axisflags)));
+                        case ProbingViewModel.CoordMode.Measure:
+                            center.X += probing.ProbeOffsetX;
+                            center.Y += probing.ProbeOffsetY;
+                            probing.Measurement.Add(center, axisflags, ProbingType);
+                            break;
+
+                        case ProbingViewModel.CoordMode.G92:
+                            center.X = probing.ProbeOffsetX;
+                            center.Y = probing.ProbeOffsetY;
+                            probing.WaitForResponse("G92" + center.ToString(axisflags));
+                            if (!probing.Grbl.IsParserStateLive)
+                                probing.Grbl.ExecuteCommand("$G");
+                            break;
+
+                        case ProbingViewModel.CoordMode.G10:
+                            center.X += probing.ProbeOffsetX;
+                            center.Y += probing.ProbeOffsetY;
+                            probing.WaitForResponse(string.Format("G10L2P{0}{1}", probing.CoordinateSystem, center.ToString(axisflags)));
+                            break;
                     }
                 }
 

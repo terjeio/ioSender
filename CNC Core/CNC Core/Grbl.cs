@@ -1,7 +1,7 @@
 ﻿/*
  * Grbl.cs - part of CNC Controls library
  *
- * v0.40 / 2022-07-16 / Io Engineering (Terje Io)
+ * v0.41 / 2022-09-29 / Io Engineering (Terje Io)
  *
  */
 
@@ -124,7 +124,6 @@ namespace CNC.Core
             FORMAT_METRIC = "###0.000",
             FORMAT_IMPERIAL = "##0.0000",
             NO_TOOL = "None",
-            SIGNALS = "XYZABCEPRDHSBTOW", // Keep in sync with Signals enum below!!
             THCSIGNALS = "AERTOVHDU"; // Keep in sync with THCSignals enum below!!
 
         public const int
@@ -303,7 +302,7 @@ namespace CNC.Core
     }
 
     [Flags]
-    public enum Signals : int // Keep in sync with SIGNALS constant above
+    public enum Signals : int // Keep in sync with GrblInfo.SignalLetters constant below
     {
         Off = 0,
         LimitX = 1 << 0,
@@ -312,16 +311,20 @@ namespace CNC.Core
         LimitA = 1 << 3,
         LimitB = 1 << 4,
         LimitC = 1 << 5,
-        EStop  = 1 << 6,
-        Probe  = 1 << 7,
-        Reset = 1 << 8,
-        SafetyDoor = 1 << 9,
-        Hold = 1 << 10,
-        CycleStart = 1 << 11,
-        BlockDelete = 1 << 12,
-        OptionalStop = 1 << 13,
-        ProbeDisconnected = 1 << 14,
-        MotorWarning = 1 << 15
+        LimitU = 1 << 6,
+        LimitV = 1 << 7,
+        LimitW = 1 << 8,
+        EStop = 1 << 9,
+        Probe  = 1 << 10,
+        Reset = 1 << 11,
+        SafetyDoor = 1 << 12,
+        Hold = 1 << 13,
+        CycleStart = 1 << 14,
+        BlockDelete = 1 << 15,
+        OptionalStop = 1 << 16,
+        ProbeDisconnected = 1 << 17,
+        MotorWarning = 1 << 18,
+        MotorFault = 1 << 19
     }
 
     [Flags]
@@ -489,9 +492,9 @@ namespace CNC.Core
     public class CoordinateValues<T> : ViewModelBase
     {
         private bool _suspend = false;
-        private T[] arr = new T[6];
+        private T[] arr = new T[9];
 
-        public int Length { get { return 6; } }
+        public int Length { get { return 9; } }
         public bool SuspendNotifications
         {
             get { return _suspend; }
@@ -517,10 +520,58 @@ namespace CNC.Core
                 {
                     arr[i] = value;
                     if(!_suspend)
-                        OnPropertyChanged(GrblInfo.AxisIndexToLetter(i));
+                        OnPropertyChanged("XYZABCUVW".Substring(i, 1));
                 }
             }
         }
+    }
+
+    public class AxisLetter : ViewModelBase
+    {
+        public AxisLetter()
+        {
+            Values.PropertyChanged += Values_PropertyChanged;
+
+            Remap(GrblInfo.AxisLetters);
+        }
+
+        private void Values_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            OnPropertyChanged(e.PropertyName);
+        }
+
+        public void Remap(string map)
+        {
+            int i;
+            for (i = 0; i < map.Length; i++)
+                Values[i] = map.Substring(i, 1);
+
+            for(; i < Values.Length; i++)
+                Values[i] = "-";
+        }
+
+        public string All
+        {
+            get
+            {
+                string all = string.Empty;
+                for (int i = 0; i < Values.Length; i++)
+                    all += Values[i];
+
+                return all;
+            }
+        }
+
+        public CoordinateValues<string> Values { get; private set; } = new CoordinateValues<string>();
+        public string X { get { return Values[0]; } set { Values[0] = value; } }
+        public string Y { get { return Values[1]; } set { Values[1] = value; } }
+        public string Z { get { return Values[2]; } set { Values[2] = value; } }
+        public string A { get { return Values[3]; } set { Values[3] = value; } }
+        public string B { get { return Values[4]; } set { Values[4] = value; } }
+        public string C { get { return Values[5]; } set { Values[5] = value; } }
+        public string U { get { return Values[6]; } set { Values[6] = value; } }
+        public string V { get { return Values[7]; } set { Values[7] = value; } }
+        public string W { get { return Values[8]; } set { Values[8] = value; } }
     }
 
     public class Position : ViewModelBase
@@ -732,6 +783,9 @@ namespace CNC.Core
         public double A { get { return Values[3]; } set { Values[3] = value; } }
         public double B { get { return Values[4]; } set { Values[4] = value; } }
         public double C { get { return Values[5]; } set { Values[5] = value; } }
+        public double U { get { return Values[6]; } set { Values[6] = value; } }
+        public double V { get { return Values[7]; } set { Values[7] = value; } }
+        public double W { get { return Values[8]; } set { Values[8] = value; } }
     }
 
     public class CoordinateSystem : Position
@@ -823,7 +877,8 @@ namespace CNC.Core
             NumAxes = 3;
         }
 
-        public static string AxisLetters { get; private set; } = "XYZABC";
+        public static string AxisLetters { get; private set; } = "XYZABCUVW";
+        public static string SignalLetters { get; private set; } = "XYZABCUVWEPRDHSBTOMF"; // Keep in sync with Signals enum above!!
         public static string PositionFormatString { get; private set; } = string.Empty;
         public static string Version { get; private set; } = string.Empty;
         public static int Build { get; private set; } = 0;
@@ -878,11 +933,13 @@ namespace CNC.Core
         public static string IpAddress { get; private set; } = string.Empty;
         public static bool HasPIDLog { get; private set; }
         public static bool HasProbe { get; private set; } = true;
+        public static bool HasRTC { get; private set; } = false;
         public static bool HomingEnabled { get; internal set; } = true;
         public static AxisFlags HomingDirection { get; internal set; } = AxisFlags.None;
         public static bool UseLegacyRTCommands { get; internal set; } = true;
         public static bool MPGMode { get; set; }
         public static bool HasFirmwareJog { get; internal set; } = false;
+        public static bool LightBurnCluster { get; internal set; } = false;
         public static bool LatheModeEnabled
         {
             get { return GrblParserState.LatheMode != LatheMode.Disabled; }
@@ -1147,6 +1204,18 @@ namespace CNC.Core
                             NumTools = int.Parse(s[4], CultureInfo.InvariantCulture);
                         break;
 
+                    case "AXS":
+                        NumAxes = int.Parse(valuepair[1], CultureInfo.InvariantCulture);
+                        AxisLetters = valuepair[2];
+                        if (Grbl.GrblViewModel != null) {
+                            Grbl.GrblViewModel.AxisLetter.Remap(AxisLetters);
+                            AxisLetters = Grbl.GrblViewModel.AxisLetter.All;
+                            SignalLetters = AxisLetters + SignalLetters.Substring(9);
+                            Grbl.GrblViewModel.ClearSignals();
+                            NumAxes = Grbl.GrblViewModel.NumAxes;
+                        }
+                        break;
+
                     case "NEWOPT":
                         NewOptions = valuepair[1];
                         string[] s2 = valuepair[1].Split(',');
@@ -1155,85 +1224,94 @@ namespace CNC.Core
                             if (value.StartsWith("TMC="))
                                 TrinamicDrivers = value.Substring(4);
                             else switch (value)
-                                {
-                                    case "ENUMS":
-                                        HasEnums = true;
-                                        break;
+                            {
+                                case "ENUMS":
+                                    HasEnums = true;
+                                    break;
 
-                                    case "EXPR":
-                                        ExpressionsSupported = true;
-                                        break;
+                                case "EXPR":
+                                    ExpressionsSupported = true;
+                                    break;
 
-                                    case "TC":
-                                        ManualToolChange = true;
-                                        break;
+                                case "TC":
+                                    ManualToolChange = true;
+                                    break;
 
-                                    case "ATC":
-                                        HasATC = true;
-                                        break;
+                                case "ATC":
+                                    HasATC = true;
+                                    break;
 
-                                    case "ETH":
-                                        break;
+                                case "RTC":
+                                    HasRTC = true;
+                                    break;
 
-                                    case "HOME":
-                                        HomingEnabled = true;
-                                        break;
+                                case "ETH":
+                                    break;
 
-                                    case "SD":
-                                        HasSDCard = true;
-                                        break;
+                                case "HOME":
+                                    HomingEnabled = true;
+                                    break;
 
-                                    case "SED":
-                                        HasSettingDescriptions = true;
-                                        break;
+                                case "SD":
+                                    HasSDCard = true;
+                                    break;
 
-                                    case "YM":
-                                        if(UploadProtocol == string.Empty)
-                                            UploadProtocol = "YModem";
-                                        break;
+                                case "SED":
+                                    HasSettingDescriptions = true;
+                                    break;
 
-                                    case "FTP":
-                                        UploadProtocol = "FTP";
-                                        break;
+                                case "YM":
+                                    if(UploadProtocol == string.Empty)
+                                        UploadProtocol = "YModem";
+                                    break;
 
-                                    case "PID":
-                                        HasPIDLog = true;
-                                        break;
+                                case "FTP":
+                                    UploadProtocol = "FTP";
+                                    break;
 
-                                    case "NOPROBE":
-                                        HasProbe = false;
-                                        break;
+                                case "PID":
+                                    HasPIDLog = true;
+                                    break;
 
-                                    case "LATHE":
-                                        LatheModeEnabled = true;
-                                        break;
+                                case "NOPROBE":
+                                    HasProbe = false;
+                                    break;
 
-                                    case "BD":
-                                        OptionalSignals |= Signals.BlockDelete;
-                                        break;
+                                case "LATHE":
+                                    LatheModeEnabled = true;
+                                    break;
 
-                                    case "ES":
-                                        OptionalSignals |= Signals.EStop;
-                                        break;
+                                case "BD":
+                                    OptionalSignals |= Signals.BlockDelete;
+                                    break;
 
-                                    case "MW":
-                                        OptionalSignals |= Signals.MotorWarning;
-                                        break;
+                                case "ES":
+                                    OptionalSignals |= Signals.EStop;
+                                    break;
 
-                                    case "OS":
-                                        OptionalSignals |= Signals.OptionalStop;
-                                        break;
+                                case "MW":
+                                    OptionalSignals |= Signals.MotorWarning;
+                                    break;
 
-                                    case "RT+":
-                                    case "RT-":
-                                        UseLegacyRTCommands = false;
-                                        break;
-                                }
+                                case "OS":
+                                    OptionalSignals |= Signals.OptionalStop;
+                                    break;
+
+                                case "RT+":
+                                case "RT-":
+                                    UseLegacyRTCommands = false;
+                                    break;
+                            }
                         }
                         break;
 
                     case "FIRMWARE":
                         Firmware = valuepair[1];
+                        SystemInfo.Add(data);
+                        break;
+
+                    case "CLUSTER":
+                        LightBurnCluster = true;
                         SystemInfo.Add(data);
                         break;
 

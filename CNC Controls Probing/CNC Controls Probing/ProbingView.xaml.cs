@@ -1,7 +1,7 @@
 ﻿/*
  * ProbingView.xaml.cs - part of CNC Probing library
  *
- * v0.37 / 2022-02-21 / Io Engineering (Terje Io)
+ * v0.41 / 2022-11-13 / Io Engineering (Terje Io)
  *
  */
 
@@ -82,9 +82,12 @@ namespace CNC.Controls.Probing
                 keyboard.AddHandler(Key.S, ModifierKeys.Alt, StopProbe, this);
                 keyboard.AddHandler(Key.C, ModifierKeys.Alt, ProbeConnectedToggle, this);
 
+                DRO.DataContext = grbl;
                 DataContext = model = new ProbingViewModel(DataContext as GrblViewModel, profiles);
 
                 grbl.OnCameraProbe += addCameraPosition;
+
+                showDRO();
             }
         }
 
@@ -134,7 +137,7 @@ namespace CNC.Controls.Probing
         private bool StartProbe(Key key)
         {
             focusedControl = Keyboard.FocusedElement;
-            getView(tab.SelectedItem as TabItem)?.Start();
+            getView(tab.SelectedItem as TabItem)?.Start(model.PreviewEnable);
 
             return true;
         }
@@ -207,6 +210,7 @@ namespace CNC.Controls.Probing
 
         private void ProbingView_SizeChanged(object sender, SizeChangedEventArgs e)
         {
+            showDRO();
             showProbeProperties();
         }
 
@@ -264,6 +268,7 @@ namespace CNC.Controls.Probing
                 else
                     GrblParserState.Get(true);
 
+                model.ProbeVerified = !AppConfig.Settings.Probing.ValidateProbeConnected;
                 model.DistanceMode = GrblParserState.DistanceMode;
                 model.Tool = model.Grbl.Tool == GrblConstants.NO_TOOL ? "0" : model.Grbl.Tool;
                 model.CanProbe = !model.Grbl.Signals.Value.HasFlag(Signals.Probe);
@@ -289,6 +294,7 @@ namespace CNC.Controls.Probing
                 cycleStartSignal = model.Grbl.Signals.Value.HasFlag(Signals.CycleStart);
 
                 DisplayPosition(model.Grbl);
+
             }
             else
             {
@@ -403,6 +409,9 @@ namespace CNC.Controls.Probing
                 {
                     var view = getView(e.AddedItems[0] as TabItem);
                     model.Positions.Clear();
+                    if (!model.AllowMeasure && model.CoordinateMode == ProbingViewModel.CoordMode.Measure)
+                        model.CoordinateMode = ProbingViewModel.CoordMode.G10;
+                    model.AllowMeasure = false;
                     model.ProbingType = view.ProbingType;
                     model.Message = string.Empty;
                     model.PreviewEnable = false;
@@ -417,6 +426,25 @@ namespace CNC.Controls.Probing
                 }
                 e.Handled = true;
             }
+        }
+
+        // https://stackoverflow.com/questions/5707143/how-to-get-the-width-height-of-a-collapsed-control-in-wpf
+        private void showDRO()
+        {
+            double width;
+
+            if (droPanel.Visibility == Visibility.Collapsed)
+            {
+                droPanel.Visibility = Visibility.Hidden;
+                droPanel.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+                width = droPanel.DesiredSize.Width;
+                droPanel.Visibility = Visibility.Collapsed;
+            }
+            else
+                width = droPanel.ActualWidth;
+
+            droPanel.Visibility = (tab.ActualWidth + width + t1.ActualWidth + 20) < ActualWidth ? Visibility.Visible : Visibility.Collapsed;
+            dp.Width = droPanel.Visibility == Visibility.Visible  ? 460 : 240;
         }
     }
 }

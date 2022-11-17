@@ -1,7 +1,7 @@
 ﻿/*
  * GCodeParser.cs - part of CNC Controls library
  *
- * v0.40 / 2022-07-14 / Io Engineering (Terje Io)
+ * v0.41 / 2022-09-29 / Io Engineering (Terje Io)
  *
  */
 
@@ -74,7 +74,7 @@ namespace CNC.GCode
             public double Q;
             public double R;
             public double S;
-            public double[] XYZ = new double[6];
+            public double[] XYZ = new double[9];
             public uint N;
             public int H;
             public int T;
@@ -86,6 +86,9 @@ namespace CNC.GCode
             public double A { get { return XYZ[3]; } set { XYZ[3] = value; } }
             public double B { get { return XYZ[4]; } set { XYZ[4] = value; } }
             public double C { get { return XYZ[5]; } set { XYZ[5] = value; } }
+            public double U { get { return XYZ[6]; } set { XYZ[6] = value; } }
+            public double V { get { return XYZ[7]; } set { XYZ[7] = value; } }
+            public double W { get { return XYZ[8]; } set { XYZ[8] = value; } }
 
             public double I { get { return IJK[0]; } set { IJK[0] = value; } }
             public double J { get { return IJK[1]; } set { IJK[1] = value; } }
@@ -152,7 +155,10 @@ namespace CNC.GCode
             X = 1 << 18,
             Y = 1 << 19,
             Z = 1 << 20,
-            Q = 1 << 21
+            Q = 1 << 21,
+            U = 1 << 22,
+            V = 1 << 23,
+            W = 1 << 24
         }
 
         private enum AxisCommand
@@ -187,6 +193,7 @@ namespace CNC.GCode
         public event ToolChangedHandler ToolChanged = null;
 
         private bool motionModeChanged = false;
+        private bool remapU2A = false, remapV2B = false, remapW2C = false;
         private GCValues gcValues = new GCValues();
         private GCodeToken last_token = new GCodeToken();
         private NGCExpr ngcexpr;
@@ -238,6 +245,9 @@ namespace CNC.GCode
             IsScaled = motionModeChanged = false;
             Decimals = 3;
             zorg = feedRate = 0d;
+            remapU2A = !GrblInfo.AxisLetters.Contains('A');
+            remapV2B = !GrblInfo.AxisLetters.Contains('B');
+            remapW2C = !GrblInfo.AxisLetters.Contains('C');
         }
 
         private bool VerifyIgnore(string code, CommandIgnoreState state)
@@ -812,6 +822,8 @@ namespace CNC.GCode
                                 break;
 
                             case 'S':
+                                if (GrblInfo.LightBurnCluster && block.Contains(':'))
+                                    pos = block.Length; // Skip rest of the block assuming there are no other commands present
                                 gcValues.S = value;
                                 wordFlag = WordFlags.S;
                                 break;
@@ -860,6 +872,51 @@ namespace CNC.GCode
                                 wordFlag = WordFlags.C;
                                 axisWords |= GCode.AxisFlags.C;
                                 gcValues.C = Math.Round(value, Decimals);
+                                break;
+
+                            case 'U':
+                                if (remapU2A)
+                                {
+                                    wordFlag = WordFlags.A;
+                                    axisWords |= GCode.AxisFlags.A;
+                                    gcValues.A = Math.Round(value, Decimals);
+                                }
+                                else
+                                {
+                                    wordFlag = WordFlags.U;
+                                    axisWords |= GCode.AxisFlags.U;
+                                    gcValues.U = Math.Round(value, Decimals);
+                                }
+                                break;
+
+                            case 'V':
+                                if (remapV2B)
+                                {
+                                    wordFlag = WordFlags.B;
+                                    axisWords |= GCode.AxisFlags.B;
+                                    gcValues.B = Math.Round(value, Decimals);
+                                }
+                                else
+                                {
+                                    wordFlag = WordFlags.V;
+                                    axisWords |= GCode.AxisFlags.V;
+                                    gcValues.W = Math.Round(value, Decimals);
+                                }
+                                break;
+
+                            case 'W':
+                                if (remapW2C)
+                                {
+                                    wordFlag = WordFlags.C;
+                                    axisWords |= GCode.AxisFlags.C;
+                                    gcValues.C = Math.Round(value, Decimals);
+                                }
+                                else
+                                {
+                                    wordFlag = WordFlags.W;
+                                    axisWords |= GCode.AxisFlags.W;
+                                    gcValues.W = Math.Round(value, Decimals);
+                                }
                                 break;
 
                             default:
@@ -1986,19 +2043,19 @@ namespace CNC.GCode
         }
     }
 
-    public class GCAxisCommand6 : GCodeToken
+    public class GCAxisCommand9 : GCodeToken
     {
-        public GCAxisCommand6()
+        public GCAxisCommand9()
         { }
 
-        public GCAxisCommand6(Commands command, uint lnr, double[] values, AxisFlags axisFlags) : base(command, lnr)
+        public GCAxisCommand9(Commands command, uint lnr, double[] values, AxisFlags axisFlags) : base(command, lnr)
         {
             Array.Copy(values, Values, values.Length); // Only copy for num axes?
             AxisFlags = axisFlags;
         }
 
         [XmlIgnore]
-        public double[] Values { get; set; } = new double[6];
+        public double[] Values { get; set; } = new double[9];
         public AxisFlags AxisFlags { get; set; }
         public double X { get { return Values[0]; } set { Values[0] = value; } }
         public double Y { get { return Values[1]; } set { Values[1] = value; } }
@@ -2006,6 +2063,9 @@ namespace CNC.GCode
         public double A { get { return Values[3]; } set { Values[3] = value; } }
         public double B { get { return Values[4]; } set { Values[4] = value; } }
         public double C { get { return Values[5]; } set { Values[5] = value; } }
+        public double U { get { return Values[6]; } set { Values[6] = value; } }
+        public double V { get { return Values[7]; } set { Values[7] = value; } }
+        public double W { get { return Values[8]; } set { Values[8] = value; } }
 
         public new string ToString()
         {
@@ -2048,7 +2108,7 @@ namespace CNC.GCode
         }
     }
 
-    public class GCLinearMotion : GCAxisCommand6
+    public class GCLinearMotion : GCAxisCommand9
     {
         public GCLinearMotion()
         { }
@@ -2062,7 +2122,7 @@ namespace CNC.GCode
         }
     }
 
-    public class GCAbsLinearMotion : GCAxisCommand6
+    public class GCAbsLinearMotion : GCAxisCommand9
     {
         public GCAbsLinearMotion()
         { }
@@ -2854,7 +2914,7 @@ namespace CNC.GCode
         }
     }
 
-    public class GCCoordinateSystem : GCAxisCommand6
+    public class GCCoordinateSystem : GCAxisCommand9
     {
         public GCCoordinateSystem()
         { }
@@ -2939,7 +2999,7 @@ namespace CNC.GCode
         }
     }
 
-    public class GCScaling : GCAxisCommand6
+    public class GCScaling : GCAxisCommand9
     {
         public GCScaling()
         { }

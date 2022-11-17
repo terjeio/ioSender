@@ -99,9 +99,12 @@
                 <local:SignalControl Label="X" IsSet="{Binding Path=Signals[(core:Signals)LimitX], Mode=OneWay}"/>
                 <local:SignalControl Label="Y" IsSet="{Binding Path=Signals[(core:Signals)LimitY], Mode=OneWay}" Style="{StaticResource YAxisVisibleStyle}"/>
                 <local:SignalControl Label="Z" IsSet="{Binding Path=Signals[(core:Signals)LimitZ], Mode=OneWay}" Style="{StaticResource ZAxisVisibleStyle}"/>
-                <local:SignalControl Label="A" IsSet="{Binding Path=Signals[(core:Signals)LimitA], Mode=OneWay}" Style="{StaticResource AAxisVisibleStyle}"/>
-                <local:SignalControl Label="B" IsSet="{Binding Path=Signals[(core:Signals)LimitB], Mode=OneWay}" Style="{StaticResource BAxisVisibleStyle}"/>
-                <local:SignalControl Label="C" IsSet="{Binding Path=Signals[(core:Signals)LimitC], Mode=OneWay}" Style="{StaticResource CAxisVisibleStyle}"/>
+                <local:SignalControl Label="{Binding Path=AxisLetter.A, Mode=OneWay}" IsSet="{Binding Path=Signals[(core:Signals)LimitA], Mode=OneWay}" Style="{StaticResource AAxisVisibleStyle}"/>
+                <local:SignalControl Label="{Binding Path=AxisLetter.B, Mode=OneWay}" IsSet="{Binding Path=Signals[(core:Signals)LimitB], Mode=OneWay}" Style="{StaticResource BAxisVisibleStyle}"/>
+                <local:SignalControl Label="{Binding Path=AxisLetter.C, Mode=OneWay}" IsSet="{Binding Path=Signals[(core:Signals)LimitC], Mode=OneWay}" Style="{StaticResource CAxisVisibleStyle}"/>
+                <local:SignalControl Label="U" IsSet="{Binding Path=Signals[(core:Signals)LimitU], Mode=OneWay}" Style="{StaticResource UAxisVisibleStyle}"/>
+                <local:SignalControl Label="V" IsSet="{Binding Path=Signals[(core:Signals)LimitV], Mode=OneWay}" Style="{StaticResource VAxisVisibleStyle}"/>
+                <local:SignalControl Label="W" IsSet="{Binding Path=Signals[(core:Signals)LimitW], Mode=OneWay}" Style="{StaticResource WAxisVisibleStyle}"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,3,0" VerticalAlignment="Center" DockPanel.Dock="Right">
                 <local:SignalControl x:Uid="lbl_signalMotorWarning" Label="W" ToolTip="Motor warning" IsSet="{Binding Path=Signals[(core:Signals)MotorWarning], Mode=OneWay}" Style="{StaticResource MotorWarningVisibleStyle}"/>

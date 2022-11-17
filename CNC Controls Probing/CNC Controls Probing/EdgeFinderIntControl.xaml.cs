@@ -1,7 +1,7 @@
 ﻿/*
  * EdgeFinderIntControl.xaml.cs - part of CNC Probing library
  *
- * v0.37 / 2022-02-21 / Io Engineering (Terje Io)
+ * v0.41 / 2022-11-13 / Io Engineering (Terje Io)
  *
  */
 
@@ -67,8 +67,10 @@ namespace CNC.Controls.Probing
 
         public void Activate(bool activate)
         {
-            if (activate)
+            if (activate) {
+                (DataContext as ProbingViewModel).AllowMeasure = true;
                 (DataContext as ProbingViewModel).Instructions = ((string)FindResource("Instructions")).Replace("\\n", "\n");
+            }
         }
 
         public void Start(bool preview = false)
@@ -83,6 +85,9 @@ namespace CNC.Controls.Probing
                 MessageBox.Show((string)FindResource("SelectType"), "Edge finder", MessageBoxButton.OK, MessageBoxImage.Exclamation);
                 return;
             }
+
+            if(!probing.VerifyProbe())
+                return;
 
             if (!probing.Program.Init())
                 return;
@@ -264,24 +269,33 @@ namespace CNC.Controls.Probing
 
                 if (ok)
                 {
-                    if (probing.CoordinateMode == ProbingViewModel.CoordMode.G92)
+                    switch (probing.CoordinateMode)
                     {
-                        if ((ok = !isCancelled && probing.GotoMachinePosition(pos, AxisFlags.Z)))
-                        {
-                            pos.X = -probing.ProbeOffsetX;
-                            pos.Y = -probing.ProbeOffsetY;
-                            pos.Z = probing.WorkpieceHeight + probing.TouchPlateHeight;
-                            probing.WaitForResponse("G92" + pos.ToString(axisflags));
-                            if (!isCancelled && axisflags.HasFlag(AxisFlags.Z))
-                                probing.GotoMachinePosition(probing.StartPosition, AxisFlags.Z);
-                        }
-                    }
-                    else
-                    {
-                        pos.X += probing.ProbeOffsetX;
-                        pos.Y += probing.ProbeOffsetY;
-                        pos.Z -= probing.WorkpieceHeight + probing.TouchPlateHeight + probing.Grbl.ToolOffset.Z;
-                        probing.WaitForResponse(string.Format("G10L2P{0}{1}", probing.CoordinateSystem, pos.ToString(axisflags)));
+                        case ProbingViewModel.CoordMode.Measure:
+                            pos.X += probing.ProbeOffsetX;
+                            pos.Y += probing.ProbeOffsetY;
+                            pos.Z -= probing.WorkpieceHeight + probing.TouchPlateHeight + probing.Grbl.ToolOffset.Z;
+                            probing.Measurement.Add(pos, axisflags, ProbingType);
+                            break;
+
+                        case ProbingViewModel.CoordMode.G92:
+                            if ((ok = !isCancelled && probing.GotoMachinePosition(pos, AxisFlags.Z)))
+                            {
+                                pos.X = -probing.ProbeOffsetX;
+                                pos.Y = -probing.ProbeOffsetY;
+                                pos.Z = probing.WorkpieceHeight + probing.TouchPlateHeight;
+                                probing.WaitForResponse("G92" + pos.ToString(axisflags));
+                                if (!isCancelled && axisflags.HasFlag(AxisFlags.Z))
+                                    probing.GotoMachinePosition(probing.StartPosition, AxisFlags.Z);
+                            }
+                            break;
+
+                        case ProbingViewModel.CoordMode.G10:
+                            pos.X += probing.ProbeOffsetX;
+                            pos.Y += probing.ProbeOffsetY;
+                            pos.Z -= probing.WorkpieceHeight + probing.TouchPlateHeight + probing.Grbl.ToolOffset.Z;
+                            probing.WaitForResponse(string.Format("G10L2P{0}{1}", probing.CoordinateSystem, pos.ToString(axisflags)));
+                            break;
                     }
                 }
 

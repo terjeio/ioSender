@@ -1,7 +1,7 @@
 ﻿/*
  * Hpgl2GCode.cs - part of CNC Converters library
  *
- * v0.16 / 2022-12-01 / Io Engineering (Terje Io)
+ * v0.41 / 2022-07-19 / Io Engineering (Terje Io)
  *
  */
 
@@ -97,7 +97,8 @@ namespace CNC.Converters
         bool isDown = false;
         Point3D offset = new Point3D(100000d, 100000d, 0d), pos = new Point3D();
 
-        public string FileType { get { return "plt"; } }
+        public string FileType { get { return "HPGL files"; } }
+        public string FileExtensions { get { return "plt"; } }
 
         private void toVectors (List<HPGLCommand> commands)
         {

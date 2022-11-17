@@ -1,0 +1,13 @@
+﻿<Window x:Class="CNC.Controls.Probing.ProbeVerify"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CNC.Controls.Probing"
+        mc:Ignorable="d"
+        Title="Sender" Height="100" Width="300" ResizeMode="NoResize"
+        Loaded="Window_Loaded" Closing="Window_Closing" Icon="Resources/App.ico">
+    <Grid Background="Snow">
+        <Label x:Uid="str_probeVerify" x:Name="label" Content="Assert probe to verify connection." HorizontalAlignment="Center" Margin="0" VerticalAlignment="Center" FontSize="16"/>
+    </Grid>
+</Window>

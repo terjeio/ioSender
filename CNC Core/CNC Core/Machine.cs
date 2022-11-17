@@ -1,13 +1,13 @@
 ﻿/*
  * Machine.cs - part of CNC Core library
  *
- * v0.36 / 2021-11-30 / Io Engineering (Terje Io)
+ * v0.41 / 2022-09-23 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020-2021, Io Engineering (Terje Io)
+Copyright (c) 2020-2022, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -51,10 +51,10 @@ namespace CNC.Core
         protected bool isRelative = false;
 
         protected int _tool = 0;
-        protected double[] offsets = new double[6];
-        protected double[] origin = new double[6];
-        protected double[] scaleFactors = new double[6];
-        protected double[] toolOffsets = new double[6];
+        protected double[] offsets = new double[9];
+        protected double[] origin = new double[9];
+        protected double[] scaleFactors = new double[9];
+        protected double[] toolOffsets = new double[9];
         protected List<CoordinateSystem> coordinateSystems = new List<CoordinateSystem>();
         protected CoordinateSystem coordinateSystem, g28, g30, g92;
         protected List<Tool> toolTable = new List<Tool>();

@@ -1,7 +1,7 @@
 /*
  * GrblViewModel.cs - part of CNC Controls library
  *
- * v0.39 / 2022-06-24 / Io Engineering (Terje Io)
+ * v0.41 / 2022-09-23 / Io Engineering (Terje Io)
  *
  */
 
@@ -97,6 +97,7 @@ namespace CNC.Core
 
             _grblState.LastAlarm = 0;
 
+            AxisLetter.PropertyChanged += Axisletter_PropertyChanged;
             Signals.PropertyChanged += Signals_PropertyChanged;
             THCSignals.PropertyChanged += THCSignals_PropertyChanged;
             OptionalSignals.PropertyChanged += OptionalSignals_PropertyChanged;
@@ -107,6 +108,11 @@ namespace CNC.Core
             WorkPositionOffset.PropertyChanged += WorkPositionOffset_PropertyChanged;
             ProbePosition.PropertyChanged += ProbePosition_PropertyChanged;
             ToolOffset.PropertyChanged += ToolOffset_PropertyChanged;
+        }
+
+        private void Axisletter_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            OnPropertyChanged(nameof(AxisLetter));
         }
 
         private void WorkPositionOffset_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -219,6 +225,11 @@ namespace CNC.Core
             WorkPositionOffset.Clear();
             Position.Clear();
             ProgramLimits.Clear();
+        }
+
+        public void ClearSignals()
+        {
+            Set("Pn", string.Empty);
         }
 
         public PollGrbl Poller { get; } = new PollGrbl();
@@ -381,6 +392,7 @@ namespace CNC.Core
             set { Position.SuspendNotifications = value; }
         }
 
+        public AxisLetter AxisLetter { get; private set; } = new AxisLetter();
         public EnumFlags<AxisFlags> AxisHomed { get; private set; } = new EnumFlags<AxisFlags>(AxisFlags.None);
         public Position HomePosition { get; private set; } = new Position();
 
@@ -941,7 +953,7 @@ namespace CNC.Core
                         int s = 0;
                         foreach (char c in _pn)
                         {
-                            int i = GrblConstants.SIGNALS.IndexOf(c);
+                            int i = GrblInfo.SignalLetters.IndexOf(c);
                             if (i >= 0)
                                 s |= (1 << i);
                         }

@@ -1,7 +1,7 @@
 ﻿/*
  * AppConfig.cs - part of CNC Controls library
  *
- * v0.38 / 2022-04-20 / Io Engineering (Terje Io)
+ * v0.41 / 2022-11-09 / Io Engineering (Terje Io)
  *
  */
 
@@ -97,8 +97,10 @@ namespace CNC.Controls
     public class ProbeConfig : ViewModelBase
     {
         private bool _CheckProbeStatus = true;
+        private bool _ValidateProbeConnected = false;
 
         public bool CheckProbeStatus { get { return _CheckProbeStatus; } set { _CheckProbeStatus = value; OnPropertyChanged(); } }
+        public bool ValidateProbeConnected { get { return _ValidateProbeConnected; } set { _ValidateProbeConnected = value; OnPropertyChanged(); } }
     }
 
     [Serializable]
@@ -363,17 +365,17 @@ namespace CNC.Controls
             return !(port.ToLower().StartsWith("ws://") || char.IsDigit(port[0]));
         }
 
-        private void setPort(string port)
+        private void setPort(string port, string baud)
         {
-            if (!(port.ToLower().StartsWith("ws://") || char.IsDigit(port[0])) && port.IndexOf(':') == -1)
+            if (isComPort(port) && port.IndexOf(':') == -1)
             {
-                string prop = ":115200,N,8,1";
+                string prop = string.Format(":{0},N,8,1", string.IsNullOrEmpty(baud) ? "115200" : baud);
                 string[] values = port.Split('!');
                 if (isComPort(Base.PortParams))
                 {
                     var props = Base.PortParams.Substring(Base.PortParams.IndexOf(':')).Split(',');
                     if(props.Length >= 4)
-                        prop = string.Format("{0},{1},{2},{3}", props[0], props[1], props[2], props[3]);
+                        prop = string.Format(":{0},{1},{2},{3}", (string.IsNullOrEmpty(baud) ? props[0] : baud), props[1], props[2], props[3]);
                 }
                 port = values[0] + prop + (values.Length > 1 ? ",," + values[1] : "");
             }
@@ -385,7 +387,7 @@ namespace CNC.Controls
             int status = 0;
             bool selectPort = false;
             int jogMode = -1;
-            string port = string.Empty;
+            string port = string.Empty, baud = string.Empty;
 
             CNC.Core.Resources.Path = AppDomain.CurrentDomain.BaseDirectory;
 
@@ -413,6 +415,10 @@ namespace CNC.Controls
 
                     case "-port":
                         port = GetArg(args, p++);
+                        break;
+
+                    case "-baud":
+                        baud = GetArg(args, p++);
                         break;
 
                     case "-selectport":
@@ -457,7 +463,7 @@ namespace CNC.Controls
             if (!selectPort)
             {
                 if (!string.IsNullOrEmpty(port))
-                    setPort(port);
+                    setPort(port, baud);
 #if USEWEBSOCKET
                 if (Base.PortParams.ToLower().StartsWith("ws://"))
                     new WebsocketStream(Base.PortParams, dispatcher);
@@ -483,7 +489,7 @@ namespace CNC.Controls
 
                 else
                 {
-                    setPort(port);
+                    setPort(port, string.Empty);
 #if USEWEBSOCKET
                     if (port.ToLower().StartsWith("ws://"))
                         new WebsocketStream(Base.PortParams, dispatcher);
