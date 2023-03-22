@@ -37,6 +37,7 @@
                     <MenuItem x:Uid="mnu_run" Header="Run" Click="Run_Click" />
                     <MenuItem x:Uid="mnu_downloadRun" Header="D_ownload and run" Click="DownloadRun_Click" />
                     <MenuItem x:Uid="mnu_enableRewind" Header="Enable rewind" IsEnabled="{Binding Path=CanRewind}" IsChecked="{Binding Path=Rewind, Mode=TwoWay}" IsCheckable="True" />
+                    <MenuItem x:Uid="mnu_viewAll" Header="View all" IsEnabled="{Binding Path=CanViewAll}" IsChecked="{Binding Path=ViewAll, Mode=TwoWay}" IsCheckable="True" Click="ViewAll_Click"/>
                     <MenuItem x:Uid="mnu_delete" Header="Delete" IsEnabled="{Binding Path=CanDelete}" Click="Delete_Click" />
                 </ContextMenu>
             </DataGrid.ContextMenu>

@@ -1,5 +1,22 @@
 ## ioSender changelog
 
+2023-03-22: [Release 2.0.42](https://github.com/terjeio/Grbl-GCode-Sender/releases/tag/2.0.42).
+
+* Fix for incorrect handling of coordinates when controller is in inches mode (setting $13). Issue #283.  
+__NOTE:__ Probing and gcode conversions/transforms are performed in metric (G21 active), probing with controller is in inches mode has only been lightly tested.
+* Workaround for _MPos_ flyout not showing coordinates when number of axes > 3 plus fix for heightmap probing issues. Issue #279.
+* Cannot zero _DRO_ in probing tab, causes exception. Issue #273.
+* Fix for lathe mode _DRO_ display. Issue #270.
+* Fix for missing color selectors for 3D viewer in app setup. Issue #263.
+* Fix for inaccurate tool length offset calulated \(_Tool length offset_ tab\). Issue #262.
+* Fix for issue with heightmap transform corrupting arcs. Issue #261.
+* Added _View all_ submenu to SD card filelist popup menu, for getting an unfiltered list. Requires grblHAL controller with support for the _$F+_ command.
+* Improved handling for some grblHAL setting types.
+* Added Hungarian translation, thanks to @dobakszilard \(issue #267\).
+* Some minor changes and improvements.
+
+---
+
 2022-11-17: [Release 2.0.41](https://github.com/terjeio/Grbl-GCode-Sender/releases/tag/2.0.41).
 
 * Fix for incorrect handling of negative values entered in DRO. Issue #240.

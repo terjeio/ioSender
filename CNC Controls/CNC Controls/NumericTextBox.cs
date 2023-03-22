@@ -1,13 +1,13 @@
 ﻿/*
  * NumericTextBox.cs - part of CNC Controls library
  *
- * v0.41 / 2022-08-11 / Io Engineering (Terje Io)
+ * v0.42 / 2023-03-01 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2022, Io Engineering (Terje Io)
+Copyright (c) 2018-2023, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -53,9 +53,9 @@ namespace CNC.Controls
 
         public NumericTextBox()
         {
+            Height = 24;
             HorizontalContentAlignment = HorizontalAlignment.Right;
             VerticalContentAlignment = VerticalAlignment.Bottom;
-            Height = 24;
             TextWrapping = TextWrapping.NoWrap;
         }
 
@@ -67,13 +67,13 @@ namespace CNC.Controls
             DependencyProperty.Register(nameof(Value), typeof(double), typeof(NumericTextBox), new PropertyMetadata(double.NaN, new PropertyChangedCallback(OnValueChanged)));
         public double Value
         {
-            get { double v = (double)GetValue(ValueProperty); return v == double.NaN ? 0d : v; }
+            get { double v = (double)GetValue(ValueProperty); return double.IsNaN(v) ? 0d : v; }
             set { SetValue(ValueProperty, value); }
         }
         private static void OnValueChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (((NumericTextBox)d).updateText)
-                ((NumericTextBox)d).Text = double.IsNaN((double)e.NewValue) || double.IsNegativeInfinity((double)e.NewValue) ? "" : Math.Round((double)e.NewValue, ((NumericTextBox)d).np.Precision).ToString(((NumericTextBox)d).np.DisplayFormat, CultureInfo.InvariantCulture);
+                ((NumericTextBox)d).Text = double.IsNaN((double)e.NewValue) || double.IsNegativeInfinity((double)e.NewValue) ? string.Empty : Math.Round((double)e.NewValue, ((NumericTextBox)d).np.Precision).ToString(((NumericTextBox)d).np.DisplayFormat, CultureInfo.InvariantCulture);
         }
         //        public static bool CoerceValueChanged(DependencyObject d, object value)
         //        {
@@ -100,7 +100,7 @@ namespace CNC.Controls
             updateText = false;
             Value = double.NaN;
             updateText = true;
-            Text = string.Empty;
+            base.Text = string.Empty;
         }
 
         protected override void OnPreviewKeyUp(KeyEventArgs e)
@@ -146,7 +146,7 @@ namespace CNC.Controls
 
                 base.OnTextChanged(e);
             }
-            else if(Text == "" || Text == ".")
+            else if(Text == string.Empty || Text == ".")
             {
                 updateText = false;
                 Value = 0d;

@@ -1,0 +1,171 @@
+﻿CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,btn_addPosition:System.Windows.Controls.ContentControl.Content,Button,True,True,,Hozzáadás _pozíció
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,btn_addProfile:System.Windows.Controls.ContentControl.Content,Button,True,True,,...
+CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,btn_apply:System.Windows.Controls.ContentControl.Content,Button,True,True,,_Alkalmaz
+CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,btn_apply:System.Windows.Controls.ContentControl.Content,Button,True,True,,_Alkalmaz
+CNC.Controls.Probing.g.en-US.resources:csselectcontrol.baml,btn_clear:System.Windows.Controls.ContentControl.Content,Button,True,True,,Tisztít
+CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,btn_fromLimits:System.Windows.Controls.ContentControl.Content,Button,True,True,,Beállítás a program korlátaiból
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,btn_jog:System.Windows.Controls.ContentControl.Content,Button,True,True,,Kattintson a billentyűzet kocogás aktiválásához
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,btn_jog:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Ctrl+Shift az aktiváláshoz
+CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,btn_load:System.Windows.Controls.ContentControl.Content,Button,True,True,,_Betöltés
+CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,btn_probe:System.Windows.Controls.ContentControl.Content,Button,True,True,,_Szonda
+CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,btn_save:System.Windows.Controls.ContentControl.Content,Button,True,True,,_Mentés
+CNC.Controls.Probing.g.en-US.resources:csselectcontrol.baml,btn_setG92:System.Windows.Controls.ContentControl.Content,RadioButton,True,True,,Eltolás beállítása (G92)
+CNC.Controls.Probing.g.en-US.resources:csselectcontrol.baml,btn_setMeasure:System.Windows.Controls.ContentControl.Content,RadioButton,True,True,,Intézkedés
+CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,btn_start:System.Windows.Controls.ContentControl.Content,Button,True,True,,Start
+CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,btn_start:System.Windows.Controls.ContentControl.Content,Button,True,True,,Start
+CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,btn_start:System.Windows.Controls.ContentControl.Content,Button,True,True,,Start
+CNC.Controls.Probing.g.en-US.resources:edgefindercontrol.baml,btn_start:System.Windows.Controls.ContentControl.Content,Button,True,True,,Start
+CNC.Controls.Probing.g.en-US.resources:edgefinderintcontrol.baml,btn_start:System.Windows.Controls.ContentControl.Content,Button,True,True,,Start
+CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,btn_start:System.Windows.Controls.ContentControl.Content,Button,True,True,,Start
+CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,btn_stop:System.Windows.Controls.ContentControl.Content,Button,True,True,,Stop
+CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,btn_stop:System.Windows.Controls.ContentControl.Content,Button,True,True,,Stop
+CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,btn_stop:System.Windows.Controls.ContentControl.Content,Button,True,True,,Stop
+CNC.Controls.Probing.g.en-US.resources:edgefindercontrol.baml,btn_stop:System.Windows.Controls.ContentControl.Content,Button,True,True,,Stop
+CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,btn_stop:System.Windows.Controls.ContentControl.Content,Button,True,True,,Stop
+CNC.Controls.Probing.g.en-US.resources:edgefinderintcontrol.baml,btn_stop:System.Windows.Controls.ContentControl.Content,Button,True,True,,Stop
+CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,btn_useCamera:System.Windows.Controls.ContentControl.Content,Button,True,True,,Használja a kameraállásokat
+CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,chk_useX0Y0:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,"Használja X0,Y0"
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,fld_depth:CNC.Controls.NumericField.Label,None,False,True,,Mélység:
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,fld_depth:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,"Z eltolás az aktuális pozícióhoz képest, ahol a tapintásra kerül sor"
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,fld_diameter:CNC.Controls.NumericField.Label,None,False,True,,Átmérő:
+CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,fld_distance:CNC.Controls.NumericField.Label,None,False,True,,Távolság
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,fld_fixture:CNC.Controls.NumericField.Label,None,False,True,,Alkatrész:
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,fld_offset:CNC.Controls.NumericField.Label,None,False,True,,Eltolás:
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,fld_offset:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Távolság a saroktól a szondáig
+CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,fld_passes:CNC.Controls.NumericField.Label,None,False,True,,Elfogadva:
+CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,fld_passes:CNC.Controls.NumericField.Unit,None,False,True,,
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,fld_probeOffsetX:CNC.Controls.NumericField.Label,None,False,True,,X:
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,fld_probeOffsetX:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,X eltolás a tapintótól a vezérelt pontig
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,fld_probeOffsetY:CNC.Controls.NumericField.Label,None,False,True,,Y:
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,fld_probeOffsetY:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Y eltolás a tapintótól a vezérelt pontig
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,fld_touchPlate:CNC.Controls.NumericField.Label,None,False,True,,Érintőlemez:
+CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,fld_xSize:CNC.Controls.NumericField.Label,None,False,True,,X méret:
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,fld_xyClearance:CNC.Controls.NumericField.Label,None,False,True,,XY Engedélyezés:
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,fld_xyClearance:CNC.Controls.NumericField.Tooltip2,None,False,True,,Kezdeti távolság az arctól a szondáig
+CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,fld_ySize:CNC.Controls.NumericField.Label,None,False,True,,Y méret:
+CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,grd_action:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Kattintson az élre a tapintási művelet kiválasztásához.
+CNC.Controls.Probing.g.en-US.resources:edgefinderintcontrol.baml,grd_action:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,"Kattintson az élre, a sarokra vagy a középpontra a tapintási művelet kiválasztásához."
+CNC.Controls.Probing.g.en-US.resources:edgefindercontrol.baml,grd_action:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,"Kattintson az élre, a sarokra vagy a középpontra a tapintási művelet kiválasztásához."
+CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,grd_action:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Kattintson a szondázási művelet kiválasztásához.
+CNC.Controls.Probing.g.en-US.resources:csselectcontrol.baml,grp_action:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Akció
+CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,grp_camera:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Kamera
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,grp_clearances:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Szondázás engedélyezése
+CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,grp_dimensions:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,A munkadarab méretei
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,grp_distanceAndSpeed:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Szondázási távolságok és sebesség mérése
+CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,grp_gridSize:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Rácsméret
+CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,grp_passes:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Elfogadva
+CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,grp_passes:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,A pontos méretekhez általában egynél több menetre van szükség.
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,grp_prbeProperties:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Szonda XY eltolások
+CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,grp_preview:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Előnézet
+CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,grp_probeArea:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Vizsgálandó terület
+CNC.Controls.Probing.g.en-US.resources:configcontrol.baml,grp_probeConfig:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Szondázás
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,grp_probeTipOrTool:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Szonda hegye/szerszáma
+CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,grp_RotationCenter:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,"Kattintson ide a munkához viszonyított forgatási középpont kiválasztásához, ha nincs kiválasztva X0,Y0 használatban."
+CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,grp_RotationCenter:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Forgatási központ
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,grp_touchOrFixture:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Érintőlemez/rögzítés magassága
+CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,grp_workpiece:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Munkadarab
+CNC.Controls.Probing.g.en-US.resources:edgefinderintcontrol.baml,grp_workpiece:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Munkadarab
+CNC.Controls.Probing.g.en-US.resources:edgefindercontrol.baml,grp_workpiece:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Munkadarab
+CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,grp_workpiece:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Munkadarab
+CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,grp_workpieceOffset:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Munkadarab eltolás
+CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,hdr_preview:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Előnézet
+CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,lbl_addOffset:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Eltolás hozzáadása
+CNC.Controls.Probing.g.en-US.resources:configcontrol.baml,lbl_chkProbeConnected:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,"Egy párbeszédpanel jelenik meg mindaddig, amíg a szondát érvényesítik vagy a párbeszédpanelt meg nem szakítják."
+CNC.Controls.Probing.g.en-US.resources:configcontrol.baml,lbl_chkProbeConnected:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,A szonda manuális ellenőrzése csatlakoztatva van
+CNC.Controls.Probing.g.en-US.resources:configcontrol.baml,lbl_chkProbeStatus:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Indítás előtt ellenőrizze a szonda állapotát (G59.3)
+CNC.Controls.Probing.g.en-US.resources:configcontrol.baml,lbl_chkProbeStatus:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,"A vezérlő riasztást generál, ha nincs engedélyezve, és a szonda érvényesül."
+CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,lbl_clearToolOffset:System.Windows.Controls.ContentControl.Content,Button,True,True,,Tiszta szerszámhossz-eltolás
+CNC.Controls.Probing.g.en-US.resources:edgefinderintcontrol.baml,lbl_height:CNC.Controls.NumericField.Label,None,False,True,,Magasság
+CNC.Controls.Probing.g.en-US.resources:edgefindercontrol.baml,lbl_height:CNC.Controls.NumericField.Label,None,False,True,,Magasság
+CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,lbl_height:CNC.Controls.NumericField.Label,None,False,True,,H:
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,lbl_latchDistance:CNC.Controls.NumericField.Label,None,False,True,,Retesz távolság:
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,lbl_latchDistance:CNC.Controls.NumericField.Tooltip2,None,False,True,,"Távolság a visszahúzáshoz a második lassú tapintási lépéshez, állítsa 0-ra az átugráshoz"
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,lbl_latchFeed:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Előtolás a második lassú tapintási lépéshez
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,lbl_latchFeed:CNC.Controls.NumericField.Label,None,False,True,,Reteszelőtolás:
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,lbl_latchFeed:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
+CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,lbl_lock:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Zár
+CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,lbl_lock:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,"Oldja fel a zárolást, és állítsa az X vagy Y méretet 0-ra, hogy csak egy irányban vizsgáljon."
+CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,lbl_lock:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Zár
+CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,lbl_pause:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Szünet a szondázás előtt
+CNC.Controls.Probing.g.en-US.resources:edgefinderintcontrol.baml,lbl_preview:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Előnézet
+CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,lbl_preview:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Előnézet
+CNC.Controls.Probing.g.en-US.resources:edgefindercontrol.baml,lbl_preview:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Előnézet
+CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,lbl_preview:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Előnézet
+CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,lbl_probeFixture:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Szonda rögzítése @ G59.3
+CNC.Controls.Probing.g.en-US.resources:edgefindercontrol.baml,lbl_probeZ:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Szonda Z
+CNC.Controls.Probing.g.en-US.resources:edgefinderintcontrol.baml,lbl_probeZ:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Szonda Z
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,lbl_probingDistance:CNC.Controls.NumericField.Label,None,False,True,,Szondázási távolság:
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,lbl_probingDistance:CNC.Controls.NumericField.Tooltip2,None,False,True,,Max. távolság a tapintó mozdulatokhoz
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,lbl_profile:System.Windows.Controls.ContentControl.Content,Label,True,True,,Profil:
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,lbl_rapidsFeed:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,"Előtolás gyors mozgásokhoz, állítsa 0-ra a vezérlőbeállítás használatához"
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,lbl_rapidsFeed:CNC.Controls.NumericField.Label,None,False,True,,Gyors előtolási sebesség:
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,lbl_rapidsFeed:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,lbl_searchFeed:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,lbl_searchFeed:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Előtolás a kezdeti tapintási lépéshez
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,lbl_searchFeed:CNC.Controls.NumericField.Label,None,False,True,,Keresés előtolási sebesség:
+CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,lbl_setCoordOrOffset:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Állítsa be a koordinátarendszert vagy az eltolást
+CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,lbl_setRefernecOffset:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Referencia eltolás létrehozása
+CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,lbl_setZ0AtX0Y0:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Állítsa be Z = 0 az X0Y0:
+CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,lbl_width:CNC.Controls.NumericField.Label,None,False,True,,W:
+CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,lbl_withTool:System.Windows.Controls.ContentControl.Content,Label,True,True,,szerszámmal:
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,mnu_add:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Hozzáadás
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,mnu_delete:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Törlés
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,mnu_update:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Frissítés
+CNC.Controls.Probing.g.en-US.resources:csselectcontrol.baml,set_coord:System.Windows.Controls.ContentControl.Content,RadioButton,True,True,,Állítsa be a koordinátarendszert:
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,str_cameraPosition:System.String.$Content,None,True,True,,"Kamera Pozíció {0}, X: {1}, Y: {2}"
+CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,str_centerFinderClearance:System.String.$Content,None,True,True,,A tapintási XY hézag túl nagy a munkadarab {0} méretéhez.
+CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,str_centerFinderCompleted:System.String.$Content,None,True,True,,"A szondázás befejeződött: X távolság {0}, Y távolság {1}."
+CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,str_centerFinderFailed:System.String.$Content,None,True,True,,A szondázás nem sikerült
+CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,str_centerFinderInitFailed:System.String.$Content,None,True,True,,Az init nem sikerült!
+CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,str_CenterFinderInstructions:System.String.$Content,None,True,True,,Kattintson a fenti képre a tapintási művelet kiválasztásához.\\nHelyezze a szondát a munkadarab hozzávetőleges közepe fölé a kezdés előtt.
+CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,str_centerFinderPass:System.String.$Content,None,True,True,,"Szondázás, engedélyezve {0} az {1}..."
+CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,str_centerFinderType:System.String.$Content,None,True,True,,Válassza ki a szonda típusát a fenti képek egyikére kattintva.
+CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,str_centerFinderWpSize:System.String.$Content,None,True,True,,A(z) {0} munkadarab mérete nem lehet 0.
+CNC.Controls.Probing.g.en-US.resources:edgefindercontrol.baml,str_edgeFinderCompleted:System.String.$Content,None,True,True,,A szondázás befejeződött.
+CNC.Controls.Probing.g.en-US.resources:edgefindercontrol.baml,str_edgeFinderFailed:System.String.$Content,None,True,True,,A szondázás nem sikerült
+CNC.Controls.Probing.g.en-US.resources:edgefindercontrol.baml,str_edgeFinderInitFailed:System.String.$Content,None,True,True,,"A tapintás nem sikerült, a gép pozíciója nem ismert."
+CNC.Controls.Probing.g.en-US.resources:edgefindercontrol.baml,str_EdgeFinderInstructions:System.String.$Content,None,True,True,,"Kattintson a fenti kép szélére, sarkára vagy közepére a tapintási művelet kiválasztásához.\\nIndítás előtt mozgassa a szondát a zöld ponttal jelzett pozíció fölé.."
+CNC.Controls.Probing.g.en-US.resources:edgefindercontrol.baml,str_edgeFinderType:System.String.$Content,None,True,True,,Válassza ki a vizsgálandó élt vagy sarkot a fenti kép megfelelő részére kattintva.
+CNC.Controls.Probing.g.en-US.resources:edgefinderintcontrol.baml,str_edgeIntFinderCompleted:System.String.$Content,None,True,True,,A szondázás befejeződött.
+CNC.Controls.Probing.g.en-US.resources:edgefinderintcontrol.baml,str_edgeIntFinderFailed:System.String.$Content,None,True,True,,A szondázás nem sikerült
+CNC.Controls.Probing.g.en-US.resources:edgefinderintcontrol.baml,str_edgeIntFinderInitFailed:System.String.$Content,None,True,True,,"A tapintás nem sikerült, a gép pozíciója nem ismert."
+CNC.Controls.Probing.g.en-US.resources:edgefinderintcontrol.baml,str_edgeIntFinderInstructions:System.String.$Content,None,True,True,,"Kattintson a fenti kép szélére, sarkára vagy közepére a tapintási művelet kiválasztásához.\\nIndítás előtt mozgassa a szondát a zöld ponttal jelzett pozíció fölé.."
+CNC.Controls.Probing.g.en-US.resources:edgefinderintcontrol.baml,str_edgeIntFinderType:System.String.$Content,None,True,True,,Válassza ki a vizsgálandó élt vagy sarkot a fenti kép megfelelő részére kattintva.
+CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,str_heightMapCompleted:System.String.$Content,None,True,True,,"A szondázás befejeződött: Z min: {0}, Z max: {1}."
+CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,str_heightMapFailed:System.String.$Content,None,True,True,,A szondázás nem sikerült
+CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,str_heightMapInstructions:System.String.$Content,None,True,True,,"A magasságtérkép vizsgálatának megkezdése előtt gyors mozgást hajtunk végre az X0Y0 felé.\\nGyőződjön meg arról, hogy a kezdeti Z-pozíció mentes a tapintás során esetlegesen felmerülő akadályoktól."
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,str_jogActive:System.String.$Content,None,True,True,,Billentyűzet kocogás aktív
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,str_jogDisabled:System.String.$Content,None,True,True,,Billentyűzet kocogás letiltva
+CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,str_positionsRequired:System.String.$Content,None,True,True,,{0} szondapozíció szükséges.
+CNC.Controls.Probing.g.en-US.resources:probeverify.baml,str_probeVerify:System.Windows.Controls.ContentControl.Content,Label,True,True,,Állítsd a szondát a kapcsolat ellenőrzéséhez.
+CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probing:System.String.$Content,None,True,True,,Szondázás...
+CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probingDistanceError:System.String.$Content,None,True,True,,"A tapintó távolságnak nagyobbnak kell lennie, mint az XY hézag + ½ tapintó/szerszám átmérő."
+CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probingFailedAlarm:System.String.$Content,None,True,True,,"A szondázás nem sikerült riasztással, törölje a Grbl lapon."
+CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probingFailedCancelled:System.String.$Content,None,True,True,,A szondázás megszakítva/sikertelen.
+CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probingHeigthMapMinSize:System.String.$Content,None,True,True,,A magasságtérképnek legalább 4 pontból kell állnia.
+CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probingHeigthMapNarrow:System.String.$Content,None,True,True,,Magasság térkép can&apos;t végtelenül szűk legyen.
+CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probingIllegalPosition:System.String.$Content,None,True,True,,"Illegális vizsgálópozíció, próbálja újra."
+CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probingLatchDistanceError:System.String.$Content,None,True,True,,"A retesz távolságának kisebbnek kell lennie, mint a szondázási távolság."
+CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probingNoPos:System.String.$Content,None,True,True,,"A tapintás nem sikerült, nem sikerült megállapítani a gép aktuális pozícióját."
+CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probingNoProbe:System.String.$Content,None,True,True,,"A szondázás sikertelen, a szonda nincs csatlakoztatva."
+CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probingNotIdle:System.String.$Content,None,True,True,,"A tapintás nem sikerült, a Grbl nincs tétlen vagy szerszámcsere állapotban."
+CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probingNoVerifyContinue:System.String.$Content,None,True,True,,"A szonda kapcsolatának ellenőrzése nem történt meg, mégis folytatja?"
+CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probingProbeAsserted:System.String.$Content,None,True,True,,"A szondázás sikertelen, a szonda jele érvényesül."
+CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probingRadiusArcs:System.String.$Content,None,True,True,,"A GCode XZ vagy YZ síkban íveket tartalmaz (G18/19), transzformáció nem alkalmazható. Használat &apos;Arcs to Lines&apos; ha tényleg szüksége van erre."
+CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probingVerifyStart:System.String.$Content,None,True,True,,Nyomja meg újra a [Start] gombot a tapintás megkezdéséhez.
+CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,str_rotationCompleted:System.String.$Content,None,True,True,,A szondázás befejeződött.
+CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,str_rotationFailed:System.String.$Content,None,True,True,,A szondázás nem sikerült
+CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,str_rotationInitFailed:System.String.$Content,None,True,True,,Szög: {0} fok
+CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,str_rotationInstructions:System.String.$Content,None,True,True,,Kattintson a fenti kép szélére a tapintási művelet kiválasztásához.\\nIndítás előtt mozgassa a szondát a zöld ponttal jelzett pozíció fölé..
+CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,str_rotationType:System.String.$Content,None,True,True,,Válassza ki a vizsgálandó élt a fenti kép megfelelő részére kattintva.
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,str_runMacro:System.String.$Content,None,True,True,,Fut {0} makró?
+CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,str_toolLengthCompleted:System.String.$Content,None,True,True,,A szondázás befejeződött.
+CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,str_toolLengthFailed:System.String.$Content,None,True,True,,A szondázás nem sikerült
+CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,str_toolLengthInitFailed:System.String.$Content,None,True,True,,A tengelyeket a rögzítőelem szondázása előtt be kell helyezni!
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,tab_Center:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Középkereső
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,tab_edgeExternal:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,"Élkereső, külső"
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,tab_edgeInternal:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,"Élkereső, külső"
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,tab_heightmap:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Magasság térkép
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,tab_Rotation:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Forgás
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,tab_toolOffset:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Tool length eltolása
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,txt_warning:System.Windows.Documents.Run.Text,Text,True,True,,Figyelem! Használja körültekintően – a helytelen paraméterek károsíthatják a szondát!

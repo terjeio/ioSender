@@ -1,13 +1,13 @@
 ﻿/*
  * OutlineBaseControl.xaml.cs - part of CNC Controls library
  *
- * v0.36 / 2021-12-08 / Io Engineering (Terje Io)
+ * v0.42 / 2023-03-21 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2021, Io Engineering (Terje Io)
+Copyright (c) 2021-2023, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -69,13 +69,19 @@ namespace CNC.Controls
 
             if (model.IsFileLoaded)
             {
-                string gcode = string.Format("G90G1F{0}\r", FeedRate.ToString());
+                if (!model.IsParserStateLive)
+                    GrblParserState.Get();
 
-                gcode += string.Format("X{0}Y{1}\r", model.ProgramLimits.MinX.ToInvariantString(), model.ProgramLimits.MinY.ToInvariantString());
-                gcode += string.Format("Y{0}\r", model.ProgramLimits.MaxY.ToInvariantString());
-                gcode += string.Format("X{0}\r", model.ProgramLimits.MaxX.ToInvariantString());
-                gcode += string.Format("Y{0}\r", model.ProgramLimits.MinY.ToInvariantString());
-                gcode += string.Format("X{0}\r", model.ProgramLimits.MinX.ToInvariantString());
+                bool wasMetric = GrblParserState.IsMetric;
+                string gcode = string.Format("G90G{0}G1F{1}\r", model.IsMetric ? 21 : 20, FeedRate);
+
+                gcode += string.Format("X{0}Y{1}\r", model.ProgramLimits.MinX.ToInvariantString(), model.ProgramLimits.MinY.ToInvariantString(model.Format));
+                gcode += string.Format("Y{0}\r", model.ProgramLimits.MaxY.ToInvariantString(model.Format));
+                gcode += string.Format("X{0}\r", model.ProgramLimits.MaxX.ToInvariantString(model.Format));
+                gcode += string.Format("Y{0}\r", model.ProgramLimits.MinY.ToInvariantString(model.Format));
+                gcode += string.Format("X{0}\r", model.ProgramLimits.MinX.ToInvariantString(model.Format));
+                if(model.IsMetric != wasMetric)
+                    gcode += string.Format("G{0}\r", wasMetric ? 21 : 20);
 
                 model.ExecuteCommand(gcode);
             }

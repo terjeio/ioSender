@@ -1,0 +1,18 @@
+﻿CNC.Converters.g.en-US.resources:jobparametersdialog.baml,bn_cancel:System.Windows.Controls.ContentControl.Content,Button,True,True,,Mégsem
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,btn_ok:System.Windows.Controls.ContentControl.Content,Button,True,True,,Ok
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_cutDepth:CNC.Controls.NumericField.Unit,None,False,True,,mm
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_cutDepth:CNC.Controls.NumericField.Label,None,False,True,,Vágási mélység:
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_feedrate:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_feedrate:CNC.Controls.NumericField.Label,None,False,True,,Előtolás mérték:
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_plungeRate:CNC.Controls.NumericField.Label,None,False,True,,Merülési sebesség:
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_plungeRate:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_rapids:CNC.Controls.NumericField.Unit,None,False,True,,mm
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_rapids:CNC.Controls.NumericField.Label,None,False,True,,Gyors mozgás:
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_rpm:CNC.Controls.NumericField.Label,None,False,True,,RPM:
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_rpm:CNC.Controls.NumericField.Unit,None,False,True,,
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_toolChange:CNC.Controls.NumericField.Unit,None,False,True,,mm
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_toolChange:CNC.Controls.NumericField.Label,None,False,True,,Szerszámcsere:
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,grp_scalingFactors:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Méretezési tényezők
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,grp_spindle_feed:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Orsó és előtolás
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,grp_tool:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Eszköz
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,grp_zPosition:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Z pozíciók (a munkadarab felületéhez viszonyítva)

@@ -1,7 +1,7 @@
 /*
  * Renderer.xaml.cs - part of CNC Controls library
  *
- * v0.40 / 2022-07-12 / Io Engineering (Terje Io)
+ * v0.42 / 2023-03-22 / Io Engineering (Terje Io)
  *
  */
 
@@ -14,7 +14,7 @@
 
 /*
 
-Copyright (c) 2019-2022, Io Engineering (Terje Io)
+Copyright (c) 2019-2023, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -451,9 +451,12 @@ namespace CNC.Controls.Viewer
 
                 case nameof(GrblViewModel.WorkPositionOffset):
                     if (Machine.ShowGrid && Machine.Grid != null)
-                        Machine.Grid.Center = new Point3D(gridOffset.X - model.WorkPositionOffset.X * gridfix.X,
-                                                           gridOffset.Y - model.WorkPositionOffset.Y * gridfix.Y,
-                                                            gridOffset.Z + model.WorkPositionOffset.Z * gridfix.Z);
+                    {
+                        Position workPositionOffset = new Position(model.WorkPositionOffset, model.UnitFactor);
+                        Machine.Grid.Center = new Point3D(gridOffset.X - workPositionOffset.X * gridfix.X,
+                                                           gridOffset.Y - workPositionOffset.Y * gridfix.Y,
+                                                            gridOffset.Z + workPositionOffset.Z * gridfix.Z);
+                    }
                     AddWorkEnvelope();
                     break;
             }
@@ -581,6 +584,9 @@ namespace CNC.Controls.Viewer
         {
             // TODO: set a sensible viewing distance dynamically
 
+            if (model.UnitFactor != 1d)
+                bbox = new ProgramLimits(bbox, model.UnitFactor);
+
             if (model.LatheMode == LatheMode.Disabled)
             {
                 double pos;
@@ -655,17 +661,21 @@ namespace CNC.Controls.Viewer
 
         private void AddWorkEnvelope()
         {
+            Position workPositionOffset = new Position(model.WorkPositionOffset, model.UnitFactor);
+
             if (isLatheMode == true)
-                workEnvelope.BoundingBox = new Rect3D(-model.WorkPositionOffset.X, 0d, -GrblInfo.MaxTravel.Z - model.WorkPositionOffset.Z, GrblInfo.MaxTravel.X, 0d, GrblInfo.MaxTravel.Z);
+                workEnvelope.BoundingBox = new Rect3D(-workPositionOffset.X, 0d, -GrblInfo.MaxTravel.Z - workPositionOffset.Z, GrblInfo.MaxTravel.X, 0d, GrblInfo.MaxTravel.Z);
             else if(GrblInfo.ForceSetOrigin)
-                workEnvelope.BoundingBox = new Rect3D(-model.WorkPositionOffset.X, -model.WorkPositionOffset.Y, -GrblInfo.MaxTravel.Z - model.WorkPositionOffset.Z, GrblInfo.MaxTravel.X, GrblInfo.MaxTravel.Y, GrblInfo.MaxTravel.Z);
+                workEnvelope.BoundingBox = new Rect3D(-workPositionOffset.X, -workPositionOffset.Y, -GrblInfo.MaxTravel.Z - workPositionOffset.Z, GrblInfo.MaxTravel.X, GrblInfo.MaxTravel.Y, GrblInfo.MaxTravel.Z);
             else
-                workEnvelope.BoundingBox = new Rect3D(-GrblInfo.MaxTravel.X - model.WorkPositionOffset.X, -GrblInfo.MaxTravel.Y - model.WorkPositionOffset.Y, -GrblInfo.MaxTravel.Z - model.WorkPositionOffset.Z, GrblInfo.MaxTravel.X, GrblInfo.MaxTravel.Y, GrblInfo.MaxTravel.Z);
+                workEnvelope.BoundingBox = new Rect3D(-GrblInfo.MaxTravel.X - workPositionOffset.X, -GrblInfo.MaxTravel.Y - workPositionOffset.Y, -GrblInfo.MaxTravel.Z - workPositionOffset.Z, GrblInfo.MaxTravel.X, GrblInfo.MaxTravel.Y, GrblInfo.MaxTravel.Z);
         }
 
         private void AnimateTool()
         {
-            Machine.SetToolPosition(model.Position.X, model.Position.Y, model.Position.Z);
+            Position position = new Position(model.Position, model.UnitFactor);
+
+            Machine.SetToolPosition(position.X, position.Y, position.Z);
 
             if (IsJobLoaded) switch (Machine.ToolMode)
             {
@@ -700,77 +710,82 @@ namespace CNC.Controls.Viewer
                 positionPoints.Add(q);
             };
 
+            Position position = new Position(model.Position, model.UnitFactor);
+            Position workPositionOffset = new Position(model.WorkPositionOffset, model.UnitFactor);
+
             switch (Machine.RenderMode)
             {
                 case RenderMode.Mode3D:
                     if (GrblInfo.ForceSetOrigin)
                     {
-                        positionPoints.Add(new Point3D(-model.WorkPositionOffset.X, model.Position.Y, model.Position.Z));
-                        positionPoints.Add(new Point3D(positionPoints.Last().X + GrblInfo.MaxTravel.X, model.Position.Y, model.Position.Z));
-                        positionPoints.Add(new Point3D(model.Position.X, -model.WorkPositionOffset.Y, model.Position.Z));
+                        positionPoints.Add(new Point3D(-workPositionOffset.X, position.Y, position.Z));
+                        positionPoints.Add(new Point3D(positionPoints.Last().X + GrblInfo.MaxTravel.X, position.Y, position.Z));
+                        positionPoints.Add(new Point3D(position.X, -workPositionOffset.Y, position.Z));
                     }
                     else
                     {
-                        positionPoints.Add(new Point3D(-GrblInfo.MaxTravel.X - model.WorkPositionOffset.X, model.Position.Y, model.Position.Z + .05d));
-                        positionPoints.Add(new Point3D(positionPoints.Last().X + GrblInfo.MaxTravel.X, model.Position.Y, model.Position.Z + .05d));
-                        positionPoints.Add(new Point3D(model.Position.X, -GrblInfo.MaxTravel.Y - model.WorkPositionOffset.Y, model.Position.Z + .05d));
+                        positionPoints.Add(new Point3D(-GrblInfo.MaxTravel.X - workPositionOffset.X, position.Y, position.Z + .05d));
+                        positionPoints.Add(new Point3D(positionPoints.Last().X + GrblInfo.MaxTravel.X, position.Y, position.Z + .05d));
+                        positionPoints.Add(new Point3D(position.X, -GrblInfo.MaxTravel.Y - workPositionOffset.Y, position.Z + .05d));
                     }
-                    positionPoints.Add(new Point3D(model.Position.X, positionPoints.Last().Y + GrblInfo.MaxTravel.Y, model.Position.Z + .05d));
-                    positionPoints.Add(new Point3D(model.Position.X, model.Position.Y, -GrblInfo.MaxTravel.Z - model.WorkPositionOffset.Z));
-                    positionPoints.Add(new Point3D(model.Position.X, model.Position.Y, positionPoints.Last().Z + GrblInfo.MaxTravel.Z + .05d));
+                    positionPoints.Add(new Point3D(position.X, positionPoints.Last().Y + GrblInfo.MaxTravel.Y, position.Z + .05d));
+                    positionPoints.Add(new Point3D(position.X, position.Y, -GrblInfo.MaxTravel.Z - workPositionOffset.Z));
+                    positionPoints.Add(new Point3D(position.X, position.Y, positionPoints.Last().Z + GrblInfo.MaxTravel.Z + .05d));
                 break;
 
                 case RenderMode.Mode2DXY:
                     if (GrblInfo.ForceSetOrigin)
                     {
-                        positionPoints.Add(new Point3D(-model.WorkPositionOffset.X, model.Position.Y, 0d));
-                        positionPoints.Add(new Point3D(positionPoints.Last().X + GrblInfo.MaxTravel.X, model.Position.Y, 0d));
-                        positionPoints.Add(new Point3D(model.Position.X, -model.WorkPositionOffset.Y, 0d));
+                        positionPoints.Add(new Point3D(-workPositionOffset.X, position.Y, 0d));
+                        positionPoints.Add(new Point3D(positionPoints.Last().X + GrblInfo.MaxTravel.X, position.Y, 0d));
+                        positionPoints.Add(new Point3D(position.X, -workPositionOffset.Y, 0d));
                     }
                     else
                     {
-                        positionPoints.Add(new Point3D(-GrblInfo.MaxTravel.X - model.WorkPositionOffset.X, model.Position.Y, 0d));
-                        positionPoints.Add(new Point3D(positionPoints.Last().X + GrblInfo.MaxTravel.X, model.Position.Y, 0d));
-                        positionPoints.Add(new Point3D(model.Position.X, -GrblInfo.MaxTravel.Y - model.WorkPositionOffset.Y, 0d));
+                        positionPoints.Add(new Point3D(-GrblInfo.MaxTravel.X - workPositionOffset.X, position.Y, 0d));
+                        positionPoints.Add(new Point3D(positionPoints.Last().X + GrblInfo.MaxTravel.X, position.Y, 0d));
+                        positionPoints.Add(new Point3D(position.X, -GrblInfo.MaxTravel.Y - workPositionOffset.Y, 0d));
                     }
-                    positionPoints.Add(new Point3D(model.Position.X, positionPoints.Last().Y + GrblInfo.MaxTravel.Y, 0d));
+                    positionPoints.Add(new Point3D(position.X, positionPoints.Last().Y + GrblInfo.MaxTravel.Y, 0d));
                     break;
 
                 case RenderMode.Mode2DXZ:
                     if (GrblInfo.ForceSetOrigin)
-                        positionPoints.Add(new Point3D(-model.WorkPositionOffset.X, 0d, model.Position.Z));
+                        positionPoints.Add(new Point3D(-workPositionOffset.X, 0d, position.Z));
                     else
-                        positionPoints.Add(new Point3D(-GrblInfo.MaxTravel.X - model.WorkPositionOffset.X, 0d, model.Position.Z));
-                    positionPoints.Add(new Point3D(positionPoints.Last().X + GrblInfo.MaxTravel.X, 0d, model.Position.Z));
-                    positionPoints.Add(new Point3D(model.Position.X, 0d, -GrblInfo.MaxTravel.Z - model.WorkPositionOffset.Z));
-                    positionPoints.Add(new Point3D(model.Position.X, 0d, positionPoints.Last().Z + GrblInfo.MaxTravel.Z));
+                        positionPoints.Add(new Point3D(-GrblInfo.MaxTravel.X - workPositionOffset.X, 0d, position.Z));
+                    positionPoints.Add(new Point3D(positionPoints.Last().X + GrblInfo.MaxTravel.X, 0d, position.Z));
+                    positionPoints.Add(new Point3D(position.X, 0d, -GrblInfo.MaxTravel.Z - workPositionOffset.Z));
+                    positionPoints.Add(new Point3D(position.X, 0d, positionPoints.Last().Z + GrblInfo.MaxTravel.Z));
                     break;
 
                 case RenderMode.Mode2DYZ:
                     if (GrblInfo.ForceSetOrigin)
-                        positionPoints.Add(new Point3D(0d, -model.WorkPositionOffset.Y, model.Position.Z));
+                        positionPoints.Add(new Point3D(0d, -workPositionOffset.Y, position.Z));
                     else
-                        positionPoints.Add(new Point3D(0d, -GrblInfo.MaxTravel.Y - model.WorkPositionOffset.Y, model.Position.Z));
-                    positionPoints.Add(new Point3D(0d, positionPoints.Last().Y + GrblInfo.MaxTravel.Y, model.Position.Z));
-                    positionPoints.Add(new Point3D(0d, model.Position.Y, -GrblInfo.MaxTravel.Z - model.WorkPositionOffset.Z));
+                        positionPoints.Add(new Point3D(0d, -GrblInfo.MaxTravel.Y - workPositionOffset.Y, position.Z));
+                    positionPoints.Add(new Point3D(0d, positionPoints.Last().Y + GrblInfo.MaxTravel.Y, position.Z));
+                    positionPoints.Add(new Point3D(0d, position.Y, -GrblInfo.MaxTravel.Z - workPositionOffset.Z));
                     positionPoints.Add(new Point3D(0d, model.Position.Y, positionPoints.Last().Z + GrblInfo.MaxTravel.Z));
                     break;
             }
 
 
             //if (isLatheMode == true)
-            //    workEnvelope.BoundingBox = new Rect3D(-model.WorkPositionOffset.X, 0d, -GrblInfo.MaxTravel.Z - model.WorkPositionOffset.Z, GrblInfo.MaxTravel.X, 0d, GrblInfo.MaxTravel.Z);
+            //    workEnvelope.BoundingBox = new Rect3D(-workPositionOffset.X, 0d, -GrblInfo.MaxTravel.Z - workPositionOffset.Z, GrblInfo.MaxTravel.X, 0d, GrblInfo.MaxTravel.Z);
             //else if (GrblInfo.ForceSetOrigin)
-            //    workEnvelope.BoundingBox = new Rect3D(-model.WorkPositionOffset.X, -model.WorkPositionOffset.Y, -GrblInfo.MaxTravel.Z - model.WorkPositionOffset.Z, GrblInfo.MaxTravel.X, GrblInfo.MaxTravel.Y, GrblInfo.MaxTravel.Z);
+            //    workEnvelope.BoundingBox = new Rect3D(-workPositionOffset.X, -workPositionOffset.Y, -GrblInfo.MaxTravel.Z - workPositionOffset.Z, GrblInfo.MaxTravel.X, GrblInfo.MaxTravel.Y, GrblInfo.MaxTravel.Z);
             //else
-            //    workEnvelope.BoundingBox = new Rect3D(-GrblInfo.MaxTravel.X - model.WorkPositionOffset.X, -GrblInfo.MaxTravel.Y - model.WorkPositionOffset.Y, -GrblInfo.MaxTravel.Z - model.WorkPositionOffset.Z, GrblInfo.MaxTravel.X, GrblInfo.MaxTravel.Y, GrblInfo.MaxTravel.Z);
+            //    workEnvelope.BoundingBox = new Rect3D(-GrblInfo.MaxTravel.X - workPositionOffset.X, -GrblInfo.MaxTravel.Y - workPositionOffset.Y, -GrblInfo.MaxTravel.Z - workPositionOffset.Z, GrblInfo.MaxTravel.X, GrblInfo.MaxTravel.Y, GrblInfo.MaxTravel.Z);
 
             Machine.ToolOrigin = positionPoints;
         }
 
         public void ShowPosition()
         {
-            GrblViewModel model = (GrblViewModel)DataContext;
+            GrblViewModel model = DataContext as GrblViewModel;
+            Position position = new Position(model.Position, model.UnitFactor);
+            ProgramLimits programLimits = new ProgramLimits(model.ProgramLimits, model.UnitFactor);
 
             Machine.ToolOrigin = null;
 
@@ -779,18 +794,18 @@ namespace CNC.Controls.Viewer
             if (Machine.Limits.X == 0d)
                 Machine.SetLimits(GrblInfo.MaxTravel.X, GrblInfo.MaxTravel.Y, GrblInfo.MaxTravel.Z);
 
-            positionPoints.Add(new Point3D(Math.Min(model.Position.X, model.ProgramLimits.MinX) - 5d, model.Position.Y, model.Position.Z));
-            positionPoints.Add(new Point3D(Machine.Limits.X, model.Position.Y, model.Position.Z));
+            positionPoints.Add(new Point3D(Math.Min(position.X, programLimits.MinX) - 5d, position.Y, position.Z));
+            positionPoints.Add(new Point3D(Machine.Limits.X, position.Y, position.Z));
 
-            positionPoints.Add(new Point3D(model.Position.X, Math.Min(model.Position.Y, model.ProgramLimits.MinY) - 5d, model.Position.Z));
-            positionPoints.Add(new Point3D(model.Position.X, Machine.Limits.Y, model.Position.Z));
+            positionPoints.Add(new Point3D(position.X, Math.Min(position.Y, programLimits.MinY) - 5d, position.Z));
+            positionPoints.Add(new Point3D(position.X, Machine.Limits.Y, position.Z));
 
-            positionPoints.Add(new Point3D(model.Position.X, model.Position.Y, Math.Min(model.Position.Z, model.ProgramLimits.MinZ) - 5d));
-            positionPoints.Add(new Point3D(model.Position.X, model.Position.Y, Machine.Limits.Z));
+            positionPoints.Add(new Point3D(position.X, position.Y, Math.Min(position.Z, programLimits.MinZ) - 5d));
+            positionPoints.Add(new Point3D(position.X, position.Y, Machine.Limits.Z));
 
             Machine.ToolOrigin = positionPoints;
             var orgpos = Machine.StartPosition;
-            Machine.SetStartPosition(model.Position.X, model.Position.Y, model.Position.Z);
+            Machine.SetStartPosition(position.X, position.Y, position.Z);
 
             if (Machine.RapidLines != null && Machine.RapidLines.Count > 0 && Machine.RapidLines[0].Equals(orgpos))
             {
@@ -864,12 +879,18 @@ namespace CNC.Controls.Viewer
 
         public void showAdorners (ProgramLimits bbox)
         {
+            if(model.UnitFactor != 1d)
+                bbox = new ProgramLimits(bbox, model.UnitFactor);
+
             double lineThickness = bbox.MaxSize / 1000d;
             double arrowOffset = lineThickness * 30d;
             double labelOffset = lineThickness * 50d;
 
             AxisBrush = new SolidColorBrush(Machine.GridColor);
             gridWidth = gridsz(GrblInfo.MaxTravel.X);
+
+            Position workPositionOffset = new Position(model.WorkPositionOffset, model.UnitFactor);
+            ProgramLimits programLimits = new ProgramLimits(model.ProgramLimits, model.UnitFactor);
 
             if (isLatheMode == null)
             {
@@ -896,9 +917,9 @@ namespace CNC.Controls.Viewer
                         lengthDirection = new Vector3D(1d, 0d, 0d);
                         normal = new Vector3D(0d, 0d, 1d);
                         if (GrblInfo.ForceSetOrigin)
-                            gridOffset = new Point3D(gridWidth / 2d, gridHeight / 2d, model.ProgramLimits.MinZ);
+                            gridOffset = new Point3D(gridWidth / 2d, gridHeight / 2d, programLimits.MinZ);
                         else
-                            gridOffset = new Point3D(-gridWidth / 2d, -gridHeight / 2d, model.ProgramLimits.MinZ);
+                            gridOffset = new Point3D(-gridWidth / 2d, -gridHeight / 2d, programLimits.MinZ);
                         break;
 
                     case RenderMode.Mode2DXY:
@@ -906,9 +927,9 @@ namespace CNC.Controls.Viewer
                         normal = new Vector3D(0d, 0d, 1d);
                         gridfix = new Point3D(1d, 1d, 0d);
                         if (GrblInfo.ForceSetOrigin)
-                            gridOffset = new Point3D(gridWidth / 2d, gridHeight / 2d, model.ProgramLimits.MinZ);
+                            gridOffset = new Point3D(gridWidth / 2d, gridHeight / 2d, programLimits.MinZ);
                         else
-                            gridOffset = new Point3D(-gridWidth / 2d, -gridHeight / 2d, model.ProgramLimits.MinZ);
+                            gridOffset = new Point3D(-gridWidth / 2d, -gridHeight / 2d, programLimits.MinZ);
                         break;
 
                     case RenderMode.Mode2DXZ:
@@ -940,9 +961,9 @@ namespace CNC.Controls.Viewer
                     //                        Center = new Point3D(boffset(bbox.SizeX, bbox.MinX, w, wm) - TickSize, boffset(bbox.SizeY, bbox.MinY, h, wh) - TickSize, 0d),
                     //                        Center = new Point3D(w / 2d, h / 2d, 0d),
 
-                    Center = new Point3D(gridOffset.X - model.WorkPositionOffset.X * gridfix.X,
-                                            gridOffset.Y - model.WorkPositionOffset.Y * gridfix.Y,
-                                            gridOffset.Z + model.WorkPositionOffset.Z * gridfix.Z),
+                    Center = new Point3D(gridOffset.X - workPositionOffset.X * gridfix.X,
+                                            gridOffset.Y - workPositionOffset.Y * gridfix.Y,
+                                            gridOffset.Z + workPositionOffset.Z * gridfix.Z),
                     //                        Center = new Point3D(0d,0d, 0d),
 
                     MinorDistance = 2.5d,
@@ -963,9 +984,9 @@ namespace CNC.Controls.Viewer
 
                 grid = new GridLinesVisual3D()
                 {
-                    Center = new Point3D(gridOffset.X - model.WorkPositionOffset.X * gridfix.X,
+                    Center = new Point3D(gridOffset.X - workPositionOffset.X * gridfix.X,
                                             0d,
-                                            gridOffset.Z - model.WorkPositionOffset.Z * gridfix.Z),
+                                            gridOffset.Z - workPositionOffset.Z * gridfix.Z),
                     MinorDistance = 2.5d,
                     MajorDistance = TickSize,
                     Width = gridWidth,

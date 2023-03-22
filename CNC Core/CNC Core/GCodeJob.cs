@@ -1,13 +1,13 @@
 ﻿/*
  * GCodeJob.cs - part of CNC Controls library
  *
- * v0.41 / 2022-09-23 / Io Engineering (Terje Io)
+ * v0.42 / 2023-03-22 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2022, Io Engineering (Terje Io)
+Copyright (c) 2018-2023, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -260,6 +260,18 @@ namespace CNC.Core
             init();
         }
 
+        public ProgramLimits(ProgramLimits limits, double scaleFactor)
+        {
+            for (var i = 0; i < MinValues.Length; i++)
+            {
+                MinValues[i] = limits.MinValues[i] * scaleFactor;
+                MaxValues[i] = limits.MaxValues[i] * scaleFactor;
+            }
+
+            MinValues.PropertyChanged += MinValues_PropertyChanged;
+            MaxValues.PropertyChanged += MaxValues_PropertyChanged;
+        }
+
         private void init()
         {
             Clear();
@@ -274,6 +286,15 @@ namespace CNC.Core
             {
                 MinValues[i] = double.NaN;
                 MaxValues[i] = double.NaN;
+            }
+        }
+
+        public void Scale(double factor)
+        {
+            for (var i = 0; i < MinValues.Length; i++)
+            {
+                MinValues[i] *= factor;
+                MaxValues[i] *= factor;
             }
         }
 

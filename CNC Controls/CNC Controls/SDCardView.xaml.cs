@@ -1,13 +1,13 @@
 /*
  * SDCardView.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.36 / 2021-11-10 / Io Engineering (Terje Io)
+ * v0.42 / 2023-03-12 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2021, Io Engineering (Terje Io)
+Copyright (c) 2018-2023, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -73,9 +73,10 @@ namespace CNC.Controls
         {
             if (activate)
             {
-                GrblSDCard.Load(DataContext as GrblViewModel);
+                GrblSDCard.Load(DataContext as GrblViewModel, ViewAll);
                 CanUpload = GrblInfo.UploadProtocol != string.Empty;
                 CanDelete = GrblInfo.Build >= 20210421;
+                CanViewAll = GrblInfo.Build >= 20230312;
                 CanRewind = GrblInfo.IsGrblHAL;
             }
             else
@@ -106,6 +107,20 @@ namespace CNC.Controls
         {
             get { return (bool)GetValue(CanRewindProperty); }
             set { SetValue(CanRewindProperty, value); }
+        }
+
+        public static readonly DependencyProperty ViewAllProperty = DependencyProperty.Register(nameof(ViewAll), typeof(bool), typeof(SDCardView), new PropertyMetadata(false));
+        public bool ViewAll
+        {
+            get { return (bool)GetValue(ViewAllProperty); }
+            set { SetValue(ViewAllProperty, value); }
+        }
+
+        public static readonly DependencyProperty CanViewAllProperty = DependencyProperty.Register(nameof(CanViewAll), typeof(bool), typeof(SDCardView), new PropertyMetadata(false));
+        public bool CanViewAll
+        {
+            get { return (bool)GetValue(CanViewAllProperty); }
+            set { SetValue(CanViewAllProperty, value); }
         }
 
         public static readonly DependencyProperty CanUploadProperty = DependencyProperty.Register(nameof(CanUpload), typeof(bool), typeof(SDCardView), new PropertyMetadata(false));
@@ -249,7 +264,7 @@ namespace CNC.Controls
                 if(!(GrblInfo.UploadProtocol == "FTP" && !ok))
                     model.Message = (string)FindResource(ok ? "TransferDone" : "TransferAborted");
 
-                GrblSDCard.Load(model);
+                GrblSDCard.Load(model, ViewAll);
             }
         }
 
@@ -263,13 +278,17 @@ namespace CNC.Controls
         {
             RunFile();
         }
+        private void ViewAll_Click(object sender, RoutedEventArgs e)
+        {
+            GrblSDCard.Load(DataContext as GrblViewModel, ViewAll);
+        }
 
         private void Delete_Click(object sender, RoutedEventArgs e)
         {
             if (MessageBox.Show(string.Format((string)FindResource("DeleteFile"), (string)currentFile["Name"]), "ioSender", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes) == MessageBoxResult.Yes)
             {
                 Comms.com.WriteCommand(GrblConstants.CMD_SDCARD_UNLINK + (string)currentFile["Name"]);
-                GrblSDCard.Load(DataContext as GrblViewModel);
+                GrblSDCard.Load(DataContext as GrblViewModel, ViewAll);
             }
         }
 
@@ -317,7 +336,7 @@ namespace CNC.Controls
         public static DataView Files { get { return data.DefaultView; } }
         public static bool Loaded { get { return data.Rows.Count > 0; } }
 
-        public static void Load(GrblViewModel model)
+        public static void Load(GrblViewModel model, bool ViewAll)
         {
             bool? res = null;
             CancellationToken cancellationToken = new CancellationToken();
@@ -351,12 +370,12 @@ namespace CNC.Controls
 
                 new Thread(() =>
                 {
-                    res = WaitFor.AckResponse<string>(
-                        cancellationToken,
-                        response => Process(response),
-                        a => model.OnResponseReceived += a,
-                        a => model.OnResponseReceived -= a,
-                        2000, () => Comms.com.WriteCommand(GrblConstants.CMD_SDCARD_DIR));
+                res = WaitFor.AckResponse<string>(
+                    cancellationToken,
+                    response => Process(response),
+                    a => model.OnResponseReceived += a,
+                    a => model.OnResponseReceived -= a,
+                    2000, () => Comms.com.WriteCommand(ViewAll ? GrblConstants.CMD_SDCARD_DIR_ALL : GrblConstants.CMD_SDCARD_DIR));
                 }).Start();
 
                 while (res == null)

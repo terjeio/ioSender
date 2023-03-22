@@ -1,13 +1,13 @@
 ﻿/*
  * ProbingViewModel.cs - part of CNC Probing library
  *
- * v0.41 / 2022-11-13 / Io Engineering (Terje Io)
+ * v0.42 / 2023-03-22 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020-2022, Io Engineering (Terje Io)
+Copyright (c) 2020-2023, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -126,7 +126,7 @@ namespace CNC.Controls.Probing
         private void Measurement_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             var m = sender as Measurement;
-            Grbl.ResponseLog.Add("Measured: " + (m.Position - Grbl.WorkPositionOffset).ToString(m.AxisFlags) + " " + m.ProbingType.ToString());
+            Grbl.ResponseLog.Add("Measured: " + (m.Position - Grbl.WorkPositionOffset).ToString(m.AxisFlags, Grbl.Precision) + " " + m.ProbingType.ToString());
         }
 
         private void HeightMap_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -199,6 +199,8 @@ namespace CNC.Controls.Probing
                 if (Grbl.ResponseLogVerbose)
                     Grbl.ResponseLog.Add(command);
 
+                Comms.com.PurgeQueue();
+
                 new Thread(() =>
                 {
                     res = WaitFor.AckResponse<string>(
@@ -213,7 +215,26 @@ namespace CNC.Controls.Probing
                     EventUtils.DoEvents();
             }
 
-            if (Grbl.GrblState.State != GrblStates.Idle && Grbl.GrblState.State != GrblStates.Alarm)
+            res = null;
+
+            // Wait for real-time report to arrive
+            new Thread(() =>
+            {
+                res = WaitFor.SingleEvent<string>(
+                cancellationToken,
+                null,
+                a => Grbl.OnRealtimeStatusProcessed += a,
+                a => Grbl.OnRealtimeStatusProcessed -= a,
+                1100);
+            }).Start();
+
+            while (res == null)
+                EventUtils.DoEvents();
+
+            if (Grbl.GrblState.State == GrblStates.Alarm)
+                res = null;
+
+            if (!(Grbl.GrblState.State == GrblStates.Idle || Grbl.GrblState.State == GrblStates.Alarm))
             {
                 Stopwatch timer = new Stopwatch();
                 timer.Start();
@@ -247,6 +268,11 @@ namespace CNC.Controls.Probing
             }
 
             return res == true;
+        }
+
+        public bool WaitForIdle()
+        {
+            return WaitForIdle(string.Empty);
         }
 
         public bool WaitForWcoUpdate()
@@ -285,6 +311,8 @@ namespace CNC.Controls.Probing
             Comms.com.PurgeQueue();
 
             Grbl.Poller.SetState(0);
+
+            isCancelled = false;
 
             new Thread(() =>
             {
@@ -326,7 +354,7 @@ namespace CNC.Controls.Probing
                     {
                         if ((axes & 0x01) != 0)
                         {
-                            delta = Math.Abs(pos.Values[i] - Grbl.MachinePosition.Values[i]);
+                            delta = Math.Abs(pos.Values[i] - Grbl.MachinePosition.Values[i] * Grbl.UnitFactor);
                             wait = delta > Math.Max(0.003d, GrblInfo.TravelResolution.Values[i] * 2d);
                             delta_max = Math.Max(delta, delta_max);
                             if (wait && Grbl.GrblState.State == GrblStates.Idle && (running || delta_max < 0.01d))

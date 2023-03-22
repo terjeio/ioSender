@@ -1,13 +1,13 @@
 ﻿/*
  * ToolLengthControl.cs - part of CNC Probing library
  *
- * v0.41 / 2022-11-13 / Io Engineering (Terje Io)
+ * v0.41 / 2023-01-26 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020-2022, Io Engineering (Terje Io)
+Copyright (c) 2020-2023, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -129,6 +129,8 @@ namespace CNC.Controls.Probing
 
                 if (probing.AddAction)
                 {
+                    ok = probing.GotoMachinePosition(pos, AxisFlags.Z);
+
                     if (probing.ProbeFixture)
                         pos.Z = probing.FixtureHeight;
                     else

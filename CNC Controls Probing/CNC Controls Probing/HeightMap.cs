@@ -31,6 +31,7 @@ SOFTWARE.
 
     2020-09-20 : Added constructor for separate X and Y grid sizes
     2022-01-23 : Added check for rapid motions and motion validity
+    2023-03-02 : Added Z offset
 
 */
 
@@ -81,6 +82,7 @@ namespace CNC.Controls.Probing
 
         public double MinHeight { get; private set; } = double.MaxValue;
         public double MaxHeight { get; private set; } = double.MinValue;
+        public double ZOffset { get; set; } = 0d;
 
         public event Action MapUpdated;
 
@@ -160,7 +162,7 @@ namespace CNC.Controls.Probing
             double linUpper = Points[iHX, iHY].Value * fX + Points[iLX, iHY].Value * (1 - fX);       //linear immediates
             double linLower = Points[iHX, iLY].Value * fX + Points[iLX, iLY].Value * (1 - fX);
 
-            return linUpper * fY + linLower * (1 - fY);     //bilinear result
+            return linUpper * fY + linLower * (1 - fY) + ZOffset;     //bilinear result
         }
 
         public Vector2 GetCoordinates(int x, int y)
@@ -251,6 +253,7 @@ namespace CNC.Controls.Probing
             w.WriteAttributeString("MaxY", Max.Y.ToString(Constants.DecimalParseFormat));
             w.WriteAttributeString("SizeX", SizeX.ToString(Constants.DecimalParseFormat));
             w.WriteAttributeString("SizeY", SizeY.ToString(Constants.DecimalParseFormat));
+            w.WriteAttributeString("ZOffset", ZOffset.ToString(Constants.DecimalParseFormat));
             for (int x = 0; x < SizeX; x++)
             {
                 for (int y = 0; y < SizeY; y++)

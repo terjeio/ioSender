@@ -1,13 +1,13 @@
 /*
  * ToolView.xaml.cs - part of CNC Controls library
  *
- * v0.31 / 2021-04-27 / Io Engineering (Terje Io)
+ * v0.42 / 2023-03-21 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2021, Io Engineering (Terje Io)
+Copyright (c) 2018-2023, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -105,9 +105,10 @@ namespace CNC.Controls
                     if (!(awaitCoord = double.IsNaN(parameters.MachinePosition.Values[0])))
                     {
                         offset.Set(parameters.MachinePosition);
-                        parameters.Position.SuspendNotifications = parameters.WorkPositionOffset.SuspendNotifications = true;
+                        parameters.SuspendPositionNotifications = true;
                         parameters.Clear();
-                        parameters.WorkPositionOffset.SuspendNotifications = parameters.Position.SuspendNotifications = false;
+                        parameters.MachinePosition.Clear();
+                        parameters.SuspendPositionNotifications = false;
                     }
                     break;
             }

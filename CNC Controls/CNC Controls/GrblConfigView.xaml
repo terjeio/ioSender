@@ -28,6 +28,17 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
+        <Style x:Key="StringErrorStyle" TargetType="TextBox">
+            <Style.Triggers>
+                <Trigger Property="Validation.HasError" Value="true">
+                    <Setter Property="TextBox.ToolTip">
+                        <Setter.Value>
+                            <Binding RelativeSource="{RelativeSource Self}" Path="(Validation.Errors)[0].ErrorContent" />
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
         <Style x:Key="Ip4ErrorStyle" TargetType="TextBox">
             <Style.Triggers>
                 <Trigger Property="Validation.HasError" Value="true">

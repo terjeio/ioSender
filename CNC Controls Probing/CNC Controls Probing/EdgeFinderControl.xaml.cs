@@ -1,13 +1,13 @@
 ﻿/*
  * EdgeFinderControl.xaml.cs - part of CNC Probing library
  *
- * v0.41 / 2022-11-13 / Io Engineering (Terje Io)
+ * v0.42 / 2023-03-22 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020-2022, Io Engineering (Terje Io)
+Copyright (c) 2020-2023, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -267,7 +267,7 @@ namespace CNC.Controls.Probing
                         ok = ok && !isCancelled && probing.RemoveLastPosition();
                         if ((ok = ok && !isCancelled && probing.WaitForResponse(probing.SlowProbe + "Z-" + probing.Depth.ToInvariantString())))
                         {
-                            pos.Z = probing.Grbl.ProbePosition.Z;
+                            pos.Z = probing.Grbl.ProbePosition.Z * probing.Grbl.UnitFactor;
                             ok = !isCancelled && probing.GotoMachinePosition(probing.StartPosition, AxisFlags.Z);
                         }
                     }
@@ -287,7 +287,7 @@ namespace CNC.Controls.Probing
                             pos.X += probing.ProbeOffsetX;
                             pos.Y += probing.ProbeOffsetY;
                             pos.Z -= probing.WorkpieceHeight + probing.TouchPlateHeight + probing.Grbl.ToolOffset.Z;
-                            probing.Measurement.Add(pos, axisflags, ProbingType);
+                            probing.Measurement.Add(new Position(pos, 1d / probing.Grbl.UnitFactor), axisflags, ProbingType);
                             break;
 
                         case ProbingViewModel.CoordMode.G92:

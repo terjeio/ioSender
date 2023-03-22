@@ -1,0 +1,12 @@
+﻿CNC.Controls.Camera.g.en-US.resources:configcontrol.baml,btn_getPosition:System.Windows.Controls.ContentControl.Content,Button,True,True,,Szerezze meg az aktuális pozíciót
+CNC.Controls.Camera.g.en-US.resources:cameracontrol.baml,btn_moveOffset:System.Windows.Controls.ContentControl.Content,Button,True,True,,Mozgatás eltolás
+CNC.Controls.Camera.g.en-US.resources:cameracontrol.baml,btn_useAsProbe:System.Windows.Controls.ContentControl.Content,Button,True,True,,Használja szonda pozícióként
+CNC.Controls.Camera.g.en-US.resources:configcontrol.baml,chk_confirmMove:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Mozgás megerősítése
+CNC.Controls.Camera.g.en-US.resources:configcontrol.baml,chk_moveToSpindle:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Kezdeti lépés az orsóhoz
+CNC.Controls.Camera.g.en-US.resources:configcontrol.baml,fld_xOffset:CNC.Controls.NumericField.Label,None,False,True,,X eltolás:
+CNC.Controls.Camera.g.en-US.resources:configcontrol.baml,fld_yOffset:CNC.Controls.NumericField.Label,None,False,True,,Y eltolás:
+CNC.Controls.Camera.g.en-US.resources:configcontrol.baml,grp_camera:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Kamera
+CNC.Controls.Camera.g.en-US.resources:cameracontrol.baml,lbl_cameraToSpindlePosition:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,kamera orsóhoz
+CNC.Controls.Camera.g.en-US.resources:configcontrol.baml,lbl_offsetMotion:System.Windows.Controls.ContentControl.Content,Label,True,True,,Eltolás mozgás:
+CNC.Controls.Camera.g.en-US.resources:cameracontrol.baml,str_moveCameraTo:System.String.$Content,None,True,True,,Mozgassa a kamerát orsó pozícióba?
+CNC.Controls.Camera.g.en-US.resources:cameracontrol.baml,str_moveSpindleTo:System.String.$Content,None,True,True,,Állítsa az orsót kameraállásba?

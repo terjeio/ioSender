@@ -1,7 +1,7 @@
 ﻿/*
  * RotationControl.xaml.cs - part of CNC Probing library
  *
- * v0.41 / 2022-11-13 / Io Engineering (Terje Io)
+ * v0.42 / 2023-03-22 / Io Engineering (Terje Io)
  *
  */
 
@@ -185,7 +185,7 @@ namespace CNC.Controls.Probing
         {
             var probing = DataContext as ProbingViewModel;
 
-            probing.Positions.Add(new Position(probing.Grbl.MachinePosition));
+            probing.Positions.Add(new Position(probing.Grbl.MachinePosition, probing.Grbl.UnitFactor));
         }
 
         private void OnCompleted()

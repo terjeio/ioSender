@@ -19,7 +19,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -52,11 +52,11 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="Xceed.Wpf.Toolkit">
-      <HintPath>..\..\Extended.WPF.Toolkit.Binaries.NET.4.x\Xceed.Wpf.Toolkit.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ColorPicker.xaml.cs">
+      <DependentUpon>ColorPicker.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ConfigControl.xaml.cs">
       <DependentUpon>ConfigControl.xaml</DependentUpon>
     </Compile>
@@ -72,6 +72,10 @@
     <Compile Include="Viewer.xaml.cs">
       <DependentUpon>Viewer.xaml</DependentUpon>
     </Compile>
+    <Page Include="ColorPicker.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="ConfigControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

@@ -94,8 +94,8 @@ namespace CNC.Controls
                     Model.ProgramLimits.Clear();
                 else foreach (int i in AxisFlags.All.ToIndices())
                 {
-                    Model.ProgramLimits.MinValues[i] = Program.BoundingBox.Min[i];
-                    Model.ProgramLimits.MaxValues[i] = Program.BoundingBox.Max[i];
+                    Model.ProgramLimits.MinValues[i] = Model.ConvertMM2Current(Program.BoundingBox.Min[i]);
+                    Model.ProgramLimits.MaxValues[i] = Model.ConvertMM2Current(Program.BoundingBox.Max[i]);
                 }
 
                 Model.FileName = filename;

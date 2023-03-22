@@ -1,13 +1,13 @@
 ﻿/*
  * DROControl.xaml.cs - part of CNC Controls library
  *
- * v0.41 / 2022-09-25 / Io Engineering (Terje Io)
+ * v0.42 / 2023-02-14 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2022, Io Engineering (Terje Io)
+Copyright (c) 2018-2023, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -65,9 +65,10 @@ namespace CNC.Controls
 
             foreach (DROBaseControl axis in UIUtils.FindLogicalChildren<DROBaseControl>(this))
             {
-                axis.txtReadout.GotFocus += TxtReadout_GotFocus;
-                axis.txtReadout.LostFocus += txtPos_LostFocus;
-                axis.txtReadout.PreviewKeyUp += txtPos_KeyPress;
+                axis.txtReadout.GotFocus += txtReadout_GotFocus;
+                axis.txtReadout.LostFocus += txtReadout_LostFocus;
+                axis.txtReadout.PreviewKeyDown += txtReadout_PreviewKeyDown;
+                axis.txtReadout.PreviewKeyUp += txtReadout_PreviewKeyUp;
                 axis.btnZero.Click += btnZero_Click;
             }
         }
@@ -98,13 +99,13 @@ namespace CNC.Controls
                 if (GrblInfo.AxisFlags.HasFlag(AxisFlags.C))
                     keyboard.AddHandler(Key.C, ModifierKeys.Control | ModifierKeys.Shift, ZeroC);
                 keyboard.AddHandler(Key.D0, ModifierKeys.Control | ModifierKeys.Shift, ZeroAxes);
-
-                foreach (DROBaseControl axis in UIUtils.FindLogicalChildren<DROBaseControl>(this))
-                    axis.Tag = GrblInfo.AxisLetterToIndex(axis.Label);
             }
+
+            foreach (DROBaseControl axis in UIUtils.FindLogicalChildren<DROBaseControl>(this))
+                axis.Tag = GrblInfo.AxisLetterToIndex(axis.Label);
         }
 
-        private void TxtReadout_GotFocus(object sender, RoutedEventArgs e)
+        private void txtReadout_GotFocus(object sender, RoutedEventArgs e)
         {
             if (IsFocusable && !(DataContext as GrblViewModel).IsJobRunning)
             {
@@ -122,7 +123,7 @@ namespace CNC.Controls
             }
         }
 
-        void txtPos_LostFocus(object sender, EventArgs e)
+        void txtReadout_LostFocus(object sender, EventArgs e)
         {
             ((NumericTextBox)(sender)).IsReadOnly = true;
 
@@ -139,7 +140,13 @@ namespace CNC.Controls
             DROEnabledChanged?.Invoke(false);
         }
 
-        private void txtPos_KeyPress(object sender, KeyEventArgs e)
+        private void txtReadout_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (!hasFocus)
+                e.Handled = true;
+        }
+
+        private void txtReadout_PreviewKeyUp(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
             {

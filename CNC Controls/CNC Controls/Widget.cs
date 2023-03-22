@@ -1,13 +1,13 @@
 /*
  * Widget.cs - part of CNC Controls library for Grbl
  *
- * v0.41 / 2022-09-23 / Io Engineering (Terje Io)
+ * v0.41 / 2023-01-12 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2022, Io Engineering (Terje Io)
+Copyright (c) 2018-2023, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -76,6 +76,7 @@ namespace CNC.Controls
         public string Value { get; private set; }
         public double Min { get; private set; } = double.NaN;
         public double Max { get; private set; } = double.NaN;
+        public bool AllowNull { get; private set; } = false;
 
         GrblSettingDetails properties = null;
 
@@ -96,6 +97,7 @@ namespace CNC.Controls
             Value = Properties.Value;
             Min = Properties.Min;
             Max = Properties.Max;
+            AllowNull = Properties.AllowNull;
         }
     }
 
@@ -249,7 +251,8 @@ namespace CNC.Controls
                     binding.ValidationRules.Add(new NumericRangeRule()
                     {
                         Min = widget.Min,
-                        Max = widget.Max
+                        Max = widget.Max,
+                        AllowNull = widget.AllowNull
                     });
                     wNumericTextBox.Style = View.Resources["NumericErrorStyle"] as Style;
                     BindingOperations.SetBinding(wNumericTextBox, NumericTextBox.ValueProperty, binding);
@@ -286,6 +289,27 @@ namespace CNC.Controls
                         };
                         sbinding.ValidationRules.Add(new IP4ValueRule());
                         wTextBox.Style = View.Resources["Ip4ErrorStyle"] as Style;
+                        BindingOperations.SetBinding(wTextBox, TextBox.TextProperty, sbinding);
+                    }
+                    if(widget.Min != double.NaN &&
+                        (widget.DataType == GrblSettingDetails.DataTypes.TEXT || 
+                          widget.DataType == GrblSettingDetails.DataTypes.PASSWORD))
+                    {
+                        Binding sbinding = new Binding("Text")
+                        {
+                            Source = Canvas.DataContext,
+                            Path = new PropertyPath("TextValue"),
+                            Mode = BindingMode.TwoWay,
+                            UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
+                            ValidatesOnDataErrors = true
+                        };
+                        sbinding.ValidationRules.Add(new StringRangeRule()
+                        {
+                            Min = widget.Min,
+                            Max = widget.Max,
+                            AllowNull = widget.AllowNull
+                        });
+                        wTextBox.Style = View.Resources["StringErrorStyle"] as Style;
                         BindingOperations.SetBinding(wTextBox, TextBox.TextProperty, sbinding);
                     }
                     grid = labelGrid = AddGrid();

@@ -1,13 +1,13 @@
 /*
  * UIUtils.cs - part of CNC Controls library
  *
- * v0.36 / 2021-12-25 / Io Engineering (Terje Io)
+ * v0.41 / 2023-01-12 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2021, Io Engineering (Terje Io)
+Copyright (c) 2018-2023, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -118,23 +118,53 @@ namespace CNC.Controls
         }
     }
 
+    public class StringRangeRule : ValidationRule
+    {
+        public double Min { get; set; } = double.NaN;
+        public double Max { get; set; } = double.NaN;
+        public bool AllowNull { get; set; } = false;
+
+        public override ValidationResult Validate(object value, CultureInfo cultureInfo)
+        {
+            int v = ((string)value).Length;
+
+            if (!(v == 0 && AllowNull))
+            {
+                if (!double.IsNaN(Min) && !double.IsNaN(Max) && (v < Min || v > Max))
+                    return new ValidationResult(false, string.Format(LibStrings.FindResource("ValAllowedRange"), Min, Max));
+
+                if (!double.IsNaN(Min) && v < Min)
+                    return new ValidationResult(false, string.Format(LibStrings.FindResource("ValAllowedMin"), Min));
+
+                if (!double.IsNaN(Max) && v > Max)
+                    return new ValidationResult(false, string.Format(LibStrings.FindResource("ValAllowedMax"), Max));
+            }
+
+            return ValidationResult.ValidResult;
+        }
+    }
+
     public class NumericRangeRule : ValidationRule
     {
         public double Min { get; set; } = double.NaN;
         public double Max { get; set; } = double.NaN;
+        public bool AllowNull { get; set; } = false;
 
         public override ValidationResult Validate(object value, CultureInfo cultureInfo)
         {
             double v = (double)value;
 
-            if(!double.IsNaN(Min) && !double.IsNaN(Max) && (v < Min || v > Max))
-                return new ValidationResult(false, string.Format(LibStrings.FindResource("ValAllowedRange"), Min, Max));
+            if (!(v == 0d && AllowNull))
+            {
+                if (!double.IsNaN(Min) && !double.IsNaN(Max) && (v < Min || v > Max))
+                    return new ValidationResult(false, string.Format(LibStrings.FindResource("ValAllowedRange"), Min, Max));
 
-            if (!double.IsNaN(Min) && v < Min)
-                return new ValidationResult(false, string.Format(LibStrings.FindResource("ValAllowedMin"), Min));
+                if (!double.IsNaN(Min) && v < Min)
+                    return new ValidationResult(false, string.Format(LibStrings.FindResource("ValAllowedMin"), Min));
 
-            if (!double.IsNaN(Max) && v > Max)
-                return new ValidationResult(false, string.Format(LibStrings.FindResource("ValAllowedMax"), Max));
+                if (!double.IsNaN(Max) && v > Max)
+                    return new ValidationResult(false, string.Format(LibStrings.FindResource("ValAllowedMax"), Max));
+            }
 
             return ValidationResult.ValidResult;
         }

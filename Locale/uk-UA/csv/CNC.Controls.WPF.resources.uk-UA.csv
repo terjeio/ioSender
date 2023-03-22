@@ -194,6 +194,7 @@ CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,mnu_delete:System.Windows.Con
 CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,mnu_downloadRun:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Завантажити з вик_онанням
 CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,mnu_enableRewind:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Дозволити повернення
 CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,mnu_run:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Пуск
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,mnu_viewAll:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,View all
 CNC.Controls.WPF.g.en-US.resources:appconfigview.baml,msg_restart:System.String.$Content,None,True,True,,Зміни налаштувань почнуть діяти після перезапуска програми!
 CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,pnl_kbdJogging:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Увага! - Grbl має помилки при перериванні переміщення (при відпусканні клавиш).
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_appconfCreate:System.String.$Content,None,True,True,,Файл конфігурації не існує або пошкоджено. Створити новий?

@@ -1,0 +1,18 @@
+﻿CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,btn_cancel:System.Windows.Controls.ContentControl.Content,Button,True,True,,Mégsem
+CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,btn_ok:System.Windows.Controls.ContentControl.Content,Button,True,True,,Ok
+CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,dlg_dragKnife:System.Windows.Window.Title,Title,True,True,,Húzó kés paraméterei
+CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,fld_cutDepth:CNC.Controls.NumericField.Label,None,False,True,,Vágási mélység:
+CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,fld_cutDepth:CNC.Controls.NumericField.Unit,None,False,True,,mm
+CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,fld_dentLength:CNC.Controls.NumericField.Unit,None,False,True,,mm
+CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,fld_dentLength:CNC.Controls.NumericField.Label,None,False,True,,Horpadás hossza:
+CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,fld_retractAngle:CNC.Controls.NumericField.Label,None,False,True,,Visszahúzási szög:
+CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,fld_retractAngle:CNC.Controls.NumericField.Unit,None,False,True,,fok
+CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,fld_retractDepth:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
+CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,fld_retractDepth:CNC.Controls.NumericField.Label,None,False,True,,Visszahúzási mélység:
+CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,fld_swivelAngle:CNC.Controls.NumericField.Label,None,False,True,,Elfordulási szög:
+CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,fld_swivelAngle:CNC.Controls.NumericField.Unit,None,False,True,,fok
+CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,fld_tipOffset:CNC.Controls.NumericField.Unit,None,False,True,,mm
+CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,fld_tipOffset:CNC.Controls.NumericField.Label,None,False,True,,A hegy eltolása:
+CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,grp_knife:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Kés
+CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,grp_retract:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Visszahúzás
+CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,lbl_retractEnable:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Visszahúzás engedélyezése

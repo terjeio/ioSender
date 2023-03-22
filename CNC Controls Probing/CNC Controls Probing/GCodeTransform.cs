@@ -7,7 +7,6 @@ using CNC.GCode;
 using RP.Math;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace CNC.Controls.Probing
 {
@@ -41,8 +40,8 @@ namespace CNC.Controls.Probing
 
             GCPlane plane = new GCPlane(GrblParserState.Plane == Plane.XY ? Commands.G17 : Commands.G18, 0);
             DistanceMode distanceMode = GrblParserState.DistanceMode;
-
-            Vector3 pos = new Vector3(model.Grbl.Position.X, model.Grbl.Position.Y, model.Grbl.Position.Z);
+            Position position = new Position(model.Grbl.Position, model.Grbl.UnitFactor);
+            Vector3 pos = new Vector3(position.X, position.Y, position.Z);
 
             List<GCodeToken> newToolPath = new List<GCodeToken>();
 
@@ -56,6 +55,7 @@ namespace CNC.Controls.Probing
                     case Commands.G1:
                         {
                             var motion = token as GCLinearMotion;
+//                            GCLinearMotion last_segment = null;
 
                             var m = new Line(motion.AxisFlags);
                             m.Start = pos;
@@ -66,8 +66,10 @@ namespace CNC.Controls.Probing
                             {
                                 Vector3 target = new Vector3(Math.Round(subMotion.End.X, precision), Math.Round(subMotion.End.Y, precision), Math.Round(subMotion.End.Z + map.InterpolateZ(subMotion.End.X, subMotion.End.Y), precision));
 
-                                newToolPath.Add(new GCLinearMotion(motion.Command, lnr++, target.Array, motion.AxisFlags | AxisFlags.Z));
+                                newToolPath.Add(/*last_segment = */new GCLinearMotion(motion.Command, lnr++, target.Array, motion.AxisFlags | AxisFlags.Z));
                             }
+//                            if(last_segment != null)
+//                                pos = ToAbsolute(pos, last_segment.Values);
                         }
                         break;
 
@@ -78,6 +80,7 @@ namespace CNC.Controls.Probing
                                 throw new Exception(LibStrings.FindResource("HasRadiusArcs"));
 
                             var arc = token as GCArc;
+                            GCArc last_segment = null;
                             double[] center = arc.GetCenter(plane, pos.Array);
                             double[] ijk = new double[3];
 
@@ -99,10 +102,26 @@ namespace CNC.Controls.Probing
                                     ijk[1] = Math.Round(center[1] - subMotion.Start.Y, precision);
                                 }
 
-                                Vector3 target = new Vector3(Math.Round(subMotion.End.X, precision), Math.Round(subMotion.End.Y, precision), Math.Round(subMotion.End.Z + map.InterpolateZ(subMotion.End.X, subMotion.End.Y), precision));
+//                                Vector3 target = new Vector3(Math.Round(subMotion.End.X, precision), Math.Round(subMotion.End.Y, precision), Math.Round(subMotion.End.Z + map.InterpolateZ(subMotion.End.X, subMotion.End.Y), precision));
+                                Vector3 target = new Vector3(subMotion.End.X, subMotion.End.Y, subMotion.End.Z + map.InterpolateZ(subMotion.End.X, subMotion.End.Y));
 
-                                newToolPath.Add(new GCArc(arc.Command, lnr++, target.Array, arc.AxisFlags | AxisFlags.Z, ijk, arc.IjkFlags, arc.R, arc.P, arc.IJKMode));
+                                target = new Vector3(Math.Round(target.X, precision), Math.Round(target.Y, precision), Math.Round(target.Z, precision));
+
+                                AxisFlags axisFlags = AxisFlags.XYZ;
+                                if(last_segment != null)
+                                {
+                                    if (last_segment.X == target.X)
+                                        axisFlags &= ~AxisFlags.X;
+                                    if (last_segment.Y == target.Y)
+                                        axisFlags &= ~AxisFlags.Y;
+                                    if (last_segment.Z == target.Z)
+                                        axisFlags &= ~AxisFlags.Z;
+                                }
+
+                                newToolPath.Add(last_segment = new GCArc(arc.Command, lnr++, target.Array, axisFlags, ijk, arc.IjkFlags, arc.R, arc.P, arc.IJKMode));
                             }
+//                            if (last_segment != null)
+//                                pos = ToAbsolute(pos, last_segment.Values);
                         }
                         break;
 

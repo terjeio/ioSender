@@ -1,0 +1,52 @@
+﻿ioSender.g.en-US.resources:mainwindow.baml,lbl_jogStep:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,A billentyűzet léptetésének távolsága  (a &lt;CTRL&gt; módosítva).
+ioSender.g.en-US.resources:mainwindow.baml,mnu_about:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Az IOSender
+ioSender.g.en-US.resources:mainwindow.baml,mnu_briefTour:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Rövid túra
+ioSender.g.en-US.resources:mainwindow.baml,mnu_camera:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Kamera
+ioSender.g.en-US.resources:mainwindow.baml,mnu_close:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Bezárás
+ioSender.g.en-US.resources:mainwindow.baml,mnu_errorsAndAlarms:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Hiba és riasztás kódok
+ioSender.g.en-US.resources:mainwindow.baml,mnu_exit:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Kilépés
+ioSender.g.en-US.resources:mainwindow.baml,mnu_file:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Fájl
+ioSender.g.en-US.resources:mainwindow.baml,mnu_help:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Segítség
+ioSender.g.en-US.resources:mainwindow.baml,mnu_load:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Betöltés
+ioSender.g.en-US.resources:mainwindow.baml,mnu_open:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Kinyit
+ioSender.g.en-US.resources:mainwindow.baml,mnu_openConsole:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Nyissa meg a konzolt
+ioSender.g.en-US.resources:mainwindow.baml,mnu_save:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Mentés
+ioSender.g.en-US.resources:mainwindow.baml,mnu_transform:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Átalakítani
+ioSender.g.en-US.resources:mainwindow.baml,mnu_usageTips:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Használati _tippek
+ioSender.g.en-US.resources:mainwindow.baml,mnu_videoTutorials:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Videó oktatóanyagok
+ioSender.g.en-US.resources:mainwindow.baml,mnu_wiki:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,_Wiki
+ioSender.g.en-US.resources:mainwindow.baml,str_jogStep:System.String.$Content,None,True,True,,Kocogó lépés: {0}
+ioSender.g.en-US.resources:mainwindow.baml,str_mnuArcsToLines:System.String.$Content,None,True,True,,Ívek a vonalakhoz
+ioSender.g.en-US.resources:mainwindow.baml,str_mnuCompress:System.String.$Content,None,True,True,,Tömörítés (kísérleti)
+ioSender.g.en-US.resources:mainwindow.baml,str_mnuDragKnife:System.String.$Content,None,True,True,,Húzókés mozuloatok hozzáadása
+ioSender.g.en-US.resources:mainwindow.baml,str_mnuRotate:System.String.$Content,None,True,True,,Forog
+ioSender.g.en-US.resources:jobview.baml,str_msgDoorExit:System.String.$Content,None,True,True,,"Az ajtó még nyitva van, kilépjen?"
+ioSender.g.en-US.resources:jobview.baml,str_msgDoorOpen:System.String.$Content,None,True,True,,"Az ajtó nyitva van, zárja be az ajtót és folytassa?"
+ioSender.g.en-US.resources:jobview.baml,str_msgDoorPersist:System.String.$Content,None,True,True,,Az ajtó állapotát nem lehet törölni &lt;Reset&gt;
+ioSender.g.en-US.resources:jobview.baml,str_msgEStop:System.String.$Content,None,True,True,,E-Stop aktív! - tisztítsa meg a folytatás előtt...
+ioSender.g.en-US.resources:jobview.baml,str_msgEStopExit:System.String.$Content,None,True,True,,"E-Stop még aktív, lépjen ki?"
+ioSender.g.en-US.resources:jobview.baml,str_msgHome:System.String.$Content,None,True,True,,"Homing cycle required, &lt;Home&gt; to continue"
+ioSender.g.en-US.resources:jobview.baml,str_msgNoComm:System.String.$Content,None,True,True,,"A vezérlő {0} állapotban van, és nem tud válaszolni, próbálja meg a lágy reset-et?"
+ioSender.g.en-US.resources:jobview.baml,str_msgNoCommAlarm:System.String.$Content,None,True,True,,"A vezérlő nem tud kommunikálni a(z) {0} riasztás miatt, lágy visszaállítást kísérel meg."
+ioSender.g.en-US.resources:jobview.baml,str_msgNoResponse:System.String.$Content,None,True,True,,A vezérlő nem válaszol!
+ioSender.g.en-US.resources:jobview.baml,str_msgResetExit:System.String.$Content,None,True,True,,"A vezérlő lágy reset nem sikerült, kilépés."
+ioSender.g.en-US.resources:jobview.baml,str_msgResetFailed:System.String.$Content,None,True,True,,"A vezérlő lágy reset nem sikerült, kilépés."
+ioSender.g.en-US.resources:jobview.baml,str_msgWait:System.String.$Content,None,True,True,,Várakozás a vezérlőre ({0})...
+ioSender.g.en-US.resources:mainwindow.baml,str_runTime:System.String.$Content,None,True,True,,Futási idő: {0}
+ioSender.g.en-US.resources:mainwindow.baml,tab_3DView:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,3D Nézet
+ioSender.g.en-US.resources:jobview.baml,tab_3DView:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,3D Nézet
+ioSender.g.en-US.resources:mainwindow.baml,tab_appConfig:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Beállítások: App
+ioSender.g.en-US.resources:jobview.baml,tab_console:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Konzol
+ioSender.g.en-US.resources:mainwindow.baml,tab_grbl:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Grbl
+ioSender.g.en-US.resources:mainwindow.baml,tab_grblConfig:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Beállítások: Grbl
+ioSender.g.en-US.resources:mainwindow.baml,tab_jogSidebar:System.Windows.Controls.ContentControl.Content,None,True,True,,_Kocogó
+ioSender.g.en-US.resources:mainwindow.baml,tab_offsets:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Eltolások
+ioSender.g.en-US.resources:mainwindow.baml,tab_parting:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Elválás
+ioSender.g.en-US.resources:mainwindow.baml,tab_pidTuner:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,PID Hangoló
+ioSender.g.en-US.resources:mainwindow.baml,tab_probing:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Szondázás
+ioSender.g.en-US.resources:jobview.baml,tab_program:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Program
+ioSender.g.en-US.resources:mainwindow.baml,tab_sdCard:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,SD Card
+ioSender.g.en-US.resources:mainwindow.baml,tab_threading:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Befűzés
+ioSender.g.en-US.resources:mainwindow.baml,tab_tools:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Eszközök
+ioSender.g.en-US.resources:mainwindow.baml,tab_trinamic:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Trinamic hangoló
+ioSender.g.en-US.resources:mainwindow.baml,tab_turning:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Fordulás

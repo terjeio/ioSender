@@ -1,13 +1,13 @@
 ﻿/*
  * GCodeParser.cs - part of CNC Controls library
  *
- * v0.41 / 2022-09-29 / Io Engineering (Terje Io)
+ * v0.42 / 2023-01-07 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2022, Io Engineering (Terje Io)
+Copyright (c) 2019-2023, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -70,6 +70,7 @@ namespace CNC.GCode
             public double E;
             public double F;
             public double[] IJK = new double[3];
+            public int O;
             public double P;
             public double Q;
             public double R;
@@ -79,6 +80,7 @@ namespace CNC.GCode
             public int H;
             public int T;
             public int L;
+            public int Dollar;
 
             public double X { get { return XYZ[0]; } set { XYZ[0] = value; } }
             public double Y { get { return XYZ[1]; } set { XYZ[1] = value; } }
@@ -98,7 +100,7 @@ namespace CNC.GCode
             {
                 D = E = F = P = Q = R = S = 0d;
                 N = 0;
-                H = T = L = 0;
+                H = T = L = O = Dollar = 0;
                 for (int i = 0; i < XYZ.Length; i++)
                     XYZ[i] = 0d;
                 for (int i = 0; i < IJK.Length; i++)
@@ -148,17 +150,19 @@ namespace CNC.GCode
             K = 1 << 11,
             L = 1 << 12,
             N = 1 << 13,
-            P = 1 << 14,
-            R = 1 << 15,
-            S = 1 << 16,
-            T = 1 << 17,
-            X = 1 << 18,
-            Y = 1 << 19,
-            Z = 1 << 20,
-            Q = 1 << 21,
-            U = 1 << 22,
-            V = 1 << 23,
-            W = 1 << 24
+            O = 1 << 14,
+            P = 1 << 15,
+            R = 1 << 16,
+            S = 1 << 17,
+            T = 1 << 18,
+            X = 1 << 19,
+            Y = 1 << 20,
+            Z = 1 << 21,
+            Q = 1 << 22,
+            U = 1 << 23,
+            V = 1 << 24,
+            W = 1 << 25,
+            Dollar = 1 << 26
         }
 
         private enum AxisCommand
@@ -806,6 +810,11 @@ namespace CNC.GCode
                                 wordFlag = WordFlags.N;
                                 break;
 
+                            case 'O':
+                                gcValues.O = (int)value;
+                                wordFlag = WordFlags.O;
+                                break;
+
                             case 'P':
                                 gcValues.P = value;
                                 wordFlag = WordFlags.P;
@@ -919,6 +928,11 @@ namespace CNC.GCode
                                 }
                                 break;
 
+                            case '$':
+                                gcValues.Dollar = (int)value;
+                                wordFlag = WordFlags.Dollar;
+                                break;
+
                             default:
                                 throw new GCodeException(LibStrings.FindResource("ParserCmdUnknown"));
                         }
@@ -1002,7 +1016,8 @@ namespace CNC.GCode
 
             if (wordFlags.HasFlag(WordFlags.S))
             {
-                Tokens.Add(new GCSpindleRPM(Commands.SpindleRPM, gcValues.N, gcValues.S));
+                Tokens.Add(new GCSpindleRPM(Commands.SpindleRPM, gcValues.N, gcValues.S, wordFlags.HasFlag(WordFlags.Dollar) ? gcValues.Dollar : -1));
+                wordFlags &= ~WordFlags.Dollar;
             }
 
             //
@@ -1037,7 +1052,8 @@ namespace CNC.GCode
                 // M3, M4, M5
                 if (modalGroups.HasFlag(ModalGroups.M7))
                 {
-                    Tokens.Add(new GCSpindleState(gcValues.N, SpindleState));
+                    Tokens.Add(new GCSpindleState(gcValues.N, SpindleState, wordFlags.HasFlag(WordFlags.Dollar) ? gcValues.Dollar : -2));
+                    wordFlags &= ~WordFlags.Dollar;
                 }
 
                 //
@@ -1512,7 +1528,8 @@ namespace CNC.GCode
 
                     case MotionMode.G33:
                         RetractOldZ = true;
-                        Tokens.Add(new GCSyncMotion(Commands.G33, gcValues.N, gcValues.XYZ, axisWords, gcValues.K));
+                        Tokens.Add(new GCSyncMotion(Commands.G33, gcValues.N, gcValues.XYZ, axisWords, gcValues.K, wordFlags.HasFlag(WordFlags.Dollar) ? gcValues.Dollar : -1));
+                        wordFlags &= ~WordFlags.Dollar;
                         break;
 
                     case MotionMode.G38_2:
@@ -1615,7 +1632,8 @@ namespace CNC.GCode
                                 foreach (int i in ijkWords.ToIndices())
                                     gcValues.IJK[i] /= 2d;
                             RetractOldZ = true;
-                            Tokens.Add(new GCThreadingMotion(Commands.G76, gcValues.N, gcValues.P, gcValues.XYZ, axisWords, gcValues.IJK, IJKFlags.All, optValues, optFlags));
+                            Tokens.Add(new GCThreadingMotion(Commands.G76, gcValues.N, gcValues.P, gcValues.XYZ, axisWords, gcValues.IJK, IJKFlags.All, optValues, optFlags, wordFlags.HasFlag(WordFlags.Dollar) ? gcValues.Dollar : -1));
+                            wordFlags &= ~WordFlags.Dollar;
                         }
                         break;
 
@@ -2820,16 +2838,18 @@ namespace CNC.GCode
         public GCSyncMotion()
         { }
 
-        public GCSyncMotion(Commands command, uint lnr, double[] values, AxisFlags axisFlags, double k) : base(command, lnr, values, axisFlags)
+        public GCSyncMotion(Commands command, uint lnr, double[] values, AxisFlags axisFlags, double k, int spindle) : base(command, lnr, values, axisFlags)
         {
+            Spindle = spindle;
             K = k;
         }
 
+        public int Spindle { get; set; }
         public double K { get; set; }
 
         public new string ToString()
         {
-            return base.ToString() + "K" + K.ToInvariantString();
+            return base.ToString() + "K" + K.ToInvariantString() + (Spindle >= 0 ? "$" + Spindle.ToString() : ""); ;
         }
     }
 
@@ -2838,7 +2858,7 @@ namespace CNC.GCode
         public GCThreadingMotion()
         { }
 
-        public GCThreadingMotion(Commands command, uint lnr, double p, double[] values, AxisFlags axisFlags, double[] ijkValues, IJKFlags ijkFlags, double[] optvals, ThreadingFlags threadingFlags) : base(command, lnr, values, axisFlags, ijkValues, ijkFlags)
+        public GCThreadingMotion(Commands command, uint lnr, double p, double[] values, AxisFlags axisFlags, double[] ijkValues, IJKFlags ijkFlags, double[] optvals, ThreadingFlags threadingFlags, int spindle) : base(command, lnr, values, axisFlags, ijkValues, ijkFlags)
         {
             P = p;
 
@@ -2872,6 +2892,7 @@ namespace CNC.GCode
         public double[] OptionValues { get; set; } = new double[5];
         public ThreadingFlags ThreadingFlags { get; set; }
         public ThreadTaper ThreadTaper  { get; set; }
+        public int Spindle { get; set; }
         public double P { get; set; }
         public double R { get { return OptionValues[0]; } set { OptionValues[0] = value; } }
         public double Q { get { return OptionValues[1]; } set { OptionValues[1] = value; } }
@@ -2910,7 +2931,7 @@ namespace CNC.GCode
             foreach (int i in ThreadingFlags.ToIndices())
                 options += ((ThreadingFlags)(1 << i)).ToString() + OptionValues[i].ToInvariantString();
 
-            return base.ToString() + string.Format("P{0}K{1}", P.ToInvariantString(), K.ToInvariantString()) + options;
+            return base.ToString() + string.Format("P{0}K{1}", P.ToInvariantString(), K.ToInvariantString()) + options + (Spindle >= 0 ? "$" + Spindle.ToString() : "");
         }
     }
 
@@ -3060,16 +3081,18 @@ namespace CNC.GCode
         public GCSpindleRPM()
         { }
 
-        public GCSpindleRPM(Commands command, uint lnr, double spindleRPM) : base(command, lnr)
+        public GCSpindleRPM(Commands command, uint lnr, double spindleRPM, int spindle) : base(command, lnr)
         {
+            Spindle = spindle;
             SpindleRPM = spindleRPM;
         }
 
+        public int Spindle { get; set; }
         public double SpindleRPM { get; set; }
 
         public new string ToString()
         {
-            return "S" + SpindleRPM.ToInvariantString();
+            return "S" + SpindleRPM.ToInvariantString() + (Spindle >= 0 ? "$" + Spindle.ToString() : "");
         }
     }
 
@@ -3078,18 +3101,20 @@ namespace CNC.GCode
         public GCSpindleState()
         { }
 
-        public GCSpindleState(uint lnr, SpindleState spindleState)
+        public GCSpindleState(uint lnr, SpindleState spindleState, int spindle)
         {
             LineNumber = lnr;
             Command = spindleState == SpindleState.Off ? Commands.M5 : (spindleState == SpindleState.CW ? Commands.M3 : Commands.M4);
+            Spindle = spindle;
             SpindleState = spindleState;
         }
 
+        public int Spindle { get; set; }
         public SpindleState SpindleState { get; set; }
 
         public new string ToString()
         {
-            return Command.ToString();
+            return Command.ToString() + (Spindle >= -1 ? "$" + Spindle.ToString() : "");
         }
     }
 

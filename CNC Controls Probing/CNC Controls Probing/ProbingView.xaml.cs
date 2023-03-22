@@ -1,13 +1,13 @@
 ﻿/*
  * ProbingView.xaml.cs - part of CNC Probing library
  *
- * v0.41 / 2022-11-13 / Io Engineering (Terje Io)
+ * v0.42 / 2023-03-21 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020-2022, Io Engineering (Terje Io)
+Copyright (c) 2020-2023, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -56,7 +56,7 @@ namespace CNC.Controls.Probing
     {
         private static bool keyboardMappingsOk = false;
 
-        private bool jogEnabled = false, probeTriggered = false, probeDisconnected = false, cycleStartSignal = false;
+        private bool jogEnabled = false, probeTriggered = false, probeDisconnected = false, cycleStartSignal = false, wasMetric = true;
         private ProbingViewModel model = null;
         private ProbingProfiles profiles = new ProbingProfiles();
         private GrblViewModel grbl = null;
@@ -165,10 +165,11 @@ namespace CNC.Controls.Probing
 
         private void DisplayPosition(GrblViewModel grbl)
         {
+            Position position = new Position(grbl.Position, grbl.UnitFactor);
             model.Position = string.Format("X:{0}  Y:{1}  Z:{2} {3} {4}",
-                                            grbl.Position.X.ToInvariantString(grbl.Format),
-                                             grbl.Position.Y.ToInvariantString(grbl.Format),
-                                              grbl.Position.Z.ToInvariantString(grbl.Format),
+                                            position.X.ToInvariantString(grbl.Format),
+                                             position.Y.ToInvariantString(grbl.Format),
+                                              position.Z.ToInvariantString(grbl.Format),
                                                probeTriggered ? "P" : "",
                                                 probeDisconnected ? "D" : "");
         }
@@ -268,6 +269,9 @@ namespace CNC.Controls.Probing
                 else
                     GrblParserState.Get(true);
 
+                if (!(wasMetric = GrblParserState.IsMetric))
+                    model.WaitForResponse("G21");
+
                 model.ProbeVerified = !AppConfig.Settings.Probing.ValidateProbeConnected;
                 model.DistanceMode = GrblParserState.DistanceMode;
                 model.Tool = model.Grbl.Tool == GrblConstants.NO_TOOL ? "0" : model.Grbl.Tool;
@@ -294,7 +298,6 @@ namespace CNC.Controls.Probing
                 cycleStartSignal = model.Grbl.Signals.Value.HasFlag(Signals.CycleStart);
 
                 DisplayPosition(model.Grbl);
-
             }
             else
             {
@@ -309,6 +312,9 @@ namespace CNC.Controls.Probing
                     //else
                     if (model.Grbl.GrblError != 0)
                         model.WaitForResponse("");  // Clear error
+
+                    if (!wasMetric)
+                        model.WaitForResponse("G20");
 
                     model.WaitForResponse(model.DistanceMode == DistanceMode.Absolute ? "G90" : "G91");
                 }

@@ -1,13 +1,13 @@
 ﻿/*
  * Program.cs - part of CNC Probing library
  *
- * v0.36 / 2022-01-09 / Io Engineering (Terje Io)
+ * v0.42 / 2023-03-22 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020-2022, Io Engineering (Terje Io)
+Copyright (c) 2020-2023, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -93,7 +93,7 @@ namespace CNC.Controls.Probing
             {
                 case nameof(GrblViewModel.IsProbeSuccess):
                     if (Grbl.IsProbeSuccess)
-                        probing.Positions.Add(new Position(Grbl.ProbePosition));
+                        probing.Positions.Add(new Position(Grbl.ProbePosition, Grbl.UnitFactor));
                     else
                         ResponseReceived("fail");
                     break;
@@ -288,6 +288,8 @@ namespace CNC.Controls.Probing
             }
 
             probing.StartPosition.Set(probing.Grbl.MachinePosition);
+            if(probing.Grbl.UnitFactor != 1d)
+                probing.StartPosition.Scale(probing.Grbl.UnitFactor);
 
             hasPause = probeOnCycleStart = false;
             _program.Clear();
@@ -465,7 +467,21 @@ namespace CNC.Controls.Probing
             return probing.IsSuccess;
         }
 
-        private void ResponseReceived(string response)
+        public bool ProbeZ(double x, double y)
+        {
+            probing.WaitForIdle();
+
+            if (!probing.Program.Init(false))
+                return false;
+
+            probing.Program.AddRapid(string.Format("G90X{0}Y{0}", x.ToInvariantString(probing.Grbl.Format), y.ToInvariantString(probing.Grbl.Format)));
+            probing.Program.Add(string.Format("G91F{0}", probing.ProbeFeedRate.ToInvariantString()));
+            probing.Program.AddProbingAction(AxisFlags.Z, true);
+
+            return probing.Program.Execute(true);
+        }
+
+    private void ResponseReceived(string response)
         {
             if(cmd_response != "cancel")
                 cmd_response = response;

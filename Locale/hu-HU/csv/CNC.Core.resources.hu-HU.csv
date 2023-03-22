@@ -1,0 +1,43 @@
+﻿CNC.Core.g.en-US.resources:libstrings.baml,str_contClearResetUnlock:System.String.$Content,None,True,True,,tiszta akkor &lt;Visszaállítás&gt; azután &lt;Kinyit&gt; folytatni
+CNC.Core.g.en-US.resources:libstrings.baml,str_contHome:System.String.$Content,None,True,True,,&lt;Haza&gt; Folytatni
+CNC.Core.g.en-US.resources:libstrings.baml,str_contHomeUnlock:System.String.$Content,None,True,True,,&lt;Haza&gt; vagy &lt;Kinyit&gt; Folytatni
+CNC.Core.g.en-US.resources:libstrings.baml,str_contResetUnlock:System.String.$Content,None,True,True,,&lt;Visszaállítás&gt; azután &lt;Kinyit&gt; Folytatni
+CNC.Core.g.en-US.resources:libstrings.baml,str_contUnlock:System.String.$Content,None,True,True,,&lt;Kinyit&gt; Folytatni
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcLoadError:System.String.$Content,None,True,True,,{0}\\nSor: {1}\\nLetiltás: {2}\\n\\nFolytatja a betöltést?
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserAxisError:System.String.$Content,None,True,True,,Tengelyparancs ütközés
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserBadExpr:System.String.$Content,None,True,True,,Rossz kifejezés
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserCMDInvalid:System.String.$Content,None,True,True,,Érvénytelen GCode
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserCmdUnknown:System.String.$Content,None,True,True,,A parancsszó nem ismerhető fel
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserErrE:System.String.$Content,None,True,True,,"E paraméter nagyobb, mint a meghajtóvonal hosszának a fele"
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserG1NoFeed:System.String.$Content,None,True,True,,"G1 akkor használatos, ha az előtolás nincs beállítva"
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserG6NoP:System.String.$Content,None,True,True,,G4 - hiányzik a P paraméter
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserKlesseqJ:System.String.$Content,None,True,True,,"K paraméternek nagyobbnak kell lennie, mint J paraméter"
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserM66NoPorE:System.String.$Content,None,True,True,,P- vagy E-paraméter hiányzik az M66-nál
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserM66PandE:System.String.$Content,None,True,True,,Nem használható egyszerre a P- és az E-paraméter az M66-tal
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserModalGrpError:System.String.$Content,None,True,True,,Modális csoport megsértése
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNegH:System.String.$Content,None,True,True,,A H paraméter negatív
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNegJ:System.String.$Content,None,True,True,,J paraméter negatív
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNegK:System.String.$Content,None,True,True,,K paraméter negatív
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNegP:System.String.$Content,None,True,True,,P paraméter negatív
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNoG0orG1:System.String.$Content,None,True,True,,G0 vagy G1 nem aktív
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNoIandorJ:System.String.$Content,None,True,True,,I és/vagy J paraméter hiányzik
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNoInvalidQ:System.String.$Content,None,True,True,,Q paraméter hiányzik vagy a tartományon kívül esik
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNoK:System.String.$Content,None,True,True,,K paraméter hiányzik
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNoP:System.String.$Content,None,True,True,,P paraméter hiányzik
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNoPandorQ:System.String.$Content,None,True,True,,P és/vagy Q paraméter hiányzik
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNoR:System.String.$Content,None,True,True,,R paraméter hiányzik
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserPlaneNotXY:System.String.$Content,None,True,True,,Nem XY gép
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserPlaneNotZx:System.String.$Content,None,True,True,,Nem ZX gép
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserRadiusErr:System.String.$Content,None,True,True,,Hiba az ívsugár kiszámításakor.
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserRless1:System.String.$Content,None,True,True,,"R paraméter kevesebb, mint 1"
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserStrip:System.String.$Content,None,True,True,,"{0} parancs található, strip?"
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserStripHdr:System.String.$Content,None,True,True,,Sáv parancs
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserToolNoI:System.String.$Content,None,True,True,,Hiányzik a paraméter
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserToolNoJ:System.String.$Content,None,True,True,,J paraméter hiányzik
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserToolProfile:System.String.$Content,None,True,True,,A(z) {0} eszköz nincs profilhoz társítva
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserUnsupportedCmd:System.String.$Content,None,True,True,,Nem támogatott parancs
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserWordRepeated:System.String.$Content,None,True,True,,A parancsszó ismétlődött
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserZPlus:System.String.$Content,None,True,True,,Z-től eltérő tengely(ek) találhatók
+CNC.Core.g.en-US.resources:libstrings.baml,str_joggingOnly:System.String.$Content,None,True,True,,Csak a kocogás és bizonyos rendszerparancsok engedélyezettek szerszámváltáskor!
+CNC.Core.g.en-US.resources:libstrings.baml,str_sdStreamComplete:System.String.$Content,None,True,True,,SD Card streamelés {0}% kész
+CNC.Core.g.en-US.resources:libstrings.baml,str_serialPortError:System.String.$Content,None,True,True,,Nem lehet megnyitni a soros portot: {0}

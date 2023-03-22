@@ -1,13 +1,13 @@
 /*
  * MainWindow.xaml.cs - part of Grbl Code Sender
  *
- * v0.41 / 2022-09-14 / Io Engineering (Terje Io)
+ * v0.42 / 2023-03-21 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2022, Io Engineering (Terje Io)
+Copyright (c) 2019-2023, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -56,7 +56,7 @@ namespace GCode_Sender
 
     public partial class MainWindow : Window
     {
-        private const string version = "2.0.41";
+        private const string version = "2.0.42";
         public static MainWindow ui = null;
         public static CNC.Controls.Viewer.Viewer GCodeViewer = null;
         public static UIViewModel UIViewModel { get; } = new UIViewModel();

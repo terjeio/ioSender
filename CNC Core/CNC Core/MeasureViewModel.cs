@@ -1,13 +1,13 @@
 ﻿/*
  * MeasureViewModel.cs - part of CNC Controls library
  *
- * v0.33 / 2021-05-16 / Io Engineering (Terje Io)
+ * v0.42 / 2023-03-21 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020-2021, Io Engineering (Terje Io)
+Copyright (c) 2020-2023, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -69,5 +69,13 @@ namespace CNC.Core
         public string Format { get { return _isMetric ? GrblConstants.FORMAT_METRIC : GrblConstants.FORMAT_IMPERIAL; } }
         public string FormatSigned { get { return "-" + Format; } }
         public int Precision { get { return _isMetric ? 3 : 4; } }
+
+        public double ConvertMM2Current (double value)
+        {
+            if(!_isMetric)
+                value /= 25.4d;
+
+            return value;
+        }
     }
 }

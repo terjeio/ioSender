@@ -1,13 +1,13 @@
 ﻿/*
  * CameraControl.xaml.cs - part of CNC Controls Camera library
  *
- * v0.38 / 2022-04-20 / Io Engineering (Terje Io)
+ * v0.42 / 2023-03-22 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2022, Io Engineering (Terje Io) - parts derived from AForge example code
+Copyright (c) 2018-2023, Io Engineering (Terje Io) - parts derived from AForge example code
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -261,7 +261,7 @@ namespace CNC.Controls.Camera
 
         private void btnPublish_Click(object sender, RoutedEventArgs e)
         {
-            Position pos = new Position(Grbl.GrblViewModel.MachinePosition);
+            Position pos = new Position(Grbl.GrblViewModel.MachinePosition, Grbl.GrblViewModel.UnitFactor);
 
             pos.X += XOffset;
             pos.Y += YOffset;

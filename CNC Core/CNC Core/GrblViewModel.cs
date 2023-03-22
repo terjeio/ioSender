@@ -1,13 +1,13 @@
 /*
  * GrblViewModel.cs - part of CNC Controls library
  *
- * v0.41 / 2022-09-23 / Io Engineering (Terje Io)
+ * v0.42 / 2023-03-21 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2022, Io Engineering (Terje Io)
+Copyright (c) 2019-2023, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -220,7 +220,7 @@ namespace CNC.Core
         {
             has_wco = false;
             _MPos = _WPos = _wco = _h = string.Empty;
-            MachinePosition.Clear();
+            MachinePosition.Zero(); // clearing this stops updates of machine position flyout when > 3 axes, seemingly due to internal timing/sequencing issue.
             WorkPosition.Clear();
             WorkPositionOffset.Clear();
             Position.Clear();
@@ -389,7 +389,7 @@ namespace CNC.Core
         public bool SuspendPositionNotifications
         {
             get { return Position.SuspendNotifications; }
-            set { Position.SuspendNotifications = value; }
+            set { Position.SuspendNotifications = MachinePosition.SuspendNotifications = value; }
         }
 
         public AxisLetter AxisLetter { get; private set; } = new AxisLetter();

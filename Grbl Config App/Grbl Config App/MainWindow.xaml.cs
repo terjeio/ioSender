@@ -52,7 +52,7 @@ namespace Grbl_Config_App
 
     public partial class MainWindow : Window
     {
-        private const string version = "2.0.41";
+        private const string version = "2.0.42";
         public static UIViewModel UIViewModel { get; } = new UIViewModel();
 
         public MainWindow()

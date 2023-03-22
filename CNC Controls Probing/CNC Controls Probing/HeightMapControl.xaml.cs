@@ -1,13 +1,13 @@
 ﻿/*
  * HeightMapControl.xaml.cs - part of CNC Probing library
  *
- * v0.41 / 2022-11-13 / Io Engineering (Terje Io)
+ * v0.42 / 2023-03-22 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020-2022, Io Engineering (Terje Io)
+Copyright (c) 2020-2023, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -53,6 +53,7 @@ namespace CNC.Controls.Probing
     public partial class HeightMapControl : UserControl, IProbeTab
     {
         private int x, y;
+        private Position origin;
 
         public HeightMapControl()
         {
@@ -74,6 +75,8 @@ namespace CNC.Controls.Probing
 
             if (!probing.ValidateInput(true))
                 return;
+
+            origin = new Position(probing.Grbl.MachinePosition, probing.Grbl.UnitFactor);
 
             if (!probing.WaitForIdle(string.Format("G90G0X{0}Y{1}", probing.HeightMap.MinX.ToInvariantString(), probing.HeightMap.MinY.ToInvariantString())))
                 return;
@@ -141,22 +144,6 @@ namespace CNC.Controls.Probing
 
             if ((ok = probing.IsSuccess && probing.Positions.Count == probing.HeightMap.Map.TotalPoints))
             {
-                probing.GotoMachinePosition(probing.StartPosition, AxisFlags.Z);
-                probing.GotoMachinePosition(probing.StartPosition, AxisFlags.X | AxisFlags.Y);
-
-                if (probing.HeightMap.SetToolOffset)
-                {
-                    if (probing.CoordinateMode == ProbingViewModel.CoordMode.G10)
-                        probing.Grbl.ExecuteCommand(string.Format("G10L2P{0}Z{1}", probing.CoordinateSystem, (probing.Positions[0].Z - probing.Grbl.ToolOffset.Z).ToInvariantString()));
-                    else if ((ok == probing.GotoMachinePosition(probing.Positions[0], AxisFlags.Z)))
-                    {
-                        probing.Grbl.ExecuteCommand("G92Z0");
-                        probing.GotoMachinePosition(probing.StartPosition, AxisFlags.Z);
-                        if (!probing.Grbl.IsParserStateLive)
-                            probing.Grbl.ExecuteCommand("$G");
-                    }
-                }
-
                 double Z0 = probing.Positions[0].Z, z_min = 0d, z_max = 0d, z_delta;
 
                 int i = 0;
@@ -194,7 +181,27 @@ namespace CNC.Controls.Probing
                 probing.HeightMap.MapPoints = mapPoints.Points;
                 probing.HeightMap.HasHeightMap = true;
 
-                if(ok)
+//                double z = probing.HeightMap.Map.InterpolateZ(0d, 0d);
+
+                if (probing.HeightMap.SetToolOffset &&
+                    (ok = (probing.Positions[0].X == origin.X && probing.Positions[0].Y == origin.Y) || probing.Program.ProbeZ(0d, 0d)))
+                {
+                    probing.HeightMap.Map.ZOffset = Z0 - probing.Positions[0].Z; // vs Z above, add check for allowed delta?
+
+                    if (probing.CoordinateMode == ProbingViewModel.CoordMode.G10)
+                        probing.Grbl.ExecuteCommand(string.Format("G10L2P{0}Z{1}", probing.CoordinateSystem, (probing.Positions[0].Z - probing.Grbl.ToolOffset.Z).ToInvariantString()));
+                    else if ((ok = probing.GotoMachinePosition(probing.Positions[0], AxisFlags.Z)))
+                    {
+                        probing.Grbl.ExecuteCommand("G92Z0");
+                        if (!probing.Grbl.IsParserStateLive)
+                            probing.Grbl.ExecuteCommand("$G");
+                    }
+                }
+
+                probing.GotoMachinePosition(origin, AxisFlags.Z);
+                probing.GotoMachinePosition(origin, AxisFlags.X | AxisFlags.Y);
+
+                if (ok)
                     probing.Program.End(string.Format((string)FindResource("ProbingCompleted"), z_min.ToInvariantString(probing.Grbl.Format), z_max.ToInvariantString(probing.Grbl.Format)));
             }
 
@@ -300,10 +307,12 @@ namespace CNC.Controls.Probing
         {
             var probing = DataContext as ProbingViewModel;
 
-            probing.HeightMap.MinX = probing.Grbl.ProgramLimits.MinX;
-            probing.HeightMap.MinY = probing.Grbl.ProgramLimits.MinY;
-            probing.HeightMap.MaxX = probing.Grbl.ProgramLimits.MaxX;
-            probing.HeightMap.MaxY = probing.Grbl.ProgramLimits.MaxY;
+            ProgramLimits programLimits = new ProgramLimits(probing.Grbl.ProgramLimits, probing.Grbl.UnitFactor);
+
+            probing.HeightMap.MinX = programLimits.MinX;
+            probing.HeightMap.MinY = programLimits.MinY;
+            probing.HeightMap.MaxX = programLimits.MaxX;
+            probing.HeightMap.MaxY = programLimits.MaxY;
             //probing.HeightMap.GridSizeLockXY = true;
             //probing.HeightMap.GridSizeX = probing.HeightMap.GridSizeY = 5d;
         }

@@ -1,13 +1,13 @@
 ﻿/*
  * CenterFinderControl.xaml.cs - part of CNC Probing library
  *
- * v0.41 / 2022-11-13 / Io Engineering (Terje Io)
+ * v0.42 / 2023-03-22 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020-2022, Io Engineering (Terje Io)
+Copyright (c) 2020-2023, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -387,7 +387,7 @@ namespace CNC.Controls.Probing
                         case ProbingViewModel.CoordMode.Measure:
                             center.X += probing.ProbeOffsetX;
                             center.Y += probing.ProbeOffsetY;
-                            probing.Measurement.Add(center, axisflags, ProbingType);
+                            probing.Measurement.Add(new Position(center, 1d / probing.Grbl.UnitFactor), axisflags, ProbingType);
                             break;
 
                         case ProbingViewModel.CoordMode.G92:

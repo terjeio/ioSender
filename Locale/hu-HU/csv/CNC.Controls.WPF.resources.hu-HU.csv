@@ -1,0 +1,276 @@
+﻿CNC.Controls.WPF.g.en-US.resources:macroeditor.baml,btn_add:System.Windows.Controls.ContentControl.Content,Button,True,True,,Hozzáadás
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,btn_backup:System.Windows.Controls.ContentControl.Content,Button,True,True,,Biztonsági mentés
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,btn_cancel:System.Windows.Controls.ContentControl.Content,Button,True,True,,Mégsem
+CNC.Controls.WPF.g.en-US.resources:gcoderotatedialog.baml,btn_cancel:System.Windows.Controls.ContentControl.Content,Button,True,True,,Mégsem
+CNC.Controls.WPF.g.en-US.resources:macroeditor.baml,btn_cancel:System.Windows.Controls.ContentControl.Content,Button,True,True,,Mégsem
+CNC.Controls.WPF.g.en-US.resources:gcodewrapdialog.baml,btn_cancel:System.Windows.Controls.ContentControl.Content,Button,True,True,,Mégsem
+CNC.Controls.WPF.g.en-US.resources:consolecontrol.baml,btn_clear:System.Windows.Controls.ContentControl.Content,Button,True,True,,Tisztít
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,btn_clear:System.Windows.Controls.ContentControl.Content,Button,True,True,,Mindent tisztít
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,btn_clear:System.Windows.Controls.ContentControl.Content,Button,True,True,,Mindent tisztít
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,btn_currPos:System.Windows.Controls.ContentControl.Content,Button,True,True,,Szerezze meg az aktuális pozíciót
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,btn_currPos:System.Windows.Controls.ContentControl.Content,Button,True,True,,Szerezze meg az aktuális pozíciót
+CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,btn_cycleStart:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Alt+R
+CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,btn_cycleStart:System.Windows.Controls.ContentControl.Content,Button,True,True,,Ciklusindítás
+CNC.Controls.WPF.g.en-US.resources:macroexecutecontrol.baml,btn_edit:System.Windows.Controls.ContentControl.Content,Button,True,True,,Szerkesztés
+CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,btn_feedHold:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Űr
+CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,btn_feedHold:System.Windows.Controls.ContentControl.Content,Button,True,True,,Előtolás tartás
+CNC.Controls.WPF.g.en-US.resources:trinamicview.baml,btn_getStatus:System.Windows.Controls.ContentControl.Content,Button,True,True,,Állapot lekérése
+CNC.Controls.WPF.g.en-US.resources:trinamicview.baml,btn_getStatusAll:System.Windows.Controls.ContentControl.Content,Button,True,True,,"Szerezzen állapotot, minden meghajtóról"
+CNC.Controls.WPF.g.en-US.resources:outlineflyout.baml,btn_go:System.Windows.Controls.ContentControl.Content,Button,True,True,,Indulás
+CNC.Controls.WPF.g.en-US.resources:outlinebasecontrol.baml,btn_go:System.Windows.Controls.ContentControl.Content,Button,True,True,,Indulás
+CNC.Controls.WPF.g.en-US.resources:gotobasecontrol.baml,btn_gotoG28:System.Windows.Controls.ContentControl.Content,Button,True,True,,Menj pozícióba 1 (G28)
+CNC.Controls.WPF.g.en-US.resources:gotobasecontrol.baml,btn_gotoG30:System.Windows.Controls.ContentControl.Content,Button,True,True,,Menj pozícióba 2 (G30)
+CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,btn_home:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Ctrl+H
+CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,btn_home:System.Windows.Controls.ContentControl.Content,Button,True,True,,Haza
+CNC.Controls.WPF.g.en-US.resources:macroeditor.baml,btn_ok:System.Windows.Controls.ContentControl.Content,Button,True,True,,Ok
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,btn_ok:System.Windows.Controls.ContentControl.Content,Button,True,True,,Ok
+CNC.Controls.WPF.g.en-US.resources:about.baml,btn_ok:System.Windows.Controls.ContentControl.Content,Button,True,True,,Ok
+CNC.Controls.WPF.g.en-US.resources:gcoderotatedialog.baml,btn_ok:System.Windows.Controls.ContentControl.Content,Button,True,True,,Ok
+CNC.Controls.WPF.g.en-US.resources:gcodewrapdialog.baml,btn_ok:System.Windows.Controls.ContentControl.Content,Button,True,True,,Ok
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,btn_reload:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,A beállítások újratöltése a vezérlőről.
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,btn_reload:System.Windows.Controls.ContentControl.Content,Button,True,True,,Újratöltés
+CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,btn_reset:System.Windows.Controls.ContentControl.Content,Button,True,True,,Visszaállítás
+CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,btn_reset:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Ctrl+Shift+R
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,btn_restore:System.Windows.Controls.ContentControl.Content,Button,True,True,,Visszaállítás
+CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,btn_rewind:System.Windows.Controls.ContentControl.Content,Button,True,True,,Visszatekerés
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,btn_save:System.Windows.Controls.ContentControl.Content,Button,True,True,,Mentés
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,btn_save:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Mentse el a módosított beállításokat a vezérlőbe.
+CNC.Controls.WPF.g.en-US.resources:appconfigview.baml,btn_saveKeyMap:System.Windows.Controls.ContentControl.Content,Button,True,True,,Billentyűkiosztás mentése
+CNC.Controls.WPF.g.en-US.resources:appconfigview.baml,btn_saveSettings:System.Windows.Controls.ContentControl.Content,Button,True,True,,Beállítások mentése
+CNC.Controls.WPF.g.en-US.resources:mdicontrol.baml,btn_send:System.Windows.Controls.ContentControl.Content,Button,True,True,,Küld
+CNC.Controls.WPF.g.en-US.resources:coordvaluesetcontrol.baml,btn_set:System.Windows.Controls.ContentControl.Content,Button,True,True,,Készlet
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,btn_setAll:System.Windows.Controls.ContentControl.Content,Button,True,True,,Állítsa be az összeset
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,btn_setAll:System.Windows.Controls.ContentControl.Content,Button,True,True,,Állítsa be az összeset
+CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,btn_stop:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Alt+S
+CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,btn_stop:System.Windows.Controls.ContentControl.Content,Button,True,True,,Stop
+CNC.Controls.WPF.g.en-US.resources:about.baml,btn_toClipboard:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,A grbl verzióinformációit és beállításait másolja a vágólapra
+CNC.Controls.WPF.g.en-US.resources:about.baml,btn_toClipboard:System.Windows.Controls.ContentControl.Content,Button,True,True,,A vágólapra
+CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,btn_unlock:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Ctrl+U
+CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,btn_unlock:System.Windows.Controls.ContentControl.Content,Button,True,True,,Kinyit
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,btn_upload:System.Windows.Controls.ContentControl.Content,Button,True,True,,Feltöltés
+CNC.Controls.WPF.g.en-US.resources:drocontrol.baml,btn_zeroAll:System.Windows.Controls.ContentControl.Content,Button,True,True,,Mind nullára
+CNC.Controls.WPF.g.en-US.resources:macroeditor.baml,chk_confirm:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Végrehajtás előtt erősítse meg
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,dgr_sdcard:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,"Kattintson a jobb gombbal a menühöz, kattintson duplán a fájl futtatásához."
+CNC.Controls.WPF.g.en-US.resources:about.baml,dlg_about:System.Windows.Window.Title,Title,True,True,,Az IOSender
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,dlg_connection:System.Windows.Window.Title,Title,True,True,,Feladó kapcsolat
+CNC.Controls.WPF.g.en-US.resources:macroeditor.baml,dlg_macroEditor:System.Windows.Window.Title,Title,True,True,,Makrószerkesztő
+CNC.Controls.WPF.g.en-US.resources:consolewindow.baml,dlg_senderConsole:System.Windows.Window.Title,Title,True,True,,Feladó konzol
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,dlg_title:System.Windows.Window.Title,Title,True,True,,Feladó kapcsolat
+CNC.Controls.WPF.g.en-US.resources:gcoderotatedialog.baml,fld_angle:CNC.Controls.NumericField.Unit,None,True,True,,fokon
+CNC.Controls.WPF.g.en-US.resources:gcoderotatedialog.baml,fld_angle:CNC.Controls.NumericField.Label,None,True,True,,Szög:
+CNC.Controls.WPF.g.en-US.resources:gcodewrapdialog.baml,fld_diameter:CNC.Controls.NumericField.Label,None,True,True,,Átmérő:
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_fastDistance:CNC.Controls.NumericField.Label,None,False,True,,Gyors távolság:
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_fastFeedrate:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_fastFeedrate:CNC.Controls.NumericField.Label,None,False,True,,Gyors előtolás:
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_maxBuffer:CNC.Controls.NumericField.Unit,None,False,True,,bájtok
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_maxBuffer:CNC.Controls.NumericField.Label,None,False,True,,Max puffer:
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_maxBuffer:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Maximális felhasznált soros pufferméret (a jelentett érték 90%-ára korlátozva).
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_pollInterval:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,A vezérlőnek küldött állapotkérelem között eltelt idő.
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_pollInterval:CNC.Controls.NumericField.Unit,None,False,True,,ms
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_pollInterval:CNC.Controls.NumericField.Label,None,False,True,,Szavazási időköz:
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_resetDelay:CNC.Controls.NumericField.Unit,None,False,True,,ms
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_resetDelay:CNC.Controls.NumericField.Label,None,False,True,,Visszaállítás késleltetés:
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_resetDelay:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,"Késleltetés, hogy a vezérlő befejezze a rendszerindítást a kommunikáció megkezdése előtt."
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_slowDistance:CNC.Controls.NumericField.Label,None,False,True,,Lassú távolság:
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_slowFeedrate:CNC.Controls.NumericField.Label,None,False,True,,Lassú távolság:
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_slowFeedrate:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_stepDistance:CNC.Controls.NumericField.Label,None,False,True,,Lépéstávolság:
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_stepFeedrate:CNC.Controls.NumericField.Label,None,False,True,,Lépés-előtolás:
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_stepFeedrate:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,grb_mainConfig:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Fő
+CNC.Controls.WPF.g.en-US.resources:coolantcontrol.baml,grp_coolant:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Hűtőfolyadék
+CNC.Controls.WPF.g.en-US.resources:drocontrol.baml,grp_dro:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,DRO
+CNC.Controls.WPF.g.en-US.resources:feedcontrol.baml,grp_feedrate:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Előtolás mérték
+CNC.Controls.WPF.g.en-US.resources:stripgcodeconfigcontrol.baml,grp_gcodeStrip:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,GCode parancs eltávolítása
+CNC.Controls.WPF.g.en-US.resources:gotocontrol.baml,grp_goto:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Menj
+CNC.Controls.WPF.g.en-US.resources:jogbasecontrol.baml,grp_jogDistance:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Távolság
+CNC.Controls.WPF.g.en-US.resources:jogbasecontrol.baml,grp_jogFeedrate:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Előtolás mérték
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,grp_kbdJogging:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Billentyűzet kocogás
+CNC.Controls.WPF.g.en-US.resources:mdicontrol.baml,grp_mdi:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,MDI
+CNC.Controls.WPF.g.en-US.resources:outlinecontrol.baml,grp_outline:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Vázlat
+CNC.Controls.WPF.g.en-US.resources:limitscontrol.baml,grp_programLimits:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Programkorlátok
+CNC.Controls.WPF.g.en-US.resources:gcoderotatedialog.baml,grp_rotationCenter:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,"Kattintson ide a munkához viszonyított forgatási középpont kiválasztásához, ha nincs kiválasztva X0,Y0 használatban."
+CNC.Controls.WPF.g.en-US.resources:gcoderotatedialog.baml,grp_rotationCenter:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Forgatási központ 
+CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,grp_signals:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Jelek
+CNC.Controls.WPF.g.en-US.resources:spindlecontrol.baml,grp_spindle:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Orsó
+CNC.Controls.WPF.g.en-US.resources:trinamicview.baml,grp_stallGuard:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,stallGuard
+CNC.Controls.WPF.g.en-US.resources:jogcontrol.baml,grp_uijog:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Kocogás
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,grp_uiJogging:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,UI kocogás
+CNC.Controls.WPF.g.en-US.resources:workparameterscontrol.baml,grp_workparams:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Munkaparaméterek
+CNC.Controls.WPF.g.en-US.resources:grblalarmlist.baml,hdr_alarmCode:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Kód
+CNC.Controls.WPF.g.en-US.resources:grblalarmlist.baml,hdr_alarmMessage:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Üzenet
+CNC.Controls.WPF.g.en-US.resources:gcodelistcontrol.baml,hdr_block:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Blokk
+CNC.Controls.WPF.g.en-US.resources:gcodelistcontrol.baml,hdr_data:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Adat
+CNC.Controls.WPF.g.en-US.resources:grblerrorlist.baml,hdr_errorCode:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Kód
+CNC.Controls.WPF.g.en-US.resources:grblerrorlist.baml,hdr_errorMessage:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Üzenet
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,hdr_name:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Név
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,hdr_offset:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Eltolás
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,hdr_settingId:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Id
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,hdr_settingName:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Név
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,hdr_settingUnit:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Mértékegység
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,hdr_settingValue:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Érték
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,hdr_size:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Méret
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,hdr_tool:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Eszköz
+CNC.Controls.WPF.g.en-US.resources:consolecontrol.baml,label_filterRT:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Szűrje ki a valós idejű válaszokat
+CNC.Controls.WPF.g.en-US.resources:consolecontrol.baml,label_showAll:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Az összes valós idejű válasz megjelenítése
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_agressiveBuffering:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Egynél több GCode blokkot pufferel a vezérlőben a gördülékenyebb végrehajtás érdekében. Csak a grblHAL számára!
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_agressiveBuffering:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Agresszív pufferelés
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_autoCompressGcode:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,A gcode automatikus tömörítése átalakításoknál
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_autoCompressGcode:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Eltávolítja a felesleges gcode parancselemeket.
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,lbl_axis:System.String.$Content,None,True,True,,{0} tengely:
+CNC.Controls.WPF.g.en-US.resources:spindlecontrol.baml,lbl_ccw:System.Windows.Controls.ContentControl.Content,RadioButton,True,True,,CCW
+CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,lbl_check:System.Windows.Controls.ContentControl.Content,Label,True,True,,Ellenőrzés
+CNC.Controls.WPF.g.en-US.resources:trinamicview.baml,lbl_configure:System.Windows.Controls.ContentControl.Content,Button,True,True,,Konfiguráció
+CNC.Controls.WPF.g.en-US.resources:spindlecontrol.baml,lbl_cw:System.Windows.Controls.ContentControl.Content,RadioButton,True,True,,CW
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_distance0:CNC.Controls.NumericField.Label,None,False,True,,Távolság 0:
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_distance0:CNC.Controls.NumericField.Unit,None,False,True,,mm
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_distance1:CNC.Controls.NumericField.Label,None,False,True,,Távolság 1:
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_distance1:CNC.Controls.NumericField.Unit,None,False,True,,mm
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_distance2:CNC.Controls.NumericField.Unit,None,False,True,,mm
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_distance2:CNC.Controls.NumericField.Label,None,False,True,,Távolság 2:
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_distance3:CNC.Controls.NumericField.Unit,None,False,True,,mm
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_distance3:CNC.Controls.NumericField.Label,None,False,True,,Távolság 3:
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,lbl_enable:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Engedélyezze
+CNC.Controls.WPF.g.en-US.resources:coolantcontrol.baml,lbl_fan:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Ventilátor
+CNC.Controls.WPF.g.en-US.resources:outlineflyout.baml,lbl_feedrate:CNC.Controls.NumericField.Label,None,True,True,,Előtolás mérték:
+CNC.Controls.WPF.g.en-US.resources:outlinebasecontrol.baml,lbl_feedrate:CNC.Controls.NumericField.Label,None,True,True,,Előtolás mérték:
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_feedrate0:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_feedrate0:CNC.Controls.NumericField.Label,None,False,True,,Előtolás mérték 0:
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_feedrate1:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_feedrate1:CNC.Controls.NumericField.Label,None,False,True,,Előtolás mérték 1:
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_feedrate2:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_feedrate2:CNC.Controls.NumericField.Label,None,False,True,,Előtolás mérték 2:
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_feedrate3:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_feedrate3:CNC.Controls.NumericField.Label,None,False,True,,Előtolás mérték 3:
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_FilterOk:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,"Engedélyezése, ha az OK válaszok túlterhelik a konzolnaplózást, általában sok rövid parancs küldésekor történik."
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_FilterOk:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Szűrő &quot;ok&quot; válasz
+CNC.Controls.WPF.g.en-US.resources:consolecontrol.baml,lbl_filterRT:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Szűrje ki a valós idejű válaszokat
+CNC.Controls.WPF.g.en-US.resources:coolantcontrol.baml,lbl_flood:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Árvíz
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,lbl_ipAddress:System.Windows.Controls.ContentControl.Content,Label,True,True,,IP-cím:
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_keepMdiFocus:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Egynél több GCode blokkot pufferel a vezérlőben a gördülékenyebb végrehajtás érdekében. Csak a grblHAL számára!
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_keepMdiFocus:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Tartsa az MDI fókuszt
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,lbl_linkStepToUi:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Lépéstávolság összekapcsolása a felhasználói felület kocogásával
+CNC.Controls.WPF.g.en-US.resources:machinepositionflyout.baml,lbl_machinePosition:System.Windows.Controls.TextBlock.Text,Text,True,True,,Gép helyzete
+CNC.Controls.WPF.g.en-US.resources:coolantcontrol.baml,lbl_mist:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Köd
+CNC.Controls.WPF.g.en-US.resources:mpgpending.baml,lbl_mpgModeActive:System.Windows.Controls.ContentControl.Content,Label,True,True,,"MPG mód aktív, várja a letiltásra..."
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,lbl_netPort:System.Windows.Controls.ContentControl.Content,Label,True,True,,Port:
+CNC.Controls.WPF.g.en-US.resources:macroexecutecontrol.baml,lbl_noMacrosDefined:System.Windows.Controls.ContentControl.Content,Label,True,True,,"Nincsenek makrók meghatározva, a Szerkesztés gombbal adhatja hozzá."
+CNC.Controls.WPF.g.en-US.resources:macroexecutecontrol.baml,lbl_noMacrosDefined:System.Windows.Controls.TextBlock.Text,Text,True,True,,"Nincsenek makrók meghatározva, a Szerkesztés gombbal adhatja hozzá."
+CNC.Controls.WPF.g.en-US.resources:spindlecontrol.baml,lbl_off:System.Windows.Controls.ContentControl.Content,RadioButton,True,True,,Ki
+CNC.Controls.WPF.g.en-US.resources:workparameterscontrol.baml,lbl_offset:System.Windows.Controls.ContentControl.Content,Label,True,True,,Eltolás:
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,lbl_offset:System.Windows.Controls.ContentControl.Content,Label,True,True,,Eltolás:
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,lbl_onConnect:System.Windows.Controls.ContentControl.Content,Label,True,True,,Csatlakozáskor:
+CNC.Controls.WPF.g.en-US.resources:overridecontrol.baml,lbl_override:System.Windows.Controls.ContentControl.Content,Label,True,True,,Felülbírálás
+CNC.Controls.WPF.g.en-US.resources:feedcontrol.baml,lbl_rapids:System.Windows.Controls.ContentControl.Content,Label,True,True,,Gyors mozgás:
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_restoreWindowSize:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Az ablak méretének visszaállítása a következő indításkor.
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_restoreWindowSize:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Az utolsó ablakméret visszaállítása indításkor
+CNC.Controls.WPF.g.en-US.resources:spindlecontrol.baml,lbl_rpm:System.Windows.Controls.ContentControl.Content,Label,True,True,,RPM
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,lbl_serialBaud:System.Windows.Controls.ContentControl.Content,Label,True,True,,Átviteli sebesség:
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,lbl_serialPort:System.Windows.Controls.ContentControl.Content,Label,True,True,,Port:
+CNC.Controls.WPF.g.en-US.resources:trinamicview.baml,lbl_sgLoad:System.Windows.Controls.ContentControl.Content,Label,True,True,,Betöltés (SG_RESULT)
+CNC.Controls.WPF.g.en-US.resources:consolecontrol.baml,lbl_showAll:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Az összes valós idejű válasz megjelenítése
+CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalBlockDelete:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Törlés letiltása
+CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalCycleStart:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Ciklusindítás
+CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalEStop:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,E-Stop
+CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalFeedHold:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Előtolás tartás
+CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalMotorWarning:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Motor figyelmeztetés
+CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalOptionalStop:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Opcionális megállás
+CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalProbe:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Szonda
+CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalReset:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Visszaállítás
+CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalSafetyDoor:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Biztonsági ajtó
+CNC.Controls.WPF.g.en-US.resources:trinamicview.baml,lbl_stallGuardEnable:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Szűrő engedélyezése (SFILT)
+CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,lbl_state:System.Windows.Controls.ContentControl.Content,Label,True,True,,State:
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,lbl_tipRadius:CNC.Controls.CoordValueSetControl.Label,None,True,True,,A hegy sugara:
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,lbl_tool:System.Windows.Controls.ContentControl.Content,Label,True,True,,Eszköz:
+CNC.Controls.WPF.g.en-US.resources:workparameterscontrol.baml,lbl_tool:System.Windows.Controls.ContentControl.Content,Label,True,True,,Eszköz:
+CNC.Controls.WPF.g.en-US.resources:consolecontrol.baml,lbl_verbose:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Bőbeszédű
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,lbl_websocket:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,WebSocket
+CNC.Controls.WPF.g.en-US.resources:gcodewrapdialog.baml,lbl_wrapSource:System.Windows.Controls.ContentControl.Content,Label,True,True,,Betakar:
+CNC.Controls.WPF.g.en-US.resources:gcodewrapdialog.baml,lbl_wrapTarget:System.Windows.Controls.ContentControl.Content,Label,True,True,,nak:
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,lbl_xAxis:CNC.Controls.CoordValueSetControl.Label,None,True,True,,X tengely:
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,lbl_yAxis:CNC.Controls.CoordValueSetControl.Label,None,True,True,,Y tengely:
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,lbl_zAxis:CNC.Controls.CoordValueSetControl.Label,None,True,True,,Z tengely:
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,mnu_delete:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Törlés
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,mnu_downloadRun:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,letöltés_ és futtatás
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,mnu_enableRewind:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Visszatekerés engedélyezése
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,mnu_run:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Fut
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,mnu_viewAll:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,View all
+CNC.Controls.WPF.g.en-US.resources:appconfigview.baml,msg_restart:System.String.$Content,None,True,True,,A beállítások módosítása után újraindítás szükséges!
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,pnl_kbdJogging:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Figyelem! - A Grbl-nek kiemelkedő hibái vannak a kocogó-megszakításnál (felfelé mutató gombnál).
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_appconfCreate:System.String.$Content,None,True,True,,"A konfigurációs fájl nem található vagy érvénytelen, hozzon létre újat?"
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_appconfCreateFail:System.String.$Content,None,True,True,,Nem sikerült menteni a konfigurációs fájlt.
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_appconfNoConnect:System.String.$Content,None,True,True,,Nem lehet megnyitni a kapcsolatot ({0})
+CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,str_checking:System.String.$Content,None,True,True,,Ellenőrzés...
+CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,str_clearEStop:System.String.$Content,None,True,True,,E-Stop törlése előtt &lt;Visszaállítás&gt;&gt;
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_convBlockOfBlocks:System.String.$Content,None,True,True,,Blokk: {0}/{1}
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_convNumBlocks:System.String.$Content,None,True,True,,Blokkok: {1}
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,str_deleteFile:System.String.$Content,None,True,True,,Törlés {0}?
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,str_downloadAndRun:System.String.$Content,None,True,True,,Töltse le és futtassa {0}?
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,str_downloading:System.String.$Content,None,True,True,,Letöltés {0}...
+CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,str_g28g30:System.String.$Content,None,True,True,,"A munka G28/G30 mozgásokat végez, és a gép nincs otthon."
+CNC.Controls.WPF.g.en-US.resources:gotoflyoutcontrol.baml,str_gotoFlyout:System.String.$Content,None,True,True,,_Menj
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_grblStateAlarm:System.String.$Content,None,True,True,,RIASZTÁS
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_grblStateCheck:System.String.$Content,None,True,True,,ELLENŐRZÉS
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_grblStateDoor:System.String.$Content,None,True,True,,AJTÓ
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_grblStateHold:System.String.$Content,None,True,True,,TART
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_grblStateHome:System.String.$Content,None,True,True,,HAZA
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_grblStateIdle:System.String.$Content,None,True,True,,TÉTLEN
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_grblStateJog:System.String.$Content,None,True,True,,KOCOGÓ
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_grblStateRun:System.String.$Content,None,True,True,,FUT
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_grblStateSleep:System.String.$Content,None,True,True,,ALVÁS
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_grblStateTool:System.String.$Content,None,True,True,,ESZKÖZ
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_grblStateUnknown:System.String.$Content,None,True,True,,ISMERETLEN
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,str_illegalName:System.String.$Content,None,True,True,,"Fájl: {0}\\n!,?,~ és SZÓKÖZ nem támogatott a fájlnevekben, kérjük, nevezze át."
+CNC.Controls.WPF.g.en-US.resources:jogflyoutcontrol.baml,str_jogFlyout:System.String.$Content,None,True,True,,_Kocogó
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_keymappingsSaved:System.String.$Content,None,True,True,,A billentyűleképezések elmentve ide {0}
+CNC.Controls.WPF.g.en-US.resources:macroexecutecontrol.baml,str_macrosFlyout:System.String.$Content,None,True,True,,_Makrók
+CNC.Controls.WPF.g.en-US.resources:machinepositionflyout.baml,str_mposFlyout:System.String.$Content,None,True,True,,M_Pos
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgBadResponseExit:System.String.$Content,None,True,True,,"Váratlan válasz érkezett a vezérlőtől: {0}, kilépés."
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgDoorExit:System.String.$Content,None,True,True,,"Az ajtó még nyitva van, kilépjen?"
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgDoorOpen:System.String.$Content,None,True,True,,"Az ajtó nyitva van, zárja be az ajtót és folytassa?"
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgDoorPersist:System.String.$Content,None,True,True,,Az ajtó állapotát nem lehet törölni &lt;Reset&gt;
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgEStop:System.String.$Content,None,True,True,,E-Stop aktív! - tisztítsa meg a folytatás előtt...
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgEStopExit:System.String.$Content,None,True,True,,"E-Stop még aktív, lépjen ki?"
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgHome:System.String.$Content,None,True,True,,"Helyreállítási ciklus szükséges, &lt;Haza&gt; folytatáshoz"
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgNoComm:System.String.$Content,None,True,True,,"A vezérlő {0} állapotban van, és nem tud válaszolni, próbálja meg a lágy reset-et?"
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgNoCommAlarm:System.String.$Content,None,True,True,,"A vezérlő nem tud kommunikálni a(z) {0} riasztás miatt, lágy visszaállítást kísérel meg."
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgNoResponse:System.String.$Content,None,True,True,,A vezérlő nem válaszol!
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgNoResponseExit:System.String.$Content,None,True,True,,"Nem érkezett válasz a vezérlőtől, kilépés."
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgResetExit:System.String.$Content,None,True,True,,"A vezérlő lágy reset nem sikerült, kilépés."
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgResetFailed:System.String.$Content,None,True,True,,"A vezérlő lágy reset nem sikerült, kilépés."
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgWait:System.String.$Content,None,True,True,,Várakozás a vezérlőre ({0})...
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,str_notConnection:System.String.$Content,None,True,True,,Nincs kapcsolat.
+CNC.Controls.WPF.g.en-US.resources:outlineflyout.baml,str_outlineFlyout:System.String.$Content,None,True,True,,_Vázlat
+CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,str_pause:System.String.$Content,None,True,True,,Szünet
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_rotateG17G18Arcs:System.String.$Content,None,True,True,,"A GCode XZ vagy YZ síkban íveket tartalmaz (G18/19), transzformáció nem alkalmazható. Használat &apos;Arcs to Lines&apos; ha tényleg szüksége van erre."
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_rotateRadiusArcs:System.String.$Content,None,True,True,,"A GCode sugármódú íveket tartalmaz, nem alkalmazható transzformáció. Használat &apos;Arcs to Lines&apos; ha tényleg szüksége van erre."
+CNC.Controls.WPF.g.en-US.resources:macroexecutecontrol.baml,str_runMacro:System.String.$Content,None,True,True,,Fut {0} makró?
+CNC.Controls.WPF.g.en-US.resources:macrotoolbarcontrol.baml,str_runMacro:System.String.$Content,None,True,True,,Fut {0} makró?
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_saveSettings:System.String.$Content,None,True,True,,"A beállítások megváltoztak, mentse most?"
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsError:System.String.$Content,None,True,True,,"A(z) {0} beállítás eredménye {1}, folytassa?"
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsFail:System.String.$Content,None,True,True,,Baj...\\nBetöltés folytatása?
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsInvalid:System.String.$Content,None,True,True,,A fájl nem tartalmaz semmilyen beállítást.
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsRestore:System.String.$Content,None,True,True,,Beállítások visszaállítása fájlból
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_settingsSaved:System.String.$Content,None,True,True,,Beállítások elmentve.
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsTimeout:System.String.$Content,None,True,True,,"Időtúllépés történt a(z) {0} beállítása közben, folytassa?"
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsWritten:System.String.$Content,None,True,True,,Az összes beállítás a feladó mappában lévő {0} címre írva.
+CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,str_stop:System.String.$Content,None,True,True,,Stop
+CNC.Controls.WPF.g.en-US.resources:thcmonitorcontrol.baml,str_ThcFlyout:System.String.$Content,None,True,True,,_THC monitor
+CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,str_toolchanges:System.String.$Content,None,True,True,,"A munkának {0} szerszámcseréje van az M6 használatával, csak néhány Grbl port támogatja ezt."
+CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,str_toolchangeTLO:System.String.$Content,None,True,True,,"A munkának {0} szerszámcseréje van, a szerszámhossz-referenciát az indítás előtt meg kell határozni."
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,str_transferAborted:System.String.$Content,None,True,True,,Az átvitel megszakítva.
+CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,str_transferComplete:System.String.$Content,None,True,True,,Az átvitel kész
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,str_transferDone:System.String.$Content,None,True,True,,Az átvitel megtörtént.
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,str_transferring:System.String.$Content,None,True,True,,Áthelyezve {0} a {1} bájtból...
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,str_uploading:System.String.$Content,None,True,True,,Feltöltés...
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_validateMax:System.String.$Content,None,True,True,,Érvénytelen bevitel: a megengedett maximális érték {0}.
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_validateMin:System.String.$Content,None,True,True,,Érvénytelen bevitel: a minimális megengedett érték {0}.
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_validateNotIP4:System.String.$Content,None,True,True,,Érvénytelen bevitel: nem IP4-cím..
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_validateRange:System.String.$Content,None,True,True,,Érvénytelen bevitel: a megengedett tartomány {0} - {1}.
+CNC.Controls.WPF.g.en-US.resources:errorsandalarms.baml,tab_alarms:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Riasztási kódok
+CNC.Controls.WPF.g.en-US.resources:errorsandalarms.baml,tab_errors:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Hibakódok
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,tab_network:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Hálózat
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,tab_serial:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Sorozat
+CNC.Controls.WPF.g.en-US.resources:outlinebasecontrol.baml,txt_line1:System.Windows.Documents.Run.Text,Text,True,True,,Hajtsa végre a mozgásokat az X és Y program határainak felvázolásához.
+CNC.Controls.WPF.g.en-US.resources:outlinebasecontrol.baml,txt_line2:System.Windows.Documents.Run.Text,Text,True,True,,"Ügyeljen arra, hogy a szerszám hegye ne legyen akadályozva!"
+CNC.Controls.WPF.g.en-US.resources:errorsandalarms.baml,wnd_errorsAndAlarms:System.Windows.Window.Title,Title,True,True,,Vezérlő hiba és riasztási kódok

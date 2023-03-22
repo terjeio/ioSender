@@ -1,13 +1,13 @@
 ﻿/*
  * Grbl.cs - part of CNC Controls library
  *
- * v0.41 / 2022-09-29 / Io Engineering (Terje Io)
+ * v0.42 / 2023-03-22 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2022, Io Engineering (Terje Io)
+Copyright (c) 2018-2023, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -117,6 +117,7 @@ namespace CNC.Core
             CMD_PROGRAM_DEMARCATION = "%",
             CMD_SDCARD_MOUNT = "$FM",
             CMD_SDCARD_DIR = "$F",
+            CMD_SDCARD_DIR_ALL = "$F+",
             CMD_SDCARD_REWIND = "$FR",
             CMD_SDCARD_RUN = "$F=",
             CMD_SDCARD_UNLINK = "$FD=",
@@ -602,6 +603,13 @@ namespace CNC.Core
                 Values[i] = pos.Values[i];
         }
 
+        public Position(Position pos, double scaleFactor)
+        {
+            init();
+            foreach (int i in GrblInfo.AxisFlags.ToIndices())
+                Values[i] = pos.Values[i] * scaleFactor;
+        }
+
         private void init()
         {
             for (var i = 0; i < Values.Length; i++)
@@ -621,7 +629,7 @@ namespace CNC.Core
                 Values[i] = double.NaN;
             }
 
-            if (changed)
+            if (changed && !Values.SuspendNotifications)
                 OnPropertyChanged(nameof(Position));
         }
 
@@ -635,7 +643,7 @@ namespace CNC.Core
                 Values[i] = 0d;
             }
 
-            if (changed)
+            if (changed && !Values.SuspendNotifications)
                 OnPropertyChanged(nameof(Position));
         }
 
@@ -664,7 +672,8 @@ namespace CNC.Core
             foreach(int i in GrblInfo.AxisFlags.ToIndices())
                 Values[i] += pos.Values[i];
 
-            OnPropertyChanged(nameof(Position));
+            if (!Values.SuspendNotifications)
+                OnPropertyChanged(nameof(Position));
         }
 
         public void Subtract(Position pos)
@@ -672,7 +681,8 @@ namespace CNC.Core
             foreach (int i in GrblInfo.AxisFlags.ToIndices())
                 Values[i] -= pos.Values[i];
 
-            OnPropertyChanged(nameof(Position));
+            if (!Values.SuspendNotifications)
+                OnPropertyChanged(nameof(Position));
         }
 
         public void Set(Position pos)
@@ -682,7 +692,18 @@ namespace CNC.Core
                 if (!Values[i].Equals(pos.Values[i]))
                     Values[i] = pos.Values[i];
             }
-            OnPropertyChanged(nameof(Position));
+
+            if (!Values.SuspendNotifications)
+                OnPropertyChanged(nameof(Position));
+        }
+
+        public void Scale(double factor)
+        {
+            foreach (int i in GrblInfo.AxisFlags.ToIndices())
+                Values[i] *= factor;
+
+            if (factor != 1d && !Values.SuspendNotifications)
+                OnPropertyChanged(nameof(Position));
         }
 
         public bool IsSet(AxisFlags axisflags)
@@ -738,7 +759,7 @@ namespace CNC.Core
                     }
                 }
 
-                if (changed)
+                if (changed && !Values.SuspendNotifications)
                     OnPropertyChanged("Position");
 
                 ok = true;
@@ -899,7 +920,7 @@ namespace CNC.Core
             get { return _numAxes;  }
             private set
             {
-                _numAxes = value;
+                _numAxes = LatheModeEnabled ? Math.Max(value, 3) : value;
                 int flags = 0;
                 PositionFormatString = string.Empty;
                 for (int i = 0; i < _numAxes; i++)
@@ -2313,6 +2334,10 @@ namespace CNC.Core
             Format = values[5];
             Min = values[6] == string.Empty ? double.NaN : dbl.Parse(values[6]);
             Max = values[7] == string.Empty ? double.NaN : dbl.Parse(values[7]);
+            if (values.Length > 8)
+                RebootRequired = values[8] == "1";
+            if (values.Length > 9)
+                AllowNull = values[9] == "1";
         }
 
         public int Id { get; internal set; }
@@ -2381,6 +2406,8 @@ namespace CNC.Core
         public DataTypes DataType { get; internal set; }
         public double Min { get; internal set; }
         public double Max { get; internal set; }
+        public bool AllowNull { get; internal set; }
+        public bool RebootRequired { get; internal set; }
         public string Description {
             get
             {
