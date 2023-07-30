@@ -10,9 +10,36 @@
              d:DesignHeight="515" d:DesignWidth="875">
     <UserControl.Resources>
         <Controls:StringCollectionToTextConverter x:Key="GCodeConverter"/>
+        <Controls:MultiLineConverter x:Key="ErrorMessageConverter" />
         <Style x:Key="CNCValue" TargetType="Controls:NumericField">
             <Setter Property="Format" Value="{Binding Path=Format, Mode=OneWay}"/>
             <Setter Property="Unit" Value="{Binding Path=Unit, Mode=OneWay}"/>
+            <Style.Triggers>
+                <Trigger Property="Validation.HasError" Value="true">
+                    <Setter Property="Controls:NumericField.ToolTip">
+                        <Setter.Value>
+                            <MultiBinding Converter="{StaticResource ErrorMessageConverter}">
+                                <Binding RelativeSource="{RelativeSource Self}" Path="(Validation.Errors)" />
+                                <Binding RelativeSource="{RelativeSource Self}" Path="(Validation.Errors).Count" />
+                            </MultiBinding>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="SpindleErrorStyle" TargetType="local:CssControl">
+            <Style.Triggers>
+                <Trigger Property="Validation.HasError" Value="true">
+                    <Setter Property="local:CssControl.ToolTip">
+                        <Setter.Value>
+                            <MultiBinding Converter="{StaticResource ErrorMessageConverter}">
+                                <Binding RelativeSource="{RelativeSource Self}" Path="(Validation.Errors)" />
+                                <Binding RelativeSource="{RelativeSource Self}" Path="(Validation.Errors).Count" />
+                            </MultiBinding>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
         </Style>
     </UserControl.Resources>
     <Grid>
@@ -30,17 +57,17 @@
         <GroupBox x:Name="groupBox2" Header="Cut depths and feed rates" HorizontalAlignment="Left" Margin="10,140,0,0" VerticalAlignment="Top" Height="95" Width="585">
             <StackPanel HorizontalAlignment="Left" Height="Auto" VerticalAlignment="Top" Width="580">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Height="30" VerticalAlignment="Top" Width="580">
-                    <Controls:NumericField x:Name="cvPassDepth" Style="{StaticResource CNCValue}" Label="Pass depth:" Value="{Binding Path=Passdepth, Mode=TwoWay}"  ToolTip="Same for radius and diameter mode."/>
-                    <Controls:NumericField x:Name="cvFeedRate" Label="Feed rate:" Value="{Binding Path=FeedRate, Mode=TwoWay}" Unit="{Binding Path=FeedrateUnit}"/>
+                    <Controls:NumericField x:Name="cvPassDepth" Label="Pass depth:" Value="{Binding Path=Passdepth, Mode=TwoWay}" Style="{StaticResource CNCValue}" ToolTip="Same for radius and diameter mode."/>
+                    <Controls:NumericField x:Name="cvFeedRate" Label="Feed rate:" Value="{Binding Path=FeedRate, Mode=TwoWay}" Unit="{Binding Path=FeedrateUnit}" Style="{StaticResource CNCValue}"/>
                     <local:SpringPassControl x:Name="springPasses" Value="{Binding Path=SpringPasses, Mode=TwoWay}" IsPassesEnabled="{Binding Path=IsSpringPassesEnabled, Mode=TwoWay}"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Height="30" VerticalAlignment="Top" Width="580">
-                    <Controls:NumericField x:Name="cvPassDepthLast" Style="{StaticResource CNCValue}" Label="Last pass:" Value="{Binding Path=PassdepthLastPass, Mode=TwoWay}"/>
-                    <Controls:NumericField x:Name="cvFeedRateLast" Label="Feed rate:" Value="{Binding Path=FeedRateLastPass, Mode=TwoWay}" Unit="{Binding Path=FeedrateUnit}"/>
+                    <Controls:NumericField x:Name="cvPassDepthLast" Label="Last pass:" Value="{Binding Path=PassdepthLastPass, Mode=TwoWay}" Style="{StaticResource CNCValue}"/>
+                    <Controls:NumericField x:Name="cvFeedRateLast" Label="Feed rate:" Value="{Binding Path=FeedRateLastPass, Mode=TwoWay}" Unit="{Binding Path=FeedrateUnit}" Style="{StaticResource CNCValue}"/>
                 </StackPanel>
             </StackPanel>
         </GroupBox>
-        <local:CssControl x:Name="css" IsCssEnabled="{Binding Path=IsCssEnabled, Mode=TwoWay}" Value="{Binding Path=CssSpeed, Mode=TwoWay}" Unit="{Binding Path=CssUnit}" HorizontalAlignment="Left" Margin="10,245,0,0" VerticalAlignment="Top"/>
+        <local:CssControl x:Name="css" IsCssEnabled="{Binding Path=IsCssEnabled, Mode=TwoWay}" Value="{Binding Path=CssSpeed, Mode=TwoWay}" Unit="{Binding Path=CssUnit}" HorizontalAlignment="Left" Margin="10,245,0,0" VerticalAlignment="Top" Style="{StaticResource SpindleErrorStyle}"/>
         <Grid Margin="10,280,0,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
@@ -55,6 +82,9 @@
                 </TextBox.Text>
             </TextBox>
             <Button x:Name="btnCalculate" Content="Calculate" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Grid.Row="1" Click="btnCalculate_Click"/>
+            <TextBlock TextWrapping="NoWrap" Grid.Row="1" Height="20" Margin="90,2,0,0" Width="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+            <Run x:Uid="txt_warning" Text="Warning! Use with care - only lightly tested!" Foreground="Red" FontWeight="Bold"/>
+            </TextBlock>
         </Grid>
     </Grid>
 </UserControl>

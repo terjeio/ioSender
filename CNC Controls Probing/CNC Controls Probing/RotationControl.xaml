@@ -18,6 +18,7 @@
         <Controls:EnumValueToBooleanConverter x:Key="EnumToEdgeConverter" />
         <Controls:BoolToVisibleConverter x:Key="ToVisibleConverter" />
         <local:OriginToBooleanConverter x:Key="UseX0Y0Converter" />
+        <local:OriginToCurrentPositionConverter x:Key="UseXYConverter" />
         <local:EnumValueToVisibleConverter x:Key="ZProbeIsVisibleConverter" />
         <Style x:Key="ButtonStyleNoHighlighting" TargetType="Button" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
             <Setter Property="Template">
@@ -63,14 +64,23 @@
                     </Setter>
                 </Style>
             </StackPanel.Resources>
-            <StackPanel Orientation="Horizontal" Height="70">
+            <StackPanel Orientation="Horizontal" Height="130">
                 <GroupBox x:Uid="grp_workpiece" Header="Workpiece" Visibility="Collapsed">
                     <Controls:NumericField x:Uid="fld_distance" Label="Distance" Value="{Binding Path=WorkpieceHeight, Mode=TwoWay}" Margin="0,5,85,0" VerticalAlignment="Top"/>
+                </GroupBox>
+                <GroupBox x:Uid="grp_workpieceOffset" Header="Workpiece offset" Margin="5,0,0,0" Width="280">
+                    <StackPanel>
+                        <CheckBox x:Uid="lbl_addOffset" Content="Determine X0,Y0 for right angled workpiece" ToolTip="Adds a probe point on the left edge." IsChecked="{Binding Path=AddAction, Mode=TwoWay}"  Margin="5,7,0,5" VerticalAlignment="Center"/>
+                        <local:CsSelectControl IsEnabled="{Binding Path=AddAction}" Margin="5,0,0,0"/>
+                    </StackPanel>
                 </GroupBox>
                 <GroupBox x:Uid="grp_RotationCenter" Header="Rotation center" HorizontalAlignment="Left" Margin="5,0" ToolTip="Click to select rotation center relative to job, if not selected X0,Y0 is used.">
                     <StackPanel Orientation="Horizontal">
                         <Controls:OriginControl Value="{Binding Path=Origin, Mode=TwoWay}" IsEnabled="{Binding Path=Grbl.IsFileLoaded}" Margin="5,5,0,0"/>
-                        <CheckBox x:Uid="chk_useX0Y0" Content="Use X0,Y0" Margin="8,30,5,3" IsEnabled="{Binding Path=Grbl.IsFileLoaded}" IsChecked="{Binding Path=Origin, Mode=TwoWay, Converter={StaticResource UseX0Y0Converter}}"/>
+                        <StackPanel Orientation="Vertical" Margin="8,18,5,3">
+                            <CheckBox x:Uid="chk_useXY" Content="Use X,Y" IsEnabled="{Binding Path=Grbl.IsFileLoaded}" IsChecked="{Binding Path=Origin, Mode=TwoWay, Converter={StaticResource UseXYConverter}}"/>
+                            <CheckBox x:Uid="chk_useX0Y0" Content="Use X0,Y0" IsEnabled="{Binding Path=Grbl.IsFileLoaded}" IsChecked="{Binding Path=Origin, Mode=TwoWay, Converter={StaticResource UseX0Y0Converter}}"/>
+                        </StackPanel>
                     </StackPanel>
                 </GroupBox>
             </StackPanel>
@@ -93,7 +103,7 @@
                     <RadioButton Content="Resources/RotaterCB.png" Grid.Row="1" Grid.Column="1" Style="{StaticResource Flag}" IsChecked="{Binding Path=ProbeEdge, Mode=TwoWay, Converter={StaticResource EnumToEdgeConverter}, ConverterParameter=CB}" />
                 </Grid>
                 <GroupBox x:Uid="hdr_preview" Header="Preview" Margin="30,0,0,0" Visibility="{Binding Path=PreviewEnable, Converter={StaticResource ToVisibleConverter}}" VerticalAlignment="Top">
-                    <TextBox IsReadOnly="True" Text="{Binding Path=PreviewText, Mode=OneWay}" TextWrapping="NoWrap" Margin="0,5,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="245" Height="180"
+                    <TextBox IsReadOnly="True" Text="{Binding Path=PreviewText, Mode=OneWay}" TextWrapping="NoWrap" Margin="0,5,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="245" Height="150"
                          FontSize="10" FontFamily="Verdana"
                          ScrollViewer.VerticalScrollBarVisibility="Auto"
                          ScrollViewer.HorizontalScrollBarVisibility="Auto">

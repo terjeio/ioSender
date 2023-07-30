@@ -9,6 +9,7 @@
              Loaded="RenderControl_Loaded"
              d:DesignHeight="335" d:DesignWidth="400">
     <UserControl.Resources>
+        <Controls:HomedStateToBooleanConverter x:Key="IsHomed" />
         <Controls:LogicalNotConverter x:Key="IsNotRunningConverter" />
         <Controls:LogicalNotConverter x:Key="IsNotVisibleConverter">
             <Controls:LogicalNotConverter.FinalConverter>
@@ -73,7 +74,7 @@
             <Button x:Uid="restoreView" Content="Resources/RestoreView.png" Style="{StaticResource BtnImage}" IsEnabled="{Binding Path=MachineView.CanRestoreView, RelativeSource={RelativeSource AncestorType=UserControl}}" Click="RestoreView_Click" ToolTip="Restore view (Ctrl+R)"/>
             <ToggleButton x:Uid="showGrid" Content="Resources/GridOn.png" Tag="Resources/GridOff.png" Style="{StaticResource Flag}" IsChecked="{Binding Path=MachineView.ShowGrid, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" ToolTip="Toggle grid visibility (Ctrl+G)"/>
             <ToggleButton x:Uid="showJobEnvelope" Content="Resources/JobBoxOn.png" Tag="Resources/JobBoxOff.png" Style="{StaticResource Flag}" IsChecked="{Binding Path=MachineView.ShowJobEnvelope, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" ToolTip="Toggle job bounds visibility (Ctrl+J)"/>
-            <ToggleButton x:Uid="showWorkEnvelope" Content="Resources/WorkBoxOn.png" Tag="Resources/WorkBoxOff.png" Style="{StaticResource Flag}" IsChecked="{Binding Path=MachineView.ShowWorkEnvelope, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" ToolTip="Toggle machine work envelope visibility (Ctrl+W)"/>
+            <ToggleButton x:Uid="showWorkEnvelope" Content="Resources/WorkBoxOn.png" Tag="Resources/WorkBoxOff.png" Style="{StaticResource Flag}" IsChecked="{Binding Path=MachineView.ShowWorkEnvelope, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" IsEnabled="{Binding Path=HomedState, Mode=OneWay, Converter={StaticResource IsHomed}}" ToolTip="Toggle machine work envelope visibility (Ctrl+W)"/>
             <ToggleButton x:Uid="showXYZMarkers" Content="Resources/XYZOn.png" Tag="Resources/XYZOff.png" Style="{StaticResource Flag}" IsChecked="{Binding Path=MachineView.ShowAxes, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" ToolTip="Toggle axes visibility"/>
             <Button x:Uid="saveView" Content="Resources/SaveView.png" Style="{StaticResource BtnImage}" IsEnabled="{Binding Path=IsFileLoaded}" Click="SaveView_Click" ToolTip="Save view"/>
         </StackPanel>

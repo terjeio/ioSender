@@ -1,13 +1,13 @@
 /*
  * JobControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.41 / 2022-09-06 / Io Engineering (Terje Io)
+ * v0.43 / 2023-05-31 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2022, Io Engineering (Terje Io)
+Copyright (c) 2018-2023, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -297,8 +297,9 @@ namespace CNC.Controls
                 initOK = true;
                 serialSize = Math.Min(AppConfig.Settings.Base.MaxBufferSize, (int)(GrblInfo.SerialBufferSize * 0.9f)); // size should be less than hardware handshake HWM
                 GCode.File.Parser.Dialect = GrblInfo.IsGrblHAL ? Dialect.GrblHAL : Dialect.Grbl;
+                GCode.File.Parser.ExpressionsSupported = GrblInfo.ExpressionsSupported;
 
-                if(GrblInfo.HasRTC)
+                if (GrblInfo.HasRTC)
                     SendCommand("$RTC=" + DateTime.Now.ToLocalTime().ToString("s"));
             }
 

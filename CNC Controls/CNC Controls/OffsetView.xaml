@@ -20,7 +20,7 @@
             <local:LogicalNotConverter x:Key="IsNotPredefined" />
         </ResourceDictionary>
     </UserControl.Resources>
-    <Grid>
+    <Grid Background="Transparent">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="Auto"/>

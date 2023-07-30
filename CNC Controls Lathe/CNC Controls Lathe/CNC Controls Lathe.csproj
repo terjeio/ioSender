@@ -60,6 +60,7 @@
     <Compile Include="CssControl.xaml.cs">
       <DependentUpon>CssControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="FacingLogic.cs" />
     <Compile Include="FacingWizard.xaml.cs">
       <DependentUpon>FacingWizard.xaml</DependentUpon>
     </Compile>

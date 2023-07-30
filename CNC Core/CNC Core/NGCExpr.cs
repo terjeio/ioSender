@@ -1,7 +1,7 @@
 ﻿/*
  * NGCExpr.cs - part of CNC Controls library
  *
- * v0.36 / 2021-10-30 / Io Engineering (Terje Io)
+ * v0.43 / 2021-10-30 / Io Engineering (Terje Io)
  *
  */
 
@@ -121,6 +121,25 @@ namespace CNC.Core
             TAN,
             Exists
         };
+
+        public enum FlowControl
+        {
+            NoOp = 0,
+            IF,
+            ELSEIF,
+            ELSE,
+            ENDIF,
+            DO,
+            CONTINUE,
+            BREAK,
+            WHILE,
+            ENDWHILE,
+            REPEAT,
+            ENDREPEAT,
+            RETURN,
+            ALARM,
+            ERROR
+        }
 
         public enum NamedParam
         {
@@ -1081,6 +1100,26 @@ namespace CNC.Core
                 if (!read_double(line, ref pos, ref value))
                     value = double.NaN;
             }
+
+            return LastError;
+        }
+
+        public OpStatus ReadFlowControl(string line, ref int pos, out FlowControl flowControl)
+        {
+            flowControl = FlowControl.NoOp;
+            WasExpression = true;
+            LastError = OpStatus.OK;
+            int end = pos;
+
+            while (end < line.Length && line[end] != '[')
+                end++;
+
+            string stmnt = line.Substring(pos, end - pos).ToUpper();
+
+            if (!Enum.TryParse(stmnt, out flowControl))
+                LastError = OpStatus.ExpressionSyntaxError;
+
+            pos = end - (end < line.Length ? 1 : 0);
 
             return LastError;
         }

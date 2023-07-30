@@ -5,9 +5,17 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CNC.Controls"
              mc:Ignorable="d" 
-             d:DesignHeight="185" d:DesignWidth="310">
+             d:DesignHeight="210" d:DesignWidth="310">
     <GroupBox x:Uid="grb_mainConfig" x:Name="grpBasic" Header="Main" HorizontalAlignment="Left" VerticalAlignment="Top" Height="Auto" Width="310">
         <StackPanel HorizontalAlignment="Left">
+            <Grid x:Name="grid">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="160"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Label x:Uid="lbl_theme" x:Name="lblTheme" Content="Theme:" Grid.Column="0" HorizontalContentAlignment="Right" HorizontalAlignment="Right" VerticalAlignment="Center" Height="26"/>
+                <ComboBox Grid.Column="1" IsEnabled="False" ItemsSource="{Binding Path=Themes}" DisplayMemberPath="Value" SelectedValuePath="Key" SelectedValue="{Binding Path=Theme, Mode=TwoWay}" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Center" Width="80"/>
+            </Grid>
             <local:NumericField x:Uid="fld_resetDelay" Label="Reset delay:" ColonAt="160" Unit="ms" Format="###0" Value="{Binding Path=ResetDelay, Mode=TwoWay}" Height="29" VerticalAlignment="Bottom" ToolTip="Delay to allow controller to finish booting before communication starts."/>
             <local:NumericField x:Uid="fld_pollInterval" Label="Poll interval:" ColonAt="160" Unit="ms" Format="###0" Value="{Binding Path=PollInterval, Mode=TwoWay}" Height="29" VerticalAlignment="Bottom" ToolTip="Time between status request sent to controller."/>
             <local:NumericField x:Uid="fld_maxBuffer" Label="Max buffer:" ColonAt="160" Unit="bytes" Format="###0" Value="{Binding Path=MaxBufferSize, Mode=TwoWay}" Height="29" VerticalAlignment="Bottom" ToolTip="Maximum serial buffer size utilized (limited to 90% of reported value)."/>

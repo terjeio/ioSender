@@ -1,13 +1,13 @@
 ﻿/*
  * Converters.cs - part of CNC Probing library
  *
- * v0.38 / 2022-04-20 / Io Engineering (Terje Io)
+ * v0.43 / 2023-07-29 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2022, Io Engineering (Terje Io)
+Copyright (c) 2019-2023, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -48,6 +48,7 @@ namespace CNC.Controls.Probing
     {
         public static EnumValueToVisibleConverter EnumValueToVisibleConverter = new EnumValueToVisibleConverter();
         public static OriginToBooleanConverter OriginToBooleanConverter = new OriginToBooleanConverter();
+        public static OriginToCurrentPositionConverter OriginToCurrentPositionConverter = new OriginToCurrentPositionConverter();
     }
 
     public class EnumValueToVisibleConverter : IMultiValueConverter
@@ -77,6 +78,19 @@ namespace CNC.Controls.Probing
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             return (bool)value ? OriginControl.Origin.None : OriginControl.Origin.Center;
+        }
+    }
+
+    public class OriginToCurrentPositionConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value is OriginControl.Origin && (OriginControl.Origin)value == OriginControl.Origin.CurrentPos;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return (bool)value ? OriginControl.Origin.CurrentPos : OriginControl.Origin.None;
         }
     }
 }

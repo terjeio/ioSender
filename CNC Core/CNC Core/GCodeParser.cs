@@ -1,7 +1,7 @@
 ﻿/*
  * GCodeParser.cs - part of CNC Controls library
  *
- * v0.42 / 2023-01-07 / Io Engineering (Terje Io)
+ * v0.43 / 2023-05-31 / Io Engineering (Terje Io)
  *
  */
 
@@ -41,7 +41,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
-using System.Globalization;
 using System.Windows;
 using System.Windows.Media.Media3D;
 using System.Xml.Serialization;
@@ -62,7 +61,76 @@ namespace CNC.GCode
         }
 
         public static readonly IJKFlags[] IjkFlag = { IJKFlags.I, IJKFlags.J, IJKFlags.K };
-        public static readonly AxisFlags[] AxisFlag = { AxisFlags.X, AxisFlags.Y, AxisFlags.Z, AxisFlags.A, AxisFlags.B, AxisFlags.C };
+        public static readonly AxisFlags[] AxisFlag = { AxisFlags.X, AxisFlags.Y, AxisFlags.Z, AxisFlags.A, AxisFlags.B, AxisFlags.C, AxisFlags.U, AxisFlags.V, AxisFlags.W };
+
+        internal class GCParameters
+        {
+            const string words = "ABCDEFHIJKMQRSTUVWXYZ";
+
+            public double[] Values = new double[21];
+
+            public GCParameters (GCValues value, WordFlags flags)
+            {
+                for (int i = 0; i < 21; i++)
+                    Values[i] = double.NaN;
+
+                if (flags.HasFlag(WordFlags.A))
+                    Values[0] = value.A;
+                if (flags.HasFlag(WordFlags.B))
+                    Values[1] = value.B;
+                if (flags.HasFlag(WordFlags.C))
+                    Values[2] = value.C;
+                if (flags.HasFlag(WordFlags.D))
+                    Values[3] = value.D;
+                if (flags.HasFlag(WordFlags.E))
+                    Values[4] = value.E;
+                if (flags.HasFlag(WordFlags.F))
+                    Values[5] = value.F;
+                if (flags.HasFlag(WordFlags.H))
+                    Values[6] = value.H;
+                if (flags.HasFlag(WordFlags.I))
+                    Values[7] = value.I;
+                if (flags.HasFlag(WordFlags.J))
+                    Values[8] = value.J;
+                if (flags.HasFlag(WordFlags.K))
+                    Values[9] = value.K;
+                if (flags.HasFlag(WordFlags.M))
+                    Values[10] = value.M;
+                if (flags.HasFlag(WordFlags.Q))
+                    Values[11] = value.Q;
+                if (flags.HasFlag(WordFlags.R))
+                    Values[12] = value.R;
+                if (flags.HasFlag(WordFlags.S))
+                    Values[13] = value.S;
+                if (flags.HasFlag(WordFlags.T))
+                    Values[14] = (double)value.T;
+                if (flags.HasFlag(WordFlags.U))
+                    Values[15] = value.U;
+                if (flags.HasFlag(WordFlags.V))
+                    Values[16] = value.V;
+                if (flags.HasFlag(WordFlags.W))
+                    Values[17] = value.W;
+                if (flags.HasFlag(WordFlags.X))
+                    Values[18] = value.X;
+                if (flags.HasFlag(WordFlags.Y))
+                    Values[19] = value.Y;
+                if (flags.HasFlag(WordFlags.Z))
+                    Values[20] = value.Z;
+            }
+
+            public static string ToString(double[] values)
+            {
+                string s = string.Empty;
+
+                for (int i = 0; i < values.Length; i++)
+                {
+                    if (!double.IsNaN(values[i]))
+                        s += words.Substring(i, 1) + values[i].ToInvariantString();
+                }
+
+                return s;
+            }
+        }
 
         internal class GCValues
         {
@@ -76,6 +144,7 @@ namespace CNC.GCode
             public double R;
             public double S;
             public double[] XYZ = new double[9];
+            public double M;
             public uint N;
             public int H;
             public int T;
@@ -106,6 +175,11 @@ namespace CNC.GCode
                 for (int i = 0; i < IJK.Length; i++)
                     IJK[i] = 0d;
             }
+
+            public GCParameters GetParameters(WordFlags flags)
+            {
+                return new GCParameters(this, flags);
+            }
         }
 
         [Flags]
@@ -135,34 +209,49 @@ namespace CNC.GCode
             M10 = 1 << 20   // User defined M commands
         }
 
+        // Do not change order!
         [Flags]
-        private enum WordFlags : int
+        public enum WordFlags : int
         {
-            A = 1 << 0,
-            B = 1 << 1,
-            C = 1 << 2,
-            D = 1 << 3,
-            E = 1 << 4,
-            F = 1 << 5,
-            H = 1 << 6,
-            I = 1 << 9,
-            J = 1 << 10,
-            K = 1 << 11,
+            Dollar = 1 << 0,
+            A = 1 << 1,
+            B = 1 << 2,
+            C = 1 << 3,
+            I = 1 << 4,
+            J = 1 << 5,
+            K = 1 << 6,
+            D = 1 << 7,
+            E = 1 << 8,
+            F = 1 << 9,
+            G = 1 << 10,
+            H = 1 << 11,
             L = 1 << 12,
-            N = 1 << 13,
-            O = 1 << 14,
-            P = 1 << 15,
-            R = 1 << 16,
-            S = 1 << 17,
-            T = 1 << 18,
-            X = 1 << 19,
-            Y = 1 << 20,
-            Z = 1 << 21,
-            Q = 1 << 22,
-            U = 1 << 23,
-            V = 1 << 24,
-            W = 1 << 25,
-            Dollar = 1 << 26
+            M = 1 << 13,
+            N = 1 << 14,
+            O = 1 << 15,
+            P = 1 << 16,
+            Q = 1 << 17,
+            R = 1 << 18,
+            S = 1 << 19,
+            T = 1 << 20,
+            U = 1 << 21,
+            V = 1 << 22,
+            W = 1 << 23,
+            X = 1 << 24,
+            Y = 1 << 25,
+            Z = 1 << 26,
+        }
+
+        private struct G65VarMap
+        {
+            public G65VarMap(WordFlags flag, bool mapped)
+            {
+                Flag = flag;
+                Mapped = mapped;
+            }
+
+            public WordFlags Flag { get; }
+            public bool Mapped { get; }
         }
 
         private enum AxisCommand
@@ -214,6 +303,36 @@ namespace CNC.GCode
         private Commands cmdLatheMode = Commands.Undefined, cmdRetractMode = Commands.Undefined, cmdSpindleRpmMode = Commands.Undefined, cmdFeedrateMode = Commands.Undefined;
         private Commands cmdUnits = Commands.Undefined, cmdPathMode = Commands.Undefined;
 
+        // Do not change order!
+        private G65VarMap[] varmap = {
+            new G65VarMap(WordFlags.A, true),
+            new G65VarMap(WordFlags.B, true),
+            new G65VarMap(WordFlags.C, true),
+            new G65VarMap(WordFlags.I, true),
+            new G65VarMap(WordFlags.J, true),
+            new G65VarMap(WordFlags.K, true),
+            new G65VarMap(WordFlags.D, true),
+            new G65VarMap(WordFlags.E, true),
+            new G65VarMap(WordFlags.F, true),
+            new G65VarMap(WordFlags.G, false),
+            new G65VarMap(WordFlags.H, true),
+            new G65VarMap(WordFlags.L, false),
+            new G65VarMap(WordFlags.M, true),
+            new G65VarMap(WordFlags.N, false),
+            new G65VarMap(WordFlags.O, false),
+            new G65VarMap(WordFlags.P, false),
+            new G65VarMap(WordFlags.Q, true),
+            new G65VarMap(WordFlags.R, true),
+            new G65VarMap(WordFlags.S, true),
+            new G65VarMap(WordFlags.T, true),
+            new G65VarMap(WordFlags.U, true),
+            new G65VarMap(WordFlags.V, true),
+            new G65VarMap(WordFlags.W, true),
+            new G65VarMap(WordFlags.X, true),
+            new G65VarMap(WordFlags.Y, true),
+            new G65VarMap(WordFlags.Z, true)
+        };
+
         public GCodeParser()
         {
             Reset();
@@ -226,6 +345,7 @@ namespace CNC.GCode
         public static CommandIgnoreState IgnoreG61G64 { get; set; } = CommandIgnoreState.Strip;
 
         public Dialect Dialect { get; set; } = Dialect.GrblHAL;
+        public bool ExpressionsSupported { get; set; } = false;
         public int Decimals { get; private set; }
         public string NumFormat { get { return "#0." + "000000".Substring(0, Math.Min(6, Decimals)); } }
 
@@ -321,13 +441,15 @@ namespace CNC.GCode
             AxisFlags axisWords = AxisFlags.None;
             IJKFlags ijkWords = IJKFlags.None;
             ModalGroups modalGroups = 0, modalGroup = 0;
+            AxisCommand axisCommand = AxisCommand.None;
+            NGCExpr.FlowControl flowControl = NGCExpr.FlowControl.NoOp;
             List<StrReplace> replace = new List<StrReplace>();
 
-        int userMCode = 0;
+            int userMCode = 0;
             bool isScaling = false;
-            string comment = string.Empty, block;
+            string comment = string.Empty, flowExpression = string.Empty, block;
             double value;
-            AxisCommand axisCommand = AxisCommand.None;
+            cmdNonModal = Commands.Undefined;
 
             block = line = TrimBlock(line);
 
@@ -369,7 +491,6 @@ namespace CNC.GCode
                     pos++;
                     continue;
                 }
-
                 if (char.ToUpperInvariant(block[pos]) == 'G')
                 {
                     ppos = pos++;
@@ -377,7 +498,7 @@ namespace CNC.GCode
                     {
                         throw new GCodeException(LibStrings.FindResource("ParserBadExpr"));
                     }
-                    if (ngcexpr.WasExpression)
+                    if (ngcexpr.WasExpression && !ExpressionsSupported)
                         replace.Add(new StrReplace(ppos + 1, pos, value.ToInvariantString()));
 
                     int fv = (int)Math.Round((value - Math.Floor(value)) * 10.0, 0);
@@ -537,6 +658,14 @@ namespace CNC.GCode
                             }
                             break;
 
+                        case 65:
+                            if (Dialect != Dialect.GrblHAL)
+                                throw new GCodeException(LibStrings.FindResource("ParserUnsupportedCmd"));
+                            // NOTE: not NIST
+                            modalGroup = ModalGroups.G0;
+                            cmdNonModal = Commands.G65;
+                            break;
+
                         case 80:
                             //                            if (axisCommand != AxisCommand.None)
                             //                                throw new GCodeException(LibStrings.FindResource("ParserAxisError"));
@@ -634,13 +763,17 @@ namespace CNC.GCode
                     {
                         throw new GCodeException(LibStrings.FindResource("ParserBadExpr")); ;
                     }
-                    if (ngcexpr.WasExpression)
+                    if (ngcexpr.WasExpression && !ExpressionsSupported)
                         replace.Add(new StrReplace(ppos + 1, pos, value.ToInvariantString()));
 
                     int fv = (int)Math.Round((value - Math.Floor(value)) * 10.0, 0);
                     int iv = (int)Math.Floor(value);
 
-                    switch (iv)
+                    if (cmdNonModal == Commands.G65) {
+                        gcValues.M = value;
+                        wordFlag = WordFlags.M;
+                    }
+                    else switch (iv)
                     {
                         case 0:
                         case 1:
@@ -742,7 +875,8 @@ namespace CNC.GCode
                 {
                     ppos = pos;
                     ngcexpr.ReadSetParameter(block, ref pos);
-                    replace.Add(new StrReplace(ppos, pos, "(" + block.Substring(ppos, pos - ppos) + ")"));
+                    if (!ExpressionsSupported)
+                        replace.Add(new StrReplace(ppos, pos, "(" + block.Substring(ppos, pos - ppos) + ")"));
                 }
                 else if (block[pos] == ';')
                     pos = block.Length;
@@ -757,7 +891,7 @@ namespace CNC.GCode
                         {
                             throw new GCodeException(LibStrings.FindResource("ParserBadExpr"));
                         }
-                        if (ngcexpr.WasExpression)
+                        if (ngcexpr.WasExpression && !ExpressionsSupported)
                             replace.Add(new StrReplace(ppos + 1, pos, value.ToInvariantString(NumFormat) + "(" + block.Substring(ppos + 1, pos - ppos - 1) + ")"));
 
                         switch (char.ToUpperInvariant(block[ppos]))
@@ -813,6 +947,13 @@ namespace CNC.GCode
                             case 'O':
                                 gcValues.O = (int)value;
                                 wordFlag = WordFlags.O;
+                                if (wordFlags == 0 && ngcexpr.ReadFlowControl(block, ref pos, out flowControl) == NGCExpr.OpStatus.OK)
+                                {
+                                    if(!ExpressionsSupported)
+                                        throw new GCodeException(LibStrings.FindResource("ParserBadExpr"));
+                                    else if (pos != block.Length)
+                                        flowExpression = block.Substring(pos + 1);
+                                }
                                 break;
 
                             case 'P':
@@ -843,7 +984,7 @@ namespace CNC.GCode
                                 break;
 
                             case 'X':
-                                if (!ngcexpr.WasExpression)
+                                if (!ngcexpr.WasExpression && !ExpressionsSupported)
                                 {
                                     string val = block.Substring(ppos + 1, pos - ppos - 1);
                                     Decimals = Math.Max(Decimals, val.Length - val.IndexOf('.') - 1);
@@ -973,6 +1114,16 @@ namespace CNC.GCode
             //
 
             Line = (int)gcValues.N;
+
+            //
+            // 0. Flow control
+            //
+
+            if (flowControl != NGCExpr.FlowControl.NoOp)
+            {
+                Tokens.Add(new GCFlowControl(Commands.FlowControl, gcValues.N, (uint)gcValues.O, flowControl, flowExpression));
+
+            }
 
             //
             // 1. Comments feedback
@@ -1406,6 +1557,14 @@ namespace CNC.GCode
                             G92Active = true;
                             Tokens.Add(new GCodeToken(cmdNonModal, gcValues.N));
                             break;
+
+                        case Commands.G65:
+                            if (!wordFlags.HasFlag(WordFlags.P))
+                                throw new GCodeException(LibStrings.FindResource("ParserCMDInvalid"));
+                            wordFlags &= ~(WordFlags.L | WordFlags.N | WordFlags.O | WordFlags.P);
+                            Tokens.Add(new GCMacroCall(cmdNonModal, gcValues.N, (uint)gcValues.P, (uint)gcValues.L, new GCParameters(gcValues, wordFlags).Values));
+                            break;
+
                     }
                     if(cmdNonModal != Commands.G53)
                         axisWords = AxisFlags.None;
@@ -1718,6 +1877,7 @@ namespace CNC.GCode
                         typeof(GCQuadraticSpline),
                         typeof(GCSyncMotion),
                         typeof(GCThreadingMotion),
+                        typeof(GCMacroCall),
                         typeof(GCCannedDrill),
                         typeof(GCPlane),
                         typeof(GCDistanceMode),
@@ -1740,7 +1900,8 @@ namespace CNC.GCode
                         typeof(GCDigitalOutput),
                         typeof(GCWaitOnInput),
                         typeof(GCAnalogOutput),
-                        typeof(GCUserMCommand)
+                        typeof(GCUserMCommand),
+                        typeof(GCFlowControl)
                     });
                     bin.Serialize(stream, objToSerialize);
                 }
@@ -2787,6 +2948,28 @@ namespace CNC.GCode
         }
     }
 
+    public class GCMacroCall : GCodeToken
+    {
+        public GCMacroCall()
+        { }
+
+        public GCMacroCall(Commands command, uint lnr, uint macroId, uint repeats, double[] values) : base(command, lnr)
+        {
+            P = macroId;
+            L = repeats;
+            Values = values;
+        }
+
+        public uint L { get; set; }
+        public uint P { get; set; }
+        public double[] Values { get; set; }
+
+        public new string ToString()
+        {
+            return base.ToString() + "P" + P + (L > 1 ? "L" + L : string.Empty) + GCodeParser.GCParameters.ToString(Values);
+        }
+    }
+
     public class GCCannedDrill : GCAxisCommand3
     {
         public GCCannedDrill()
@@ -3365,6 +3548,28 @@ namespace CNC.GCode
 
         public GCodeException(string message, Exception innerException) : base(message, innerException)
         {
+        }
+    }
+
+    public class GCFlowControl : GCodeToken
+    {
+        public GCFlowControl()
+        { }
+
+        public GCFlowControl(Commands command, uint lnr, uint o, NGCExpr.FlowControl flowControl, string expression) : base(command, lnr)
+        {
+            O = o;
+            FlowControl = flowControl;
+            Expression = expression;
+        }
+
+        public uint O { get; set; }
+        NGCExpr.FlowControl FlowControl;
+        string Expression;
+
+        public new string ToString()
+        {
+            return base.ToString() + "O" + O + FlowControl.ToString().ToLower() + Expression;
         }
     }
 }

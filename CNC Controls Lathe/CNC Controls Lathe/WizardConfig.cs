@@ -81,7 +81,7 @@ namespace CNC.Controls.Lathe
         public double FeedrateMax { get { return active.FeedrateMax; } }
         public double RPM { get { return active.RPM; } }
         public bool CSS { get { return active.CSS; } }
-        public double CSSMaxRPM { get { return active.CSSMaxRPM; } }
+        public double CSSMaxRPM { get { return active.CSSMaxRPM; } } // ? GrblSettings.GetDouble(GrblSetting.RpmMax) : active.CSSMaxRPM; } }
 
         public double RpmMin { get; private set; }
         public double RpmMax { get; private set; }

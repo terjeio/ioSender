@@ -25,6 +25,7 @@ CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,btn_stop:System.Wind
 CNC.Controls.Probing.g.en-US.resources:edgefinderintcontrol.baml,btn_stop:System.Windows.Controls.ContentControl.Content,Button,True,True,,Parar
 CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,btn_useCamera:System.Windows.Controls.ContentControl.Content,Button,True,True,,Usar posições da camera
 CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,chk_useX0Y0:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,"Usar X0,Y0"
+CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,chk_useXY:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,"Use X,Y"
 CNC.Controls.Probing.g.en-US.resources:probingview.baml,fld_depth:CNC.Controls.NumericField.Label,None,False,True,,Profundidade:
 CNC.Controls.Probing.g.en-US.resources:probingview.baml,fld_depth:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Offset de Z da sonda para o ponto controlado
 CNC.Controls.Probing.g.en-US.resources:probingview.baml,fld_diameter:CNC.Controls.NumericField.Label,None,False,True,,Diametro:
@@ -68,8 +69,11 @@ CNC.Controls.Probing.g.en-US.resources:edgefinderintcontrol.baml,grp_workpiece:S
 CNC.Controls.Probing.g.en-US.resources:edgefindercontrol.baml,grp_workpiece:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Peça de trabalho
 CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,grp_workpiece:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Peça de trabalho
 CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,grp_workpieceOffset:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Offset da peça de trabalho
+CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,grp_workpieceOffset:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Workpiece offset
 CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,hdr_preview:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Preview
 CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,lbl_addOffset:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Adicionar deslocamento (offset)
+CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,lbl_addOffset:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,"Determine X0,Y0 for right angled workpiece"
+CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,lbl_addOffset:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Adds a probe point on the left edge.
 CNC.Controls.Probing.g.en-US.resources:configcontrol.baml,lbl_chkProbeConnected:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,A dialog will be shown until the probe is asserted or the dialog is cancelled.
 CNC.Controls.Probing.g.en-US.resources:configcontrol.baml,lbl_chkProbeConnected:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Manually validate probe is connected
 CNC.Controls.Probing.g.en-US.resources:configcontrol.baml,lbl_chkProbeStatus:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Verifique o status da sonda antes de iniciar (G59.3)

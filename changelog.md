@@ -1,5 +1,19 @@
 ## ioSender changelog
 
+2023-07-30: [Release 2.0.43](https://github.com/terjeio/Grbl-GCode-Sender/releases/tag/2.0.43).
+
+* Added gcode parser support for flow control statements. Note that this does not yet include validation.
+* Added ".macro" as selectable filetype for SD card upload.
+* Fix for issue #289 - crash when open some GRBL settings.
+* Fix for issue #290 - cannot read settings on startup after exiting door mode, fix for lathe mode axis settings handling.
+* Fix for issue #307 - camera offset applied multiple times after closing/reopening camera view.
+* Fix for issue #309 - illegal value \(NaN\) returned when DRO field is blank.
+* Fix for issue #310 - SD Card, Download and Run, no Program tab or Run time update.
+* Added handling of new grblHAL auto reporting feature and support for some $-commands, such as settings, while critical events are active. Fixes issue #298.
+* Rotation: added option to determine X0,Y0 for right angled workpiece.
+* 3D viewer: improved grid handling, disabled show work envelope button if homing is not enabled/done.
+* Added facing wizard for lathes, issue #287.
+
 2023-03-22: [Release 2.0.42](https://github.com/terjeio/Grbl-GCode-Sender/releases/tag/2.0.42).
 
 * Fix for incorrect handling of coordinates when controller is in inches mode (setting $13). Issue #283.  

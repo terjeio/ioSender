@@ -125,6 +125,9 @@
             </TextBox.Text>
         </TextBox>
         <Button x:Name="btnCalculate" Content="Calculate" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Grid.Row="2" Click="btnCalculate_Click"/>
+        <TextBlock TextWrapping="NoWrap" Grid.Row="2" Height="20" Margin="90,2,0,0" Width="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+        <Run x:Uid="txt_warning" Text="Warning! Use with care - only lightly tested!" Foreground="Red" FontWeight="Bold"/>
+        </TextBlock>
         </Grid>
         <Grid Margin="364,115,0,0">
             <Grid.ColumnDefinitions>

@@ -1,13 +1,13 @@
 ﻿/*
  * PartingLogic.cs - part of CNC Controls Lathe library
  *
- * v0.19 / 2020-05-21 / Io Engineering (Terje Io)
+ * v0.43 / 2023-06-03 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2020, Io Engineering (Terje Io)
+Copyright (c) 2019-2023, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -96,66 +96,10 @@ namespace CNC.Controls.Lathe
 
         public void Calculate()
         {
-            model.ClearErrors();
-
             double speed = model.CssSpeed;
-            bool css = model.IsCssEnabled;
 
-            if (model.FeedRate > model.config.ZMaxFeedRate)
-            {
-                model.SetError(nameof(model.FeedRate), "Feed rate > max allowed.");
+            if (!model.Validate(ref speed))
                 return;
-            }
-
-            if (model.FeedRate == 0.0d)
-            {
-                model.SetError(nameof(model.FeedRate), "Feed rate is required.");
-                return;
-            }
-
-            if (speed == 0.0d)
-            {
-                model.SetError(nameof(model.RPM), "Spindle RPM is required.");
-                return;
-            }
-
-            if (css)
-            {
-                speed = Math.Round(speed / (Math.PI * model.XStart * model.UnitFactor) * (model.IsMetric ? 1000.0d : 12.0d * 25.4d), 0);
-                if (model.config.CSSMaxRPM > 0.0d)
-                    speed = Math.Min(speed, model.config.CSSMaxRPM);
-            }
-
-            if (speed > model.config.RpmMax && model.config.CSSMaxRPM == 0.0d)
-            {
-                model.SetError(nameof(model.RPM), "Spindle RPM > max allowed.");
-                return;
-            }
-
-            if (speed < model.config.RpmMin)
-            {
-                model.SetError(nameof(model.RPM), "Spindle RPM < min allowed.");
-                return;
-            }
-
-            if (css)
-            {
-                speed = Math.Round(speed / (Math.PI * model.XStart * model.UnitFactor) * (model.IsMetric ? 1000.0d : 12.0d * 25.4d), 0);
-                if (model.config.CSSMaxRPM > 0.0d)
-                    speed = Math.Min(speed, model.config.CSSMaxRPM);
-            }
-
-            if (speed > model.config.RpmMax && model.config.CSSMaxRPM == 0.0d)
-            {
-                model.SetError(nameof(model.RPM), "Spindle RPM > max allowed.");
-                return;
-            }
-
-            if (speed < model.config.RpmMin)
-            {
-                model.SetError(nameof(model.RPM), "Spindle RPM < min allowed.");
-                return;
-            }
 
             double passdepth = model.Passdepth;
             double passdepth_last = model.PassdepthLastPass;
@@ -172,13 +116,6 @@ namespace CNC.Controls.Lathe
             //if (xtarget == 0.0d) // nothing to do...
             //    return;
 
-            if (passdepth_last > passdepth)
-            {
-                model.SetError(nameof(model.Passdepth), "Last pass cut depth must be smaller than cut depth.");
-                model.SetError(nameof(model.PassdepthLastPass), "Last pass cut depth must be smaller than cut depth.");
-                return;
-            }
-
             if (model.config.xmode == LatheMode.Radius)
             {
                 xtarget /= 2.0d;
@@ -191,7 +128,6 @@ namespace CNC.Controls.Lathe
             //    xclearance *= 2.0d;
             //}
 
-            double angle = 0.0d;
             double xstart = diameter;
             double xclear = xstart;
 
@@ -213,8 +149,8 @@ namespace CNC.Controls.Lathe
             model.gCode.Add(string.Format("M3S{0} G4P1", speed.ToString()));
             model.gCode.Add(string.Format("G0 X{0}", model.FormatValue(diameter + xclearance)));
             model.gCode.Add(string.Format("G0 Z{0}", model.FormatValue(zstart + model.config.ZClearance / model.UnitFactor)));
-            model.gCode.Add(css ? string.Format(model.config.CSSMaxRPM > 0.0d ? "G96S{0}D{1}" : "G96S{0}",
-                                             model.CssSpeed, model.config.CSSMaxRPM) : "G97");
+            model.gCode.Add(model.IsCssEnabled ? string.Format(model.config.CSSMaxRPM > 0.0d ? "G96S{0}D{1}" : "G96S{0}",
+                                                                model.CssSpeed, model.config.CSSMaxRPM) : "G97");
 
             do
             {
@@ -242,7 +178,7 @@ namespace CNC.Controls.Lathe
                                     model.FormatValue(zstart), model.FormatValue(ztarget), model.FormatValue(0d)), Core.Action.Add);
             GCode.File.AddBlock(string.Format("(Passdepth: {0}, Feedrate: {1}, {2}: {3})",
                                     model.FormatValue(passdepth), model.FormatValue(model.FeedRate),
-                                         (css ? "CSS" : "RPM"), model.FormatValue((double)model.CssSpeed)), Core.Action.Add);
+                                         (model.IsCssEnabled ? "CSS" : "RPM"), model.FormatValue((double)model.CssSpeed)), Core.Action.Add);
 
             foreach (string s in model.gCode)
                 GCode.File.AddBlock(s, Core.Action.Add);

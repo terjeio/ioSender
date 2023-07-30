@@ -1,7 +1,7 @@
 /*
  * SDCardView.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.42 / 2023-03-12 / Io Engineering (Terje Io)
+ * v0.43 / 2023-06-02 / Io Engineering (Terje Io)
  *
  */
 
@@ -214,7 +214,7 @@ namespace CNC.Controls
             string filename = string.Empty;
             OpenFileDialog file = new OpenFileDialog();
 
-            file.Filter = string.Format("GCode files ({0})|{0}|Text files (*.txt)|*.txt|All files (*.*)|*.*", FileUtils.ExtensionsToFilter(GCode.FileTypes));
+            file.Filter = string.Format("GCode files ({0})|{0}|GCode macros (*.macro)|*.macro|Text files (*.txt)|*.txt|All files (*.*)|*.*", FileUtils.ExtensionsToFilter(GCode.FileTypes));
 
             if (file.ShowDialog() == true)
             {

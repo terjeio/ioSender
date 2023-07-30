@@ -1,12 +1,108 @@
-﻿<UserControl x:Class="CNC.Controls.Lathe.FacingView"
+﻿<UserControl x:Class="CNC.Controls.Lathe.FacingWizard"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CNC.Controls.Lathe"
+             xmlns:Controls="clr-namespace:CNC.Controls;assembly=CNC.Controls.WPF"
+             xmlns:Converters="clr-namespace:CNC.Controls.Lathe"
              mc:Ignorable="d" 
              d:DesignHeight="515" d:DesignWidth="875">
+    <UserControl.Resources>
+        <Controls:StringCollectionToTextConverter x:Key="GCodeConverter"/>
+        <Controls:MultiLineConverter x:Key="ErrorMessageConverter" />
+        <Style x:Key="CNCValue" TargetType="Controls:NumericField">
+            <Setter Property="Format" Value="{Binding Path=Format, Mode=OneWay}"/>
+            <Setter Property="Unit" Value="{Binding Path=Unit, Mode=OneWay}"/>
+            <Style.Triggers>
+                <Trigger Property="Validation.HasError" Value="true">
+                    <Setter Property="Controls:NumericField.ToolTip">
+                        <Setter.Value>
+                            <MultiBinding Converter="{StaticResource ErrorMessageConverter}">
+                                <Binding RelativeSource="{RelativeSource Self}" Path="(Validation.Errors)" />
+                                <Binding RelativeSource="{RelativeSource Self}" Path="(Validation.Errors).Count" />
+                            </MultiBinding>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="CNCValueSigned" TargetType="Controls:NumericField">
+            <Setter Property="Format" Value="{Binding Path=FormatSigned, Mode=OneWay}"/>
+            <Setter Property="Unit" Value="{Binding Path=Unit, Mode=OneWay}"/>
+            <Style.Triggers>
+                <Trigger Property="Validation.HasError" Value="true">
+                    <Setter Property="Controls:NumericField.ToolTip">
+                        <Setter.Value>
+                            <MultiBinding Converter="{StaticResource ErrorMessageConverter}">
+                                <Binding RelativeSource="{RelativeSource Self}" Path="(Validation.Errors)" />
+                                <Binding RelativeSource="{RelativeSource Self}" Path="(Validation.Errors).Count" />
+                            </MultiBinding>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="SpindleErrorStyle" TargetType="local:CssControl">
+            <Style.Triggers>
+                <Trigger Property="Validation.HasError" Value="true">
+                    <Setter Property="local:CssControl.ToolTip">
+                        <Setter.Value>
+                            <MultiBinding Converter="{StaticResource ErrorMessageConverter}">
+                                <Binding RelativeSource="{RelativeSource Self}" Path="(Validation.Errors)" />
+                                <Binding RelativeSource="{RelativeSource Self}" Path="(Validation.Errors).Count" />
+                            </MultiBinding>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
     <Grid>
-            
+        <local:ProfileControl x:Name="cbxProfile" ItemsSource="{Binding Path=Profiles}" SelectedItem="{Binding Path=Profile, Mode=TwoWay}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Height="30" Margin="15,50,0,0" VerticalAlignment="Top" Width="500">
+            <Controls:NumericField x:Name="cvStart" Label="Start Z:" Value="{Binding Path=ZStart, Mode=TwoWay}" Style="{StaticResource CNCValueSigned}"/>
+            <Controls:NumericField x:Name="cvTarget" Label="Target Z:" Value="{Binding Path=ZTarget, Mode=TwoWay}" Style="{StaticResource CNCValueSigned}"/>
+            <Controls:NumericField x:Name="cvClearanceZ" Label="Clearance" Value="{Binding Path=ZClearance, Mode=TwoWay}" Style="{StaticResource CNCValue}"/>
+        </StackPanel>
+        <GroupBox x:Name="groupBox" Header="Diameter" HorizontalAlignment="Left" Margin="10,85,0,0" VerticalAlignment="Top" Height="50" Width="585">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Height="30" VerticalAlignment="Top" Width="580">
+                <Controls:NumericField x:Name="cvDiameter" Label="Start" Value="{Binding Path=XStart, Mode=TwoWay}" Style="{StaticResource CNCValue}" ToolTip="Measured diameter of stock."/>
+                <Controls:NumericField x:Name="cvTargetX" Label="Target" Value="{Binding Path=XTarget, Mode=TwoWay}" Style="{StaticResource CNCValue}"/>
+                <Controls:NumericField x:Name="cvClearanceX" Label="Clearance" Value="{Binding Path=XClearance, Mode=TwoWay}" Style="{StaticResource CNCValue}"/>
+            </StackPanel>
+        </GroupBox>
+        <GroupBox x:Name="groupBox2" Header="Cut depths and feed rates" HorizontalAlignment="Left" Margin="10,140,0,0" VerticalAlignment="Top" Height="95" Width="585">
+            <StackPanel HorizontalAlignment="Left" Height="Auto" VerticalAlignment="Top" Width="580">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Height="30" VerticalAlignment="Top" Width="580">
+                    <Controls:NumericField x:Name="cvPassDepth" Label="Pass depth:" Value="{Binding Path=Passdepth, Mode=TwoWay}" Style="{StaticResource CNCValue}" ToolTip="Same for radius and diameter mode."/>
+                    <Controls:NumericField x:Name="cvFeedRate" Label="Feed rate:" Value="{Binding Path=FeedRate, Mode=TwoWay}" Unit="{Binding Path=FeedrateUnit}" Style="{StaticResource CNCValue}"/>
+                    <local:SpringPassControl x:Name="springPasses" Value="{Binding Path=SpringPasses, Mode=TwoWay}" IsPassesEnabled="{Binding Path=IsSpringPassesEnabled, Mode=TwoWay}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Height="30" VerticalAlignment="Top" Width="580">
+                    <Controls:NumericField x:Name="cvPassDepthLast" Style="{StaticResource CNCValue}" Label="Last pass:" Value="{Binding Path=PassdepthLastPass, Mode=TwoWay}"/>
+                    <Controls:NumericField x:Name="cvFeedRateLast" Label="Feed rate:" Value="{Binding Path=FeedRateLastPass, Mode=TwoWay}" Unit="{Binding Path=FeedrateUnit}" Style="{StaticResource CNCValue}"/>
+                </StackPanel>
+            </StackPanel>
+        </GroupBox>
+        <local:CssControl x:Name="css" IsCssEnabled="{Binding Path=IsCssEnabled, Mode=TwoWay}" Value="{Binding Path=CssSpeed, Mode=TwoWay}" Unit="{Binding Path=CssUnit}" HorizontalAlignment="Left" Margin="10,245,0,0" VerticalAlignment="Top" Style="{StaticResource SpindleErrorStyle}"/>
+        <Grid Margin="10,280,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <TextBox x:Name="txtGCode" HorizontalAlignment="Left" Margin="0,5" TextWrapping="Wrap" VerticalAlignment="Stretch" Width="400">
+                <TextBox.Text>
+                    <MultiBinding Converter="{StaticResource GCodeConverter}">
+                        <Binding Path="gCode" Mode="OneWay"/>
+                        <Binding Path="gCode.Count" Mode="OneWay" />
+                    </MultiBinding>
+                </TextBox.Text>
+            </TextBox>
+            <Button x:Name="btnCalculate" Content="Calculate" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Grid.Row="1" Click="btnCalculate_Click"/>
+            <TextBlock TextWrapping="NoWrap" Grid.Row="1" Height="20" Margin="90,2,0,0" Width="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+            <Run x:Uid="txt_warning" Text="Warning! Use with care - only lightly tested!" Foreground="Red" FontWeight="Bold"/>
+            </TextBlock>
+        </Grid>
     </Grid>
 </UserControl>

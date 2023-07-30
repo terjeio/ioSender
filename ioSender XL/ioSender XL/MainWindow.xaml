@@ -11,6 +11,7 @@
         xmlns:cncprobingcontrols="clr-namespace:CNC.Controls.Probing;assembly=CNC.Controls.Probing"
         xmlns:local="clr-namespace:GCode_Sender"
         mc:Ignorable="d"
+        Background="#FFE5E5E5"
         Title="Sender ({0})" Height="640" Width="925" MinHeight="700" MinWidth="1250"
         Loaded="Window_Load"
         SizeChanged="Window_SizeChanged"
@@ -111,7 +112,7 @@
             <cnccontrols:MachinePositionFlyout x:Name="mposFlyout" Visibility="Hidden" Canvas.Right="22"/>
             <cnccontrols:THCMonitorControl x:Name="thcControl" Visibility="Hidden" Canvas.Right="22"/>
         </Canvas>
-        <TabControl Background="#FFE5E5E5" DockPanel.Dock="Left" x:Name="tabMode" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Focusable="False" SelectionChanged="TabMode_SelectionChanged">
+        <TabControl Background="Transparent" DockPanel.Dock="Left" x:Name="tabMode" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Focusable="False" SelectionChanged="TabMode_SelectionChanged">
             <TabControl.Resources>
                 <Style TargetType="{x:Type TabItem}">
                     <Setter Property="Height" Value="32" />
@@ -137,6 +138,9 @@
             </TabItem>
             <TabItem x:Uid="tab_parting" x:Name="tabParting" Header="Parting">
                 <cnclathecontrols:PartingWizard x:Name="partingWizard"/>
+            </TabItem>
+            <TabItem x:Uid="tab_facing" x:Name="tabFacing" Header="Facing">
+                <cnclathecontrols:FacingWizard x:Name="facingWizard"/>
             </TabItem>
             <TabItem x:Uid="tab_threading" x:Name="tabThreading" Header="Threading">
                 <cnclathecontrols:ThreadingWizard x:Name="threadingWizard"/>

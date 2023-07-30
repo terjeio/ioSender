@@ -1,7 +1,7 @@
 ﻿/*
  * ProbingView.xaml.cs - part of CNC Probing library
  *
- * v0.42 / 2023-03-21 / Io Engineering (Terje Io)
+ * v0.43 / 2023-07-25 / Io Engineering (Terje Io)
  *
  */
 
@@ -136,8 +136,11 @@ namespace CNC.Controls.Probing
 
         private bool StartProbe(Key key)
         {
-            focusedControl = Keyboard.FocusedElement;
-            getView(tab.SelectedItem as TabItem)?.Start(model.PreviewEnable);
+            if (!grbl.IsJobRunning)
+            {
+                focusedControl = Keyboard.FocusedElement;
+                getView(tab.SelectedItem as TabItem)?.Start(model.PreviewEnable);
+            }
 
             return true;
         }
@@ -202,7 +205,7 @@ namespace CNC.Controls.Probing
                     probeDisconnected = grbl.Signals.Value.HasFlag(Signals.ProbeDisconnected);
                     DisplayPosition(grbl);
                     var signals = ((GrblViewModel)sender).Signals.Value;
-                    if (signals.HasFlag(Signals.CycleStart) && !signals.HasFlag(Signals.Hold) && !cycleStartSignal)
+                    if (!grbl.IsJobRunning && signals.HasFlag(Signals.CycleStart) && !signals.HasFlag(Signals.Hold) && !cycleStartSignal)
                         StartProbe(Key.R);
                     cycleStartSignal = signals.HasFlag(Signals.CycleStart);
                     break;
@@ -213,23 +216,6 @@ namespace CNC.Controls.Probing
         {
             showDRO();
             showProbeProperties();
-        }
-
-        private void showProbeProperties()
-        {
-            double height;
-
-            if (probeProperties.Visibility == Visibility.Collapsed)
-            {
-                probeProperties.Visibility = Visibility.Hidden;
-                probeProperties.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-                height = probeProperties.DesiredSize.Height;
-                probeProperties.Visibility = Visibility.Collapsed;
-            }
-            else
-                height = probeProperties.ActualHeight;
-
-            probeProperties.Visibility = (dp.ActualHeight - t1.ActualHeight - Jog.ActualHeight + probeProperties.ActualHeight) > height ? Visibility.Visible : Visibility.Collapsed;
         }
 
         #region Methods and properties required by CNCView interface
@@ -435,6 +421,24 @@ namespace CNC.Controls.Probing
         }
 
         // https://stackoverflow.com/questions/5707143/how-to-get-the-width-height-of-a-collapsed-control-in-wpf
+
+        private void showProbeProperties()
+        {
+            double height;
+
+            if (probeProperties.Visibility == Visibility.Collapsed)
+            {
+                probeProperties.Visibility = Visibility.Hidden;
+                probeProperties.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+                height = probeProperties.DesiredSize.Height;
+                probeProperties.Visibility = Visibility.Collapsed;
+            }
+            else
+                height = probeProperties.ActualHeight;
+
+            probeProperties.Visibility = (t1.ActualHeight - (Clearances.TranslatePoint(new Point(0, Clearances.ActualHeight), dp).Y + Jog.ActualHeight + Position.ActualHeight) + probeProperties.ActualHeight) > height ? Visibility.Visible : Visibility.Collapsed;
+        }
+
         private void showDRO()
         {
             double width;

@@ -180,6 +180,7 @@ CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalReset:System.Wi
 CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalSafetyDoor:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Biztonsági ajtó
 CNC.Controls.WPF.g.en-US.resources:trinamicview.baml,lbl_stallGuardEnable:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Szűrő engedélyezése (SFILT)
 CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,lbl_state:System.Windows.Controls.ContentControl.Content,Label,True,True,,State:
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_theme:System.Windows.Controls.ContentControl.Content,Label,True,True,,Theme:
 CNC.Controls.WPF.g.en-US.resources:toolview.baml,lbl_tipRadius:CNC.Controls.CoordValueSetControl.Label,None,True,True,,A hegy sugara:
 CNC.Controls.WPF.g.en-US.resources:toolview.baml,lbl_tool:System.Windows.Controls.ContentControl.Content,Label,True,True,,Eszköz:
 CNC.Controls.WPF.g.en-US.resources:workparameterscontrol.baml,lbl_tool:System.Windows.Controls.ContentControl.Content,Label,True,True,,Eszköz:
@@ -256,6 +257,11 @@ CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsTimeout:Syste
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsWritten:System.String.$Content,None,True,True,,Az összes beállítás a feladó mappában lévő {0} címre írva.
 CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,str_stop:System.String.$Content,None,True,True,,Stop
 CNC.Controls.WPF.g.en-US.resources:thcmonitorcontrol.baml,str_ThcFlyout:System.String.$Content,None,True,True,,_THC monitor
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_themeBlack:System.String.$Content,None,True,True,,Black
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_themeDark:System.String.$Content,None,True,True,,Dark
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_themeDefault:System.String.$Content,None,True,True,,Default
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_themeLight:System.String.$Content,None,True,True,,Light
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_themeWhite:System.String.$Content,None,True,True,,White
 CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,str_toolchanges:System.String.$Content,None,True,True,,"A munkának {0} szerszámcseréje van az M6 használatával, csak néhány Grbl port támogatja ezt."
 CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,str_toolchangeTLO:System.String.$Content,None,True,True,,"A munkának {0} szerszámcseréje van, a szerszámhossz-referenciát az indítás előtt meg kell határozni."
 CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,str_transferAborted:System.String.$Content,None,True,True,,Az átvitel megszakítva.

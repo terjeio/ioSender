@@ -61,6 +61,18 @@ namespace GCode_Sender
             TaskScheduler.UnobservedTaskException += TaskSchedulerOnUnobservedTaskException;
         }
 
+        public ResourceDictionary ThemeDictionary
+        {
+            // You could probably get it via its name with some query logic as well.
+            get { return Resources.MergedDictionaries[0]; }
+        }
+
+        public void ChangeTheme(Uri uri)
+        {
+            ThemeDictionary.MergedDictionaries.Clear();
+            ThemeDictionary.MergedDictionaries.Add(new ResourceDictionary() { Source = uri });
+        }
+
         protected override void OnStartup(StartupEventArgs e)
         {
             string[] args = Environment.GetCommandLineArgs();

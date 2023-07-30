@@ -1,7 +1,7 @@
 ﻿/*
  * Grbl.cs - part of CNC Controls library
  *
- * v0.42 / 2023-03-22 / Io Engineering (Terje Io)
+ * v0.43 / 2023-07-05 / Io Engineering (Terje Io)
  *
  */
 
@@ -76,6 +76,8 @@ namespace CNC.Core
             CMD_OPTIONAL_STOP_TOGGLE = 0x88,
             CMD_SINGLE_BLOCK_TOGGLE = 0x89,
             CMD_OVERRIDE_FAN0_TOGGLE = 0x8A,
+            CMD_MPG_MODE_TOGGLE = 0x8B,
+            CMD_AUTO_REPORTING_TOGGLE = 0x8C,
             CMD_FEED_OVR_RESET = 0x90,
             CMD_FEED_OVR_COARSE_PLUS = 0x91,
             CMD_FEED_OVR_COARSE_MINUS = 0x92,
@@ -608,6 +610,9 @@ namespace CNC.Core
             init();
             foreach (int i in GrblInfo.AxisFlags.ToIndices())
                 Values[i] = pos.Values[i] * scaleFactor;
+
+            if (double.IsNaN(Y))
+                Y = pos.Y;
         }
 
         private void init()
@@ -955,7 +960,7 @@ namespace CNC.Core
         public static bool HasPIDLog { get; private set; }
         public static bool HasProbe { get; private set; } = true;
         public static bool HasRTC { get; private set; } = false;
-        public static bool HomingEnabled { get; internal set; } = true;
+        public static bool HomingEnabled { get; internal set; } = false;
         public static AxisFlags HomingDirection { get; internal set; } = AxisFlags.None;
         public static bool UseLegacyRTCommands { get; internal set; } = true;
         public static bool MPGMode { get; set; }
@@ -2466,6 +2471,8 @@ namespace CNC.Core
 
     public static class GrblSettings
     {
+        private static List<string> responses = new List<string>();
+
         public static ObservableCollection<GrblSettingDetails> Settings { get; private set; } = new ObservableCollection<GrblSettingDetails>();
 
         public static bool IsLoaded { get { return Settings.Count > 0; } }
@@ -2561,7 +2568,11 @@ namespace CNC.Core
                 GrblSettingGroups.Get(model);
             }
 
+            foreach (var response in responses)
+                Settings.Add(new GrblSettingDetails(response));
+
             res = null;
+            responses.Clear();
 
             new Thread(() =>
             {
@@ -2799,8 +2810,9 @@ namespace CNC.Core
             if (data != "ok")
             {
                 string[] valuepair = data.TrimEnd(']').Split(':');
+
                 if (valuepair.Length == 2 && valuepair[0] == "[SETTING")
-                    Settings.Add(new GrblSettingDetails(valuepair[1]));
+                    responses.Add(valuepair[1]);
             }
         }
 
@@ -2844,8 +2856,9 @@ namespace CNC.Core
 
                     if (setting == null)
                     {
+                        Action<GrblSettingDetails> addMethod = Settings.Add;
                         setting = new GrblSettingDetails(id.ToString() + "|0||||||");
-                        Settings.Add(setting);
+                        Application.Current.Dispatcher.BeginInvoke(addMethod, setting);
                     }
 
                     setting.Value = valuepair[1];

@@ -1,7 +1,7 @@
 ﻿/*
  * GCode.cs - part of CNC Controls library
  *
- * v0.41 / 2022-09-18 / Io Engineering (Terje Io)
+ * v0.43 / 2023-05-31 / Io Engineering (Terje Io)
  *
  */
 
@@ -259,6 +259,7 @@ namespace CNC.GCode
         G61,
         G61_1,
         G64,
+        G65,
         G73,
         G76,
         G80,
@@ -314,6 +315,7 @@ namespace CNC.GCode
         ToolSelect,
         Comment,
         UserMCommand,
+        FlowControl,
         Undefined
     }
 

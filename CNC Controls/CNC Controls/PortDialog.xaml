@@ -34,7 +34,7 @@
             <TabItem x:Uid="tab_serial" Header="Serial">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                        <Label  x:Uid="lbl_serialPort" Content="Port:" HorizontalAlignment="Left" HorizontalContentAlignment="Right" Width="80" VerticalAlignment="Center"/>
+                        <Label x:Uid="lbl_serialPort" Content="Port:" HorizontalAlignment="Left" HorizontalContentAlignment="Right" Width="80" VerticalAlignment="Center"/>
                         <ComboBox HorizontalAlignment="Left" VerticalAlignment="Center" Width="285"
                             DropDownOpened="CbxPorts_DropDownOpened"
                             ItemsSource="{Binding Path=Com.Ports}"
@@ -44,7 +44,7 @@
                          />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
-                        <Label  x:Uid="lbl_serialBaud" Content="Baud rate:" HorizontalAlignment="Left" HorizontalContentAlignment="Right" Width="80" VerticalAlignment="Center"/>
+                        <Label x:Uid="lbl_serialBaud" Content="Baud rate:" HorizontalAlignment="Left" HorizontalContentAlignment="Right" Width="80" VerticalAlignment="Center"/>
                         <ComboBox HorizontalAlignment="Left" VerticalAlignment="Center" Width="90"
                             ItemsSource="{Binding Path=Com.Baud}"
                             SelectedValue="{Binding Path=Com.SelectedBaud, Mode=TwoWay}"

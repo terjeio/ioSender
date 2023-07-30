@@ -1,13 +1,13 @@
 ﻿/*
  * NumericField.xaml.cs - part of CNC Controls library
  *
- * v0.36 / 2021-11-01 / Io Engineering (Terje Io)
+ * v0.43 / 2023-06-28 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2020, Io Engineering (Terje Io)
+Copyright (c) 2018-2023, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -62,7 +62,7 @@ namespace CNC.Controls
         public static readonly DependencyProperty ValueProperty = DependencyProperty.Register(nameof(Value), typeof(double), typeof(NumericField), new PropertyMetadata(double.NaN, new PropertyChangedCallback(OnValueChanged)), new ValidateValueCallback(IsValidReading));
         public double Value
         {
-            get { return (double)GetValue(ValueProperty); }
+            get { double v = (double)GetValue(ValueProperty); return double.IsNaN(v) ? 0d : v; }
             set { SetValue(ValueProperty, value); }
         }
         private static void OnValueChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)

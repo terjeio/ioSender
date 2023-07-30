@@ -1,13 +1,13 @@
 ﻿/*
  * BaseViewModel.cs - part of CNC Controls Lathe library
  *
- * v0.03 / 2020-01-28 / Io Engineering (Terje Io)
+ * v0.43 / 2023-06-03 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2020, Io Engineering (Terje Io)
+Copyright (c) 2019-2023, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -41,7 +41,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using CNC.Core;
 using System;
-using System.Globalization;
 
 namespace CNC.Controls.Lathe
 {
@@ -353,6 +352,73 @@ namespace CNC.Controls.Lathe
                     OnPropertyChanged();
                 }
             }
+        }
+
+        public bool Validate(ref double spindleSpeed)
+        {
+            bool ok = true;
+
+            ClearErrors();
+
+            if (FeedRate > config.ZMaxFeedRate)
+            {
+                ok = false;
+                SetError(nameof(FeedRate), "Feed rate > max allowed.");
+            }
+
+            if (FeedRate == 0.0d)
+            {
+                ok = false;
+                SetError(nameof(FeedRate), "Feed rate is required.");
+            }
+
+            if (FeedRateLastPass == 0.0d)
+            {
+                ok = false;
+                SetError(nameof(FeedRateLastPass), "Feed rate is required.");
+            }
+
+            if (FeedRateLastPass > config.ZMaxFeedRate)
+            {
+                ok = false;
+                SetError(nameof(FeedRateLastPass), "Feed rate > max allowed.");
+            }
+
+            if (spindleSpeed == 0.0d)
+            {
+                ok = false;
+                SetError(nameof(CssSpeed), IsCssEnabled ? "Cutting speed is required." : "Spindle RPM is required");
+            }
+            else
+            {
+                if (IsCssEnabled)
+                {
+                    spindleSpeed = Math.Round(spindleSpeed / (Math.PI * XStart * UnitFactor) * (IsMetric ? 1000.0d : 12.0d * 25.4d), 0);
+                    if (config.CSSMaxRPM > 0.0d)
+                        spindleSpeed = Math.Min(spindleSpeed, config.CSSMaxRPM);
+                }
+
+                if (spindleSpeed > (IsCssEnabled && config.CSSMaxRPM > 0.0d ? config.CSSMaxRPM : config.RpmMax))
+                {
+                    ok = false;
+                    SetError(nameof(CssSpeed), IsCssEnabled ? "Cutting speed is too high for spindle." : "Spindle RPM > max allowed.");
+                }
+            }
+
+            if (spindleSpeed < config.RpmMin)
+            {
+                ok = false;
+                SetError(nameof(CssSpeed), IsCssEnabled ? "Cutting speed is too low for spindle." : "Spindle RPM < min allowed.");
+            }
+
+            if (PassdepthLastPass > Passdepth)
+            {
+                ok = false;
+                SetError(nameof(Passdepth), "Last pass cut depth must be smaller than cut depth.");
+                SetError(nameof(PassdepthLastPass), "Last pass cut depth must be smaller than cut depth.");
+            }
+
+            return ok;
         }
     }
 }

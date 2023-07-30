@@ -1,7 +1,7 @@
 /*
  * Widget.cs - part of CNC Controls library for Grbl
  *
- * v0.41 / 2023-01-12 / Io Engineering (Terje Io)
+ * v0.43 / 2023-03-30 / Io Engineering (Terje Io)
  *
  */
 
@@ -123,7 +123,10 @@ namespace CNC.Controls
         {
             string labels = string.Empty;
 
-            for(int i = 0; i < GrblInfo.NumAxes; i++)
+            if (GrblInfo.NumAxes == 2)
+                labels = string.Format("{0} axis,N/A,{1} axis", GrblInfo.AxisIndexToLetter(0), GrblInfo.AxisIndexToLetter(2));
+
+            else for (int i = 0; i < GrblInfo.NumAxes; i++)
             {
                 labels += (labels == string.Empty ? "" : ",") + GrblInfo.AxisIndexToLetter(i) + " axis";
             }
@@ -167,7 +170,7 @@ namespace CNC.Controls
                     has_unit = false;
                     bool axes = widget.DataType == GrblSettingDetails.DataTypes.AXISMASK || widget.Format == "axes";
                     string[] format = (axes ? AxisLabels() : widget.Format).Split(',');
-                    for (int i = 0; i < (axes ? 6 : format.Length); i++)
+                    for (int i = 0; i < (axes ? GCodeParser.AxisFlag.Length : format.Length); i++)
                     {
                         if (axes && !GrblInfo.AxisFlags.HasFlag(GCodeParser.AxisFlag[i]))
                             continue;

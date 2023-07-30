@@ -1,13 +1,13 @@
 ﻿/*
  * AppConfig.cs - part of CNC Controls library
  *
- * v0.41 / 2022-11-09 / Io Engineering (Terje Io)
+ * v0.43 / 2023-07-21 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2022, Io Engineering (Terje Io)
+Copyright (c) 2019-2023, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -48,6 +48,7 @@ using System.Windows.Media.Media3D;
 using CNC.Core;
 using CNC.GCode;
 using static CNC.GCode.GCodeParser;
+using System.Collections.Generic;
 
 namespace CNC.Controls
 {
@@ -137,7 +138,10 @@ namespace CNC.Controls
         private bool _showTextOverlay = false, _renderExecuted = false, _blackBackground = false, _scaleTool = true;
         Color _cutMotion = Colors.Black, _rapidMotion = Colors.LightPink, _retractMotion = Colors.Green, _toolOrigin = Colors.Green, _grid = Colors.Gray, _highlight = Colors.Crimson;
 
-        public bool IsEnabled { get { return _isEnabled; } set { _isEnabled = value; OnPropertyChanged(); } }
+        [XmlIgnore]
+        public bool IsHomingEnabled { get { return _isEnabled && GrblInfo.HomingEnabled; } set { OnPropertyChanged(); } }
+
+        public bool IsEnabled { get { return _isEnabled; } set { _isEnabled = value; OnPropertyChanged(); OnPropertyChanged(nameof(IsHomingEnabled)); } }
         public int ArcResolution { get { return _arcResolution; } set { _arcResolution = value; OnPropertyChanged(); } }
         public double MinDistance { get { return _minDistance; } set { _minDistance = value; OnPropertyChanged(); } }
         public bool ToolAutoScale { get { return _scaleTool; } set { _scaleTool = value; OnPropertyChanged(); } }
@@ -145,7 +149,7 @@ namespace CNC.Controls
         public bool ShowGrid { get { return _showGrid; } set { _showGrid = value; OnPropertyChanged(); } }
         public bool ShowAxes { get { return _showAxes; } set { _showAxes = value; OnPropertyChanged(); } }
         public bool ShowBoundingBox { get { return _showBoundingBox; } set { _showBoundingBox = value; OnPropertyChanged(); } }
-        public bool ShowWorkEnvelope { get { return _showWorkEnvelope; } set { _showWorkEnvelope = value; OnPropertyChanged(); } }
+        public bool ShowWorkEnvelope { get { return _showWorkEnvelope && GrblInfo.HomingEnabled; } set { _showWorkEnvelope = value; OnPropertyChanged(); } }
         public bool ShowViewCube { get { return _showViewCube; } set { _showViewCube = value; OnPropertyChanged(); } }
         public bool ShowTextOverlay { get { return _showTextOverlay; } set { _showTextOverlay = value; OnPropertyChanged(); } }
         public bool ShowCoordinateSystem { get { return _showCoordSystem; } set { _showCoordSystem = value; OnPropertyChanged(); } }
@@ -237,7 +241,21 @@ namespace CNC.Controls
         private int _pollInterval = 200, /* ms*/  _maxBufferSize = 300;
         private bool _useBuffering = false, _keepMdiFocus = true, _filterOkResponse = false, _saveWindowSize = false, _autoCompress = false;
         private CommandIgnoreState _ignoreM6 = CommandIgnoreState.No, _ignoreM7 = CommandIgnoreState.No, _ignoreM8 = CommandIgnoreState.No, _ignoreG61G64 = CommandIgnoreState.Strip;
+        private string _theme = "default";
 
+        [XmlIgnore]
+        public Dictionary<string, string> Themes { get; private set; } = new Dictionary<string, string>();
+
+        public string Theme
+        {
+            get { return _theme; }
+            set {
+                _theme = value; //.Substring(0, 1).ToUpper() + value.Substring(1);
+                Properties.Settings.Default.ColorMode = value; // value.Substring(0, 1).ToUpper() + value.Substring(1);
+                Properties.Settings.Default.Save();
+                OnPropertyChanged();
+            }
+        }
         public int PollInterval { get { return _pollInterval < 100 ? 100 : _pollInterval; } set { _pollInterval = value; OnPropertyChanged(); } }
         public string PortParams { get; set; } = "COMn:115200,N,8,1";
         public int ResetDelay { get; set; } = 2000;
@@ -269,21 +287,39 @@ namespace CNC.Controls
         public ProbeConfig Probing { get; set; } = new ProbeConfig();
     }
 
-    public class AppConfig
+    public class AppConfig : ViewModelBase
     {
         private string configfile = null;
         private bool? MPGactive = null;
+        private Config _base = null;
 
         public string FileName { get; private set; }
 
         private static readonly Lazy<AppConfig> settings = new Lazy<AppConfig>(() => new AppConfig());
 
         private AppConfig()
-        { }
+        {
+            Properties.Settings.Default.PropertyChanged += Default_PropertyChanged;
+        }
+
+        private void Default_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            OnPropertyChanged(nameof(ColorMode));   
+        }
 
         public static AppConfig Settings { get { return settings.Value; } }
 
-        public Config Base { get; private set; } = null;
+        public static string ColorMode { get { return Properties.Settings.Default.ColorMode; } }
+
+        public Config Base
+        {
+            get { return _base; }
+            private set
+            {
+                _base = value;
+            }
+        }
+
         public ObservableCollection<CNC.GCode.Macro> Macros { get { return Base == null ? null : Base.Macros; } }
         public JogConfig Jog { get { return Base == null ? null : Base.Jog; } }
         public JogUIConfig JogUiMetric { get { return Base == null ? null : Base.JogUiMetric; } }
@@ -454,6 +490,12 @@ namespace CNC.Controls
                     return 1;
             }
 
+            Base.Themes.Add("Standard", LibStrings.FindResource("ThemeDefault"));
+            Base.Themes.Add("Black", LibStrings.FindResource("ThemeBlack"));
+            Base.Themes.Add("Dark", LibStrings.FindResource("ThemeDark"));
+            Base.Themes.Add("Light", LibStrings.FindResource("ThemeLight"));
+            Base.Themes.Add("White", LibStrings.FindResource("ThemeWhite"));
+
             if (jogMode != -1)
                 Base.Jog.Mode = (JogConfig.JogMode)jogMode;
 
@@ -528,6 +570,34 @@ namespace CNC.Controls
                 while (MPGactive == null)
                     EventUtils.DoEvents();
 
+                if (MPGactive == true)
+                {
+                    MPGactive = null;
+
+                    new Thread(() =>
+                    {
+                        MPGactive = WaitFor.SingleEvent<string>(
+                        cancellationToken,
+                        null,
+                        a => model.OnRealtimeStatusProcessed += a,
+                        a => model.OnRealtimeStatusProcessed -= a,
+                        500, () => Comms.com.WriteByte(GrblConstants.CMD_STATUS_REPORT_ALL));
+                    }).Start();
+
+                    while (MPGactive == null)
+                        EventUtils.DoEvents();
+
+                    if (MPGactive == true)
+                    {
+                        if (model.IsMPGActive != true && model.AutoReportingEnabled)
+                        {
+                            MPGactive = false;
+                            if (model.AutoReportInterval > 0)
+                                Comms.com.WriteByte(GrblConstants.CMD_AUTO_REPORTING_TOGGLE);
+                        }
+                    }
+                }
+
                 // ...if so show dialog for wait for it to stop polling and relinquish control.
                 if (MPGactive == true)
                 {
@@ -588,14 +658,13 @@ namespace CNC.Controls
             {
                 if (model.GrblState.State != GrblStates.Unknown)
                 {
-
                     switch (model.GrblState.State)
                     {
                         case GrblStates.Alarm:
 
                             model.Poller.SetState(AppConfig.Settings.Base.PollInterval);
 
-                            switch (model.GrblState.Substate)
+                            if (!model.SysCommandsAlwaysAvailable) switch(model.GrblState.Substate)
                             {
                                 case 1: // Hard limits
                                     if (!GrblInfo.IsLoaded)
@@ -701,6 +770,8 @@ namespace CNC.Controls
                                         }
                                     } while (!exit);
                                 }
+                                if(model.GrblState.State == GrblStates.Door && model.GrblState.Substate == 0)
+                                    Comms.com.WriteByte(GrblConstants.CMD_RESET);
                             }
                             else
                             {

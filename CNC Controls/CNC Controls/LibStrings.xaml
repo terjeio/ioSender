@@ -40,4 +40,9 @@
     <system:String x:Uid="str_grblStateSleep" x:Key="StateSleep">SLEEP</system:String>
     <system:String x:Uid="str_settingsSaved" x:Key="SettingsSaved">Settings saved.</system:String>
     <system:String x:Uid="str_keymappingsSaved" x:Key="KeymappingsSaved">Keymappings saved to {0}</system:String>
+    <system:String x:Uid="str_themeBlack" x:Key="ThemeBlack">Black</system:String>
+    <system:String x:Uid="str_themeDark" x:Key="ThemeDark">Dark</system:String>
+    <system:String x:Uid="str_themeLight" x:Key="ThemeLight">Light</system:String>
+    <system:String x:Uid="str_themeWhite" x:Key="ThemeWhite">White</system:String>
+    <system:String x:Uid="str_themeDefault" x:Key="ThemeDefault">Default</system:String>
 </ResourceDictionary>

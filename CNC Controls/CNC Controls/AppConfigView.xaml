@@ -9,11 +9,18 @@
              d:DesignHeight="550" d:DesignWidth="875">
     <UserControl.Resources>
         <system:String x:Uid="msg_restart" x:Key="RestartMessage">A restart is required after changing settings!</system:String>
+        <Style x:Key="ConfigButtonStyle" TargetType="Button">
+            <Setter Property="MinWidth" Value="90" />
+            <Setter Property="MaxWidth" Value="150" />
+            <Setter Property="Height" Value="22" />
+            <Setter Property="Padding" Value="5,0" />
+            <Setter Property="VerticalAlignment" Value="Top" />
+        </Style>
     </UserControl.Resources>
     <DockPanel>
         <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal">
-            <Button x:Uid="btn_saveSettings" x:Name="btnSave" Content="Save settings" Margin="5" Padding="5,0" Click="btnSave_Click"/>
-            <Button x:Uid="btn_saveKeyMap" x:Name="btnSaveKeyMap" Content="Save keymappings" Margin="5" Padding="5,0" Click="btnSaveKeyMap_Click"/>
+            <Button x:Uid="btn_saveSettings" x:Name="btnSave" Content="Save settings" Margin="5" Padding="5,0" Click="btnSave_Click" Style="{StaticResource ConfigButtonStyle}"/>
+            <Button x:Uid="btn_saveKeyMap" x:Name="btnSaveKeyMap" Content="Save keymappings" Width="120" Margin="5" Padding="5,0" Click="btnSaveKeyMap_Click" Style="{StaticResource ConfigButtonStyle}"/>
         </StackPanel>
         <ItemsControl x:Name="xx" DockPanel.Dock="Top">
             <ItemsControl.ItemsPanel>

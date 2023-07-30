@@ -16,5 +16,8 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <!--
+        <ResourceDictionary Source="pack://application:,,,/CNC.Controls.WPF;component/Themes/ThemeSelector.xaml"/>
+        -->
     </Application.Resources>
 </Application>

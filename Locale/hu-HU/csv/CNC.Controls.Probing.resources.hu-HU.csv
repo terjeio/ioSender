@@ -25,6 +25,7 @@ CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,btn_stop:System.Wind
 CNC.Controls.Probing.g.en-US.resources:edgefinderintcontrol.baml,btn_stop:System.Windows.Controls.ContentControl.Content,Button,True,True,,Stop
 CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,btn_useCamera:System.Windows.Controls.ContentControl.Content,Button,True,True,,Használja a kameraállásokat
 CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,chk_useX0Y0:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,"Használja X0,Y0"
+CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,chk_useXY:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,"Use X,Y"
 CNC.Controls.Probing.g.en-US.resources:probingview.baml,fld_depth:CNC.Controls.NumericField.Label,None,False,True,,Mélység:
 CNC.Controls.Probing.g.en-US.resources:probingview.baml,fld_depth:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,"Z eltolás az aktuális pozícióhoz képest, ahol a tapintásra kerül sor"
 CNC.Controls.Probing.g.en-US.resources:probingview.baml,fld_diameter:CNC.Controls.NumericField.Label,None,False,True,,Átmérő:
@@ -68,8 +69,11 @@ CNC.Controls.Probing.g.en-US.resources:edgefinderintcontrol.baml,grp_workpiece:S
 CNC.Controls.Probing.g.en-US.resources:edgefindercontrol.baml,grp_workpiece:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Munkadarab
 CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,grp_workpiece:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Munkadarab
 CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,grp_workpieceOffset:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Munkadarab eltolás
+CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,grp_workpieceOffset:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Workpiece offset
 CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,hdr_preview:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Előnézet
 CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,lbl_addOffset:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Eltolás hozzáadása
+CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,lbl_addOffset:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,"Determine X0,Y0 for right angled workpiece"
+CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,lbl_addOffset:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Adds a probe point on the left edge.
 CNC.Controls.Probing.g.en-US.resources:configcontrol.baml,lbl_chkProbeConnected:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,"Egy párbeszédpanel jelenik meg mindaddig, amíg a szondát érvényesítik vagy a párbeszédpanelt meg nem szakítják."
 CNC.Controls.Probing.g.en-US.resources:configcontrol.baml,lbl_chkProbeConnected:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,A szonda manuális ellenőrzése csatlakoztatva van
 CNC.Controls.Probing.g.en-US.resources:configcontrol.baml,lbl_chkProbeStatus:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Indítás előtt ellenőrizze a szonda állapotát (G59.3)

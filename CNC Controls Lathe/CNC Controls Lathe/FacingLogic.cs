@@ -1,13 +1,13 @@
 ﻿/*
- * TurningLogic.cs - part of CNC Controls Lathe library
+ * FacingLogic.cs - part of CNC Controls Lathe library
  *
- * v0.43 / 2023-06-03 / Io Engineering (Terje Io)
+ * v0.43 / 2023-06-06 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2023, Io Engineering (Terje Io)
+Copyright (c) 2023, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -42,14 +42,14 @@ using CNC.GCode;
 
 namespace CNC.Controls.Lathe
 {
-    class TurningLogic
+    class FacingLogic
     {
         private double last_rpm = 0d, last_css = 0d;
         private BaseViewModel model;
 
-        public TurningLogic()
+        public FacingLogic()
         {
-            model = new BaseViewModel("Turning");
+            model = new BaseViewModel("Facing");
             model.PropertyChanged += Model_PropertyChanged;
             SetDefaults();
         }
@@ -83,6 +83,7 @@ namespace CNC.Controls.Lathe
                 last_css = model.config.CSS && model.config.RPM != 0.0d ? model.config.RPM / (model.IsMetric ? 1d : model.UnitFactor * 0.12d) : 0.0d;
                 last_rpm = model.config.CSS || model.config.RPM == 0.0d ? 0.0d : model.config.RPM;
 
+                model.ZClearance = model.config.ZClearance / model.UnitFactor;
                 model.XClearance = model.config.XClearance / model.UnitFactor;
                 model.Passdepth = model.config.PassDepthFirst / model.UnitFactor;
                 model.PassdepthLastPass = model.config.PassDepthLast / model.UnitFactor;
@@ -101,13 +102,19 @@ namespace CNC.Controls.Lathe
             if (!model.Validate(ref speed))
                 return;
 
+            if (model.ZStart < model.ZTarget)
+            {
+                model.SetError(nameof(model.ZStart), "Start must be greater than target.");
+                model.SetError(nameof(model.ZTarget), "Start must be greater than target.");
+                return;
+            }
+
             double passdepth = model.Passdepth;
             double passdepth_last = model.PassdepthLastPass;
             double zstart = model.ZStart;
-            double zlength = model.ZLength;
-            double ztarget = (zstart + zlength * model.config.ZDirection);
-            double xclearance = model.XClearance;
+            double ztarget = model.ZTarget;
             double xtarget = model.XTarget;
+            double xclearance = xtarget + model.XClearance;
             double diameter = model.XStart;
 
             if (Math.Abs(diameter - xtarget) == 0.0d) // nothing to do...
@@ -116,79 +123,76 @@ namespace CNC.Controls.Lathe
             if (model.config.xmode == LatheMode.Radius)
             {
                 xtarget /= 2.0d;
+                xclearance /= 2.0d;
                 diameter /= 2.0d;
             }
-            else
-            {
-                passdepth *= 2.0d;
-                passdepth_last *= 2.0d;
-                xclearance *= 2.0d;
-            }
 
-            double angle = 0.0d;
-            double xdistance = xtarget - diameter;
-            bool boring = xdistance > 0.0d;
-            double xstart = xtarget;
+            double xstart = diameter;
+            double xclear = xstart + xclearance;
+            double zclearance = model.ZClearance;
 
-            PassCalc cut = new PassCalc(xdistance, passdepth, passdepth_last, model.Precision);
-
-            if (model.IsTaperEnabled)
-                angle = Math.Tan(Math.PI * model.Taper / 180.0d);
-
-            //  error.Clear();
+            PassCalc cut = new PassCalc(zstart - ztarget, passdepth, passdepth_last, model.Precision);
 
             if (cut.Passes < 1)
             {
-                model.SetError("Diameter", "Starting diameter must be larger than target.");
+                model.SetError(nameof(model.XStart), "Starting diameter must be larger than target.");
                 return;
             }
 
-            if (model.IsSpringPassesEnabled)
-                cut.Springpasses = (int)model.SpringPasses;
-
-            if (boring)
-                xclearance = -xclearance;
-
             uint pass = 1;
+            string cssCmd = model.IsCssEnabled ? string.Format(model.config.CSSMaxRPM > 0.0d ? "G96S{0}D{1}" : "G96S{0}",
+                                                                model.CssSpeed, model.config.CSSMaxRPM) : "";
 
             model.gCode.Clear();
             model.gCode.Add(string.Format("G18 G{0} G{1}", model.config.xmode == LatheMode.Radius ? "8" : "7", model.IsMetric ? "21" : "20"));
+            if (!model.IsCssEnabled)
+                model.gCode.Add("G97");
             model.gCode.Add(string.Format("M3S{0} G4P1", speed.ToString()));
-            model.gCode.Add(string.Format("G0 X{0}", model.FormatValue(diameter + xclearance)));
-            model.gCode.Add(string.Format("G0 Z{0}", model.FormatValue(zstart + model.config.ZClearance / model.UnitFactor)));
-            model.gCode.Add(model.IsCssEnabled ? string.Format(model.config.CSSMaxRPM > 0.0d ? "G96S{0}D{1}" : "G96S{0}",
-                                                                model.CssSpeed, model.config.CSSMaxRPM) : "G97");
+            model.gCode.Add(string.Format("G0 X{0}", model.FormatValue(xclear)));
+            model.gCode.Add(string.Format("G0 Z{0}", model.FormatValue(zstart + zclearance)));
 
             do
             {
-                xtarget = cut.GetPassTarget(pass, diameter, !boring);
+                ztarget = cut.GetPassTarget(pass, zstart, true);
                 double feedrate = cut.IsLastPass ? model.FeedRateLastPass : model.FeedRate;
 
-                model.gCode.Add(string.Format("(Pass: {0}, DOC: {1} {2})", pass, model.FormatValue(xtarget), model.FormatValue(cut.DOC)));
+                model.gCode.Add(string.Format("(Pass: {0}, DOC: {1} {2})", pass, ztarget, cut.DOC));
 
-                // diameter = Math.Max(diameter - passdepth, xtarget);
-                // TODO: G0 to prev target to keep spindle speed constant?
-                //     if (css)
-                //         code[i++] = string.Format("G0 X{0}", model.FormatValue(doc_prev));
-                model.gCode.Add(string.Format("G1 X{0} F{1}", model.FormatValue(xtarget), model.FormatValue(feedrate)));
-                if (angle != 0.0d)
+                if (model.IsCssEnabled)
+                    model.gCode.Add(cssCmd);
+                model.gCode.Add(string.Format("G1 Z{0} F{1}", model.FormatValue(ztarget), model.FormatValue(feedrate)));
+                model.gCode.Add(string.Format("G1 X{0}", model.FormatValue(xtarget)));
+                if (!cut.IsLastPass || !(model.IsSpringPassesEnabled && model.SpringPasses > 0))
                 {
-                    ztarget = cut.Distance / angle * model.config.ZDirection;
-                    model.gCode.Add(string.Format("G1 X{0} Z{1}", model.FormatValue(diameter), model.FormatValue(zstart + ztarget)));
+                    model.gCode.Add(string.Format("G0 Z{0}", model.FormatValue(ztarget + zclearance)));
+                    if (model.IsCssEnabled)
+                        model.gCode.Add(string.Format("G97S{0}", speed.ToString()));
+                    model.gCode.Add(string.Format("G0 X{0}", model.FormatValue(xclear)));
                 }
-                else
-                    model.gCode.Add(string.Format("G1 Z{0} F{1}", model.FormatValue(ztarget), model.FormatValue(feedrate)));
-                model.gCode.Add(string.Format("G0 X{0}", model.FormatValue(xtarget + xclearance)));
-                model.gCode.Add(string.Format("G0 Z{0}", model.FormatValue(zstart + model.config.ZClearance / model.UnitFactor)));
 
             } while (++pass <= cut.Passes);
 
-            GCode.File.AddBlock("Wizard: Turning", Core.Action.New);
-            GCode.File.AddBlock(string.Format("({0}, Start: {1}, Target: {2}, Length: {3})",
-                                        boring ? "Boring" : "Turning",
-                                         model.FormatValue(diameter), model.FormatValue(xtarget), model.FormatValue(zlength)), Core.Action.Add);
+            if(model.IsSpringPassesEnabled && model.SpringPasses > 0)
+            {
+                model.gCode.Add(string.Format("(Pass: {0}, springpass)", pass));
+                model.gCode.Add(string.Format("G1 X{0}", model.FormatValue(xclear)));
+                while (model.SpringPasses > 1)
+                {
+                    model.SpringPasses--;
+                    model.gCode.Add(string.Format("(Pass: {0}, springpass)", ++pass));
+                    model.gCode.Add(string.Format("G0 Z{0}", model.FormatValue(ztarget + zclearance)));
+                    model.gCode.Add(string.Format("G0 X{0}", model.FormatValue(xtarget)));
+                    model.gCode.Add(string.Format("G1 Z{0}", model.FormatValue(ztarget)));
+                    model.gCode.Add(string.Format("G1 X{0}", model.FormatValue(xclear)));
+                }
+            }
+
+            GCode.File.AddBlock("Wizard: Facing", Core.Action.New);
+            GCode.File.AddBlock(string.Format("({0}, Start: {1}, Target: {2}, Length{3})",
+                                    "Facing",
+                                    model.FormatValue(zstart), model.FormatValue(ztarget), model.FormatValue(0d)), Core.Action.Add);
             GCode.File.AddBlock(string.Format("(Passdepth: {0}, Feedrate: {1}, {2}: {3})",
-                                        model.FormatValue(passdepth), model.FormatValue(model.FeedRate),
+                                    model.FormatValue(passdepth), model.FormatValue(model.FeedRate),
                                          (model.IsCssEnabled ? "CSS" : "RPM"), model.FormatValue((double)model.CssSpeed)), Core.Action.Add);
 
             foreach (string s in model.gCode)

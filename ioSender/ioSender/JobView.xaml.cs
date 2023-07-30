@@ -1,13 +1,13 @@
 /*
  * JobView.xaml.cs - part of Grbl Code Sender
  *
- * v0.39 / 2022-06-24 / Io Engineering (Terje Io)
+ * v0.43 / 2023-07-09 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2022, Io Engineering (Terje Io)
+Copyright (c) 2019-2023, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -56,7 +56,7 @@ namespace GCode_Sender
     public partial class JobView : UserControl, ICNCView
     {
         private bool? initOK = null;
-        private bool isBooted = false;
+        private bool isBooted = false, isCameraClaimed = false;
         private GrblViewModel model;
         private IInputElement focusedControl = null;
         private Controller Controller = null;
@@ -141,28 +141,28 @@ namespace GCode_Sender
                     string filename = (sender as GrblViewModel).FileName;
                     MainWindow.ui.WindowTitle = filename;
 
-                    if(string.IsNullOrEmpty(filename))
-                        MainWindow.CloseFile();
-                    else if ((sender as GrblViewModel).IsSDCardJob)
-                    {
-                        MainWindow.EnableView(false, ViewType.GCodeViewer);
-                    }
-                    else if (filename.StartsWith("Wizard:"))
-                    {
-                        if (MainWindow.IsViewVisible(ViewType.GCodeViewer))
+                        if (string.IsNullOrEmpty(filename))
+                            MainWindow.CloseFile();
+                        else if ((sender as GrblViewModel).IsSDCardJob)
                         {
-                            MainWindow.EnableView(true, ViewType.GCodeViewer);
-                            gcodeRenderer.Open(GCode.File.Tokens);
+                            MainWindow.EnableView(false, ViewType.GCodeViewer);
                         }
-                    }
-                    else if (!string.IsNullOrEmpty(filename) && AppConfig.Settings.GCodeViewer.IsEnabled)
-                    {
-                        //MainWindow.GCodeViewer.Open(GCode.File.Tokens);
-                        //MainWindow.EnableView(true, ViewType.GCodeViewer);
-                        GCodeSender.EnablePolling(false);
-                        gcodeRenderer.Open(GCode.File.Tokens);
-                        GCodeSender.EnablePolling(true);
-                    }
+                        else if (AppConfig.Settings.GCodeViewer.IsEnabled)
+                        {
+                            if (filename.StartsWith("Wizard:"))
+                            {
+                                //MainWindow.EnableView(true, ViewType.GCodeViewer);
+                                gcodeRenderer.Open(GCode.File.Tokens);
+                            }
+                            else if (!string.IsNullOrEmpty(filename))
+                            {
+                                //MainWindow.GCodeViewer.Open(GCode.File.Tokens);
+                                //MainWindow.EnableView(true, ViewType.GCodeViewer);
+                                GCodeSender.EnablePolling(false);
+                                gcodeRenderer.Open(GCode.File.Tokens);
+                                GCodeSender.EnablePolling(true);
+                            }
+                        }
                     break;
             }
         }
@@ -177,7 +177,7 @@ namespace GCode_Sender
             if (activate)
             {
                 GCodeSender.RewindFile();
-                GCodeSender.CallHandler(GCode.File.IsLoaded ? StreamingState.Idle : (model.IsSDCardJob ? StreamingState.Start : StreamingState.NoFile), false);
+                GCodeSender.CallHandler(model.IsSDCardJob ? StreamingState.Start : (GCode.File.IsLoaded ? StreamingState.Idle : StreamingState.NoFile), false);
 
                 model.ResponseLogFilterOk = AppConfig.Settings.Base.FilterOkResponse;
 
@@ -210,11 +210,11 @@ namespace GCode_Sender
                 }
 
 #if ADD_CAMERA
-                if (MainWindow.UIViewModel.Camera != null)
+                if (MainWindow.UIViewModel.Camera != null && !isCameraClaimed)
                 {
                     MainWindow.UIViewModel.Camera.MoveOffset += Camera_MoveOffset;
                     MainWindow.UIViewModel.Camera.IsVisibilityChanged += Camera_Opened;
-                    MainWindow.UIViewModel.Camera.IsMoveEnabled = true;
+                    MainWindow.UIViewModel.Camera.IsMoveEnabled = isCameraClaimed = true;
                 }
 #endif
                 //if (viewer == null)
@@ -241,7 +241,7 @@ namespace GCode_Sender
 #if ADD_CAMERA
                 if (MainWindow.UIViewModel.Camera != null) {
                     MainWindow.UIViewModel.Camera.MoveOffset-= Camera_MoveOffset;
-                    MainWindow.UIViewModel.Camera.IsMoveEnabled = false;
+                    MainWindow.UIViewModel.Camera.IsMoveEnabled = isCameraClaimed = false;
                 }
 #endif
                 focusedControl = AppConfig.Settings.Base.KeepMdiFocus &&
@@ -383,8 +383,8 @@ namespace GCode_Sender
             if (GrblInfo.LatheModeEnabled)
             {
                 MainWindow.EnableView(true, ViewType.Turning);
-          //      MainWindow.EnableView(true, ViewType.Parting);
-          //      MainWindow.EnableView(true, ViewType.Facing);
+                MainWindow.EnableView(true, ViewType.Parting);
+                MainWindow.EnableView(true, ViewType.Facing);
                 MainWindow.EnableView(true, ViewType.G76Threading);
             }
             else

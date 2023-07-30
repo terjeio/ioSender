@@ -1,13 +1,13 @@
 ﻿/*
  * OriginControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.33 / 2021-05-10 / Io Engineering (Terje Io)
+ * v0.43 / 2023-07-29 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2021, Io Engineering (Terje Io)
+Copyright (c) 2021-2023, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -55,7 +55,8 @@ namespace CNC.Controls
             AB,
             AD,
             CB,
-            CD
+            CD,
+            CurrentPos
         }
 
         // D |-----| C

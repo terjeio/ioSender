@@ -1,7 +1,7 @@
 ﻿/*
  * ProbingViewModel.cs - part of CNC Probing library
  *
- * v0.42 / 2023-03-22 / Io Engineering (Terje Io)
+ * v0.43 / 2023-06-30 / Io Engineering (Terje Io)
  *
  */
 
@@ -451,6 +451,7 @@ namespace CNC.Controls.Probing
         public double ProbeFeedRate { get { return _probeFeedRate; } set { _probeFeedRate = value; OnPropertyChanged(); } }
         public double ProbeDistance { get { return _probeDistance; } set { _probeDistance = value; OnPropertyChanged(); } }
         public double ProbeDiameter { get { return _ProbeDiameter; } set { _ProbeDiameter = value; OnPropertyChanged(); } }
+        public double ProbeRadius { get { return _ProbeDiameter / 2d; } }
         public double LatchDistance { get { return _latchDistance; } set { _latchDistance = value; OnPropertyChanged(); } }
         public double LatchFeedRate { get { return _latchFeedRate; } set { _latchFeedRate = value; OnPropertyChanged(); } }
         public double RapidsFeedRate { get { return _rapidsFeedRate; } set { _rapidsFeedRate = value; OnPropertyChanged(); } }

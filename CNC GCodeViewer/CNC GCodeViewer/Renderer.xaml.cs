@@ -1,7 +1,7 @@
 /*
  * Renderer.xaml.cs - part of CNC Controls library
  *
- * v0.42 / 2023-03-22 / Io Engineering (Terje Io)
+ * v0.43 / 2023-07-05 / Io Engineering (Terje Io)
  *
  */
 
@@ -263,7 +263,7 @@ namespace CNC.Controls.Viewer
         private GCodeEmulator emu = new GCodeEmulator(true);
         private List<GCodeToken> tokens;
 
-        private Point3D gridOffset, gridfix = new Point3D();
+        private Point3D gridOffset;
         private GridLinesVisual3D grid = null;
         private ModelVisual3D axes = new ModelVisual3D();
         private Point3DCollection cutPoints = new Point3DCollection();
@@ -452,10 +452,7 @@ namespace CNC.Controls.Viewer
                 case nameof(GrblViewModel.WorkPositionOffset):
                     if (Machine.ShowGrid && Machine.Grid != null)
                     {
-                        Position workPositionOffset = new Position(model.WorkPositionOffset, model.UnitFactor);
-                        Machine.Grid.Center = new Point3D(gridOffset.X - workPositionOffset.X * gridfix.X,
-                                                           gridOffset.Y - workPositionOffset.Y * gridfix.Y,
-                                                            gridOffset.Z + workPositionOffset.Z * gridfix.Z);
+                        Machine.Grid.Center = getGridAdjust(gridOffset);
                     }
                     AddWorkEnvelope();
                     break;
@@ -877,6 +874,50 @@ namespace CNC.Controls.Viewer
             return travel;
         }
 
+        private Point3D getGridAdjust (Point3D offset)
+        {
+            Point3D gridfix;
+            Position workPositionOffset = new Position(model.WorkPositionOffset, model.UnitFactor);
+            ProgramLimits programLimits = new ProgramLimits(model.ProgramLimits, model.UnitFactor);
+
+            if (model.LatheMode == LatheMode.Disabled)
+            {
+                switch (Machine.RenderMode)
+                {
+                    case RenderMode.Mode3D:
+                    case RenderMode.Mode2DXY:
+                        if (model.HomedState != HomedState.Homed)
+                            gridfix = new Point3D(-programLimits.MinX, -programLimits.MinY, 0d);
+                        else
+                            gridfix = new Point3D(workPositionOffset.X, workPositionOffset.Y, 0d);
+                        break;
+
+                    case RenderMode.Mode2DXZ:
+                        if (model.HomedState != HomedState.Homed)
+                            gridfix = new Point3D(-programLimits.MinX, 0d, programLimits.MinZ);
+                        else
+                            gridfix = new Point3D(workPositionOffset.X, 0d, workPositionOffset.Z);
+                        break;
+
+                    default:
+                        if (model.HomedState != HomedState.Homed)
+                            gridfix = new Point3D(-programLimits.MinX, -programLimits.MinY, 0d);
+                        else
+                            gridfix = new Point3D(0d, workPositionOffset.Y, workPositionOffset.Z);
+                        break;
+                }
+            }
+            else
+            {
+                if (model.HomedState != HomedState.Homed)
+                    gridfix = new Point3D(-programLimits.MinX, 0d, -programLimits.MinX);
+                else
+                    gridfix = new Point3D(workPositionOffset.X, 0d, workPositionOffset.Y);
+            }
+
+            return new Point3D(offset.X - gridfix.X, offset.Y - gridfix.Y, offset.Z - gridfix.Z);
+        }
+
         public void showAdorners (ProgramLimits bbox)
         {
             if(model.UnitFactor != 1d)
@@ -913,20 +954,10 @@ namespace CNC.Controls.Viewer
                 switch (Machine.RenderMode)
                 {
                     case RenderMode.Mode3D:
-                        gridfix = new Point3D(1d, 1d, 0d);
-                        lengthDirection = new Vector3D(1d, 0d, 0d);
-                        normal = new Vector3D(0d, 0d, 1d);
-                        if (GrblInfo.ForceSetOrigin)
-                            gridOffset = new Point3D(gridWidth / 2d, gridHeight / 2d, programLimits.MinZ);
-                        else
-                            gridOffset = new Point3D(-gridWidth / 2d, -gridHeight / 2d, programLimits.MinZ);
-                        break;
-
                     case RenderMode.Mode2DXY:
                         lengthDirection = new Vector3D(1d, 0d, 0d);
                         normal = new Vector3D(0d, 0d, 1d);
-                        gridfix = new Point3D(1d, 1d, 0d);
-                        if (GrblInfo.ForceSetOrigin)
+                        if (model.HomedState != HomedState.Homed || GrblInfo.ForceSetOrigin)
                             gridOffset = new Point3D(gridWidth / 2d, gridHeight / 2d, programLimits.MinZ);
                         else
                             gridOffset = new Point3D(-gridWidth / 2d, -gridHeight / 2d, programLimits.MinZ);
@@ -936,8 +967,7 @@ namespace CNC.Controls.Viewer
                         gridHeight = gridsz(GrblInfo.MaxTravel.Z);
                         lengthDirection = new Vector3D(1d, 0d, 0d);
                         normal = new Vector3D(0d, 1d, 0d);
-                        gridfix = new Point3D(1d, 0d, -1d);
-                        if (GrblInfo.ForceSetOrigin)
+                        if (model.HomedState != HomedState.Homed || GrblInfo.ForceSetOrigin)
                             gridOffset = new Point3D(gridWidth / 2d, 0d, -gridHeight / 2d);
                         else
                             gridOffset = new Point3D(-gridWidth / 2d, 0d, -gridHeight / 2d);
@@ -948,8 +978,7 @@ namespace CNC.Controls.Viewer
                         gridHeight = gridsz(GrblInfo.MaxTravel.Z);
                         lengthDirection = new Vector3D(0d, 1d, 0d);
                         normal = new Vector3D(1d, 0d, 0d);
-                        gridfix = new Point3D(0d, 1d, -1d);
-                        if (GrblInfo.ForceSetOrigin)
+                        if (model.HomedState != HomedState.Homed ||  GrblInfo.ForceSetOrigin)
                             gridOffset = new Point3D(0d, gridWidth / 2d, -gridHeight / 2d);
                         else
                             gridOffset = new Point3D(0d, -gridWidth / 2d, -gridHeight / 2d);
@@ -958,14 +987,7 @@ namespace CNC.Controls.Viewer
 
                 grid = new GridLinesVisual3D()
                 {
-                    //                        Center = new Point3D(boffset(bbox.SizeX, bbox.MinX, w, wm) - TickSize, boffset(bbox.SizeY, bbox.MinY, h, wh) - TickSize, 0d),
-                    //                        Center = new Point3D(w / 2d, h / 2d, 0d),
-
-                    Center = new Point3D(gridOffset.X - workPositionOffset.X * gridfix.X,
-                                            gridOffset.Y - workPositionOffset.Y * gridfix.Y,
-                                            gridOffset.Z + workPositionOffset.Z * gridfix.Z),
-                    //                        Center = new Point3D(0d,0d, 0d),
-
+                    Center = getGridAdjust(gridOffset),
                     MinorDistance = 2.5d,
                     MajorDistance = TickSize,
                     Width = gridHeight,
@@ -979,14 +1001,11 @@ namespace CNC.Controls.Viewer
             else
             {
                 gridHeight = gridsz(GrblInfo.MaxTravel.Z);
-                gridfix = new Point3D(1d, 0d, 1d);
                 gridOffset = new Point3D(gridWidth / 2d, 0d, -gridHeight / 2d);
 
                 grid = new GridLinesVisual3D()
                 {
-                    Center = new Point3D(gridOffset.X - workPositionOffset.X * gridfix.X,
-                                            0d,
-                                            gridOffset.Z - workPositionOffset.Z * gridfix.Z),
+                    Center = getGridAdjust(gridOffset),
                     MinorDistance = 2.5d,
                     MajorDistance = TickSize,
                     Width = gridWidth,

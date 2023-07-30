@@ -1,7 +1,7 @@
 /*
  * GrblViewModel.cs - part of CNC Controls library
  *
- * v0.42 / 2023-03-21 / Io Engineering (Terje Io)
+ * v0.43 / 2023-07-21 / Io Engineering (Terje Io)
  *
  */
 
@@ -52,11 +52,11 @@ namespace CNC.Core
         private string _tool, _message, _WPos, _MPos, _wco, _wcs, _a, _fs, _ov, _pn, _sc, _sd, _fans, _d, _gc, _h, _thcv, _thcs;
         private string _mdiCommand, _fileName;
         private string[] _rtState = new string[3];
-        private bool has_wco = false, suspend = false, _hasFans = false;
+        private bool has_wco = false, _hasFans = false;
         private bool _flood, _mist, _fan0, _toolChange, _reset, _isMPos, _isJobRunning, _isProbeSuccess, _pgmEnd, _isParserStateLive, _isTloRefSet;
-        private bool _canReset, _isCameraVisible = false, _responseLogVerbose = false, _isProbing = false;
+        private bool _isCameraVisible = false, _responseLogVerbose = false, _isProbing = false, _autoReporting = false;
         private bool? _mpg;
-        private int _pwm, _line, _scrollpos, _blocks = 0, _executingBlock = 0, _auxinValue = -2;
+        private int _pwm, _line, _scrollpos, _blocks = 0, _executingBlock = 0, _auxinValue = -2, _autoReportInterval = 0;
         private double _feedrate = 0d;
         private double _rpm = 0d, _rpmInput = 0d, _rpmDisplay = 0d, _jogStep = 0.1d, _tloReferenceOffset = double.NaN;
         private double _rpmActual = double.NaN;
@@ -186,7 +186,6 @@ namespace CNC.Core
             _fileName = _mdiCommand = string.Empty;
             _streamingState = StreamingState.NoFile;
             _isMPos = _reset = _isJobRunning = _isProbeSuccess = _pgmEnd = _isTloRefSet = false;
-            _canReset = true;
             _pb_avail = _rxb_avail = _rtState[0] = _rtState[1] = _rtState[2] = string.Empty;
             _mpg = null;
             _line = _pwm = _scrollpos = 0;
@@ -370,6 +369,8 @@ namespace CNC.Core
         //        public bool CanReset { get { return _canReset; } private set { if(value != _canReset) { _canReset = value; OnPropertyChanged(); } } }
         public bool GrblReset { get { return _reset; } set { if ((_reset = value)) { _grblState.Error = 0; OnPropertyChanged(); Message = ""; } } }
         public GrblState GrblState { get { return _grblState; } set { _grblState = value; OnPropertyChanged(); } }
+        public bool AutoReportingEnabled { get { return _autoReporting; } private set { { _autoReporting = value; OnPropertyChanged(); } } }
+        public int AutoReportInterval { get { return _autoReportInterval;  } private set { { _autoReportInterval = value;  OnPropertyChanged();  } } }
         public bool IsGCLock { get { return _grblState.State == GrblStates.Alarm; } }
         public bool IsCheckMode { get { return _grblState.State == GrblStates.Check; } }
         public bool IsSleepMode { get { return _grblState.State == GrblStates.Sleep; } }
@@ -424,6 +425,7 @@ namespace CNC.Core
         public bool? IsMPGActive { get { return _mpg; } private set { if (_mpg != value) { _mpg = value; OnPropertyChanged(); } } }
         public string Scaling { get { return _sc; } private set { _sc = value; OnPropertyChanged(); } }
         public string SDCardStatus { get { return _sd; } private set { _sd = value; OnPropertyChanged(); } }
+        public bool IsHomingEnabled { get { return GrblInfo.HomingEnabled; } }
         public HomedState HomedState { get { return _homedState; } private set { _homedState = value; OnPropertyChanged(); } }
         public LatheMode LatheMode
         {
@@ -631,7 +633,8 @@ namespace CNC.Core
         }
 
         public bool IsParserStateLive { get { return _isParserStateLive; } set { _isParserStateLive = value; OnPropertyChanged(); } }
-
+        public bool SysCommandsAlwaysAvailable { get; private set; }
+        
         #endregion
 
         public bool SetGRBLState(string newState, int substate, bool force)
@@ -958,6 +961,8 @@ namespace CNC.Core
                                 s |= (1 << i);
                         }
                         Signals.Value = (Signals)s;
+                        if(Signals.Value.HasFlag(Core.Signals.EStop) && !OptionalSignals.Value.HasFlag(Core.Signals.EStop))
+                            OptionalSignals.Value |= Core.Signals.EStop;
 //                        CanReset = canReset();
                     }
                     break;
@@ -1044,6 +1049,15 @@ namespace CNC.Core
                 case "D":
                     _d = value;
                     LatheMode = GrblParserState.LatheMode = value == "0" ? LatheMode.Radius : LatheMode.Diameter;
+                    break;
+
+                case "$C":
+                    SysCommandsAlwaysAvailable = value != "0";
+                    break;
+
+                case "AR":
+                    AutoReportingEnabled = true;
+                    AutoReportInterval = value == string.Empty ? 0 : int.Parse(value);
                     break;
 
                 case "THC":
@@ -1201,6 +1215,8 @@ namespace CNC.Core
                 _reset = false;
                 OnPropertyChanged(nameof(IsCheckMode));
                 OnPropertyChanged(nameof(IsSleepMode));
+                if(IsReady && AutoReportingEnabled)
+                    Comms.com.WriteByte(GrblConstants.CMD_AUTO_REPORTING_TOGGLE);
             }
             else if (_grblState.State != GrblStates.Jog)
             {

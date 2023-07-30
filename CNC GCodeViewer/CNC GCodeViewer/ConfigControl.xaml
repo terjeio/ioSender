@@ -37,7 +37,7 @@
             <CheckBox x:Uid="lbl_blackBackgroud" Content="Black background" Margin="5,2,0,0" IsChecked="{Binding Path=GCodeViewer.BlackBackground, Mode=TwoWay}" IsEnabled="{Binding Path=GCodeViewer.IsEnabled, Mode=OneWay}"/>
             <CheckBox x:Uid="lbl_showGrid" Content="Show grid" Margin="5,2,0,0" IsChecked="{Binding Path=GCodeViewer.ShowGrid, Mode=TwoWay}" IsEnabled="{Binding Path=GCodeViewer.IsEnabled, Mode=OneWay}"/>
             <CheckBox x:Uid="lbl_showAxes" Content="Show axes" Margin="5,2,0,0" IsChecked="{Binding Path=GCodeViewer.ShowAxes, Mode=TwoWay}" IsEnabled="{Binding Path=GCodeViewer.IsEnabled, Mode=OneWay}"/>
-            <CheckBox  Content="Show work envelope" Margin="5,2,0,0" IsChecked="{Binding Path=GCodeViewer.ShowWorkEnvelope, Mode=TwoWay}" IsEnabled="{Binding Path=GCodeViewer.IsEnabled, Mode=OneWay}"/>
+            <CheckBox  Content="Show work envelope" Margin="5,2,0,0" IsChecked="{Binding Path=GCodeViewer.ShowWorkEnvelope, Mode=TwoWay}" IsEnabled="{Binding Path=GCodeViewer.IsHomingEnabled, Mode=OneWay}"/>
             <CheckBox x:Uid="lbl_showBbox" Content="Show bounding box" Margin="5,2,0,0" IsChecked="{Binding Path=GCodeViewer.ShowBoundingBox, Mode=TwoWay}" IsEnabled="{Binding Path=GCodeViewer.IsEnabled, Mode=OneWay}"/>
             <CheckBox x:Uid="lbl_showViewCube" Content="Show ViewCube" Margin="5,2,0,0" IsChecked="{Binding Path=GCodeViewer.ShowViewCube, Mode=TwoWay}" IsEnabled="{Binding Path=GCodeViewer.IsEnabled, Mode=OneWay}"/>
             <CheckBox x:Uid="lbl_showCoordSys" Content="Show coordinate system" Margin="5,2,0,0" IsChecked="{Binding Path=GCodeViewer.ShowCoordinateSystem, Mode=TwoWay}" IsEnabled="{Binding Path=GCodeViewer.IsEnabled, Mode=OneWay}"/>
