@@ -1,7 +1,7 @@
 ﻿/*
  * HeightMapControl.xaml.cs - part of CNC Probing library
  *
- * v0.42 / 2023-03-22 / Io Engineering (Terje Io)
+ * v0.44 / 2023-10-01 / Io Engineering (Terje Io)
  *
  */
 
@@ -110,10 +110,15 @@ namespace CNC.Controls.Probing
             probing.HeightMap.GridSizeX = probing.HeightMap.Map.GridX;
             probing.HeightMap.GridSizeY = probing.HeightMap.Map.GridY;
 
+            int point = 0, points = probing.HeightMap.Map.SizeX * probing.HeightMap.Map.SizeX;
+            string pointOf = ((string)FindResource("ProbingPointOf"));
+
             for (x = 0; x < probing.HeightMap.Map.SizeX; x++)
             {
                 for (y = 0; y < probing.HeightMap.Map.SizeY; y++)
                 {
+                    probing.Program.AddMessage(string.Format(pointOf, ++point, points));
+
                     if (probing.HeightMap.AddPause && (x > 0 || y > 0))
                         probing.Program.AddPause();
                     probing.Program.AddProbingAction(AxisFlags.Z, true);
@@ -184,7 +189,7 @@ namespace CNC.Controls.Probing
 //                double z = probing.HeightMap.Map.InterpolateZ(0d, 0d);
 
                 if (probing.HeightMap.SetToolOffset &&
-                    (ok = (probing.Positions[0].X == origin.X && probing.Positions[0].Y == origin.Y) || probing.Program.ProbeZ(0d, 0d)))
+                    (ok = /* (probing.Positions[0].X == origin.X && probing.Positions[0].Y == origin.Y) || */ probing.Program.ProbeZ(0d, 0d)))
                 {
                     probing.HeightMap.Map.ZOffset = Z0 - probing.Positions[0].Z; // vs Z above, add check for allowed delta?
 

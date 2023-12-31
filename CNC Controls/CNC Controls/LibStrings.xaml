@@ -40,6 +40,8 @@
     <system:String x:Uid="str_grblStateSleep" x:Key="StateSleep">SLEEP</system:String>
     <system:String x:Uid="str_settingsSaved" x:Key="SettingsSaved">Settings saved.</system:String>
     <system:String x:Uid="str_keymappingsSaved" x:Key="KeymappingsSaved">Keymappings saved to {0}</system:String>
+    <system:String x:Uid="str_verifyStartFrom" x:Key="VerifyStartFrom">Are you sure the controller is in the correct state to start from block {0}?</system:String>
+    <system:String x:Uid="str_verifySendController" x:Key="VerifySendController">Are you sure you want to send the selected blocks to the controller?</system:String>
     <system:String x:Uid="str_themeBlack" x:Key="ThemeBlack">Black</system:String>
     <system:String x:Uid="str_themeDark" x:Key="ThemeDark">Dark</system:String>
     <system:String x:Uid="str_themeLight" x:Key="ThemeLight">Light</system:String>

@@ -1,7 +1,7 @@
 ﻿/*
  * GCodeJob.cs - part of CNC Controls library
  *
- * v0.42 / 2023-03-22 / Io Engineering (Terje Io)
+ * v0.44 / 2023-11-30 / Io Engineering (Terje Io)
  *
  */
 
@@ -200,14 +200,19 @@ namespace CNC.Core
 
                 foreach (var cmd in emu.Execute(Tokens))
                 {
-                    if(cmd.Token is GCArc)
-                        BoundingBox.AddBoundingBox((cmd.Token as GCArc).GetBoundingBox(emu.Plane, new double[]{ cmd.Start.X, cmd.Start.Y, cmd.Start.Z }, emu.DistanceMode == DistanceMode.Incremental));
+                    if (cmd.Token is GCArc)
+                        BoundingBox.AddBoundingBox((cmd.Token as GCArc).GetBoundingBox(emu.Plane, new double[] { cmd.Start.X, cmd.Start.Y, cmd.Start.Z }, emu.DistanceMode == DistanceMode.Incremental));
                     else if (cmd.Token is GCCubicSpline)
                         BoundingBox.AddBoundingBox((cmd.Token as GCCubicSpline).GetBoundingBox(emu.Plane, new double[] { cmd.Start.X, cmd.Start.Y, cmd.Start.Z }, emu.DistanceMode == DistanceMode.Incremental));
                     else if (cmd.Token is GCQuadraticSpline)
                         BoundingBox.AddBoundingBox((cmd.Token as GCQuadraticSpline).GetBoundingBox(emu.Plane, new double[] { cmd.Start.X, cmd.Start.Y, cmd.Start.Z }, emu.DistanceMode == DistanceMode.Incremental));
                     else if (cmd.Token is GCAxisCommand9)
-                        BoundingBox.AddPoint(cmd.End, (cmd.Token as GCAxisCommand9).AxisFlags);
+                    {
+                        if (GrblInfo.LatheUVWModeEnabled)
+                            BoundingBox.AddBoundingBox((cmd.Token as GCAxisCommand9).GetBoundingBox(emu.Plane, new double[] { cmd.Start.X, cmd.Start.Y, cmd.Start.Z }, emu.DistanceMode == DistanceMode.Incremental));
+                        else
+                            BoundingBox.AddPoint(cmd.End, (cmd.Token as GCAxisCommand9).AxisFlags);
+                    }
                 }
 
                 BoundingBox.Conclude();

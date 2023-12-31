@@ -1,7 +1,7 @@
 /*
  * Widget.cs - part of CNC Controls library for Grbl
  *
- * v0.43 / 2023-03-30 / Io Engineering (Terje Io)
+ * v0.44 / 2023-12-30 / Io Engineering (Terje Io)
  *
  */
 
@@ -49,8 +49,16 @@ namespace CNC.Controls
 
     public class WidgetViewModel : ViewModelBase
     {
-        string _tv;
-        double _nv;
+        private string _tv;
+        private double _nv;
+        private GrblViewModel _grblmodel;
+
+        public WidgetViewModel (GrblViewModel grblmodel)
+        {
+            _grblmodel = grblmodel;
+        }
+
+        public GrblViewModel Grbl { get { return _grblmodel; } private set { _grblmodel = value; OnPropertyChanged(); } }
 
         public double NumericValue
         {
@@ -206,26 +214,29 @@ namespace CNC.Controls
                     string[] rformat = widget.Format.Split(',');
                     for (int i = 0; i < rformat.Length; i++)
                     {
-                        wRadiobutton = new RadioButton
+                        if (rformat[i] != "N/A")
                         {
-                            Name = string.Format("_radiobutton{0}", i),
-                            Content = rformat[i].Trim(),
-                            IsEnabled = false,
-                            Tag = i
-                        };
-                        grid = AddGrid(300);
-                        if (i == 0)
-                        {
-                            labelGrid = grid;
-                            wRadiobutton.Margin = new Thickness(0, 6, 0, 0);
+                            wRadiobutton = new RadioButton
+                            {
+                                Name = string.Format("_radiobutton{0}", i),
+                                Content = rformat[i].Trim(),
+                                IsEnabled = false,
+                                Tag = i
+                            };
+                            grid = AddGrid(300);
+                            if (i == 0)
+                            {
+                                labelGrid = grid;
+                                wRadiobutton.Margin = new Thickness(0, 6, 0, 0);
+                            }
+                            else
+                                grid.Height = 20;
+                            grid.Children.Add(wRadiobutton);
+                            Grid.SetColumn(wRadiobutton, 1);
+                            wRadiobutton.Checked += wWidget_TextChanged;
+                            components.Children.Add(grid);
+                            wRadiobutton = null;
                         }
-                        else
-                            grid.Height = 20;
-                        grid.Children.Add(wRadiobutton);
-                        Grid.SetColumn(wRadiobutton, 1);
-                        wRadiobutton.Checked += wWidget_TextChanged;
-                        components.Children.Add(grid);
-                        wRadiobutton = null;
                     }
                     break;
 

@@ -1,7 +1,7 @@
 ﻿/*
  * Grbl.cs - part of CNC Controls library
  *
- * v0.43 / 2023-07-05 / Io Engineering (Terje Io)
+ * v0.44 / 2023-12-27 / Io Engineering (Terje Io)
  *
  */
 
@@ -135,7 +135,10 @@ namespace CNC.Core
             Z_AXIS = 2,
             A_AXIS = 3,
             B_AXIS = 4,
-            C_AXIS = 5;
+            C_AXIS = 5,
+            U_AXIS = 6,
+            V_AXIS = 7,
+            W_AXIS = 8;
     }
 
     public enum CameraMoveMode
@@ -274,7 +277,8 @@ namespace CNC.Core
         MicroStepsBase = 150,
         StallGuardBase = 200,
         // End per axis settings
-        ToolChangeMode = 341
+        ToolChangeMode = 341,
+        UnlockAfterEStop = 484
     }
 
     public enum StreamingState
@@ -359,7 +363,7 @@ namespace CNC.Core
         public static string Path { get; set; }
         public static string Locale { get; set; }
         public static string IniName { get; set; }
-        public static string IniFile { get { return Path + IniName; } }
+        public static string IniFile { get { return (System.IO.Path.IsPathRooted(IniName) ? "" : Path) + IniName; } }
         public static string DebugFile { get; set; } = string.Empty;
         public static string ConfigName { get; set; }
         public static bool IsLegacyController { get; set; } = false; // Set true if controller is legacy v1.1
@@ -895,7 +899,7 @@ namespace CNC.Core
     {
         #region Attributes
 
-        private static bool _probeProtect = false;
+        private static bool _probeProtect = false, _latheUVWMode = false;
         private static int _numAxes;
 
         static GrblInfo()
@@ -969,8 +973,25 @@ namespace CNC.Core
         public static bool LatheModeEnabled
         {
             get { return GrblParserState.LatheMode != LatheMode.Disabled; }
-            set { if (value && GrblParserState.LatheMode == LatheMode.Disabled) { GrblParserState.LatheMode = LatheMode.Radius; } }
+            set
+            {
+                if (value && GrblParserState.LatheMode == LatheMode.Disabled) {
+                    GrblParserState.LatheMode = LatheMode.Radius;
+                }
+            }
         }
+        public static bool LatheUVWModeEnabled
+        {
+            get { return _latheUVWMode && GrblParserState.LatheMode != LatheMode.Disabled; }
+            set
+            {
+                if ((_latheUVWMode = value))
+                    AxisLetters = AxisLetters.Substring(0, 6) + (_numAxes == 2 ? "U-W" : "UVW");
+                else
+                    AxisLetters = AxisLetters.Substring(0, 6) + "---";
+            }
+        }
+        public static bool THCMode { get; internal set; } = false;
         public static ObservableCollection<string> SystemInfo { get; private set; } = new ObservableCollection<string>();
         public static bool IsLoaded { get; private set; }
 
@@ -1263,6 +1284,10 @@ namespace CNC.Core
                                     ManualToolChange = true;
                                     break;
 
+                                case "THC":
+                                    THCMode = true;
+                                    break;
+
                                 case "ATC":
                                     HasATC = true;
                                     break;
@@ -1307,6 +1332,10 @@ namespace CNC.Core
                                     LatheModeEnabled = true;
                                     break;
 
+                                case "LATHEUVW":
+                                    LatheUVWModeEnabled = true;
+                                    break;
+
                                 case "BD":
                                     OptionalSignals |= Signals.BlockDelete;
                                     break;
@@ -1334,6 +1363,17 @@ namespace CNC.Core
                     case "FIRMWARE":
                         Firmware = valuepair[1];
                         SystemInfo.Add(data);
+                        break;
+
+                    case "SIGNALS":
+                        int signals = 0;
+                        foreach (char c in valuepair[1])
+                        {
+                            int i = GrblInfo.SignalLetters.IndexOf(c);
+                            if (i >= 0)
+                                signals |= (1 << i);
+                        }
+                        OptionalSignals = (Signals)signals;
                         break;
 
                     case "CLUSTER":
@@ -2080,14 +2120,13 @@ namespace CNC.Core
                             int key;
                             string[] columns = line.Split(',');
 
-                            columns[0].Replace("\"", "");
-
+                            columns[0] = columns[0].Replace("\"", "");
                             if (columns.Length == 3 && int.TryParse(columns[0], out key))
                             {
                                 if (!noload && messages.TryGetValue(key, out msg))
                                     messages.Remove(key);
 
-                                messages.Add(key, columns[1] + ": " + columns[2]);
+                                messages.Add(key, columns[1].Trim('"') + ": " + columns[2].Trim('"'));
                             }
 
                             line = file.ReadLine();

@@ -1,7 +1,7 @@
 ﻿/*
  * ProbingView.xaml.cs - part of CNC Probing library
  *
- * v0.43 / 2023-07-25 / Io Engineering (Terje Io)
+ * v0.44 / 2023-08-26 / Io Engineering (Terje Io)
  *
  */
 
@@ -324,18 +324,18 @@ namespace CNC.Controls.Probing
 
         private void mnu_Click(object sender, RoutedEventArgs e)
         {
-            switch ((string)((MenuItem)sender).Header)
+            switch ((string)((MenuItem)sender).Name)
             {
-                case "Add":
+                case "mnuAdd":
                     cbxProfile.SelectedValue = profiles.Add(cbxProfile.Text, model);                
                     break;
 
-                case "Update":
+                case "mnuUpdate":
                     if(model.Profile != null)
                         profiles.Update(model.Profile.Id, cbxProfile.Text, model);
                     break;
 
-                case "Delete":
+                case "mnuDelete":
                     if (model.Profile != null && profiles.Delete(model.Profile.Id))
                         cbxProfile.SelectedValue = profiles.Profiles[0].Id;
                     break;

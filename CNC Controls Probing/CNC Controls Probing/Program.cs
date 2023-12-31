@@ -1,7 +1,7 @@
 ﻿/*
  * Program.cs - part of CNC Probing library
  *
- * v0.42 / 2023-03-22 / Io Engineering (Terje Io)
+ * v0.44 / 2023-10-01 / Io Engineering (Terje Io)
  *
  */
 
@@ -308,6 +308,11 @@ namespace CNC.Controls.Probing
             }
         }
 
+        public void AddMessage(string msg)
+        {
+            _program.Add("#" + msg);
+        }
+
         public void AddSimulatedProbe(int p)
         {
             probing.IsSuccess = true;
@@ -415,8 +420,7 @@ namespace CNC.Controls.Probing
 
                         if (response == "ok")
                         {
-                            step++;
-                            if (step < _program.Count)
+                            if (++step < _program.Count)
                             {
                                 int i;
                                 //if ((i = _program[step].IndexOf('$')) > 0)
@@ -426,6 +430,13 @@ namespace CNC.Controls.Probing
                                 //    double val = _positions[_positions.Count - 1].Values[i] + dbl.Parse(_program[step].Substring(i, 3));
                                 //    _program[step] = _program[step] + val.ToInvariantString();
                                 //}
+                                if (_program[step].StartsWith("#"))
+                                {
+                                    Grbl.Message = _program[step].Substring(1);
+                                    if (++step == _program.Count)
+                                        break;
+                                }
+
                                 if (_program[step].StartsWith("!"))
                                 {
                                     isProbing = false;
@@ -475,6 +486,7 @@ namespace CNC.Controls.Probing
                 return false;
 
             probing.Program.AddRapid(string.Format("G90X{0}Y{0}", x.ToInvariantString(probing.Grbl.Format), y.ToInvariantString(probing.Grbl.Format)));
+            probing.Program.AddMessage(LibStrings.FindResource("ProbingAtX0Y0"));
             probing.Program.Add(string.Format("G91F{0}", probing.ProbeFeedRate.ToInvariantString()));
             probing.Program.AddProbingAction(AxisFlags.Z, true);
 

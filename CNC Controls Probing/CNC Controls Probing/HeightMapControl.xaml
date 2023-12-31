@@ -13,6 +13,7 @@
         <system:String x:Uid="str_heightMapInstructions" x:Key="Instructions">A rapid motion to X0Y0 will be performed before probing the height map starts.\nEnsure the initial Z-position is clear of any obstacles that might be encountered during probing.</system:String>
         <system:String x:Uid="str_heightMapFailed" x:Key="ProbingFailed">Probing failed</system:String>
         <system:String x:Uid="str_heightMapCompleted" x:Key="ProbingCompleted">Probing completed: Z min: {0}, Z max: {1}.</system:String>
+        <system:String x:Uid="str_heightMapPointOf" x:Key="ProbingPointOf">Probing point {0} of {1}...</system:String>
         <Controls:LogicalNotConverter x:Key="IsNotRunningConverter" />
     </UserControl.Resources>
         <Grid>

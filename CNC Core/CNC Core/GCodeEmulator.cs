@@ -1,13 +1,13 @@
 ﻿/*
  * GCodeEmulator.cs - part of CNC Controls library
  *
- * v0.40 / 2022-07-12 / Io Engineering (Terje Io)
+ * v0.44 / 2023-12-16 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020-2021, Io Engineering (Terje Io)
+Copyright (c) 2020-2023, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -528,6 +528,8 @@ namespace CNC.Core
                                 action.Start = action.End;
                             }
 
+                            double oldZ = action.End.Z;
+
                             isRelative = wasRelative;
                             setEndP(drill.Values, AxisFlags.XY);
                             isRelative = false;
@@ -547,7 +549,7 @@ namespace CNC.Core
                                 yield return action;
                                 action.Start = action.End;
 
-                                values[2] = r;
+                                values[2] = RetractOldZ ? oldZ : r;
                                 setEndP(values, AxisFlags.Z);
                                 action.IsRetract = true;
                                 action.Token = new GCLinearMotion(Commands.G0, token.LineNumber, values, AxisFlags.Z);
@@ -602,7 +604,13 @@ namespace CNC.Core
                         }
                         break;
 
-                    //M3, M4, M5: Spindle Control
+                    // G98, G99: Canned cycle return mode
+                    case Commands.G98: // Old Z
+                    case Commands.G99: // R value
+                        RetractOldZ = (token as GCodeToken).Command == Commands.G98;
+                        break;
+
+                        //M3, M4, M5: Spindle Control
                     case Commands.M3: // CW
                     case Commands.M4: // CCW
                     case Commands.M5: // Off

@@ -11,7 +11,7 @@
         xmlns:local="clr-namespace:GCode_Sender"
         mc:Ignorable="d"
         Background="#FFE5E5E5"
-        Title="Sender ({0})" Height="640" Width="925" MinHeight="700" MinWidth="1020"
+        Title="Sender ({0})" Height="640" Width="925" MinHeight="685" MinWidth="1020"
         Loaded="Window_Load"
         SizeChanged="Window_SizeChanged"
         Closing="Window_Closing"

@@ -1,7 +1,7 @@
 /*
  * OffsetView.xaml.cs - part of CNC Controls library
  *
- * v0.42 / 2023-03-21 / Io Engineering (Terje Io)
+ * v0.44 / 2023-09-16 / Io Engineering (Terje Io)
  *
  */
 
@@ -132,6 +132,10 @@ namespace CNC.Controls
                         parameters.SuspendPositionNotifications = false;
                     }
                     break;
+
+                case nameof(GrblViewModel.GrblError):
+                    GrblWorkParameters.Get(parameters);
+                    break;
             }
         }
 
@@ -176,24 +180,33 @@ namespace CNC.Controls
 
         void saveOffset(string axis)
         {
-            string cmd;
+            bool mChanged;
+            string cmd = string.Empty;
 
             Position newpos = new Position(Offset);
 
             newpos.X = GrblWorkParameters.ConvertX(GrblWorkParameters.LatheMode, GrblParserState.LatheMode, selectedOffset.X);
+
+            GrblParserState.Get();
+            if ((mChanged = GrblParserState.IsMetric != (DataContext as GrblViewModel).IsMetric))
+                cmd = (DataContext as GrblViewModel).IsMetric ? "G21" : "G20";
+
+            (DataContext as GrblViewModel).Message = String.Empty;
 
             if (selectedOffset.Id == 0)
             {
                 string code = selectedOffset.Code == "G28" || selectedOffset.Code == "G30" ? selectedOffset.Code + ".1" : selectedOffset.Code;
 
                 if (axis == "ClearAll" || IsPredefined)
-                    cmd = selectedOffset.Code == "G43.1" ? "G49" : selectedOffset.Code + ".1";
+                    cmd += selectedOffset.Code == "G43.1" ? "G49" : selectedOffset.Code + ".1";
                 else
-                    cmd = string.Format("G90{0}{1}", code, newpos.ToString(axis == "All" ? GrblInfo.AxisFlags : GrblInfo.AxisLetterToFlag(axis)));
+                    cmd += string.Format("G90{0}{1}", code, newpos.ToString(axis == "All" ? GrblInfo.AxisFlags : GrblInfo.AxisLetterToFlag(axis)));
             } else
-                cmd = string.Format("G90G10L2P{0}{1}", selectedOffset.Id, newpos.ToString(axis == "All" || axis == "ClearAll" ? GrblInfo.AxisFlags : GrblInfo.AxisLetterToFlag(axis)));
+                cmd += string.Format("G90G10L2P{0}{1}", selectedOffset.Id, newpos.ToString(axis == "All" || axis == "ClearAll" ? GrblInfo.AxisFlags : GrblInfo.AxisLetterToFlag(axis)));
 
             Comms.com.WriteCommand(cmd);
+            if(mChanged)
+                Comms.com.WriteCommand((DataContext as GrblViewModel).IsMetric ? "G20" : "G21");
         }
 
         private void cvOffset_Click(object sender, RoutedEventArgs e)

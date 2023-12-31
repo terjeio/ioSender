@@ -711,7 +711,7 @@ namespace CNC.Controls
                                         {
                                             if (MessageBox.Show(LibStrings.FindResource("MsgEStopExit"), "ioSender", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                                                 return RestartResult.Close;
-                                        };
+                                        }
                                     }
                                     else
                                         AttemptReset();
@@ -725,6 +725,17 @@ namespace CNC.Controls
                                     else
                                         Message = LibStrings.FindResource("MsgHome");
                                     break;
+
+                                case 17: // Motor fault
+                                        if (!(GrblInfo.IsGrblHAL && model.Signals.Value.HasFlag(Signals.MotorFault)))
+                                        {
+                                            AttemptReset();
+                                            if (!GrblInfo.IsLoaded)
+                                                model.ExecuteCommand(GrblConstants.CMD_UNLOCK);
+                                        }
+                                    break;
+
+
                             }
                             break;
 

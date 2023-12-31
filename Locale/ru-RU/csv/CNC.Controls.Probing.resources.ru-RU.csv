@@ -74,8 +74,8 @@ CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,hdr_preview:System.W
 CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,lbl_addOffset:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Добавить смещение
 CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,lbl_addOffset:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,"Determine X0,Y0 for right angled workpiece"
 CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,lbl_addOffset:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Adds a probe point on the left edge.
-CNC.Controls.Probing.g.en-US.resources:configcontrol.baml,lbl_chkProbeConnected:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,A dialog will be shown until the probe is asserted or the dialog is cancelled.
 CNC.Controls.Probing.g.en-US.resources:configcontrol.baml,lbl_chkProbeConnected:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Manually validate probe is connected
+CNC.Controls.Probing.g.en-US.resources:configcontrol.baml,lbl_chkProbeConnected:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,A dialog will be shown until the probe is asserted or the dialog is cancelled.
 CNC.Controls.Probing.g.en-US.resources:configcontrol.baml,lbl_chkProbeStatus:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Проверять состояние датчика перед стартом (G59.3)
 CNC.Controls.Probing.g.en-US.resources:configcontrol.baml,lbl_chkProbeStatus:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,"Авария будет активирована контроллером, при срабатвании не активного датчика."
 CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,lbl_clearToolOffset:System.Windows.Controls.ContentControl.Content,Button,True,True,,Отменить коррекцию длинны
@@ -138,6 +138,7 @@ CNC.Controls.Probing.g.en-US.resources:edgefinderintcontrol.baml,str_edgeIntFind
 CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,str_heightMapCompleted:System.String.$Content,None,True,True,,"Измерение завершено: Z min: {0}, Z max: {1}."
 CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,str_heightMapFailed:System.String.$Content,None,True,True,,Ошибка измерения
 CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,str_heightMapInstructions:System.String.$Content,None,True,True,,"Быстрое перемнщение в X0Y0 перед началом измерения карты высот.\\nУбедитесть, что позиция по Z установлена в положение, свободнгое от препятствий."
+CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,str_heightMapPointOf:System.String.$Content,None,True,True,,Probing point {0} of {1}...
 CNC.Controls.Probing.g.en-US.resources:probingview.baml,str_jogActive:System.String.$Content,None,True,True,,Перемещение клавиатурой активно
 CNC.Controls.Probing.g.en-US.resources:probingview.baml,str_jogDisabled:System.String.$Content,None,True,True,,Перемещение клавиатурой отключено
 CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,str_positionsRequired:System.String.$Content,None,True,True,,Необходимо {0} точек измерения.
@@ -155,6 +156,7 @@ CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probingNoProbe:System
 CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probingNotIdle:System.String.$Content,None,True,True,,"Ошибка измерения, Grbl не в режиме ГОТОВ или смена инструмента."
 CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probingNoVerifyContinue:System.String.$Content,None,True,True,,"Probe connection was not verified, continue anyway?"
 CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probingProbeAsserted:System.String.$Content,None,True,True,,"Ошибка измерения, неожиданный сигнал с датчика."
+CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probingProbingAtX0Y0:System.String.$Content,None,True,True,,Probing @X0Y0...
 CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probingRadiusArcs:System.String.$Content,None,True,True,,GCode содержит дуги в плоскости XZ или YZ (G18/19). Трансляция невозможна. Используйте &apos;Arcs to Lines&apos; при необходимости.
 CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probingVerifyStart:System.String.$Content,None,True,True,,Press [Start] again to start probing.
 CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,str_rotationCompleted:System.String.$Content,None,True,True,,Измерение завершено.

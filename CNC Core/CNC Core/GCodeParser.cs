@@ -1,7 +1,7 @@
 ﻿/*
  * GCodeParser.cs - part of CNC Controls library
  *
- * v0.43 / 2023-05-31 / Io Engineering (Terje Io)
+ * v0.44 / 2023-12-16 / Io Engineering (Terje Io)
  *
  */
 
@@ -369,9 +369,9 @@ namespace CNC.GCode
             IsScaled = motionModeChanged = false;
             Decimals = 3;
             zorg = feedRate = 0d;
-            remapU2A = !GrblInfo.AxisLetters.Contains('A');
-            remapV2B = !GrblInfo.AxisLetters.Contains('B');
-            remapW2C = !GrblInfo.AxisLetters.Contains('C');
+            remapU2A = !GrblInfo.AxisLetters.Contains('A') && !GrblInfo.LatheUVWModeEnabled;
+            remapV2B = !GrblInfo.AxisLetters.Contains('B') && !GrblInfo.LatheUVWModeEnabled;
+            remapW2C = !GrblInfo.AxisLetters.Contains('C') && !GrblInfo.LatheUVWModeEnabled;
         }
 
         private bool VerifyIgnore(string code, CommandIgnoreState state)
@@ -1566,7 +1566,7 @@ namespace CNC.GCode
                             break;
 
                     }
-                    if(cmdNonModal != Commands.G53)
+                    if(cmdNonModal != Commands.G53 && cmdNonModal != Commands.G4)
                         axisWords = AxisFlags.None;
                 }
             }
@@ -2176,7 +2176,10 @@ namespace CNC.GCode
     {
         public uint LineNumber { get; set; }
         public Commands Command { get; set; }
-
+        /*
+        public int ViewIndexStart { get; set; }
+        public int ViewIndexEnd { get; set; }
+        */
         public GCodeToken()
         {
             Command = Commands.Undefined;
@@ -2245,6 +2248,39 @@ namespace CNC.GCode
         public double U { get { return Values[6]; } set { Values[6] = value; } }
         public double V { get { return Values[7]; } set { Values[7] = value; } }
         public double W { get { return Values[8]; } set { Values[8] = value; } }
+
+        // NOTE: only called when Lathe UVW mode is active
+        public GcodeBoundingBox GetBoundingBox(GCPlane plane, double[] start, bool isRelative = false)
+        {
+            GcodeBoundingBox bbox = new GcodeBoundingBox();
+
+            bbox.AddPoint(plane, start[0], start[1], start[2]);
+
+            var end = (double[])start.Clone();
+
+            if (AxisFlags.HasFlag(AxisFlags.X))
+                end[0] = isRelative ? start[0] + X : X;
+            if (AxisFlags.HasFlag(AxisFlags.Y))
+                end[1] = isRelative ? start[1] + Y : Y;
+            if (AxisFlags.HasFlag(AxisFlags.Z))
+                end[2] = isRelative ? start[2] + Z : Z;
+
+            if(GrblInfo.LatheUVWModeEnabled)
+            {
+                if(AxisFlags.HasFlag(AxisFlags.U))
+                    end[0] += U / 2d;
+                if (AxisFlags.HasFlag(AxisFlags.V))
+                    end[1] += V;
+                if (AxisFlags.HasFlag(AxisFlags.W))
+                    end[2] += W;
+            }
+
+            bbox.AddPoint(plane, end[0], end[1], end[2]);
+
+            bbox.Conclude();
+
+            return bbox;
+        }
 
         public new string ToString()
         {

@@ -1,7 +1,7 @@
 /*
  * GrblViewModel.cs - part of CNC Controls library
  *
- * v0.43 / 2023-07-21 / Io Engineering (Terje Io)
+ * v0.44 / 2023-12-20 / Io Engineering (Terje Io)
  *
  */
 
@@ -50,13 +50,13 @@ namespace CNC.Core
     public class GrblViewModel : MeasureViewModel
     {
         private string _tool, _message, _WPos, _MPos, _wco, _wcs, _a, _fs, _ov, _pn, _sc, _sd, _fans, _d, _gc, _h, _thcv, _thcs;
-        private string _mdiCommand, _fileName;
+        private string _mdiCommand, _mdiText, _fileName;
         private string[] _rtState = new string[3];
         private bool has_wco = false, _hasFans = false;
         private bool _flood, _mist, _fan0, _toolChange, _reset, _isMPos, _isJobRunning, _isProbeSuccess, _pgmEnd, _isParserStateLive, _isTloRefSet;
         private bool _isCameraVisible = false, _responseLogVerbose = false, _isProbing = false, _autoReporting = false;
         private bool? _mpg;
-        private int _pwm, _line, _scrollpos, _blocks = 0, _executingBlock = 0, _auxinValue = -2, _autoReportInterval = 0;
+        private int _pwm, _line, _scrollpos, _blocks = 0, _startFromBlock = 0, _executingBlock = 0, _auxinValue = -2, _autoReportInterval = 0;
         private double _feedrate = 0d;
         private double _rpm = 0d, _rpmInput = 0d, _rpmDisplay = 0d, _jogStep = 0.1d, _tloReferenceOffset = double.NaN;
         private double _rpmActual = double.NaN;
@@ -82,6 +82,7 @@ namespace CNC.Core
         public Action<Position> OnCameraProbe;
 
         public delegate void GrblResetHandler();
+        public event EventHandler OnCycleStart;
 
         public GrblViewModel()
         {
@@ -91,6 +92,7 @@ namespace CNC.Core
 
             Keyboard = new KeypressHandler(this);
             MDICommand = new ActionCommand<string>(ExecuteMDI);
+            StartFromBlock = new ActionCommand<int>(ExecuteStartFromBlock, canExecuteStartFromBlock);
 
             pollThread = new Thread(new ThreadStart(Poller.Run));
             pollThread.Start();
@@ -183,7 +185,7 @@ namespace CNC.Core
 
         public void Clear()
         {
-            _fileName = _mdiCommand = string.Empty;
+            _fileName = _mdiCommand = _mdiText = string.Empty;
             _streamingState = StreamingState.NoFile;
             _isMPos = _reset = _isJobRunning = _isProbeSuccess = _pgmEnd = _isTloRefSet = false;
             _pb_avail = _rxb_avail = _rtState[0] = _rtState[1] = _rtState[2] = string.Empty;
@@ -213,6 +215,8 @@ namespace CNC.Core
                 LatheMode = LatheMode.Radius;
 
             _thcv = _thcs = string.Empty;
+
+            IgnoreNextCycleStart = true;
         }
 
         public void ClearPosition()
@@ -229,11 +233,13 @@ namespace CNC.Core
         public void ClearSignals()
         {
             Set("Pn", string.Empty);
+            IgnoreNextCycleStart = true;
         }
 
         public PollGrbl Poller { get; } = new PollGrbl();
 
         public ICommand MDICommand { get; private set; }
+        public ICommand StartFromBlock { get; private set; }
 
         public void CameraProbed(Position position)
         {
@@ -316,6 +322,16 @@ namespace CNC.Core
             }
         }
 
+        private bool canExecuteStartFromBlock(int block)
+        {
+            return IsFileLoaded && StreamingState == StreamingState.Idle;
+        }
+        private void ExecuteStartFromBlock(int block)
+        {
+            if(canExecuteStartFromBlock(block))
+                StartFromBlockNum = block;
+        }
+
         public KeypressHandler Keyboard { get; private set; }
 
         public bool ResponseLogVerbose { get { return _responseLogVerbose; } set { _responseLogVerbose = value; OnPropertyChanged(); } }
@@ -327,6 +343,7 @@ namespace CNC.Core
         public bool IsGrblHAL { get { return GrblInfo.IsGrblHAL; } }
         public string Firmware { get; set; } = string.Empty;
         public bool SuspendProcessing { get; set; } = false;
+        public bool IgnoreNextCycleStart { get; set; } = false;
 
         public bool LimitTriggered {
             get {
@@ -346,6 +363,7 @@ namespace CNC.Core
 
         public ProgramLimits ProgramLimits { get; private set; } = new ProgramLimits();
         public string MDI { get { return _mdiCommand; } private set { _mdiCommand = value; OnPropertyChanged(); _mdiCommand = string.Empty; } }
+        public string MDIText { get { return _mdiText; } set { _mdiText = value; OnPropertyChanged(); } }
         public ObservableCollection<CoordinateSystem> CoordinateSystems { get { return GrblWorkParameters.CoordinateSystems; } }
         public ObservableCollection<Tool> Tools { get { return GrblWorkParameters.Tools; } }
         public ObservableCollection<string> SystemInfo { get { return GrblInfo.SystemInfo; } }
@@ -376,7 +394,17 @@ namespace CNC.Core
         public bool IsSleepMode { get { return _grblState.State == GrblStates.Sleep; } }
         public bool IsG92Active { get { return GrblParserState.IsActive("G92") != null; } }
         public bool IsToolOffsetActive { get { return IsGrblHAL ? GrblParserState.IsActive("G49") == null : !(double.IsNaN(ToolOffset.Z) || ToolOffset.Z == 0d); } }
-        public bool IsJobRunning { get { return _isJobRunning; } set { if (_isJobRunning != value) { _isJobRunning = value; OnPropertyChanged(); } } }
+        public bool IsJobRunning {
+            get { return _isJobRunning; }
+            set {
+                if (_isJobRunning != value) {
+                    _isJobRunning = value;
+                    if (!_isJobRunning)
+                        JobTimer.Stop();
+                    OnPropertyChanged();
+                }
+            }
+        }
         public bool IsProbing { get { return _isProbing; } set { _isProbing = value; OnPropertyChanged(); } }
         public bool ProgramEnd { get { return _pgmEnd; } set { _pgmEnd = value; if(_pgmEnd) OnPropertyChanged(); } }
         public int GrblError { get { return _grblState.Error; } set { _grblState.Error = value; OnPropertyChanged(); } }
@@ -420,6 +448,7 @@ namespace CNC.Core
                 OnPropertyChanged();
             }
         }
+        public int StartFromBlockNum { get { return _startFromBlock; } private set { _startFromBlock = value; OnPropertyChanged(); _startFromBlock = 0;  } }
         public int BlockExecuting { get { return _executingBlock; } set { _executingBlock = value; OnPropertyChanged(); } }
         public bool IsPhysicalFileLoaded { get { return _fileName != string.Empty && (_fileName.StartsWith(@"\\") || _fileName[1] == ':'); } }
         public bool? IsMPGActive { get { return _mpg; } private set { if (_mpg != value) { _mpg = value; OnPropertyChanged(); } } }
@@ -435,7 +464,7 @@ namespace CNC.Core
                 if (_latheMode != value)
                 {
                     _latheMode = value;
-                    if(_latheMode != LatheMode.Disabled && NumAxes == 3)
+                    if(_latheMode != LatheMode.Disabled && NumAxes == 2)
                     {
                         Position.Y = MachinePosition.Y = WorkPosition.Y = WorkPositionOffset.Y = 0d;
                     }
@@ -793,7 +822,7 @@ namespace CNC.Core
                     }
 
                     if (!data.Contains("|Pn:"))
-                        Set("Pn", "");
+                        Set("Pn", string.Empty);
 
                     if (pos_changed)
                     {
@@ -951,7 +980,16 @@ namespace CNC.Core
                 case "Pn":
                     if (_pn != value)
                     {
+                        bool isCycleStart = value.Contains('S') && !_pn.Contains('S');
+
                         _pn = value;
+
+                        if (!IgnoreNextCycleStart)
+                        {
+                            if (isCycleStart && !_pn.Contains('H'))
+                                OnCycleStart?.Invoke(this, EventArgs.Empty);
+                        } else
+                            IgnoreNextCycleStart = false;
 
                         int s = 0;
                         foreach (char c in _pn)
@@ -1020,6 +1058,8 @@ namespace CNC.Core
                         value = string.Format(LibStrings.FindResource("SdStreamComplete"), value.Split(',')[0]);
                         if (SDCardStatus != value)
                             Message = SDCardStatus = value;
+                        if (IsSDCardJob && !JobTimer.IsRunning && GrblState.State == GrblStates.Run)
+                            JobTimer.Start();
                     }
                     break;
 
@@ -1035,6 +1075,8 @@ namespace CNC.Core
                 case "MPG":
                     GrblInfo.MPGMode = _grblState.MPG = value == "1";
                     IsMPGActive = _grblState.MPG;
+                    if(IsMPGActive == false && AutoReportInterval > 0)
+                        Comms.com.WriteByte(GrblConstants.CMD_AUTO_REPORTING_TOGGLE);
                     break;
 
                 case "H":
@@ -1184,7 +1226,11 @@ namespace CNC.Core
                             switch(GrblState.Substate)
                             {
                                 case 10:
-                                    _message = LibStrings.FindResource("ContClearResetUnlock");
+                                    if (GrblSettings.GetInteger(grblHALSetting.UnlockAfterEStop) != 0)
+                                    {
+                                        msg = "Emergecy stop";
+                                        _message = LibStrings.FindResource("ContClearResetUnlock");
+                                    }
                                     break;
                                 case 11:
                                     _message = LibStrings.FindResource("ContHome");
@@ -1198,8 +1244,12 @@ namespace CNC.Core
                         }
                         else
                             Message = msg;
-                        if (msg == "Pgm End")
-                            ProgramEnd = true;
+                            if (msg == "Pgm End")
+                            {
+                                ProgramEnd = true;
+                                if (IsSDCardJob)
+                                    IsJobRunning = false;
+                            }
                         break;
                 }
             }
@@ -1210,6 +1260,7 @@ namespace CNC.Core
                 _grblState.State = GrblStates.Unknown;
                 var msg = Message;
                 GrblReset = true;
+                IsJobRunning = false;
                 OnGrblReset?.Invoke(data);
                 Message = msg;
                 _reset = false;

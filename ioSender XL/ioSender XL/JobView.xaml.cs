@@ -1,7 +1,7 @@
 /*
  * JobView.xaml.cs - part of Grbl Code Sender
  *
- * v0.43 / 2023-07-09 / Io Engineering (Terje Io)
+ * v0.44 / 2023-12-30 / Io Engineering (Terje Io)
  *
  */
 
@@ -56,10 +56,11 @@ namespace GCode_Sender
     public partial class JobView : UserControl, ICNCView
     {
         private bool? initOK = null;
-        private bool isBooted = false, isCameraClaimed = false;
+        private bool isBooted = false, isCameraClaimed = false, holdActivated = false;
         private GrblViewModel model;
         private IInputElement focusedControl = null;
         private Controller Controller = null;
+        private SidebarItem thcFlyout = null;
 
         public JobView()
         {
@@ -89,6 +90,13 @@ namespace GCode_Sender
                     {
                         if (isBooted && initOK == false && (sender as GrblViewModel).GrblState.State != GrblStates.Alarm)
                             Dispatcher.BeginInvoke(new System.Action(() => InitSystem()), DispatcherPriority.ApplicationIdle);
+                        else if ((sender as GrblViewModel).GrblState.State == GrblStates.Hold && !MainWindow.ui.JobRunning)
+                        {
+                            holdActivated = true;
+                            MainWindow.ui.JobRunning = true;
+                        }
+                        else if ((sender as GrblViewModel).GrblState.State != GrblStates.Hold && holdActivated)
+                            MainWindow.ui.JobRunning = holdActivated = false;
                     }
                     break;
 
@@ -234,6 +242,8 @@ namespace GCode_Sender
 
                 if (!GrblInfo.IsGrblHAL)
                     model.Keyboard.IsContinuousJoggingEnabled = AppConfig.Settings.Jog.KeyboardEnable;
+
+                model.IgnoreNextCycleStart = true;
             }
             else if(ViewType != ViewType.Shutdown)
             {
@@ -430,6 +440,9 @@ namespace GCode_Sender
             else
                 MainWindow.ShowView(false, ViewType.TrinamicTuner);
 
+            if (GrblInfo.THCMode && thcFlyout == null)
+                MainWindow.UIViewModel.SidebarItems.Add(thcFlyout = new SidebarItem(MainWindow.ui.thcControl));
+
             return true;
         }
 
@@ -490,7 +503,7 @@ namespace GCode_Sender
 
         protected bool ProcessKeyPreview(KeyEventArgs e)
         {
-            return model.Keyboard.ProcessKeypress(e, !(mdiControl.IsFocused || DRO.IsFocused || spindleControl.IsFocused || workParametersControl.IsFocused));
+            return model.Keyboard.ProcessKeypress(e, !(mdiControl.IsFocused || DRO.IsFocused || spindleControl.IsFocused || workParametersControl.IsFocused), this);
         }
 
 #endregion

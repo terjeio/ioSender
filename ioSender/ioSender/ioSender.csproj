@@ -77,11 +77,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="..\..\CNC Controls\CNC Controls\Themes\ThemeSelector.xaml">
-      <Link>ThemeSelector.xaml</Link>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="JobView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

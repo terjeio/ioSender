@@ -17,6 +17,8 @@
         <system:String x:Uid="str_settingsFail" x:Key="SettingsFail">Bummer...\nContinue loading?</system:String>
         <system:String x:Uid="str_settingsInvalid" x:Key="SettingsInvalid">The file does not contain any settings.</system:String>
         <system:String x:Uid="str_settingsRestore" x:Key="SettingsRestore">Restore settings from file</system:String>
+        <local:LogicalNotConverter x:Key="IsNotConverter" />
+        <local:GrblStateToBooleanConverter x:Key="StateToBooleanConverter" />
         <Style x:Key="NumericErrorStyle" TargetType="local:NumericTextBox">
             <Style.Triggers>
                 <Trigger Property="Validation.HasError" Value="true">
@@ -89,7 +91,20 @@
             <DockPanel DockPanel.Dock="Bottom" HorizontalAlignment="Stretch" Height="Auto" Margin="10,0,10,10" VerticalAlignment="Top" Width="Auto">
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" Height="Auto" VerticalAlignment="Top">
                     <Button x:Uid="btn_reload" x:Name="btnReload" Content="Reload" ToolTip="Reload settings from controller." HorizontalAlignment="Left" Style="{StaticResource ConfigButtonStyle}" Click="btnReload_Click"/>
-                    <Button x:Uid="btn_save" x:Name="btnSave" Content="Save" ToolTip="Save changed settings to controller." HorizontalAlignment="Left" Margin="5,0,0,0" VerticalAlignment="Top" Style="{StaticResource ConfigButtonStyle}" Click="btnSave_Click"/>
+                    <Button x:Uid="btn_save" x:Name="btnSave" Content="Save" ToolTip="Save changed settings to controller." HorizontalAlignment="Left" Margin="5,0,0,0" VerticalAlignment="Top" Style="{StaticResource ConfigButtonStyle}" Click="btnSave_Click">
+<!--- TODO                        <Button.IsEnabled>
+                            <Binding Converter="IsNotConverter">
+                            <MultiBinding Converter="{StaticResource StateToBooleanConverter}">
+                            <Binding Path="Grbl.GrblState"/>
+                            <Binding>
+                                <Binding.Source>
+                                    <cnccore:GrblStates>Hold</cnccore:GrblStates>
+                                </Binding.Source>
+                            </Binding>
+                            </MultiBinding>
+                            </Binding>
+                        </Button.IsEnabled> -->
+                    </Button>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" Height="Auto" VerticalAlignment="Top" HorizontalAlignment="Right">
                     <Button x:Uid="btn_backup" x:Name="btnBackup" Content="Backup" HorizontalAlignment="Left" VerticalAlignment="Top" Style="{StaticResource ConfigButtonStyle}" Click="btnBackup_Click"/>

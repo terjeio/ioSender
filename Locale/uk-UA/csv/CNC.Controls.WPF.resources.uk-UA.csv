@@ -191,10 +191,13 @@ CNC.Controls.WPF.g.en-US.resources:gcodewrapdialog.baml,lbl_wrapTarget:System.Wi
 CNC.Controls.WPF.g.en-US.resources:toolview.baml,lbl_xAxis:CNC.Controls.CoordValueSetControl.Label,None,True,True,,Вісь X:
 CNC.Controls.WPF.g.en-US.resources:toolview.baml,lbl_yAxis:CNC.Controls.CoordValueSetControl.Label,None,True,True,,Вісь Y:
 CNC.Controls.WPF.g.en-US.resources:toolview.baml,lbl_zAxis:CNC.Controls.CoordValueSetControl.Label,None,True,True,,Вісь Z:
+CNC.Controls.WPF.g.en-US.resources:gcodelistcontrol.baml,mnu_copyToMDI:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Copy to MDI
 CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,mnu_delete:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Видалити
 CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,mnu_downloadRun:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Завантажити з вик_онанням
 CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,mnu_enableRewind:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Дозволити повернення
 CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,mnu_run:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Пуск
+CNC.Controls.WPF.g.en-US.resources:gcodelistcontrol.baml,mnu_sendToController:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Send to controller
+CNC.Controls.WPF.g.en-US.resources:gcodelistcontrol.baml,mnu_startFromHere:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Start from here
 CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,mnu_viewAll:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,View all
 CNC.Controls.WPF.g.en-US.resources:appconfigview.baml,msg_restart:System.String.$Content,None,True,True,,Зміни налаштувань почнуть діяти після перезапуска програми!
 CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,pnl_kbdJogging:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Увага! - Grbl має помилки при перериванні переміщення (при відпусканні клавиш).
@@ -273,6 +276,8 @@ CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_validateMax:System.String
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_validateMin:System.String.$Content,None,True,True,,Помилка ввода: min. значення {0}.
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_validateNotIP4:System.String.$Content,None,True,True,,Помилка ввода: невірний формат IP4 адреси..
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_validateRange:System.String.$Content,None,True,True,,Помилка ввода: дозволений діапазон {0} - {1}.
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_verifySendController:System.String.$Content,None,True,True,,Are you sure you want to send the selected blocks to the controller?
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_verifyStartFrom:System.String.$Content,None,True,True,,Are you sure the controller is in the correct state to start from block {0}?
 CNC.Controls.WPF.g.en-US.resources:errorsandalarms.baml,tab_alarms:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Коди аварій
 CNC.Controls.WPF.g.en-US.resources:errorsandalarms.baml,tab_errors:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Коди помилок
 CNC.Controls.WPF.g.en-US.resources:portdialog.baml,tab_network:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Мережа

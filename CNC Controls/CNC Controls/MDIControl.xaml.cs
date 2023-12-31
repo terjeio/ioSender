@@ -1,13 +1,13 @@
 ﻿/*
  * MDIControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.27 / 2020-09-17 / Io Engineering (Terje Io)
+ * v0.44 / 2023-10-07 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2020, Io Engineering (Terje Io)
+Copyright (c) 2018-2023, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -41,6 +41,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using CNC.Core;
 
 namespace CNC.Controls
@@ -68,6 +69,19 @@ namespace CNC.Controls
         {
             get { return (ObservableCollection<string>)GetValue(CommandsProperty); }
             set { SetValue(CommandsProperty, value); }
+        }
+
+        private void OnDataContextPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (sender is GrblViewModel) switch (e.PropertyName)
+            {
+                case nameof(GrblViewModel.MDIText):
+                    var txt = (sender as GrblViewModel).MDIText;
+                    if (!string.IsNullOrEmpty(txt) && !Commands.Contains(txt))
+                        Commands.Insert(0, txt);
+                    Command = txt;
+                    break;
+            }
         }
 
         private void txtMDI_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
@@ -109,6 +123,8 @@ namespace CNC.Controls
             var mdi = txtMDI.Template.FindName("PART_EditableTextBox", txtMDI) as TextBox;
             if(mdi != null)
                 mdi.Tag = "MDI";
+            if(DataContext != null)
+                (DataContext as GrblViewModel).PropertyChanged += OnDataContextPropertyChanged;
         }
     }
 }

@@ -1,13 +1,13 @@
 /*
  * GrblConfigView.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.36 / 2021-11-01 / Io Engineering (Terje Io)
+ * v0.44 / 2023-12-30 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2021, Io Engineering (Terje Io)
+Copyright (c) 2018-2023, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -39,12 +39,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using System.Windows;
 using System.Windows.Controls;
-using CNC.Core;
 using Microsoft.Win32;
 using System.Collections.Generic;
 using System.IO;
 using System;
 using System.Threading;
+using CNC.Core;
 
 namespace CNC.Controls
 {
@@ -58,19 +58,14 @@ namespace CNC.Controls
         public GrblConfigView()
         {
             InitializeComponent();
-
-            DataContextChanged += GrblConfigView_DataContextChanged;
-        }
-
-        private void GrblConfigView_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
-        {
-            if (e.OldValue is GrblViewModel)
-                model = (GrblViewModel)e.OldValue;
         }
 
         private void ConfigView_Loaded(object sender, RoutedEventArgs e)
         {
-            DataContext = new WidgetViewModel();
+            if(!(DataContext is WidgetViewModel))
+                DataContext = new WidgetViewModel(DataContext as GrblViewModel);
+
+            model = (DataContext as WidgetViewModel).Grbl;
 
             dgrSettings.Visibility = GrblInfo.HasEnums ? Visibility.Collapsed : Visibility.Visible;
             treeView.Visibility = !GrblInfo.HasEnums ? Visibility.Collapsed : Visibility.Visible;

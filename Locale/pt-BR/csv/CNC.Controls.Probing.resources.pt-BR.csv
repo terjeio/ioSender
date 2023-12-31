@@ -74,8 +74,8 @@ CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,hdr_preview:System.W
 CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,lbl_addOffset:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Adicionar deslocamento (offset)
 CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,lbl_addOffset:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,"Determine X0,Y0 for right angled workpiece"
 CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,lbl_addOffset:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Adds a probe point on the left edge.
-CNC.Controls.Probing.g.en-US.resources:configcontrol.baml,lbl_chkProbeConnected:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,A dialog will be shown until the probe is asserted or the dialog is cancelled.
 CNC.Controls.Probing.g.en-US.resources:configcontrol.baml,lbl_chkProbeConnected:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Manually validate probe is connected
+CNC.Controls.Probing.g.en-US.resources:configcontrol.baml,lbl_chkProbeConnected:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,A dialog will be shown until the probe is asserted or the dialog is cancelled.
 CNC.Controls.Probing.g.en-US.resources:configcontrol.baml,lbl_chkProbeStatus:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Verifique o status da sonda antes de iniciar (G59.3)
 CNC.Controls.Probing.g.en-US.resources:configcontrol.baml,lbl_chkProbeStatus:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Um alarme será ativado pelo controle se não estiver ligado e a sonda verificada.
 CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,lbl_clearToolOffset:System.Windows.Controls.ContentControl.Content,Button,True,True,,Limpar o deslocamento do tamanho da ferramenta
@@ -138,6 +138,7 @@ CNC.Controls.Probing.g.en-US.resources:edgefinderintcontrol.baml,str_edgeIntFind
 CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,str_heightMapCompleted:System.String.$Content,None,True,True,,"Sondagem completa.: Z min: {0}, Z max: {1}."
 CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,str_heightMapFailed:System.String.$Content,None,True,True,,Sondagem falhou
 CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,str_heightMapInstructions:System.String.$Content,None,True,True,,Um movimento rápido até X0Y0 será feito antes da sondagem de nível começar.\\nGaranta que a posição inicial Z não irá colidir com nenhum obstáculo que pode ser encontrado durante a sondagem.
+CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,str_heightMapPointOf:System.String.$Content,None,True,True,,Probing point {0} of {1}...
 CNC.Controls.Probing.g.en-US.resources:probingview.baml,str_jogActive:System.String.$Content,None,True,True,,Jogging com teclado está ativo
 CNC.Controls.Probing.g.en-US.resources:probingview.baml,str_jogDisabled:System.String.$Content,None,True,True,,Jogging com teclado desativado
 CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,str_positionsRequired:System.String.$Content,None,True,True,,{0} posições da sonda são necessárias.
@@ -155,6 +156,7 @@ CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probingNoProbe:System
 CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probingNotIdle:System.String.$Content,None,True,True,,"Sondagem falhou, Grbl não está em estado inativo ou de mudança de ferramenta."
 CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probingNoVerifyContinue:System.String.$Content,None,True,True,,"Probe connection was not verified, continue anyway?"
 CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probingProbeAsserted:System.String.$Content,None,True,True,,"Sondagem falhou, sinal de sonda está determinada."
+CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probingProbingAtX0Y0:System.String.$Content,None,True,True,,Probing @X0Y0...
 CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probingRadiusArcs:System.String.$Content,None,True,True,,"GCode contem arcos nos planos XZ ou YZ (G18/19), não é possível aplicar tranformação. Use &apos;Arcos para Linhas&apos; se isto é realmente necessário."
 CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probingVerifyStart:System.String.$Content,None,True,True,,Press [Start] again to start probing.
 CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,str_rotationCompleted:System.String.$Content,None,True,True,,Sondagem completa.

@@ -1,5 +1,18 @@
 ## ioSender changelog
 
+2023-12-30: [Release 2.0.44](https://github.com/terjeio/Grbl-GCode-Sender/releases/tag/2.0.44).
+
+* Fix for issue #350 - improved handling of cycle start message coming from the controller to avoid unwanted start of loaded program.
+* Fix for issue #350 - Z probe with unexpected result in Probing tab.
+* Fix for issue #339- removed unpublished files from builds.
+* Fix for issue #310 - run time not updaing when streaming from SD card.
+* Added right click meny in the program listing to start from a given block, execute a single block or send selected commands to the controller.
+* Added Plasma THC flyout to sidebar menu. Visible when the controller supports THC. Plus fix for issue #331.
+* Updated rendering of canned cycles to match latest grblHAL controller release.
+* Added support for UVW lathe mode.
+* Added handling of controller auto-reporting mode, will be disabled when the sender is connected.
+* A number of minor bug fixes and improvements.
+
 2023-07-30: [Release 2.0.43](https://github.com/terjeio/Grbl-GCode-Sender/releases/tag/2.0.43).
 
 * Added gcode parser support for flow control statements. Note that this does not yet include validation.

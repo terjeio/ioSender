@@ -17,4 +17,5 @@
     <system:String x:Uid="str_probingIllegalPosition" x:Key="IllegalPosition">Illegal probe position, try again.</system:String>
     <system:String x:Uid="str_probingNoVerifyContinue" x:Key="NoVerifyContinue">Probe connection was not verified, continue anyway?</system:String>
     <system:String x:Uid="str_probingVerifyStart" x:Key="VerifyStart">Press [Start] again to start probing.</system:String>
+    <system:String x:Uid="str_probingProbingAtX0Y0" x:Key="ProbingAtX0Y0">Probing @X0Y0...</system:String>
 </ResourceDictionary>

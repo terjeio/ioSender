@@ -1,7 +1,7 @@
 ﻿/*
  * ProbingViewModel.cs - part of CNC Probing library
  *
- * v0.43 / 2023-06-30 / Io Engineering (Terje Io)
+ * v0.44 / 2023-10-01 / Io Engineering (Terje Io)
  *
  */
 
@@ -170,9 +170,6 @@ namespace CNC.Controls.Probing
         public bool WaitForResponse(string command)
         {
             bool? res = null;
-
-            if (Grbl.ResponseLogVerbose)
-                Grbl.ResponseLog.Add(command);
 
             var t = new Thread(() =>
             {

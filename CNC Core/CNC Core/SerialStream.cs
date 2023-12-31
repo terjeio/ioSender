@@ -127,7 +127,7 @@ namespace CNC.Core
                         /* For resetting ESP32 */
                         serialPort.RtsEnable = true;
                         System.Threading.Thread.Sleep(5);
-                        serialPort.RtsEnable = false;
+  //                      serialPort.RtsEnable = false;
                         if(ResetDelay > 0)
                             System.Threading.Thread.Sleep(ResetDelay);
                         break;

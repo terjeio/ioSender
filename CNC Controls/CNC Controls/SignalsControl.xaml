@@ -61,6 +61,20 @@
                             </Setter.Value>
                         </Setter>
                     </Style>
+                    <Style x:Key="MotorFaultVisibleStyle">
+                        <Setter Property="Control.Visibility">
+                            <Setter.Value>
+                                <MultiBinding Converter="{StaticResource IsSignalVisibleConverter}">
+                                    <Binding Path="OptionalSignals" />
+                                    <Binding>
+                                        <Binding.Source>
+                                            <core:Signals>MotorFault</core:Signals>
+                                        </Binding.Source>
+                                    </Binding>
+                                </MultiBinding>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
                     <Style x:Key="BlockDeleteVisibleStyle">
                         <Setter Property="Control.Visibility">
                             <Setter.Value>
@@ -108,6 +122,7 @@
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,3,0" VerticalAlignment="Center" DockPanel.Dock="Right">
                 <local:SignalControl x:Uid="lbl_signalMotorWarning" Label="W" ToolTip="Motor warning" IsSet="{Binding Path=Signals[(core:Signals)MotorWarning], Mode=OneWay}" Style="{StaticResource MotorWarningVisibleStyle}"/>
+                <local:SignalControl x:Uid="lbl_signalMotorFault" Label="F" ToolTip="Motor fault" IsSet="{Binding Path=Signals[(core:Signals)MotorFault], Mode=OneWay}" Style="{StaticResource MotorFaultVisibleStyle}"/>
                 <local:SignalControl x:Uid="lbl_signalBlockDelete" Label="B" ToolTip="Block delete" IsSet="{Binding Path=Signals[(core:Signals)BlockDelete], Mode=OneWay}" Style="{StaticResource BlockDeleteVisibleStyle}"/>
                 <local:SignalControl x:Uid="lbl_signalOptionalStop" Label="O" ToolTip="Optional stop" IsSet="{Binding Path=Signals[(core:Signals)OptionalStop], Mode=OneWay}" Style="{StaticResource OptionalStopVisibleStyle}"/>
                 <local:SignalControl x:Uid="lbl_signalFeedHold" Label="H" ToolTip="Feed hold" IsSet="{Binding Path=Signals[(core:Signals)Hold], Mode=OneWay}"/>

@@ -1,13 +1,13 @@
 ﻿/*
  * Machine.cs - part of CNC Core library
  *
- * v0.41 / 2022-09-23 / Io Engineering (Terje Io)
+ * v0.44 / 2023-11-30 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020-2022, Io Engineering (Terje Io)
+Copyright (c) 2020-2023, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -90,6 +90,7 @@ namespace CNC.Core
             CoolantState = GrblParserState.CoolantState;
             SpindleState = GrblParserState.SpindleState;
             LatheMode = GrblParserState.LatheMode;
+            LatheUVWMode = GrblInfo.LatheUVWModeEnabled;
             DistanceMode = GrblParserState.DistanceMode;
             ToolLengthOffset = GrblParserState.ToolLengthOffset;
             FeedRateMode = GrblParserState.FeedRateMode;
@@ -153,6 +154,7 @@ namespace CNC.Core
         public GCPlane Plane { get; protected set; }
         public IJKMode IJKMode { get; protected set; }
         public LatheMode LatheMode { get; protected set; }
+        public bool LatheUVWMode { get; protected set; }
         public CoolantState CoolantState { get; protected set; }
         public SpindleState SpindleState { get; protected set; }
         public ToolLengthOffset ToolLengthOffset { get; protected set; }
@@ -214,7 +216,38 @@ namespace CNC.Core
 
         protected void setEndP(double[] values, AxisFlags axisFlags)
         {
-            machinePos.Set(values, axisFlags, isRelative);
+            if(LatheUVWMode)
+            {
+                double[] target = (double[])values.Clone();
+                if(axisFlags.HasFlag(AxisFlags.U)) {
+                    axisFlags |= AxisFlags.X;
+                    axisFlags &= ~AxisFlags.U;
+                    target[GrblConstants.U_AXIS] /= 2d;
+                    if (!isRelative)
+                        target[GrblConstants.X_AXIS] = machinePos.X + target[GrblConstants.U_AXIS];
+                    target[GrblConstants.U_AXIS] = 0d;
+                }
+                if (axisFlags.HasFlag(AxisFlags.V))
+                {
+                    axisFlags |= AxisFlags.Y;
+                    axisFlags &= ~AxisFlags.V;
+                    if (!isRelative)
+                        target[GrblConstants.Y_AXIS] = machinePos.Y + target[GrblConstants.V_AXIS];
+                    target[GrblConstants.V_AXIS] = 0d;
+                }
+                if (axisFlags.HasFlag(AxisFlags.W))
+                {
+                    axisFlags |= AxisFlags.Z;
+                    axisFlags &= ~AxisFlags.W;
+                    if(!isRelative)
+                        target[GrblConstants.Z_AXIS] = machinePos.Z + target[GrblConstants.W_AXIS];
+                    target[GrblConstants.W_AXIS] = 0d;
+                }
+
+                machinePos.Set(target, axisFlags, isRelative);
+            }
+            else
+                machinePos.Set(values, axisFlags, isRelative);
         }
 
         public CoordinateSystem GetCoordSystem(int id)
