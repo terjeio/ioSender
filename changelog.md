@@ -6,7 +6,7 @@
 * Fix for issue #350 - Z probe with unexpected result in Probing tab.
 * Fix for issue #339- removed unpublished files from builds.
 * Fix for issue #310 - run time not updaing when streaming from SD card.
-* Added right click meny in the program listing to start from a given block, execute a single block or send selected commands to the controller.
+* Added right click menu in the program listing to start from a given block, execute a single block or send selected commands to the controller.
 * Added Plasma THC flyout to sidebar menu. Visible when the controller supports THC. Plus fix for issue #331.
 * Updated rendering of canned cycles to match latest grblHAL controller release.
 * Added support for UVW lathe mode.
