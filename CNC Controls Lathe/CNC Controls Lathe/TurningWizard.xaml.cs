@@ -1,13 +1,13 @@
 /*
  * TurningWizard.xaml.cs - part of CNC Controls library
  *
- * v0.31 / 2021-04-27 / Io Engineering (Terje Io)
+ * v0.45 / 2024-04-21 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2021, Io Engineering (Terje Io)
+Copyright (c) 2019-2024, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -41,6 +41,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Windows.Controls;
 using CNC.Core;
+using CNC.GCode;
 
 namespace CNC.Controls.Lathe
 {
@@ -50,7 +51,7 @@ namespace CNC.Controls.Lathe
     public partial class TurningWizard : UserControl, ICNCView
     {
         private bool initOk = false, resetProfileBindings = true;
-        private double last_rpm = 0d, last_css = 0d;
+        private double last_rpm = 0d, last_css = 0d, length = 0d;
         private BaseViewModel model;
         private TurningLogic logic = new TurningLogic();
 
@@ -74,6 +75,8 @@ namespace CNC.Controls.Lathe
 
             //UIUtils.GroupBoxCaptionBold(groupBox1);
             //UIUtils.GroupBoxCaptionBold(groupBox2);
+            taper.OnValueChanged += taperChanged;
+            taper.OnTaperEnabledChanged += taperEnabled;
         }
 
         public ObservableCollection<string> gCode { get; private set; }
@@ -120,9 +123,38 @@ namespace CNC.Controls.Lathe
         #endregion
         public void InitUI()
         {
+
         }
 
         public WizardConfig config { get; private set; }
+
+        private void taperEnabled (bool enabled)
+        {
+            if (enabled)
+                length = cvLength.Value;
+            else
+                cvLength.Value = length;
+
+            cvLength.IsEnabled = !enabled;
+        }
+
+        private void taperChanged (double angle)
+        {
+           if(taper.IsTaperEnabled && angle != 0d && Math.Abs(model.XStart - model.XTarget) != 0.0d)
+            {
+                double xtarget = model.XTarget;
+                double diameter = model.XStart;
+
+                if (model.config.xmode == LatheMode.Radius)
+                {
+                    xtarget /= 2.0d;
+                    diameter /= 2.0d;
+                }
+
+                //bool boring = (xtarget - diameter) > 0.0d; ??
+                cvLength.Value = (xtarget - diameter) / Math.Tan(Math.PI * angle / 180.0d) * model.config.ZDirection;
+            }
+        }
 
         private void btnCalculate_Click(object sender, System.Windows.RoutedEventArgs e)
         {

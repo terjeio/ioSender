@@ -33,6 +33,20 @@
                             </Setter.Value>
                         </Setter>
                     </Style>
+                    <Style x:Key="ResetVisibleStyle">
+                        <Setter Property="Control.Visibility">
+                            <Setter.Value>
+                                <MultiBinding Converter="{StaticResource IsSignalVisibleConverter}">
+                                    <Binding Path="OptionalSignals" />
+                                    <Binding>
+                                        <Binding.Source>
+                                            <core:Signals>Reset</core:Signals>
+                                        </Binding.Source>
+                                    </Binding>
+                                </MultiBinding>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
                     <Style x:Key="EStopVisibleStyle">
                         <Setter Property="Control.Visibility">
                             <Setter.Value>
@@ -127,7 +141,7 @@
                 <local:SignalControl x:Uid="lbl_signalOptionalStop" Label="O" ToolTip="Optional stop" IsSet="{Binding Path=Signals[(core:Signals)OptionalStop], Mode=OneWay}" Style="{StaticResource OptionalStopVisibleStyle}"/>
                 <local:SignalControl x:Uid="lbl_signalFeedHold" Label="H" ToolTip="Feed hold" IsSet="{Binding Path=Signals[(core:Signals)Hold], Mode=OneWay}"/>
                 <local:SignalControl x:Uid="lbl_signalCycleStart" Label="S" ToolTip="Cycle start" IsSet="{Binding Path=Signals[(core:Signals)CycleStart], Mode=OneWay}"/>
-                <local:SignalControl x:Uid="lbl_signalReset" Label="R" ToolTip="Reset" IsSet="{Binding Path=Signals[(core:Signals)Reset], Mode=OneWay}"/>
+                <local:SignalControl x:Uid="lbl_signalReset" Label="R" ToolTip="Reset" IsSet="{Binding Path=Signals[(core:Signals)Reset], Mode=OneWay}" Style="{StaticResource ResetVisibleStyle}"/>
                 <local:SignalControl x:Uid="lbl_signalEStop" Label="E" ToolTip="E-Stop" IsSet="{Binding Path=Signals[(core:Signals)EStop], Mode=OneWay}" Style="{StaticResource EStopVisibleStyle}"/>
                 <local:SignalControl x:Uid="lbl_signalSafetyDoor" Label="D" ToolTip="Safety door" IsSet="{Binding Path=Signals[(core:Signals)SafetyDoor], Mode=OneWay}" Style="{StaticResource DoorOpenVisibleStyle}"/>
                 <local:SignalControl x:Uid="lbl_signalProbe" Label="P" ToolTip="Probe" IsSet="{Binding Path=Signals[(core:Signals)Probe], Mode=OneWay}"/>

@@ -1,13 +1,13 @@
 ﻿/*
  * RotationControl.xaml.cs - part of CNC Probing library
  *
- * v0.43 / 2023-07-29 / Io Engineering (Terje Io)
+ * v0.45 / 2024-07-16 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2021-2023, Io Engineering (Terje Io)
+Copyright (c) 2020-2024, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -326,6 +326,7 @@ namespace CNC.Controls.Probing
                 probing.Grbl.ExecuteCommand(GrblConstants.CMD_GETPARSERSTATE);
 
             probing.Grbl.IsJobRunning = false;
+            probing.Program.OnCompleted?.Invoke(probing.CanApplyTransform);
         }
 
         private void PreviewOnCompleted()

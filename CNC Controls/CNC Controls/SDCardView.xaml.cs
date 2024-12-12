@@ -1,13 +1,13 @@
 /*
  * SDCardView.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.43 / 2023-06-02 / Io Engineering (Terje Io)
+ * v0.45 / 2024-09-07 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2023, Io Engineering (Terje Io)
+Copyright (c) 2018-2024, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -160,9 +160,14 @@ namespace CNC.Controls
             GCode.File.AddBlock(data);
         }
 
+        private bool isMacro (string filename)
+        {
+            return filename.ToLower().EndsWith(".macro");
+        }
+
         private void DownloadRun_Click(object sender, RoutedEventArgs e)
         {
-            if (currentFile != null && MessageBox.Show(string.Format((string)FindResource("DownloandRun"), (string)currentFile["Name"]), "ioSender", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes) == MessageBoxResult.Yes)
+            if (currentFile != null && !isMacro((string)currentFile["Name"]) && MessageBox.Show(string.Format((string)FindResource("DownloandRun"), (string)currentFile["Name"]), "ioSender", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes) == MessageBoxResult.Yes)
             {
                 var model = DataContext as GrblViewModel;
 
@@ -238,8 +243,13 @@ namespace CNC.Controls
                         {
                             using (WebClient client = new WebClient())
                             {
+                                int port = GrblSettings.GetInteger(grblHALSetting.FtpPort0);
+                                if(port == -1)
+                                    port = GrblSettings.GetInteger(grblHALSetting.FtpPort1);
+                                if (port == -1)
+                                    port = GrblSettings.GetInteger(grblHALSetting.FtpPort2);
                                 client.Credentials = new NetworkCredential("grblHAL", "grblHAL");
-                                client.UploadFile(string.Format("ftp://{0}/{1}", GrblInfo.IpAddress, filename.Substring(filename.LastIndexOf('\\') + 1)), WebRequestMethods.Ftp.UploadFile, filename);
+                                client.UploadFile(string.Format("ftp://{0}:{1}/{2}", GrblInfo.IpAddress, port == -1 ? 21 : port, filename.Substring(filename.LastIndexOf('\\') + 1)), WebRequestMethods.Ftp.UploadFile, filename);
                                 ok = true;
                             }
                         }
@@ -296,6 +306,8 @@ namespace CNC.Controls
         {
             if (currentFile != null)
             {
+                (DataContext as GrblViewModel).Message = string.Empty;
+
                 if ((bool)currentFile["Invalid"])
                 {
                     MessageBox.Show(string.Format(((string)FindResource("IllegalName")).Replace("\\n", "\r\r"), (string)currentFile["Name"]), "ioSender",
@@ -303,6 +315,25 @@ namespace CNC.Controls
                 }
                 else
                 {
+                    if (GrblInfo.ExpressionsSupported && isMacro((string)currentFile["Name"])) {
+                        string filename = ((string)currentFile["Name"]).ToLower();
+                        filename = filename.Substring(0, filename.LastIndexOf(".macro"));
+                        int pos = filename.LastIndexOf("p");
+                        if(pos >= 0)
+                        {
+                            int macro;
+                            if(int.TryParse(filename.Substring(pos + 1), out macro) && macro >= 100)
+                            {
+                                if(MessageBox.Show(string.Format((string)FindResource("RunMacro"), macro), "ioSender",
+                   MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                                {
+                                    Comms.com.WriteCommand("G65P" + macro.ToString());
+                                }
+
+                            }
+                        }
+                        return;
+                    }
                     if (Rewind)
                     {
                         Comms.com.WriteCommand(GrblConstants.CMD_SDCARD_REWIND);

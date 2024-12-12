@@ -1,13 +1,13 @@
 ﻿/*
  * ProbingViewModel.cs - part of CNC Probing library
  *
- * v0.44 / 2023-10-01 / Io Engineering (Terje Io)
+ * v0.45 / 2024-07-19 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020-2023, Io Engineering (Terje Io)
+Copyright (c) 2020-2024, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -81,7 +81,7 @@ namespace CNC.Controls.Probing
 
         private string _message = string.Empty, _tool = string.Empty, _instructions = string.Empty, _position = string.Empty, _probeProgram = string.Empty;
         private string _previewText = string.Empty;
-        private double _tpHeight, _fHeight, _ProbeDiameter, _workpieceSizeX = 0d, _workpieceSizeY = 0d, _workpieceHeight = 0d;
+        private double _tpHeight, _fHeight, _ProbeDiameter, _workpieceSizeX = 0d, _workpieceSizeY = 0d, _workpieceHeight = 0d, _edgeOffsetXY = 0d;
         private double _latchDistance, _latchFeedRate;
         private double _probeDistance, _probeFeedRate;
         private double _rapidsFeedRate;
@@ -397,6 +397,7 @@ namespace CNC.Controls.Probing
             _isComplete = _isSuccess = false;
         }
 
+        public ProbeMacroViewModel Macro { get; private set; } = new ProbeMacroViewModel();
         public GrblViewModel Grbl { get { return _grblmodel; } private set { _grblmodel = value; OnPropertyChanged(); } }
         public Position StartPosition { get; private set; } = new Position();
         public HeightMapViewModel HeightMap { get; private set; } = new HeightMapViewModel();
@@ -436,6 +437,7 @@ namespace CNC.Controls.Probing
                 OnPropertyChanged(nameof(TouchPlateHeightEnable));
             }
         }
+
         public bool ProbeVerified { get; set; } = false;
         public string FastProbe { get { return string.Format(Probing.Command + "F{0}", ProbeFeedRate.ToInvariantString()); } }
         public string SlowProbe { get { return string.Format(Probing.Command + "F{0}", LatchFeedRate.ToInvariantString()); } }
@@ -466,6 +468,7 @@ namespace CNC.Controls.Probing
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(TouchPlateHeightEnable));
                 OnPropertyChanged(nameof(XYOffsetEnable));
+                OnPropertyChanged(nameof(ProbeVerticalEdge));
             }
         }
         public string Tool { get { return _tool; } set { _tool = value; OnPropertyChanged(); } }
@@ -563,6 +566,7 @@ namespace CNC.Controls.Probing
                 _edge = value;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(ProbeDiameterEnable));
+                OnPropertyChanged(nameof(ProbeVerticalEdge));
                 ProbeCorner = _edge == Edge.A || _edge == Edge.B || _edge == Edge.C || _edge == Edge.D;
             }
         }
@@ -601,6 +605,10 @@ namespace CNC.Controls.Probing
                 OnPropertyChanged(nameof(OffsetEnable));
                 OnPropertyChanged(nameof(XYOffsetEnable));
             }
+        }
+        public bool ProbeVerticalEdge
+        {
+            get { return !(_edge == Edge.None || _edge == Edge.Z); }
         }
         public Center ProbeCenter { get { return _center; } set { _center = value; OnPropertyChanged(); } }
         public bool WorkpiecLockXY
@@ -644,6 +652,6 @@ namespace CNC.Controls.Probing
             }
         }
         public double WorkpieceHeight { get { return _workpieceHeight; } set { _workpieceHeight = value; OnPropertyChanged(); } }
-
+        public double WorkpieceXYEdgeOffset { get { return _edgeOffsetXY; } set { _edgeOffsetXY = value; OnPropertyChanged(); } }
     }
 }

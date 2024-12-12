@@ -9,10 +9,12 @@
              d:DesignHeight="515" d:DesignWidth="875"
              Loaded="SDCardView_Loaded">
     <UserControl.Resources>
+        <local:LogicalNotConverter x:Key="NotConverter" />
         <system:String x:Uid="str_notConnection" x:Key="NoConnection">No connection.</system:String>
         <system:String x:Uid="str_uploading" x:Key="Uploading">Uploading...</system:String>
         <system:String x:Uid="str_downloading" x:Key="Downloading">Downloading {0}...</system:String>
         <system:String x:Uid="str_downloadAndRun" x:Key="DownloandRun">Download and run {0}?</system:String>
+        <system:String x:Uid="str_runMacro" x:Key="RunMacro">Run macro {0} with no parameters?</system:String>
         <system:String x:Uid="str_transferDone" x:Key="TransferDone">Transfer done.</system:String>
         <system:String x:Uid="str_transferAborted" x:Key="TransferAborted">Transfer aborted.</system:String>
         <system:String x:Uid="str_transferring" x:Key="Transferring">Transferred {0} of {1} bytes...</system:String>
@@ -20,11 +22,16 @@
         <system:String x:Uid="str_illegalName" x:Key="IllegalName">File: {0}\n!,?,~ and SPACE is not supported in filenames, please rename.</system:String>
     </UserControl.Resources>
     <Grid>
-        <DataGrid x:Uid="dgr_sdcard" x:Name="dgrSDCard" ItemsSource="{Binding}" IsReadOnly="True" HorizontalAlignment="Left" Margin="30,30,0,0" VerticalAlignment="Top" Height="450" Width="380"
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <CheckBox x:Uid="chk_viewAll" x:Name="checkBox" Content="List CNC files only" IsEnabled="{Binding Path=CanViewAll, RelativeSource={RelativeSource AncestorType=UserControl}}" IsChecked="{Binding Path=ViewAll, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource NotConverter}}" HorizontalAlignment="Left" Margin="30,5,0,0" VerticalAlignment="Top" Click="ViewAll_Click"/>
+        <DataGrid x:Uid="dgr_sdcard" x:Name="dgrSDCard" ItemsSource="{Binding}" IsReadOnly="True" HorizontalAlignment="Left" Margin="30,0,0,0" VerticalAlignment="Top" Height="450" Width="380"
                   SelectionMode="Single" SelectionUnit="FullRow" AutoGenerateColumns="False"
                   CanUserReorderColumns="False" CanUserResizeColumns="False" CanUserResizeRows="False" CanUserSortColumns="False" CanUserAddRows="False"
                   SelectionChanged="dgrSDCard_SelectionChanged" MouseDoubleClick="dgrSDCard_MouseDoubleClick"
-                  ToolTip="Right click for menu, double click to run file.">
+                  ToolTip="Right click for menu, double click to run file." Grid.Row="1">
             <DataGrid.Columns>
                 <DataGridTextColumn x:Uid="hdr_name" Header="Name" Binding="{Binding Name}" Width="*"/>
                 <DataGridTextColumn x:Uid="hdr_size" Header="Size" Binding="{Binding Size}" Width="70"/>
@@ -37,11 +44,11 @@
                     <MenuItem x:Uid="mnu_run" Header="Run" Click="Run_Click" />
                     <MenuItem x:Uid="mnu_downloadRun" Header="D_ownload and run" Click="DownloadRun_Click" />
                     <MenuItem x:Uid="mnu_enableRewind" Header="Enable rewind" IsEnabled="{Binding Path=CanRewind}" IsChecked="{Binding Path=Rewind, Mode=TwoWay}" IsCheckable="True" />
-                    <MenuItem x:Uid="mnu_viewAll" Header="View all" IsEnabled="{Binding Path=CanViewAll}" IsChecked="{Binding Path=ViewAll, Mode=TwoWay}" IsCheckable="True" Click="ViewAll_Click"/>
+                    <MenuItem x:Uid="mnu_viewAll" Header="List CNC files only" IsEnabled="{Binding Path=CanViewAll}" IsChecked="{Binding Path=ViewAll, Mode=TwoWay, Converter={StaticResource NotConverter}}" IsCheckable="True" Click="ViewAll_Click"/>
                     <MenuItem x:Uid="mnu_delete" Header="Delete" IsEnabled="{Binding Path=CanDelete}" Click="Delete_Click" />
                 </ContextMenu>
             </DataGrid.ContextMenu>
         </DataGrid>
-        <Button x:Uid="btn_upload" Content="Upload" IsEnabled="{Binding Path=CanUpload, RelativeSource={RelativeSource AncestorType=UserControl}}" HorizontalAlignment="Left" Margin="428,460,0,0" VerticalAlignment="Top" Width="75" Click="Upload_Click"/>
+        <Button x:Uid="btn_upload" Content="Upload" IsEnabled="{Binding Path=CanUpload, RelativeSource={RelativeSource AncestorType=UserControl}}" HorizontalAlignment="Left" Margin="428,430,0,0" VerticalAlignment="Top" Width="75" Click="Upload_Click" Grid.Row="1"/>
     </Grid>
 </UserControl>

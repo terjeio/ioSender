@@ -50,6 +50,7 @@ CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,btn_unlock:System.Windows.
 CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,btn_upload:System.Windows.Controls.ContentControl.Content,Button,True,True,,Upload
 CNC.Controls.WPF.g.en-US.resources:drocontrol.baml,btn_zeroAll:System.Windows.Controls.ContentControl.Content,Button,True,True,,Zero all
 CNC.Controls.WPF.g.en-US.resources:macroeditor.baml,chk_confirm:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Confirm before executing
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,chk_viewAll:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,List CNC files only
 CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,dgr_sdcard:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,"Right click for menu, double click to run file."
 CNC.Controls.WPF.g.en-US.resources:about.baml,dlg_about:System.Windows.Window.Title,Title,True,True,,About
 CNC.Controls.WPF.g.en-US.resources:portdialog.baml,dlg_connection:System.Windows.Window.Title,Title,True,True,,Sender connection
@@ -173,6 +174,7 @@ CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalBlockDelete:Sys
 CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalCycleStart:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Cycle start
 CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalEStop:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,E-Stop
 CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalFeedHold:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Feed hold
+CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalMotorFault:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Motor fault
 CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalMotorWarning:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Motor warning
 CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalOptionalStop:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Optional stop
 CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalProbe:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Probe
@@ -198,7 +200,7 @@ CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,mnu_enableRewind:System.Windo
 CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,mnu_run:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Run
 CNC.Controls.WPF.g.en-US.resources:gcodelistcontrol.baml,mnu_sendToController:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Send to controller
 CNC.Controls.WPF.g.en-US.resources:gcodelistcontrol.baml,mnu_startFromHere:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Start from here
-CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,mnu_viewAll:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,View all
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,mnu_viewAll:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,List CNC files only
 CNC.Controls.WPF.g.en-US.resources:appconfigview.baml,msg_restart:System.String.$Content,None,True,True,,A restart is required after changing settings!
 CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,pnl_kbdJogging:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Warning! - Grbl has outstanding bug(s) in jog cancel (on key up).
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_appconfCreate:System.String.$Content,None,True,True,,"Config file not found or invalid, create new?"
@@ -248,12 +250,15 @@ CNC.Controls.WPF.g.en-US.resources:outlineflyout.baml,str_outlineFlyout:System.S
 CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,str_pause:System.String.$Content,None,True,True,,Pause
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_rotateG17G18Arcs:System.String.$Content,None,True,True,,"GCode contains arcs in XZ or YZ plane (G18/19), can&apos;t apply transform. Use &apos;Arcs to Lines&apos; if you really need this."
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_rotateRadiusArcs:System.String.$Content,None,True,True,,"GCode contains radius mode arcs, can&apos;t apply transform. Use &apos;Arcs to Lines&apos; if you really need this."
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,str_runMacro:System.String.$Content,None,True,True,,Run macro {0} with no parameters?
 CNC.Controls.WPF.g.en-US.resources:macroexecutecontrol.baml,str_runMacro:System.String.$Content,None,True,True,,Run {0} macro?
 CNC.Controls.WPF.g.en-US.resources:macrotoolbarcontrol.baml,str_runMacro:System.String.$Content,None,True,True,,Run {0} macro?
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_saveSettings:System.String.$Content,None,True,True,,"Settings changed, save now?"
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsError:System.String.$Content,None,True,True,,"Setting {0} returned {1}, continue?"
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsFail:System.String.$Content,None,True,True,,Bummer...\\nContinue loading?
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsInvalid:System.String.$Content,None,True,True,,The file does not contain any settings.
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsReloadMismatch:System.String.$Content,None,True,True,,"{0} settings were ignored, not supported by the controller."
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_settingsReloadMismatch:System.String.$Content,None,True,True,,"Some settings were ignored, not supported by the controller."
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsRestore:System.String.$Content,None,True,True,,Restore settings from file
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_settingsSaved:System.String.$Content,None,True,True,,Settings saved.
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsTimeout:System.String.$Content,None,True,True,,"Timed out while setting {0}, continue?"

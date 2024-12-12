@@ -1,13 +1,13 @@
 /*
  * GrblConfigView.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.44 / 2023-12-30 / Io Engineering (Terje Io)
+ * v0.45 / 2024-11-08 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2023, Io Engineering (Terje Io)
+Copyright (c) 2018-2024, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -214,7 +214,7 @@ namespace CNC.Controls
 
         public bool LoadFile(string filename)
         {
-            int pos, id;
+            int pos, id, mismatch = 0;
             List<string> lines = new List<string>();
             List<int> dep = new List<int>();
             Dictionary<int, string> settings = new Dictionary<int, string>();
@@ -296,23 +296,35 @@ namespace CNC.Controls
                 {
                     if (settings.ContainsKey(d))
                     {
-                        if (!SetSetting(new KeyValuePair<int, string>(d, settings[d])))
+                        var setting = new KeyValuePair<int, string>(d, settings[d]);
+                        if (GrblSettings.HasSetting((GrblSetting)setting.Key))
                         {
-                            settings.Clear();
-                            break;
+                            if (!SetSetting(setting))
+                            {
+                                settings.Clear();
+                                break;
+                            }
                         }
+                        else
+                            mismatch++;
                     }
                 }
 
                 foreach (var setting in settings)
                 {
-                    if (!dep.Contains(setting.Key)) {
-                        if(!SetSetting(setting))
-                            break;
+                    if (GrblSettings.HasSetting((GrblSetting)setting.Key))
+                    {
+                        if (!dep.Contains(setting.Key))
+                        {
+                            if (!SetSetting(setting))
+                                break;
+                        }
                     }
+                    else
+                        mismatch++;
                 }
 
-                if (lines[0] == "%")
+                if (lines.Count > 0 && lines[0] == "%")
                     Comms.com.WriteCommand("%");
 
                 using (new UIUtils.WaitCursor())
@@ -322,6 +334,9 @@ namespace CNC.Controls
             }
 
             model.Message = string.Empty;
+
+            if (mismatch > 0)
+                MessageBox.Show(string.Format((string)FindResource("SettingsReloadMismatch"), mismatch), "ioSender", MessageBoxButton.OK, MessageBoxImage.Exclamation);
 
             return settings.Count > 0;
         }

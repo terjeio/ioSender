@@ -50,6 +50,7 @@ CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,btn_unlock:System.Windows.
 CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,btn_upload:System.Windows.Controls.ContentControl.Content,Button,True,True,,Feltöltés
 CNC.Controls.WPF.g.en-US.resources:drocontrol.baml,btn_zeroAll:System.Windows.Controls.ContentControl.Content,Button,True,True,,Mind nullára
 CNC.Controls.WPF.g.en-US.resources:macroeditor.baml,chk_confirm:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Végrehajtás előtt erősítse meg
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,chk_viewAll:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,List CNC files only
 CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,dgr_sdcard:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,"Kattintson a jobb gombbal a menühöz, kattintson duplán a fájl futtatásához."
 CNC.Controls.WPF.g.en-US.resources:about.baml,dlg_about:System.Windows.Window.Title,Title,True,True,,Az IOSender
 CNC.Controls.WPF.g.en-US.resources:portdialog.baml,dlg_connection:System.Windows.Window.Title,Title,True,True,,Feladó kapcsolat
@@ -173,6 +174,7 @@ CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalBlockDelete:Sys
 CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalCycleStart:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Ciklusindítás
 CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalEStop:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,E-Stop
 CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalFeedHold:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Előtolás tartás
+CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalMotorFault:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Motor fault
 CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalMotorWarning:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Motor figyelmeztetés
 CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalOptionalStop:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Opcionális megállás
 CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalProbe:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Szonda
@@ -198,7 +200,7 @@ CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,mnu_enableRewind:System.Windo
 CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,mnu_run:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Fut
 CNC.Controls.WPF.g.en-US.resources:gcodelistcontrol.baml,mnu_sendToController:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Send to controller
 CNC.Controls.WPF.g.en-US.resources:gcodelistcontrol.baml,mnu_startFromHere:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Start from here
-CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,mnu_viewAll:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,View all
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,mnu_viewAll:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,List CNC files only
 CNC.Controls.WPF.g.en-US.resources:appconfigview.baml,msg_restart:System.String.$Content,None,True,True,,A beállítások módosítása után újraindítás szükséges!
 CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,pnl_kbdJogging:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Figyelem! - A Grbl-nek kiemelkedő hibái vannak a kocogó-megszakításnál (felfelé mutató gombnál).
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_appconfCreate:System.String.$Content,None,True,True,,"A konfigurációs fájl nem található vagy érvénytelen, hozzon létre újat?"
@@ -248,12 +250,15 @@ CNC.Controls.WPF.g.en-US.resources:outlineflyout.baml,str_outlineFlyout:System.S
 CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,str_pause:System.String.$Content,None,True,True,,Szünet
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_rotateG17G18Arcs:System.String.$Content,None,True,True,,"A GCode XZ vagy YZ síkban íveket tartalmaz (G18/19), transzformáció nem alkalmazható. Használat &apos;Arcs to Lines&apos; ha tényleg szüksége van erre."
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_rotateRadiusArcs:System.String.$Content,None,True,True,,"A GCode sugármódú íveket tartalmaz, nem alkalmazható transzformáció. Használat &apos;Arcs to Lines&apos; ha tényleg szüksége van erre."
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,str_runMacro:System.String.$Content,None,True,True,,Run macro {0} with no parameters?
 CNC.Controls.WPF.g.en-US.resources:macroexecutecontrol.baml,str_runMacro:System.String.$Content,None,True,True,,Fut {0} makró?
 CNC.Controls.WPF.g.en-US.resources:macrotoolbarcontrol.baml,str_runMacro:System.String.$Content,None,True,True,,Fut {0} makró?
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_saveSettings:System.String.$Content,None,True,True,,"A beállítások megváltoztak, mentse most?"
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsError:System.String.$Content,None,True,True,,"A(z) {0} beállítás eredménye {1}, folytassa?"
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsFail:System.String.$Content,None,True,True,,Baj...\\nBetöltés folytatása?
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsInvalid:System.String.$Content,None,True,True,,A fájl nem tartalmaz semmilyen beállítást.
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsReloadMismatch:System.String.$Content,None,True,True,,"{0} settings were ignored, not supported by the controller."
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_settingsReloadMismatch:System.String.$Content,None,True,True,,"Some settings were ignored, not supported by the controller."
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsRestore:System.String.$Content,None,True,True,,Beállítások visszaállítása fájlból
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_settingsSaved:System.String.$Content,None,True,True,,Beállítások elmentve.
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsTimeout:System.String.$Content,None,True,True,,"Időtúllépés történt a(z) {0} beállítása közben, folytassa?"

@@ -11,6 +11,7 @@
              d:DesignHeight="150" d:DesignWidth="250">
     <UserControl.Resources>
         <local:LogicalNotConverter x:Key="LogicalNotConverter" />
+        <local:BoolToVisibleConverter x:Key="IsVisibleConverter" />
     </UserControl.Resources>
     <Grid>
         <GroupBox x:Uid="grp_spindle" x:Name="grpSpindle" Header="Spindle" HorizontalAlignment="Left" VerticalAlignment="Top" Height="150" Width="250">
@@ -25,6 +26,7 @@
                     <RadioButton x:Uid="lbl_cw" x:Name="rbSpindleCW" Content="CW" IsChecked="{Binding Path=SpindleState[(gcode:SpindleState)CW], Mode=TwoWay}" HorizontalAlignment="Left" VerticalAlignment="Center" Height="16" Click="rbSpindle_Click"/>
                     <RadioButton x:Uid="lbl_ccw" x:Name="rbSpindleCCW" Content="CCW" IsChecked="{Binding Path=SpindleState[(gcode:SpindleState)CCW], Mode=TwoWay}" HorizontalAlignment="Left" VerticalAlignment="Center" Height="16" Click="rbSpindle_Click"/>
                 </StackPanel>
+                <ComboBox x:Name="cbxSpindle" DisplayMemberPath="Name" SelectedValuePath="SpindleNum" ItemsSource="{Binding Path=Spindles}" SelectedValue="{Binding Path=SpindleNum, Mode=OneWay}" IsEnabled="{Binding Path=IsJobRunning, Converter={StaticResource LogicalNotConverter}}" Visibility="{Binding Path=MultiSpindle, Converter={StaticResource IsVisibleConverter}}" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,1,2,0" Width="100" Height="22" SelectionChanged="cbxSpindle_SelectionChanged"/>
                 <StackPanel Orientation="Horizontal" Margin="5,0" Height="26" Grid.Row="1">
                     <Label x:Uid="lbl_rpm" x:Name="lblRPM" Content="RPM" HorizontalContentAlignment="Right" VerticalAlignment="Center" Height="24" Width="40"/>
                     <local:NumericTextBox x:Name="cvRPM" Value="{Binding Path=RPM, Mode=TwoWay}" IsEnabled="{Binding Path=IsJobRunning, Converter={StaticResource LogicalNotConverter}}" Format="####0" HorizontalAlignment="Left" Margin="2,0,0,0" TextWrapping="NoWrap" VerticalAlignment="Center"/>

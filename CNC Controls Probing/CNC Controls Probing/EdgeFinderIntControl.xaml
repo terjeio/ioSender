@@ -16,6 +16,7 @@
         <system:String x:Uid="str_edgeIntFinderFailed" x:Key="ProbingFailed">Probing failed</system:String>
         <system:String x:Uid="str_edgeIntFinderCompleted" x:Key="ProbingCompleted">Probing completed.</system:String>
         <Controls:LogicalNotConverter x:Key="IsNotRunningConverter" />
+        <Controls:LogicalAndConverter x:Key="LogicalAndConverter"/>
         <Controls:EnumValueToBooleanConverter x:Key="EnumToEdgeConverter" />
         <Controls:BoolToVisibleConverter x:Key="ToVisibleConverter" />
         <local:EnumValueToVisibleConverter x:Key="ZProbeIsVisibleConverter"/>
@@ -73,7 +74,17 @@
             <StackPanel Orientation="Horizontal">
                 <local:CsSelectControl/>
                 <GroupBox x:Uid="grp_workpiece" Header="Workpiece">
-                    <Controls:NumericField x:Uid="lbl_height" Label="Height" Value="{Binding Path=WorkpieceHeight, Mode=TwoWay}" IsEnabled="{Binding Path=ProbeZ}" Margin="0,5,85,0" VerticalAlignment="Top"/>
+                    <StackPanel Orientation="Vertical" Margin="0,5,0,5">
+                        <Controls:NumericField x:Uid="lbl_height" Label="Height:" ColonAt="75" Value="{Binding Path=WorkpieceHeight, Mode=TwoWay}" IsEnabled="{Binding Path=ProbeZ}" Margin="0,2,0,0" />
+                        <Controls:NumericField x:Uid="lbl_edgeoffsetxy" ColonAt="75" Label="Edge offset:" ToolTip="Set to 0 to use 0.5 x probe/tool diameter" Value="{Binding Path=WorkpieceXYEdgeOffset, Mode=TwoWay}" Margin="0,2,0,0">
+                            <Controls:NumericField.IsEnabled>
+                                <MultiBinding Converter="{StaticResource LogicalAndConverter}">
+                                    <Binding Path="ProbeZ"/>
+                                    <Binding Path="ProbeVerticalEdge"/>
+                                </MultiBinding>
+                            </Controls:NumericField.IsEnabled>
+                        </Controls:NumericField>
+                    </StackPanel>
                 </GroupBox>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="0,5,0,5">

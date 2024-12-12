@@ -6,8 +6,9 @@
              xmlns:local="clr-namespace:CNC.Controls.Lathe"
              xmlns:Controls="clr-namespace:CNC.Controls;assembly=CNC.Controls.WPF" x:Class="CNC.Controls.Lathe.TurningWizard"
              xmlns:Converters="clr-namespace:CNC.Controls.Lathe"
-             mc:Ignorable="d" 
-             d:DesignHeight="515" d:DesignWidth="875">
+             mc:Ignorable="d"
+             d:DesignHeight="515" d:DesignWidth="875"
+             Loaded="TurningWizard_Load">
     <UserControl.Resources>
         <Controls:StringCollectionToTextConverter x:Key="GCodeConverter"/>
         <Controls:MultiLineConverter x:Key="ErrorMessageConverter" />
@@ -55,7 +56,7 @@
                     <Controls:NumericField x:Name="cvTargetX" Label="Target" Value="{Binding Path=XTarget, Mode=TwoWay}" Style="{StaticResource CNCValue}"/>
                     <Controls:NumericField x:Name="cvClearanceX" Label="Clearance" Value="{Binding Path=XClearance, Mode=TwoWay}" Style="{StaticResource CNCValue}"/>
                 </StackPanel>
-                <local:TaperControl x:Name="taper" Value="{Binding Taper, Mode=TwoWay}" IsTaperEnabled="{Binding IsTaperEnabled, Mode=TwoWay}" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" ToolTip="Degrees from centerline."/>
+                <local:TaperControl x:Name="taper" Value="{Binding Taper, Mode=TwoWay}" Format="#0.##" IsTaperEnabled="{Binding IsTaperEnabled, Mode=TwoWay}" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" ToolTip="Degrees from centerline."/>
             </StackPanel>
         </GroupBox>
         <GroupBox x:Name="groupBox2" Header="Cut depths and feed rates" HorizontalAlignment="Left" Margin="10,185,0,0" VerticalAlignment="Top" Height="95" Width="585">

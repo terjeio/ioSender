@@ -1,13 +1,13 @@
 ﻿/*
  * ArcsToLines.cs - part of CNC Controls library for Grbl
  *
- * v0.40 / 2022-07-12 / Io Engineering (Terje Io)
+ * v0.45 / 2024-11-10 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020-2022, Io Engineering (Terje Io)
+Copyright (c) 2020-2024, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -70,16 +70,15 @@ namespace CNC.Controls
                                 var arc = cmd.Token as GCArc;
                                 lnroffset++;
                                 lnr = arc.LineNumber;
-                                toolPath.Add(new GCComment(Commands.Comment, arc.LineNumber + lnroffset, "Arc to lines start: " + arc.ToString()));
+                                toolPath.Add(new GCComment(Commands.Comment, arc.LineNumber + lnroffset, "Arc to lines start: " + arc.ToString(), arc.BlockDelete));
 
                                 List<Point3D> points = arc.GeneratePoints(emu.Plane, ToPos(cmd.Start, emu.IsImperial), arcTolerance, emu.DistanceMode == DistanceMode.Incremental); // Dynamic resolution
                                 foreach (Point3D point in points)
                                 {
                                     lnroffset++;
-                                    toolPath.Add(new GCLinearMotion(Commands.G1, arc.LineNumber + lnroffset, ToPos(point, emu.IsImperial), AxisFlags.XYZ));
+                                    toolPath.Add(new GCLinearMotion(Commands.G1, arc.LineNumber + lnroffset, ToPos(point, emu.IsImperial), AxisFlags.XYZ, arc.BlockDelete));
                                 }
                                 lnroffset++;
-                                toolPath.Add(new GCComment(Commands.Comment, arc.LineNumber + lnroffset, "Arc to lines end"));
                             }
                             break;
 
@@ -88,16 +87,16 @@ namespace CNC.Controls
                                 var spline = cmd.Token as GCCubicSpline;
                                 lnroffset++;
                                 lnr = spline.LineNumber;
-                                toolPath.Add(new GCComment(Commands.Comment, spline.LineNumber + lnroffset, "Spline to lines start: " + spline.ToString()));
+                                toolPath.Add(new GCComment(Commands.Comment, spline.LineNumber + lnroffset, "Spline to lines start: " + spline.ToString(), spline.BlockDelete));
 
                                 List<Point3D> points = spline.GeneratePoints(ToPos(cmd.Start, emu.IsImperial), arcTolerance, emu.DistanceMode == DistanceMode.Incremental); // Dynamic resolution
                                 foreach (Point3D point in points)
                                 {
                                     lnroffset++;
-                                    toolPath.Add(new GCLinearMotion(Commands.G1, spline.LineNumber + lnroffset, ToPos(point, emu.IsImperial), AxisFlags.XYZ));
+                                    toolPath.Add(new GCLinearMotion(Commands.G1, spline.LineNumber + lnroffset, ToPos(point, emu.IsImperial), AxisFlags.XYZ, spline.BlockDelete));
                                 }
                                 lnroffset++;
-                                toolPath.Add(new GCComment(Commands.Comment, lnr, "Spline to lines end"));
+                                toolPath.Add(new GCComment(Commands.Comment, lnr, "Spline to lines end", spline.BlockDelete));
                             }
                             break;
 
@@ -106,16 +105,16 @@ namespace CNC.Controls
                                 var spline = cmd.Token as GCQuadraticSpline;
                                 lnroffset++;
                                 lnr = spline.LineNumber;
-                                toolPath.Add(new GCComment(Commands.Comment, spline.LineNumber + lnroffset, "Spline to lines start: " + spline.ToString()));
+                                toolPath.Add(new GCComment(Commands.Comment, spline.LineNumber + lnroffset, "Spline to lines start: " + spline.ToString(), spline.BlockDelete));
 
                                 List<Point3D> points = spline.GeneratePoints(ToPos(cmd.Start, emu.IsImperial), arcTolerance, emu.DistanceMode == DistanceMode.Incremental); // Dynamic resolution
                                 foreach (Point3D point in points)
                                 {
                                     lnroffset++;
-                                    toolPath.Add(new GCLinearMotion(Commands.G1, spline.LineNumber + lnroffset, ToPos(point, emu.IsImperial), AxisFlags.XYZ));
+                                    toolPath.Add(new GCLinearMotion(Commands.G1, spline.LineNumber + lnroffset, ToPos(point, emu.IsImperial), AxisFlags.XYZ, spline.BlockDelete));
                                 }
                                 lnroffset++;
-                                toolPath.Add(new GCComment(Commands.Comment, lnr, "Spline to lines end"));
+                                toolPath.Add(new GCComment(Commands.Comment, lnr, "Spline to lines end", spline.BlockDelete));
                             }
                             break;
 

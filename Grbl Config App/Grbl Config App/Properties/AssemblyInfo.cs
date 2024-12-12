@@ -12,7 +12,7 @@ using System.Windows;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Io Engineering")]
 [assembly: AssemblyProduct("Grbl Config App")]
-[assembly: AssemblyCopyright("Copyright ©  2023 Io Engineering")]
+[assembly: AssemblyCopyright("Copyright ©  2024 Io Engineering")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -51,5 +51,5 @@ using System.Windows;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("2.0.42.0")]
-[assembly: AssemblyFileVersion("2.0.42.0")]
+[assembly: AssemblyVersion("2.0.45.0")]
+[assembly: AssemblyFileVersion("2.0.45.0")]

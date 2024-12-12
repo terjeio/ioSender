@@ -1,13 +1,13 @@
 ﻿/*
  * Grbl.cs - part of CNC Controls library
  *
- * v0.44 / 2023-12-27 / Io Engineering (Terje Io)
+ * v0.45 / 2024-11-08 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2023, Io Engineering (Terje Io)
+Copyright (c) 2018-2024, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -116,6 +116,7 @@ namespace CNC.Core
             CMD_GETSETTINGSGROUPS = "$EG",
             CMD_GETALARMCODES = "$EA",
             CMD_GETERRORCODES = "$EE",
+            CMD_GETSPINDLES = "$SPINDLESH",
             CMD_PROGRAM_DEMARCATION = "%",
             CMD_SDCARD_MOUNT = "$FM",
             CMD_SDCARD_DIR = "$F",
@@ -277,6 +278,9 @@ namespace CNC.Core
         MicroStepsBase = 150,
         StallGuardBase = 200,
         // End per axis settings
+        FtpPort0 = 308,
+        FtpPort1 = 318,
+        FtpPort2 = 328,
         ToolChangeMode = 341,
         UnlockAfterEStop = 484
     }
@@ -870,6 +874,7 @@ namespace CNC.Core
         public static string Mist { get; set; } = ((char)GrblConstants.CMD_COOLANT_MIST_OVR_TOGGLE).ToString();
         public static string Flood { get; set; } = ((char)GrblConstants.CMD_COOLANT_FLOOD_OVR_TOGGLE).ToString();
         public static string Fan { get; set; } = ((char)GrblConstants.CMD_OVERRIDE_FAN0_TOGGLE).ToString();
+        public static string SpindleChange { get; set; } = "M104Q{0}";
         public static string ToolChange { get; set; } = "T{0}";
     }
 
@@ -908,7 +913,7 @@ namespace CNC.Core
         }
 
         public static string AxisLetters { get; private set; } = "XYZABCUVW";
-        public static string SignalLetters { get; private set; } = "XYZABCUVWEPRDHSBTOMF"; // Keep in sync with Signals enum above!!
+        public static string SignalLetters { get; private set; } = "XYZABCUVWEPRDHSLTOMF"; // Keep in sync with Signals enum above!!
         public static string PositionFormatString { get; private set; } = string.Empty;
         public static string Version { get; private set; } = string.Empty;
         public static int Build { get; private set; } = 0;
@@ -964,6 +969,8 @@ namespace CNC.Core
         public static bool HasPIDLog { get; private set; }
         public static bool HasProbe { get; private set; } = true;
         public static bool HasRTC { get; private set; } = false;
+        public static bool HasVariableSpindle { get; private set; } = false;
+        public static bool HasReversableSpindle { get; private set; } = true;
         public static bool HomingEnabled { get; internal set; } = false;
         public static AxisFlags HomingDirection { get; internal set; } = AxisFlags.None;
         public static bool UseLegacyRTCommands { get; internal set; } = true;
@@ -1237,11 +1244,13 @@ namespace CNC.Core
                         if (s[0].Contains('+'))
                             OptionalSignals |= Signals.SafetyDoor;
                         ForceSetOrigin = s[0].Contains('Z');
+                        HasVariableSpindle = s[0].Contains('V');
+                        HasReversableSpindle = !s[0].Contains('D');
                         if (s.Length > 1)
                             PlanBufferSize = int.Parse(s[1], CultureInfo.InvariantCulture);
                         if (s.Length > 2)
                             SerialBufferSize = int.Parse(s[2], CultureInfo.InvariantCulture);
-                        if (s.Length > 3 && NumAxes != int.Parse(s[3], CultureInfo.InvariantCulture))
+                        if (s.Length > 3 && IsGrblHAL && NumAxes != int.Parse(s[3], CultureInfo.InvariantCulture))
                         {
                             NumAxes = int.Parse(s[3], CultureInfo.InvariantCulture);
                             if (Grbl.GrblViewModel != null)
@@ -1938,6 +1947,102 @@ namespace CNC.Core
                         }
                         break;
                 }
+            }
+        }
+    }
+
+    public class Spindle
+    {
+        public int SpindleId { get; set; }
+        public int SpindleNum { get; set; }
+        public string Name { get; set; }
+        public bool Variable { get; set; }
+        public bool Direction { get; set; }
+
+        //public IEnumerable<GrblSpindles> Settings
+        //{
+        //    get { return GrblSpindles.Spindles.Where(x => x.SpindleId == Id); }
+        //}
+
+        public Spindle(string data)
+        {
+            string[] values = data.Split('|');
+            if (GrblInfo.IsGrblHAL && GrblInfo.Build < 20240812) // Workaround for controller bug
+            {
+                SpindleId = int.Parse(values[1]);
+                SpindleNum = int.Parse(values[0]);
+            }
+            else
+            {
+                SpindleId = int.Parse(values[0]);
+                SpindleNum = int.Parse(values[1]);
+            }
+            Name = values[4];
+            Variable = values[3].Contains('V');
+            Direction = values[3].Contains('D') || values[3].Contains('L');
+        }
+    }
+
+    public static class GrblSpindles
+    {
+        private static Dispatcher dispatcher;
+        public static ObservableCollection<Spindle> Spindles { get; private set; } = new ObservableCollection<Spindle>();
+
+        private static Action<string> dataReceived;
+
+        public static bool Get()
+        {
+            return Grbl.GrblViewModel != null && Get(Grbl.GrblViewModel);
+        }
+
+        public static bool Get(GrblViewModel model)
+        {
+            bool? res = null;
+
+            if (GrblInfo.IsGrblHAL && GrblInfo.Build >= 20240307 && Spindles.Count == 0)
+            {
+                dispatcher = Dispatcher.CurrentDispatcher;
+                dataReceived += process;
+
+                PollGrbl.Suspend();
+                CancellationToken cancellationToken = new CancellationToken();
+
+                new Thread(() =>
+                {
+                    res = WaitFor.AckResponse<string>(
+                        cancellationToken,
+                        response => dataReceived(response),
+                        a => model.OnResponseReceived += a,
+                        a => model.OnResponseReceived -= a,
+                        400, () => Comms.com.WriteCommand(GrblConstants.CMD_GETSPINDLES));
+                }).Start();
+
+                while (res == null)
+                    EventUtils.DoEvents();
+
+                PollGrbl.Resume();
+                dataReceived -= process;
+            }
+
+            if(Spindles.Count == 0)
+                Spindles.Add(new Spindle("0|0|0|" + (GrblInfo.HasReversableSpindle ? "D" : "") + (GrblInfo.HasVariableSpindle ? "V" : "") + "|Default|0.0|1000.0"));
+
+            return Spindles.Count > 0;
+        }
+
+        private static void process(string data)
+        {
+            if (Dispatcher.CurrentDispatcher != dispatcher)
+            {
+                dispatcher.Invoke(dataReceived, data);
+                return;
+            }
+
+            if (data != "ok")
+            {
+                string[] valuepair = data.TrimEnd(']').Split(':');
+                if (valuepair.Length == 2 && valuepair[0] == "[SPINDLE" && valuepair[1].Split('|')[1] != "-")
+                    Spindles.Add(new Spindle(valuepair[1]));
             }
         }
     }
@@ -2878,15 +2983,17 @@ namespace CNC.Core
                             GrblInfo.HasFirmwareJog = true;
                             break;
 
-
                         case GrblSetting.StatusReportMask:
                             {
                                 if (String.IsNullOrEmpty(valuepair[1])) // FluidNC workaround
                                     valuepair[1] = "0";                 // for missing parameter value
-                                var value = int.Parse(valuepair[1]);
-                                Grbl.GrblViewModel.IsParserStateLive = (value & (1 << 9)) != 0;
-                                GrblInfo.ReportProbeResult = ReportProbeCoordinates = (value & (1 << 7)) != 0;
-                                GrblInfo.HasSimpleProbeProtect = (value & (1 << 11)) != 0;
+                                int value;
+                                if (int.TryParse(valuepair[1], out value))
+                                {
+                                    Grbl.GrblViewModel.IsParserStateLive = (value & (1 << 9)) != 0;
+                                    GrblInfo.ReportProbeResult = ReportProbeCoordinates = (value & (1 << 7)) != 0;
+                                    GrblInfo.HasSimpleProbeProtect = (value & (1 << 11)) != 0;
+                                }
                             }
                             break;
                     }

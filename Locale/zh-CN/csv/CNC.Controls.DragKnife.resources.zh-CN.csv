@@ -4,15 +4,15 @@ CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,dlg_dragKnife:Syst
 CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,fld_cutDepth:CNC.Controls.NumericField.Label,None,False,True,,铣削深度：
 CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,fld_cutDepth:CNC.Controls.NumericField.Unit,None,False,True,,mm
 CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,fld_dentLength:CNC.Controls.NumericField.Unit,None,False,True,,mm
-CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,fld_dentLength:CNC.Controls.NumericField.Label,None,False,True,,Dent length:
-CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,fld_retractAngle:CNC.Controls.NumericField.Label,None,False,True,,Retract angle:
+CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,fld_dentLength:CNC.Controls.NumericField.Label,None,False,True,,凹痕长度:
+CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,fld_retractAngle:CNC.Controls.NumericField.Label,None,False,True,,缩回角度：
 CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,fld_retractAngle:CNC.Controls.NumericField.Unit,None,False,True,,角度
 CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,fld_retractDepth:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
-CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,fld_retractDepth:CNC.Controls.NumericField.Label,None,False,True,,Retract depth:
-CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,fld_swivelAngle:CNC.Controls.NumericField.Label,None,False,True,,Swivel angle:
+CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,fld_retractDepth:CNC.Controls.NumericField.Label,None,False,True,,缩回深度：
+CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,fld_swivelAngle:CNC.Controls.NumericField.Label,None,False,True,,旋转角度：
 CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,fld_swivelAngle:CNC.Controls.NumericField.Unit,None,False,True,,角度
 CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,fld_tipOffset:CNC.Controls.NumericField.Unit,None,False,True,,mm
-CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,fld_tipOffset:CNC.Controls.NumericField.Label,None,False,True,,Tip offset:
+CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,fld_tipOffset:CNC.Controls.NumericField.Label,None,False,True,,尖端偏移：
 CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,grp_knife:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,刀
-CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,grp_retract:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Retract
-CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,lbl_retractEnable:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Retract enable
+CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,grp_retract:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,缩回
+CNC.Controls.DragKnife.g.en-US.resources:dragknifedialog.baml,lbl_retractEnable:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,缩回启用

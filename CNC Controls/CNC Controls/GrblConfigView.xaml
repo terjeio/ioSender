@@ -17,6 +17,7 @@
         <system:String x:Uid="str_settingsFail" x:Key="SettingsFail">Bummer...\nContinue loading?</system:String>
         <system:String x:Uid="str_settingsInvalid" x:Key="SettingsInvalid">The file does not contain any settings.</system:String>
         <system:String x:Uid="str_settingsRestore" x:Key="SettingsRestore">Restore settings from file</system:String>
+        <system:String x:Uid="str_settingsReloadMismatch" x:Key="SettingsReloadMismatch">{0} settings were ignored, not supported by the controller.</system:String>
         <local:LogicalNotConverter x:Key="IsNotConverter" />
         <local:GrblStateToBooleanConverter x:Key="StateToBooleanConverter" />
         <Style x:Key="NumericErrorStyle" TargetType="local:NumericTextBox">

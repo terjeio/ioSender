@@ -1,13 +1,13 @@
 /*
  * MainWindow.xaml.cs - part of Grbl Code Sender
  *
- * v0.44 / 2023-12-30 / Io Engineering (Terje Io)
+ * v0.45 / 2024-12-11 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2023, Io Engineering (Terje Io)
+Copyright (c) 2019-2024, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -56,7 +56,7 @@ namespace GCode_Sender
 
     public partial class MainWindow : Window
     {
-        private const string version = "2.0.44";
+        private const string version = "2.0.45";
         public static MainWindow ui = null;
         public static CNC.Controls.Viewer.Viewer GCodeViewer = null;
         public static UIViewModel UIViewModel { get; } = new UIViewModel();
@@ -217,6 +217,12 @@ namespace GCode_Sender
                 }
 #endif
                 Comms.com.DataReceived -= (DataContext as GrblViewModel).DataReceived;
+
+                if (CNC.Core.Grbl.GrblViewModel.AutoReportInterval > 0)
+                {
+                    Comms.com.WriteByte(GrblConstants.CMD_AUTO_REPORTING_TOGGLE);
+                    System.Threading.Thread.Sleep(50);
+                }
 
                 using (new UIUtils.WaitCursor())
                 {

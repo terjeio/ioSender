@@ -1,13 +1,13 @@
 ﻿/*
  * HeightMapControl.xaml.cs - part of CNC Probing library
  *
- * v0.44 / 2023-10-01 / Io Engineering (Terje Io)
+ * v0.45 / 2024-07-16 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020-2023, Io Engineering (Terje Io)
+Copyright (c) 2020-2024, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -110,7 +110,7 @@ namespace CNC.Controls.Probing
             probing.HeightMap.GridSizeX = probing.HeightMap.Map.GridX;
             probing.HeightMap.GridSizeY = probing.HeightMap.Map.GridY;
 
-            int point = 0, points = probing.HeightMap.Map.SizeX * probing.HeightMap.Map.SizeX;
+            int point = 0, points = probing.HeightMap.Map.SizeX * probing.HeightMap.Map.SizeY;
             string pointOf = ((string)FindResource("ProbingPointOf"));
 
             for (x = 0; x < probing.HeightMap.Map.SizeX; x++)
@@ -212,6 +212,8 @@ namespace CNC.Controls.Probing
 
             if(!ok)
                 probing.Program.End((string)FindResource("ProbingFailed"));
+
+            probing.Program.OnCompleted?.Invoke(ok);
         }
 
         public void Load (string fileName)

@@ -38,7 +38,7 @@ namespace CNC.Controls.Probing
             double segmentLength = Math.Min(map.GridX, map.GridY);
             int precision = model.Grbl.Precision;
 
-            GCPlane plane = new GCPlane(GrblParserState.Plane == Plane.XY ? Commands.G17 : Commands.G18, 0);
+            GCPlane plane = new GCPlane(GrblParserState.Plane == Plane.XY ? Commands.G17 : Commands.G18, 0, false);
             DistanceMode distanceMode = GrblParserState.DistanceMode;
             Position position = new Position(model.Grbl.Position, model.Grbl.UnitFactor);
             Vector3 pos = new Vector3(position.X, position.Y, position.Z);
@@ -66,7 +66,7 @@ namespace CNC.Controls.Probing
                             {
                                 Vector3 target = new Vector3(Math.Round(subMotion.End.X, precision), Math.Round(subMotion.End.Y, precision), Math.Round(subMotion.End.Z + map.InterpolateZ(subMotion.End.X, subMotion.End.Y), precision));
 
-                                newToolPath.Add(/*last_segment = */new GCLinearMotion(motion.Command, lnr++, target.Array, motion.AxisFlags | AxisFlags.Z));
+                                newToolPath.Add(/*last_segment = */new GCLinearMotion(motion.Command, lnr++, target.Array, motion.AxisFlags | AxisFlags.Z, motion.BlockDelete));
                             }
 //                            if(last_segment != null)
 //                                pos = ToAbsolute(pos, last_segment.Values);
@@ -118,7 +118,7 @@ namespace CNC.Controls.Probing
                                         axisFlags &= ~AxisFlags.Z;
                                 }
 
-                                newToolPath.Add(last_segment = new GCArc(arc.Command, lnr++, target.Array, axisFlags, ijk, arc.IjkFlags, arc.R, arc.P, arc.IJKMode));
+                                newToolPath.Add(last_segment = new GCArc(arc.Command, lnr++, target.Array, axisFlags, ijk, arc.IjkFlags, arc.R, arc.P, arc.IJKMode, arc.BlockDelete));
                             }
 //                            if (last_segment != null)
 //                                pos = ToAbsolute(pos, last_segment.Values);

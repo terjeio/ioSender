@@ -189,8 +189,7 @@ namespace CNC.Controls.Probing
             if (height < MinHeight)
                 MinHeight = height;
 
-            if (MapUpdated != null)
-                MapUpdated();
+            MapUpdated?.Invoke();
         }
 
         public static HeightMap Load(string path)

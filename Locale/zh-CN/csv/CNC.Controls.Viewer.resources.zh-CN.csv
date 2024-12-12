@@ -1,41 +1,41 @@
-﻿CNC.Controls.Viewer.g.en-US.resources:viewer.baml,btn_resetView:System.Windows.Controls.ContentControl.Content,Button,True,True,,Reset view
+﻿CNC.Controls.Viewer.g.en-US.resources:viewer.baml,btn_resetView:System.Windows.Controls.ContentControl.Content,Button,True,True,,重置视图
 CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,fld_arcResolution:CNC.Controls.NumericField.Label,None,False,True,,圆弧分辨率：
-CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,fld_arcResolution:CNC.Controls.NumericField.Unit,None,False,True,,segments
-CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,fld_minDistance:CNC.Controls.NumericField.Label,None,False,True,,最小距离：
+CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,fld_arcResolution:CNC.Controls.NumericField.Unit,None,False,True,,段
+CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,fld_minDistance:CNC.Controls.NumericField.Label,None,False,True,,最短距离：
 CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,fld_toolDiameter:CNC.Controls.NumericField.Label,None,False,True,,刀具直径：
 CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,fld_toolDiameter:CNC.Controls.NumericField.Unit,None,False,True,,mm
 CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,fld_toolDiameter:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,默认刀具直径。
 CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,fld_toolScalePct:CNC.Controls.NumericField.Unit,None,False,True,,%
 CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,grp_gcodeViewer:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,G代码查看器
-CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_blackBackgroud:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Black background
-CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_cutColor:System.Windows.Controls.ContentControl.Content,Label,True,True,,剪裁颜色：
-CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_enable:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,启用
+CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_blackBackgroud:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,黑色背景
+CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_cutColor:System.Windows.Controls.ContentControl.Content,Label,True,True,,切割颜色：
+CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_enable:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,使能
 CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_gridColor:System.Windows.Controls.ContentControl.Content,Label,True,True,,网格颜色：
-CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_highlightColor:System.Windows.Controls.ContentControl.Content,Label,True,True,,突出颜色：
-CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_highlightCompleted:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,突出显示已完成的剪辑
-CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_rapidsColor:System.Windows.Controls.ContentControl.Content,Label,True,True,,Rapids color:
-CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_retractColor:System.Windows.Controls.ContentControl.Content,Label,True,True,,Retract color:
-CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_showAxes:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Show axes
-CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_showBbox:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Show bounding box
-CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_showCoordSys:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Show coordinate system
-CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_showGrid:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Show grid
-CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_showOverlay:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Show text overlay
-CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_showViewCube:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Show ViewCube
+CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_highlightColor:System.Windows.Controls.ContentControl.Content,Label,True,True,,高亮显示颜色：
+CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_highlightCompleted:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,高亮显示已完成的刀路
+CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_rapidsColor:System.Windows.Controls.ContentControl.Content,Label,True,True,,快速颜色：
+CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_retractColor:System.Windows.Controls.ContentControl.Content,Label,True,True,,缩回颜色：
+CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_showAxes:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,显示轴
+CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_showBbox:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,显示边界框
+CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_showCoordSys:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,显示坐标系
+CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_showGrid:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,显示网格
+CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_showOverlay:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,显示文本叠加
+CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_showViewCube:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,显示视图立方体
 CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_toolAutoScale:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,自动缩放工具
-CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,resetView:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Reset view (Ctrl+V)
+CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,resetView:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,重置视图 (Ctrl+V)
 CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,resetView:System.Windows.Controls.ContentControl.Content,Button,True,True,,Resources/ResetView.png
 CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,restoreView:System.Windows.Controls.ContentControl.Content,Button,True,True,,Resources/RestoreView.png
-CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,restoreView:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Restore view (Ctrl+R)
-CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,saveView:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Save view
+CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,restoreView:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,恢复视图 (Ctrl+R)
+CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,saveView:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,保存视图
 CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,saveView:System.Windows.Controls.ContentControl.Content,Button,True,True,,Resources/SaveView.png
 CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,showGrid:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,切换网格可见性 (Ctrl+G)
 CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,showGrid:System.Windows.Controls.ContentControl.Content,Button,True,True,,Resources/GridOn.png
 CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,showJobEnvelope:System.Windows.Controls.ContentControl.Content,Button,True,True,,Resources/JobBoxOn.png
-CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,showJobEnvelope:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,切换作业边界可见性 (Ctrl+J)
+CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,showJobEnvelope:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,切换工作边界可见性 (Ctrl+J)
 CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,showWorkEnvelope:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,切换机器工作范围可见性 (Ctrl+W)
 CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,showWorkEnvelope:System.Windows.Controls.ContentControl.Content,Button,True,True,,Resources/WorkBoxOn.png
 CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,showXYZMarkers:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,切换轴可见性
 CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,showXYZMarkers:System.Windows.Controls.ContentControl.Content,Button,True,True,,Resources/XYZOn.png
 CNC.Controls.Viewer.g.en-US.resources:renderer.baml,str_toolCone:System.String.$Content,None,True,True,,锥体
-CNC.Controls.Viewer.g.en-US.resources:renderer.baml,str_toolCrosshair:System.String.$Content,None,True,True,,十字准线
+CNC.Controls.Viewer.g.en-US.resources:renderer.baml,str_toolCrosshair:System.String.$Content,None,True,True,,十字线
 CNC.Controls.Viewer.g.en-US.resources:renderer.baml,str_toolNoShow:System.String.$Content,None,True,True,,没有刀具

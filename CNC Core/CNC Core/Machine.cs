@@ -1,13 +1,13 @@
 ﻿/*
  * Machine.cs - part of CNC Core library
  *
- * v0.44 / 2023-11-30 / Io Engineering (Terje Io)
+ * v0.45 / 2022-11-10 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020-2023, Io Engineering (Terje Io)
+Copyright (c) 2020-2024, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -116,20 +116,30 @@ namespace CNC.Core
                 machinePos[i] = 0d;
                 scaleFactors[i] = 1d;
                 toolOffsets[i] = SelectedTool == null ? 0d : SelectedTool.Values[i];
+
+                if(LatheUVWMode && i >= 6)
+                {   
+                    if (g28 != null)
+                        g28.Values[i] = g28.Values[i - 6];
+                    if (g30 != null)
+                        g30.Values[i] = g28.Values[i - 6];
+                    if (g92 != null)
+                        g92.Values[i] = g28.Values[i - 6];
+                }
             }
 
             switch (GrblParserState.Plane)
             {
                 case GCode.Plane.XY:
-                    Plane = new GCPlane(Commands.G17, 0);
+                    Plane = new GCPlane(Commands.G17, 0, false);
                     break;
 
                 case GCode.Plane.XZ:
-                    Plane = new GCPlane(Commands.G18, 0);
+                    Plane = new GCPlane(Commands.G18, 0, false);
                     break;
 
                 case GCode.Plane.YZ:
-                    Plane = new GCPlane(Commands.G19, 0);
+                    Plane = new GCPlane(Commands.G19, 0, false);
                     break;
             }
         }

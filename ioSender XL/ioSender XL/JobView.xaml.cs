@@ -1,13 +1,13 @@
 /*
  * JobView.xaml.cs - part of Grbl Code Sender
  *
- * v0.44 / 2023-12-30 / Io Engineering (Terje Io)
+ * v0.45 / 2024-03-14 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2023, Io Engineering (Terje Io)
+Copyright (c) 2019-2024, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -380,6 +380,7 @@ namespace GCode_Sender
                 {
                     GrblParserState.Get();
                     GrblWorkParameters.Get();
+                    GrblSpindles.Get();
                 }
                 else
                     GrblParserState.Get(true);

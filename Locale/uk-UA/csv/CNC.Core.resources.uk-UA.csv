@@ -12,6 +12,7 @@ CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserErrE:System.String.$Conte
 CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserG1NoFeed:System.String.$Content,None,True,True,,G1 - подача не встановлена
 CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserG6NoP:System.String.$Content,None,True,True,,G4 - відсутній параметр P
 CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserKlesseqJ:System.String.$Content,None,True,True,,Параметр K повинен бути більше за J!
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserM66BadParams:System.String.$Content,None,True,True,,Illegal M66 parameters
 CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserM66NoPorE:System.String.$Content,None,True,True,,Параметер P або E Відсутній в M66
 CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserM66PandE:System.String.$Content,None,True,True,,Одночасну використання параметрів P- та E- для M66 неможливе
 CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserModalGrpError:System.String.$Content,None,True,True,,Порушення модальної группи

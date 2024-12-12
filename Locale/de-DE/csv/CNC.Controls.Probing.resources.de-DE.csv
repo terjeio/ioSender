@@ -1,8 +1,11 @@
-﻿CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,btn_addPosition:System.Windows.Controls.ContentControl.Content,Button,True,True,,Position hinzu
+﻿CNC.Controls.Probing.g.en-US.resources:macrodialog.baml,btn_actionMenu:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Click for actions menu.
+CNC.Controls.Probing.g.en-US.resources:macrodialog.baml,btn_actionMenu:System.Windows.Controls.ContentControl.Content,Button,True,True,,Resources\\menu_22x22.png
+CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,btn_addPosition:System.Windows.Controls.ContentControl.Content,Button,True,True,,Position hinzu
 CNC.Controls.Probing.g.en-US.resources:probingview.baml,btn_addProfile:System.Windows.Controls.ContentControl.Content,Button,True,True,,...
 CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,btn_apply:System.Windows.Controls.ContentControl.Content,Button,True,True,,_Anwenden
 CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,btn_apply:System.Windows.Controls.ContentControl.Content,Button,True,True,,_Anwenden
 CNC.Controls.Probing.g.en-US.resources:csselectcontrol.baml,btn_clear:System.Windows.Controls.ContentControl.Content,Button,True,True,,Löschen
+CNC.Controls.Probing.g.en-US.resources:macrodialog.baml,btn_close:System.Windows.Controls.ContentControl.Content,Button,True,True,,Schließen
 CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,btn_fromLimits:System.Windows.Controls.ContentControl.Content,Button,True,True,,Aus Programmgrenzen einstellen
 CNC.Controls.Probing.g.en-US.resources:probingview.baml,btn_jog:System.Windows.Controls.ContentControl.Content,Button,True,True,,Tastatur Bewegungen aktivieren
 CNC.Controls.Probing.g.en-US.resources:probingview.baml,btn_jog:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Strg+Shift zum Aktivieren
@@ -24,8 +27,10 @@ CNC.Controls.Probing.g.en-US.resources:edgefindercontrol.baml,btn_stop:System.Wi
 CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,btn_stop:System.Windows.Controls.ContentControl.Content,Button,True,True,,Stop
 CNC.Controls.Probing.g.en-US.resources:edgefinderintcontrol.baml,btn_stop:System.Windows.Controls.ContentControl.Content,Button,True,True,,Stop
 CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,btn_useCamera:System.Windows.Controls.ContentControl.Content,Button,True,True,,Use camera positions
+CNC.Controls.Probing.g.en-US.resources:macrodialog.baml,chk_runonce:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Run once
 CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,chk_useX0Y0:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,"Nutze X0,Y0"
 CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,chk_useXY:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,"Use X,Y"
+CNC.Controls.Probing.g.en-US.resources:macrodialog.baml,dlg_probingMacros:System.Windows.Window.Title,Title,True,True,,Probing macros
 CNC.Controls.Probing.g.en-US.resources:probingview.baml,fld_depth:CNC.Controls.NumericField.Label,None,False,True,,Antast Tiefe:
 CNC.Controls.Probing.g.en-US.resources:probingview.baml,fld_depth:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,"Z-Versatz von der aktuellen Position, an der die Antastung erfolgen soll"
 CNC.Controls.Probing.g.en-US.resources:probingview.baml,fld_diameter:CNC.Controls.NumericField.Label,None,False,True,,Durchmesser:
@@ -72,15 +77,20 @@ CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,grp_workpieceOffse
 CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,grp_workpieceOffset:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Workpiece offset
 CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,hdr_preview:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Vorschau
 CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,lbl_addOffset:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Offset hinzu
-CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,lbl_addOffset:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,"Determine X0,Y0 for right angled workpiece"
 CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,lbl_addOffset:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Adds a probe point on the left edge.
+CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,lbl_addOffset:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,"Determine X0,Y0 for right angled workpiece"
 CNC.Controls.Probing.g.en-US.resources:configcontrol.baml,lbl_chkProbeConnected:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Manually validate probe is connected
 CNC.Controls.Probing.g.en-US.resources:configcontrol.baml,lbl_chkProbeConnected:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,A dialog will be shown until the probe is asserted or the dialog is cancelled.
 CNC.Controls.Probing.g.en-US.resources:configcontrol.baml,lbl_chkProbeStatus:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Prüfe Sensor Status vor dem Start (G59.3)
 CNC.Controls.Probing.g.en-US.resources:configcontrol.baml,lbl_chkProbeStatus:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,"Ein Alarm wird erzeugt, wenn nicht aktiviert und ein Sensor angeschlossen ist"
 CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,lbl_clearToolOffset:System.Windows.Controls.ContentControl.Content,Button,True,True,,Werkzeug Längenversatz löschen
-CNC.Controls.Probing.g.en-US.resources:edgefinderintcontrol.baml,lbl_height:CNC.Controls.NumericField.Label,None,False,True,,Höhe
-CNC.Controls.Probing.g.en-US.resources:edgefindercontrol.baml,lbl_height:CNC.Controls.NumericField.Label,None,False,True,,Höhe
+CNC.Controls.Probing.g.en-US.resources:edgefindercontrol.baml,lbl_edgeoffsetxy:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Set to 0 to use 0.5 x probe/tool diameter
+CNC.Controls.Probing.g.en-US.resources:edgefinderintcontrol.baml,lbl_edgeoffsetxy:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Set to 0 to use 0.5 x probe/tool diameter
+CNC.Controls.Probing.g.en-US.resources:edgefindercontrol.baml,lbl_edgeoffsetxy:CNC.Controls.NumericField.Label,None,False,True,,Edge offset:
+CNC.Controls.Probing.g.en-US.resources:edgefinderintcontrol.baml,lbl_edgeoffsetxy:CNC.Controls.NumericField.Label,None,False,True,,Edge offset:
+CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,lbl_height:CNC.Controls.NumericField.Label,None,False,True,,Höhe:
+CNC.Controls.Probing.g.en-US.resources:edgefinderintcontrol.baml,lbl_height:CNC.Controls.NumericField.Label,None,False,True,,Höhe:
+CNC.Controls.Probing.g.en-US.resources:edgefindercontrol.baml,lbl_height:CNC.Controls.NumericField.Label,None,False,True,,Höhe:
 CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,lbl_height:CNC.Controls.NumericField.Label,None,False,True,,T:
 CNC.Controls.Probing.g.en-US.resources:probingview.baml,lbl_latchDistance:CNC.Controls.NumericField.Label,None,False,True,,Rückzugsweg:
 CNC.Controls.Probing.g.en-US.resources:probingview.baml,lbl_latchDistance:CNC.Controls.NumericField.Tooltip2,None,False,True,,"Rückzugsweg für die zweite langsame Antastbewegung, zum Überspringen auf 0 setzen"
@@ -91,6 +101,8 @@ CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,lbl_lock:System.Win
 CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,lbl_lock:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,"Deaktivieren und X- oder Y-Größe auf 0 setzen, um nur in eine Richtung zu messen."
 CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,lbl_lock:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Sperren
 CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,lbl_pause:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Pause vor dem Antasten
+CNC.Controls.Probing.g.en-US.resources:macrodialog.baml,lbl_postjobmacro:System.Windows.Controls.ContentControl.Content,Label,True,True,,Post job:
+CNC.Controls.Probing.g.en-US.resources:macrodialog.baml,lbl_prejobmacro:System.Windows.Controls.ContentControl.Content,Label,True,True,,Pre job:
 CNC.Controls.Probing.g.en-US.resources:edgefinderintcontrol.baml,lbl_preview:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Vorschau
 CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,lbl_preview:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Vorschau
 CNC.Controls.Probing.g.en-US.resources:edgefindercontrol.baml,lbl_preview:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Vorschau
@@ -113,8 +125,11 @@ CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,lbl_setZ0AtX0Y0:Sys
 CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,lbl_width:CNC.Controls.NumericField.Label,None,False,True,,B:
 CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,lbl_withTool:System.Windows.Controls.ContentControl.Content,Label,True,True,,mit Werkzeug:
 CNC.Controls.Probing.g.en-US.resources:probingview.baml,mnu_add:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Hinzu
+CNC.Controls.Probing.g.en-US.resources:macrodialog.baml,mnu_add:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Add
+CNC.Controls.Probing.g.en-US.resources:macrodialog.baml,mnu_delete:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Delete
 CNC.Controls.Probing.g.en-US.resources:probingview.baml,mnu_delete:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Löschen
 CNC.Controls.Probing.g.en-US.resources:probingview.baml,mnu_update:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Update
+CNC.Controls.Probing.g.en-US.resources:macrodialog.baml,mnu_update:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Update
 CNC.Controls.Probing.g.en-US.resources:csselectcontrol.baml,set_coord:System.Windows.Controls.ContentControl.Content,RadioButton,True,True,,Setze Koordinatensystem:
 CNC.Controls.Probing.g.en-US.resources:probingview.baml,str_cameraPosition:System.String.$Content,None,True,True,,"Camera position {0}, X: {1}, Y: {2}"
 CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,str_centerFinderClearance:System.String.$Content,None,True,True,,Antastung XY-Abstand zu groß für Werkstückgröße {0}.
@@ -141,6 +156,7 @@ CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,str_heightMapInstru
 CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,str_heightMapPointOf:System.String.$Content,None,True,True,,Probing point {0} of {1}...
 CNC.Controls.Probing.g.en-US.resources:probingview.baml,str_jogActive:System.String.$Content,None,True,True,,Tastatur-Jogging aktiv
 CNC.Controls.Probing.g.en-US.resources:probingview.baml,str_jogDisabled:System.String.$Content,None,True,True,,Tastatur-Jogging deaktiviert
+CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_macroChangedSave:System.String.$Content,None,True,True,,"Macro was changed, save?"
 CNC.Controls.Probing.g.en-US.resources:centerfindercontrol.baml,str_positionsRequired:System.String.$Content,None,True,True,,{0} probe positions are required.
 CNC.Controls.Probing.g.en-US.resources:probeverify.baml,str_probeVerify:System.Windows.Controls.ContentControl.Content,Label,True,True,,Assert probe to verify connection.
 CNC.Controls.Probing.g.en-US.resources:libstrings.baml,str_probing:System.String.$Content,None,True,True,,Antasten…
@@ -174,4 +190,6 @@ CNC.Controls.Probing.g.en-US.resources:probingview.baml,tab_edgeInternal:System.
 CNC.Controls.Probing.g.en-US.resources:probingview.baml,tab_heightmap:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Höhenkarte
 CNC.Controls.Probing.g.en-US.resources:probingview.baml,tab_Rotation:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Drehung
 CNC.Controls.Probing.g.en-US.resources:probingview.baml,tab_toolOffset:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Werkzeuglängenversatz
+CNC.Controls.Probing.g.en-US.resources:macrodialog.baml,txt_postprobecommands:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Commands to after before probing completes.
+CNC.Controls.Probing.g.en-US.resources:macrodialog.baml,txt_preprobecommands:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Commands to run before probing starts.
 CNC.Controls.Probing.g.en-US.resources:probingview.baml,txt_warning:System.Windows.Documents.Run.Text,Text,True,True,,Warnung! Vorsicht bei der Verwendung - falsche Parameter können Ihre Tastspitze beschädigen!

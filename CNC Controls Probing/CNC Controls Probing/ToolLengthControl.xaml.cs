@@ -1,13 +1,13 @@
 ﻿/*
  * ToolLengthControl.cs - part of CNC Probing library
  *
- * v0.41 / 2023-01-26 / Io Engineering (Terje Io)
+ * v0.45 / 2024-07-16 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020-2023, Io Engineering (Terje Io)
+Copyright (c) 2020-2024, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -49,7 +49,8 @@ namespace CNC.Controls.Probing
     /// </summary>
     public partial class ToolLengthControl : UserControl, IProbeTab
     {
-        private Position safeZ = null, g59_3 = null;
+        private Position g59_3 = null;
+        private bool probeFixture = false;
 
         public ToolLengthControl()
         {
@@ -59,12 +60,17 @@ namespace CNC.Controls.Probing
 
         public void Activate(bool activate)
         {
+            var probing = DataContext as ProbingViewModel;
+
             if (activate)
             {
-                var probing = DataContext as ProbingViewModel;
                 probing.Instructions = string.Empty;
+                probing.ProbeFixture = probeFixture;
                 if (!probing.Grbl.IsParserStateLive)
                     probing.Grbl.ExecuteCommand(probing.Grbl.IsGrblHAL ? GrblConstants.CMD_GETPARSERSTATE : GrblConstants.CMD_GETNGCPARAMETERS);
+            } else {
+                probeFixture = probing.ProbeFixture;
+                probing.ProbeFixture = false;
             }
         }
 
@@ -182,6 +188,7 @@ namespace CNC.Controls.Probing
             }
 
             probing.Program.End((string)FindResource(ok ? "ProbingCompleted" : "ProbingFailed"));
+            probing.Program.OnCompleted?.Invoke(ok);
         }
 
         private void clearToolOffset_Click(object sender, RoutedEventArgs e)

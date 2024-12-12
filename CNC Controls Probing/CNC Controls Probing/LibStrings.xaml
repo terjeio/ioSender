@@ -18,4 +18,5 @@
     <system:String x:Uid="str_probingNoVerifyContinue" x:Key="NoVerifyContinue">Probe connection was not verified, continue anyway?</system:String>
     <system:String x:Uid="str_probingVerifyStart" x:Key="VerifyStart">Press [Start] again to start probing.</system:String>
     <system:String x:Uid="str_probingProbingAtX0Y0" x:Key="ProbingAtX0Y0">Probing @X0Y0...</system:String>
+    <system:String x:Uid="str_macroChangedSave" x:Key="MacroChangedSave">Macro was changed, save?</system:String>
 </ResourceDictionary>

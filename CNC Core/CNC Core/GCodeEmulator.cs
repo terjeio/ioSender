@@ -1,13 +1,13 @@
 ﻿/*
  * GCodeEmulator.cs - part of CNC Controls library
  *
- * v0.44 / 2023-12-16 / Io Engineering (Terje Io)
+ * v0.45 / 2024-11-10 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020-2023, Io Engineering (Terje Io)
+Copyright (c) 2020-2024, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -186,7 +186,7 @@ namespace CNC.Core
                             {
                                 axisFlags = motion.AxisFlags;
                                 setEndP(motion.Values, motion.AxisFlags);
-                                action.Token = new GCLinearMotion(Commands.G0, token.LineNumber, machinePos.Array, motion.AxisFlags);
+                                action.Token = new GCLinearMotion(Commands.G0, token.LineNumber, machinePos.Array, motion.AxisFlags, token.BlockDelete);
                                 yield return action;
                                 action.Start = action.End;
                             } else
@@ -196,7 +196,7 @@ namespace CNC.Core
                                 machinePos[i] = g28.Values[i]; // - offsets[i] - origin[i];
                             action.End = machinePos.Point3D;
                 //            action.Token = new GCLinearMotion(Commands.G0, token.LineNumber, machinePos.Array, AxisFlags.All);
-                            action.Token = new GCAbsLinearMotion(token.Command, Commands.G0, token.LineNumber, machinePos.Array, axisFlags);
+                            action.Token = new GCAbsLinearMotion(token.Command, Commands.G0, token.LineNumber, machinePos.Array, axisFlags, token.BlockDelete);
 
                             yield return action;
                             action.Start = action.End;
@@ -221,7 +221,7 @@ namespace CNC.Core
                             {
                                 axisFlags = motion.AxisFlags;
                                 setEndP(motion.Values, motion.AxisFlags);
-                                action.Token = new GCLinearMotion(Commands.G0, token.LineNumber, machinePos.Array, motion.AxisFlags);
+                                action.Token = new GCLinearMotion(Commands.G0, token.LineNumber, machinePos.Array, motion.AxisFlags, token.BlockDelete);
                                 yield return action;
                                 action.Start = action.End;
                             }
@@ -232,7 +232,7 @@ namespace CNC.Core
                                 machinePos[i] = g30.Values[i]; // - offsets[i] - origin[i];
                             action.End = machinePos.Point3D;
 //                            action.Token = new GCLinearMotion(Commands.G0, token.LineNumber, machinePos.Array, AxisFlags.All);
-                            action.Token = new GCAbsLinearMotion(token.Command, Commands.G0, token.LineNumber, machinePos.Array, axisFlags);
+                            action.Token = new GCAbsLinearMotion(token.Command, Commands.G0, token.LineNumber, machinePos.Array, axisFlags, token.BlockDelete);
                             yield return action;
                             action.Start = action.End;
                         }
@@ -252,7 +252,7 @@ namespace CNC.Core
                             var motion = token as GCSyncMotion;
                             setEndP(motion.Values, motion.AxisFlags);
                             action.IsSpindleSynced = true;
-                            action.Token = new GCLinearMotion(Commands.G1, token.LineNumber, machinePos.Array, motion.AxisFlags);
+                            action.Token = new GCLinearMotion(Commands.G1, token.LineNumber, machinePos.Array, motion.AxisFlags, token.BlockDelete);
                             yield return action;
                             action.IsSpindleSynced = false;
                             action.Start = action.End;
@@ -268,7 +268,7 @@ namespace CNC.Core
                         {
                             var motion = token as GCLinearMotion;
                             setEndP(motion.Values, motion.AxisFlags);
-                            action.Token = new GCLinearMotion(Commands.G1, token.LineNumber, machinePos.Array, motion.AxisFlags);
+                            action.Token = new GCLinearMotion(Commands.G1, token.LineNumber, machinePos.Array, motion.AxisFlags, token.BlockDelete);
                         }
                         break;
 
@@ -330,7 +330,7 @@ namespace CNC.Core
                                     machinePos[i] = motion.Values[i] - offsets[i] - origin[i];
                                 action.End = machinePos.Point3D;
                             }
-                            action.Token = new GCLinearMotion(motion.Motion, token.LineNumber, machinePos.Array, motion.AxisFlags);
+                            action.Token = new GCLinearMotion(motion.Motion, token.LineNumber, machinePos.Array, motion.AxisFlags, token.BlockDelete);
                             yield return action;
                             action.Start = action.End;
                         }
@@ -393,7 +393,7 @@ namespace CNC.Core
                                 infeed_offset = doc * infeed_factor;
                                 action.End.X = origin.X + (doc - thread.Depth) * thread.CutDirection;
                                 action.End.Z = start_z - infeed_offset;
-                                action.Token = new GCLinearMotion(Commands.G0, token.LineNumber, machinePos.Array, AxisFlags.XZ);
+                                action.Token = new GCLinearMotion(Commands.G0, token.LineNumber, machinePos.Array, AxisFlags.XZ, token.BlockDelete);
                                 yield return action;
                                 action.Start = action.End;
                             }
@@ -414,13 +414,13 @@ namespace CNC.Core
 
                                     // TODO: move this segment outside of synced motion?
                                     action.End.X = origin.X + (thread.Peak + doc - thread.Depth) * thread.CutDirection;
-                                    action.Token = new GCLinearMotion(Commands.G0, token.LineNumber, machinePos.Array, AxisFlags.X);
+                                    action.Token = new GCLinearMotion(Commands.G0, token.LineNumber, machinePos.Array, AxisFlags.X, token.BlockDelete);
                                     yield return action;
                                     action.Start = action.End;
 
                                     action.End.X = origin.X + (thread.Peak + doc) * thread.CutDirection;
                                     action.End.Z -= t_end_taper_length;
-                                    action.Token = new GCLinearMotion(Commands.G1, token.LineNumber, machinePos.Array, AxisFlags.XZ);
+                                    action.Token = new GCLinearMotion(Commands.G1, token.LineNumber, machinePos.Array, AxisFlags.XZ, token.BlockDelete);
                                     yield return action;
                                     action.Start = action.End;
                                 }
@@ -428,7 +428,7 @@ namespace CNC.Core
                                 {
                                     // 2. Rapid to DOC
                                     action.End.X = origin.X + (thread.Peak + doc) * thread.CutDirection;
-                                    action.Token = new GCLinearMotion(Commands.G0, token.LineNumber, machinePos.Array, AxisFlags.X);
+                                    action.Token = new GCLinearMotion(Commands.G0, token.LineNumber, machinePos.Array, AxisFlags.X, token.BlockDelete);
                                     yield return action;
                                     action.Start = action.End;
                                     action.IsSpindleSynced = true;
@@ -438,13 +438,13 @@ namespace CNC.Core
                                 if (thread.ThreadTaper.HasFlag(ThreadTaper.Exit))
                                 {
                                     action.End.Z = target_z - infeed_offset + t_end_taper_length;
-                                    action.Token = new GCLinearMotion(Commands.G1, token.LineNumber, machinePos.Array, AxisFlags.Z);
+                                    action.Token = new GCLinearMotion(Commands.G1, token.LineNumber, machinePos.Array, AxisFlags.Z, token.BlockDelete);
                                     yield return action;
                                     action.Start = action.End;
 
                                     action.End.X = origin.X + (thread.Peak + doc - thread.Depth) * thread.CutDirection;
                                     action.End.Z -= t_end_taper_length;
-                                    action.Token = new GCLinearMotion(Commands.G1, token.LineNumber, machinePos.Array, AxisFlags.XZ);
+                                    action.Token = new GCLinearMotion(Commands.G1, token.LineNumber, machinePos.Array, AxisFlags.XZ, token.BlockDelete);
                                     yield return action;
                                     action.Start = action.End;
                                 }
@@ -452,7 +452,7 @@ namespace CNC.Core
                                 {
                                     // 2. Main part
                                     action.End.Z = target_z - infeed_offset;
-                                    action.Token = new GCLinearMotion(Commands.G1, token.LineNumber, machinePos.Array, AxisFlags.Z);
+                                    action.Token = new GCLinearMotion(Commands.G1, token.LineNumber, machinePos.Array, AxisFlags.Z, token.BlockDelete);
                                     yield return action;
                                     action.Start = action.End;
                                 }
@@ -466,14 +466,14 @@ namespace CNC.Core
 
                                     // 4. Retract
                                     action.End.X = origin.X + (doc - thread.Depth) * thread.CutDirection;
-                                    action.Token = new GCLinearMotion(Commands.G0, token.LineNumber, machinePos.Array, AxisFlags.X);
+                                    action.Token = new GCLinearMotion(Commands.G0, token.LineNumber, machinePos.Array, AxisFlags.X, token.BlockDelete);
                                     yield return action;
                                     action.Start = action.End;
 
                                     // 5. Back to start, add compound slide angle offset when commanded.
                                     infeed_offset = infeed_factor != 0d ? doc * infeed_factor : 0d;
                                     action.End.Z = start_z - infeed_offset;
-                                    action.Token = new GCLinearMotion(Commands.G0, token.LineNumber, machinePos.Array, AxisFlags.Z);
+                                    action.Token = new GCLinearMotion(Commands.G0, token.LineNumber, machinePos.Array, AxisFlags.Z, token.BlockDelete);
                                     yield return action;
                                     action.Start = action.End;
                                 }
@@ -482,7 +482,7 @@ namespace CNC.Core
                                     // 6. Retract to target position
                                     doc = thread.Depth;
                                     action.End.X = origin.X;
-                                    action.Token = new GCLinearMotion(Commands.G0, token.LineNumber, machinePos.Array, AxisFlags.X);
+                                    action.Token = new GCLinearMotion(Commands.G0, token.LineNumber, machinePos.Array, AxisFlags.X, token.BlockDelete);
                                     yield return action;
                                     action.Start = action.End;
                                 }
@@ -523,7 +523,7 @@ namespace CNC.Core
                                 double[] start = new double[] { action.Start.X, action.Start.Y, r };
                                 isRelative = false;
                                 setEndP(start, AxisFlags.Z);
-                                action.Token = new GCLinearMotion(Commands.G0, token.LineNumber, start, AxisFlags.Z);
+                                action.Token = new GCLinearMotion(Commands.G0, token.LineNumber, start, AxisFlags.Z, token.BlockDelete);
                                 yield return action;
                                 action.Start = action.End;
                             }
@@ -537,7 +537,7 @@ namespace CNC.Core
                             double[] values = new double[] { action.End.X, action.End.Y, action.End.Z };
 
                             setEndP(values, AxisFlags.XY);
-                            action.Token = new GCLinearMotion(Commands.G0, token.LineNumber, values, AxisFlags.XY);
+                            action.Token = new GCLinearMotion(Commands.G0, token.LineNumber, values, AxisFlags.XY, token.BlockDelete);
                             yield return action;
                             action.Start = action.End;
 
@@ -545,14 +545,14 @@ namespace CNC.Core
                             {
                                 values[2] = z;
                                 setEndP(values, AxisFlags.Z);
-                                action.Token = new GCLinearMotion(Commands.G1, token.LineNumber, values, AxisFlags.Z);
+                                action.Token = new GCLinearMotion(Commands.G1, token.LineNumber, values, AxisFlags.Z, token.BlockDelete);
                                 yield return action;
                                 action.Start = action.End;
 
                                 values[2] = RetractOldZ ? oldZ : r;
                                 setEndP(values, AxisFlags.Z);
                                 action.IsRetract = true;
-                                action.Token = new GCLinearMotion(Commands.G0, token.LineNumber, values, AxisFlags.Z);
+                                action.Token = new GCLinearMotion(Commands.G0, token.LineNumber, values, AxisFlags.Z, token.BlockDelete);
                                 yield return action;
                                 action.Start = action.End;
                                 action.IsRetract = false;
@@ -562,7 +562,7 @@ namespace CNC.Core
                                     values[0] += drill.X;
                                     values[1] += drill.Y;
                                     setEndP(values, AxisFlags.X | AxisFlags.Y);
-                                    action.Token = new GCLinearMotion(Commands.G0, token.LineNumber, values, AxisFlags.XY);
+                                    action.Token = new GCLinearMotion(Commands.G0, token.LineNumber, values, AxisFlags.XY, token.BlockDelete);
                                     yield return action;
                                     action.Start = action.End;
                                 }

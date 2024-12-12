@@ -1,13 +1,13 @@
 ﻿/*
  * GCodeJob.cs - part of CNC Controls library
  *
- * v0.44 / 2023-11-30 / Io Engineering (Terje Io)
+ * v0.45 / 2024-02-27 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2023, Io Engineering (Terje Io)
+Copyright (c) 2018-2024, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -196,6 +196,8 @@ namespace CNC.Core
 
                 // Calculate program limits (bounding box)
 
+                BoundingBox.Reset();
+
                 GCodeEmulator emu = new GCodeEmulator(true);
 
                 foreach (var cmd in emu.Execute(Tokens))
@@ -348,9 +350,9 @@ namespace CNC.Core
 
     public class GcodeBoundingBox
     {
-        public double[] Min = new double[6];
-        public double[] Max = new double[6];
-        public double[] Size = new double[6];
+        public double[] Min = new double[9];
+        public double[] Max = new double[9];
+        public double[] Size = new double[9];
 
         public GcodeBoundingBox()
         {

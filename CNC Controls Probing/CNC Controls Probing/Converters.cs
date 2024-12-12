@@ -1,13 +1,13 @@
 ﻿/*
  * Converters.cs - part of CNC Probing library
  *
- * v0.43 / 2023-07-29 / Io Engineering (Terje Io)
+ * v0.45 / 2024-07-19 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2023, Io Engineering (Terje Io)
+Copyright (c) 2019-2024, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -41,6 +41,7 @@ using System;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
+using System.Windows.Media;
 
 namespace CNC.Controls.Probing
 {
@@ -49,6 +50,7 @@ namespace CNC.Controls.Probing
         public static EnumValueToVisibleConverter EnumValueToVisibleConverter = new EnumValueToVisibleConverter();
         public static OriginToBooleanConverter OriginToBooleanConverter = new OriginToBooleanConverter();
         public static OriginToCurrentPositionConverter OriginToCurrentPositionConverter = new OriginToCurrentPositionConverter();
+        public static ProbingMacroActiveToColorConverter ProbingMacroActiveToColorConverter = new ProbingMacroActiveToColorConverter();
     }
 
     public class EnumValueToVisibleConverter : IMultiValueConverter
@@ -91,6 +93,18 @@ namespace CNC.Controls.Probing
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             return (bool)value ? OriginControl.Origin.CurrentPos : OriginControl.Origin.None;
+        }
+    }
+
+    public class ProbingMacroActiveToColorConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value is bool && (bool)value ? Brushes.Salmon : System.Windows.SystemColors.ControlBrush;
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
         }
     }
 }

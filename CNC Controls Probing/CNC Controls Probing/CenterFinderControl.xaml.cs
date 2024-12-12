@@ -1,13 +1,13 @@
 ﻿/*
  * CenterFinderControl.xaml.cs - part of CNC Probing library
  *
- * v0.42 / 2023-03-22 / Io Engineering (Terje Io)
+ * v0.45 / 2024-07-16 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020-2023, Io Engineering (Terje Io)
+Copyright (c) 2020-2024, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -409,6 +409,8 @@ namespace CNC.Controls.Probing
                 if (!ok || pass == 1)
                     probing.Program.End(ok ? string.Format((string)FindResource("ProbingCompleted"), X_distance.ToInvariantString(), Y_distance.ToInvariantString()) : (string)FindResource("ProbingFailed"));
             }
+
+            probing.Program.OnCompleted?.Invoke(ok);
 
             return ok;
         }

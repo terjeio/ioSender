@@ -1,13 +1,13 @@
 ﻿/*
  * NumericTextBox.cs - part of CNC Controls library
  *
- * v0.42 / 2023-03-01 / Io Engineering (Terje Io)
+ * v0.45 / 2024-01-09 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2023, Io Engineering (Terje Io)
+Copyright (c) 2018-2024, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -57,6 +57,8 @@ namespace CNC.Controls
             HorizontalContentAlignment = HorizontalAlignment.Right;
             VerticalContentAlignment = VerticalAlignment.Bottom;
             TextWrapping = TextWrapping.NoWrap;
+            if (Format == NumericProperties.MetricFormat)
+                NumericProperties.OnFormatChanged(this, np, Format);
         }
 
         public new string Text { get { return base.Text; } set { base.Text = value; } }

@@ -1,13 +1,13 @@
 ﻿/*
  * DROControl.xaml.cs - part of CNC Controls library
  *
- * v0.42 / 2023-02-14 / Io Engineering (Terje Io)
+ * v0.45 / 2024-07-16 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2023, Io Engineering (Terje Io)
+Copyright (c) 2018-2024, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -83,6 +83,9 @@ namespace CNC.Controls
 
         private void DRO_Loaded(object sender, RoutedEventArgs e)
         {
+            if (System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
+                return;
+
             if (!keyboardMappingsOk && DataContext is GrblViewModel)
             {
                 KeypressHandler keyboard = (DataContext as GrblViewModel).Keyboard;
@@ -218,15 +221,23 @@ namespace CNC.Controls
 
         void AxisPositionChanged(string axis, double position)
         {
+            if (GrblParserState.IsMetric != (DataContext as GrblViewModel).IsMetric)
+            {
+                if(GrblParserState.IsMetric)
+                    position *= MeasureViewModel.MM_PER_INCH;
+                else
+                    position /= MeasureViewModel.MM_PER_INCH;
+            }
+
             if (axis == "ALL")
             {
                 string s = "G90G10L20P0";
                 foreach (int i in GrblInfo.AxisFlags.ToIndices())
                     s += GrblInfo.AxisIndexToLetter(i) + "{0}";
-                (DataContext as GrblViewModel).ExecuteCommand(string.Format(s, position.ToInvariantString("F3")));
+                (DataContext as GrblViewModel).ExecuteCommand(string.Format(s, position.ToInvariantString(GrblParserState.IsMetric ? "F3" : "F4")));
             }
             else
-                (DataContext as GrblViewModel).ExecuteCommand(string.Format("G10L20P0{0}{1}", axis, position.ToInvariantString("F3")));
+                (DataContext as GrblViewModel).ExecuteCommand(string.Format("G10L20P0{0}{1}", axis, position.ToInvariantString(GrblParserState.IsMetric ? "F3" : "F4")));
         }
     }
 }

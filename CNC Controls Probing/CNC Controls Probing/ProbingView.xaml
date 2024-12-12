@@ -24,6 +24,7 @@
                 <Controls:BoolToVisibleConverter />
             </Controls:LogicalNotConverter.FinalConverter>
         </Controls:LogicalNotConverter>
+        <local:ProbingMacroActiveToColorConverter x:Key="ProbingMacroActiveConverter" />
         <Style x:Key="ErrorStyle" TargetType="Controls:NumericField">
             <Style.Triggers>
                 <Trigger Property="Validation.HasError" Value="true">
@@ -122,11 +123,21 @@
                     <local:HeightMapControl HorizontalAlignment="Left" VerticalAlignment="Top"/>
                 </TabItem>
             </TabControl>
-            <TextBlock TextWrapping="Wrap" Height="70" Margin="0,2,0,0" Width="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Top">
-            <Run Text="{Binding Path=Instructions, Mode=OneWay}"/>
-            <LineBreak/>
-            <Run x:Uid="txt_warning" Text="Warning! Use with care - incorrect parameters may damage your probe!" Foreground="Red" FontWeight="Bold"/>
-            </TextBlock>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="125"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" TextWrapping="Wrap" Height="70" Margin="0,2,0,0" Width="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                <Run Text="{Binding Path=Instructions, Mode=OneWay}"/>
+                <LineBreak/>
+                <Run x:Uid="txt_warning" Text="Warning! Use with care - incorrect parameters may damage your probe!" Foreground="Red" FontWeight="Bold"/>
+                </TextBlock>
+                <Button Content="Pre/post macros" Grid.Column="1" Command="{Binding Macro.OpenDialog}" ToolTip="{Binding Macro.ActiveMacroName}"
+                        IsEnabled="{Binding Path=Grbl.IsJobRunning, Converter={StaticResource IsNotRunningConverter}}"
+                        Background="{Binding Path=Macro.CanDelete, Converter={StaticResource ProbingMacroActiveConverter}}"
+                        HorizontalAlignment="Right" VerticalAlignment="Center" Height="25" Width="125" Margin="0,0,0,0"></Button>
+            </Grid>
         </StackPanel>
     </DockPanel>
 </UserControl>

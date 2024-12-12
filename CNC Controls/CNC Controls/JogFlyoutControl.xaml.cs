@@ -1,13 +1,13 @@
 ﻿/*
  * JogFlyoutControl.xaml.cs - part of CNC Controls library
  *
- * v0.36 / 2021-12-25 / Io Engineering (Terje Io)
+ * v0.45 / 2024-05-20 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2021, Io Engineering (Terje Io)
+Copyright (c) 2021-2024, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using System.ComponentModel;
 using System.Windows;
 using CNC.Core;
+using System.Windows.Input;
 
 namespace CNC.Controls
 {
@@ -74,6 +75,28 @@ namespace CNC.Controls
                         Visibility = Visibility.Hidden;
                     break;
             }
+        }
+
+        protected override void OnPreviewKeyDown(KeyEventArgs e)
+        {
+            if (!(e.Handled = ProcessKeyPreview(e)))
+            {
+                if (Keyboard.Modifiers == (ModifierKeys.Control | ModifierKeys.Shift))
+                    Focus();
+
+                base.OnPreviewKeyDown(e);
+            }
+        }
+
+        protected override void OnPreviewKeyUp(KeyEventArgs e)
+        {
+            if (!(e.Handled = ProcessKeyPreview(e)))
+                base.OnPreviewKeyDown(e);
+        }
+
+        protected bool ProcessKeyPreview(KeyEventArgs e)
+        {
+            return (DataContext as GrblViewModel).Keyboard.ProcessKeypress(e, true, this);
         }
     }
 }

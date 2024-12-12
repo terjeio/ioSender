@@ -1,13 +1,13 @@
 ﻿/*
  * Program.cs - part of CNC Probing library
  *
- * v0.44 / 2023-10-01 / Io Engineering (Terje Io)
+ * v0.45 / 2024-12-11 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020-2023, Io Engineering (Terje Io)
+Copyright (c) 2020-2024, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -41,6 +41,7 @@ using System;
 using System.Windows;
 using System.Collections.Generic;
 using System.Threading;
+using System.Collections.Concurrent;
 using CNC.Core;
 using CNC.GCode;
 
@@ -72,20 +73,32 @@ namespace CNC.Controls.Probing
         ProbingViewModel probing;
         private bool probeProtect = false;
         private volatile bool probeAsserted = false, probeConnected = false;
-        private volatile bool _isComplete = false, isRunning = false, isProbing = false, hasPause = false, probeOnCycleStart = false;
+        private volatile bool _isComplete = false, isRunning = false, cancelling = false, hasPause = false, probeOnCycleStart = false;
         private int step = 0;
-        private volatile string cmd_response;
+        private ConcurrentQueue<string> cmd_response = new ConcurrentQueue<string>();
         private CancellationToken cancellationToken = new CancellationToken();
 
         public bool Silent = false;
+        public Action<bool> OnCompleted;
 
         public Program(ProbingViewModel model)
         {
             Grbl = model.Grbl;
             probing = model;
+            OnCompleted = Completed;
         }
 
         public bool IsCancelled { get; set; }
+
+        private void Completed(bool success)
+        {
+            if (probing.Macro.SelectedMacro != null) {
+                if(success && probing.Macro.PostJobCommands.Length > 0)
+                    Grbl.ExecuteMacro(probing.Macro.PostJobCommands);
+                if (probing.Macro.RunOnce)
+                    probing.Macro.Clear();
+            }
+        }
 
         private void Grbl_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
@@ -372,7 +385,7 @@ namespace CNC.Controls.Probing
 
         public bool Execute(bool go)
         {
-            _isComplete = isProbing = false;
+            _isComplete = false;
 
             probing.ClearExeStatus();
 
@@ -387,10 +400,14 @@ namespace CNC.Controls.Probing
 
                 Comms.com.PurgeQueue();
 
+
                 if (!isRunning)
                 {
                     isRunning = true;
                     probeProtect = GrblInfo.HasSimpleProbeProtect;
+
+                    while (!cmd_response.IsEmpty)
+                        cmd_response.TryDequeue(out response);
 
                     Grbl.OnCommandResponseReceived += ResponseReceived;
                     Grbl.PropertyChanged += Grbl_PropertyChanged;
@@ -398,23 +415,26 @@ namespace CNC.Controls.Probing
                         probing.PropertyChanged += Probing_PropertyChanged;
                 }
 
+                if (probing.Macro.PreJobCommands.Length > 0)
+                    _program.InsertRange(0, probing.Macro.PreJobCommands);
+
+                cancelling = false;
                 Grbl.IsJobRunning = true;
+
+                if (probing.Macro.PreJobCommands.Length > 0)
+                    _program.InsertRange(0, probing.Macro.PreJobCommands);
 
                 if (probing.Message == string.Empty)
                     probing.Message = LibStrings.FindResource("Probing");
 
-                cmd_response = string.Empty;
                 Grbl.ExecuteCommand(_program[step]);
 
                 while (!_isComplete)
                 {
                     EventUtils.DoEvents();
 
-                    if(cmd_response != string.Empty)
+                    if (cmd_response.TryDequeue(out response))
                     {
-                        response = cmd_response;
-                        cmd_response = string.Empty;
-
                         if (Grbl.ResponseLogVerbose)
                             Grbl.ResponseLog.Add("PM:" + response);
 
@@ -422,7 +442,7 @@ namespace CNC.Controls.Probing
                         {
                             if (++step < _program.Count)
                             {
-                                int i;
+                                //int i;
                                 //if ((i = _program[step].IndexOf('$')) > 0)
                                 //{
                                 //    string rp = _program[step].Substring(i, 2);
@@ -439,7 +459,6 @@ namespace CNC.Controls.Probing
 
                                 if (_program[step].StartsWith("!"))
                                 {
-                                    isProbing = false;
                                     _program[step] = _program[step].Substring(1);
                                     probing.RemoveLastPosition();
                                 }
@@ -490,13 +509,16 @@ namespace CNC.Controls.Probing
             probing.Program.Add(string.Format("G91F{0}", probing.ProbeFeedRate.ToInvariantString()));
             probing.Program.AddProbingAction(AxisFlags.Z, true);
 
-            return probing.Program.Execute(true);
+            return probing.Program.Execute(true) && probing.Positions.Count == 1;
         }
 
-    private void ResponseReceived(string response)
+        private void ResponseReceived(string response)
         {
-            if(cmd_response != "cancel")
-                cmd_response = response;
+            if (!cancelling)
+                cmd_response.Enqueue(response);
+
+            if (response == "cancel")
+                cancelling = true;
         }
 
         public override string ToString()

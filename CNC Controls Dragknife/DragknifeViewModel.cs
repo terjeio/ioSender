@@ -1,13 +1,13 @@
 ﻿/*
  * DragKnifeViewModel.cs - part of CNC Controls DragKnife library for Grbl
  *
- * v0.40 / 2022-07-12 / Io Engineering (Terje Io)
+ * v0.45 / 2024-10-11 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020-2021, Io Engineering (Terje Io)
+Copyright (c) 2020-2024, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -159,8 +159,8 @@ namespace CNC.Controls.DragKnife
                 if (i == 0)
                 {
                     end = prev.P1 + n1 * _knifeTipOffset;
-                    newToolPath.Add(new GCLinearMotion(Commands.G0, lnr++, ToPos(end), AxisFlags.XY));
-                    newToolPath.Add(new GCLinearMotion(Commands.G1, lnr++, ToPos(end + new Vector3(0d, 0d, _cutDepth)), AxisFlags.Z));
+                    newToolPath.Add(new GCLinearMotion(Commands.G0, lnr++, ToPos(end), AxisFlags.XY, false));
+                    newToolPath.Add(new GCLinearMotion(Commands.G1, lnr++, ToPos(end + new Vector3(0d, 0d, _cutDepth)), AxisFlags.Z, false));
                 }
 
                 if (Math.Abs(angle) > (i == 0 ? 1d : _swivelAngle) && cp2.Magnitude >= _dentLength)
@@ -171,19 +171,19 @@ namespace CNC.Controls.DragKnife
                     StartDirection = dir;
                     end = end1;
                     var arcdir = n1.X * n2.Y - n1.Y * n2.X;
-                    newToolPath.Add(new GCArc(arcdir < 0d ? Commands.G2 : Commands.G3, lnr++, ToPos(end), AxisFlags.XY, ToPos(dir), IJKFlags.I | IJKFlags.J, 0d, 0, IJKMode.Incremental));
+                    newToolPath.Add(new GCArc(arcdir < 0d ? Commands.G2 : Commands.G3, lnr++, ToPos(end), AxisFlags.XY, ToPos(dir), IJKFlags.I | IJKFlags.J, 0d, 0, IJKMode.Incremental, false));
                 }
                 if (cp2.Magnitude > _knifeTipOffset)
                     end = polyLine[i].P2 + n2 * _knifeTipOffset;
                 else
                     end += cp2;
 
-                newToolPath.Add(new GCLinearMotion((i & 1) == 1 ? Commands.G1 : Commands.G1, lnr++, ToPos(end), AxisFlags.XY));
+                newToolPath.Add(new GCLinearMotion((i & 1) == 1 ? Commands.G1 : Commands.G1, lnr++, ToPos(end), AxisFlags.XY, false));
                 prev = polyLine[i];
 
                 if (i == polyLine.Count - 1)
                 {
-                    newToolPath.Add(new GCLinearMotion(Commands.G0, lnr++, ToPos(end + new Vector3(0d, 0d, -_cutDepth)), AxisFlags.Z));
+                    newToolPath.Add(new GCLinearMotion(Commands.G0, lnr++, ToPos(end + new Vector3(0d, 0d, -_cutDepth)), AxisFlags.Z, false));
                 }
             }
         }
@@ -219,26 +219,26 @@ namespace CNC.Controls.DragKnife
                     if (i == 0)
                     {
                         //                        start = StartDirection * _knifeTipOffset;
-                        newToolPath.Add(new GCLinearMotion(Commands.G0, lnr++, ToPos(start), AxisFlags.XY));
-                        newToolPath.Add(new GCLinearMotion(Commands.G1, lnr++, ToPos(start + new Vector3(0d, 0d, _cutDepth)), AxisFlags.Z));
+                        newToolPath.Add(new GCLinearMotion(Commands.G0, lnr++, ToPos(start), AxisFlags.XY, false));
+                        newToolPath.Add(new GCLinearMotion(Commands.G1, lnr++, ToPos(start + new Vector3(0d, 0d, _cutDepth)), AxisFlags.Z, false));
                     }
                //     else
 
-                        newToolPath.Add(new GCLinearMotion(Commands.G1, lnr++, ToPos(end), AxisFlags.XY));
+                        newToolPath.Add(new GCLinearMotion(Commands.G1, lnr++, ToPos(end), AxisFlags.XY, false));
 
                     if (Math.Abs(ad) > _swivelAngle && cp2.Magnitude >= _dentLength)
                     {
                         var arcdir = n1.X * n2.Y - n1.Y * n2.X;
                         //                        newToolPath.Add(new GCArc(arcdir < 0d ? Commands.G2 : Commands.G3, lnr++, ToPos(polyLine[i + 1].P1 + offset2), AxisFlags.XY, ToPos(dir), IJKFlags.I | IJKFlags.J, 0d, IJKMode.Incremental));
                         //newToolPath.Add(new GCArc(arcdir < 0d ? Commands.G2 : Commands.G3, lnr++, ToPos(polyLine[i].P1 + offset2), AxisFlags.XY, ToPos(dir), IJKFlags.I | IJKFlags.J, 0d, IJKMode.Incremental));
-                        newToolPath.Add(new GCArc(arcdir < 0d ? Commands.G2 : Commands.G3, lnr++, ToPos(polyLine[i + 1].P1 + offset2), AxisFlags.XY, ToPos(dir), IJKFlags.I | IJKFlags.J, 0d, 0, IJKMode.Incremental));
+                        newToolPath.Add(new GCArc(arcdir < 0d ? Commands.G2 : Commands.G3, lnr++, ToPos(polyLine[i + 1].P1 + offset2), AxisFlags.XY, ToPos(dir), IJKFlags.I | IJKFlags.J, 0d, 0, IJKMode.Incremental, false));
                     }
 
                 }
                 if (i == polyLine.Count - 1)
                 {
-                    newToolPath.Add(new GCLinearMotion(Commands.G1, lnr++, ToPos(polyLine[i].P2 + offset2), AxisFlags.XY));
-                    newToolPath.Add(new GCLinearMotion(Commands.G0, lnr++, ToPos(polyLine[i].P2 + offset2 + new Vector3(0d, 0d, -_cutDepth)), AxisFlags.Z));
+                    newToolPath.Add(new GCLinearMotion(Commands.G1, lnr++, ToPos(polyLine[i].P2 + offset2), AxisFlags.XY, false));
+                    newToolPath.Add(new GCLinearMotion(Commands.G0, lnr++, ToPos(polyLine[i].P2 + offset2 + new Vector3(0d, 0d, -_cutDepth)), AxisFlags.Z, false));
              //       StartDirection = dir;
                 }
                 //                newToolPath.Add(new GCLinearMotion(Commands.G1, (uint)i, new double[] { polyLine[i].P2.X, polyLine[i].P2.Y, polyLine[i].P2.Z }, AxisFlags.XY));

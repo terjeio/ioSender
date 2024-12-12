@@ -38,7 +38,7 @@
                     <StackPanel Orientation="Horizontal">
                         <local:CsSelectControl IsEnabled="{Binding Path=AddAction}" Margin="5,0,0,0"/>
                         <GroupBox x:Uid="grp_workpiece" Header="Workpiece">
-                            <Controls:NumericField Label="Height" Value="{Binding Path=WorkpieceHeight, Mode=TwoWay}" IsEnabled="{Binding Path=AddAction}" Margin="0,5,85,0" VerticalAlignment="Top"/>
+                            <Controls:NumericField x:Uid="lbl_height" Label="Height:" Value="{Binding Path=WorkpieceHeight, Mode=TwoWay}" IsEnabled="{Binding Path=AddAction}" Margin="0,5,85,0" VerticalAlignment="Top"/>
                         </GroupBox>
                     </StackPanel>
                 </StackPanel>

@@ -12,6 +12,7 @@ CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserErrE:System.String.$Conte
 CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserG1NoFeed:System.String.$Content,None,True,True,,G1 used when feed rate is not set
 CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserG6NoP:System.String.$Content,None,True,True,,G4 - missing P word
 CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserKlesseqJ:System.String.$Content,None,True,True,,K word must be greater than J word
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserM66BadParams:System.String.$Content,None,True,True,,Illegal M66 parameters
 CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserM66NoPorE:System.String.$Content,None,True,True,,P- or E-word missing for M66
 CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserM66PandE:System.String.$Content,None,True,True,,Cannot use both P- and E-word with M66
 CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserModalGrpError:System.String.$Content,None,True,True,,Modal group violation

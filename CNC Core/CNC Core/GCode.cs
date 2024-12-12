@@ -1,13 +1,13 @@
 ﻿/*
  * GCode.cs - part of CNC Controls library
  *
- * v0.43 / 2023-05-31 / Io Engineering (Terje Io)
+ * v0.45 / 2022-02-28 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2022, Io Engineering (Terje Io)
+Copyright (c) 2018-2024, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -69,7 +69,10 @@ namespace CNC.GCode
         XY = 0x03,
         XZ = 0x05,
         XYZ = 0x07,
-        All = 0x3F
+        ABC = 0x38,
+        XYZABC = 0x3F,
+        UVW = 0x1C,
+        All = 0x1FF
     }
 
     [Flags]

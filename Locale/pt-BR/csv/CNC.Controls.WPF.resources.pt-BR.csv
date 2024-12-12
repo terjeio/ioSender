@@ -50,6 +50,7 @@ CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,btn_unlock:System.Windows.
 CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,btn_upload:System.Windows.Controls.ContentControl.Content,Button,True,True,,Envio
 CNC.Controls.WPF.g.en-US.resources:drocontrol.baml,btn_zeroAll:System.Windows.Controls.ContentControl.Content,Button,True,True,,Zerar tudo
 CNC.Controls.WPF.g.en-US.resources:macroeditor.baml,chk_confirm:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Confirmar antes de executar
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,chk_viewAll:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,List CNC files only
 CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,dgr_sdcard:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,"Botão direito para menu, clicar duas vezes para executar arquivo."
 CNC.Controls.WPF.g.en-US.resources:about.baml,dlg_about:System.Windows.Window.Title,Title,True,True,,Sobre
 CNC.Controls.WPF.g.en-US.resources:portdialog.baml,dlg_connection:System.Windows.Window.Title,Title,True,True,,Sender connection
@@ -173,6 +174,7 @@ CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalBlockDelete:Sys
 CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalCycleStart:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Iniciar Ciclo
 CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalEStop:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,E-Stop
 CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalFeedHold:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Espera feed
+CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalMotorFault:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Motor fault
 CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalMotorWarning:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Aviso de motor
 CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalOptionalStop:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Parada opcional
 CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalProbe:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Sonda
@@ -198,7 +200,7 @@ CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,mnu_enableRewind:System.Windo
 CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,mnu_run:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Executar
 CNC.Controls.WPF.g.en-US.resources:gcodelistcontrol.baml,mnu_sendToController:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Send to controller
 CNC.Controls.WPF.g.en-US.resources:gcodelistcontrol.baml,mnu_startFromHere:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Start from here
-CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,mnu_viewAll:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,View all
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,mnu_viewAll:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,List CNC files only
 CNC.Controls.WPF.g.en-US.resources:appconfigview.baml,msg_restart:System.String.$Content,None,True,True,,É necessário reiniciar o programa após mudar as configurações!
 CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,pnl_kbdJogging:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Aviso! - Grbl tem muitos bug ao cancelar o movimento (na tecla pra cima).
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_appconfCreate:System.String.$Content,None,True,True,,"Arquivo de configuração não encontrado, criar novo?"
@@ -248,12 +250,15 @@ CNC.Controls.WPF.g.en-US.resources:outlineflyout.baml,str_outlineFlyout:System.S
 CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,str_pause:System.String.$Content,None,True,True,,Pausar
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_rotateG17G18Arcs:System.String.$Content,None,True,True,,"GCode contem arcos nos planos XZ ou YZ (G18/19), não é possível aplicar tranformação. Use &apos;Arcos para Linhas&apos; se isto é realmente necessário."
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_rotateRadiusArcs:System.String.$Content,None,True,True,,"GCode contem arcos do modo radial, não é possível aplicar tranformação. Use &apos;Arcos para Linhas&apos; se isto é realmente necessário."
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,str_runMacro:System.String.$Content,None,True,True,,Run macro {0} with no parameters?
 CNC.Controls.WPF.g.en-US.resources:macroexecutecontrol.baml,str_runMacro:System.String.$Content,None,True,True,,Executar {0} macro?
 CNC.Controls.WPF.g.en-US.resources:macrotoolbarcontrol.baml,str_runMacro:System.String.$Content,None,True,True,,Executar {0} macro?
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_saveSettings:System.String.$Content,None,True,True,,"Configurações alteradas, salvar agora?"
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsError:System.String.$Content,None,True,True,,"Configurações {0} retornaram {1}, continuar?"
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsFail:System.String.$Content,None,True,True,,Que pena...\\nContinuar carregando?
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsInvalid:System.String.$Content,None,True,True,,O arquivo não contém configurações.
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsReloadMismatch:System.String.$Content,None,True,True,,"{0} settings were ignored, not supported by the controller."
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_settingsReloadMismatch:System.String.$Content,None,True,True,,"Some settings were ignored, not supported by the controller."
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsRestore:System.String.$Content,None,True,True,,Restaurar configurações do arquivo
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_settingsSaved:System.String.$Content,None,True,True,,Configurações salvas.
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsTimeout:System.String.$Content,None,True,True,,"Tempo esgotado realizando a configuração {0}, continuar?"

@@ -1,13 +1,13 @@
 ﻿/*
  * GCodeWrap.cs - part of CNC Controls library for Grbl
  *
- * v0.37 / 2022-02-19 / Io Engineering (Terje Io)
+ * v0.45 / 2024-10-11 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2022, Io Engineering (Terje Io)
+Copyright (c) 2022-2024, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -68,7 +68,7 @@ namespace CNC.Controls
             int precision = GCode.File.Decimals;
             double feedrate_pgm = 0d, feedrate = 0d, feedrate_cur = 0d;
             string hdr = string.Format("Wrap applied, diameter: {0}, {1}-axis to {2}-axis", model.Diameter.ToInvariantString(), GrblInfo.AxisIndexToLetter(model.SourceAxis), GrblInfo.AxisIndexToLetter(model.TargetAxis));
-            GCPlane plane = new GCPlane(GrblParserState.Plane == Plane.XY ? Commands.G17 : Commands.G18, 0);
+            GCPlane plane = new GCPlane(GrblParserState.Plane == Plane.XY ? Commands.G17 : Commands.G18, 0, false);
             DistanceMode distanceMode = GrblParserState.DistanceMode;
             FeedRateMode feedRateMode = GrblParserState.FeedRateMode;
             AxisFlags targetAxis = GrblInfo.AxisIndexToFlag(model.TargetAxis);
@@ -151,19 +151,19 @@ namespace CNC.Controls
                                         if (feedRateMode != FeedRateMode.UnitsPerMin)
                                         {
                                             feedrate_cur = 0d;
-                                            toolPath.Add(new GCFeedRateMode(motion.LineNumber, feedRateMode = FeedRateMode.UnitsPerMin));
+                                            toolPath.Add(new GCFeedRateMode(motion.LineNumber, feedRateMode = FeedRateMode.UnitsPerMin, motion.BlockDelete));
                                         }
                                         if (feedrate_cur != feedrate)
-                                            toolPath.Add(new GCFeedrate(motion.LineNumber, feedrate_cur = feedrate));
+                                            toolPath.Add(new GCFeedrate(motion.LineNumber, feedrate_cur = feedrate, motion.BlockDelete));
                                     }
                                     else
                                     {
                                         if (feedRateMode != FeedRateMode.InverseTime)
-                                            toolPath.Add(new GCFeedRateMode(motion.LineNumber, feedRateMode = FeedRateMode.InverseTime));
-                                        toolPath.Add(new GCFeedrate(motion.LineNumber, Math.Round(feedrate_pgm / dist, 1)));
+                                            toolPath.Add(new GCFeedRateMode(motion.LineNumber, feedRateMode = FeedRateMode.InverseTime, motion.BlockDelete));
+                                        toolPath.Add(new GCFeedrate(motion.LineNumber, Math.Round(feedrate_pgm / dist, 1), motion.BlockDelete));
                                     }
 
-                                    toolPath.Add(new GCLinearMotion(motion.Command, motion.LineNumber, newpos.Array, motion.AxisFlags));
+                                    toolPath.Add(new GCLinearMotion(motion.Command, motion.LineNumber, newpos.Array, motion.AxisFlags, motion.BlockDelete));
                                     pos.Set(newpos.Array, motion.AxisFlags, distanceMode == DistanceMode.Incremental);
                                 }
                                 else
@@ -174,21 +174,21 @@ namespace CNC.Controls
                                     if (feedRateMode != FeedRateMode.UnitsPerMin)
                                     {
                                         feedrate_cur = 0d;
-                                        toolPath.Add(new GCFeedRateMode(motion.LineNumber, feedRateMode = FeedRateMode.UnitsPerMin));
+                                        toolPath.Add(new GCFeedRateMode(motion.LineNumber, feedRateMode = FeedRateMode.UnitsPerMin, motion.BlockDelete));
                                     }
 
                                     if (feedrate_cur != feedrate_pgm)
-                                        toolPath.Add(new GCFeedrate(motion.LineNumber, feedrate_cur = feedrate_pgm));
+                                        toolPath.Add(new GCFeedrate(motion.LineNumber, feedrate_cur = feedrate_pgm, motion.BlockDelete));
 
                                     G53lnr = 0;
-                                    toolPath.Add(new GCLinearMotion(motion.Command, motion.LineNumber, newpos.Array, motion.AxisFlags));
+                                    toolPath.Add(new GCLinearMotion(motion.Command, motion.LineNumber, newpos.Array, motion.AxisFlags, motion.BlockDelete));
                                     pos.Set(newpos.Array, motion.AxisFlags, distanceMode == DistanceMode.Incremental);
                                 }
                             }
                             else // G0
                             {
                                 G53lnr = 0;
-                                toolPath.Add(new GCLinearMotion(motion.Command, motion.LineNumber, newpos.Array, motion.AxisFlags));
+                                toolPath.Add(new GCLinearMotion(motion.Command, motion.LineNumber, newpos.Array, motion.AxisFlags, motion.BlockDelete));
                                 pos.Set(newpos.Array, motion.AxisFlags, distanceMode == DistanceMode.Incremental);
                             }
                         }

@@ -1,13 +1,13 @@
 ﻿/*
  * TurningLogic.cs - part of CNC Controls Lathe library
  *
- * v0.43 / 2023-06-03 / Io Engineering (Terje Io)
+ * v0.45 / 2024-04-21 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2023, Io Engineering (Terje Io)
+Copyright (c) 2019-2024, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -133,8 +133,15 @@ namespace CNC.Controls.Lathe
             PassCalc cut = new PassCalc(xdistance, passdepth, passdepth_last, model.Precision);
 
             if (model.IsTaperEnabled)
+            {
+                if (model.Taper >= 90d)
+                {
+                    model.SetError(nameof(model.Taper), "Error: taper cannot be >= 90 deg.");
+                    return;
+                }
                 angle = Math.Tan(Math.PI * model.Taper / 180.0d);
-
+                model.ZLength = (xtarget - diameter) / angle * model.config.ZDirection;
+            }
             //  error.Clear();
 
             if (cut.Passes < 1)
@@ -170,15 +177,19 @@ namespace CNC.Controls.Lathe
                 // TODO: G0 to prev target to keep spindle speed constant?
                 //     if (css)
                 //         code[i++] = string.Format("G0 X{0}", model.FormatValue(doc_prev));
-                model.gCode.Add(string.Format("G1 X{0} F{1}", model.FormatValue(xtarget), model.FormatValue(feedrate)));
                 if (angle != 0.0d)
                 {
                     ztarget = cut.Distance / angle * model.config.ZDirection;
+                    model.gCode.Add(string.Format("G1 X{0} F{1}", model.FormatValue(xtarget -= model.config.ZClearance / model.UnitFactor * angle), model.FormatValue(feedrate)));
                     model.gCode.Add(string.Format("G1 X{0} Z{1}", model.FormatValue(diameter), model.FormatValue(zstart + ztarget)));
+                    model.gCode.Add(string.Format("G0 X{0}", model.FormatValue(diameter + xclearance)));
                 }
                 else
+                {
+                    model.gCode.Add(string.Format("G1 X{0} F{1}", model.FormatValue(xtarget), model.FormatValue(feedrate)));
                     model.gCode.Add(string.Format("G1 Z{0} F{1}", model.FormatValue(ztarget), model.FormatValue(feedrate)));
-                model.gCode.Add(string.Format("G0 X{0}", model.FormatValue(xtarget + xclearance)));
+                    model.gCode.Add(string.Format("G0 X{0}", model.FormatValue(xtarget + xclearance)));
+                }
                 model.gCode.Add(string.Format("G0 Z{0}", model.FormatValue(zstart + model.config.ZClearance / model.UnitFactor)));
 
             } while (++pass <= cut.Passes);
@@ -190,6 +201,8 @@ namespace CNC.Controls.Lathe
             GCode.File.AddBlock(string.Format("(Passdepth: {0}, Feedrate: {1}, {2}: {3})",
                                         model.FormatValue(passdepth), model.FormatValue(model.FeedRate),
                                          (model.IsCssEnabled ? "CSS" : "RPM"), model.FormatValue((double)model.CssSpeed)), Core.Action.Add);
+            if (angle != 0.0d)
+                GCode.File.AddBlock(string.Format("(Taper length: {0})", model.FormatValue(model.ZLength)));
 
             foreach (string s in model.gCode)
                 GCode.File.AddBlock(s, Core.Action.Add);

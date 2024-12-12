@@ -15,6 +15,7 @@
     <system:String x:Uid="str_gcParserToolProfile" x:Key="ParserToolProfile">Tool {0} not associated with a profile</system:String>
     <system:String x:Uid="str_gcParserM66PandE" x:Key="ParserM66PandE">Cannot use both P- and E-word with M66</system:String>
     <system:String x:Uid="str_gcParserM66NoPorE" x:Key="ParserM66NoPorE">P- or E-word missing for M66</system:String>
+    <system:String x:Uid="str_gcParserM66BadParams" x:Key="ParserM66BadParams">Illegal M66 parameters</system:String>
     <system:String x:Uid="str_gcParserG6NoP" x:Key="ParserG6NoP">G4 - missing P word</system:String>
     <system:String x:Uid="str_gcParserNoG0orG1" x:Key="ParserNoG0orG1">G0 or G1 not active</system:String>
     <system:String x:Uid="str_gcParserG1NoFeed" x:Key="ParserG1NoFeed">G1 used when feed rate is not set</system:String>

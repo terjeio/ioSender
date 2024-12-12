@@ -1,13 +1,13 @@
 ﻿/*
  * AppConfig.cs - part of CNC Controls library
  *
- * v0.43 / 2023-07-21 / Io Engineering (Terje Io)
+ * v0.45 / 2024-02-18 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2023, Io Engineering (Terje Io)
+Copyright (c) 2019-2024, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -593,7 +593,10 @@ namespace CNC.Controls
                         {
                             MPGactive = false;
                             if (model.AutoReportInterval > 0)
+                            {
+                                model.AutoReportingEnabled = false;
                                 Comms.com.WriteByte(GrblConstants.CMD_AUTO_REPORTING_TOGGLE);
+                            }
                         }
                     }
                 }
@@ -786,7 +789,7 @@ namespace CNC.Controls
                             }
                             else
                             {
-                                MessageBox.Show(LibStrings.FindResource("MsgDoorPersist"), "ioSender", MessageBoxButton.YesNo, MessageBoxImage.Exclamation);
+                                MessageBox.Show(LibStrings.FindResource("MsgDoorPersist"), "ioSender", MessageBoxButton.OK, MessageBoxImage.Exclamation);
                                 response = string.Empty;
                             }
                             break;

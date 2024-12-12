@@ -1,13 +1,13 @@
 ﻿/*
  * OverrideControl.xaml.cs - part of CNC Controls library
  *
- * v0.20 / 2020-07-19 / Io Engineering (Terje Io)
+ * v0.45 / 2024-04-03 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2020, Io Engineering (Terje Io)
+Copyright (c) 2018-2024, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -101,7 +101,7 @@ namespace CNC.Controls
         public GrblEncoderMode EncoderMode
         {
             get { return (GrblEncoderMode)GetValue(EncoderModeProperty); }
-            set { SetValue(MinusOnlyProperty, value); }
+            set { SetValue(EncoderModeProperty, value); }
         }
 
         void btnOverrideClick(object sender, EventArgs e)

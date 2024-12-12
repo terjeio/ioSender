@@ -1,13 +1,13 @@
 ﻿/*
  * SpindleControl.xaml.cs - part of CNC Controls library
  *
- * v0.40 / 2022-07-16 / Io Engineering (Terje Io)
+ * v0.45 / 2024-08-17 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2022, Io Engineering (Terje Io)
+Copyright (c) 2018-2024, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -125,6 +125,18 @@ namespace CNC.Controls
         void overrideControl_CommandGenerated(string command)
         {
             (DataContext as GrblViewModel).ExecuteCommand(command);
+        }
+
+        private void cbxSpindle_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.AddedItems.Count == 1 && ((ComboBox)sender).IsDropDownOpen)
+            {
+                if (GrblInfo.IsGrblHAL && GrblInfo.Build < 20240812) // Workaround for controller bug
+                    (DataContext as GrblViewModel).ExecuteCommand(string.Format(GrblCommand.SpindleChange, ((Spindle)e.AddedItems[0]).SpindleId));
+                else
+                    (DataContext as GrblViewModel).ExecuteCommand(string.Format(GrblCommand.SpindleChange, ((Spindle)e.AddedItems[0]).SpindleNum));
+            }
+            // TODO: add disable of CCW and RPM based on caps
         }
     }
 }

@@ -48,6 +48,8 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -81,10 +83,14 @@
     </Compile>
     <Compile Include="HeightMapViewModel.cs" />
     <Compile Include="IProbeTab.cs" />
+    <Compile Include="MacroDialog.xaml.cs">
+      <DependentUpon>MacroDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ProbeVerify.xaml.cs">
       <DependentUpon>ProbeVerify.xaml</DependentUpon>
     </Compile>
     <Compile Include="ProbingConfig.cs" />
+    <Compile Include="ProbingMacros.cs" />
     <Compile Include="ProbingView.xaml.cs">
       <DependentUpon>ProbingView.xaml</DependentUpon>
     </Compile>
@@ -134,6 +140,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="LibStrings.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MacroDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -197,6 +207,12 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\App.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="App.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\menu_22x22.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -1,7 +1,7 @@
 ﻿/*
  * ProbingView.xaml.cs - part of CNC Probing library
  *
- * v0.44 / 2023-08-26 / Io Engineering (Terje Io)
+ * v0.45 / 2023-12-20 / Io Engineering (Terje Io)
  *
  */
 
@@ -278,6 +278,7 @@ namespace CNC.Controls.Probing
                 getView(tab.SelectedItem as TabItem)?.Activate(true);
 
                 model.Grbl.PropertyChanged += Grbl_PropertyChanged;
+                model.Grbl.IgnoreNextCycleStart = true;
 
                 probeTriggered = model.Grbl.Signals.Value.HasFlag(Signals.Probe);
                 probeDisconnected = model.Grbl.Signals.Value.HasFlag(Signals.ProbeDisconnected);

@@ -1,13 +1,13 @@
 ﻿/*
  * GCodeRotate.cs - part of CNC Controls library for Grbl
  *
- * v0.40 / 2022-07-12 / Io Engineering (Terje Io)
+ * v0.45 / 2024-10-11 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2021-2022, Io Engineering (Terje Io)
+Copyright (c) 2021-2024, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -63,7 +63,7 @@ namespace CNC.Controls
         {
             uint G53lnr = 0;
             int precision = GCode.File.Decimals;
-            GCPlane plane = new GCPlane(GrblParserState.Plane == Plane.XY ? Commands.G17 : Commands.G18, 0);
+            GCPlane plane = new GCPlane(GrblParserState.Plane == Plane.XY ? Commands.G17 : Commands.G18, 0, false);
             DistanceMode distanceMode = GrblParserState.DistanceMode;
             Vector3 pos = new Vector3(Grbl.GrblViewModel.Position.X, Grbl.GrblViewModel.Position.Y, Grbl.GrblViewModel.Position.Z);
             List<GCodeToken> toolPath = new List<GCodeToken>();
@@ -107,13 +107,13 @@ namespace CNC.Controls
                                 else
                                     pos = target;
 
-                                toolPath.Add(new GCLinearMotion(motion.Command, motion.LineNumber, target.Array, motion.AxisFlags));
+                                toolPath.Add(new GCLinearMotion(motion.Command, motion.LineNumber, target.Array, motion.AxisFlags, motion.BlockDelete));
 
                             }
                             else
                             {
                                 G53lnr = 0;
-                                toolPath.Add(new GCLinearMotion(motion.Command, motion.LineNumber, motion.Values, motion.AxisFlags));
+                                toolPath.Add(new GCLinearMotion(motion.Command, motion.LineNumber, motion.Values, motion.AxisFlags, motion.BlockDelete));
                             }
                         }
                         break;
@@ -140,7 +140,7 @@ namespace CNC.Controls
 
                             pos = target;
 
-                            toolPath.Add(new GCArc(arc.Command, arc.LineNumber, pos.Array, arc.AxisFlags, targetijk.Array, arc.IjkFlags, arc.R, arc.P, arc.IJKMode));
+                            toolPath.Add(new GCArc(arc.Command, arc.LineNumber, pos.Array, arc.AxisFlags, targetijk.Array, arc.IjkFlags, arc.R, arc.P, arc.IJKMode, arc.BlockDelete));
                         }
                         break;
 
@@ -151,7 +151,7 @@ namespace CNC.Controls
                             var ij = new Vector3(spline.I, spline.J, 0d).RotateZ(offset.X, offset.Y, angle).Round(precision);
                             var pq = new Vector3(spline.P, spline.Q, 0d).RotateZ(offset.X, offset.Y, angle).Round(precision);
 
-                            toolPath.Add(new GCCubicSpline(spline.Command, spline.LineNumber, pos.Array, spline.AxisFlags, new double[] { ij.X, ij.Y, pq.X, pq.Y }));
+                            toolPath.Add(new GCCubicSpline(spline.Command, spline.LineNumber, pos.Array, spline.AxisFlags, new double[] { ij.X, ij.Y, pq.X, pq.Y }, spline.BlockDelete));
                         }
                         break;
 
@@ -161,7 +161,7 @@ namespace CNC.Controls
                             pos = new Vector3(spline.X, spline.Y, 0d).RotateZ(offset.X, offset.Y, angle).Round(precision);
                             var ij = new Vector3(spline.I, spline.J, 0d).RotateZ(offset.X, offset.Y, angle).Round(precision);
 
-                            toolPath.Add(new GCQuadraticSpline(spline.Command, spline.LineNumber, pos.Array, spline.AxisFlags, new double[] { ij.X, ij.Y }));
+                            toolPath.Add(new GCQuadraticSpline(spline.Command, spline.LineNumber, pos.Array, spline.AxisFlags, new double[] { ij.X, ij.Y }, spline.BlockDelete));
                         }
                         break;
 
@@ -199,7 +199,7 @@ namespace CNC.Controls
                             else
                                 pos = target;
 
-                            toolPath.Add(new GCCannedDrill(drill.Command, drill.LineNumber, target.Round(precision).Array, drill.AxisFlags, drill.R, drill.L, drill.P, drill.Q));
+                            toolPath.Add(new GCCannedDrill(drill.Command, drill.LineNumber, target.Round(precision).Array, drill.AxisFlags, drill.R, drill.L, drill.P, drill.Q, drill.BlockDelete));
                         }
                         break;
 

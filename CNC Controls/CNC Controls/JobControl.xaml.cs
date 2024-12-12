@@ -1,13 +1,13 @@
 /*
  * JobControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.44 / 2023-12-20 / Io Engineering (Terje Io)
+ * v0.45 / 2023-06-04 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2023, Io Engineering (Terje Io)
+Copyright (c) 2018-2024, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -74,7 +74,7 @@ namespace CNC.Controls
         private struct JobData
         {
             public int CurrBlock, PendingLine, PgmEndLine, ToolChangeLine, ACKPending, serialUsed;
-            public bool Started, Transferred, Complete, IsSDFile, IsChecking, HasError;
+            public bool Started, Transferred, Complete, IsSDFile, IsChecking, HasError, Stopped, ToolChanged;
             public DataRow CurrentRow, NextRow;
         }
 
@@ -204,9 +204,18 @@ namespace CNC.Controls
                 model.OnRealtimeStatusProcessed += RealtimeStatusProcessed;
                 model.OnCommandResponseReceived += ResponseReceived;
                 model.OnCycleStart += OnCycleStart;
+                model.OnStop += OnStop;
                 GCode.File.Model = model;
             }
         }
+
+        private void OnStop(object sender, EventArgs e)
+        {
+            JobTimer.Stop();
+            job.Stopped = true;
+            streamingHandler.Call(StreamingState.Stop, true);
+        }
+
         private void OnCycleStart(object sender, EventArgs e)
         {
             if (isActive && JobPending)
@@ -260,6 +269,7 @@ namespace CNC.Controls
                         else
                         {
                             job.ToolChangeLine = -1;
+                            job.ToolChanged = false;
                             job.CurrBlock = job.PendingLine = job.ACKPending = model.BlockExecuting = 0;
                             job.PgmEndLine = GCode.File.Blocks - 1;
                             if ((sender as GrblViewModel).IsPhysicalFileLoaded)
@@ -439,7 +449,9 @@ namespace CNC.Controls
             }
             else if (grblState.State == GrblStates.Tool)
             {
-                model.Message = "";
+                model.Message = string.Empty;
+                job.ToolChanged = false;
+                job.ToolChangeLine = -1;
                 Comms.com.WriteByte(GrblLegacy.ConvertRTCommand(GrblConstants.CMD_CYCLE_START));
             }
             else if(JobTimer.IsRunning)
@@ -450,7 +462,16 @@ namespace CNC.Controls
             else if (GCode.File.IsLoaded)
             {
                 model.Message = model.RunTime = string.Empty;
-                if (model.IsSDCardJob)
+                if(job.ToolChanged)
+                {
+                    job.ToolChanged = false;
+                    if (job.ToolChangeLine != -1)
+                    {
+                        job.ToolChangeLine = -1;
+                        SendNextLine();
+                    }
+                }
+                else if (model.IsSDCardJob)
                 {
                     Comms.com.WriteCommand(GrblConstants.CMD_SDCARD_RUN + model.FileName.Substring(7));
                 }
@@ -460,7 +481,7 @@ namespace CNC.Controls
                     model.BlockExecuting = fromBlock;
                     job.CurrBlock = job.ACKPending = job.PendingLine = fromBlock;
                     job.serialUsed = missed = 0;
-                    job.Started = job.Transferred = job.HasError = false;
+                    job.Started = job.Transferred = job.HasError = job.ToolChanged = false;
                     job.NextRow = GCode.File.Data.Rows[job.CurrBlock];
                     Comms.com.PurgeQueue();
                     JobTimer.Start();
@@ -598,6 +619,8 @@ namespace CNC.Controls
                     btnStart.IsEnabled = true;
                     btnHold.IsEnabled = false;
                     btnStop.IsEnabled = true;
+                    if (JobTimer.IsRunning)
+                        JobTimer.Pause = true;
                     break;
 
                 case StreamingState.Idle:
@@ -605,15 +628,14 @@ namespace CNC.Controls
                     if (JobTimer.IsRunning)
                     {
                         model.IsJobRunning = true;
-                        if (job.ToolChangeLine >= 0) {
+                        JobTimer.Pause = false;
+                        if (job.ToolChangeLine >= 0)
                             GCode.File.Data.Rows[job.ToolChangeLine]["Sent"] = "ok";
-                            job.ToolChangeLine = -1;
-                        }
                         SetStreamingHandler(StreamingHandler.SendFile);
-                       // SendNextLine();
                     }
                     else
                         SetStreamingHandler(StreamingHandler.Previous);
+                    job.ToolChanged = true;
                     break;
 
                 case StreamingState.Error:
@@ -661,6 +683,10 @@ namespace CNC.Controls
 
                     case StreamingState.Stop:
                         SetStreamingHandler(StreamingHandler.Idle);
+                        break;
+
+                    case StreamingState.JobFinished:
+                        SetStreamingHandler(StreamingHandler.SendFile);
                         break;
                 }
             }
@@ -926,7 +952,7 @@ namespace CNC.Controls
                         job.CurrentRow = job.NextRow = null;
                         if (model.IsSDCardJob && !GCode.File.IsLoaded)
                             model.FileName = string.Empty;
-                        if (!grblState.MPG)
+                        if (!grblState.MPG && !job.Stopped)
                         {
                             if (GrblInfo.IsGrblHAL && !(grblState.State == GrblStates.Home || grblState.State == GrblStates.Alarm))
                             {
@@ -940,6 +966,7 @@ namespace CNC.Controls
                             else if (grblState.State == GrblStates.Hold && !model.GrblReset)
                                 Comms.com.WriteByte(GrblConstants.CMD_RESET);
                         }
+                        job.Stopped = false;
                         if (JobTimer.IsRunning)
                         {
                             always = false;

@@ -50,6 +50,7 @@ CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,btn_unlock:System.Windows.
 CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,btn_upload:System.Windows.Controls.ContentControl.Content,Button,True,True,,Загрузити
 CNC.Controls.WPF.g.en-US.resources:drocontrol.baml,btn_zeroAll:System.Windows.Controls.ContentControl.Content,Button,True,True,,Обнул. Все
 CNC.Controls.WPF.g.en-US.resources:macroeditor.baml,chk_confirm:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Підтверджувати виконання
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,chk_viewAll:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,List CNC files only
 CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,dgr_sdcard:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,"Клікніть правою кнопкою для меню, подвійний клік для виконання файла."
 CNC.Controls.WPF.g.en-US.resources:about.baml,dlg_about:System.Windows.Window.Title,Title,True,True,,Про програму
 CNC.Controls.WPF.g.en-US.resources:portdialog.baml,dlg_connection:System.Windows.Window.Title,Title,True,True,,Підключення контролера
@@ -173,6 +174,7 @@ CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalBlockDelete:Sys
 CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalCycleStart:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Запуск програми.
 CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalEStop:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,E-Stop
 CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalFeedHold:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Заборона руху
+CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalMotorFault:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Motor fault
 CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalMotorWarning:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Попередження мотора
 CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalOptionalStop:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Не обов'язкова зупинка
 CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalProbe:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Зонд
@@ -198,7 +200,7 @@ CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,mnu_enableRewind:System.Windo
 CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,mnu_run:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Пуск
 CNC.Controls.WPF.g.en-US.resources:gcodelistcontrol.baml,mnu_sendToController:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Send to controller
 CNC.Controls.WPF.g.en-US.resources:gcodelistcontrol.baml,mnu_startFromHere:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Start from here
-CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,mnu_viewAll:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,View all
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,mnu_viewAll:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,List CNC files only
 CNC.Controls.WPF.g.en-US.resources:appconfigview.baml,msg_restart:System.String.$Content,None,True,True,,Зміни налаштувань почнуть діяти після перезапуска програми!
 CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,pnl_kbdJogging:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Увага! - Grbl має помилки при перериванні переміщення (при відпусканні клавиш).
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_appconfCreate:System.String.$Content,None,True,True,,Файл конфігурації не існує або пошкоджено. Створити новий?
@@ -248,12 +250,15 @@ CNC.Controls.WPF.g.en-US.resources:outlineflyout.baml,str_outlineFlyout:System.S
 CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,str_pause:System.String.$Content,None,True,True,,Пауза
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_rotateG17G18Arcs:System.String.$Content,None,True,True,,GCode містить дуги у площині XZ або YZ (G18/19). Трансляція неможлива. Використовуйте &apos;Arcs to Lines&apos; за потреби трансляції.
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_rotateRadiusArcs:System.String.$Content,None,True,True,,GCode містить дуги у радіусній формі.  Трансляція неможлива. Використовуйте &apos;Arcs to Lines&apos; за потреби трансляції.
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,str_runMacro:System.String.$Content,None,True,True,,Run macro {0} with no parameters?
 CNC.Controls.WPF.g.en-US.resources:macroexecutecontrol.baml,str_runMacro:System.String.$Content,None,True,True,,Виконати макрос {0}?
 CNC.Controls.WPF.g.en-US.resources:macrotoolbarcontrol.baml,str_runMacro:System.String.$Content,None,True,True,,Виконати макрос {0}?
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_saveSettings:System.String.$Content,None,True,True,,Налаштування змінено. Зберегти зараз?
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsError:System.String.$Content,None,True,True,,"Установка {0} повернула {1}, продовжити?"
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsFail:System.String.$Content,None,True,True,,Помилка...\\nПродовжити завантаження?
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsInvalid:System.String.$Content,None,True,True,,Файл не містить бідьяких налаштувань.
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsReloadMismatch:System.String.$Content,None,True,True,,"{0} settings were ignored, not supported by the controller."
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_settingsReloadMismatch:System.String.$Content,None,True,True,,"Some settings were ignored, not supported by the controller."
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsRestore:System.String.$Content,None,True,True,,Відновити налаштування з файла
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_settingsSaved:System.String.$Content,None,True,True,,Налаштування збережено.
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsTimeout:System.String.$Content,None,True,True,,"Перевищєно час при встановленні {0}, продовжити?"

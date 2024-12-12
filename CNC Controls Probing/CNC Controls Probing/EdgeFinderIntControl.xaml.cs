@@ -1,13 +1,13 @@
 ﻿/*
  * EdgeFinderIntControl.xaml.cs - part of CNC Probing library
  *
- * v0.42 / 2023-03-22 / Io Engineering (Terje Io)
+ * v0.45 / 2024-07-19 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020-2023, Io Engineering (Terje Io)
+Copyright (c) 2020-2024, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -246,9 +246,10 @@ namespace CNC.Controls.Probing
                 if (probing.ProbeZ && axisflags != AxisFlags.Z)
                 {
                     Position pz = new Position(pos);
+                    double xyOffset = probing.WorkpieceXYEdgeOffset == 0d ? probing.ProbeDiameter / 2d : probing.WorkpieceXYEdgeOffset;
 
-                    pz.X += probing.ProbeDiameter / 2d * af[GrblConstants.X_AXIS];
-                    pz.Y += probing.ProbeDiameter / 2d * af[GrblConstants.Y_AXIS];
+                    pz.X += xyOffset * af[GrblConstants.X_AXIS];
+                    pz.Y += xyOffset * af[GrblConstants.Y_AXIS];
                     if ((ok = !isCancelled && probing.GotoMachinePosition(pz, axisflags)))
                     {
                         ok = !isCancelled && probing.WaitForResponse(probing.FastProbe + "Z-" + probing.Depth.ToInvariantString());
@@ -309,6 +310,7 @@ namespace CNC.Controls.Probing
                 probing.Grbl.ExecuteCommand(GrblConstants.CMD_GETPARSERSTATE);
 
             probing.Grbl.IsJobRunning = false;
+            probing.Program.OnCompleted?.Invoke(ok);
         }
 
         private void PreviewOnCompleted()

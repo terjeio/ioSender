@@ -30,7 +30,7 @@
         <cnccore:GrblViewModel />
     </Window.DataContext>
 
-    <DockPanel IsEnabled="{Binding Path=IsMPGActive, Converter={StaticResource BooleanConverter}}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+    <DockPanel VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
         <Menu IsEnabled="{Binding Path=IsJobRunning, Converter={StaticResource BooleanConverter}}" DockPanel.Dock="Top">
             <MenuItem x:Uid="mnu_file" x:Name="menuFile" Header="_File">
                 <MenuItem x:Uid="mnu_load" Header="_Load" Click="fileOpenMenuItem_Click"/>
@@ -52,7 +52,7 @@
                 <MenuItem x:Uid="mnu_about" Header="_About" Click="aboutMenuItem_Click"/>
             </MenuItem>
         </Menu>
-        <ToolBarTray DockPanel.Dock="Top" IsLocked="True">
+        <ToolBarTray IsEnabled="{Binding Path=IsMPGActive, Converter={StaticResource BooleanConverter}}" DockPanel.Dock="Top" IsLocked="True">
             <ToolBar IsEnabled="{Binding Path=IsJobRunning, Converter={StaticResource BooleanConverter}}" Height="42" VerticalAlignment="Top" Width="{Binding Path=ActualWidth, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DockPanel}}}" >
                 <cnccontrols:FileActionControl IsEnabled="{Binding Path=IsToolChanging, Converter={StaticResource BooleanConverter}}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                 <Separator Margin="4,0"></Separator>
@@ -98,7 +98,7 @@
                 <TextBlock x:Uid="lbl_jogStep" ToolTip="Distance for keyboard step jog (with &lt;CTRL&gt; modifier)." Text="{Binding Path=JogStep, StringFormat={StaticResource JogStep}}" HorizontalAlignment="Right" TextWrapping="NoWrap" Margin="4,0"/>
             </StatusBarItem>
         </StatusBar>
-        <Canvas DockPanel.Dock="Right" Width="22" VerticalAlignment="Stretch" HorizontalAlignment="Right" ClipToBounds="False" Panel.ZIndex="1" Margin="0,34,0,0">
+        <Canvas IsEnabled="{Binding Path=IsMPGActive, Converter={StaticResource BooleanConverter}}" DockPanel.Dock="Right" Width="22" VerticalAlignment="Stretch" HorizontalAlignment="Right" ClipToBounds="False" Panel.ZIndex="1" Margin="0,34,0,0">
             <ItemsControl x:Name="xx" Width="22" VerticalAlignment="Stretch">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -113,7 +113,7 @@
             <cnccontrols:MachinePositionFlyout x:Name="mposFlyout" Visibility="Hidden" Canvas.Right="22"/>
             <cnccontrols:THCMonitorControl x:Name="thcControl" Visibility="Hidden" Canvas.Right="22"/>
         </Canvas>
-        <TabControl Background="Transparent" DockPanel.Dock="Left" x:Name="tabMode" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Focusable="False" SelectionChanged="TabMode_SelectionChanged">
+        <TabControl IsEnabled="{Binding Path=IsMPGActive, Converter={StaticResource BooleanConverter}}" Background="Transparent" DockPanel.Dock="Left" x:Name="tabMode" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Focusable="False" SelectionChanged="TabMode_SelectionChanged">
             <TabControl.Resources>
                 <Style TargetType="{x:Type TabItem}">
                     <Setter Property="Height" Value="32" />

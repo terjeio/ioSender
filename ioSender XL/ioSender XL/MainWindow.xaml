@@ -112,7 +112,7 @@
             <cnccontrols:MachinePositionFlyout x:Name="mposFlyout" Visibility="Hidden" Canvas.Right="22"/>
             <cnccontrols:THCMonitorControl x:Name="thcControl" Visibility="Hidden" Canvas.Right="22"/>
         </Canvas>
-        <TabControl Background="Transparent" DockPanel.Dock="Left" x:Name="tabMode" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Focusable="False" SelectionChanged="TabMode_SelectionChanged">
+        <TabControl IsEnabled="{Binding Path=IsMPGActive, Converter={StaticResource BooleanConverter}}" Background="Transparent" DockPanel.Dock="Left" x:Name="tabMode" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Focusable="False" SelectionChanged="TabMode_SelectionChanged">
             <TabControl.Resources>
                 <Style TargetType="{x:Type TabItem}">
                     <Setter Property="Height" Value="32" />

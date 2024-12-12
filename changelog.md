@@ -1,5 +1,23 @@
 ## ioSender changelog
 
+2024-12-30: [Release 2.0.45](https://github.com/terjeio/Grbl-GCode-Sender/releases/tag/2.0.45).
+
+* Added spindle selection using drop down, ref. issue #399.
+* Remove R\(eset\) Signals "LED" if the input is not available.
+* Fixes for issue #414 & #429, heightmap probing failures. NOTE: these issues were due to a regression in a 2.0.45 prerelease.
+* Added parser support for block delete character.
+* Added filter button in SD card viewer for show/hide non-CNC files.
+* Allow use of modified legacy Grbl controller.
+* Added support for spindle selection when multiple spindles is available.
+* No longer stops jobtimer when changing tool.
+* Added FTP port settings, available when controller supports FTP file transfer.
+* Fixed and improved lathe turning wizard, taper mode.
+* Improved handling of cycle start signal
+* Improved tool length probing
+* Added pre/post probing job macro support.
+* Added Edge offset input in Edge finder tabs.
+* A number of minor bug fixes and improvements.
+
 2023-12-30: [Release 2.0.44](https://github.com/terjeio/Grbl-GCode-Sender/releases/tag/2.0.44).
 
 * Fix for issue #350 - improved handling of cycle start message coming from the controller to avoid unwanted start of loaded program.

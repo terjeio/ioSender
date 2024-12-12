@@ -262,6 +262,13 @@ namespace CNC.Core
         {
             byte[] bytes = Encoding.Default.GetBytes(data);
             WriteBytes(bytes, bytes.Length);
+#if RESPONSELOG
+            if (log != null)
+            {
+                log.WriteLine(data);
+                log.Flush();
+            }
+#endif
         }
 
         public void WriteCommand(string command)
@@ -272,6 +279,13 @@ namespace CNC.Core
                 WriteByte((byte)command.ToCharArray()[0]);
             else
             {
+#if RESPONSELOG
+                if (log != null)
+                {
+                    log.WriteLine(command);
+                    log.Flush();
+                }
+#endif
                 command += "\r";
                 byte[] bytes = System.Text.Encoding.UTF8.GetBytes(command);
                 if(serialPort != null)

@@ -12,6 +12,7 @@ CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserErrE:System.String.$Conte
 CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserG1NoFeed:System.String.$Content,None,True,True,,"G1 akkor használatos, ha az előtolás nincs beállítva"
 CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserG6NoP:System.String.$Content,None,True,True,,G4 - hiányzik a P paraméter
 CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserKlesseqJ:System.String.$Content,None,True,True,,"K paraméternek nagyobbnak kell lennie, mint J paraméter"
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserM66BadParams:System.String.$Content,None,True,True,,Illegal M66 parameters
 CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserM66NoPorE:System.String.$Content,None,True,True,,P- vagy E-paraméter hiányzik az M66-nál
 CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserM66PandE:System.String.$Content,None,True,True,,Nem használható egyszerre a P- és az E-paraméter az M66-tal
 CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserModalGrpError:System.String.$Content,None,True,True,,Modális csoport megsértése

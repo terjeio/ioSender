@@ -1,13 +1,13 @@
 ﻿/*
  * GCodeParser.cs - part of CNC Controls library
  *
- * v0.44 / 2023-12-16 / Io Engineering (Terje Io)
+ * v0.45 / 2024-10-11 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2023, Io Engineering (Terje Io)
+Copyright (c) 2019-2024, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -429,6 +429,16 @@ namespace CNC.GCode
             return sb.ToString();
         }
 
+        private bool isMessage(string block)
+        {
+            block = block.ToUpperInvariant();
+
+            return block.StartsWith("(MSG,") ||
+                    block.StartsWith("(PRINT,") ||
+                     block.StartsWith("(DEBUG,") ||
+                      block.StartsWith("(ABORT,");
+        }
+
         public bool ParseBlock(ref string line, bool quiet)
         {
             bool isComment;
@@ -446,7 +456,7 @@ namespace CNC.GCode
             List<StrReplace> replace = new List<StrReplace>();
 
             int userMCode = 0;
-            bool isScaling = false;
+            bool isScaling = false, blockDelete;
             string comment = string.Empty, flowExpression = string.Empty, block;
             double value;
             cmdNonModal = Commands.Undefined;
@@ -468,6 +478,8 @@ namespace CNC.GCode
             if (quiet)
                 return true;
 
+            blockDelete = block[0] == '/';
+
             if (block[0] == '%')
             {
                 if (++demarcCount == 2)
@@ -477,9 +489,9 @@ namespace CNC.GCode
 
             gcValues.N++;
             motionModeChanged = false;
-            isComment = block[0] == '(' && block.LastIndexOf(')') == block.Length - 1 && !block.StartsWith("(MSG");
+            isComment = block[0] == '(' && block.LastIndexOf(')') == block.Length - 1 && !isMessage(block);
 
-            int pos = 0, ppos = 0;
+            int pos = blockDelete ? 1 : 0, ppos = 0;
 
             while(pos < block.Length)
             {
@@ -1121,8 +1133,7 @@ namespace CNC.GCode
 
             if (flowControl != NGCExpr.FlowControl.NoOp)
             {
-                Tokens.Add(new GCFlowControl(Commands.FlowControl, gcValues.N, (uint)gcValues.O, flowControl, flowExpression));
-
+                Tokens.Add(new GCFlowControl(Commands.FlowControl, gcValues.N, (uint)gcValues.O, flowControl, flowExpression, blockDelete));
             }
 
             //
@@ -1130,7 +1141,7 @@ namespace CNC.GCode
             //
             if (comment != string.Empty)
             {
-                Tokens.Add(new GCComment(Commands.Comment, gcValues.N, comment));
+                Tokens.Add(new GCComment(Commands.Comment, gcValues.N, comment, blockDelete));
                 comment = string.Empty;
             }
 
@@ -1142,7 +1153,7 @@ namespace CNC.GCode
             if (modalGroups.HasFlag(ModalGroups.G5))
             {
                 FeedRateMode = (FeedRateMode)(cmdFeedrateMode - 93);
-                Tokens.Add(new GCFeedRateMode(cmdFeedrateMode, gcValues.N));
+                Tokens.Add(new GCFeedRateMode(cmdFeedrateMode, gcValues.N, blockDelete));
             }
 
             //
@@ -1151,7 +1162,7 @@ namespace CNC.GCode
             if (wordFlags.HasFlag(WordFlags.F))
             {
                 feedRate = IsImperial ? gcValues.F * 25.4d : gcValues.F;
-                Tokens.Add(new GCFeedrate(Commands.Feedrate, gcValues.N, feedRate));
+                Tokens.Add(new GCFeedrate(Commands.Feedrate, gcValues.N, feedRate, blockDelete));
             }
 
             //
@@ -1162,12 +1173,12 @@ namespace CNC.GCode
             if (modalGroups.HasFlag(ModalGroups.G14))
             {
                 SpindleRpmMode = cmdSpindleRpmMode == Commands.G97;
-                Tokens.Add(new GCodeToken(cmdSpindleRpmMode, gcValues.N));
+                Tokens.Add(new GCodeToken(cmdSpindleRpmMode, gcValues.N, blockDelete));
             }
 
             if (wordFlags.HasFlag(WordFlags.S))
             {
-                Tokens.Add(new GCSpindleRPM(Commands.SpindleRPM, gcValues.N, gcValues.S, wordFlags.HasFlag(WordFlags.Dollar) ? gcValues.Dollar : -1));
+                Tokens.Add(new GCSpindleRPM(Commands.SpindleRPM, gcValues.N, gcValues.S, wordFlags.HasFlag(WordFlags.Dollar) ? gcValues.Dollar : -1, blockDelete));
                 wordFlags &= ~WordFlags.Dollar;
             }
 
@@ -1177,7 +1188,7 @@ namespace CNC.GCode
             if (wordFlags.HasFlag(WordFlags.T))
             {
                 Tool = gcValues.T;
-                Tokens.Add(new GCToolSelect(Commands.ToolSelect, gcValues.N, gcValues.T));
+                Tokens.Add(new GCToolSelect(Commands.ToolSelect, gcValues.N, gcValues.T, blockDelete));
 
                 if (!quiet && ToolChanged != null && !ToolChanged(gcValues.T))
                     MessageBox.Show(string.Format(LibStrings.FindResource("ParserToolProfile"), gcValues.T.ToString()), "GCode parser", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -1193,7 +1204,7 @@ namespace CNC.GCode
                 if (modalGroups.HasFlag(ModalGroups.M6))
                 {
                     ToolChanges++;
-                    Tokens.Add(new GCodeToken(Commands.M6, gcValues.N));
+                    Tokens.Add(new GCodeToken(Commands.M6, gcValues.N, blockDelete));
                 }
 
                 //
@@ -1203,7 +1214,7 @@ namespace CNC.GCode
                 // M3, M4, M5
                 if (modalGroups.HasFlag(ModalGroups.M7))
                 {
-                    Tokens.Add(new GCSpindleState(gcValues.N, SpindleState, wordFlags.HasFlag(WordFlags.Dollar) ? gcValues.Dollar : -2));
+                    Tokens.Add(new GCSpindleState(gcValues.N, SpindleState, wordFlags.HasFlag(WordFlags.Dollar) ? gcValues.Dollar : -2, blockDelete));
                     wordFlags &= ~WordFlags.Dollar;
                 }
 
@@ -1214,7 +1225,7 @@ namespace CNC.GCode
                 // M7, M8, M9
                 if (modalGroups.HasFlag(ModalGroups.M8))
                 {
-                    Tokens.Add(new GCCoolantState(gcValues.N, CoolantState));
+                    Tokens.Add(new GCCoolantState(gcValues.N, CoolantState, blockDelete));
                 }
 
                 //
@@ -1224,7 +1235,7 @@ namespace CNC.GCode
                 // M49, M50, M51, M52, M53, M56
                 if (modalGroups.HasFlag(ModalGroups.M9))
                 {
-                    Tokens.Add(new GCodeToken(cmdOverride, gcValues.N));
+                    Tokens.Add(new GCodeToken(cmdOverride, gcValues.N, blockDelete));
                 }
 
                 //
@@ -1239,7 +1250,7 @@ namespace CNC.GCode
                         case 64:
                         case 65:
                             if(wordFlags.HasFlag(WordFlags.P))
-                                Tokens.Add(new GCDigitalOutput(Commands.M62 + (userMCode - 62), gcValues.N, (uint)gcValues.P));
+                                Tokens.Add(new GCDigitalOutput(Commands.M62 + (userMCode - 62), gcValues.N, (uint)gcValues.P, blockDelete));
                             break;
 
                         case 66:
@@ -1250,23 +1261,25 @@ namespace CNC.GCode
                                     throw new GCodeException(LibStrings.FindResource("ParserM66NoPorE"));
                                 uint l = wordFlags.HasFlag(WordFlags.L) ? (uint)gcValues.L : 0;
                                 double q = wordFlags.HasFlag(WordFlags.Q) ? gcValues.Q : 0d;
-                                if (l <= 4 && (l == 0 && q != 0d))
+                                if (l == 0 || (wordFlags.HasFlag(WordFlags.P) && l <= 4 && q != 0d))
                                     Tokens.Add(new GCWaitOnInput(gcValues.N, wordFlags.HasFlag(WordFlags.P) ? (int)gcValues.P : -1,
                                                                               wordFlags.HasFlag(WordFlags.E) ? (int)gcValues.E : -1,
-                                                                              l, gcValues.Q));
+                                                                              l, q, blockDelete));
+                                else
+                                    throw new GCodeException(LibStrings.FindResource("ParserM66BadParams"));
                             }
                             break;
 
                         case 67:
                         case 68:
                             if (wordFlags.HasFlag(WordFlags.E) && wordFlags.HasFlag(WordFlags.Q))
-                                Tokens.Add(new GCAnalogOutput(Commands.M67 + (userMCode - 67), gcValues.N, (uint)gcValues.P, gcValues.Q));
+                                Tokens.Add(new GCAnalogOutput(Commands.M67 + (userMCode - 67), gcValues.N, (uint)gcValues.P, gcValues.Q, blockDelete));
                             break;
 
                         default:
                             Tokens.Add(new GCUserMCommand(gcValues.N, (uint)userMCode,
                                                            wordFlags.HasFlag(WordFlags.P) ? gcValues.P : double.NaN,
-                                                            wordFlags.HasFlag(WordFlags.Q) ? gcValues.Q : double.NaN));
+                                                            wordFlags.HasFlag(WordFlags.Q) ? gcValues.Q : double.NaN, blockDelete));
                             break;
                     }
                 }
@@ -1279,7 +1292,7 @@ namespace CNC.GCode
                 if ((modalGroups.HasFlag(ModalGroups.G0) && cmdNonModal == Commands.G4))
                 {
                     if (wordFlags.HasFlag(WordFlags.P))
-                        Tokens.Add(new GCDwell(gcValues.N, gcValues.P));
+                        Tokens.Add(new GCDwell(gcValues.N, gcValues.P, blockDelete));
                     else
                         throw new GCodeException(LibStrings.FindResource("ParserG6NoP"));
                 }
@@ -1291,7 +1304,7 @@ namespace CNC.GCode
                 // G17, G18, G19
                 if (modalGroups.HasFlag(ModalGroups.G2))
                 {
-                    Tokens.Add(Plane = new GCPlane(cmdPlane, gcValues.N));
+                    Tokens.Add(Plane = new GCPlane(cmdPlane, gcValues.N, blockDelete));
                 }
 
                 //
@@ -1301,7 +1314,7 @@ namespace CNC.GCode
                 // Lathe mode: G7, G8
                 if (modalGroups.HasFlag(ModalGroups.G15))
                 {
-                    var mode = new GCLatheMode(cmdLatheMode, gcValues.N);
+                    var mode = new GCLatheMode(cmdLatheMode, gcValues.N, blockDelete);
                     LatheMode = mode.LatheMode;
                     Tokens.Add(mode);
                 }
@@ -1310,13 +1323,13 @@ namespace CNC.GCode
                 if (modalGroups.HasFlag(ModalGroups.G6))
                 {
                     IsImperial = cmdUnits == Commands.G20;
-                    Tokens.Add(new GCUnits(cmdUnits, gcValues.N));
+                    Tokens.Add(new GCUnits(cmdUnits, gcValues.N, blockDelete));
                 }
 
                 // Scaling: G50, G51
                 if (modalGroups.HasFlag(ModalGroups.G11))
                 {
-                    Tokens.Add(new GCScaling((isScaling ? Commands.G51 : Commands.G50), gcValues.N, gcValues.XYZ, axisWords));
+                    Tokens.Add(new GCScaling((isScaling ? Commands.G51 : Commands.G50), gcValues.N, gcValues.XYZ, axisWords, blockDelete));
                     IsScaled = false;
                     if (isScaling)
                     {
@@ -1359,7 +1372,7 @@ namespace CNC.GCode
                 // G40, G41, G42
                 if (modalGroups.HasFlag(ModalGroups.G7))
                 {
-                    Tokens.Add(new GCPlane(Commands.G40, gcValues.N));
+                    Tokens.Add(new GCPlane(Commands.G40, gcValues.N, blockDelete));
                 }
 
                 //
@@ -1373,7 +1386,7 @@ namespace CNC.GCode
                     {
                         case ToolLengthOffset.Enable:
                             {
-                                var offset = new GCToolOffset(Commands.G43, gcValues.N, (uint)gcValues.H);
+                                var offset = new GCToolOffset(Commands.G43, gcValues.N, (uint)gcValues.H, blockDelete);
                                 if (SetToolOffset(offset))
                                     Tokens.Add(offset);
                                 // else error?
@@ -1382,7 +1395,7 @@ namespace CNC.GCode
 
                         case ToolLengthOffset.ApplyAdditional:
                             {
-                                var offset = new GCToolOffset(Commands.G43_2, gcValues.N, (uint)gcValues.H);
+                                var offset = new GCToolOffset(Commands.G43_2, gcValues.N, (uint)gcValues.H, blockDelete);
                                 if(AddToolOffset(offset))
                                     Tokens.Add(offset);
                                 // else error?
@@ -1391,7 +1404,7 @@ namespace CNC.GCode
 
                         case ToolLengthOffset.EnableDynamic:
                             {
-                                var offset = new GCToolOffsets(Commands.G43_1, gcValues.N, gcValues.XYZ, axisWords);
+                                var offset = new GCToolOffsets(Commands.G43_1, gcValues.N, gcValues.XYZ, axisWords, blockDelete);
                                 DynamicToolOffset(offset);
                                 Tokens.Add(offset);
                             }
@@ -1399,7 +1412,7 @@ namespace CNC.GCode
 
                         case ToolLengthOffset.Cancel:
                             CancelToolCompensation();
-                            Tokens.Add(new GCodeToken(Commands.G49, gcValues.N));
+                            Tokens.Add(new GCodeToken(Commands.G49, gcValues.N, blockDelete));
                             break;
                     }
                 }
@@ -1412,7 +1425,7 @@ namespace CNC.GCode
                 if (modalGroups.HasFlag(ModalGroups.G12))
                 {
                     CoordSystem = (int)coordSystem - 53;
-                    Tokens.Add(new GCodeToken(Commands.G54 + CoordSystem - 1, gcValues.N));
+                    Tokens.Add(new GCodeToken(Commands.G54 + CoordSystem - 1, gcValues.N, blockDelete));
                 }
 
                 //
@@ -1422,7 +1435,7 @@ namespace CNC.GCode
                 // G61, G61.1, G64
                 if (modalGroups.HasFlag(ModalGroups.G13))
                 {
-                    Tokens.Add(new GCodeToken(cmdPathMode, gcValues.N));
+                    Tokens.Add(new GCodeToken(cmdPathMode, gcValues.N, blockDelete));
                 }
 
                 //
@@ -1432,7 +1445,7 @@ namespace CNC.GCode
                 // G90, G91
                 if (modalGroups.HasFlag(ModalGroups.G3))
                 {
-                    var mode = new GCDistanceMode(cmdDistMode, gcValues.N);
+                    var mode = new GCDistanceMode(cmdDistMode, gcValues.N, blockDelete);
                     DistanceMode = mode.DistanceMode;
                     Tokens.Add(mode);
                 }
@@ -1440,7 +1453,7 @@ namespace CNC.GCode
                 // G90.1, G91.1
                 if (modalGroups.HasFlag(ModalGroups.G4))
                 {
-                    var mode = new GCIJKMode(cmdDistModeIJK, gcValues.N);
+                    var mode = new GCIJKMode(cmdDistModeIJK, gcValues.N, blockDelete);
                     IJKMode = mode.IJKMode;
                     Tokens.Add(mode);
                 }
@@ -1453,7 +1466,7 @@ namespace CNC.GCode
                 if (modalGroups.HasFlag(ModalGroups.G10))
                 {
                     RetractOldZ = cmdRetractMode == Commands.G98;
-                    Tokens.Add(new GCodeToken(cmdRetractMode, gcValues.N));
+                    Tokens.Add(new GCodeToken(cmdRetractMode, gcValues.N, blockDelete));
                 }
 
                 //
@@ -1475,7 +1488,7 @@ namespace CNC.GCode
                                 case 1:
                                     {
                                         var r = wordFlags.HasFlag(WordFlags.R) ? gcValues.R : double.NaN;
-                                        var offset = new GCToolTable(Commands.G10, 1, gcValues.N, (uint)gcValues.P, r, gcValues.XYZ, axisWords);
+                                        var offset = new GCToolTable(Commands.G10, 1, gcValues.N, (uint)gcValues.P, r, gcValues.XYZ, axisWords, blockDelete);
                                         if(SetToolTable(offset))
                                             Tokens.Add(offset);
                                         // else erroor?
@@ -1487,7 +1500,7 @@ namespace CNC.GCode
                                     {
                                         // to current position
                                         var r = wordFlags.HasFlag(WordFlags.R) ? gcValues.R : double.NaN;
-                                        var offset = new GCToolTable(Commands.G10, gcValues.N, (uint)gcValues.L, (uint)gcValues.P, r, gcValues.XYZ, axisWords);
+                                        var offset = new GCToolTable(Commands.G10, gcValues.N, (uint)gcValues.L, (uint)gcValues.P, r, gcValues.XYZ, axisWords, blockDelete);
                                         if (SetToolTable(offset))
                                             Tokens.Add(offset);
                                         // else erroor?
@@ -1497,7 +1510,7 @@ namespace CNC.GCode
                                 case 2:
                                 case 20:
                                     {
-                                        var offset = new GCCoordinateSystem(Commands.G10, gcValues.N, (uint)gcValues.L, (uint)gcValues.P, gcValues.XYZ, axisWords);
+                                        var offset = new GCCoordinateSystem(Commands.G10, gcValues.N, (uint)gcValues.L, (uint)gcValues.P, gcValues.XYZ, axisWords, blockDelete);
                                         if (SetCoordinateSystem(offset))
                                             Tokens.Add(offset);
                                         // else erroor?
@@ -1509,17 +1522,17 @@ namespace CNC.GCode
                         case Commands.G28:
                         case Commands.G30:
                             HasGoPredefinedPosition = true;
-                            Tokens.Add(new GCLinearMotion(cmdNonModal, gcValues.N, gcValues.XYZ, axisWords));
+                            Tokens.Add(new GCLinearMotion(cmdNonModal, gcValues.N, gcValues.XYZ, axisWords, blockDelete));
                             break;
 
                         case Commands.G53:
                             if (motionMode == MotionMode.G0 || motionMode == MotionMode.G1)
                             {
                                 if (modalGroups.HasFlag(ModalGroups.G1))
-                                    Tokens.Add(new GCAbsLinearMotion(cmdNonModal, motionMode == MotionMode.G0 ? Commands.G0 : Commands.G1, gcValues.N, gcValues.XYZ, AxisFlags.None));
+                                    Tokens.Add(new GCAbsLinearMotion(cmdNonModal, motionMode == MotionMode.G0 ? Commands.G0 : Commands.G1, gcValues.N, gcValues.XYZ, AxisFlags.None, blockDelete));
                                 else
                                 {
-                                    Tokens.Add(new GCAbsLinearMotion(cmdNonModal, motionMode == MotionMode.G0 ? Commands.G0 : Commands.G1, gcValues.N, gcValues.XYZ, axisWords));
+                                    Tokens.Add(new GCAbsLinearMotion(cmdNonModal, motionMode == MotionMode.G0 ? Commands.G0 : Commands.G1, gcValues.N, gcValues.XYZ, axisWords, blockDelete));
                                     axisWords = AxisFlags.None;
                                 }
                             }
@@ -1528,41 +1541,41 @@ namespace CNC.GCode
                             break;
 
                         case Commands.G28_1:
-                            Tokens.Add(new GCCoordinateSystem(cmdNonModal, gcValues.N, 11, gcValues.XYZ, axisWords));
+                            Tokens.Add(new GCCoordinateSystem(cmdNonModal, gcValues.N, 11, gcValues.XYZ, axisWords, blockDelete));
                             break;
 
                         case Commands.G30_1:
-                            Tokens.Add(new GCCoordinateSystem(cmdNonModal, gcValues.N, 12, gcValues.XYZ, axisWords));
+                            Tokens.Add(new GCCoordinateSystem(cmdNonModal, gcValues.N, 12, gcValues.XYZ, axisWords, blockDelete));
                             break;
 
                         case Commands.G92:
                             {
-                                var offset = new GCCoordinateSystem(cmdNonModal, gcValues.N, 10, gcValues.XYZ, axisWords);
+                                var offset = new GCCoordinateSystem(cmdNonModal, gcValues.N, 10, gcValues.XYZ, axisWords, blockDelete);
                                 SetG92Offset(offset);
-                                Tokens.Add(new GCCoordinateSystem(cmdNonModal, gcValues.N, 10, gcValues.XYZ, axisWords));
+                                Tokens.Add(new GCCoordinateSystem(cmdNonModal, gcValues.N, 10, gcValues.XYZ, axisWords, blockDelete));
                             }
                             break;
 
                         case Commands.G92_1:
                             G92Clear();
-                            Tokens.Add(new GCodeToken(cmdNonModal, gcValues.N));
+                            Tokens.Add(new GCodeToken(cmdNonModal, gcValues.N, blockDelete));
                             break;
 
                         case Commands.G92_2:
                             G92Active = false;
-                            Tokens.Add(new GCodeToken(cmdNonModal, gcValues.N));
+                            Tokens.Add(new GCodeToken(cmdNonModal, gcValues.N, blockDelete));
                             break;
 
                         case Commands.G92_3:
                             G92Active = true;
-                            Tokens.Add(new GCodeToken(cmdNonModal, gcValues.N));
+                            Tokens.Add(new GCodeToken(cmdNonModal, gcValues.N, blockDelete));
                             break;
 
                         case Commands.G65:
                             if (!wordFlags.HasFlag(WordFlags.P))
                                 throw new GCodeException(LibStrings.FindResource("ParserCMDInvalid"));
                             wordFlags &= ~(WordFlags.L | WordFlags.N | WordFlags.O | WordFlags.P);
-                            Tokens.Add(new GCMacroCall(cmdNonModal, gcValues.N, (uint)gcValues.P, (uint)gcValues.L, new GCParameters(gcValues, wordFlags).Values));
+                            Tokens.Add(new GCMacroCall(cmdNonModal, gcValues.N, (uint)gcValues.P, (uint)gcValues.L, new GCParameters(gcValues, wordFlags).Values, blockDelete));
                             break;
 
                     }
@@ -1580,7 +1593,7 @@ namespace CNC.GCode
             {
                 motionMode = MotionMode.None;
                 RetractOldZ = true;
-                Tokens.Add(new GCodeToken(Commands.G80, gcValues.N));
+                Tokens.Add(new GCodeToken(Commands.G80, gcValues.N, blockDelete));
             }
 
             if (motionMode != MotionMode.None && (axisWords != AxisFlags.None || ijkWords != IJKFlags.None || modalGroups.HasFlag(ModalGroups.G1)))
@@ -1589,14 +1602,14 @@ namespace CNC.GCode
                 {
                     case MotionMode.G0:
                         RetractOldZ = true;
-                        Tokens.Add(new GCLinearMotion(Commands.G0, gcValues.N, gcValues.XYZ, axisWords));
+                        Tokens.Add(new GCLinearMotion(Commands.G0, gcValues.N, gcValues.XYZ, axisWords, blockDelete));
                         break;
 
                     case MotionMode.G1:
                         if (feedRate == 0d)
                             throw new GCodeException(LibStrings.FindResource("ParserG1NoFeed"));
                         RetractOldZ = true;
-                        Tokens.Add(new GCLinearMotion(Commands.G1, gcValues.N, gcValues.XYZ, axisWords));
+                        Tokens.Add(new GCLinearMotion(Commands.G1, gcValues.N, gcValues.XYZ, axisWords, blockDelete));
                         break;
 
                     case MotionMode.G2:
@@ -1631,7 +1644,7 @@ namespace CNC.GCode
                             if(gcValues.P <= 0d)
                                 throw new GCodeException(LibStrings.FindResource("ParserCMDInvalid"));
                         }
-                        Tokens.Add(new GCArc(motionMode == MotionMode.G2 ? Commands.G2 : Commands.G3, gcValues.N, gcValues.XYZ, axisWords, gcValues.IJK, ijkWords, gcValues.R, wordFlags.HasFlag(WordFlags.P) ? (int)gcValues.P : 0, IJKMode));
+                        Tokens.Add(new GCArc(motionMode == MotionMode.G2 ? Commands.G2 : Commands.G3, gcValues.N, gcValues.XYZ, axisWords, gcValues.IJK, ijkWords, gcValues.R, wordFlags.HasFlag(WordFlags.P) ? (int)gcValues.P : 0, IJKMode, blockDelete));
                         break;
 
                     case MotionMode.G5:
@@ -1666,7 +1679,7 @@ namespace CNC.GCode
                                 splinePQ[i] *= scaleFactors[i];
                         }
                         RetractOldZ = true;
-                        Tokens.Add(new GCCubicSpline(Commands.G5, gcValues.N, gcValues.XYZ, axisWords, new double[] { gcValues.IJK[0], gcValues.IJK[1], splinePQ[0], splinePQ[1] }));
+                        Tokens.Add(new GCCubicSpline(Commands.G5, gcValues.N, gcValues.XYZ, axisWords, new double[] { gcValues.IJK[0], gcValues.IJK[1], splinePQ[0], splinePQ[1] }, blockDelete));
                         break;
 
                     case MotionMode.G5_1:
@@ -1682,33 +1695,33 @@ namespace CNC.GCode
                                 gcValues.IJK[i] *= scaleFactors[i];
                         }
                         RetractOldZ = true;
-                        Tokens.Add(new GCQuadraticSpline(Commands.G5_1, gcValues.N, gcValues.XYZ, axisWords, new double[] { gcValues.IJK[0], gcValues.IJK[1] }));
+                        Tokens.Add(new GCQuadraticSpline(Commands.G5_1, gcValues.N, gcValues.XYZ, axisWords, new double[] { gcValues.IJK[0], gcValues.IJK[1] }, blockDelete));
                         break;
 
                     case MotionMode.G33:
                         RetractOldZ = true;
-                        Tokens.Add(new GCSyncMotion(Commands.G33, gcValues.N, gcValues.XYZ, axisWords, gcValues.K, wordFlags.HasFlag(WordFlags.Dollar) ? gcValues.Dollar : -1));
+                        Tokens.Add(new GCSyncMotion(Commands.G33, gcValues.N, gcValues.XYZ, axisWords, gcValues.K, wordFlags.HasFlag(WordFlags.Dollar) ? gcValues.Dollar : -1, blockDelete));
                         wordFlags &= ~WordFlags.Dollar;
                         break;
 
                     case MotionMode.G38_2:
                         RetractOldZ = true;
-                        Tokens.Add(new GCLinearMotion(Commands.G38_2, gcValues.N, gcValues.XYZ, axisWords));
+                        Tokens.Add(new GCLinearMotion(Commands.G38_2, gcValues.N, gcValues.XYZ, axisWords, blockDelete));
                         break;
 
                     case MotionMode.G38_3:
                         RetractOldZ = true;
-                        Tokens.Add(new GCLinearMotion(Commands.G38_3, gcValues.N, gcValues.XYZ, axisWords));
+                        Tokens.Add(new GCLinearMotion(Commands.G38_3, gcValues.N, gcValues.XYZ, axisWords, blockDelete));
                         break;
 
                     case MotionMode.G38_4:
                         RetractOldZ = true;
-                        Tokens.Add(new GCLinearMotion(Commands.G38_4, gcValues.N, gcValues.XYZ, axisWords));
+                        Tokens.Add(new GCLinearMotion(Commands.G38_4, gcValues.N, gcValues.XYZ, axisWords, blockDelete));
                         break;
 
                     case MotionMode.G38_5:
                         RetractOldZ = true;
-                        Tokens.Add(new GCLinearMotion(Commands.G38_5, gcValues.N, gcValues.XYZ, axisWords));
+                        Tokens.Add(new GCLinearMotion(Commands.G38_5, gcValues.N, gcValues.XYZ, axisWords, blockDelete));
                         break;
 
                     case MotionMode.G73:
@@ -1718,7 +1731,7 @@ namespace CNC.GCode
                                 throw new GCodeException(LibStrings.FindResource("ParserNoR"));
                             if (motionModeChanged && !wordFlags.HasFlag(WordFlags.Q) || gcValues.Q <= 0d)
                                 throw new GCodeException(LibStrings.FindResource("ParserNoInvalidQ"));
-                            Tokens.Add(new GCCannedDrill(Commands.G73, gcValues.N, gcValues.XYZ, axisWords, ToMetric(gcValues.R), repeats, 0d, ToMetric(gcValues.Q)));
+                            Tokens.Add(new GCCannedDrill(Commands.G73, gcValues.N, gcValues.XYZ, axisWords, ToMetric(gcValues.R), repeats, 0d, ToMetric(gcValues.Q), blockDelete));
                         }
                         break;
 
@@ -1791,7 +1804,7 @@ namespace CNC.GCode
                                 foreach (int i in ijkWords.ToIndices())
                                     gcValues.IJK[i] /= 2d;
                             RetractOldZ = true;
-                            Tokens.Add(new GCThreadingMotion(Commands.G76, gcValues.N, gcValues.P, gcValues.XYZ, axisWords, gcValues.IJK, IJKFlags.All, optValues, optFlags, wordFlags.HasFlag(WordFlags.Dollar) ? gcValues.Dollar : -1));
+                            Tokens.Add(new GCThreadingMotion(Commands.G76, gcValues.N, gcValues.P, gcValues.XYZ, axisWords, gcValues.IJK, IJKFlags.All, optValues, optFlags, wordFlags.HasFlag(WordFlags.Dollar) ? gcValues.Dollar : -1, blockDelete));
                             wordFlags &= ~WordFlags.Dollar;
                         }
                         break;
@@ -1799,7 +1812,7 @@ namespace CNC.GCode
                     case MotionMode.G81:
                         {
                             uint repeats = wordFlags.HasFlag(WordFlags.L) ? (uint)gcValues.L : 1;
-                            Tokens.Add(new GCCannedDrill(Commands.G81, gcValues.N, gcValues.XYZ, axisWords, wordFlags.HasFlag(WordFlags.R) ? ToMetric(gcValues.R) : double.NaN, repeats));
+                            Tokens.Add(new GCCannedDrill(Commands.G81, gcValues.N, gcValues.XYZ, axisWords, wordFlags.HasFlag(WordFlags.R) ? ToMetric(gcValues.R) : double.NaN, repeats, blockDelete));
                         }
                         break;
 
@@ -1807,7 +1820,7 @@ namespace CNC.GCode
                         {
                             uint repeats = wordFlags.HasFlag(WordFlags.L) ? (uint)gcValues.L : 1;
                             double dwell = wordFlags.HasFlag(WordFlags.P) ? gcValues.P : 0d;
-                            Tokens.Add(new GCCannedDrill(Commands.G82, gcValues.N, gcValues.XYZ, axisWords, wordFlags.HasFlag(WordFlags.R) ? ToMetric(gcValues.R) : double.NaN, repeats, dwell));
+                            Tokens.Add(new GCCannedDrill(Commands.G82, gcValues.N, gcValues.XYZ, axisWords, wordFlags.HasFlag(WordFlags.R) ? ToMetric(gcValues.R) : double.NaN, repeats, dwell, blockDelete));
                         }
                         break;
 
@@ -1816,14 +1829,14 @@ namespace CNC.GCode
                             uint repeats = wordFlags.HasFlag(WordFlags.L) ? (uint)gcValues.L : 1;
                             if (motionModeChanged && !wordFlags.HasFlag(WordFlags.Q) || gcValues.Q <= 0d)
                                 throw new GCodeException(LibStrings.FindResource("ParserNoInvalidQ"));
-                            Tokens.Add(new GCCannedDrill(Commands.G83, gcValues.N, gcValues.XYZ, axisWords, wordFlags.HasFlag(WordFlags.R) ? ToMetric(gcValues.R) : double.NaN, repeats, 0d, ToMetric(gcValues.Q)));
+                            Tokens.Add(new GCCannedDrill(Commands.G83, gcValues.N, gcValues.XYZ, axisWords, wordFlags.HasFlag(WordFlags.R) ? ToMetric(gcValues.R) : double.NaN, repeats, 0d, ToMetric(gcValues.Q), blockDelete));
                         }
                         break;
 
                     case MotionMode.G85:
                         {
                             uint repeats = wordFlags.HasFlag(WordFlags.L) ? (uint)gcValues.L : 1;
-                            Tokens.Add(new GCCannedDrill(Commands.G85, gcValues.N, gcValues.XYZ, axisWords, wordFlags.HasFlag(WordFlags.R) ? ToMetric(gcValues.R) : double.NaN, repeats));
+                            Tokens.Add(new GCCannedDrill(Commands.G85, gcValues.N, gcValues.XYZ, axisWords, wordFlags.HasFlag(WordFlags.R) ? ToMetric(gcValues.R) : double.NaN, repeats, blockDelete));
                         }
                         break;
 
@@ -1832,7 +1845,7 @@ namespace CNC.GCode
                             // error if spindle not running
                             uint repeats = wordFlags.HasFlag(WordFlags.L) ? (uint)gcValues.L : 1;
                             double dwell = wordFlags.HasFlag(WordFlags.P) ? gcValues.P : 0d;
-                            Tokens.Add(new GCCannedDrill(Commands.G86, gcValues.N, gcValues.XYZ, axisWords, wordFlags.HasFlag(WordFlags.R) ? ToMetric(gcValues.R) : double.NaN, repeats, dwell));
+                            Tokens.Add(new GCCannedDrill(Commands.G86, gcValues.N, gcValues.XYZ, axisWords, wordFlags.HasFlag(WordFlags.R) ? ToMetric(gcValues.R) : double.NaN, repeats, dwell, blockDelete));
                         }
                         break;
 
@@ -1840,7 +1853,7 @@ namespace CNC.GCode
                         {
                             uint repeats = wordFlags.HasFlag(WordFlags.L) ? (uint)gcValues.L : 1;
                             double dwell = wordFlags.HasFlag(WordFlags.P) ? gcValues.P : 0d;
-                            Tokens.Add(new GCCannedDrill(Commands.G89, gcValues.N, gcValues.XYZ, axisWords, wordFlags.HasFlag(WordFlags.R) ? ToMetric(gcValues.R) : double.NaN, repeats, dwell));
+                            Tokens.Add(new GCCannedDrill(Commands.G89, gcValues.N, gcValues.XYZ, axisWords, wordFlags.HasFlag(WordFlags.R) ? ToMetric(gcValues.R) : double.NaN, repeats, dwell, blockDelete));
                         }
                         break;
                 }
@@ -1856,7 +1869,7 @@ namespace CNC.GCode
             if (modalGroups.HasFlag(ModalGroups.M4))
             {
                 ProgramEnd = cmdProgramFlow == Commands.M2 || cmdProgramFlow == Commands.M30;
-                Tokens.Add(new GCodeToken(cmdProgramFlow, gcValues.N));
+                Tokens.Add(new GCodeToken(cmdProgramFlow, gcValues.N, blockDelete));
             }
 
             return true;
@@ -1934,7 +1947,7 @@ namespace CNC.GCode
             uint line = 0;
 
             bool isRelative = false, relativeChanged = true;
-            GCodeToken lastMotion = new GCodeToken(Commands.Undefined, 0);
+            GCodeToken lastMotion = new GCodeToken(Commands.Undefined, 0, false);
 
             foreach (var token in tokens)
             {
@@ -1943,7 +1956,7 @@ namespace CNC.GCode
                     if (block != string.Empty)
                     {
                         gc.Add(block);
-                        block = string.Empty;
+                        block = token.BlockDelete ? "/" : string.Empty;
                     }
                     line = token.LineNumber;
                 }
@@ -2094,7 +2107,7 @@ namespace CNC.GCode
                         break;
 
                     case Commands.G80:
-                        lastMotion = new GCodeToken(Commands.Undefined, 0);
+                        lastMotion = new GCodeToken(Commands.Undefined, 0, false);
                         block += token.ToString();
                         break;
 
@@ -2176,6 +2189,7 @@ namespace CNC.GCode
     {
         public uint LineNumber { get; set; }
         public Commands Command { get; set; }
+        public bool BlockDelete { get; set; }
         /*
         public int ViewIndexStart { get; set; }
         public int ViewIndexEnd { get; set; }
@@ -2185,10 +2199,11 @@ namespace CNC.GCode
             Command = Commands.Undefined;
         }
 
-        public GCodeToken(Commands command, uint lnr)
+        public GCodeToken(Commands command, uint lnr, bool blockDelete)
         {
             Command = command;
             LineNumber = lnr;
+            BlockDelete = blockDelete;
         }
 
         public new string ToString()
@@ -2201,7 +2216,7 @@ namespace CNC.GCode
         public GCAxisCommand3()
         { }
 
-        public GCAxisCommand3(Commands command, uint lnr, double[] values, AxisFlags axisFlags) : base(command, lnr)
+        public GCAxisCommand3(Commands command, uint lnr, double[] values, AxisFlags axisFlags, bool blockDelete) : base(command, lnr, blockDelete)
         {
             Array.Copy(values, Values, 3);
             AxisFlags = axisFlags;
@@ -2230,7 +2245,7 @@ namespace CNC.GCode
         public GCAxisCommand9()
         { }
 
-        public GCAxisCommand9(Commands command, uint lnr, double[] values, AxisFlags axisFlags) : base(command, lnr)
+        public GCAxisCommand9(Commands command, uint lnr, double[] values, AxisFlags axisFlags, bool blockDelete) : base(command, lnr, blockDelete)
         {
             Array.Copy(values, Values, values.Length); // Only copy for num axes?
             AxisFlags = axisFlags;
@@ -2298,7 +2313,7 @@ namespace CNC.GCode
         public AxisCommand3IJK()
         { }
 
-        public AxisCommand3IJK(Commands command, uint lnr, double[] values, AxisFlags axisFlags, double[] ijkValues, IJKFlags ijkFlags) : base(command, lnr, values, axisFlags)
+        public AxisCommand3IJK(Commands command, uint lnr, double[] values, AxisFlags axisFlags, double[] ijkValues, IJKFlags ijkFlags, bool blockDelete) : base(command, lnr, values, axisFlags, blockDelete)
         {
             Array.Copy(ijkValues, IJKvalues, 3);
             IjkFlags = ijkFlags;
@@ -2328,7 +2343,7 @@ namespace CNC.GCode
         public GCLinearMotion()
         { }
 
-        public GCLinearMotion(Commands command, uint lnr, double[] values, AxisFlags axisFlags) : base(command, lnr, values, axisFlags)
+        public GCLinearMotion(Commands command, uint lnr, double[] values, AxisFlags axisFlags, bool blockDelete) : base(command, lnr, values, axisFlags, blockDelete)
         { }
 
         public new string ToString()
@@ -2342,7 +2357,7 @@ namespace CNC.GCode
         public GCAbsLinearMotion()
         { }
 
-        public GCAbsLinearMotion(Commands command, Commands motion, uint lnr, double[] values, AxisFlags axisFlags) : base(command, lnr, values, axisFlags)
+        public GCAbsLinearMotion(Commands command, Commands motion, uint lnr, double[] values, AxisFlags axisFlags, bool blockDelete) : base(command, lnr, values, axisFlags, blockDelete)
         {
             Motion = motion;
         }
@@ -2365,7 +2380,7 @@ namespace CNC.GCode
         public GCArc()
         { }
 
-        public GCArc(Commands cmd, uint lnr, double[] xyz_values, AxisFlags axisFlags, double[] ijk_values, IJKFlags ijkFlags, double r, int p, IJKMode ijkMode) : base(cmd, lnr, xyz_values, axisFlags)
+        public GCArc(Commands cmd, uint lnr, double[] xyz_values, AxisFlags axisFlags, double[] ijk_values, IJKFlags ijkFlags, double r, int p, IJKMode ijkMode, bool blockDelete) : base(cmd, lnr, xyz_values, axisFlags, blockDelete)
         {
             Array.Copy(ijk_values, IJKvalues, 3);
             Array.Copy(Values, end, 3);
@@ -2892,7 +2907,7 @@ namespace CNC.GCode
         public GCCubicSpline()
         { }
 
-        public GCCubicSpline(Commands cmd, uint lnr, double[] xyz_values, AxisFlags axisFlags, double[] ijpq_values) : base(cmd, lnr, xyz_values, axisFlags)
+        public GCCubicSpline(Commands cmd, uint lnr, double[] xyz_values, AxisFlags axisFlags, double[] ijpq_values, bool blockDelete) : base(cmd, lnr, xyz_values, axisFlags, blockDelete)
         {
             Array.Copy(ijpq_values, IJPQKvalues, 4);
         }
@@ -2940,7 +2955,7 @@ namespace CNC.GCode
         public GCQuadraticSpline()
         { }
 
-        public GCQuadraticSpline(Commands cmd, uint lnr, double[] xyz_values, AxisFlags axisFlags, double[] ij_values) : base(cmd, lnr, xyz_values, axisFlags)
+        public GCQuadraticSpline(Commands cmd, uint lnr, double[] xyz_values, AxisFlags axisFlags, double[] ij_values, bool blockDelete) : base(cmd, lnr, xyz_values, axisFlags, blockDelete)
         {
             Array.Copy(ij_values, IJvalues, 2);
         }
@@ -2989,7 +3004,7 @@ namespace CNC.GCode
         public GCMacroCall()
         { }
 
-        public GCMacroCall(Commands command, uint lnr, uint macroId, uint repeats, double[] values) : base(command, lnr)
+        public GCMacroCall(Commands command, uint lnr, uint macroId, uint repeats, double[] values, bool blockDelete) : base(command, lnr, blockDelete)
         {
             P = macroId;
             L = repeats;
@@ -3012,7 +3027,7 @@ namespace CNC.GCode
         { }
 
         // G81,G85
-        public GCCannedDrill(Commands command, uint lnr, double[] values, AxisFlags axisFlags, double r, uint l) : base(command, lnr, values, axisFlags)
+        public GCCannedDrill(Commands command, uint lnr, double[] values, AxisFlags axisFlags, double r, uint l, bool blockDelete) : base(command, lnr, values, axisFlags, blockDelete)
         {
             R = r;
             L = l == 0 ? 1 : l;
@@ -3020,7 +3035,7 @@ namespace CNC.GCode
         }
 
         // G82,G86,G89
-        public GCCannedDrill(Commands command, uint lnr, double[] values, AxisFlags axisFlags, double r, uint l, double p) : base(command, lnr, values, axisFlags)
+        public GCCannedDrill(Commands command, uint lnr, double[] values, AxisFlags axisFlags, double r, uint l, double p, bool blockDelete) : base(command, lnr, values, axisFlags, blockDelete)
         {
             R = r;
             L = l == 0 ? 1 : l;
@@ -3029,7 +3044,7 @@ namespace CNC.GCode
         }
 
         // G73,G83 // P always 0 for these
-        public GCCannedDrill(Commands command, uint lnr, double[] values, AxisFlags axisFlags, double r, uint l, double p, double q) : base(command, lnr, values, axisFlags)
+        public GCCannedDrill(Commands command, uint lnr, double[] values, AxisFlags axisFlags, double r, uint l, double p, double q, bool blockDelete) : base(command, lnr, values, axisFlags, blockDelete)
         {
             R = r;
             L = l == 0 ? 1 : l;
@@ -3057,7 +3072,7 @@ namespace CNC.GCode
         public GCSyncMotion()
         { }
 
-        public GCSyncMotion(Commands command, uint lnr, double[] values, AxisFlags axisFlags, double k, int spindle) : base(command, lnr, values, axisFlags)
+        public GCSyncMotion(Commands command, uint lnr, double[] values, AxisFlags axisFlags, double k, int spindle, bool blockDelete) : base(command, lnr, values, axisFlags, blockDelete)
         {
             Spindle = spindle;
             K = k;
@@ -3077,7 +3092,7 @@ namespace CNC.GCode
         public GCThreadingMotion()
         { }
 
-        public GCThreadingMotion(Commands command, uint lnr, double p, double[] values, AxisFlags axisFlags, double[] ijkValues, IJKFlags ijkFlags, double[] optvals, ThreadingFlags threadingFlags, int spindle) : base(command, lnr, values, axisFlags, ijkValues, ijkFlags)
+        public GCThreadingMotion(Commands command, uint lnr, double p, double[] values, AxisFlags axisFlags, double[] ijkValues, IJKFlags ijkFlags, double[] optvals, ThreadingFlags threadingFlags, int spindle, bool blockDelete) : base(command, lnr, values, axisFlags, ijkValues, ijkFlags, blockDelete)
         {
             P = p;
 
@@ -3159,13 +3174,13 @@ namespace CNC.GCode
         public GCCoordinateSystem()
         { }
 
-        public GCCoordinateSystem(Commands cmd, uint lnr, uint p, double[] values, AxisFlags axisFlags) : base(cmd, lnr, values, axisFlags)
+        public GCCoordinateSystem(Commands cmd, uint lnr, uint p, double[] values, AxisFlags axisFlags, bool blockDelete) : base(cmd, lnr, values, axisFlags, blockDelete)
         {
             L = 0;
             P = p;
             R = double.NaN;
         }
-        public GCCoordinateSystem(Commands cmd, uint lnr, uint l, uint p, double[] values, AxisFlags axisFlags) : base(cmd, lnr, values, axisFlags)
+        public GCCoordinateSystem(Commands cmd, uint lnr, uint l, uint p, double[] values, AxisFlags axisFlags, bool blockDelete) : base(cmd, lnr, values, axisFlags, blockDelete)
         {
             L = l;
             P = p;
@@ -3189,7 +3204,7 @@ namespace CNC.GCode
         public GCToolOffset()
         { }
 
-        public GCToolOffset(Commands cmd, uint lnr, uint h) : base(cmd, lnr)
+        public GCToolOffset(Commands cmd, uint lnr, uint h, bool blockDelete) : base(cmd, lnr, blockDelete)
         {
             H = h;
         }
@@ -3207,7 +3222,7 @@ namespace CNC.GCode
         public GCToolOffsets()
         { }
 
-        public GCToolOffsets(Commands cmd, uint lnr, double[] values, AxisFlags axisFlags) : base(cmd, lnr, values, axisFlags)
+        public GCToolOffsets(Commands cmd, uint lnr, double[] values, AxisFlags axisFlags, bool blockDelete) : base(cmd, lnr, values, axisFlags, blockDelete)
         {
         }
 
@@ -3222,7 +3237,7 @@ namespace CNC.GCode
         public GCToolTable()
         { }
 
-        public GCToolTable(Commands cmd, uint lnr, uint l, uint p, double r, double[] values, AxisFlags axisFlags) : base(cmd, lnr, values, axisFlags)
+        public GCToolTable(Commands cmd, uint lnr, uint l, uint p, double r, double[] values, AxisFlags axisFlags, bool blockDelete) : base(cmd, lnr, values, axisFlags, blockDelete)
         {
             P = p;
             R = r;
@@ -3244,7 +3259,7 @@ namespace CNC.GCode
         public GCScaling()
         { }
 
-        public GCScaling(Commands command, uint lnr, double[] values, AxisFlags axisFlags) : base(command, lnr, values, axisFlags)
+        public GCScaling(Commands command, uint lnr, double[] values, AxisFlags axisFlags, bool blockDelete) : base(command, lnr, values, axisFlags, blockDelete)
         {
         }
 
@@ -3259,7 +3274,7 @@ namespace CNC.GCode
         public GCToolSelect()
         { }
 
-        public GCToolSelect(Commands command, uint lnr, int tool) : base(command, lnr)
+        public GCToolSelect(Commands command, uint lnr, int tool, bool blockDelete) : base(command, lnr, blockDelete)
         {
             Tool = tool;
         }
@@ -3277,12 +3292,12 @@ namespace CNC.GCode
         public GCFeedrate()
         { }
 
-        public GCFeedrate(Commands command, uint lnr, double feedrate) : base(command, lnr)
+        public GCFeedrate(Commands command, uint lnr, double feedrate, bool blockDelete) : base(command, lnr, blockDelete)
         {
             Feedrate = feedrate;
         }
 
-        public GCFeedrate(uint lnr, double feedrate) : base(Commands.Feedrate, lnr)
+        public GCFeedrate(uint lnr, double feedrate, bool blockDelete) : base(Commands.Feedrate, lnr, blockDelete)
         {
             Feedrate = feedrate;
         }
@@ -3300,7 +3315,7 @@ namespace CNC.GCode
         public GCSpindleRPM()
         { }
 
-        public GCSpindleRPM(Commands command, uint lnr, double spindleRPM, int spindle) : base(command, lnr)
+        public GCSpindleRPM(Commands command, uint lnr, double spindleRPM, int spindle, bool blockDelete) : base(command, lnr, blockDelete)
         {
             Spindle = spindle;
             SpindleRPM = spindleRPM;
@@ -3320,10 +3335,8 @@ namespace CNC.GCode
         public GCSpindleState()
         { }
 
-        public GCSpindleState(uint lnr, SpindleState spindleState, int spindle)
+        public GCSpindleState(uint lnr, SpindleState spindleState, int spindle, bool blockDelete) : base(spindleState == SpindleState.Off ? Commands.M5 : (spindleState == SpindleState.CW ? Commands.M3 : Commands.M4), lnr, blockDelete)
         {
-            LineNumber = lnr;
-            Command = spindleState == SpindleState.Off ? Commands.M5 : (spindleState == SpindleState.CW ? Commands.M3 : Commands.M4);
             Spindle = spindle;
             SpindleState = spindleState;
         }
@@ -3342,29 +3355,20 @@ namespace CNC.GCode
         public GCCoolantState()
         { }
 
-        public GCCoolantState(uint lnr, CoolantState coolantState)
+        public GCCoolantState(uint lnr, CoolantState coolantState, bool blockDelete) : base(coolantState.HasFlag(CoolantState.Flood) ? Commands.M8 : (coolantState.HasFlag(CoolantState.Mist) ? Commands.M7 : Commands.M9), lnr, blockDelete)
         {
-            LineNumber = lnr;
-            Command = coolantState.HasFlag(CoolantState.Flood) ? Commands.M8 : (coolantState.HasFlag(CoolantState.Mist) ? Commands.M7 : Commands.M9);
             CoolantState = coolantState;
-
         }
 
         public CoolantState CoolantState { get; set; }
-
-        public new string ToString()
-        {
-            return Command.ToString();
-        }
     }
-
 
     public class GCPlane : GCodeToken
     {
         public GCPlane()
         { }
 
-        public GCPlane(Commands cmd, uint lnr) : base(cmd, lnr)
+        public GCPlane(Commands cmd, uint lnr, bool blockDelete) : base(cmd, lnr, blockDelete)
         {
         }
 
@@ -3372,11 +3376,6 @@ namespace CNC.GCode
         public int Axis0 { get { return Plane == Plane.XY ? 0 : (Plane == Plane.XZ ? 2 : 1); } }
         public int Axis1 { get { return Plane == Plane.XY ? 1 : (Plane == Plane.XZ ? 0 : 2); } }
         public int AxisLinear { get { return Plane == Plane.XY ? 2 : (Plane == Plane.XZ ? 1 : 0); } }
-
-        public new string ToString()
-        {
-            return base.ToString();
-        }
     }
 
     public class GCDistanceMode : GCodeToken
@@ -3384,11 +3383,11 @@ namespace CNC.GCode
         public GCDistanceMode()
         { }
 
-        public GCDistanceMode(Commands command, uint lnr) : base(command, lnr)
+        public GCDistanceMode(Commands command, uint lnr, bool blockDelete) : base(command, lnr, blockDelete)
         {
         }
 
-        public GCDistanceMode(uint lnr, DistanceMode distanceMode) : base(distanceMode == DistanceMode.Absolute ? Commands.G90 : Commands.G91, lnr)
+        public GCDistanceMode(uint lnr, DistanceMode distanceMode, bool blockDelete) : base(distanceMode == DistanceMode.Absolute ? Commands.G90 : Commands.G91, lnr, blockDelete)
         {
         }
 
@@ -3400,11 +3399,11 @@ namespace CNC.GCode
         public GCFeedRateMode()
         { }
 
-        public GCFeedRateMode(Commands command, uint lnr) : base(command, lnr)
+        public GCFeedRateMode(Commands command, uint lnr, bool blockDelete) : base(command, lnr, blockDelete)
         {
         }
 
-        public GCFeedRateMode(uint lnr, FeedRateMode feedRateMode) : base(feedRateMode == FeedRateMode.UnitsPerMin ? Commands.G94 : (feedRateMode == FeedRateMode.InverseTime ? Commands.G93 : Commands.G95), lnr)
+        public GCFeedRateMode(uint lnr, FeedRateMode feedRateMode, bool blockDelete) : base(feedRateMode == FeedRateMode.UnitsPerMin ? Commands.G94 : (feedRateMode == FeedRateMode.InverseTime ? Commands.G93 : Commands.G95), lnr, blockDelete)
         {
         }
 
@@ -3416,7 +3415,7 @@ namespace CNC.GCode
         public GCIJKMode()
         { }
 
-        public GCIJKMode(Commands command, uint lnr) : base(command, lnr)
+        public GCIJKMode(Commands command, uint lnr, bool blockDelete) : base(command, lnr, blockDelete)
         {
         }
 
@@ -3428,7 +3427,7 @@ namespace CNC.GCode
         public GCUnits()
         { }
 
-        public GCUnits(Commands command, uint lnr) : base(command, lnr)
+        public GCUnits(Commands command, uint lnr, bool blockDelete) : base(command, lnr, blockDelete)
         {
         }
 
@@ -3441,7 +3440,7 @@ namespace CNC.GCode
         public GCLatheMode()
         { }
 
-        public GCLatheMode(Commands command, uint lnr) : base(command, lnr)
+        public GCLatheMode(Commands command, uint lnr, bool blockDelete) : base(command, lnr, blockDelete)
         {
         }
 
@@ -3453,7 +3452,7 @@ namespace CNC.GCode
         public GCDwell()
         { }
 
-        public GCDwell(uint lnr, double delay) : base(Commands.G4, lnr)
+        public GCDwell(uint lnr, double delay, bool blockDelete) : base(Commands.G4, lnr, blockDelete)
         {
             Delay = delay;
         }
@@ -3471,7 +3470,7 @@ namespace CNC.GCode
         public GCComment()
         { }
 
-        public GCComment(Commands command, uint lnr, string comment) : base(command, lnr)
+        public GCComment(Commands command, uint lnr, string comment, bool blockDelete=false) : base(command, lnr, blockDelete)
         {
             Comment = comment.Length == 0 || comment[0] == '(' || comment[0] == ';' ? comment : "(" + comment + ")";
         }
@@ -3489,7 +3488,7 @@ namespace CNC.GCode
         public GCUserMCommand()
         { }
 
-        public GCUserMCommand(uint lnr, uint mCode, double p, double q) : base(Commands.UserMCommand, lnr)
+        public GCUserMCommand(uint lnr, uint mCode, double p, double q, bool blockDelete) : base(Commands.UserMCommand, lnr, blockDelete)
         {
             M = mCode;
             P = p;
@@ -3511,7 +3510,7 @@ namespace CNC.GCode
         public GCDigitalOutput()
         { }
 
-        public GCDigitalOutput(Commands command, uint lnr, uint p) : base(command, lnr)
+        public GCDigitalOutput(Commands command, uint lnr, uint p, bool blockDelete) : base(command, lnr, blockDelete)
         {
             P = p;
         }
@@ -3529,7 +3528,7 @@ namespace CNC.GCode
         public GCWaitOnInput()
         { }
 
-        public GCWaitOnInput(uint lnr, int p, int e, uint l, double q) : base(Commands.M67, lnr)
+        public GCWaitOnInput(uint lnr, int p, int e, uint l, double q, bool blockDelete) : base(Commands.M66, lnr, blockDelete)
         {
             P = p;
             E = e;
@@ -3554,7 +3553,7 @@ namespace CNC.GCode
         public GCAnalogOutput()
         { }
 
-        public GCAnalogOutput(Commands command, uint lnr, uint e, double q) : base(command, lnr)
+        public GCAnalogOutput(Commands command, uint lnr, uint e, double q, bool blockDelete) : base(command, lnr, blockDelete)
         {
             E = e;
             Q = q;
@@ -3592,7 +3591,7 @@ namespace CNC.GCode
         public GCFlowControl()
         { }
 
-        public GCFlowControl(Commands command, uint lnr, uint o, NGCExpr.FlowControl flowControl, string expression) : base(command, lnr)
+        public GCFlowControl(Commands command, uint lnr, uint o, NGCExpr.FlowControl flowControl, string expression, bool blockDelete) : base(command, lnr, blockDelete)
         {
             O = o;
             FlowControl = flowControl;
@@ -3605,7 +3604,7 @@ namespace CNC.GCode
 
         public new string ToString()
         {
-            return base.ToString() + "O" + O + FlowControl.ToString().ToLower() + Expression;
+            return base.ToString() + "o" + O + FlowControl.ToString().ToLower() + Expression;
         }
     }
 }
