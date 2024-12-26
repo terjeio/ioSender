@@ -1,0 +1,73 @@
+﻿<Window x:Class="CNC.Controls.Probing.MacroDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CNC.Controls.Probing"
+        mc:Ignorable="d" Height="255" Width="475"
+        WindowStartupLocation="Manual" Icon="App.ico" ResizeMode="NoResize" ShowInTaskbar="False" Background="#FFE5E5E5"
+        x:Uid="dlg_probingMacros" Title="Probing macros" Closed="Window_Closed" >
+    <Window.Resources>
+        <Style x:Key="MenuButtonStyle" TargetType="Button">
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.5"/>
+                </Trigger>
+            </Style.Triggers>
+            <Setter Property="Height" Value="24"/>
+            <Setter Property="Width" Value="24"/>
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border BorderThickness="{TemplateBinding BorderThickness}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                Background="Transparent">
+                            <Image Source="{Binding Path=Content, RelativeSource={RelativeSource TemplatedParent}}"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="32"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="30"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal" Margin="5,5,0,0">
+            <ComboBox x:Name="cbxMacro" IsEditable="True" Width="175" VerticalAlignment="Center" HorizontalAlignment="Left" DisplayMemberPath="Name" SelectedValuePath="Id"
+                      SelectedItem="{Binding SelectedMacro, Mode=TwoWay}"
+                      ItemsSource="{Binding Macros, UpdateSourceTrigger=PropertyChanged}"/>
+            <CheckBox x:Uid="chk_runonce" Content="Run once" Margin="10,0,0,0" VerticalAlignment="Center" IsChecked="{Binding RunOnce, Mode=TwoWay, FallbackValue=true}" IsEnabled="{Binding Path=CanEdit}"/>
+            <Button x:Uid="btn_actionMenu" x:Name="btnActionMenu" ToolTip="Click for actions menu." Content="Resources\menu_22x22.png" Style="{StaticResource MenuButtonStyle}" Margin="10,0,0,0" Click="btnActionMenu_Click">
+                <Button.ContextMenu>
+                    <ContextMenu x:Name="cm">
+                        <MenuItem x:Uid="mnu_add" x:Name="mnuAdd" Header="Add" IsEnabled="{Binding Path=CanAdd}" Command="{Binding AddCommand}"/>
+                        <MenuItem x:Uid="mnu_update" x:Name="mnuUpdate" Header="Update" IsEnabled="{Binding Path=CanEdit}" Command="{Binding AddCommand}"/>
+                        <MenuItem x:Uid="mnu_delete" x:Name="mnuDelete" Header="Delete" IsEnabled="{Binding Path=CanDelete}" Command="{Binding DeleteCommand}"/>
+                    </ContextMenu>
+                </Button.ContextMenu>
+            </Button>
+        </StackPanel>
+        <StackPanel Grid.Row="1" Grid.Column="0" Margin="5,0,2,0">
+            <Label x:Uid="lbl_prejobmacro" Content="Pre job:" HorizontalAlignment="Left"/>
+            <TextBox x:Uid="txt_preprobecommands" Text="{Binding PreMacroText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding Path=CanEdit}" ToolTip="Commands to run before probing starts." Height="125" TextWrapping="Wrap" AcceptsReturn="True" />
+        </StackPanel>
+        <StackPanel Grid.Row="1" Grid.Column="1" Margin="2,0,5,0">
+            <Label x:Uid="lbl_postjobmacro" Content="Post job:" HorizontalAlignment="Left"/>
+            <TextBox x:Uid="txt_postprobecommands" Text="{Binding PostMacroText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding Path=CanEdit}" ToolTip="Commands to after before probing completes." TextWrapping="Wrap" AcceptsReturn="True" Height="125"/>
+        </StackPanel>
+        <StackPanel Margin="5,0,0,5" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="3" HorizontalAlignment="Center" VerticalAlignment="Bottom" Orientation="Horizontal">
+            <Button x:Uid="btn_close" Content="Close" Width="100" Margin="0,0,10,0" Click="Button_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>
