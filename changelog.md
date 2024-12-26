@@ -4,7 +4,7 @@
 
 * Added spindle selection using drop down, ref. issue #399.
 * Remove R\(eset\) Signals "LED" if the input is not available.
-* Fixes for issue #414 & #429, heightmap probing failures. NOTE: these issues were due to a regression in a 2.0.45 prerelease.
+* Fixes for issue #414 & #420, heightmap probing failures. NOTE: these issues were due to a regression in a 2.0.45 prerelease.
 * Added parser support for block delete character.
 * Added filter button in SD card viewer for show/hide non-CNC files.
 * Allow use of modified legacy Grbl controller.
