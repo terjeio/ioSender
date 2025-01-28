@@ -245,20 +245,21 @@ CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgNoResponseExit:System.
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgResetExit:System.String.$Content,None,True,True,,控制器软重置失败，正在退出。
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgResetFailed:System.String.$Content,None,True,True,,控制器软重置失败，正在退出。
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgWait:System.String.$Content,None,True,True,,正在等待控制器 ({0})…
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,str_noCard:System.String.$Content,None,True,True,,No card mounted.
 CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,str_notConnection:System.String.$Content,None,True,True,,无连接。
 CNC.Controls.WPF.g.en-US.resources:outlineflyout.baml,str_outlineFlyout:System.String.$Content,None,True,True,,_加工范围
 CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,str_pause:System.String.$Content,None,True,True,,暂停
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_rotateG17G18Arcs:System.String.$Content,None,True,True,,"GCode contains arcs in XZ or YZ plane (G18/19), can&apos;t apply transform. Use &apos;Arcs to Lines&apos; if you really need this."
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_rotateRadiusArcs:System.String.$Content,None,True,True,,"GCode contains radius mode arcs, can&apos;t apply transform. Use &apos;Arcs to Lines&apos; if you really need this."
-CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,str_runMacro:System.String.$Content,None,True,True,,Run macro {0} with no parameters?
 CNC.Controls.WPF.g.en-US.resources:macroexecutecontrol.baml,str_runMacro:System.String.$Content,None,True,True,,运行 {0} 宏吗？
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,str_runMacro:System.String.$Content,None,True,True,,Run macro {0} with no parameters?
 CNC.Controls.WPF.g.en-US.resources:macrotoolbarcontrol.baml,str_runMacro:System.String.$Content,None,True,True,,要运行 {0} 宏吗？
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_saveSettings:System.String.$Content,None,True,True,,设置已更改，现在保存吗？
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsError:System.String.$Content,None,True,True,,设置 {0} 返回 {1}，是否继续？
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsFail:System.String.$Content,None,True,True,,糟糕...\\n继续加载吗？
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsInvalid:System.String.$Content,None,True,True,,该文件不包含任何设置。
-CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsReloadMismatch:System.String.$Content,None,True,True,,{0} 设置被忽略，控制器不支持。
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_settingsReloadMismatch:System.String.$Content,None,True,True,,某些设置被忽略，控制器不支持。
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsReloadMismatch:System.String.$Content,None,True,True,,{0} 设置被忽略，控制器不支持。
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsRestore:System.String.$Content,None,True,True,,从文件恢复设置
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_settingsSaved:System.String.$Content,None,True,True,,设置已保存。
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsTimeout:System.String.$Content,None,True,True,,设置 {0} 时超时，是否继续？

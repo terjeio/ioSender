@@ -8,6 +8,24 @@ Please check out the [Wiki](https://github.com/terjeio/Grbl-GCode-Sender/wiki) f
 
 ![Toggle DTR](Media/Sender8.png)
 
+#### Edge pre-releases
+
+Edge pre-releases can be [downloaded from here](https://www.io-engineering.com/downloads), they contains changes yet to be incorporated in a main release and might be buggy and even break existing functionality.  
+Use with care and please [post feedback](https://github.com/terjeio/ioSender/discussions/436) on any issues encountered!
+
+2.0.46p1:
+
+* Fix for center finder failing when probing more than one pass. Ref. issue [#434](https://github.com/terjeio/ioSender/issues/434).
+
+* Support for XY touch plate, adds checkbox to XY offsets in the _Probing tab_. Ref. issue [#432](https://github.com/terjeio/ioSender/issues/432).
+
+* Initial changes for using a probe offset from the spindle for Center and Height map probing.  
+__NOTE:__ This has not been fully completed/tested, I need to get my test machine updated for it. Ref. issue [#405](https://github.com/terjeio/ioSender/issues/405).
+
+* Improved SD card handling. Requires grblHAL controller with a build date >= 20250128.
+
+#### General
+
 If you want to test ioSender with grblHAL but do not have a board yet you can use the [grblHAL simulator](https://github.com/grblHAL/Simulator).
 Build it with the [Web Builder](http://svn.io-engineering.com:8080/?driver=Simulator&board=Windows), unpack the .exe-files in the downloaded .zip somewhere and
 open a command window (cmd or PowerShell) in the folder by \<Shift\>+Right clicking in it, select _Open PowerShell window here_ or

@@ -245,20 +245,21 @@ CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgNoResponseExit:System.
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgResetExit:System.String.$Content,None,True,True,,"A vezérlő lágy reset nem sikerült, kilépés."
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgResetFailed:System.String.$Content,None,True,True,,"A vezérlő lágy reset nem sikerült, kilépés."
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgWait:System.String.$Content,None,True,True,,Várakozás a vezérlőre ({0})...
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,str_noCard:System.String.$Content,None,True,True,,No card mounted.
 CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,str_notConnection:System.String.$Content,None,True,True,,Nincs kapcsolat.
 CNC.Controls.WPF.g.en-US.resources:outlineflyout.baml,str_outlineFlyout:System.String.$Content,None,True,True,,_Vázlat
 CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,str_pause:System.String.$Content,None,True,True,,Szünet
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_rotateG17G18Arcs:System.String.$Content,None,True,True,,"A GCode XZ vagy YZ síkban íveket tartalmaz (G18/19), transzformáció nem alkalmazható. Használat &apos;Arcs to Lines&apos; ha tényleg szüksége van erre."
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_rotateRadiusArcs:System.String.$Content,None,True,True,,"A GCode sugármódú íveket tartalmaz, nem alkalmazható transzformáció. Használat &apos;Arcs to Lines&apos; ha tényleg szüksége van erre."
-CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,str_runMacro:System.String.$Content,None,True,True,,Run macro {0} with no parameters?
 CNC.Controls.WPF.g.en-US.resources:macroexecutecontrol.baml,str_runMacro:System.String.$Content,None,True,True,,Fut {0} makró?
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,str_runMacro:System.String.$Content,None,True,True,,Run macro {0} with no parameters?
 CNC.Controls.WPF.g.en-US.resources:macrotoolbarcontrol.baml,str_runMacro:System.String.$Content,None,True,True,,Fut {0} makró?
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_saveSettings:System.String.$Content,None,True,True,,"A beállítások megváltoztak, mentse most?"
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsError:System.String.$Content,None,True,True,,"A(z) {0} beállítás eredménye {1}, folytassa?"
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsFail:System.String.$Content,None,True,True,,Baj...\\nBetöltés folytatása?
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsInvalid:System.String.$Content,None,True,True,,A fájl nem tartalmaz semmilyen beállítást.
-CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsReloadMismatch:System.String.$Content,None,True,True,,"{0} settings were ignored, not supported by the controller."
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_settingsReloadMismatch:System.String.$Content,None,True,True,,"Some settings were ignored, not supported by the controller."
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsReloadMismatch:System.String.$Content,None,True,True,,"{0} settings were ignored, not supported by the controller."
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsRestore:System.String.$Content,None,True,True,,Beállítások visszaállítása fájlból
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_settingsSaved:System.String.$Content,None,True,True,,Beállítások elmentve.
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsTimeout:System.String.$Content,None,True,True,,"Időtúllépés történt a(z) {0} beállítása közben, folytassa?"

@@ -245,20 +245,21 @@ CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgNoResponseExit:System.
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgResetExit:System.String.$Content,None,True,True,,Ошибка перезагрузки. Программа будет завершена.
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgResetFailed:System.String.$Content,None,True,True,,Ошибка перезагрузки. Программа будет завершена.
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgWait:System.String.$Content,None,True,True,,#N/A
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,str_noCard:System.String.$Content,None,True,True,,No card mounted.
 CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,str_notConnection:System.String.$Content,None,True,True,,Нет связи.
 CNC.Controls.WPF.g.en-US.resources:outlineflyout.baml,str_outlineFlyout:System.String.$Content,None,True,True,,_Границы
 CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,str_pause:System.String.$Content,None,True,True,,Пауза
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_rotateG17G18Arcs:System.String.$Content,None,True,True,,GCode содержит дуги в плоскости XZ или YZ (G18/19). Трансляция невозможна. Используйте &apos;Arcs to Lines&apos; при необходимости.
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_rotateRadiusArcs:System.String.$Content,None,True,True,,Gcode содердит дуги в радиусной записи.  Трансляция невозможна. Используйте &apos;Arcs to Lines&apos; при необходимости.
-CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,str_runMacro:System.String.$Content,None,True,True,,Run macro {0} with no parameters?
 CNC.Controls.WPF.g.en-US.resources:macroexecutecontrol.baml,str_runMacro:System.String.$Content,None,True,True,,Выполнить макрос {0}?
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,str_runMacro:System.String.$Content,None,True,True,,Run macro {0} with no parameters?
 CNC.Controls.WPF.g.en-US.resources:macrotoolbarcontrol.baml,str_runMacro:System.String.$Content,None,True,True,,Выполнить макрос {0}?
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_saveSettings:System.String.$Content,None,True,True,,Установки изменены. Сохранить сейчас?
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsError:System.String.$Content,None,True,True,,"Установка {0} вернула {1}, продолжить?"
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsFail:System.String.$Content,None,True,True,,Ошибка...\\nПродолжить загрузку?
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsInvalid:System.String.$Content,None,True,True,,Файл не содержит параметров настройки.
-CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsReloadMismatch:System.String.$Content,None,True,True,,"{0} settings were ignored, not supported by the controller."
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_settingsReloadMismatch:System.String.$Content,None,True,True,,"Some settings were ignored, not supported by the controller."
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsReloadMismatch:System.String.$Content,None,True,True,,"{0} settings were ignored, not supported by the controller."
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsRestore:System.String.$Content,None,True,True,,Восстановить настройки из файла
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_settingsSaved:System.String.$Content,None,True,True,,Установки сохранены.
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsTimeout:System.String.$Content,None,True,True,,"Превышено время при установке {0}, продолжить?"

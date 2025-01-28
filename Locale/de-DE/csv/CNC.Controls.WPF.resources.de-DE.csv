@@ -245,20 +245,21 @@ CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgNoResponseExit:System.
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgResetExit:System.String.$Content,None,True,True,,"Steuerung Neustart fehlgeschlagen, wird beendet."
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgResetFailed:System.String.$Content,None,True,True,,"Steuerung Neustart fehlgeschlagen, wird beendet."
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgWait:System.String.$Content,None,True,True,,Warte auf Steuerung ({0})...
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,str_noCard:System.String.$Content,None,True,True,,No card mounted.
 CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,str_notConnection:System.String.$Content,None,True,True,,No connection.
 CNC.Controls.WPF.g.en-US.resources:outlineflyout.baml,str_outlineFlyout:System.String.$Content,None,True,True,,_Umriss
 CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,str_pause:System.String.$Content,None,True,True,,Pause
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_rotateG17G18Arcs:System.String.$Content,None,True,True,,Im GCode enthaltene Kreise in XZ- oder YZ-Ebene (G18/19) können nicht umgewandelt werden. Verwenden Sie &apos;Kreisbogen zu Linien&apos; wenn Sie dies wirklich brauchen.
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_rotateRadiusArcs:System.String.$Content,None,True,True,,Im GCode enthaltene Kreise können nicht umgewandelt werden. Verwenden Sie &apos;Kreisbogen zu Linien&apos; wenn Sie dies wirklich brauchen.
-CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,str_runMacro:System.String.$Content,None,True,True,,Run macro {0} with no parameters?
 CNC.Controls.WPF.g.en-US.resources:macroexecutecontrol.baml,str_runMacro:System.String.$Content,None,True,True,,Run {0} macro?
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,str_runMacro:System.String.$Content,None,True,True,,Run macro {0} with no parameters?
 CNC.Controls.WPF.g.en-US.resources:macrotoolbarcontrol.baml,str_runMacro:System.String.$Content,None,True,True,,Macro {0} starten?
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_saveSettings:System.String.$Content,None,True,True,,"Einstellungen geändert, speichern?"
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsError:System.String.$Content,None,True,True,,"Einstellung {0} ergab {1}, weiter?"
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsFail:System.String.$Content,None,True,True,,Schade...\\nWeiter laden?
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsInvalid:System.String.$Content,None,True,True,,Datei enthält keine Einstellungen.
-CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsReloadMismatch:System.String.$Content,None,True,True,,"{0} settings were ignored, not supported by the controller."
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_settingsReloadMismatch:System.String.$Content,None,True,True,,"Some settings were ignored, not supported by the controller."
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsReloadMismatch:System.String.$Content,None,True,True,,"{0} settings were ignored, not supported by the controller."
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsRestore:System.String.$Content,None,True,True,,Einstellungen aus Datei wiederherstellen
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_settingsSaved:System.String.$Content,None,True,True,,Settings saved.
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsTimeout:System.String.$Content,None,True,True,,"Zeitüberschreitung beim Setzen von {0}, weiter?"
