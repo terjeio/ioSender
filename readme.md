@@ -13,6 +13,11 @@ Please check out the [Wiki](https://github.com/terjeio/Grbl-GCode-Sender/wiki) f
 Edge pre-releases can be [downloaded from here](https://www.io-engineering.com/downloads), they contains changes yet to be incorporated in a main release and might be buggy and even break existing functionality.  
 Use with care and please [post feedback](https://github.com/terjeio/ioSender/discussions/436) on any issues encountered!
 
+2.0.46p2:
+
+* Added support for latest \(build 20250204\) grblHAL Trinamic plugin, it now outputs StallGuard results for both motors when ganging/auto-squaring is enabled.  
+__NOTE:__ Previous versions of ioSender will crash when plotting StallGuard results for ganged/auto-squared axes.
+
 2.0.46p1:
 
 * Fix for center finder failing when probing more than one pass. Ref. issue [#434](https://github.com/terjeio/ioSender/issues/434).
@@ -86,4 +91,4 @@ Lathe mode.
 Conversational programming for Lathe Mode. Threading requires [grblHAL](https://github.com/grblHAL) controller with driver that has spindle sync support.
 
 ---
-2024-12-11
+2025-02-04
