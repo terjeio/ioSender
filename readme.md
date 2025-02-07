@@ -13,6 +13,10 @@ Please check out the [Wiki](https://github.com/terjeio/Grbl-GCode-Sender/wiki) f
 Edge pre-releases can be [downloaded from here](https://www.io-engineering.com/downloads), they contains changes yet to be incorporated in a main release and might be buggy and even break existing functionality.  
 Use with care and please [post feedback](https://github.com/terjeio/ioSender/discussions/436) on any issues encountered!
 
+2.0.46p3:
+
+* Fixed regression introduced in p1, external edge probing fail. Ref. issue [#438](https://github.com/terjeio/ioSender/issues/438).
+
 2.0.46p2:
 
 * Added support for latest \(build 20250204\) grblHAL Trinamic plugin, it now outputs StallGuard results for both motors when ganging/auto-squaring is enabled.  
