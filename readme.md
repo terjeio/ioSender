@@ -13,6 +13,12 @@ Please check out the [Wiki](https://github.com/terjeio/Grbl-GCode-Sender/wiki) f
 Edge pre-releases can be [downloaded from here](https://www.io-engineering.com/downloads), they contains changes yet to be incorporated in a main release and might be buggy and even break existing functionality.  
 Use with care and please [post feedback](https://github.com/terjeio/ioSender/discussions/436) on any issues encountered!
 
+2.0.46p4:
+
+* Added [command line parameter](https://github.com/terjeio/ioSender/wiki/Setup-and-configuration#optional-command-line-parameters) `-configpath` for specifying which directory to use for configuration files.
+
+* Now displays message if saving to configuration files fails. Ref. issue [#424](https://github.com/terjeio/ioSender/issues/424).
+
 2.0.46p3:
 
 * Fixed regression introduced in p1, external edge probing fail. Ref. issue [#438](https://github.com/terjeio/ioSender/issues/438).
