@@ -13,6 +13,10 @@ Please check out the [Wiki](https://github.com/terjeio/Grbl-GCode-Sender/wiki) f
 Edge pre-releases can be [downloaded from here](https://www.io-engineering.com/downloads), they contains changes yet to be incorporated in a main release and might be buggy and even break existing functionality.  
 Use with care and please [post feedback](https://github.com/terjeio/ioSender/discussions/436) on any issues encountered!
 
+2.0.46p5:
+
+* Added _App_ setting _Send comments_, tick if the controller makes use of "magic" comments for functionality. Currently the Plasma plugin may do so.
+
 2.0.46p4:
 
 * Added [command line parameter](https://github.com/terjeio/ioSender/wiki/Setup-and-configuration#optional-command-line-parameters) `-configpath` for specifying which directory to use for configuration files.
@@ -42,7 +46,7 @@ __NOTE:__ This has not been fully completed/tested, I need to get my test machin
 #### General
 
 If you want to test ioSender with grblHAL but do not have a board yet you can use the [grblHAL simulator](https://github.com/grblHAL/Simulator).
-Build it with the [Web Builder](http://svn.io-engineering.com:8080/?driver=Simulator&board=Windows), unpack the .exe-files in the downloaded .zip somewhere and
+Build it with the [Web Builder](https://svn.io-engineering.com:8443/?driver=Simulator&board=Windows), unpack the .exe-files in the downloaded .zip somewhere and
 open a command window (cmd or PowerShell) in the folder by \<Shift\>+Right clicking in it, select _Open PowerShell window here_ or
 _Open command window here_ from the popup menu to open it.
 Then find your computers IP address by typing `ipconfig` - the IP address can be found in the report generated.  
@@ -101,4 +105,4 @@ Lathe mode.
 Conversational programming for Lathe Mode. Threading requires [grblHAL](https://github.com/grblHAL) controller with driver that has spindle sync support.
 
 ---
-2025-02-04
+2025-02-22

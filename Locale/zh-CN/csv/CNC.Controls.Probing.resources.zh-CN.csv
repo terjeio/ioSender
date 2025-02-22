@@ -1,5 +1,5 @@
-﻿CNC.Controls.Probing.g.en-US.resources:macrodialog.baml,btn_actionMenu:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Click for actions menu.
-CNC.Controls.Probing.g.en-US.resources:macrodialog.baml,btn_actionMenu:System.Windows.Controls.ContentControl.Content,Button,True,True,,Resources\\menu_22x22.png
+﻿CNC.Controls.Probing.g.en-US.resources:macrodialog.baml,btn_actionMenu:System.Windows.Controls.ContentControl.Content,Button,True,True,,Resources\\menu_22x22.png
+CNC.Controls.Probing.g.en-US.resources:macrodialog.baml,btn_actionMenu:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Click for actions menu.
 CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,btn_addPosition:System.Windows.Controls.ContentControl.Content,Button,True,True,,添加位置
 CNC.Controls.Probing.g.en-US.resources:probingview.baml,btn_addProfile:System.Windows.Controls.ContentControl.Content,Button,True,True,,...
 CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,btn_apply:System.Windows.Controls.ContentControl.Content,Button,True,True,,_应用
@@ -77,10 +77,10 @@ CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,grp_workpieceOffse
 CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,grp_workpieceOffset:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,工件偏置
 CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,hdr_preview:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,预览
 CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,lbl_addOffset:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,添加偏移量
-CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,lbl_addOffset:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,"确定直角工件的X0,Y0"
 CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,lbl_addOffset:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,在左边缘添加一个探测点。
-CNC.Controls.Probing.g.en-US.resources:configcontrol.baml,lbl_chkProbeConnected:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,将显示一个对话框，直到探测成功或取消该对话框。
+CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,lbl_addOffset:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,"确定直角工件的X0,Y0"
 CNC.Controls.Probing.g.en-US.resources:configcontrol.baml,lbl_chkProbeConnected:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,手动验证探头是否已连接
+CNC.Controls.Probing.g.en-US.resources:configcontrol.baml,lbl_chkProbeConnected:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,将显示一个对话框，直到探测成功或取消该对话框。
 CNC.Controls.Probing.g.en-US.resources:configcontrol.baml,lbl_chkProbeStatus:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,启动前检查探头状态（G59.3）
 CNC.Controls.Probing.g.en-US.resources:configcontrol.baml,lbl_chkProbeStatus:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,如果未启用且探头已置位，控制器将生成警报。
 CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,lbl_clearToolOffset:System.Windows.Controls.ContentControl.Content,Button,True,True,,清除刀具长度偏置
