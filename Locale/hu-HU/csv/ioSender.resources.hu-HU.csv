@@ -41,6 +41,7 @@ ioSender.g.en-US.resources:mainwindow.baml,tab_facing:System.Windows.Controls.He
 ioSender.g.en-US.resources:mainwindow.baml,tab_grbl:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Grbl
 ioSender.g.en-US.resources:mainwindow.baml,tab_grblConfig:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Beállítások: Grbl
 ioSender.g.en-US.resources:mainwindow.baml,tab_jogSidebar:System.Windows.Controls.ContentControl.Content,None,True,True,,_Kocogó
+ioSender.g.en-US.resources:mainwindow.baml,tab_latheWizards:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Lathe Wizards
 ioSender.g.en-US.resources:mainwindow.baml,tab_offsets:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Eltolások
 ioSender.g.en-US.resources:mainwindow.baml,tab_parting:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Elválás
 ioSender.g.en-US.resources:mainwindow.baml,tab_pidTuner:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,PID Hangoló

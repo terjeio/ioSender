@@ -13,6 +13,14 @@ Please check out the [Wiki](https://github.com/terjeio/Grbl-GCode-Sender/wiki) f
 Edge pre-releases can be [downloaded from here](https://www.io-engineering.com/downloads), they contains changes yet to be incorporated in a main release and might be buggy and even break existing functionality.  
 Use with care and please [post feedback](https://github.com/terjeio/ioSender/discussions/436) on any issues encountered!
 
+2.0.46p7:
+
+* Moved lathe wizards to new tabs under top level tab _Lathe wizards_.
+
+* Added backup of offsets and tool table to the backup available in _Settins: Grbl".
+Offsets and tools is saved to the application folder in the file _offsets.nc_, this file has to be loaded and run manually when restoring.  
+Ref. discussion [#448](https://github.com/terjeio/ioSender/discussions/448).
+
 2.0.46p6:
 
 * Improved handling of upload to controller file systems (SD card, littlefs).

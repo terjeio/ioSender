@@ -1,5 +1,5 @@
-﻿CNC.Controls.Probing.g.en-US.resources:macrodialog.baml,btn_actionMenu:System.Windows.Controls.ContentControl.Content,Button,True,True,,Resources\\menu_22x22.png
-CNC.Controls.Probing.g.en-US.resources:macrodialog.baml,btn_actionMenu:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Click for actions menu.
+﻿CNC.Controls.Probing.g.en-US.resources:macrodialog.baml,btn_actionMenu:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Click for actions menu.
+CNC.Controls.Probing.g.en-US.resources:macrodialog.baml,btn_actionMenu:System.Windows.Controls.ContentControl.Content,Button,True,True,,Resources\\menu_22x22.png
 CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,btn_addPosition:System.Windows.Controls.ContentControl.Content,Button,True,True,,Добавиь _точку
 CNC.Controls.Probing.g.en-US.resources:probingview.baml,btn_addProfile:System.Windows.Controls.ContentControl.Content,Button,True,True,,...
 CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,btn_apply:System.Windows.Controls.ContentControl.Content,Button,True,True,,_Применить
@@ -77,16 +77,16 @@ CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,grp_workpieceOffse
 CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,grp_workpieceOffset:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Workpiece offset
 CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,hdr_preview:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Предпросмотр
 CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,lbl_addOffset:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Добавить смещение
-CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,lbl_addOffset:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Adds a probe point on the left edge.
 CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,lbl_addOffset:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,"Determine X0,Y0 for right angled workpiece"
-CNC.Controls.Probing.g.en-US.resources:configcontrol.baml,lbl_chkProbeConnected:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Manually validate probe is connected
+CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,lbl_addOffset:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Adds a probe point on the left edge.
 CNC.Controls.Probing.g.en-US.resources:configcontrol.baml,lbl_chkProbeConnected:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,A dialog will be shown until the probe is asserted or the dialog is cancelled.
+CNC.Controls.Probing.g.en-US.resources:configcontrol.baml,lbl_chkProbeConnected:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Manually validate probe is connected
 CNC.Controls.Probing.g.en-US.resources:configcontrol.baml,lbl_chkProbeStatus:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Проверять состояние датчика перед стартом (G59.3)
 CNC.Controls.Probing.g.en-US.resources:configcontrol.baml,lbl_chkProbeStatus:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,"Авария будет активирована контроллером, при срабатвании не активного датчика."
 CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,lbl_clearToolOffset:System.Windows.Controls.ContentControl.Content,Button,True,True,,Отменить коррекцию длинны
 CNC.Controls.Probing.g.en-US.resources:edgefinderintcontrol.baml,lbl_edgeoffsetxy:CNC.Controls.NumericField.Label,None,False,True,,Edge offset:
-CNC.Controls.Probing.g.en-US.resources:edgefindercontrol.baml,lbl_edgeoffsetxy:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Set to 0 to use 0.5 x probe/tool diameter
 CNC.Controls.Probing.g.en-US.resources:edgefinderintcontrol.baml,lbl_edgeoffsetxy:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Set to 0 to use 0.5 x probe/tool diameter
+CNC.Controls.Probing.g.en-US.resources:edgefindercontrol.baml,lbl_edgeoffsetxy:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Set to 0 to use 0.5 x probe/tool diameter
 CNC.Controls.Probing.g.en-US.resources:edgefindercontrol.baml,lbl_edgeoffsetxy:CNC.Controls.NumericField.Label,None,False,True,,Edge offset:
 CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,lbl_height:CNC.Controls.NumericField.Label,None,False,True,,Высота:
 CNC.Controls.Probing.g.en-US.resources:edgefinderintcontrol.baml,lbl_height:CNC.Controls.NumericField.Label,None,False,True,,Высота:
@@ -122,8 +122,8 @@ CNC.Controls.Probing.g.en-US.resources:probingview.baml,lbl_searchFeed:CNC.Contr
 CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,lbl_setCoordOrOffset:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Установка системы координат или смещения
 CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,lbl_setRefernecOffset:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Установить образцовое смещение
 CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,lbl_setZ0AtX0Y0:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Z = 0 в точке X0Y0:
-CNC.Controls.Probing.g.en-US.resources:probingview.baml,lbl_touchPlateXY:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Offsets are horizontal thickness of touchplate
 CNC.Controls.Probing.g.en-US.resources:probingview.baml,lbl_touchPlateXY:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Is touch plate
+CNC.Controls.Probing.g.en-US.resources:probingview.baml,lbl_touchPlateXY:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Offsets are horizontal thickness of touchplate
 CNC.Controls.Probing.g.en-US.resources:heightmapcontrol.baml,lbl_width:CNC.Controls.NumericField.Label,None,False,True,,W:
 CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,lbl_withTool:System.Windows.Controls.ContentControl.Content,Label,True,True,,с инструментом:
 CNC.Controls.Probing.g.en-US.resources:probingview.baml,mnu_add:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Добавить

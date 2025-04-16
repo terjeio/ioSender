@@ -41,6 +41,7 @@ ioSender.g.en-US.resources:mainwindow.baml,tab_facing:System.Windows.Controls.He
 ioSender.g.en-US.resources:mainwindow.baml,tab_grbl:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Grbl
 ioSender.g.en-US.resources:mainwindow.baml,tab_grblConfig:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Установки: Grbl
 ioSender.g.en-US.resources:mainwindow.baml,tab_jogSidebar:System.Windows.Controls.ContentControl.Content,None,True,True,,_Пульт
+ioSender.g.en-US.resources:mainwindow.baml,tab_latheWizards:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Lathe Wizards
 ioSender.g.en-US.resources:mainwindow.baml,tab_offsets:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Смещения
 ioSender.g.en-US.resources:mainwindow.baml,tab_parting:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Разбивка
 ioSender.g.en-US.resources:mainwindow.baml,tab_pidTuner:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Настройка PID
