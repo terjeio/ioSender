@@ -17,7 +17,7 @@ Use with care and please [post feedback](https://github.com/terjeio/ioSender/dis
 
 * Moved lathe wizards to new tabs under top level tab _Lathe wizards_.
 
-* Added backup of offsets and tool table to the backup available in _Settins: Grbl".
+* Added backup of offsets and tool table to the backup available in _Settins: Grbl_.
 Offsets and tools is saved to the application folder in the file _offsets.nc_, this file has to be loaded and run manually when restoring.  
 Ref. discussion [#448](https://github.com/terjeio/ioSender/discussions/448).
 
