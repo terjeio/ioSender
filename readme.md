@@ -13,11 +13,23 @@ Please check out the [Wiki](https://github.com/terjeio/Grbl-GCode-Sender/wiki) f
 Edge pre-releases can be [downloaded from here](https://www.io-engineering.com/downloads), they contains changes yet to be incorporated in a main release and might be buggy and even break existing functionality.  
 Use with care and please [post feedback](https://github.com/terjeio/ioSender/discussions/436) on any issues encountered!
 
+2.0.46p8:
+
+* Updated to .Net framework 4.6.2.
+
+* Changed coolant check boxes to toggle switches. Ref. issue [#444](https://github.com/terjeio/ioSender/issues/444).
+
+* Fixed minor bug in handling of offset probe in _Heigth map_ probing tab.
+
+* Fixed bug in applying height map for no words G0 and G1 commands.
+
+* Added search field for setting number in _Settings: Grbl_ tab.
+
 2.0.46p7:
 
 * Moved lathe wizards to new tabs under top level tab _Lathe wizards_.
 
-* Added backup of offsets and tool table to the backup available in _Settins: Grbl_.
+* Added backup of offsets and tool table to the backup available in _Settings: Grbl_.
 Offsets and tools is saved to the application folder in the file _offsets.nc_, this file has to be loaded and run manually when restoring.  
 Ref. discussion [#448](https://github.com/terjeio/ioSender/discussions/448).
 
