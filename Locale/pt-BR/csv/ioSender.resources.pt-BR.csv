@@ -33,8 +33,8 @@ ioSender.g.en-US.resources:jobview.baml,str_msgResetExit:System.String.$Content,
 ioSender.g.en-US.resources:jobview.baml,str_msgResetFailed:System.String.$Content,None,True,True,,"Reinicio falhou, fechando o programa."
 ioSender.g.en-US.resources:jobview.baml,str_msgWait:System.String.$Content,None,True,True,,Aguardando controlador ({0})...
 ioSender.g.en-US.resources:mainwindow.baml,str_runTime:System.String.$Content,None,True,True,,Tempo de execução: {0}
-ioSender.g.en-US.resources:mainwindow.baml,tab_3DView:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Visão 3D
 ioSender.g.en-US.resources:jobview.baml,tab_3DView:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Visão 3D
+ioSender.g.en-US.resources:mainwindow.baml,tab_3DView:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Visão 3D
 ioSender.g.en-US.resources:mainwindow.baml,tab_appConfig:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Configurações: Programa
 ioSender.g.en-US.resources:jobview.baml,tab_console:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Console
 ioSender.g.en-US.resources:mainwindow.baml,tab_facing:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Facing
@@ -44,11 +44,9 @@ ioSender.g.en-US.resources:mainwindow.baml,tab_jogSidebar:System.Windows.Control
 ioSender.g.en-US.resources:mainwindow.baml,tab_latheWizards:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Lathe Wizards
 ioSender.g.en-US.resources:mainwindow.baml,tab_offsets:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Offsets
 ioSender.g.en-US.resources:mainwindow.baml,tab_parting:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Separação
-ioSender.g.en-US.resources:mainwindow.baml,tab_pidTuner:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,PID Tuner
 ioSender.g.en-US.resources:mainwindow.baml,tab_probing:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Sondagem
 ioSender.g.en-US.resources:jobview.baml,tab_program:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Programa
 ioSender.g.en-US.resources:mainwindow.baml,tab_sdCard:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Cartão SD
 ioSender.g.en-US.resources:mainwindow.baml,tab_threading:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Threading
 ioSender.g.en-US.resources:mainwindow.baml,tab_tools:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Ferramentas
-ioSender.g.en-US.resources:mainwindow.baml,tab_trinamic:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Sintonizador trinamico
 ioSender.g.en-US.resources:mainwindow.baml,tab_turning:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Virando

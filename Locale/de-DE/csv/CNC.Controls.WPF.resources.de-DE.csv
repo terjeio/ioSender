@@ -1,5 +1,5 @@
 ﻿CNC.Controls.WPF.g.en-US.resources:macroeditor.baml,btn_add:System.Windows.Controls.ContentControl.Content,Button,True,True,,Hinzu
-CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,btn_backup:System.Windows.Controls.ContentControl.Content,Button,True,True,,Backup
+CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,btn_backup:System.Windows.Controls.ContentControl.Content,Button,True,True,,Backup
 CNC.Controls.WPF.g.en-US.resources:portdialog.baml,btn_cancel:System.Windows.Controls.ContentControl.Content,Button,True,True,,Abbruch
 CNC.Controls.WPF.g.en-US.resources:gcoderotatedialog.baml,btn_cancel:System.Windows.Controls.ContentControl.Content,Button,True,True,,Abbruch
 CNC.Controls.WPF.g.en-US.resources:macroeditor.baml,btn_cancel:System.Windows.Controls.ContentControl.Content,Button,True,True,,Abbruch
@@ -7,10 +7,10 @@ CNC.Controls.WPF.g.en-US.resources:gcodewrapdialog.baml,btn_cancel:System.Window
 CNC.Controls.WPF.g.en-US.resources:consolecontrol.baml,btn_clear:System.Windows.Controls.ContentControl.Content,Button,True,True,,Löschen
 CNC.Controls.WPF.g.en-US.resources:offsetview.baml,btn_clear:System.Windows.Controls.ContentControl.Content,Button,True,True,,Alles Löschen
 CNC.Controls.WPF.g.en-US.resources:toolview.baml,btn_clear:System.Windows.Controls.ContentControl.Content,Button,True,True,,Alles Löschen
-CNC.Controls.WPF.g.en-US.resources:toolview.baml,btn_currPos:System.Windows.Controls.ContentControl.Content,Button,True,True,,Aktuelle Position ermitteln
 CNC.Controls.WPF.g.en-US.resources:offsetview.baml,btn_currPos:System.Windows.Controls.ContentControl.Content,Button,True,True,,Aktuelle Position ermitteln
-CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,btn_cycleStart:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Alt+R
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,btn_currPos:System.Windows.Controls.ContentControl.Content,Button,True,True,,Aktuelle Position ermitteln
 CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,btn_cycleStart:System.Windows.Controls.ContentControl.Content,Button,True,True,,Start
+CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,btn_cycleStart:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Alt+R
 CNC.Controls.WPF.g.en-US.resources:macroexecutecontrol.baml,btn_edit:System.Windows.Controls.ContentControl.Content,Button,True,True,,Bearbeiten
 CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,btn_feedHold:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Leertaste 
 CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,btn_feedHold:System.Windows.Controls.ContentControl.Content,Button,True,True,,Pause
@@ -18,6 +18,10 @@ CNC.Controls.WPF.g.en-US.resources:trinamicview.baml,btn_getStatus:System.Window
 CNC.Controls.WPF.g.en-US.resources:trinamicview.baml,btn_getStatusAll:System.Windows.Controls.ContentControl.Content,Button,True,True,,Status aller Treiber ermitteln
 CNC.Controls.WPF.g.en-US.resources:outlineflyout.baml,btn_go:System.Windows.Controls.ContentControl.Content,Button,True,True,,Los
 CNC.Controls.WPF.g.en-US.resources:outlinebasecontrol.baml,btn_go:System.Windows.Controls.ContentControl.Content,Button,True,True,,Go
+CNC.Controls.WPF.g.en-US.resources:steppercalibrationwizard.baml,btn_goneg:System.Windows.Controls.ContentControl.Content,Button,True,True,,Go-
+CNC.Controls.WPF.g.en-US.resources:steppercalibrationwizard.baml,btn_goneg:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Press to move in the negative direction.
+CNC.Controls.WPF.g.en-US.resources:steppercalibrationwizard.baml,btn_gopos:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Press to move in the positive direction.
+CNC.Controls.WPF.g.en-US.resources:steppercalibrationwizard.baml,btn_gopos:System.Windows.Controls.ContentControl.Content,Button,True,True,,Go+
 CNC.Controls.WPF.g.en-US.resources:gotobasecontrol.baml,btn_gotoG28:System.Windows.Controls.ContentControl.Content,Button,True,True,,Gehe zu Position 1 (G28)
 CNC.Controls.WPF.g.en-US.resources:gotobasecontrol.baml,btn_gotoG30:System.Windows.Controls.ContentControl.Content,Button,True,True,,Gehe zu Position 2 (G30)
 CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,btn_home:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Strg+H
@@ -27,26 +31,28 @@ CNC.Controls.WPF.g.en-US.resources:portdialog.baml,btn_ok:System.Windows.Control
 CNC.Controls.WPF.g.en-US.resources:about.baml,btn_ok:System.Windows.Controls.ContentControl.Content,Button,True,True,,Ok
 CNC.Controls.WPF.g.en-US.resources:gcoderotatedialog.baml,btn_ok:System.Windows.Controls.ContentControl.Content,Button,True,True,,Ok
 CNC.Controls.WPF.g.en-US.resources:gcodewrapdialog.baml,btn_ok:System.Windows.Controls.ContentControl.Content,Button,True,True,,Ok
-CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,btn_reload:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Einstellungen von Steuerung neu laden
-CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,btn_reload:System.Windows.Controls.ContentControl.Content,Button,True,True,,Neu Laden
+CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,btn_reload:System.Windows.Controls.ContentControl.Content,Button,True,True,,Neu Laden
+CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,btn_reload:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Einstellungen von Steuerung neu laden
 CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,btn_reset:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Strg+Shift+R
 CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,btn_reset:System.Windows.Controls.ContentControl.Content,Button,True,True,,Reset
-CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,btn_restore:System.Windows.Controls.ContentControl.Content,Button,True,True,,Wiederherstellen
+CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,btn_restore:System.Windows.Controls.ContentControl.Content,Button,True,True,,Wiederherstellen
 CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,btn_rewind:System.Windows.Controls.ContentControl.Content,Button,True,True,,Zurücksetzen
-CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,btn_save:System.Windows.Controls.ContentControl.Content,Button,True,True,,Speichern
-CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,btn_save:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Speichern Sie die geänderten Einstellungen in der Steuerung.
+CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,btn_save:System.Windows.Controls.ContentControl.Content,Button,True,True,,Speichern
+CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,btn_save:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Speichern Sie die geänderten Einstellungen in der Steuerung.
 CNC.Controls.WPF.g.en-US.resources:appconfigview.baml,btn_saveKeyMap:System.Windows.Controls.ContentControl.Content,Button,True,True,,Save keymappings
 CNC.Controls.WPF.g.en-US.resources:appconfigview.baml,btn_saveSettings:System.Windows.Controls.ContentControl.Content,Button,True,True,,Einstellungen speichern
 CNC.Controls.WPF.g.en-US.resources:mdicontrol.baml,btn_send:System.Windows.Controls.ContentControl.Content,Button,True,True,,Senden
 CNC.Controls.WPF.g.en-US.resources:coordvaluesetcontrol.baml,btn_set:System.Windows.Controls.ContentControl.Content,Button,True,True,,Einstellen
-CNC.Controls.WPF.g.en-US.resources:toolview.baml,btn_setAll:System.Windows.Controls.ContentControl.Content,Button,True,True,,Alles einstellen
 CNC.Controls.WPF.g.en-US.resources:offsetview.baml,btn_setAll:System.Windows.Controls.ContentControl.Content,Button,True,True,,Alles einstellen
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,btn_setAll:System.Windows.Controls.ContentControl.Content,Button,True,True,,Alles einstellen
 CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,btn_stop:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Alt+S
 CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,btn_stop:System.Windows.Controls.ContentControl.Content,Button,True,True,,Stop
+CNC.Controls.WPF.g.en-US.resources:steppercalibrationwizard.baml,btn_stop:System.Windows.Controls.ContentControl.Content,Button,True,True,,Stop
 CNC.Controls.WPF.g.en-US.resources:about.baml,btn_toClipboard:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Kopieren von grbl Versionsinformationen und Einstellungen in die Zwischenablage
 CNC.Controls.WPF.g.en-US.resources:about.baml,btn_toClipboard:System.Windows.Controls.ContentControl.Content,Button,True,True,,Zwischenablage
-CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,btn_unlock:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Strg+U
 CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,btn_unlock:System.Windows.Controls.ContentControl.Content,Button,True,True,,Entriegeln
+CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,btn_unlock:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Strg+U
+CNC.Controls.WPF.g.en-US.resources:steppercalibrationwizard.baml,btn_update:System.Windows.Controls.ContentControl.Content,Button,True,True,,Save
 CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,btn_upload:System.Windows.Controls.ContentControl.Content,Button,True,True,,Hochladen
 CNC.Controls.WPF.g.en-US.resources:drocontrol.baml,btn_zeroAll:System.Windows.Controls.ContentControl.Content,Button,True,True,,Alles Nullen
 CNC.Controls.WPF.g.en-US.resources:macroeditor.baml,chk_confirm:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Confirm before executing
@@ -57,25 +63,31 @@ CNC.Controls.WPF.g.en-US.resources:portdialog.baml,dlg_connection:System.Windows
 CNC.Controls.WPF.g.en-US.resources:macroeditor.baml,dlg_macroEditor:System.Windows.Window.Title,Title,True,True,,Macro Editor
 CNC.Controls.WPF.g.en-US.resources:consolewindow.baml,dlg_senderConsole:System.Windows.Window.Title,Title,True,True,,Sender Konsole
 CNC.Controls.WPF.g.en-US.resources:portdialog.baml,dlg_title:System.Windows.Window.Title,Title,True,True,,Verbindung zum Sender
-CNC.Controls.WPF.g.en-US.resources:gcoderotatedialog.baml,fld_angle:CNC.Controls.NumericField.Unit,None,True,True,,Winkel
 CNC.Controls.WPF.g.en-US.resources:gcoderotatedialog.baml,fld_angle:CNC.Controls.NumericField.Label,None,True,True,,Winkel:
+CNC.Controls.WPF.g.en-US.resources:gcoderotatedialog.baml,fld_angle:CNC.Controls.NumericField.Unit,None,True,True,,Winkel
 CNC.Controls.WPF.g.en-US.resources:gcodewrapdialog.baml,fld_diameter:CNC.Controls.NumericField.Label,None,True,True,,Diameter:
+CNC.Controls.WPF.g.en-US.resources:steppercalibrationwizard.baml,fld_distance:CNC.Controls.NumericField.Label,None,True,True,,Distance:
 CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_fastDistance:CNC.Controls.NumericField.Label,None,False,True,,Distanz Schnellvorschub:
-CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_fastFeedrate:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
 CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_fastFeedrate:CNC.Controls.NumericField.Label,None,False,True,,Vorschub Schnell:
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_fastFeedrate:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
+CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,fld_findSetting:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Search for setting
+CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,fld_findSetting:CNC.Controls.NumericField.Unit,None,True,True,,
+CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,fld_findSetting:CNC.Controls.NumericField.KeyDown,None,True,True,,searchField_KeyDown
+CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,fld_findSetting:CNC.Controls.NumericField.Label,None,True,True,,Setting:
 CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,fld_findSetting:CNC.Controls.NumericField.Unit,None,True,True,,
-CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,fld_findSetting:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Search for setting
-CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,fld_findSetting:CNC.Controls.NumericField.KeyDown,None,True,True,,searchField_KeyDown
-CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,fld_findSetting:CNC.Controls.NumericField.Label,None,True,True,,Setting:
 CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_maxBuffer:CNC.Controls.NumericField.Label,None,False,True,,Max Puffer:
 CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_maxBuffer:CNC.Controls.NumericField.Unit,None,False,True,,bytes
 CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_maxBuffer:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Maximal genutzte serielle Puffergröße (begrenzt auf 90 % des angegebenen Wertes).
-CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_pollInterval:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Zeit zwischen den an den Controller gesendeten Statusanfragen.
+CNC.Controls.WPF.g.en-US.resources:steppercalibrationwizard.baml,fld_measured:CNC.Controls.NumericField.Tooltip2,None,True,True,,Actual distance.
+CNC.Controls.WPF.g.en-US.resources:steppercalibrationwizard.baml,fld_measured:CNC.Controls.NumericField.Label,None,True,True,,Measured:
 CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_pollInterval:CNC.Controls.NumericField.Unit,None,False,True,,ms
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_pollInterval:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Zeit zwischen den an den Controller gesendeten Statusanfragen.
 CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_pollInterval:CNC.Controls.NumericField.Label,None,False,True,,Abfrageintervall:
-CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_resetDelay:CNC.Controls.NumericField.Unit,None,False,True,,ms
-CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_resetDelay:CNC.Controls.NumericField.Label,None,False,True,,Reset Verzögerung:
 CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_resetDelay:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,"Verzögerung, damit der Controller das Booten beenden kann, bevor die Kommunikation beginnt."
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_resetDelay:CNC.Controls.NumericField.Label,None,False,True,,Reset Verzögerung:
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_resetDelay:CNC.Controls.NumericField.Unit,None,False,True,,ms
+CNC.Controls.WPF.g.en-US.resources:steppercalibrationwizard.baml,fld_resolution:CNC.Controls.NumericField.Label,None,True,True,,Resolution:
+CNC.Controls.WPF.g.en-US.resources:steppercalibrationwizard.baml,fld_resolution:CNC.Controls.NumericField.IsReadOnly,None,True,True,,True
 CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_slowDistance:CNC.Controls.NumericField.Label,None,False,True,,Distanz Langsamvorschub:
 CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_slowFeedrate:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
 CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_slowFeedrate:CNC.Controls.NumericField.Label,None,False,True,,Vorschub Langsam:
@@ -110,50 +122,51 @@ CNC.Controls.WPF.g.en-US.resources:grblerrorlist.baml,hdr_errorCode:System.Windo
 CNC.Controls.WPF.g.en-US.resources:grblerrorlist.baml,hdr_errorMessage:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Message
 CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,hdr_name:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Name
 CNC.Controls.WPF.g.en-US.resources:offsetview.baml,hdr_offset:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Offset
-CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,hdr_settingId:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Id
-CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,hdr_settingName:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Name
-CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,hdr_settingUnit:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Einheit
-CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,hdr_settingValue:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Wert
+CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,hdr_settingId:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Id
+CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,hdr_settingName:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Name
+CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,hdr_settingUnit:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Einheit
+CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,hdr_settingValue:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Wert
 CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,hdr_size:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Größe
 CNC.Controls.WPF.g.en-US.resources:toolview.baml,hdr_tool:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Werkzeug
 CNC.Controls.WPF.g.en-US.resources:consolecontrol.baml,label_filterRT:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Echtzeit-Antworten ausfiltern
 CNC.Controls.WPF.g.en-US.resources:consolecontrol.baml,label_showAll:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Alle Echtzeit-Antworten zeigen
 CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_agressiveBuffering:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Puffert mehr als einen GCode-Block in der Steuerung für eine reibungslosere Ausführung. Nur für grblHAL!
 CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_agressiveBuffering:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Aggressives Puffern
-CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_autoCompressGcode:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Gcode bei Transformationen automatisch komprimieren
 CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_autoCompressGcode:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Entfernt überflüssige GCode-Befehlselemente.
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_autoCompressGcode:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Gcode bei Transformationen automatisch komprimieren
+CNC.Controls.WPF.g.en-US.resources:steppercalibrationwizard.baml,lbl_axis:System.Windows.Controls.ContentControl.Content,Label,True,True,,Axis:
 CNC.Controls.WPF.g.en-US.resources:offsetview.baml,lbl_axis:System.String.$Content,None,True,True,,{0} Achse:
 CNC.Controls.WPF.g.en-US.resources:spindlecontrol.baml,lbl_ccw:System.Windows.Controls.ContentControl.Content,RadioButton,True,True,,CCW
 CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,lbl_check:System.Windows.Controls.ContentControl.Content,Label,True,True,,Prüfen
 CNC.Controls.WPF.g.en-US.resources:trinamicview.baml,lbl_configure:System.Windows.Controls.ContentControl.Content,Button,True,True,,Konfiguration
 CNC.Controls.WPF.g.en-US.resources:spindlecontrol.baml,lbl_cw:System.Windows.Controls.ContentControl.Content,RadioButton,True,True,,CW
-CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_distance0:CNC.Controls.NumericField.Label,None,False,True,,Distanz 0:
 CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_distance0:CNC.Controls.NumericField.Unit,None,False,True,,mm
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_distance0:CNC.Controls.NumericField.Label,None,False,True,,Distanz 0:
 CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_distance1:CNC.Controls.NumericField.Label,None,False,True,,Distanz 1:
 CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_distance1:CNC.Controls.NumericField.Unit,None,False,True,,mm
-CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_distance2:CNC.Controls.NumericField.Unit,None,False,True,,mm
 CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_distance2:CNC.Controls.NumericField.Label,None,False,True,,Distanz 2:
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_distance2:CNC.Controls.NumericField.Unit,None,False,True,,mm
 CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_distance3:CNC.Controls.NumericField.Label,None,False,True,,Distanz 3:
 CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_distance3:CNC.Controls.NumericField.Unit,None,False,True,,mm
 CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,lbl_enable:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Aktivieren
 CNC.Controls.WPF.g.en-US.resources:coolantcontrol.baml,lbl_fan:CNC.Controls.ToggleControl.Label,None,False,True,,Lüfter
 CNC.Controls.WPF.g.en-US.resources:outlineflyout.baml,lbl_feedrate:CNC.Controls.NumericField.Label,None,True,True,,Vorschub:
 CNC.Controls.WPF.g.en-US.resources:outlinebasecontrol.baml,lbl_feedrate:CNC.Controls.NumericField.Label,None,True,True,,Feed rate:
-CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_feedrate0:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
 CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_feedrate0:CNC.Controls.NumericField.Label,None,False,True,,Vorschub 0:
-CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_feedrate1:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_feedrate0:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
 CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_feedrate1:CNC.Controls.NumericField.Label,None,False,True,,Vorschub 1:
-CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_feedrate2:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_feedrate1:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
 CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_feedrate2:CNC.Controls.NumericField.Label,None,False,True,,Vorschub 2:
-CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_feedrate3:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_feedrate2:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
 CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_feedrate3:CNC.Controls.NumericField.Label,None,False,True,,Vorschub 3:
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_feedrate3:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
 CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_FilterOk:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,&quot;OK&quot; Antworten ausfiltern
 CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_FilterOk:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,"Aktivieren, wenn ok-Antworten die Konsolenprotokollierung überfordern, was typischerweise beim Senden vieler kurzer Befehle der Fall ist."
 CNC.Controls.WPF.g.en-US.resources:consolecontrol.baml,lbl_filterRT:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Echtzeit-Antworten ausfiltern
 CNC.Controls.WPF.g.en-US.resources:coolantcontrol.baml,lbl_flood:CNC.Controls.ToggleControl.Label,None,False,True,,Flut-Kühlung
 CNC.Controls.WPF.g.en-US.resources:portdialog.baml,lbl_ipAddress:System.Windows.Controls.ContentControl.Content,Label,True,True,,IP Addresse:
-CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_keepMdiFocus:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,MDI im Vordergrund behalten
 CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_keepMdiFocus:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Puffert mehr als einen GCode-Block in der Steuerung für eine reibungslosere Ausführung. Nur für grblHAL!
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_keepMdiFocus:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,MDI im Vordergrund behalten
 CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,lbl_linkStepToUi:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Link step distance to UI jogging
 CNC.Controls.WPF.g.en-US.resources:machinepositionflyout.baml,lbl_machinePosition:System.Windows.Controls.TextBlock.Text,Text,True,True,,Maschinen Position
 CNC.Controls.WPF.g.en-US.resources:coolantcontrol.baml,lbl_mist:CNC.Controls.ToggleControl.Label,None,False,True,,Nebel-Kühlung
@@ -167,11 +180,11 @@ CNC.Controls.WPF.g.en-US.resources:offsetview.baml,lbl_offset:System.Windows.Con
 CNC.Controls.WPF.g.en-US.resources:portdialog.baml,lbl_onConnect:System.Windows.Controls.ContentControl.Content,Label,True,True,,Verbinden:
 CNC.Controls.WPF.g.en-US.resources:overridecontrol.baml,lbl_override:System.Windows.Controls.ContentControl.Content,Label,True,True,,Übersteuern
 CNC.Controls.WPF.g.en-US.resources:feedcontrol.baml,lbl_rapids:System.Windows.Controls.ContentControl.Content,Label,True,True,,Schnellvorschub:
-CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_restoreWindowSize:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Fenstergröße beim nächsten Start wiederherstellen.
 CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_restoreWindowSize:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Letzte Fenstergröße beim Starten wiederherstellen
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_restoreWindowSize:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Fenstergröße beim nächsten Start wiederherstellen.
 CNC.Controls.WPF.g.en-US.resources:spindlecontrol.baml,lbl_rpm:System.Windows.Controls.ContentControl.Content,Label,True,True,,UPM
-CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_sendComments:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Send complete comments.
 CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_sendComments:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Send comments
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_sendComments:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Send complete comments.
 CNC.Controls.WPF.g.en-US.resources:portdialog.baml,lbl_serialBaud:System.Windows.Controls.ContentControl.Content,Label,True,True,,Baud rate:
 CNC.Controls.WPF.g.en-US.resources:portdialog.baml,lbl_serialPort:System.Windows.Controls.ContentControl.Content,Label,True,True,,Port:
 CNC.Controls.WPF.g.en-US.resources:trinamicview.baml,lbl_sgLoad:System.Windows.Controls.ContentControl.Content,Label,True,True,,Laden (SG_Ergebnis)
@@ -212,6 +225,14 @@ CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,pnl_kbdJogging:System.W
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_appconfCreate:System.String.$Content,None,True,True,,"Config-Datei nicht gefunden oder ungültig, neu erstellen?"
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_appconfCreateFail:System.String.$Content,None,True,True,,Konfiguration kann nicht gespeichert werden.
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_appconfNoConnect:System.String.$Content,None,True,True,,Verbindung kann nicht hergestellt werden ({0})
+CNC.Controls.WPF.g.en-US.resources:steppercalibrationwizard.baml,str_CalibrationInstructions1:System.String.$Content,None,True,True,,"1. Select the axis to calibrate, Resolution is set from the underlying setting."
+CNC.Controls.WPF.g.en-US.resources:steppercalibrationwizard.baml,str_CalibrationInstructions2:System.String.$Content,None,True,True,,2. Jog to the starting positition in the same direction as the first &quot;Go&quot; move and mark it.
+CNC.Controls.WPF.g.en-US.resources:steppercalibrationwizard.baml,str_CalibrationInstructions3:System.String.$Content,None,True,True,,"3. Enter the Distance to measure, Measured distance is linked to Distance so will be equal."
+CNC.Controls.WPF.g.en-US.resources:steppercalibrationwizard.baml,str_CalibrationInstructions4:System.String.$Content,None,True,True,,"4. Press the appropriate &quot;Go&quot; button to move the entered distance, measure and enter the value in the Measured field."
+CNC.Controls.WPF.g.en-US.resources:steppercalibrationwizard.baml,str_CalibrationInstructions5:System.String.$Content,None,True,True,,5. Press the opposite &quot;Go&quot; button to move back to the origin.\\nThis step can be skipped but avoids repositioning manually to the marked start position if multiple measurements are to be performed.
+CNC.Controls.WPF.g.en-US.resources:steppercalibrationwizard.baml,str_CalibrationInstructions6:System.String.$Content,None,True,True,,6. Press the &quot;Save&quot; button to update the setting.
+CNC.Controls.WPF.g.en-US.resources:steppercalibrationwizard.baml,str_CalibrationInstructions7:System.String.$Content,None,True,True,,7. Repeat from step 4 (or 3). until the measured distance matches the commanded distance with the required accuracy.
+CNC.Controls.WPF.g.en-US.resources:steppercalibrationwizard.baml,str_CalibrationWarnings:System.String.$Content,None,True,True,,Make sure there is room for the axis to move and avoid collision. Return move will add 0.5mm overshoot to remove any backlash from subsequent measurements.
 CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,str_checking:System.String.$Content,None,True,True,,Checking...
 CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,str_clearEStop:System.String.$Content,None,True,True,,Not-Aus entfernen vor &lt;Reset&gt;&gt;
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_convBlockOfBlocks:System.String.$Content,None,True,True,,Block: {0}/{1}
@@ -257,19 +278,19 @@ CNC.Controls.WPF.g.en-US.resources:outlineflyout.baml,str_outlineFlyout:System.S
 CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,str_pause:System.String.$Content,None,True,True,,Pause
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_rotateG17G18Arcs:System.String.$Content,None,True,True,,Im GCode enthaltene Kreise in XZ- oder YZ-Ebene (G18/19) können nicht umgewandelt werden. Verwenden Sie &apos;Kreisbogen zu Linien&apos; wenn Sie dies wirklich brauchen.
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_rotateRadiusArcs:System.String.$Content,None,True,True,,Im GCode enthaltene Kreise können nicht umgewandelt werden. Verwenden Sie &apos;Kreisbogen zu Linien&apos; wenn Sie dies wirklich brauchen.
+CNC.Controls.WPF.g.en-US.resources:macrotoolbarcontrol.baml,str_runMacro:System.String.$Content,None,True,True,,Macro {0} starten?
 CNC.Controls.WPF.g.en-US.resources:macroexecutecontrol.baml,str_runMacro:System.String.$Content,None,True,True,,Run {0} macro?
 CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,str_runMacro:System.String.$Content,None,True,True,,Run macro {0} with no parameters?
-CNC.Controls.WPF.g.en-US.resources:macrotoolbarcontrol.baml,str_runMacro:System.String.$Content,None,True,True,,Macro {0} starten?
-CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_saveSettings:System.String.$Content,None,True,True,,"Einstellungen geändert, speichern?"
-CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsError:System.String.$Content,None,True,True,,"Einstellung {0} ergab {1}, weiter?"
-CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsFail:System.String.$Content,None,True,True,,Schade...\\nWeiter laden?
-CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsInvalid:System.String.$Content,None,True,True,,Datei enthält keine Einstellungen.
-CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsReloadMismatch:System.String.$Content,None,True,True,,"{0} settings were ignored, not supported by the controller."
+CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,str_saveSettings:System.String.$Content,None,True,True,,"Settings changed, save now?"
+CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,str_settingsError:System.String.$Content,None,True,True,,"Setting {0} returned {1}, continue?"
+CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,str_settingsFail:System.String.$Content,None,True,True,,Bummer...\\nContinue loading?
+CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,str_settingsInvalid:System.String.$Content,None,True,True,,The file does not contain any settings.
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_settingsReloadMismatch:System.String.$Content,None,True,True,,"Some settings were ignored, not supported by the controller."
-CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsRestore:System.String.$Content,None,True,True,,Einstellungen aus Datei wiederherstellen
+CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,str_settingsReloadMismatch:System.String.$Content,None,True,True,,"{0} settings were ignored, not supported by the controller."
+CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,str_settingsRestore:System.String.$Content,None,True,True,,Restore settings from file
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_settingsSaved:System.String.$Content,None,True,True,,Settings saved.
-CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsTimeout:System.String.$Content,None,True,True,,"Zeitüberschreitung beim Setzen von {0}, weiter?"
-CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,str_settingsWritten:System.String.$Content,None,True,True,,Alle Einstellungen werden in {0} im Programmverzeichnis gespeichert.
+CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,str_settingsTimeout:System.String.$Content,None,True,True,,"Timed out while setting {0}, continue?"
+CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,str_settingsWritten:System.String.$Content,None,True,True,,All settings written to {0} in the sender folder.
 CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,str_stop:System.String.$Content,None,True,True,,Stop
 CNC.Controls.WPF.g.en-US.resources:thcmonitorcontrol.baml,str_ThcFlyout:System.String.$Content,None,True,True,,_THC monitor
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_themeBlack:System.String.$Content,None,True,True,,Black
@@ -291,9 +312,13 @@ CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_validateRange:System.Stri
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_verifySendController:System.String.$Content,None,True,True,,Are you sure you want to send the selected blocks to the controller?
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_verifyStartFrom:System.String.$Content,None,True,True,,Are you sure the controller is in the correct state to start from block {0}?
 CNC.Controls.WPF.g.en-US.resources:errorsandalarms.baml,tab_alarms:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Alarm codes
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,tab_basicConfig:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Basic settings
 CNC.Controls.WPF.g.en-US.resources:errorsandalarms.baml,tab_errors:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Error codes
 CNC.Controls.WPF.g.en-US.resources:portdialog.baml,tab_network:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Netzwerk
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,tab_pidTuner:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,PID Tuner
 CNC.Controls.WPF.g.en-US.resources:portdialog.baml,tab_serial:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Seriell
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,tab_stepperCalibration:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Stepper calibration
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,tab_trinamic:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Trinamic tuner
 CNC.Controls.WPF.g.en-US.resources:outlinebasecontrol.baml,txt_line1:System.Windows.Documents.Run.Text,Text,True,True,,X und Y Programmgrenzen abfahren
 CNC.Controls.WPF.g.en-US.resources:outlinebasecontrol.baml,txt_line2:System.Windows.Documents.Run.Text,Text,True,True,,"Sicherstellen, dass die Werkzeugspitze frei von Hindernissen ist!"
 CNC.Controls.WPF.g.en-US.resources:errorsandalarms.baml,wnd_errorsAndAlarms:System.Windows.Window.Title,Title,True,True,,Controller error and alarm codes

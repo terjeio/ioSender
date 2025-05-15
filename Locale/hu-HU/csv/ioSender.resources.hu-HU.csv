@@ -33,8 +33,8 @@ ioSender.g.en-US.resources:jobview.baml,str_msgResetExit:System.String.$Content,
 ioSender.g.en-US.resources:jobview.baml,str_msgResetFailed:System.String.$Content,None,True,True,,"A vezérlő lágy reset nem sikerült, kilépés."
 ioSender.g.en-US.resources:jobview.baml,str_msgWait:System.String.$Content,None,True,True,,Várakozás a vezérlőre ({0})...
 ioSender.g.en-US.resources:mainwindow.baml,str_runTime:System.String.$Content,None,True,True,,Futási idő: {0}
-ioSender.g.en-US.resources:mainwindow.baml,tab_3DView:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,3D Nézet
 ioSender.g.en-US.resources:jobview.baml,tab_3DView:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,3D Nézet
+ioSender.g.en-US.resources:mainwindow.baml,tab_3DView:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,3D Nézet
 ioSender.g.en-US.resources:mainwindow.baml,tab_appConfig:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Beállítások: App
 ioSender.g.en-US.resources:jobview.baml,tab_console:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Konzol
 ioSender.g.en-US.resources:mainwindow.baml,tab_facing:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Facing
@@ -44,11 +44,9 @@ ioSender.g.en-US.resources:mainwindow.baml,tab_jogSidebar:System.Windows.Control
 ioSender.g.en-US.resources:mainwindow.baml,tab_latheWizards:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Lathe Wizards
 ioSender.g.en-US.resources:mainwindow.baml,tab_offsets:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Eltolások
 ioSender.g.en-US.resources:mainwindow.baml,tab_parting:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Elválás
-ioSender.g.en-US.resources:mainwindow.baml,tab_pidTuner:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,PID Hangoló
 ioSender.g.en-US.resources:mainwindow.baml,tab_probing:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Szondázás
 ioSender.g.en-US.resources:jobview.baml,tab_program:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Program
 ioSender.g.en-US.resources:mainwindow.baml,tab_sdCard:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,SD Card
 ioSender.g.en-US.resources:mainwindow.baml,tab_threading:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Befűzés
 ioSender.g.en-US.resources:mainwindow.baml,tab_tools:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Eszközök
-ioSender.g.en-US.resources:mainwindow.baml,tab_trinamic:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Trinamic hangoló
 ioSender.g.en-US.resources:mainwindow.baml,tab_turning:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Fordulás

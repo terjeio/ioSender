@@ -2,9 +2,9 @@
 CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,fld_arcResolution:CNC.Controls.NumericField.Label,None,False,True,,Ívfelbontás:
 CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,fld_arcResolution:CNC.Controls.NumericField.Unit,None,False,True,,szegmensek
 CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,fld_minDistance:CNC.Controls.NumericField.Label,None,False,True,,Minimális távolság:
-CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,fld_toolDiameter:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Alapértelmezett szerszámátmérő.
 CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,fld_toolDiameter:CNC.Controls.NumericField.Label,None,False,True,,Szerszám átmérő:
 CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,fld_toolDiameter:CNC.Controls.NumericField.Unit,None,False,True,,mm
+CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,fld_toolDiameter:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Alapértelmezett szerszámátmérő.
 CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,fld_toolScalePct:CNC.Controls.NumericField.Unit,None,False,True,,%
 CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,grp_gcodeViewer:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,GCode Néző
 CNC.Controls.Viewer.g.en-US.resources:configcontrol.baml,lbl_blackBackgroud:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Fekete háttér
@@ -30,12 +30,12 @@ CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,saveView:System.Windows
 CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,saveView:System.Windows.Controls.ContentControl.Content,Button,True,True,,Resources/SaveView.png
 CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,showGrid:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,A rács láthatóságának váltása (Ctrl+G)
 CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,showGrid:System.Windows.Controls.ContentControl.Content,Button,True,True,,Resources/GridOn.png
-CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,showJobEnvelope:System.Windows.Controls.ContentControl.Content,Button,True,True,,Resources/JobBoxOn.png
 CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,showJobEnvelope:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Munkahatárok láthatóságának váltása (Ctrl+J)
+CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,showJobEnvelope:System.Windows.Controls.ContentControl.Content,Button,True,True,,Resources/JobBoxOn.png
 CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,showWorkEnvelope:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,A gépi munkaboríték láthatóságának váltása (Ctrl+W)
 CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,showWorkEnvelope:System.Windows.Controls.ContentControl.Content,Button,True,True,,Resources/WorkBoxOn.png
-CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,showXYZMarkers:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,A tengelyek láthatóságának váltása
 CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,showXYZMarkers:System.Windows.Controls.ContentControl.Content,Button,True,True,,Resources/XYZOn.png
+CNC.Controls.Viewer.g.en-US.resources:rendercontrol.baml,showXYZMarkers:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,A tengelyek láthatóságának váltása
 CNC.Controls.Viewer.g.en-US.resources:renderer.baml,str_toolCone:System.String.$Content,None,True,True,,Kúp
 CNC.Controls.Viewer.g.en-US.resources:renderer.baml,str_toolCrosshair:System.String.$Content,None,True,True,,Szálkereszt
 CNC.Controls.Viewer.g.en-US.resources:renderer.baml,str_toolNoShow:System.String.$Content,None,True,True,,Nincs szerszám

@@ -1,15 +1,15 @@
 ﻿CNC.Converters.g.en-US.resources:jobparametersdialog.baml,bn_cancel:System.Windows.Controls.ContentControl.Content,Button,True,True,,Скасувати
 CNC.Converters.g.en-US.resources:jobparametersdialog.baml,btn_ok:System.Windows.Controls.ContentControl.Content,Button,True,True,,Ok
-CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_cutDepth:CNC.Controls.NumericField.Label,None,False,True,,Глибина:
 CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_cutDepth:CNC.Controls.NumericField.Unit,None,False,True,,мм
-CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_feedrate:CNC.Controls.NumericField.Unit,None,False,True,,мм/хв
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_cutDepth:CNC.Controls.NumericField.Label,None,False,True,,Глибина:
 CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_feedrate:CNC.Controls.NumericField.Label,None,False,True,,Подача:
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_feedrate:CNC.Controls.NumericField.Unit,None,False,True,,мм/хв
 CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_plungeRate:CNC.Controls.NumericField.Label,None,False,True,,Швидкість  занурення:
 CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_plungeRate:CNC.Controls.NumericField.Unit,None,False,True,,мм/хв
-CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_rapids:CNC.Controls.NumericField.Label,None,False,True,,Швидко:
 CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_rapids:CNC.Controls.NumericField.Unit,None,False,True,,мм
-CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_rpm:CNC.Controls.NumericField.Unit,None,False,True,,
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_rapids:CNC.Controls.NumericField.Label,None,False,True,,Швидко:
 CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_rpm:CNC.Controls.NumericField.Label,None,False,True,,Об/хв:
+CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_rpm:CNC.Controls.NumericField.Unit,None,False,True,,
 CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_toolChange:CNC.Controls.NumericField.Unit,None,False,True,,мм
 CNC.Converters.g.en-US.resources:jobparametersdialog.baml,fld_toolChange:CNC.Controls.NumericField.Label,None,False,True,,Зміна інструмента:
 CNC.Converters.g.en-US.resources:jobparametersdialog.baml,grp_scalingFactors:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Масштаб

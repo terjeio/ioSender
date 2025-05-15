@@ -33,8 +33,8 @@ ioSender.g.en-US.resources:jobview.baml,str_msgResetExit:System.String.$Content,
 ioSender.g.en-US.resources:jobview.baml,str_msgResetFailed:System.String.$Content,None,True,True,,"Controller soft reset failed, exiting."
 ioSender.g.en-US.resources:jobview.baml,str_msgWait:System.String.$Content,None,True,True,,Waiting for controller ({0})...
 ioSender.g.en-US.resources:mainwindow.baml,str_runTime:System.String.$Content,None,True,True,,Laufzeit: {0}
-ioSender.g.en-US.resources:mainwindow.baml,tab_3DView:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,3D Ansicht
 ioSender.g.en-US.resources:jobview.baml,tab_3DView:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,3D Ansicht
+ioSender.g.en-US.resources:mainwindow.baml,tab_3DView:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,3D Ansicht
 ioSender.g.en-US.resources:mainwindow.baml,tab_appConfig:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Einstellungen: Programm
 ioSender.g.en-US.resources:jobview.baml,tab_console:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Konsole
 ioSender.g.en-US.resources:mainwindow.baml,tab_facing:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Facing
@@ -44,11 +44,9 @@ ioSender.g.en-US.resources:mainwindow.baml,tab_jogSidebar:System.Windows.Control
 ioSender.g.en-US.resources:mainwindow.baml,tab_latheWizards:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Lathe Wizards
 ioSender.g.en-US.resources:mainwindow.baml,tab_offsets:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Offsets
 ioSender.g.en-US.resources:mainwindow.baml,tab_parting:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Trennen
-ioSender.g.en-US.resources:mainwindow.baml,tab_pidTuner:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,PID Tuner
 ioSender.g.en-US.resources:mainwindow.baml,tab_probing:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Antasten
 ioSender.g.en-US.resources:jobview.baml,tab_program:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Programm
 ioSender.g.en-US.resources:mainwindow.baml,tab_sdCard:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,SD Karte
 ioSender.g.en-US.resources:mainwindow.baml,tab_threading:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Gewindeschneiden
 ioSender.g.en-US.resources:mainwindow.baml,tab_tools:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Werkzeuge
-ioSender.g.en-US.resources:mainwindow.baml,tab_trinamic:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Trinamic tuner
 ioSender.g.en-US.resources:mainwindow.baml,tab_turning:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Drehen
