@@ -13,6 +13,14 @@ Please check out the [Wiki](https://github.com/terjeio/Grbl-GCode-Sender/wiki) f
 Edge pre-releases can be [downloaded from here](https://www.io-engineering.com/downloads), they contains changes yet to be incorporated in a main release and might be buggy and even break existing functionality.  
 Use with care and please [post feedback](https://github.com/terjeio/ioSender/discussions/436) on any issues encountered!
 
+2.0.46p10 \(release candidate\):
+
+* Added probe select dropdown to _Work Parameters_ controls and _Probing_ tab, visible when the controller supports two or more probes.
+
+* Attempt at improving handling of fast scrolling in the program list. Ref. issue [#462](https://github.com/terjeio/ioSender/issues/462).
+
+* Fix for startup exception with legacy controllers, ref issue [#460](https://github.com/terjeio/ioSender/issues/460).
+
 2.0.46p9 \(release candidate\):
 
 * Switched to slider based override control. __NOTE:__ grblHAL builds prior to 20250515 and Grbl may exhibit odd behaviour on large changes.
@@ -145,4 +153,4 @@ Lathe mode.
 Conversational programming for Lathe Mode. Threading requires [grblHAL](https://github.com/grblHAL) controller with driver that has spindle sync support.
 
 ---
-2025-05-15
+2025-06-02
