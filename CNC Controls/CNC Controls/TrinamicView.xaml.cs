@@ -1,13 +1,13 @@
 /*
  * TrinamicView.xaml.cs - part of CNC Controls library
  *
- * v0.36 / 2021-12-19 / Io Engineering (Terje Io)
+ * v0.46 / 2025-05-09 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2021, Io Engineering (Terje Io)
+Copyright (c) 2019-2025, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -54,13 +54,14 @@ namespace CNC.Controls
     /// <summary>
     /// Interaction logic for TrinamicView.xaml
     /// </summary>
-    public partial class TrinamicView : UserControl, ICNCView
+    public partial class TrinamicView : UserControl, IGrblConfigTab
     {
-        private int sg_index = 0;
+        private int sg_index = 0, y_scale = 4;
         private bool plot = false, read_status = false, grbl_reset = false, driver_reset = false;
         private GrblViewModel model = null;
 
         private List<Line> lines;
+        private List<Line> lines2;
 
         public TrinamicView()
         {
@@ -70,6 +71,7 @@ namespace CNC.Controls
             double ypos = SGPlot.Height - ydelta;
 
             lines = new List<Line>((int)SGPlot.Width);
+            lines2 = new List<Line>((int)SGPlot.Width);
 
             //int lval = 0;
 
@@ -91,12 +93,11 @@ namespace CNC.Controls
             AxisEnabled.PropertyChanged += AxisEnabled_PropertyChanged;
         }
 
-        #region Methods and properties required by CNCView interface
+        #region Methods required by GrblConfigTab interface
 
-        public ViewType ViewType { get { return ViewType.TrinamicTuner; } }
-        public bool CanEnable { get { return DataContext == null || !(DataContext as GrblViewModel).IsGCLock; } }
+        public GrblConfigType GrblConfigType { get { return GrblConfigType.Trinamic; } }
 
-        public void Activate(bool activate, ViewType chgMode)
+        public void Activate(bool activate)
         {
             Comms.com.WriteString(string.Format("M122S{0}H{1}\r", activate ? 1 : 0, SFiltEnabled == true ? 1 : 0));
 
@@ -109,6 +110,7 @@ namespace CNC.Controls
                 SGValue = int.Parse(sgdetails.Value);
                 SGValueMin = (int)sgdetails.Min;
                 SGValueMax = (int)sgdetails.Max;
+                y_scale = SGValueMax == 255 ? 2 : 4; // StallGuard4 vs StallGuard2
                 grbl_reset = false;
             }
             else
@@ -118,14 +120,6 @@ namespace CNC.Controls
                 DataContext = null;
             }
             model.Poller.SetState(activate ? AppConfig.Settings.Base.PollInterval : 0);
-        }
-
-        public void CloseFile()
-        {
-        }
-
-        public void Setup(UIViewModel model, AppConfig profile)
-        {
         }
 
         #endregion
@@ -261,13 +255,14 @@ namespace CNC.Controls
                         PlotGrid();
                         sg_index = 0;
                         lines.Clear();
+                        lines2.Clear();
                     }
                     //else if ((sender as GrblViewModel).MDI.ToUpper().Replace(" ", "") == "M122I")
                     //     driver_reset = true;
                     break;
 
                 case nameof(GrblViewModel.GrblReset):
-                        grbl_reset = true;
+                    grbl_reset = true;
                     break;
 
                 case nameof(GrblViewModel.GrblState):
@@ -331,8 +326,10 @@ namespace CNC.Controls
                 Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.ContextIdle, addData, data);
         }
 
-        private void PlotSGValue(int value)
+        private void PlotSGValue(int value, int value2)
         {
+            value /= y_scale;
+
             if (lines.Count != (int)SGPlot.Width)
             {
                 lines.Add(new Line()
@@ -341,17 +338,40 @@ namespace CNC.Controls
                     X2 = sg_index,
                     Y1 = sg_index == 0 ? value : lines[sg_index - 1].Y2,
                     Y2 = value,
-                    Stroke = Brushes.Blue,
+                    Stroke = Brushes.Blue
                 });
 
-                SGPlot.Children.Add(lines[sg_index++]);
+                if(value2 >= 0)
+                {
+                    value2 /= y_scale;
+
+                    lines2.Add(new Line()
+                    {
+                        X1 = sg_index == 0 ? 0 : sg_index - 1,
+                        X2 = sg_index,
+                        Y1 = sg_index == 0 ? value2 : lines2[sg_index - 1].Y2,
+                        Y2 = value2,
+                        Stroke = Brushes.Green
+                    });
+
+                    SGPlot.Children.Add(lines2[sg_index]);
+                }
+
+                SGPlot.Children.Add(lines[sg_index]);
             }
             else
             {
                 sg_index %= (int)SGPlot.Width;
                 lines[sg_index].Y1 = sg_index == 0 ? value : lines[sg_index - 1].Y2;
-                lines[sg_index++].Y2 = value;
+                lines[sg_index].Y2 = value;
+                if (value2 >= 0 && lines2.Count == (int)SGPlot.Width)
+                {
+                    value2 /= y_scale;
+                    lines2[sg_index].Y1 = sg_index == 0 ? value2 : lines2[sg_index - 1].Y2;
+                    lines2[sg_index].Y2 = value2;
+                }
             }
+            sg_index++;
         }
 
         private void ProcessSGValue(string data)
@@ -361,8 +381,12 @@ namespace CNC.Controls
                 int sep = data.IndexOf(":");
                 data = data.Substring(sep + 1, data.IndexOf("]") - sep - 1);
 
-                int value = int.Parse(data) / 4;
-                Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.ContextIdle, new System.Action(() => PlotSGValue(value)));
+                var sg_result = data.Split(',');
+
+                int v1 = int.Parse(sg_result[0]);
+                int v2 = sg_result.Length == 2 ? int.Parse(sg_result[1]) : -1;
+
+                Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.ContextIdle, new System.Action(() => PlotSGValue(v1, v2)));
             }
         }
     }

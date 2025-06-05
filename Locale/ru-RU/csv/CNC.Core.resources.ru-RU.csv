@@ -40,5 +40,8 @@ CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserUnsupportedCmd:System.Str
 CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserWordRepeated:System.String.$Content,None,True,True,,Повторная команда
 CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserZPlus:System.String.$Content,None,True,True,,"Обнаружена ось, отличная от Z"
 CNC.Core.g.en-US.resources:libstrings.baml,str_joggingOnly:System.String.$Content,None,True,True,,Только перемещение и некоторые системные команды разрешены при смене инструмента!
+CNC.Core.g.en-US.resources:libstrings.baml,str_prbPrimary:System.String.$Content,None,True,True,,Primary
+CNC.Core.g.en-US.resources:libstrings.baml,str_prbSecondary:System.String.$Content,None,True,True,,Secondary
+CNC.Core.g.en-US.resources:libstrings.baml,str_prbToolSetter:System.String.$Content,None,True,True,,Toolsetter
 CNC.Core.g.en-US.resources:libstrings.baml,str_sdStreamComplete:System.String.$Content,None,True,True,,Трансляция с SD карты {0}% окончена
 CNC.Core.g.en-US.resources:libstrings.baml,str_serialPortError:System.String.$Content,None,True,True,,Невозможно открыть COM порт: {0}

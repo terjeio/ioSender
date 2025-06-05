@@ -1,0 +1,23 @@
+﻿<UserControl x:Class="CNC.Controls.Lathe.LatheWizardsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CNC.Controls.Lathe"
+             mc:Ignorable="d" 
+             d:DesignHeight="515" d:DesignWidth="900">
+    <TabControl x:Name="tab" Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="Auto" Height="Auto" SelectionChanged="tab_SelectionChanged">
+        <TabItem x:Uid="tab_turning" x:Name="tabTurning" Header="Turning">
+            <local:TurningWizard x:Name="turningWizard"/>
+        </TabItem>
+        <TabItem x:Uid="tab_parting" x:Name="tabParting" Header="Parting">
+            <local:PartingWizard x:Name="partingWizard"/>
+        </TabItem>
+        <TabItem x:Uid="tab_facing" x:Name="tabFacing" Header="Facing">
+            <local:FacingWizard x:Name="facingWizard"/>
+        </TabItem>
+        <TabItem x:Uid="tab_threading" x:Name="tabThreading" Header="Threading">
+            <local:ThreadingWizard x:Name="threadingWizard"/>
+        </TabItem>
+    </TabControl>
+</UserControl>

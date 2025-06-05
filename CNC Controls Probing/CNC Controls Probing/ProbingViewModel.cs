@@ -1,13 +1,13 @@
 ﻿/*
  * ProbingViewModel.cs - part of CNC Probing library
  *
- * v0.45 / 2024-07-19 / Io Engineering (Terje Io)
+ * v0.46 / 2025-01-19 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020-2024, Io Engineering (Terje Io)
+Copyright (c) 2020-2025, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -90,7 +90,7 @@ namespace CNC.Controls.Probing
         private double _probeOffsetX, _probeOffsetY;
 
         private bool _canProbe = false, _isComplete = false, _isSuccess = false, _probeZ = false, _useFixture = false;
-        private bool _hasToolTable = false, _hasCs9 = false, _addAction = false, _isPaused = false, _isCorner = false;
+        private bool _hasToolTable = false, _hasCs9 = false, _addAction = false, _isPaused = false, _isCorner = false, _isXYtp = false;
         private bool isCancelled = false, wasZselected = false, _referenceToolOffset = true, _workpieceLockXY = true;
         private bool _enablePreview = false, _canApplyTransform = false, _allowMeasure = false;
         private OriginControl.Origin _origin = OriginControl.Origin.None;
@@ -264,6 +264,8 @@ namespace CNC.Controls.Probing
                 timer.Stop();
             }
 
+            Program.ClearResponseQueue();
+
             return res == true;
         }
 
@@ -408,20 +410,23 @@ namespace CNC.Controls.Probing
             get { return _profile; }
             set
             {
-                _profile = value;
-                RapidsFeedRate = _profile.RapidsFeedRate;
-                ProbeFeedRate = _profile.ProbeFeedRate;
-                LatchFeedRate = _profile.LatchFeedRate;
-                ProbeDistance = _profile.ProbeDistance;
-                LatchDistance = _profile.LatchDistance;
-                ProbeDiameter = _profile.ProbeDiameter;
-                Offset = _profile.Offset;
-                XYClearance = _profile.XYClearance;
-                ProbeOffsetX = _profile.ProbeOffsetX;
-                ProbeOffsetY = _profile.ProbeOffsetY;
-                Depth = _profile.Depth;
-                TouchPlateHeight = _profile.TouchPlateHeight;
-                FixtureHeight = _profile.FixtureHeight;
+                if ((_profile = value) != null)
+                {
+                    RapidsFeedRate = _profile.RapidsFeedRate;
+                    ProbeFeedRate = _profile.ProbeFeedRate;
+                    LatchFeedRate = _profile.LatchFeedRate;
+                    ProbeDistance = _profile.ProbeDistance;
+                    LatchDistance = _profile.LatchDistance;
+                    ProbeDiameter = _profile.ProbeDiameter;
+                    Offset = _profile.Offset;
+                    XYClearance = _profile.XYClearance;
+                    ProbeOffsetX = _profile.ProbeOffsetX;
+                    ProbeOffsetY = _profile.ProbeOffsetY;
+                    Depth = _profile.Depth;
+                    TouchPlateHeight = _profile.TouchPlateHeight;
+                    TouchPlateIsXY = _profile.TouchPlateIsXY;
+                    FixtureHeight = _profile.FixtureHeight;
+                }
             }
         }
 
@@ -433,6 +438,7 @@ namespace CNC.Controls.Probing
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(OffsetEnable));
                 OnPropertyChanged(nameof(XYOffsetEnable));
+                OnPropertyChanged(nameof(TouchPlateXYEnabled));
                 OnPropertyChanged(nameof(ProbeDiameterEnable));
                 OnPropertyChanged(nameof(TouchPlateHeightEnable));
             }
@@ -455,6 +461,8 @@ namespace CNC.Controls.Probing
         public double LatchFeedRate { get { return _latchFeedRate; } set { _latchFeedRate = value; OnPropertyChanged(); } }
         public double RapidsFeedRate { get { return _rapidsFeedRate; } set { _rapidsFeedRate = value; OnPropertyChanged(); } }
         public double TouchPlateHeight { get { return _tpHeight; } set { _tpHeight = value; OnPropertyChanged(); } }
+        public bool TouchPlateIsXY { get { return _isXYtp; } set { _isXYtp = value; OnPropertyChanged(); } }
+        public bool TouchPlateXYEnabled { get { return _probingType != ProbingType.HeightMap; } }
         public double FixtureHeight { get { return _fHeight; } set { _fHeight = value; OnPropertyChanged(); } }
         public bool CanProbe { get { return _canProbe; } set { _canProbe = value; OnPropertyChanged(); } }
         public bool IsCompleted { get { return _isComplete; } set { _isComplete = value; OnPropertyChanged(); } }
@@ -507,10 +515,12 @@ namespace CNC.Controls.Probing
         public double XYClearance { get { return _xyClearance; } set { _xyClearance = value; OnPropertyChanged(); } }
         public double Offset { get { return _offset; } set { _offset = value; OnPropertyChanged(); } }
         public double ProbeOffsetX { get { return _probeOffsetX; } set { _probeOffsetX = value; OnPropertyChanged(); } }
+        public double ProbeTPOffsetX { get { return _isXYtp && IsProbeEdgeNegativeX ? - _probeOffsetX : _probeOffsetX; } }
         public double ProbeOffsetY { get { return _probeOffsetY; } set { _probeOffsetY = value; OnPropertyChanged(); } }
+        public double ProbeTPOffsetY { get { return _isXYtp && IsProbeEdgeNegativeY ? - _probeOffsetY : _probeOffsetY; } }
         public bool ProbeIsOffset { get { return !(_probeOffsetX == 0d && _probeOffsetY == 0d); } }
         public bool OffsetEnable { get { return ((_probingType == ProbingType.EdgeFinderInternal || _probingType == ProbingType.EdgeFinderExternal) && _isCorner) || _probingType == ProbingType.Rotation; } }
-        public bool XYOffsetEnable { get { return ((_probingType == ProbingType.EdgeFinderInternal || _probingType == ProbingType.EdgeFinderExternal) && _edge != Edge.None && _edge != Edge.Z) || _probingType == ProbingType.CenterFinder || _probingType == ProbingType.Rotation; } }
+        public bool XYOffsetEnable { get { return ((_probingType == ProbingType.EdgeFinderInternal || _probingType == ProbingType.EdgeFinderExternal) && _edge != Edge.None && _edge != Edge.Z) || _probingType == ProbingType.CenterFinder || _probingType == ProbingType.Rotation || _probingType == ProbingType.HeightMap; } }
         public double Depth { get { return _depth; } set { _depth = value; OnPropertyChanged(); } }
         public string RapidCommand { get { return RapidsFeedRate == 0d ? "G0" : "G1F" + RapidsFeedRate.ToInvariantString(); } }
         public string ProbeProgram { get { return Program.ToString().Replace("G53", string.Empty); } }
@@ -539,6 +549,9 @@ namespace CNC.Controls.Probing
         public bool IsCoordinateModeG92 { get { return _cmode == CoordMode.G92; } set { _cmode = value ? CoordMode.G92 : CoordMode.G10; OnPropertyChanged(); OnPropertyChanged(nameof(CoordinateMode)); } }
 
         public DistanceMode DistanceMode { get; set; } = DistanceMode.Absolute;
+
+        public bool IsProbeEdgeNegativeX { get { return _edge == Edge.B || _edge == Edge.C || _edge == Edge.CB; } }
+        public bool IsProbeEdgeNegativeY { get { return _edge == Edge.C || _edge == Edge.D || _edge == Edge.CD; } }
 
         public Edge ProbeEdge
         {

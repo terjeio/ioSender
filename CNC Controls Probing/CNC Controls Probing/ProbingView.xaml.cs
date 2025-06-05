@@ -1,13 +1,13 @@
 ﻿/*
  * ProbingView.xaml.cs - part of CNC Probing library
  *
- * v0.45 / 2023-12-20 / Io Engineering (Terje Io)
+ * v0.46 / 2025-06-05 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020-2023, Io Engineering (Terje Io)
+Copyright (c) 2020-2025, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -65,14 +65,14 @@ namespace CNC.Controls.Probing
         public ProbingView()
         {
             InitializeComponent();
-
-            profiles.Load();
         }
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
             if (!keyboardMappingsOk && DataContext is GrblViewModel)
             {
+                profiles.Load();
+
                 grbl = (DataContext as GrblViewModel);
                 KeypressHandler keyboard = grbl.Keyboard;
 
@@ -419,6 +419,12 @@ namespace CNC.Controls.Probing
                 }
                 e.Handled = true;
             }
+        }
+
+        private void cbxProbe_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.AddedItems.Count == 1 && ((ComboBox)sender).IsDropDownOpen)
+                model.Grbl.ExecuteCommand(string.Format(GrblCommand.ProbeSelect, ((Probe)e.AddedItems[0]).Id));
         }
 
         // https://stackoverflow.com/questions/5707143/how-to-get-the-width-height-of-a-collapsed-control-in-wpf

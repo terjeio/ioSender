@@ -1,7 +1,7 @@
 ﻿/*
  * OverrideControl.xaml.cs - part of CNC Controls library
  *
- * v0.45 / 2024-04-03 / Io Engineering (Terje Io)
+ * v0.46 / 2025-05-13 / Io Engineering (Terje Io)
  *
  */
 
@@ -38,7 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 using System;
-using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using CNC.Core;
@@ -47,54 +46,72 @@ namespace CNC.Controls
 {
     public partial class OverrideControl : UserControl
     {
-        private DependencyPropertyDescriptor minus_dpd;
+        private double lastValue;
 
-        public delegate void CommandGeneratedHandler(string command);
+        public delegate void CommandGeneratedHandler(byte[] commands, int len);
         public event CommandGeneratedHandler CommandGenerated;
 
         public OverrideControl()
         {
             InitializeComponent();
-
-            minus_dpd = DependencyPropertyDescriptor.FromProperty(OverrideControl.MinusOnlyProperty, typeof(OverrideControl));
-            minus_dpd.AddValueChanged(this, OnMinusChanged);
         }
 
-        ~OverrideControl()
+        public byte ResetCommand { set; get; }
+        public byte FinePlusCommand { set; get; }
+        public byte FineMinusCommand { set; get; }
+        public byte CoarsePlusCommand { set; get; }
+        public byte CoarseMinusCommand { set; get; }
+
+        #region dependencyproperties
+
+        public static readonly DependencyProperty MinimumProperty = DependencyProperty.Register(nameof(Minimum), typeof(int), typeof(OverrideControl), new PropertyMetadata(10));
+        public int Minimum
         {
-            minus_dpd.RemoveValueChanged(this, OnMinusChanged);
+            get { return (int)GetValue(MinimumProperty); }
+            set { SetValue(MinimumProperty, value); }
         }
 
-        public byte ResetCommand { set { btnOvReset.Tag = ((char)value).ToString(); } }
-        public byte FinePlusCommand { set { btnOvFinePlus.Tag = ((char)value).ToString(); } }
-        public byte FineMinusCommand { set { btnOvFineMinus.Tag = ((char)value).ToString(); } }
-        public byte CoarsePlusCommand { set { btnOvCoarsePlus.Tag = ((char)value).ToString(); } }
-        public byte CoarseMinusCommand { set { btnOvCoarseMinus.Tag = ((char)value).ToString(); } }
+        public static readonly DependencyProperty MaximumProperty = DependencyProperty.Register(nameof(Maximum), typeof(int), typeof(OverrideControl), new PropertyMetadata(200));
+        public int Maximum
+        {
+            get { return (int)GetValue(MaximumProperty); }
+            set { SetValue(MaximumProperty, value); }
+        }
 
-        public static readonly DependencyProperty ValueProperty = DependencyProperty.Register(nameof(Value), typeof(double), typeof(OverrideControl), new PropertyMetadata(double.NaN, new PropertyChangedCallback(OnValuehanged)));
+        public static readonly DependencyProperty TicksProperty = DependencyProperty.Register(nameof(Ticks), typeof(System.Windows.Media.DoubleCollection), typeof(OverrideControl));
+        public System.Windows.Media.DoubleCollection Ticks
+        {
+            get { return (System.Windows.Media.DoubleCollection)GetValue(TicksProperty); }
+            set { SetValue(TicksProperty, value); }
+        }
+
+        public static readonly DependencyProperty TickFrequencyProperty = DependencyProperty.Register(nameof(TickFrequency), typeof(int), typeof(OverrideControl), new PropertyMetadata(1));
+        public int TickFrequency
+        {
+            get { return (int)GetValue(TickFrequencyProperty); }
+            set { SetValue(TickFrequencyProperty, value); }
+        }
+
+        public static readonly DependencyProperty SliderValueProperty = DependencyProperty.Register(nameof(SliderValue), typeof(double), typeof(OverrideControl), new PropertyMetadata(0d, new PropertyChangedCallback(OnSliderValueChanged)));
+        public double SliderValue
+        {
+            get { return (double)GetValue(SliderValueProperty); }
+            set { SetValue(SliderValueProperty, value); }
+        }
+        private static void OnSliderValueChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ((OverrideControl)d).txtOverride.Text = Math.Round((double)e.NewValue).ToString() + "%";
+        }
+
+        public static readonly DependencyProperty ValueProperty = DependencyProperty.Register(nameof(Value), typeof(double), typeof(OverrideControl), new PropertyMetadata(0d, new PropertyChangedCallback(OnValueChanged)));
         public double Value
         {
             get { return (double)GetValue(ValueProperty); }
             set { SetValue(ValueProperty, value); }
         }
-        private static void OnValuehanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnValueChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ((OverrideControl)d).txtOverride.Text = ((double)e.NewValue).ToString() + "%"; ;
-        }
-
-        public static readonly DependencyProperty MinusOnlyProperty =  DependencyProperty.Register(nameof(MinusOnly), typeof(bool), typeof(OverrideControl), new PropertyMetadata(false));
-        public bool MinusOnly
-        {
-            get { return (bool)GetValue(MinusOnlyProperty); }
-            set { SetValue(MinusOnlyProperty, value); }
-        }
-        public void OnMinusChanged(object sender, EventArgs args)
-        {
-            if (MinusOnly)
-            {
-                btnOvFinePlus.Visibility = Visibility.Collapsed;
-                btnOvCoarsePlus.Visibility = Visibility.Collapsed;
-            }
+            ((OverrideControl)d).SliderValue = Math.Round((double)e.NewValue);
         }
 
         public static readonly DependencyProperty EncoderModeProperty = DependencyProperty.Register(nameof(EncoderMode), typeof(GrblEncoderMode), typeof(OverrideControl), new PropertyMetadata(GrblEncoderMode.Unknown));
@@ -104,10 +121,62 @@ namespace CNC.Controls
             set { SetValue(EncoderModeProperty, value); }
         }
 
+        #endregion
+
+        private void Slider_LostMouseCapture(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            int len = 0;
+            byte[] cmd = new byte[30];
+
+            if (FinePlusCommand == 0) // Rapids override
+            {
+                switch((int)SliderValue)
+                {
+                    case 25:
+                        cmd.SetValue(CoarseMinusCommand, len++);
+                        break;
+                    case 50:
+                        cmd.SetValue(FineMinusCommand, len++);
+                        break;
+                    default:
+                        cmd.SetValue(ResetCommand, len++);
+                        break;
+                }
+            } else {
+
+                double coarseDelta = Math.Round(SliderValue) - Value, fineDelta = coarseDelta % 10d;
+                byte coarseCmd = coarseDelta < 0d ? CoarseMinusCommand : CoarsePlusCommand,
+                     fineCmd = fineDelta < 0d ? FineMinusCommand : FinePlusCommand;
+
+                coarseDelta = Math.Abs(coarseDelta - fineDelta);
+                fineDelta = Math.Abs(fineDelta);
+
+                while (coarseDelta != 0d)
+                {
+                    cmd.SetValue(coarseCmd, len++);
+                    coarseDelta -= 10d;
+                }
+                while (fineDelta != 0d)
+                {
+                    cmd.SetValue(fineCmd, len++);
+                    fineDelta -= 1d;
+                }
+            }
+
+            if(cmd.Length > 0)
+                CommandGenerated?.Invoke(cmd, len);
+        }
+
         void btnOverrideClick(object sender, EventArgs e)
         {
-            CommandGenerated?.Invoke((string)((Button)sender).Tag);
+            byte[] cmd = new byte[] { ResetCommand };
+
+            CommandGenerated?.Invoke(cmd, 1);
+        }
+
+        private void Slider_GotMouseCapture(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            lastValue = Math.Round(Value);
         }
     }
 }
-

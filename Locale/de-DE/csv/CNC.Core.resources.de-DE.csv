@@ -40,5 +40,8 @@ CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserUnsupportedCmd:System.Str
 CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserWordRepeated:System.String.$Content,None,True,True,,Befehl wiederholt
 CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserZPlus:System.String.$Content,None,True,True,,Andere(s) Achsenwort(e) als Z gefunden
 CNC.Core.g.en-US.resources:libstrings.baml,str_joggingOnly:System.String.$Content,None,True,True,,Beim Werkzeugwechsel sind nur Tippen und einige Systembefehle erlaubt!
+CNC.Core.g.en-US.resources:libstrings.baml,str_prbPrimary:System.String.$Content,None,True,True,,Primary
+CNC.Core.g.en-US.resources:libstrings.baml,str_prbSecondary:System.String.$Content,None,True,True,,Secondary
+CNC.Core.g.en-US.resources:libstrings.baml,str_prbToolSetter:System.String.$Content,None,True,True,,Toolsetter
 CNC.Core.g.en-US.resources:libstrings.baml,str_sdStreamComplete:System.String.$Content,None,True,True,,SD Karte Übertragung {0}% abgeschlossen
 CNC.Core.g.en-US.resources:libstrings.baml,str_serialPortError:System.String.$Content,None,True,True,,Serielle Schnittstelle kann nicht geöffnet werden: {0}

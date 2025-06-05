@@ -1,13 +1,13 @@
 ﻿/*
  * FeedControl.xaml.cs - part of CNC Controls library
  *
- * v0.05 / 2020-02-01 / Io Engineering (Terje Io)
+ * v0.46 / 2025-05-08 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2019, Io Engineering (Terje Io)
+Copyright (c) 2018-2025, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -62,9 +62,9 @@ namespace CNC.Controls
             rapidsOverrideControl.CoarseMinusCommand = GrblConstants.CMD_RAPID_OVR_LOW;
         }
 
-        void override_CommandGenerated(string command)
+        void override_CommandGenerated(byte[] commands, int len)
         {
-            (DataContext as GrblViewModel).ExecuteCommand(command);
+            Comms.com.WriteBytes(commands, len);
         }
     }
 }

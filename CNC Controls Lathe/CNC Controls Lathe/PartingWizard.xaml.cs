@@ -1,13 +1,13 @@
 ﻿/*
  * PartingWizard.xaml.cs - part of CNC Controls library
  *
- * v0.31 / 2021-04-27 / Io Engineering (Terje Io)
+ * v0.46 / 2025-04-16 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2021, Io Engineering (Terje Io)
+Copyright (c) 2019-2025, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -47,7 +47,7 @@ namespace CNC.Controls.Lathe
     /// <summary>
     /// Interaction logic for PartingView.xaml
     /// </summary>
-    public partial class PartingWizard : UserControl, ICNCView
+    public partial class PartingWizard : UserControl, ILatheWizardTab
     {
         private bool initOk = false, resetProfileBindings = true;
         private double last_rpm = 0d, last_css = 0d;
@@ -80,21 +80,20 @@ namespace CNC.Controls.Lathe
 
         #region Methods and properties required by CNCView interface
 
-        public ViewType ViewType { get { return ViewType.Parting; } }
+        public LatheWizardType LatheWizardType { get { return LatheWizardType.Parting; } }
         public bool CanEnable { get { return true; } }
 
-        public void Activate(bool activate, ViewType chgMode)
+        public void Activate(bool activate)
         {
             if (activate && GrblSettings.IsLoaded)
             {
                 if (!initOk)
                 {
                     initOk = true;
-                    if (config == null)
-                    {
-                        //   cbxProfile.BindOptions(config, mode);
-                    }
+
+                    model.Profiles = model.wz.Load();
                     model.config.Update();
+
                     Converters.IsMetric = model.IsMetric = GrblParserState.IsMetric;
                     model.XStart = model.IsMetric ? 10.0d : 0.5d;
                 }
@@ -121,8 +120,6 @@ namespace CNC.Controls.Lathe
         public void InitUI()
         {
         }
-
-        public WizardConfig config { get; private set; }
 
         private void btnCalculate_Click(object sender, System.Windows.RoutedEventArgs e)
         {

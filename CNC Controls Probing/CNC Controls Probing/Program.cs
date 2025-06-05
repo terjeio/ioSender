@@ -1,13 +1,13 @@
 ﻿/*
  * Program.cs - part of CNC Probing library
  *
- * v0.45 / 2024-12-11 / Io Engineering (Terje Io)
+ * v0.46 / 2025-05-05 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020-2024, Io Engineering (Terje Io)
+Copyright (c) 2020-2025, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -359,6 +359,16 @@ namespace CNC.Controls.Probing
             _program.Add("G53" + probing.RapidCommand + pos.ToString(axisflags));
         }
 
+        public void ClearResponseQueue ()
+        {
+            string response;
+
+            Comms.com.PurgeQueue();
+
+            while (!cmd_response.IsEmpty)
+                cmd_response.TryDequeue(out response);
+        }
+
         public void Cancel()
         {
             IsCancelled = true;
@@ -367,7 +377,7 @@ namespace CNC.Controls.Probing
                 ResponseReceived("cancel");
         }
 
-        public void End(string message)
+        public void End(string message, bool force_message = false)
         {
             if (isRunning)
             {
@@ -378,7 +388,7 @@ namespace CNC.Controls.Probing
                 isRunning = Grbl.IsJobRunning = false;
                 Grbl.ExecuteCommand(probing.DistanceMode == DistanceMode.Absolute ? "G90" : "G91");
             }
-            if(!_isComplete || probing.IsSuccess)
+            if (!_isComplete || probing.IsSuccess || force_message)
                 probing.Message = message;
             _isComplete = true;
         }
@@ -391,8 +401,6 @@ namespace CNC.Controls.Probing
 
             if (_program.Count > 0)
             {
-                string response;
-
                 step = 0;
                 probing.CameraPositions = 0;
                 probing.Positions.Clear();
@@ -400,15 +408,12 @@ namespace CNC.Controls.Probing
 
                 Comms.com.PurgeQueue();
 
-
                 if (!isRunning)
                 {
                     isRunning = true;
                     probeProtect = GrblInfo.HasSimpleProbeProtect;
 
-                    while (!cmd_response.IsEmpty)
-                        cmd_response.TryDequeue(out response);
-
+                    ClearResponseQueue();
                     Grbl.OnCommandResponseReceived += ResponseReceived;
                     Grbl.PropertyChanged += Grbl_PropertyChanged;
                     if(hasPause)
@@ -431,6 +436,8 @@ namespace CNC.Controls.Probing
 
                 while (!_isComplete)
                 {
+                    string response;
+
                     EventUtils.DoEvents();
 
                     if (cmd_response.TryDequeue(out response))
@@ -504,7 +511,7 @@ namespace CNC.Controls.Probing
             if (!probing.Program.Init(false))
                 return false;
 
-            probing.Program.AddRapid(string.Format("G90X{0}Y{0}", x.ToInvariantString(probing.Grbl.Format), y.ToInvariantString(probing.Grbl.Format)));
+            probing.Program.AddRapid(string.Format("G90X{0}Y{1}", x.ToInvariantString(probing.Grbl.Format), y.ToInvariantString(probing.Grbl.Format)));
             probing.Program.AddMessage(LibStrings.FindResource("ProbingAtX0Y0"));
             probing.Program.Add(string.Format("G91F{0}", probing.ProbeFeedRate.ToInvariantString()));
             probing.Program.AddProbingAction(AxisFlags.Z, true);

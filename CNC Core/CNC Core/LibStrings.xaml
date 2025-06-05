@@ -46,4 +46,7 @@
     <system:String x:Uid="str_contClearResetUnlock" x:Key="ContClearResetUnlock">clear then &lt;Reset&gt; then &lt;Unlock&gt; to continue</system:String>
     <system:String x:Uid="str_contHome" x:Key="ContHome">&lt;Home&gt; to continue</system:String>
     <system:String x:Uid="str_contResetUnlock" x:Key="ContResetUnlock">&lt;Reset&gt; then &lt;Unlock&gt; to continue</system:String>
+    <system:String x:Uid="str_prbPrimary" x:Key="ProbePrimary">Primary</system:String>
+    <system:String x:Uid="str_prbToolSetter" x:Key="ProbeToolSetter">Toolsetter</system:String>
+    <system:String x:Uid="str_prbSecondary" x:Key="ProbeSecondary">Secondary</system:String>
 </ResourceDictionary>

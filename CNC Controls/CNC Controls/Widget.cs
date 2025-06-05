@@ -1,13 +1,13 @@
 /*
  * Widget.cs - part of CNC Controls library for Grbl
  *
- * v0.44 / 2023-12-30 / Io Engineering (Terje Io)
+ * v0.46 / 2025-05-09 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2023, Io Engineering (Terje Io)
+Copyright (c) 2018-2025, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -75,7 +75,6 @@ namespace CNC.Controls
 
     public class WidgetProperties
     {
-
         public int Id { get; private set; }
         public GrblSettingDetails.DataTypes DataType { get; private set; }
         public string Label { get; private set; }
@@ -85,8 +84,9 @@ namespace CNC.Controls
         public double Min { get; private set; } = double.NaN;
         public double Max { get; private set; } = double.NaN;
         public bool AllowNull { get; private set; } = false;
+        public GrblSettingDetails Setting { get { return properties; } }
 
-        GrblSettingDetails properties = null;
+        private GrblSettingDetails properties = null;
 
         public void Assign (string value)
         {
@@ -127,6 +127,8 @@ namespace CNC.Controls
         public RadioButton wRadiobutton = null;
         private StackPanel Canvas;
 
+        public GrblSettingDetails Setting { get { return widget.Setting; } }
+
         private string AxisLabels ()
         {
             string labels = string.Empty;
@@ -144,7 +146,7 @@ namespace CNC.Controls
 
         public string BaseValue { get { return widget.Value; } }
 
-        public Widget(GrblConfigView View, WidgetProperties widget, StackPanel Canvas)
+        public Widget(GrblConfigControl View, WidgetProperties widget, StackPanel Canvas)
         {
             this.Canvas = components = Canvas;
             this.widget = widget;

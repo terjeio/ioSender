@@ -127,8 +127,9 @@ namespace CNC.Core
                     ok = true;
                 }
             }
-            catch
+            catch (Exception e)
             {
+                System.Windows.MessageBox.Show(e.Message, "ioSender", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Exclamation);
             }
 
             return ok;

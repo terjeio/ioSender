@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:CNC.Controls"
              xmlns:gcode="clr-namespace:CNC.GCode;assembly=CNC.Core"
              mc:Ignorable="d" 
-             d:DesignHeight="515" d:DesignWidth="875"
+             d:DesignHeight="480" d:DesignWidth="875"
              Loaded="TrinamicView_Loaded">
     <UserControl.Resources>
         <ResourceDictionary>
@@ -23,8 +23,8 @@
     <DockPanel Background="Transparent" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
         <DockPanel x:Name="dp" DockPanel.Dock="Left" Margin="5,5,5,0" Width="520" HorizontalAlignment="Left" VerticalAlignment="Stretch">
             <StackPanel DockPanel.Dock="Top" Width="520" VerticalAlignment="Stretch">
-                <Border BorderThickness="1" BorderBrush="DarkGray" Height="258" Width="514" HorizontalAlignment="Left" VerticalAlignment="Top">
-                    <Canvas x:Name="SGPlot" Background="WhiteSmoke" HorizontalAlignment="Left" Height="256" VerticalAlignment="Top" Width="512"/>
+                <Border BorderThickness="1" BorderBrush="DarkGray" Height="242" Width="514" HorizontalAlignment="Left" VerticalAlignment="Top">
+                    <Canvas x:Name="SGPlot" Background="WhiteSmoke" HorizontalAlignment="Left" Height="240" VerticalAlignment="Top" Width="512"/>
                 </Border>
                 <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                     <StackPanel Orientation="Horizontal" Height="24">
@@ -39,11 +39,11 @@
                 </Grid>
                 <GroupBox x:Uid="grp_stallGuard" Header="stallGuard">
                     <StackPanel>
-                        <CheckBox x:Uid="lbl_stallGuardEnable" IsChecked="{Binding Path=SFiltEnabled, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" Content="Enable filter (SFILT)" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top"/>
                         <StackPanel Orientation="Horizontal" Margin="0,5">
                             <Slider Value="{Binding SGValue, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" Width="169" Minimum="{Binding Path=SGValueMin, RelativeSource={RelativeSource AncestorType=UserControl}}" Maximum="{Binding Path=SGValueMax, RelativeSource={RelativeSource AncestorType=UserControl}}" TickPlacement="BottomRight" IsSnapToTickEnabled="False" LostMouseCapture="Slider_LostMouseCapture"/>
                             <TextBox Text="{Binding Path=SGValue, RelativeSource={RelativeSource AncestorType=UserControl}, StringFormat='##0'}" HorizontalContentAlignment="Right" IsReadOnly="True" Width="30" Margin="5,0,0,0" />
                             <Button x:Uid="lbl_configure" Content="Configure" Width="60" VerticalAlignment="Center" Margin="5,0" Click="btnConfigureSGVal_Click"/>
+                            <CheckBox x:Uid="lbl_stallGuardEnable" IsChecked="{Binding Path=SFiltEnabled, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" Content="Enable filter (SFILT)" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Center"/>
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
@@ -52,7 +52,7 @@
                     <local:SignalsControl DockPanel.Dock="Right" VerticalAlignment="Bottom" HorizontalAlignment="Right"/>
                 </DockPanel>
             </StackPanel>
-            <StackPanel  HorizontalAlignment="Left" VerticalAlignment="Bottom">
+            <StackPanel HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="0,5,0,0">
                 <local:MDIControl x:Name="mdiControl"/>
                 <TextBlock TextWrapping="NoWrap" Height="25" Width="235" HorizontalAlignment="Left" Margin="0,5,0,0">
                     <TextBlock.Text>
@@ -64,7 +64,7 @@
                 </TextBlock>
             </StackPanel>
         </DockPanel>
-        <Grid DockPanel.Dock="Top" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <Grid DockPanel.Dock="Top" Margin="0,5,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="30"/>

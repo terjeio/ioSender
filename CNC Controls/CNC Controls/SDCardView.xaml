@@ -20,6 +20,7 @@
         <system:String x:Uid="str_transferring" x:Key="Transferring">Transferred {0} of {1} bytes...</system:String>
         <system:String x:Uid="str_deleteFile" x:Key="DeleteFile">Delete {0}?</system:String>
         <system:String x:Uid="str_illegalName" x:Key="IllegalName">File: {0}\n!,?,~ and SPACE is not supported in filenames, please rename.</system:String>
+        <system:String x:Uid="str_noCard" x:Key="NoCard">No card mounted.</system:String>
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>

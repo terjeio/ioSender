@@ -1,13 +1,13 @@
 ﻿/*
  * WorkParametersControl.xaml.cs - part of CNC Controls library
  *
- * v0.27 / 2020-09-11 / Io Engineering (Terje Io)
+ * v0.46 / 2025-05-29 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2020, Io Engineering (Terje Io)
+Copyright (c) 2018-2025, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -99,6 +99,12 @@ namespace CNC.Controls
         {
             if (e.AddedItems.Count == 1 && ((ComboBox)sender).IsDropDownOpen)
                 (DataContext as GrblViewModel).ExecuteCommand(string.Format(GrblCommand.ToolChange, ((Tool)e.AddedItems[0]).Code));
+        }
+
+        private void cbxProbe_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.AddedItems.Count == 1 && ((ComboBox)sender).IsDropDownOpen)
+                (DataContext as GrblViewModel).ExecuteCommand(string.Format(GrblCommand.ProbeSelect, ((Probe)e.AddedItems[0]).Id));
         }
 
         #endregion

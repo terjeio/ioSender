@@ -50,11 +50,11 @@ namespace CNC.Controls
             InitializeComponent();
         }
 
-        private void chkBox_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void chkCoolant_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            if((string)(sender as CheckBox).Tag == "Flood")
+            if ((string)(sender as ToggleControl).Tag == "Flood")
                 (DataContext as GrblViewModel).ExecuteCommand(GrblCommand.Flood);
-            else if ((string)(sender as CheckBox).Tag == "Mist")
+            else if ((string)(sender as ToggleControl).Tag == "Mist")
                 (DataContext as GrblViewModel).ExecuteCommand(GrblCommand.Mist);
             else
                 (DataContext as GrblViewModel).ExecuteCommand(GrblCommand.Fan);

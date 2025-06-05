@@ -1,13 +1,13 @@
 ﻿/*
  * CssControl.cs - part of CNC Controls Lathe library
  *
- * v0.03 / 2020-01-28 / Io Engineering (Terje Io)
+ * v0.46 / 2025-05-13 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2020, Io Engineering (Terje Io)
+Copyright (c) 2019-2025, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -37,6 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+using CNC.GCode;
+using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -63,6 +65,13 @@ namespace CNC.Controls.Lathe
         {
             (d as CssControl).data.Label = ((CssControl)d).IsCssEnabled == true ? "Speed:" : "Spindle:";
             (d as CssControl).data.Unit = ((CssControl)d).IsCssEnabled == true ? (d as CssControl).Unit : "RPM";
+        }
+
+        public static readonly DependencyProperty SpindleDirProperty = DependencyProperty.Register(nameof(SpindleDir), typeof(SpindleState), typeof(CssControl), new PropertyMetadata(SpindleState.CW));
+        public SpindleState SpindleDir
+        {
+            get { return (SpindleState)GetValue(SpindleDirProperty); }
+            set { SetValue(SpindleDirProperty, value); }
         }
 
         public static readonly DependencyProperty ValueProperty = DependencyProperty.Register(nameof(Value), typeof(double), typeof(CssControl), new PropertyMetadata(double.NaN));

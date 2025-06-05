@@ -1,13 +1,13 @@
 /*
  * TurningWizard.xaml.cs - part of CNC Controls library
  *
- * v0.45 / 2024-04-21 / Io Engineering (Terje Io)
+ * v0.46 / 2025-05-13 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2024, Io Engineering (Terje Io)
+Copyright (c) 2019-2025, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -48,7 +48,7 @@ namespace CNC.Controls.Lathe
     /// <summary>
     /// Interaction logic for TurningWizard.xaml
     /// </summary>
-    public partial class TurningWizard : UserControl, ICNCView
+    public partial class TurningWizard : UserControl, ILatheWizardTab
     {
         private bool initOk = false, resetProfileBindings = true;
         private double last_rpm = 0d, last_css = 0d, length = 0d;
@@ -83,21 +83,20 @@ namespace CNC.Controls.Lathe
 
         #region Methods and properties required by CNCView interface
 
-        public ViewType ViewType { get { return ViewType.Turning; } }
+        public LatheWizardType LatheWizardType { get { return LatheWizardType.Turning; } }
         public bool CanEnable { get { return true; } }
 
-        public void Activate(bool activate, ViewType chgMode)
+        public void Activate(bool activate)
         {
             if (activate && GrblSettings.IsLoaded)
             {
                 if (!initOk)
                 {
                     initOk = true;
-                    if (config == null)
-                    {
-                        //   cbxProfile.BindOptions(config, mode);
-                    }
+
+                    model.Profiles = model.wz.Load();
                     model.config.Update();
+
                     Converters.IsMetric = model.IsMetric = GrblParserState.IsMetric;
                     model.XStart = model.IsMetric ? 10.0d : 0.5d;
                 }
@@ -109,24 +108,11 @@ namespace CNC.Controls.Lathe
             }
         }
 
-        public void CloseFile()
-        {
-        }
-
-        public void Setup(UIViewModel model, AppConfig profile)
-        {
-            this.model.wz.ApplySettings(profile.Lathe);
-            if (!model.IsConfigControlInstantiated<ConfigControl>())
-                model.ConfigControls.Add(new ConfigControl());
-        }
-
         #endregion
         public void InitUI()
         {
 
         }
-
-        public WizardConfig config { get; private set; }
 
         private void taperEnabled (bool enabled)
         {

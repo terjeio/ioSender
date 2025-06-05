@@ -40,5 +40,8 @@ CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserUnsupportedCmd:System.Str
 CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserWordRepeated:System.String.$Content,None,True,True,,命令字重复
 CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserZPlus:System.String.$Content,None,True,True,,找到除Z以外的轴字
 CNC.Core.g.en-US.resources:libstrings.baml,str_joggingOnly:System.String.$Content,None,True,True,,换刀时只允许点动和一些系统命令！
+CNC.Core.g.en-US.resources:libstrings.baml,str_prbPrimary:System.String.$Content,None,True,True,,Primary
+CNC.Core.g.en-US.resources:libstrings.baml,str_prbSecondary:System.String.$Content,None,True,True,,Secondary
+CNC.Core.g.en-US.resources:libstrings.baml,str_prbToolSetter:System.String.$Content,None,True,True,,Toolsetter
 CNC.Core.g.en-US.resources:libstrings.baml,str_sdStreamComplete:System.String.$Content,None,True,True,,SD 卡流式传输已完成 {0}%
 CNC.Core.g.en-US.resources:libstrings.baml,str_serialPortError:System.String.$Content,None,True,True,,无法打开串行端口：{0}

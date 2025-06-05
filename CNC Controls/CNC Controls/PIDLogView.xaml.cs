@@ -1,13 +1,13 @@
 /*
  * PIDLogView.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.31 / 2021-04-27 / Io Engineering (Terje Io)
+ * v0.46 / 2025-05-09 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2019, Io Engineering (Terje Io)
+Copyright (c) 2018-2025, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -51,7 +51,7 @@ namespace CNC.Controls
     /// <summary>
     /// Interaction logic for PIDLogView.xaml
     /// </summary>
-    public partial class PIDLogView : UserControl, ICNCView
+    public partial class PIDLogView : UserControl, IGrblConfigTab
     {
         private double errorScale = 2500d;
 
@@ -69,20 +69,11 @@ namespace CNC.Controls
             errorScale = (DataContext as PIDLogViewModel).ScaleFactors[3];
         }
 
-        #region Methods and properties required by CNCView interface
+        #region Methods required by GrblConfigTab interface
 
-        public ViewType ViewType { get { return ViewType.PIDTuner; } }
-        public bool CanEnable { get { return true; } }
+        public GrblConfigType GrblConfigType { get { return GrblConfigType.PidTuning; } }
 
-        public void Activate(bool activate, ViewType chgMode)
-        {
-        }
-
-        public void CloseFile()
-        {
-        }
-
-        public void Setup(UIViewModel model, AppConfig profile)
+        public void Activate(bool activate)
         {
         }
 

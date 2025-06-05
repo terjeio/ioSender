@@ -1,12 +1,12 @@
 /*
  * AppConfigView.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.37 / 2021-02-27 / Io Engineering (Terje Io)
+ * v0.46 / 2025-02-14 / Io Engineering (Terje Io)
  *
  */
 /*
 
-Copyright (c) 2020-2022, Io Engineering (Terje Io)
+Copyright (c) 2020-2025, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -106,7 +106,7 @@ namespace CNC.Controls
 
         private void btnSaveKeyMap_Click(object sender, RoutedEventArgs e)
         {
-            string filename = CNC.Core.Resources.Path + string.Format("KeyMap{0}.xml", (int)AppConfig.Settings.Jog.Mode);
+            string filename = CNC.Core.Resources.ConfigPath + string.Format("KeyMap{0}.xml", (int)AppConfig.Settings.Jog.Mode);
             if(Grbl.GrblViewModel.Keyboard.SaveMappings(filename))
                 Grbl.GrblViewModel.Message = string.Format(LibStrings.FindResource("KeymappingsSaved"), filename);
         }

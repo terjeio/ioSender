@@ -1,13 +1,13 @@
 /*
  * SDCardView.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.45 / 2024-09-07 / Io Engineering (Terje Io)
+ * v0.46 / 2025-03-07 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2024, Io Engineering (Terje Io)
+Copyright (c) 2018-2025, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -73,11 +73,17 @@ namespace CNC.Controls
         {
             if (activate)
             {
-                GrblSDCard.Load(DataContext as GrblViewModel, ViewAll);
-                CanUpload = GrblInfo.UploadProtocol != string.Empty;
+                CanUpload = GrblInfo.UploadProtocol != string.Empty && (DataContext as GrblViewModel).SDCardMountStatus != SDState.Undetected;
                 CanDelete = GrblInfo.Build >= 20210421;
                 CanViewAll = GrblInfo.Build >= 20230312;
                 CanRewind = GrblInfo.IsGrblHAL;
+
+                if (GrblInfo.HasSDCard && (DataContext as GrblViewModel).SDCardMountStatus == SDState.Undetected)
+                {
+                    GrblSDCard.Clear();
+                    (DataContext as GrblViewModel).Message = (string)FindResource("NoCard");
+                } else
+                    GrblSDCard.Load(DataContext as GrblViewModel, ViewAll);
             }
             else
                 (DataContext as GrblViewModel).Message = string.Empty;
@@ -249,7 +255,7 @@ namespace CNC.Controls
                                 if (port == -1)
                                     port = GrblSettings.GetInteger(grblHALSetting.FtpPort2);
                                 client.Credentials = new NetworkCredential("grblHAL", "grblHAL");
-                                client.UploadFile(string.Format("ftp://{0}:{1}/{2}", GrblInfo.IpAddress, port == -1 ? 21 : port, filename.Substring(filename.LastIndexOf('\\') + 1)), WebRequestMethods.Ftp.UploadFile, filename);
+                                client.UploadFile(string.Format("ftp://{0}:{1}//{2}", GrblInfo.IpAddress, port == -1 ? 21 : port, System.IO.Path.GetFileName(filename)), WebRequestMethods.Ftp.UploadFile, filename);
                                 ok = true;
                             }
                         }
@@ -325,7 +331,7 @@ namespace CNC.Controls
                             if(int.TryParse(filename.Substring(pos + 1), out macro) && macro >= 100)
                             {
                                 if(MessageBox.Show(string.Format((string)FindResource("RunMacro"), macro), "ioSender",
-                   MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                                                    MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                                 {
                                     Comms.com.WriteCommand("G65P" + macro.ToString());
                                 }
@@ -349,8 +355,8 @@ namespace CNC.Controls
     public static class GrblSDCard
     {
         private static DataTable data;
-        private static bool? mounted = null;
         private static int id = 0;
+        private static GrblViewModel grbl;
 
         static GrblSDCard()
         {
@@ -367,36 +373,44 @@ namespace CNC.Controls
         public static DataView Files { get { return data.DefaultView; } }
         public static bool Loaded { get { return data.Rows.Count > 0; } }
 
+        public static void Clear()
+        {
+            data.Clear();
+        }
+
         public static void Load(GrblViewModel model, bool ViewAll)
         {
             bool? res = null;
             CancellationToken cancellationToken = new CancellationToken();
 
+            grbl = model;
+
             data.Clear();
 
-            if (mounted == null)
+            if (GrblInfo.HasSDCard && grbl.SDCardMountStatus == SDState.Unmounted)
             {
                 Comms.com.PurgeQueue();
 
                 new Thread(() =>
                 {
-                    mounted = WaitFor.AckResponse<string>(
+                    res = WaitFor.AckResponse<string>(
                         cancellationToken,
-                        null,
+                        response => CardCheck(response),
                         a => model.OnResponseReceived += a,
                         a => model.OnResponseReceived -= a,
-                        500, () => Comms.com.WriteCommand(GrblConstants.CMD_SDCARD_MOUNT));
+                        1500, () => Comms.com.WriteCommand(GrblConstants.CMD_SDCARD_MOUNT));
                 }).Start();
 
-                while (mounted == null)
+                while (res == null)
                     EventUtils.DoEvents();
             }
 
-            if (mounted == true)
+            if (!GrblInfo.HasSDCard || grbl.SDCardMountStatus == SDState.Mounted || grbl.SDCardMountStatus == SDState.Detected)
             {
                 Comms.com.PurgeQueue();
 
                 id = 0;
+                res = null;
                 model.Silent = true;
 
                 new Thread(() =>
@@ -416,6 +430,12 @@ namespace CNC.Controls
 
                 data.AcceptChanges();
             }
+        }
+
+        private static void CardCheck(string data)
+        {
+            if(data == "ok")
+                grbl.SDCardMountStatus = SDState.Mounted;
         }
 
         private static void Process(string data)
@@ -447,6 +467,8 @@ namespace CNC.Controls
                 }
                 GrblSDCard.data.Rows.Add(new object[] { id++, "", filename, filesize, invalid });
             }
+            else if (data == "error:62" || data == "error:64")
+                grbl.SDCardMountStatus = SDState.Unmounted;
         }
     }
 }

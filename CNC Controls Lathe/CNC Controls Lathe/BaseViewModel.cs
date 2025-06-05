@@ -1,13 +1,13 @@
 ﻿/*
  * BaseViewModel.cs - part of CNC Controls Lathe library
  *
- * v0.43 / 2023-06-03 / Io Engineering (Terje Io)
+ * v0.46 / 2025-05-13 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2023, Io Engineering (Terje Io)
+Copyright (c) 2019-2025, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -37,10 +37,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using CNC.Core;
-using System;
+using CNC.GCode;
 
 namespace CNC.Controls.Lathe
 {
@@ -50,6 +51,7 @@ namespace CNC.Controls.Lathe
         double _xlen = double.NaN, _xstart = double.NaN, _zlen = double.NaN, _zstart = double.NaN;
         uint _springPasses = 0, _cssSpeed = 0;
         bool  _isSpringPassesEnabled = false, _isCssEnabled = false, _isTaperEnabled = false;
+        SpindleState _spindleDir = SpindleState.CW;
 
         Thread.Format _format = Thread.Format.LinuxCNC;
 
@@ -64,7 +66,6 @@ namespace CNC.Controls.Lathe
             ZStart = 0;
 
             wz = new WizardConfig(profileName);
-            Profiles = wz.profile.profiles;
 
             PropertyChanged += BaseViewModel_PropertyChanged;
         }
@@ -87,6 +88,7 @@ namespace CNC.Controls.Lathe
 
         public ObservableCollection<string> gCode { get; private set; }
         public ObservableCollection<string> PassData { get; private set; }
+        public ObservableCollection<SpindleDirection> SpindleDirections { get; private set; } = Spindle.Directions;
 
         public ActiveProfile config { get { return wz.ActiveProfile; } }
 
@@ -119,6 +121,12 @@ namespace CNC.Controls.Lathe
         {
             get { return _rpm; }
             set { if (_rpm != value) { _rpm = value; OnPropertyChanged(); } }
+        }
+
+        public SpindleState SpindleDir
+        {
+            get { return _spindleDir; }
+            set { if (_spindleDir != value) { _spindleDir = value; OnPropertyChanged(); } }
         }
 
         public double XStart

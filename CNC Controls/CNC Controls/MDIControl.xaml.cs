@@ -1,13 +1,13 @@
 ﻿/*
  * MDIControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.44 / 2023-10-07 / Io Engineering (Terje Io)
+ * v0.46 / 2024-12-27 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2023, Io Engineering (Terje Io)
+Copyright (c) 2018-2024, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -123,7 +123,7 @@ namespace CNC.Controls
             var mdi = txtMDI.Template.FindName("PART_EditableTextBox", txtMDI) as TextBox;
             if(mdi != null)
                 mdi.Tag = "MDI";
-            if(DataContext != null)
+            if(DataContext != null && DataContext is GrblViewModel)
                 (DataContext as GrblViewModel).PropertyChanged += OnDataContextPropertyChanged;
         }
     }

@@ -1,13 +1,13 @@
 ﻿/*
  * HeightMapControl.xaml.cs - part of CNC Probing library
  *
- * v0.45 / 2024-07-16 / Io Engineering (Terje Io)
+ * v0.46 / 2025-05-05 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020-2024, Io Engineering (Terje Io)
+Copyright (c) 2020-2025, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -76,9 +76,15 @@ namespace CNC.Controls.Probing
             if (!probing.ValidateInput(true))
                 return;
 
+            var startpos = new Position(probing.HeightMap.MinX - probing.ProbeOffsetX, probing.HeightMap.MinY - probing.ProbeOffsetY, 0d);
+
+            if ((Math.Abs(startpos.X - probing.Grbl.Position.X) > 0.01d || Math.Abs(startpos.Y - probing.Grbl.Position.Y) > 0.01d) &&
+                 MessageBox.Show(string.Format((string)FindResource("AreaOrigin"), startpos.X.ToInvariantString(probing.Grbl.Format), startpos.Y.ToInvariantString(probing.Grbl.Format)), "ioSender", MessageBoxButton.OKCancel, MessageBoxImage.Warning, MessageBoxResult.No) == MessageBoxResult.Cancel)
+                return;
+
             origin = new Position(probing.Grbl.MachinePosition, probing.Grbl.UnitFactor);
 
-            if (!probing.WaitForIdle(string.Format("G90G0X{0}Y{1}", probing.HeightMap.MinX.ToInvariantString(), probing.HeightMap.MinY.ToInvariantString())))
+            if (!probing.WaitForIdle(string.Format("G90G0X{0}Y{1}", startpos.X.ToInvariantString(probing.Grbl.Format), startpos.Y.ToInvariantString(probing.Grbl.Format))))
                 return;
 
             if (!probing.VerifyProbe())
@@ -189,9 +195,9 @@ namespace CNC.Controls.Probing
 //                double z = probing.HeightMap.Map.InterpolateZ(0d, 0d);
 
                 if (probing.HeightMap.SetToolOffset &&
-                    (ok = /* (probing.Positions[0].X == origin.X && probing.Positions[0].Y == origin.Y) || */ probing.Program.ProbeZ(0d, 0d)))
+                    (ok = /* (probing.Positions[0].X == origin.X && probing.Positions[0].Y == origin.Y) || */ probing.Program.ProbeZ(-probing.ProbeOffsetX, -probing.ProbeOffsetY)))
                 {
-                    probing.HeightMap.Map.ZOffset = Z0 - probing.Positions[0].Z; // vs Z above, add check for allowed delta?
+                    probing.HeightMap.Map.ZOffset = Math.Round(Z0 - probing.Positions[0].Z, probing.Grbl.Precision); // vs Z above, add check for allowed delta?
 
                     if (probing.CoordinateMode == ProbingViewModel.CoordMode.G10)
                         probing.Grbl.ExecuteCommand(string.Format("G10L2P{0}Z{1}", probing.CoordinateSystem, (probing.Positions[0].Z - probing.Grbl.ToolOffset.Z).ToInvariantString()));
@@ -211,7 +217,7 @@ namespace CNC.Controls.Probing
             }
 
             if(!ok)
-                probing.Program.End((string)FindResource("ProbingFailed"));
+                probing.Program.End((string)FindResource("ProbingFailed"), probing.Positions.Count != probing.HeightMap.Map.TotalPoints);
 
             probing.Program.OnCompleted?.Invoke(ok);
         }

@@ -1,13 +1,13 @@
 ﻿/*
  * GCode.cs - part of CNC Controls library for Grbl
  *
- * v0.41 / 2022-07-19 / Io Engineering (Terje Io)
+ * v0.46 / 2025-05-31 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2022, Io Engineering (Terje Io)
+Copyright (c) 2018-2025, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -110,8 +110,8 @@ namespace CNC.Controls
         public int Decimals { get { return Program.Parser.Decimals; } }
         public bool HeightMapApplied { get { return Program.HeightMapApplied; } set { Program.HeightMapApplied = value; } }
 
-        public DataTable Data { get { return Program.Data; } }
-        public int Blocks { get { return Program.Data.Rows.Count; } }
+        public ObservableCollection<GCodeBlock> Data { get { return Program.Blocks; } }
+        public int Blocks { get { return Program.Blocks.Count; } }
         public List<GCodeToken> Tokens { get { return Program.Tokens; } }
         public Queue<string> Commands { get { return Program.commands; } }
         public GCodeParser Parser { get { return Program.Parser; } }
@@ -191,9 +191,9 @@ namespace CNC.Controls
 
         public void ClearStatus()
         {
-            foreach (DataRow row in Program.Data.Rows)
-                if ((string)row["Sent"] != string.Empty)
-                    row["Sent"] = string.Empty;
+            foreach (var row in Program.Blocks)
+                if (row.Sent != string.Empty)
+                    row.Sent = string.Empty;
         }
 
         public void Drag(object sender, DragEventArgs e)
@@ -295,8 +295,8 @@ namespace CNC.Controls
                     {
                         using (new UIUtils.WaitCursor())
                         {
-                            foreach (DataRow line in Program.Data.Rows)
-                                stream.WriteLine((string)line["Data"]);
+                            foreach (var line in Program.Blocks)
+                                stream.WriteLine(line.Data);
                         }
                     }
                 }

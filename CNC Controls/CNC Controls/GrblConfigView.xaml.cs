@@ -1,13 +1,13 @@
-/*
- * GrblConfigView.xaml.cs - part of CNC Controls library for Grbl
+﻿/*
+ * GrblConfigView.xaml.cs - part of CNC Probing library
  *
- * v0.45 / 2024-11-08 / Io Engineering (Terje Io)
+ * v0.46 / 2025-06-05 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2024, Io Engineering (Terje Io)
+Copyright (c) 2025, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -39,89 +39,44 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using System.Windows;
 using System.Windows.Controls;
-using Microsoft.Win32;
-using System.Collections.Generic;
-using System.IO;
-using System;
-using System.Threading;
 using CNC.Core;
 
 namespace CNC.Controls
 {
+    /// <summary>
+    /// Interaction logic for ConfigView.xaml
+    /// </summary>
     public partial class GrblConfigView : UserControl, ICNCView
     {
-        private Widget curSetting = null;
-        private GrblViewModel model = null;
-
-        private string retval;
-
         public GrblConfigView()
         {
             InitializeComponent();
         }
 
-        private void ConfigView_Loaded(object sender, RoutedEventArgs e)
-        {
-            if(!(DataContext is WidgetViewModel))
-                DataContext = new WidgetViewModel(DataContext as GrblViewModel);
-
-            model = (DataContext as WidgetViewModel).Grbl;
-
-            dgrSettings.Visibility = GrblInfo.HasEnums ? Visibility.Collapsed : Visibility.Visible;
-            treeView.Visibility = !GrblInfo.HasEnums ? Visibility.Collapsed : Visibility.Visible;
-            details.Visibility = GrblInfo.HasEnums && curSetting == null ? Visibility.Hidden : Visibility.Visible;
-
-            if (GrblInfo.HasEnums)
-            {
-                treeView.ItemsSource = GrblSettingGroups.Groups;
-            }
-            else
-            {
-                dgrSettings.DataContext = GrblSettings.Settings;
-                dgrSettings.SelectedIndex = 0;
-            }
-        }
-
-        #region Methods required by CNCView interface
+        #region Methods and properties required by CNCView interface
 
         public ViewType ViewType { get { return ViewType.GRBLConfig; } }
-        public bool CanEnable { get { return true; } }
+        public bool CanEnable { get { return DataContext is GrblViewModel ? (DataContext as GrblViewModel).SystemCommandsAllowed : true; } }
 
         public void Activate(bool activate, ViewType chgMode)
         {
-            if (model != null)
-            {
-                btnSave.IsEnabled = !model.IsCheckMode;
-                model.Message = string.Empty;
-
-                if (activate)
-                {
-                    using (new UIUtils.WaitCursor())
-                    {
-                        GrblSettings.Load();
-                    }
-
-                    if(treeView.SelectedItem != null && treeView.SelectedItem is GrblSettingDetails)
-                        ShowSetting(treeView.SelectedItem as GrblSettingDetails, false);
-                    else if (dgrSettings.SelectedItem != null)
-                        ShowSetting(dgrSettings.SelectedItem as GrblSettingDetails, false);
-                }
-                else
-                {
-                    if (curSetting != null)
-                        curSetting.Assign();
-
-                    if (GrblSettings.HasChanges())
-                    {
-                        if (MessageBox.Show((string)FindResource("SaveSettings"), "ioSender", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.Yes)
-                            GrblSettings.Save();
-                    }
-                }
-            }
+            getView(tabConfig.SelectedItem == null ? tabConfig.Items[0] as TabItem : tabConfig.SelectedItem as TabItem)?.Activate(activate);
         }
 
         public void CloseFile()
         {
+
+            //if (!string.IsNullOrEmpty(GrblInfo.TrinamicDrivers))
+            //    MainWindow.EnableView(true, ViewType.TrinamicTuner);
+            //else
+            //    MainWindow.ShowView(false, ViewType.TrinamicTuner);
+
+
+            //if (GrblInfo.HasPIDLog)
+            //    MainWindow.EnableView(true, ViewType.PIDTuner);
+            //else
+            //    MainWindow.ShowView(false, ViewType.PIDTuner);
+
         }
 
         public void Setup(UIViewModel model, AppConfig profile)
@@ -130,254 +85,68 @@ namespace CNC.Controls
 
         #endregion
 
-        #region UIEvents
-
-        void btnSave_Click(object sender, RoutedEventArgs e)
+        private  TabItem getTab(GrblConfigType tabtype)
         {
-            if (curSetting != null)
-                curSetting.Assign();
+            TabItem tab = null;
 
-            model.Message = string.Empty;
-
-            GrblSettings.Save();
-        }
-
-        void btnReload_Click(object sender, RoutedEventArgs e)
-        {
-            using(new UIUtils.WaitCursor()) {
-                GrblSettings.Load();
-            }
-        }
-
-        void btnBackup_Click(object sender, RoutedEventArgs e)
-        {
-            GrblSettings.Backup(string.Format("{0}settings.txt", Core.Resources.Path));
-            model.Message = string.Format((string)FindResource("SettingsWritten"), "settings.txt");
-        }
-
-        private void ShowSetting(GrblSettingDetails setting, bool assign)
-        {
-            details.Visibility = Visibility.Visible;
-
-            if (curSetting != null)
+            foreach (TabItem tabitem in UIUtils.FindLogicalChildren<TabItem>(tabConfig))
             {
-                if (assign)
-                    curSetting.Assign();
-                canvas.Children.Clear();
-                curSetting.Dispose();
-            }
-            txtDescription.Text = setting.Description;
-            curSetting = new Widget(this, new WidgetProperties(setting), canvas);
-            curSetting.IsEnabled = true;
-        }
-
-        private bool SetSetting (KeyValuePair<int, string> setting)
-        {
-            bool? res = null;
-            CancellationToken cancellationToken = new CancellationToken();
-            var scmd = string.Format("${0}={1}", setting.Key, setting.Value);
-
-            retval = string.Empty;
-
-            new Thread(() =>
-            {
-                res = WaitFor.AckResponse<string>(
-                    cancellationToken,
-                    response => Process(response),
-                    a => model.OnResponseReceived += a,
-                    a => model.OnResponseReceived -= a,
-                    400, () => Comms.com.WriteCommand(scmd));
-            }).Start();
-
-            while (res == null)
-                EventUtils.DoEvents();
-
-            if (retval != string.Empty)
-            {
-                if(retval.StartsWith("error:"))
+                var view = getView(tabitem);
+                if (view != null && view.GrblConfigType == tabtype)
                 {
-                    var msg = GrblErrors.GetMessage(retval.Substring(6));
-                    if(msg != retval)
-                        retval += " - \"" + msg + "\"";
-                }
-
-                var details = GrblSettings.Get((GrblSetting)setting.Key);
-
-                if (MessageBox.Show(string.Format((string)FindResource("SettingsError"), scmd, retval), "ioSender" + (details == null ? "" : " - " + details.Name), MessageBoxButton.YesNo, MessageBoxImage.Exclamation) == MessageBoxResult.No)
-                    return false;
-            }
-            else if (res == false && MessageBox.Show(string.Format((string)FindResource("SettingsTimeout"), scmd), "ioSender", MessageBoxButton.YesNo, MessageBoxImage.Exclamation) == MessageBoxResult.No)
-                return false;
-
-            return true;
-        }
-
-        public bool LoadFile(string filename)
-        {
-            int pos, id, mismatch = 0;
-            List<string> lines = new List<string>();
-            List<int> dep = new List<int>();
-            Dictionary<int, string> settings = new Dictionary<int, string>();
-            FileInfo file = new FileInfo(filename);
-            StreamReader sr = file.OpenText();
-
-            string block = sr.ReadLine();
-
-            while (block != null)
-            {
-                block = block.Trim();
-                try
-                {
-                    if (lines.Count == 0 && model.IsGrblHAL && block == "%")
-                        lines.Add(block);
-                    else if (block.StartsWith("$") && (pos = block.IndexOf('=')) > 1)
-                    {
-                        if (int.TryParse(block.Substring(1, pos - 1), out id))
-                            settings.Add(id, block.Substring(pos + 1));
-                        else
-                            lines.Add(block);
-                    }
-
-                    block = sr.ReadLine();
-                }
-                catch (Exception e)
-                {
-                    if (MessageBox.Show(((string)FindResource("SettingsFail")).Replace("\\n", "\r\r"), e.Message, MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-                        block = sr.ReadLine();
-                    else
-                    {
-                        block = null;
-                        settings.Clear();
-                        lines.Clear();
-                    }
+                    tab = tabitem;
+                    break;
                 }
             }
 
-            sr.Close();
+            return tab;
+        }
 
-            if (settings.Count == 0)
-                MessageBox.Show((string)FindResource("SettingsInvalid"));
-            else
+        private static IGrblConfigTab getView(TabItem tab)
+        {
+            IGrblConfigTab view = null;
+
+            foreach (UserControl uc in UIUtils.FindLogicalChildren<UserControl>(tab))
             {
-                bool? res = null;
-                CancellationToken cancellationToken = new CancellationToken();
-
-                // List of settings that have other dependent settings and have to be set before them
-                dep.Add((int)GrblSetting.HomingEnable);
-
-                foreach (var cmd in lines)
+                if (uc is IGrblConfigTab)
                 {
-                    res = null;
-                    retval = string.Empty;
-
-                    new Thread(() =>
-                    {
-                        res = WaitFor.AckResponse<string>(
-                            cancellationToken,
-                            response => Process(response),
-                            a => model.OnResponseReceived += a,
-                            a => model.OnResponseReceived -= a,
-                            400, () => Comms.com.WriteCommand(cmd));
-                    }).Start();
-
-                    while (res == null)
-                        EventUtils.DoEvents();
-
-                    if (retval != string.Empty)
-                    {
-                        if (MessageBox.Show(string.Format((string)FindResource("SettingsError"), cmd, retval), "ioSender", MessageBoxButton.YesNo, MessageBoxImage.Exclamation) == MessageBoxResult.No)
-                            break;
-                    }
-                    else if (res == false && MessageBox.Show(string.Format((string)FindResource("SettingsTimeout"), cmd), "ioSender", MessageBoxButton.YesNo, MessageBoxImage.Exclamation) == MessageBoxResult.No)
-                        break;
-                }
-
-                foreach (var d in dep)
-                {
-                    if (settings.ContainsKey(d))
-                    {
-                        var setting = new KeyValuePair<int, string>(d, settings[d]);
-                        if (GrblSettings.HasSetting((GrblSetting)setting.Key))
-                        {
-                            if (!SetSetting(setting))
-                            {
-                                settings.Clear();
-                                break;
-                            }
-                        }
-                        else
-                            mismatch++;
-                    }
-                }
-
-                foreach (var setting in settings)
-                {
-                    if (GrblSettings.HasSetting((GrblSetting)setting.Key))
-                    {
-                        if (!dep.Contains(setting.Key))
-                        {
-                            if (!SetSetting(setting))
-                                break;
-                        }
-                    }
-                    else
-                        mismatch++;
-                }
-
-                if (lines.Count > 0 && lines[0] == "%")
-                    Comms.com.WriteCommand("%");
-
-                using (new UIUtils.WaitCursor())
-                {
-                    GrblSettings.Load();
+                    view = (IGrblConfigTab)uc;
+                    break;
                 }
             }
 
-            model.Message = string.Empty;
-
-            if (mismatch > 0)
-                MessageBox.Show(string.Format((string)FindResource("SettingsReloadMismatch"), mismatch), "ioSender", MessageBoxButton.OK, MessageBoxImage.Exclamation);
-
-            return settings.Count > 0;
+            return view;
         }
 
-        private void Process(string data)
+        private void tab_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (data != "ok")
-                retval = data;
-        }
-
-        private void btnRestore_Click(object sender, RoutedEventArgs e)
-        {
-            OpenFileDialog file = new OpenFileDialog();
-
-            file.InitialDirectory = Core.Resources.Path;
-            file.Title = (string)FindResource("SettingsRestore");
-
-            file.Filter = string.Format("Text files (*.txt)|*.txt");
-
-            if (file.ShowDialog() == true)
+            if (Equals(e.OriginalSource, sender))
             {
-                using (new UIUtils.WaitCursor())
+                if (e.AddedItems.Count == 1)
                 {
-                    LoadFile(file.FileName);
+                    if (e.RemovedItems.Count == 1)
+                        getView(e.RemovedItems[0] as TabItem).Activate(false);
+
+                    getView(e.AddedItems[0] as TabItem).Activate(true);
                 }
+                e.Handled = true;
             }
         }
 
-        private void dgrSettings_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void RemoveTab (GrblConfigType type)
         {
-            if (e.AddedItems.Count == 1)
-                ShowSetting(e.AddedItems[0] as GrblSettingDetails, true);
+            var ptab = getTab(type);
+            if (ptab != null)
+                tabConfig.Items.Remove(ptab);
         }
-        #endregion
 
-        private void treeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
-            if (e != null && e.NewValue is GrblSettingDetails && (e.NewValue as GrblSettingDetails).Value != null)
-                ShowSetting(e.NewValue as GrblSettingDetails, true);
-            else
-                details.Visibility = Visibility.Hidden;
+            if (string.IsNullOrEmpty(GrblInfo.TrinamicDrivers))
+                RemoveTab(GrblConfigType.Trinamic);
+
+            if (!GrblInfo.HasPIDLog)
+                RemoveTab(GrblConfigType.PidTuning);
         }
     }
 }

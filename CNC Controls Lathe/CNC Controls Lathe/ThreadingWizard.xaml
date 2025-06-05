@@ -7,7 +7,7 @@
              xmlns:Controls="clr-namespace:CNC.Controls;assembly=CNC.Controls.WPF"
              xmlns:Converters="clr-namespace:CNC.Controls.Lathe"
              mc:Ignorable="d" 
-             d:DesignHeight="515" d:DesignWidth="875"
+             d:DesignHeight="480" d:DesignWidth="875"
              Loaded="ThreadingWizard_Loaded">
     <UserControl.Resources>
         <Controls:StringCollectionToTextConverter x:Key="GCodeConverter" />
@@ -108,7 +108,7 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <TextBox x:Name="txtPasses" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Stretch" Width="350">
+            <TextBox x:Name="txtPasses" IsReadOnly="True" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Stretch" Width="350">
             <TextBox.Text>
                 <MultiBinding Converter="{StaticResource GCodeConverter}">
                     <Binding Path="PassData" Mode="OneWay"/>
@@ -116,7 +116,7 @@
                 </MultiBinding>
             </TextBox.Text>
         </TextBox>
-        <TextBox x:Name="txtGCode" HorizontalAlignment="Left" Height="85" Margin="0,5" TextWrapping="Wrap" VerticalAlignment="Top" Width="450" Grid.Row="1">
+            <TextBox x:Name="txtGCode" IsReadOnly="True" HorizontalAlignment="Left" Height="85" Margin="0,5" TextWrapping="Wrap" VerticalAlignment="Top" Width="450" Grid.Row="1">
             <TextBox.Text>
                 <MultiBinding Converter="{StaticResource GCodeConverter}">
                     <Binding Path="gCode" Mode="OneWay"/>
@@ -235,7 +235,7 @@
             </StackPanel>
         </GroupBox>
         </Grid>
-        <GroupBox Header="Tool" HorizontalAlignment="Left" Margin="540,360,0,0" VerticalAlignment="Top" Height="140" Width="325">
+        <GroupBox Header="Tool" HorizontalAlignment="Left" Margin="535,330,0,0" VerticalAlignment="Top" Height="140" Width="325">
             <Grid HorizontalAlignment="Left" Height="110" Margin="0,5,0,0" VerticalAlignment="Top" Width="315">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="140*"/>

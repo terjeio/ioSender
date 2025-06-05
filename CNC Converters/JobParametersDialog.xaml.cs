@@ -1,13 +1,13 @@
 ﻿/*
  * JobParametersDialog.xaml.cs - part of CNC Converters library
  *
- * v0.33 / 2021-05-09 / Io Engineering (Terje Io)
+ * v0.46 / 2025-02-14 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020-2021, Io Engineering (Terje Io)
+Copyright (c) 2020-2025, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -68,7 +68,7 @@ namespace CNC.Converters
 
             try
             {
-                using (StreamReader reader = new StreamReader(CNC.Core.Resources.Path + (DataContext as JobParametersViewModel).Profile + suffix))
+                using (StreamReader reader = new StreamReader(CNC.Core.Resources.ConfigPath + (DataContext as JobParametersViewModel).Profile + suffix))
                 {
                     var settings = (JobParametersViewModel)new XmlSerializer(typeof(JobParametersViewModel)).Deserialize(reader);
                     Copy.Properties(settings, DataContext as JobParametersViewModel);
@@ -91,14 +91,15 @@ namespace CNC.Converters
 
             try
             {
-                using (FileStream fsout = new FileStream(CNC.Core.Resources.Path + settings.Profile + suffix, FileMode.Create, FileAccess.Write, FileShare.None))
+                using (FileStream fsout = new FileStream(CNC.Core.Resources.ConfigPath + settings.Profile + suffix, FileMode.Create, FileAccess.Write, FileShare.None))
                 {
                     new XmlSerializer(typeof(JobParametersViewModel)).Serialize(fsout, settings);
                     ok = true;
                 }
             }
-            catch
+            catch (System.Exception e)
             {
+                MessageBox.Show(e.Message, "ioSender", MessageBoxButton.OK, MessageBoxImage.Exclamation);
             }
 
             return ok;

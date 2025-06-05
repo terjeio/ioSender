@@ -1,13 +1,13 @@
 ﻿/*
  * TurningLogic.cs - part of CNC Controls Lathe library
  *
- * v0.45 / 2024-04-21 / Io Engineering (Terje Io)
+ * v0.46 / 2025-05-13 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2024, Io Engineering (Terje Io)
+Copyright (c) 2019-2025, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -83,6 +83,7 @@ namespace CNC.Controls.Lathe
                 last_css = model.config.CSS && model.config.RPM != 0.0d ? model.config.RPM / (model.IsMetric ? 1d : model.UnitFactor * 0.12d) : 0.0d;
                 last_rpm = model.config.CSS || model.config.RPM == 0.0d ? 0.0d : model.config.RPM;
 
+                model.SpindleDir = model.config.SpindleDir;
                 model.XClearance = model.config.XClearance / model.UnitFactor;
                 model.Passdepth = model.config.PassDepthFirst / model.UnitFactor;
                 model.PassdepthLastPass = model.config.PassDepthLast / model.UnitFactor;
@@ -160,7 +161,7 @@ namespace CNC.Controls.Lathe
 
             model.gCode.Clear();
             model.gCode.Add(string.Format("G18 G{0} G{1}", model.config.xmode == LatheMode.Radius ? "8" : "7", model.IsMetric ? "21" : "20"));
-            model.gCode.Add(string.Format("M3S{0} G4P1", speed.ToString()));
+            model.gCode.Add(string.Format("M{0}S{1} G4P1", model.SpindleDir == SpindleState.CW ? "3" : "4", speed.ToString()));
             model.gCode.Add(string.Format("G0 X{0}", model.FormatValue(diameter + xclearance)));
             model.gCode.Add(string.Format("G0 Z{0}", model.FormatValue(zstart + model.config.ZClearance / model.UnitFactor)));
             model.gCode.Add(model.IsCssEnabled ? string.Format(model.config.CSSMaxRPM > 0.0d ? "G96S{0}D{1}" : "G96S{0}",

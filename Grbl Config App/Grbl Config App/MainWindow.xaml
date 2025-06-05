@@ -7,7 +7,7 @@
         xmlns:cnccore="clr-namespace:CNC.Core;assembly=CNC.Core"
         xmlns:Controls="clr-namespace:CNC.Controls;assembly=CNC.Controls.WPF" x:Class="Grbl_Config_App.MainWindow"
         mc:Ignorable="d"
-        Title="grblHAL/Grbl config ({0})" Height="620" Width="1000" MinHeight="620" MinWidth="1000"
+        Title="Sender ({0})" Height="640" Width="925" MinHeight="685" MinWidth="1020"
         Loaded="Window_Loaded"
         Closing="Window_Closing" ResizeMode="NoResize" Icon="App.ico">
     <Window.DataContext>

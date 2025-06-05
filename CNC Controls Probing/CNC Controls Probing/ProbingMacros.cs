@@ -1,14 +1,14 @@
 ﻿/*
  * ProbingMacros.cs - part of CNC Probing library
  *
- * v0.45 / 2024-07-19 / Io Engineering (Terje Io)
+ * v0.46 / 2025-02-14 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
 Copyright (c) 2024, @Jay-Tech
-Copyright (c) 2024, Io Engineering (Terje Io)
+Copyright (c) 2024-2025, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -60,14 +60,15 @@ namespace CNC.Controls.Probing
             XmlSerializer xs = new XmlSerializer(typeof(ObservableCollection<ProbingMacro>));
             try
             {
-                FileStream fsout = new FileStream(Core.Resources.Path + macrosFileName, FileMode.Create, FileAccess.Write, FileShare.None);
+                FileStream fsout = new FileStream(Core.Resources.ConfigPath + macrosFileName, FileMode.Create, FileAccess.Write, FileShare.None);
                 using (fsout)
                 {
                     xs.Serialize(fsout, Macros);
                 }
             }
-            catch
+            catch (Exception e)
             {
+                MessageBox.Show(e.Message, "ioSender", MessageBoxButton.OK, MessageBoxImage.Exclamation);
             }
         }
 
@@ -77,7 +78,7 @@ namespace CNC.Controls.Probing
 
             try
             {
-                StreamReader reader = new StreamReader(Core.Resources.Path + macrosFileName);
+                StreamReader reader = new StreamReader(Core.Resources.ConfigPath + macrosFileName);
                 Macros = (ObservableCollection<ProbingMacro>)xs.Deserialize(reader);
                 reader.Close();
             }

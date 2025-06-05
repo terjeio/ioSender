@@ -7,7 +7,7 @@
              xmlns:Controls="clr-namespace:CNC.Controls;assembly=CNC.Controls.WPF" x:Class="CNC.Controls.Lathe.TurningWizard"
              xmlns:Converters="clr-namespace:CNC.Controls.Lathe"
              mc:Ignorable="d"
-             d:DesignHeight="515" d:DesignWidth="875"
+             d:DesignHeight="480" d:DesignWidth="875"
              Loaded="TurningWizard_Load">
     <UserControl.Resources>
         <Controls:StringCollectionToTextConverter x:Key="GCodeConverter"/>
@@ -72,13 +72,17 @@
                 </StackPanel>
             </StackPanel>
         </GroupBox>
-        <local:CssControl x:Name="css" IsCssEnabled="{Binding Path=IsCssEnabled, Mode=TwoWay}" Value="{Binding Path=CssSpeed, Mode=TwoWay}" Unit="{Binding Path=CssUnit}" HorizontalAlignment="Left" Margin="10,285,0,0" VerticalAlignment="Top" Style="{StaticResource SpindleErrorStyle}"/>
+        <local:CssControl x:Name="css" HorizontalAlignment="Left" Margin="10,285,0,0" VerticalAlignment="Top" Style="{StaticResource SpindleErrorStyle}"
+            IsCssEnabled="{Binding Path=IsCssEnabled, Mode=TwoWay}"
+            Value="{Binding Path=CssSpeed, Mode=TwoWay}"
+            Unit="{Binding Path=CssUnit}"         
+            SpindleDir="{Binding Path=SpindleDir, Mode=TwoWay}"/>
         <Grid Margin="10,310,0,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <TextBox x:Name="txtGCode" HorizontalAlignment="Left" Margin="0,5" TextWrapping="Wrap" VerticalAlignment="Stretch" Width="400">
+            <TextBox x:Name="txtGCode" IsReadOnly="True" HorizontalAlignment="Left" Margin="0,5" TextWrapping="Wrap" VerticalAlignment="Stretch" Width="400">
                 <TextBox.Text>
                     <MultiBinding Converter="{StaticResource GCodeConverter}">
                         <Binding Path="gCode" Mode="OneWay"/>

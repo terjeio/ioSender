@@ -1,13 +1,13 @@
 /*
  * JobControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.45 / 2023-06-04 / Io Engineering (Terje Io)
+ * v0.46 / 2025-05-31 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2024, Io Engineering (Terje Io)
+Copyright (c) 2018-2025, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -75,7 +75,7 @@ namespace CNC.Controls
         {
             public int CurrBlock, PendingLine, PgmEndLine, ToolChangeLine, ACKPending, serialUsed;
             public bool Started, Transferred, Complete, IsSDFile, IsChecking, HasError, Stopped, ToolChanged;
-            public DataRow CurrentRow, NextRow;
+            public GCodeBlock CurrentRow, NextRow;
         }
 
         private static bool keyboardMappingsOk = false;
@@ -482,7 +482,7 @@ namespace CNC.Controls
                     job.CurrBlock = job.ACKPending = job.PendingLine = fromBlock;
                     job.serialUsed = missed = 0;
                     job.Started = job.Transferred = job.HasError = job.ToolChanged = false;
-                    job.NextRow = GCode.File.Data.Rows[job.CurrBlock];
+                    job.NextRow = GCode.File.Data[job.CurrBlock];
                     Comms.com.PurgeQueue();
                     JobTimer.Start();
                     streamingHandler.Call(StreamingState.Send, false);
@@ -630,7 +630,7 @@ namespace CNC.Controls
                         model.IsJobRunning = true;
                         JobTimer.Pause = false;
                         if (job.ToolChangeLine >= 0)
-                            GCode.File.Data.Rows[job.ToolChangeLine]["Sent"] = "ok";
+                            GCode.File.Data[job.ToolChangeLine].Sent = "ok";
                         SetStreamingHandler(StreamingHandler.SendFile);
                     }
                     else
@@ -1033,7 +1033,7 @@ namespace CNC.Controls
                         if (JobTimer.IsRunning && job.PendingLine > 0 && !model.IsSDCardJob)
                         {
                             job.ToolChangeLine = job.PendingLine - 1;
-                            GCode.File.Data.Rows[job.ToolChangeLine]["Sent"] = "pending";
+                            GCode.File.Data[job.ToolChangeLine].Sent = "pending";
                         //      ResponseReceived("pending");
                         }
                         streamingHandler.Call(StreamingState.ToolChange, true);
@@ -1058,6 +1058,8 @@ namespace CNC.Controls
                     break;
 
                 case GrblStates.Alarm:
+                    grblState.State = newstate.State;
+                    grblState.Substate = newstate.Substate;
                     streamingHandler.Call(StreamingState.Stop, false);
                     break;
             }
@@ -1081,8 +1083,8 @@ namespace CNC.Controls
                 if (job.ACKPending > 0)
                     job.ACKPending--;
 
-                if (!job.IsSDFile && (job.IsChecking || (string)GCode.File.Data.Rows[job.PendingLine]["Sent"] == "*"))
-                    job.serialUsed = Math.Max(0, job.serialUsed - (int)GCode.File.Data.Rows[job.PendingLine]["Length"]);
+                if (!job.IsSDFile && (job.IsChecking || (string)GCode.File.Data[job.PendingLine].Sent == "*"))
+                    job.serialUsed = Math.Max(0, job.serialUsed - (int)GCode.File.Data[job.PendingLine].Length);
 
                 //if (streamingState == StreamingState.Send || streamingState == StreamingState.Paused)
                 //{
@@ -1092,7 +1094,7 @@ namespace CNC.Controls
                 {
                     if (!job.HasError)
                     {
-                        GCode.File.Data.Rows[job.PendingLine]["Sent"] = response;
+                        GCode.File.Data[job.PendingLine].Sent = response;
 
                         if (job.PendingLine > 5)
                             model.ScrollPosition = job.PendingLine - 5;
@@ -1109,7 +1111,7 @@ namespace CNC.Controls
                     {
                         if (job.PendingLine > 5)
                             model.ScrollPosition = job.PendingLine - 5;
-                        GCode.File.Data.Rows[job.PendingLine]["Sent"] = response;
+                        GCode.File.Data[job.PendingLine].Sent = response;
                     }
                     job.HasError = model.IsGrblHAL;
                 }
@@ -1164,16 +1166,16 @@ namespace CNC.Controls
         {
             while (job.NextRow != null) {
 
-                string line = (string)job.NextRow["Data"]; //  GCodeUtils.StripSpaces((string)currentRow["Data"]);
+                string line = (string)job.NextRow.Data; //  GCodeUtils.StripSpaces((string)currentRow["Data"]);
 
                 // Send comment lines as empty comment
-                if ((bool)job.NextRow["IsComment"])
+                if ((bool)job.NextRow.IsComment && !AppConfig.Settings.Base.SendComments)
                 {
                     line = "()";
-                    job.NextRow["Length"] = line.Length + 1;
+                    job.NextRow.Length = line.Length + 1;
                 }
 
-                if (job.serialUsed < (serialSize - (int)job.NextRow["Length"]))
+                if (job.serialUsed < (serialSize - (int)job.NextRow.Length))
                 {
 
                     if (GCode.File.Commands.Count > 0)
@@ -1183,18 +1185,18 @@ namespace CNC.Controls
                         job.CurrentRow = job.NextRow;
 
                         if(!job.IsChecking)
-                            job.CurrentRow["Sent"] = "*";
+                            job.CurrentRow.Sent = "*";
 
                         if (line == "%")
                         {
                             if (!(job.Started = !job.Started))
                                 job.PgmEndLine = job.CurrBlock;
                         }
-                        else if ((bool)job.CurrentRow["ProgramEnd"])
+                        else if (job.CurrentRow.ProgramEnd)
                             job.PgmEndLine = job.CurrBlock;
-                        job.NextRow = job.PgmEndLine == job.CurrBlock ? null : GCode.File.Data.Rows[++job.CurrBlock];
+                        job.NextRow = job.PgmEndLine == job.CurrBlock ? null : GCode.File.Data[++job.CurrBlock];
                         //            ParseBlock(line + "\r");
-                        job.serialUsed += (int)job.CurrentRow["Length"];
+                        job.serialUsed += (int)job.CurrentRow.Length;
                         Comms.com.WriteString(line + '\r');
                     }
                     job.ACKPending++;

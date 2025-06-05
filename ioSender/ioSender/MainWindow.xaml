@@ -134,17 +134,8 @@
             <TabItem x:Uid="tab_sdCard" x:Name="tabSDCard" Header="SD Card">
                 <cnccontrols:SDCardView x:Name="SDCardView" FileSelected="SDCardView_FileSelected"/>
             </TabItem>
-            <TabItem x:Uid="tab_turning" x:Name="tabTurning" Header="Turning">
-                <cnclathecontrols:TurningWizard x:Name="turningWizard"/>
-            </TabItem>
-            <TabItem x:Uid="tab_parting" x:Name="tabParting" Header="Parting">
-                <cnclathecontrols:PartingWizard x:Name="partingWizard"/>
-            </TabItem>
-            <TabItem x:Uid="tab_facing" x:Name="tabFacing" Header="Facing">
-                <cnclathecontrols:FacingWizard x:Name="facingWizard"/>
-            </TabItem>
-            <TabItem x:Uid="tab_threading" x:Name="tabThreading" Header="Threading">
-                <cnclathecontrols:ThreadingWizard x:Name="threadingWizard"/>
+            <TabItem x:Uid="tab_latheWizards" x:Name="tabLatheWizards" Header="Lathe Wizards">
+                <cnclathecontrols:LatheWizardsView x:Name="latheWizards"/>
             </TabItem>
             <TabItem x:Uid="tab_offsets" x:Name="tabOffsets" Header="Offsets">
                 <cnccontrols:OffsetView x:Name="offsetControl"/>
@@ -152,32 +143,12 @@
             <TabItem x:Uid="tab_tools" x:Name="tabTools" Header="Tools">
                 <cnccontrols:ToolView x:Name="toolControl"/>
             </TabItem>
-            <TabItem x:Uid="tab_trinamic" x:Name="tabTrinamic" Header="Trinamic tuner">
-                <cnccontrols:TrinamicView x:Name="toolTrinamic"/>
-            </TabItem>
             <TabItem x:Uid="tab_grblConfig" x:Name="tabConfig" Header="Settings: Grbl">
                 <cnccontrols:GrblConfigView x:Name="configControl"/>
             </TabItem>
             <TabItem x:Uid="tab_appConfig" x:Name="tabAppConfig" Header="Settings: App">
                 <cnccontrols:AppConfigView x:Name="appConfigControl"/>
             </TabItem>
-            <TabItem x:Uid="tab_pidTuner" x:Name="tabPIDTuner" Header="PID Tuner">
-                <cnccontrols:PIDLogView x:Name="toolPIDTuner"/>
-            </TabItem>
-            <!--
-                <TabItem x:Name="tabTurning" Header="Turning">
-                    <Grid Background="#FFE5E5E5">
-                        <cnc:TurningWizard x:Name="toolTurning" HorizontalAlignment="Left" Height="515" VerticalAlignment="Top" Width="875"/>
-                    </Grid>
-                </TabItem>
-                <TabItem x:Name="tabFacing" Header="Facing">
-                    <Grid Background="#FFE5E5E5">
-                        <WindowsFormsHost HorizontalAlignment="Left" Height="515" VerticalAlignment="Top" Width="875">
-                            <cnc:FacingWizard x:Name="toolFacing" AutoScaleMode="Inherit"/>
-                        </WindowsFormsHost>
-                    </Grid>
-                </TabItem>
--->
         </TabControl>
     </DockPanel>
 </Window>

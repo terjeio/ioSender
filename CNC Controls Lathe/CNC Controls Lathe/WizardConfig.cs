@@ -1,13 +1,13 @@
 /*
  * WizardConfig.cs - part of CNC Controls library for Grbl
  *
- * v0.29 / 2021-02-02 / Io Engineering (Terje Io)
+ * v0.46 / 2025-05-13 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2021, Io Engineering (Terje Io)
+Copyright (c) 2019-2025, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -80,6 +80,7 @@ namespace CNC.Controls.Lathe
         public double FeedrateLast { get { return active.FeedrateLast; } }
         public double FeedrateMax { get { return active.FeedrateMax; } }
         public double RPM { get { return active.RPM; } }
+        public SpindleState SpindleDir { get { return active.SpindleDir; } }
         public bool CSS { get { return active.CSS; } }
         public double CSSMaxRPM { get { return active.CSSMaxRPM; } } // ? GrblSettings.GetDouble(GrblSetting.RpmMax) : active.CSSMaxRPM; } }
 
@@ -143,9 +144,13 @@ namespace CNC.Controls.Lathe
             _CSSMaxRPM = 0.0d;
 
         private bool _CSS = false;
+        private SpindleState _spindleDir = SpindleState.CW;
 
         [XmlIgnore]
         public int Id { get; set; }
+        [XmlIgnore]
+        public ObservableCollection<SpindleDirection> SpindleDirections { get; private set; } = Spindle.Directions;
+
         public string Name { get; set; }
 
         #region DependencyProperties
@@ -195,6 +200,12 @@ namespace CNC.Controls.Lathe
             get { return _RPM; }
             set { _RPM = value; OnPropertyChanged(); }
         }
+        public SpindleState SpindleDir
+        {
+            get { return _spindleDir; }
+            set { if (_spindleDir != value) { _spindleDir = value; OnPropertyChanged(); } }
+        }
+
         public double CSSMaxRPM
         {
             get { return _CSSMaxRPM; }
@@ -214,11 +225,6 @@ namespace CNC.Controls.Lathe
 
         private int id = 0;
         private string filename;
-
-        public LatheProfile(string filename)
-        {
-            this.filename = Core.Resources.Path + filename;
-        }
 
         public ProfileData Add()
         {
@@ -243,13 +249,16 @@ namespace CNC.Controls.Lathe
                     xs.Serialize(fsout, profiles);
                 }
             }
-            catch
+            catch (Exception e)
             {
+                System.Windows.MessageBox.Show(e.Message, "ioSender", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Exclamation);
             }
         }
 
-        public void Load()
+        public void Load(string filename)
         {
+            this.filename = filename;
+
             XmlSerializer xs = new XmlSerializer(typeof(ObservableCollection<ProfileData>));
 
             try
@@ -259,7 +268,11 @@ namespace CNC.Controls.Lathe
                 reader.Close();
 
                 foreach (ProfileData profile in profiles)
+                {
                     profile.Id = id++;
+                    if (profile.SpindleDir == SpindleState.Off)
+                        profile.SpindleDir = SpindleState.CW;
+                }
             }
             catch
             {
@@ -279,24 +292,9 @@ namespace CNC.Controls.Lathe
 
             ProfileName = name;
 
-            profile = new LatheProfile(name + "Profiles.xml");
+            profile = new LatheProfile();
 
             ActiveProfile = new ActiveProfile();
-
-            using (new UIUtils.WaitCursor())
-            {
-                profile.Load();
-
-                if (profile.profiles.Count() == 0)
-                {
-                    ActiveProfile.Profile = profile.Add();
-
-                    profile.Save();
-                }
-                else
-                    ActiveProfile.Profile = profile.profiles[0];
-
-            }
         }
 
         public void ApplySettings(LatheConfig config)
@@ -319,6 +317,26 @@ namespace CNC.Controls.Lathe
         public ProfileData Add()
         {
             return profile.Add();
+        }
+
+        public ObservableCollection<ProfileData> Load()
+        {
+
+            using (new UIUtils.WaitCursor())
+            {
+                profile.Load(Core.Resources.ConfigPath + ProfileName + "Profiles.xml");
+
+                if (profile.profiles.Count() == 0)
+                {
+                    ActiveProfile.Profile = profile.Add();
+
+                    profile.Save();
+                }
+                else
+                    ActiveProfile.Profile = profile.profiles[0];
+            }
+
+            return Profiles;
         }
 
         public bool Update(ProfileData profile, double xclear, LatheMode xmode)

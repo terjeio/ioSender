@@ -1,13 +1,13 @@
 ﻿/*
  * RotationControl.xaml.cs - part of CNC Probing library
  *
- * v0.45 / 2024-07-16 / Io Engineering (Terje Io)
+ * v0.46 / 2025-01-19 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020-2024, Io Engineering (Terje Io)
+Copyright (c) 2020-2025, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -317,7 +317,7 @@ namespace CNC.Controls.Probing
                 }
             }
 
-            probing.Program.End((string)FindResource(probing.CanApplyTransform ? "ProbingCompleted" : "ProbingFailed"));
+            probing.Program.End((string)FindResource(probing.CanApplyTransform ? "ProbingCompleted" : "ProbingFailed"), probing.Positions.Count != 2);
 
             if (probing.CanApplyTransform)
                 OutputAngle();

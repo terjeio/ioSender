@@ -2,7 +2,7 @@
 /*
  * MainWindow.xaml.cs - part of Grbl Code Sender
  *
- * v0.45 / 2024-12-11 / Io Engineering (Terje Io)
+ * v0.46 / 2025-05-15 / Io Engineering (Terje Io)
  *
  */
 
@@ -52,7 +52,7 @@ namespace Grbl_Config_App
 
     public partial class MainWindow : Window
     {
-        private const string version = "2.0.45";
+        private const string version = "2.0.46";
         public static UIViewModel UIViewModel { get; } = new UIViewModel();
 
         public MainWindow()

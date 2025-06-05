@@ -1,5 +1,67 @@
 ## ioSender changelog
 
+2025-06-05: [Release 2.0.46](https://github.com/terjeio/Grbl-GCode-Sender/releases/tag/2.0.46).
+
+* Fix for incorrect distance used for external edge probing.  Ref. issue [#467](https://github.com/terjeio/ioSender/issues/467).
+
+* Added probe select dropdown to _Work Parameters_ controls and _Probing_ tab, visible when the controller supports two or more probes.
+
+* Attempt at improving handling of fast scrolling in the program list. Ref. issue [#462](https://github.com/terjeio/ioSender/issues/462).
+
+* Fix for startup exception with legacy controllers, ref issue [#460](https://github.com/terjeio/ioSender/issues/460).
+
+* Switched to slider based override control. __NOTE:__ grblHAL builds prior to 20250515 and Grbl may exhibit odd behaviour on large changes.
+
+* Changed _Spindle_ control layout for easier use with touch screens.
+
+* Moved controller settings, Trinamic and PID tuners to new tabs under the _Settings: Grbl_ tab.
+
+* Added stepper calibration tab to _Settings: Grbl_. Ref. disussion [#454](https://github.com/terjeio/ioSender/discussions/454).
+
+* Added option to set spindle drirection in most lathe wizards. Ref. issue [#458](https://github.com/terjeio/ioSender/issues/458).
+
+* Updated to .Net framework 4.6.2.
+
+* Changed coolant check boxes to toggle switches. Ref. issue [#444](https://github.com/terjeio/ioSender/issues/444).
+
+* Fixed minor bug in handling of offset probe in _Heigth map_ probing tab.
+
+* Fixed bug in applying height map for no words G0 and G1 commands.
+
+* Added search field for setting number in _Settings: Grbl_ tab.
+
+* Moved lathe wizards to new tabs under top level tab _Lathe wizards_.
+
+* Added backup of offsets and tool table to the backup available in _Settings: Grbl_.
+Offsets and tools is saved to the application folder in the file _offsets.nc_, this file has to be loaded and run manually when restoring.  
+Ref. discussion [#448](https://github.com/terjeio/ioSender/discussions/448).
+
+* Improved handling of upload to controller file systems (SD card, littlefs).
+
+* Updated to handle parsing of additional IP addresses that may be reported from the controller.
+
+* Fixed handling of alarms, added description to alarm codes reported in status line and console log.
+
+* Added _App_ setting _Send comments_, tick if the controller makes use of "magic" comments for functionality. Currently the Plasma plugin may do so.
+
+* Added [command line parameter](https://github.com/terjeio/ioSender/wiki/Setup-and-configuration#optional-command-line-parameters) `-configpath` for specifying which directory to use for configuration files.
+
+* Now displays message if saving to configuration files fails. Ref. issue [#424](https://github.com/terjeio/ioSender/issues/424).
+
+* Fixed regression introduced in p1, external edge probing fail. Ref. issue [#438](https://github.com/terjeio/ioSender/issues/438).
+
+* Added support for latest \(build 20250204\) grblHAL Trinamic plugin, it now outputs StallGuard results for both motors when ganging/auto-squaring is enabled.  
+__NOTE:__ Previous versions of ioSender will crash when plotting StallGuard results for ganged/auto-squared axes.
+
+* Fix for center finder failing when probing more than one pass. Ref. issue [#434](https://github.com/terjeio/ioSender/issues/434).
+
+* Support for XY touch plate, adds checkbox to XY offsets in the _Probing tab_. Ref. issue [#432](https://github.com/terjeio/ioSender/issues/432).
+
+* Initial changes for using a probe offset from the spindle for Center and Height map probing.  
+__NOTE:__ This has not been fully completed/tested, I need to get my test machine updated for it. Ref. issue [#405](https://github.com/terjeio/ioSender/issues/405).
+
+* Improved SD card handling. Requires grblHAL controller with a build date >= 20250128.
+
 2024-12-30: [Release 2.0.45](https://github.com/terjeio/Grbl-GCode-Sender/releases/tag/2.0.45).
 
 * Added spindle selection using drop down, ref. issue #399.

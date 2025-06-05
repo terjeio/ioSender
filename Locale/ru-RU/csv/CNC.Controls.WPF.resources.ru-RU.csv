@@ -18,8 +18,8 @@ CNC.Controls.WPF.g.en-US.resources:trinamicview.baml,btn_getStatus:System.Window
 CNC.Controls.WPF.g.en-US.resources:trinamicview.baml,btn_getStatusAll:System.Windows.Controls.ContentControl.Content,Button,True,True,,Считать статус всех
 CNC.Controls.WPF.g.en-US.resources:outlineflyout.baml,btn_go:System.Windows.Controls.ContentControl.Content,Button,True,True,,Старт
 CNC.Controls.WPF.g.en-US.resources:outlinebasecontrol.baml,btn_go:System.Windows.Controls.ContentControl.Content,Button,True,True,,Старт
-CNC.Controls.WPF.g.en-US.resources:steppercalibrationwizard.baml,btn_goneg:System.Windows.Controls.ContentControl.Content,Button,True,True,,Go-
 CNC.Controls.WPF.g.en-US.resources:steppercalibrationwizard.baml,btn_goneg:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Press to move in the negative direction.
+CNC.Controls.WPF.g.en-US.resources:steppercalibrationwizard.baml,btn_goneg:System.Windows.Controls.ContentControl.Content,Button,True,True,,Go-
 CNC.Controls.WPF.g.en-US.resources:steppercalibrationwizard.baml,btn_gopos:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Press to move in the positive direction.
 CNC.Controls.WPF.g.en-US.resources:steppercalibrationwizard.baml,btn_gopos:System.Windows.Controls.ContentControl.Content,Button,True,True,,Go+
 CNC.Controls.WPF.g.en-US.resources:gotobasecontrol.baml,btn_gotoG28:System.Windows.Controls.ContentControl.Content,Button,True,True,,Перейти в G28
@@ -70,16 +70,16 @@ CNC.Controls.WPF.g.en-US.resources:steppercalibrationwizard.baml,fld_distance:CN
 CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_fastDistance:CNC.Controls.NumericField.Label,None,False,True,,Расстояние Быстро:
 CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_fastFeedrate:CNC.Controls.NumericField.Label,None,False,True,,Подача Быстро:
 CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_fastFeedrate:CNC.Controls.NumericField.Unit,None,False,True,,мм/мин
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,fld_findSetting:CNC.Controls.NumericField.Unit,None,True,True,,
+CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,fld_findSetting:CNC.Controls.NumericField.Label,None,True,True,,Setting:
 CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,fld_findSetting:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Search for setting
 CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,fld_findSetting:CNC.Controls.NumericField.Unit,None,True,True,,
 CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,fld_findSetting:CNC.Controls.NumericField.KeyDown,None,True,True,,searchField_KeyDown
-CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,fld_findSetting:CNC.Controls.NumericField.Label,None,True,True,,Setting:
-CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,fld_findSetting:CNC.Controls.NumericField.Unit,None,True,True,,
 CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_maxBuffer:CNC.Controls.NumericField.Label,None,False,True,,Max. буфер:
 CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_maxBuffer:CNC.Controls.NumericField.Unit,None,False,True,,байт
 CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_maxBuffer:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Maксимальная загрузка последовательного буфера(Ограничте 90% глубины буфера).
-CNC.Controls.WPF.g.en-US.resources:steppercalibrationwizard.baml,fld_measured:CNC.Controls.NumericField.Tooltip2,None,True,True,,Actual distance.
 CNC.Controls.WPF.g.en-US.resources:steppercalibrationwizard.baml,fld_measured:CNC.Controls.NumericField.Label,None,True,True,,Measured:
+CNC.Controls.WPF.g.en-US.resources:steppercalibrationwizard.baml,fld_measured:CNC.Controls.NumericField.Tooltip2,None,True,True,,Actual distance.
 CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_pollInterval:CNC.Controls.NumericField.Unit,None,False,True,,мс
 CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_pollInterval:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,"Интервал запроса состояния контроллера, ms."
 CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_pollInterval:CNC.Controls.NumericField.Label,None,False,True,,Интервал опроса:
@@ -179,6 +179,7 @@ CNC.Controls.WPF.g.en-US.resources:workparameterscontrol.baml,lbl_offset:System.
 CNC.Controls.WPF.g.en-US.resources:offsetview.baml,lbl_offset:System.Windows.Controls.ContentControl.Content,Label,True,True,,Смещение:
 CNC.Controls.WPF.g.en-US.resources:portdialog.baml,lbl_onConnect:System.Windows.Controls.ContentControl.Content,Label,True,True,,Нет связи:
 CNC.Controls.WPF.g.en-US.resources:overridecontrol.baml,lbl_override:System.Windows.Controls.ContentControl.Content,Label,True,True,,Коррекция
+CNC.Controls.WPF.g.en-US.resources:workparameterscontrol.baml,lbl_probe:System.Windows.Controls.ContentControl.Content,Label,True,True,,Probe:
 CNC.Controls.WPF.g.en-US.resources:feedcontrol.baml,lbl_rapids:System.Windows.Controls.ContentControl.Content,Label,True,True,,Быстрые перемещения:
 CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_restoreWindowSize:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Восстановить предыдущий размер окна при загрузке
 CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_restoreWindowSize:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Восстановить размер окна при сдеующем запуске.
@@ -285,8 +286,8 @@ CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,str_saveSettings:Syste
 CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,str_settingsError:System.String.$Content,None,True,True,,"Установка {0} вернула {1}, продолжить?"
 CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,str_settingsFail:System.String.$Content,None,True,True,,Ошибка...\\nПродолжить загрузку?
 CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,str_settingsInvalid:System.String.$Content,None,True,True,,Файл не содержит параметров настройки.
-CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_settingsReloadMismatch:System.String.$Content,None,True,True,,"Some settings were ignored, not supported by the controller."
 CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,str_settingsReloadMismatch:System.String.$Content,None,True,True,,"{0} settings were ignored, not supported by the controller."
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_settingsReloadMismatch:System.String.$Content,None,True,True,,"Some settings were ignored, not supported by the controller."
 CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,str_settingsRestore:System.String.$Content,None,True,True,,Восстановить настройки из файла
 CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_settingsSaved:System.String.$Content,None,True,True,,Установки сохранены.
 CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,str_settingsTimeout:System.String.$Content,None,True,True,,"Превышено время при установке {0}, продолжить?"

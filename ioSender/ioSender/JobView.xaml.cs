@@ -1,13 +1,13 @@
 /*
- * JobView.xaml.cs - part of Grbl Code Sender
+ * JobView.xaml.cs - part of ioSender
  *
- * v0.45 / 2024-03-14 / Io Engineering (Terje Io)
+ * v0.46 / 2025-05-09 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2024, Io Engineering (Terje Io)
+Copyright (c) 2019-2025, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -342,7 +342,7 @@ namespace GCode_Sender
         private void OnBooted()
         {
             isBooted = true;
-            string filename = CNC.Core.Resources.Path + string.Format("KeyMap{0}.xml", (int)AppConfig.Settings.Jog.Mode);
+            string filename = CNC.Core.Resources.ConfigPath + string.Format("KeyMap{0}.xml", (int)AppConfig.Settings.Jog.Mode);
 
             if (System.IO.File.Exists(filename))
                 model.Keyboard.LoadMappings(filename);
@@ -390,29 +390,14 @@ namespace GCode_Sender
                 tabGCode.Items.Remove(tab3D);
 
             if (GrblInfo.LatheModeEnabled)
-            {
-                MainWindow.EnableView(true, ViewType.Turning);
-                MainWindow.EnableView(true, ViewType.Parting);
-                MainWindow.EnableView(true, ViewType.Facing);
-                MainWindow.EnableView(true, ViewType.G76Threading);
-            }
+                MainWindow.EnableView(true, ViewType.LatheWizards);
             else
-            {
-                MainWindow.ShowView(false, ViewType.Turning);
-                MainWindow.ShowView(false, ViewType.Parting);
-                MainWindow.ShowView(false, ViewType.Facing);
-                MainWindow.ShowView(false, ViewType.G76Threading);
-            }
+                MainWindow.ShowView(false, ViewType.LatheWizards);
 
-            if (GrblInfo.HasSDCard)
+            if (GrblInfo.HasFS)
                 MainWindow.EnableView(true, ViewType.SDCard);
             else
                 MainWindow.ShowView(false, ViewType.SDCard);
-
-            if (GrblInfo.HasPIDLog)
-                MainWindow.EnableView(true, ViewType.PIDTuner);
-            else
-                MainWindow.ShowView(false, ViewType.PIDTuner);
 
             if (GrblInfo.NumTools > 0)
                 MainWindow.EnableView(true, ViewType.Tools);
@@ -424,11 +409,6 @@ namespace GCode_Sender
 
             MainWindow.EnableView(true, ViewType.Offsets);
             MainWindow.EnableView(true, ViewType.GRBLConfig);
-
-            if(!string.IsNullOrEmpty(GrblInfo.TrinamicDrivers))
-                MainWindow.EnableView(true, ViewType.TrinamicTuner);
-            else
-                MainWindow.ShowView(false, ViewType.TrinamicTuner);
 
             if(GrblInfo.THCMode && thcFlyout == null)
                 MainWindow.UIViewModel.SidebarItems.Add(thcFlyout = new SidebarItem(MainWindow.ui.thcControl));

@@ -1,13 +1,13 @@
 ﻿/*
  * GcodeListControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.44 / 2023-10-07 / Io Engineering (Terje Io)
+ * v0.46 / 2025-05-31 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020-2023, Io Engineering (Terje Io)
+Copyright (c) 2020-2025, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -89,7 +89,7 @@ namespace CNC.Controls
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
             scroll = UIUtils.GetScrollViewer(grdGCode);
-            grdGCode.DataContext = GCode.File.Data.DefaultView;
+            grdGCode.DataContext = GCode.File.Data;
             if (DataContext is GrblViewModel)
                 (DataContext as GrblViewModel).PropertyChanged += GCodeListControl_PropertyChanged;
         }

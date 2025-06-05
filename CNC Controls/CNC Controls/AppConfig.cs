@@ -1,13 +1,13 @@
 ﻿/*
  * AppConfig.cs - part of CNC Controls library
  *
- * v0.45 / 2024-02-18 / Io Engineering (Terje Io)
+ * v0.46 / 2025-02-22 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2024, Io Engineering (Terje Io)
+Copyright (c) 2019-2025, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -239,7 +239,7 @@ namespace CNC.Controls
     public class Config : ViewModelBase
     {
         private int _pollInterval = 200, /* ms*/  _maxBufferSize = 300;
-        private bool _useBuffering = false, _keepMdiFocus = true, _filterOkResponse = false, _saveWindowSize = false, _autoCompress = false;
+        private bool _useBuffering = false, _keepMdiFocus = true, _filterOkResponse = false, _saveWindowSize = false, _autoCompress = false, _send_comments = false;
         private CommandIgnoreState _ignoreM6 = CommandIgnoreState.No, _ignoreM7 = CommandIgnoreState.No, _ignoreM8 = CommandIgnoreState.No, _ignoreG61G64 = CommandIgnoreState.Strip;
         private string _theme = "default";
 
@@ -269,6 +269,7 @@ namespace CNC.Controls
         public bool KeepMdiFocus { get { return _keepMdiFocus; } set { _keepMdiFocus = value; OnPropertyChanged(); } }
         public bool FilterOkResponse { get { return _filterOkResponse; } set { _filterOkResponse = value; OnPropertyChanged(); } }
         public bool AutoCompress { get { return _autoCompress; } set { _autoCompress = value; OnPropertyChanged(); } }
+        public bool SendComments { get { return _send_comments; } set { _send_comments = value; OnPropertyChanged(); } }
 
         [XmlIgnore]
         public CommandIgnoreState[] CommandIgnoreStates { get { return (CommandIgnoreState[])Enum.GetValues(typeof(CommandIgnoreState)); } }
@@ -349,8 +350,9 @@ namespace CNC.Controls
                     ok = true;
                 }
             }
-            catch
+            catch (Exception e)
             {
+                MessageBox.Show(e.Message, "ioSender", MessageBoxButton.OK, MessageBoxImage.Exclamation);
             }
 
             return ok;
@@ -425,7 +427,7 @@ namespace CNC.Controls
             int jogMode = -1;
             string port = string.Empty, baud = string.Empty;
 
-            CNC.Core.Resources.Path = AppDomain.CurrentDomain.BaseDirectory;
+            CNC.Core.Resources.Path = CNC.Core.Resources.ConfigPath = AppDomain.CurrentDomain.BaseDirectory;
 
             string[] args = Environment.GetCommandLineArgs();
 
@@ -440,8 +442,12 @@ namespace CNC.Controls
                         CNC.Core.Resources.DebugFile = GetArg(args, p++);
                         break;
 
-                    case "-configmapping":
-                        CNC.Core.Resources.ConfigName = GetArg(args, p++);
+                    case "-configpath":
+                        var path = GetArg(args, p++);
+                        if(Path.IsPathRooted(path) && Directory.Exists(path))
+                            Resources.ConfigPath = path + (path.EndsWith("\\") ? string.Empty : "\\");
+                        else
+                            MessageBox.Show("Invalid -configpath argument", "ioSender", MessageBoxButton.OK, MessageBoxImage.Exclamation);
                         break;
 
                     case "-locale":

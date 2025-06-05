@@ -87,15 +87,18 @@
                 </GroupBox>
                 <GroupBox x:Uid="grp_clearances" x:Name="Clearances" Header="Probing clearances">
                     <StackPanel Orientation="Vertical">
-                        <Controls:NumericField x:Uid="fld_xyClearance" Label="XY Clearance:" Tooltip2="Initial distance away from face to probe" Value="{Binding Path=XYClearance, Mode=TwoWay}" IsEnabled="{Binding Path=XYOffsetEnable}" ColonAt="102" HorizontalAlignment="Left" Margin="0,7,0,0" VerticalAlignment="Top" Style="{StaticResource ErrorStyle}"/>
+                        <Controls:NumericField x:Uid="fld_xyClearance" Label="XY Clearance:" Tooltip2="Initial distance away from face to probe" Value="{Binding Path=XYClearance, Mode=TwoWay}" IsEnabled="{Binding Path=XYOffsetEnable}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top" Style="{StaticResource ErrorStyle}"/>
                         <Controls:NumericField x:Uid="fld_offset" Label="Offset:" ToolTip="Distance from corner to probe" Value="{Binding Path=Offset, Mode=TwoWay}" IsEnabled="{Binding Path=OffsetEnable}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
                         <Controls:NumericField x:Uid="fld_depth" Label="Depth:" ToolTip="Z offset from current position where probing will take place" Value="{Binding Depth, Mode=TwoWay}" IsEnabled="{Binding XYOffsetEnable}" ColonAt="102" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
                     </StackPanel>
                 </GroupBox>
-                <GroupBox x:Uid="grp_prbeProperties" x:Name="probeProperties" Header="Probe XY offsets" Visibility="Collapsed" IsEnabled="{Binding Path=XYOffsetEnable}">
-                    <StackPanel Orientation="Horizontal">
-                        <Controls:NumericField x:Uid="fld_probeOffsetX" Label="X:" ToolTip="X offset from probe to controlled point" Value="{Binding Path=ProbeOffsetX, Mode=TwoWay}" ColonAt="20" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
-                        <Controls:NumericField x:Uid="fld_probeOffsetY" Label="Y:" ToolTip="Y offset from probe to controlled point" Value="{Binding Path=ProbeOffsetY, Mode=TwoWay}" ColonAt="20" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
+                <GroupBox x:Uid="grp_prbeProperties" x:Name="probeProperties" Header="Probe/touchplate XY offsets" Visibility="Collapsed" IsEnabled="{Binding Path=XYOffsetEnable}">
+                    <StackPanel Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal">
+                            <Controls:NumericField x:Uid="fld_probeOffsetX" Label="X:" ToolTip="X offset from probe to controlled point" Value="{Binding Path=ProbeOffsetX, Mode=TwoWay}" ColonAt="20" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
+                            <Controls:NumericField x:Uid="fld_probeOffsetY" Label="Y:" ToolTip="Y offset from probe to controlled point" Value="{Binding Path=ProbeOffsetY, Mode=TwoWay}" ColonAt="20" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top"/>
+                        </StackPanel>
+                        <CheckBox x:Uid="lbl_touchPlateXY" Content="Is touch plate" ToolTip="Offsets are horizontal thickness of touchplate" Margin="19,0,0,0" IsChecked="{Binding Path=TouchPlateIsXY}" IsEnabled="{Binding Path=TouchPlateXYEnabled}" />
                     </StackPanel>
                 </GroupBox>
                 <Button x:Uid="btn_jog" x:Name="Jog" Content="Click to activate keyboard jogging" ToolTip="Ctrl+Shift to activate" Margin="0,5,0,6" Focusable="True" FocusVisualStyle="{x:Null}" GotFocus="Jog_FocusedChanged" LostFocus="Jog_FocusedChanged"/>
@@ -133,10 +136,17 @@
                 <LineBreak/>
                 <Run x:Uid="txt_warning" Text="Warning! Use with care - incorrect parameters may damage your probe!" Foreground="Red" FontWeight="Bold"/>
                 </TextBlock>
-                <Button Content="Pre/post macros" Grid.Column="1" Command="{Binding Macro.OpenDialog}" ToolTip="{Binding Macro.ActiveMacroName}"
+                <StackPanel Orientation="Vertical" Grid.Column="1" Margin="5,5,0,0">
+                    <ComboBox x:Name="cbxProbe" HorizontalAlignment="Left" Width="120" Height="22" Margin="0,0,0,5"
+                          DisplayMemberPath="Name" SelectedValuePath="Id" ItemsSource="{Binding Path=Grbl.Probes}" SelectedValue="{Binding Path=Grbl.Probe, Mode=OneWay}"
+                          Visibility="{Binding Path=MultiProbe, Mode=OneWay, Converter={StaticResource IsVisibleConverter}}"
+                          IsEnabled="{Binding Path=Grbl.IsJobRunning, Converter={StaticResource IsNotRunningConverter}}"
+                          SelectionChanged="cbxProbe_SelectionChanged"/>
+                <Button Content="Pre/post macros" Command="{Binding Macro.OpenDialog}" ToolTip="{Binding Macro.ActiveMacroName}"
                         IsEnabled="{Binding Path=Grbl.IsJobRunning, Converter={StaticResource IsNotRunningConverter}}"
                         Background="{Binding Path=Macro.CanDelete, Converter={StaticResource ProbingMacroActiveConverter}}"
-                        HorizontalAlignment="Right" VerticalAlignment="Center" Height="25" Width="125" Margin="0,0,0,0"></Button>
+                        HorizontalAlignment="Left" Height="25" Width="120" Margin="0,0,0,0"/>
+                </StackPanel>
             </Grid>
         </StackPanel>
     </DockPanel>

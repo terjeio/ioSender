@@ -1,13 +1,13 @@
 ﻿/*
  * YModem.cs - part of CNC Controls library
  *
- * v0.31 / 2021-04-26 / Io Engineering (Terje Io)
+ * v0.46 / 2025-03-07 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2021, Io Engineering (Terje Io)
+Copyright (c) 2021-2025, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -102,7 +102,7 @@ namespace CNC.Core
         private TransferState TransferInitalPacket (string path, FileStream fileStream)
         {
             int i, j = 0;
-            char[] fileName = Path.GetFileName(path).ToCharArray(), fileSize = fileStream.Length.ToString().ToCharArray();
+            char[] fileName = ("/" + Path.GetFileName(path)).ToCharArray(), fileSize = fileStream.Length.ToString().ToCharArray();
 
             for (i = 0; i < fileName.Length; i++)
                 payload[j++] = (byte)fileName[i];

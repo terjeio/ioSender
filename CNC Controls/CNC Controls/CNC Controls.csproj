@@ -9,10 +9,11 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CNC.Controls</RootNamespace>
     <AssemblyName>CNC.Controls.WPF</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -33,7 +34,8 @@
   </PropertyGroup>
   <PropertyGroup>
     <UICulture>en-US</UICulture>
-    <ApplicationIcon>App.ico</ApplicationIcon>
+    <ApplicationIcon>
+    </ApplicationIcon>
     <Localizable>False</Localizable>
   </PropertyGroup>
   <ItemGroup>
@@ -43,6 +45,7 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -51,6 +54,9 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="ToggleSwitch">
+      <HintPath>..\..\toggle-switch-control-master\WPF\ToggleSwitch\bin\Release\ToggleSwitch.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
@@ -64,6 +70,12 @@
     <Compile Include="ArcsToLines.cs" />
     <Compile Include="BasicConfigControl.xaml.cs">
       <DependentUpon>BasicConfigControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="GrblConfigControl.xaml.cs">
+      <DependentUpon>GrblConfigControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="GrblConfigView.xaml.cs">
+      <DependentUpon>GrblConfigView.xaml</DependentUpon>
     </Compile>
     <Compile Include="ConsoleWindow.xaml.cs">
       <DependentUpon>ConsoleWindow.xaml</DependentUpon>
@@ -98,9 +110,6 @@
     <Compile Include="GrblAlarmList.xaml.cs">
       <DependentUpon>GrblAlarmList.xaml</DependentUpon>
     </Compile>
-    <Compile Include="GrblConfigView.xaml.cs">
-      <DependentUpon>GrblConfigView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="AppConfigView.xaml.cs">
       <DependentUpon>AppConfigView.xaml</DependentUpon>
     </Compile>
@@ -130,6 +139,7 @@
     <Compile Include="ICNCView.cs" />
     <Compile Include="IGCodeConverter.cs" />
     <Compile Include="IGCodeTransformer.cs" />
+    <Compile Include="IGrblConfigTab.cs" />
     <Compile Include="ISidebarControl.cs" />
     <Compile Include="JobControl.xaml.cs">
       <DependentUpon>JobControl.xaml</DependentUpon>
@@ -215,11 +225,17 @@
     <Compile Include="StatusControl.xaml.cs">
       <DependentUpon>StatusControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="StepperCalibrationWizard.xaml.cs">
+      <DependentUpon>StepperCalibrationWizard.xaml</DependentUpon>
+    </Compile>
     <Compile Include="StripGCodeConfigControl.xaml.cs">
       <DependentUpon>StripGCodeConfigControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="THCMonitorControl.xaml.cs">
       <DependentUpon>THCMonitorControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ToggleControl.xaml.cs">
+      <DependentUpon>ToggleControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="ToolView.xaml.cs">
       <DependentUpon>ToolView.xaml</DependentUpon>
@@ -237,6 +253,14 @@
       <DependentUpon>WorkParametersControl.xaml</DependentUpon>
     </Compile>
     <Page Include="About.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="GrblConfigControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="GrblConfigView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -297,10 +321,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="GotoControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="GrblConfigView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -446,11 +466,19 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="StepperCalibrationWizard.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="StripGCodeConfigControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="THCMonitorControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ToggleControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -528,6 +556,9 @@
     <Resource Include="Resources\editWhite.png" />
     <Resource Include="Resources\openWhite.png" />
     <Resource Include="Resources\reloadWhite.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\reset.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

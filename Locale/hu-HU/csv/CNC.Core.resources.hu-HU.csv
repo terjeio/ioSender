@@ -40,5 +40,8 @@ CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserUnsupportedCmd:System.Str
 CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserWordRepeated:System.String.$Content,None,True,True,,A parancsszó ismétlődött
 CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserZPlus:System.String.$Content,None,True,True,,Z-től eltérő tengely(ek) találhatók
 CNC.Core.g.en-US.resources:libstrings.baml,str_joggingOnly:System.String.$Content,None,True,True,,Csak a kocogás és bizonyos rendszerparancsok engedélyezettek szerszámváltáskor!
+CNC.Core.g.en-US.resources:libstrings.baml,str_prbPrimary:System.String.$Content,None,True,True,,Primary
+CNC.Core.g.en-US.resources:libstrings.baml,str_prbSecondary:System.String.$Content,None,True,True,,Secondary
+CNC.Core.g.en-US.resources:libstrings.baml,str_prbToolSetter:System.String.$Content,None,True,True,,Toolsetter
 CNC.Core.g.en-US.resources:libstrings.baml,str_sdStreamComplete:System.String.$Content,None,True,True,,SD Card streamelés {0}% kész
 CNC.Core.g.en-US.resources:libstrings.baml,str_serialPortError:System.String.$Content,None,True,True,,Nem lehet megnyitni a soros portot: {0}

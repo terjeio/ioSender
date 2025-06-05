@@ -57,16 +57,23 @@ namespace CNC.Controls.Probing
                             var motion = token as GCLinearMotion;
 //                            GCLinearMotion last_segment = null;
 
-                            var m = new Line(motion.AxisFlags);
-                            m.Start = pos;
-                            m.End = pos = ToAbsolute(pos, motion.Values, distanceMode == DistanceMode.Incremental);
-                            m.Rapid = token.Command == Commands.G0;
-
-                            foreach (Motion subMotion in m.Split(segmentLength))
+                            if (motion.AxisFlags == AxisFlags.None)
                             {
-                                Vector3 target = new Vector3(Math.Round(subMotion.End.X, precision), Math.Round(subMotion.End.Y, precision), Math.Round(subMotion.End.Z + map.InterpolateZ(subMotion.End.X, subMotion.End.Y), precision));
+                                newToolPath.Add(new GCLinearMotion(motion.Command, lnr++, new Vector3().Array, motion.AxisFlags, motion.BlockDelete));
+                            }
+                            else
+                            {
+                                var m = new Line(motion.AxisFlags);
+                                m.Start = pos;
+                                m.End = pos = ToAbsolute(pos, motion.Values, distanceMode == DistanceMode.Incremental);
+                                m.Rapid = token.Command == Commands.G0;
 
-                                newToolPath.Add(/*last_segment = */new GCLinearMotion(motion.Command, lnr++, target.Array, motion.AxisFlags | AxisFlags.Z, motion.BlockDelete));
+                                foreach (Motion subMotion in m.Split(segmentLength))
+                                {
+                                    Vector3 target = new Vector3(Math.Round(subMotion.End.X, precision), Math.Round(subMotion.End.Y, precision), Math.Round(subMotion.End.Z + map.InterpolateZ(subMotion.End.X, subMotion.End.Y), precision));
+
+                                    newToolPath.Add(/*last_segment = */new GCLinearMotion(motion.Command, lnr++, target.Array, motion.AxisFlags | AxisFlags.Z, motion.BlockDelete));
+                                }
                             }
 //                            if(last_segment != null)
 //                                pos = ToAbsolute(pos, last_segment.Values);

@@ -1,13 +1,13 @@
 ﻿/*
  * EdgeFinderControl.xaml.cs - part of CNC Probing library
  *
- * v0.45 / 2024-07-19 / Io Engineering (Terje Io)
+ * v0.46 / 2025-06-05 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020-2024, Io Engineering (Terje Io)
+Copyright (c) 2020-2025, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -187,7 +187,7 @@ namespace CNC.Controls.Probing
 
             probing.Program.AddProbingAction(axisflags, negative);
 
-            rapidto.Values[axis] = probing.StartPosition.Values[axis] - probing.Offset * af[axis];
+            rapidto.Values[axis] = probing.StartPosition.Values[axis] - XYClearance * af[axis];
             probing.Program.AddRapidToMPos(rapidto, axisflags);
             probing.Program.AddRapidToMPos(probing.StartPosition, AxisFlags.Z);
         }
@@ -285,8 +285,8 @@ namespace CNC.Controls.Probing
                     switch (probing.CoordinateMode)
                     {
                         case ProbingViewModel.CoordMode.Measure:
-                            pos.X += probing.ProbeOffsetX;
-                            pos.Y += probing.ProbeOffsetY;
+                            pos.X += probing.ProbeTPOffsetX;
+                            pos.Y += probing.ProbeTPOffsetY;
                             pos.Z -= probing.WorkpieceHeight + probing.TouchPlateHeight + probing.Grbl.ToolOffset.Z;
                             probing.Measurement.Add(new Position(pos, 1d / probing.Grbl.UnitFactor), axisflags, ProbingType);
                             break;
@@ -294,8 +294,8 @@ namespace CNC.Controls.Probing
                         case ProbingViewModel.CoordMode.G92:
                             if ((ok = !isCancelled && probing.GotoMachinePosition(pos, AxisFlags.Z)))
                             {
-                                pos.X = -probing.ProbeOffsetX;
-                                pos.Y = -probing.ProbeOffsetY;
+                                pos.X = -probing.ProbeTPOffsetX;
+                                pos.Y = -probing.ProbeTPOffsetY;
                                 pos.Z = probing.WorkpieceHeight + probing.TouchPlateHeight;
                                 probing.WaitForResponse("G92" + pos.ToString(axisflags));
                                 if (!isCancelled && axisflags.HasFlag(AxisFlags.Z))
@@ -304,8 +304,8 @@ namespace CNC.Controls.Probing
                             break;
 
                         case ProbingViewModel.CoordMode.G10:
-                            pos.X += probing.ProbeOffsetX;
-                            pos.Y += probing.ProbeOffsetY;
+                            pos.X += probing.ProbeTPOffsetX;
+                            pos.Y += probing.ProbeTPOffsetY;
                             pos.Z -= probing.WorkpieceHeight + probing.TouchPlateHeight + probing.Grbl.ToolOffset.Z;
                             probing.WaitForResponse(string.Format("G10L2P{0}{1}", probing.CoordinateSystem, pos.ToString(axisflags)));
                             break;

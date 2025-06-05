@@ -1,13 +1,13 @@
 ﻿/*
  * GCodeJob.cs - part of CNC Controls library
  *
- * v0.45 / 2024-02-27 / Io Engineering (Terje Io)
+ * v0.46 / 2025-06-01 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2024, Io Engineering (Terje Io)
+Copyright (c) 2018-2025, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -39,12 +39,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.IO;
 using System.ComponentModel;
 using System.Windows;
-using CNC.GCode;
 using System.Windows.Media.Media3D;
+using System.Collections.ObjectModel;
+using CNC.GCode;
 
 namespace CNC.Core
 {
@@ -55,14 +55,35 @@ namespace CNC.Core
         End
     }
 
+    public class GCodeBlock : ViewModelBase
+    {
+        private string _data, _sent;
+
+        public GCodeBlock (uint lineNum, string block, int length, bool isComment, bool programEnd)
+        {
+            LineNum = lineNum;
+            Data = block;
+            Length = length;
+            IsComment = isComment;
+            ProgramEnd = programEnd;
+        }
+
+        public uint LineNum { get; set; }
+        public int Length { get; set; }
+        public string Data { get { return _data; } set { _data = value; OnPropertyChanged(); } }
+        public string Sent { get { return _sent; } set { _sent = value; OnPropertyChanged(); } }
+        public bool File { get; set; }
+        public bool IsComment { get; set; }
+        public bool ProgramEnd { get; set; }
+        public bool Ok { get; set; }
+    }
+
     public class GCodeJob
     {
-//         public SpindleState BBB;
-
         uint LineNumber = 1;
 
         private string filename = string.Empty;
-        private DataTable gcode = new DataTable("GCode");
+        public ObservableCollection<GCodeBlock> blocks = new ObservableCollection<GCodeBlock>();
 
         public Queue<string> commands = new Queue<string>();
 
@@ -74,16 +95,6 @@ namespace CNC.Core
 
         public GCodeJob()
         {
-            gcode.Columns.Add("LineNum", typeof(int));
-            gcode.Columns.Add("Data", typeof(string));
-            gcode.Columns.Add("Length", typeof(int));
-            gcode.Columns.Add("File", typeof(bool));
-            gcode.Columns.Add("IsComment", typeof(bool));
-            gcode.Columns.Add("ProgramEnd", typeof(bool));
-            gcode.Columns.Add("Sent", typeof(string));
-            gcode.Columns.Add("Ok", typeof(bool));
-            gcode.PrimaryKey = new DataColumn[] { gcode.Columns["LineNum"] };
-
             Reset();
 
             Parser.ToolChanged += Parser_ToolChanged;
@@ -94,8 +105,8 @@ namespace CNC.Core
             return ToolChanged == null ? true : ToolChanged(toolNumber);
         }
 
-        public DataTable Data { get { return gcode; } }
-        public bool Loaded { get { return gcode.Rows.Count > 0; } }
+        public ObservableCollection<GCodeBlock> Blocks { get { return blocks; } }
+        public bool Loaded { get { return blocks.Count > 0; } }
         public bool HeightMapApplied { get; set; }
 
         public List<GCodeToken> Tokens { get { return Parser.Tokens; } }
@@ -124,11 +135,11 @@ namespace CNC.Core
                     block = block.Trim();
                     if (Parser.ParseBlock(ref block, false, out isComment))
                     {
-                        gcode.Rows.Add(new object[] { LineNumber++, block, block.Length + 1, true, isComment, Parser.ProgramEnd, "", false });
+                        blocks.Add(new GCodeBlock(LineNumber++, block, block.Length + 1, isComment, Parser.ProgramEnd));
                         while (commands.Count > 0)
                         {
                             block = commands.Dequeue();
-                            gcode.Rows.Add(new object[] { LineNumber++, block, block.Length + 1, true, false, false, "", false });
+                            blocks.Add(new GCodeBlock(LineNumber++, block, block.Length + 1, false, false));
                         }
                     }
                     block = sr.ReadLine();
@@ -157,11 +168,10 @@ namespace CNC.Core
             if (action == Action.New)
             {
                 if (Loaded)
-                    gcode.Rows.Clear();
+                    blocks.Clear();
 
                 Reset();
                 commands.Clear();
-                gcode.BeginLoadData();
 
                 filename = block;
 
@@ -172,11 +182,11 @@ namespace CNC.Core
                 block = block.Trim();
                 if (Parser.ParseBlock(ref block, false, out isComment))
                 {
-                    gcode.Rows.Add(new object[] { LineNumber++, block, block.Length + 1, true, isComment, Parser.ProgramEnd, "", false });
+                    blocks.Add(new GCodeBlock(LineNumber++, block, block.Length + 1, isComment, Parser.ProgramEnd));
                     while (commands.Count > 0)
                     {
                         block = commands.Dequeue();
-                        gcode.Rows.Add(new object[] { LineNumber++, block, block.Length + 1, true, false, false, "", false });
+                        blocks.Add(new GCodeBlock(LineNumber++, block, block.Length + 1, false, false));
                     }
                 }
             }
@@ -187,8 +197,6 @@ namespace CNC.Core
 
             if (action == Action.End)
             {
-                gcode.EndLoadData();
-
 #if DEBUG
                 System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
                 stopWatch.Start();
@@ -238,7 +246,7 @@ namespace CNC.Core
         public void CloseFile()
         {
             if (Loaded)
-                gcode.Rows.Clear();
+                blocks.Clear();
 
             commands.Clear();
 

@@ -1,13 +1,13 @@
 ﻿/*
  * ProbingProfiles.cs - part of CNC Probing library
  *
- * v0.29 / 2021-01-14 / Io Engineering (Terje Io)
+ * v0.46 / 2025-02-14 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2021, Io Engineering (Terje Io)
+Copyright (c) 2021-2025, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -66,6 +66,7 @@ namespace CNC.Controls.Probing
         public double FixtureHeight { get; set; }
         public double ProbeOffsetX { get; set; }
         public double ProbeOffsetY { get; set; }
+        public bool TouchPlateIsXY { get; set; }
     }
 
     public class ProbingProfiles
@@ -92,6 +93,7 @@ namespace CNC.Controls.Probing
                 XYClearance = data.XYClearance,
                 Depth = data.Depth,
                 TouchPlateHeight = data.TouchPlateHeight,
+                TouchPlateIsXY = data.TouchPlateIsXY,
                 FixtureHeight = data.FixtureHeight
             });
 
@@ -117,6 +119,7 @@ namespace CNC.Controls.Probing
                 profile.XYClearance = data.XYClearance;
                 profile.Depth = data.Depth;
                 profile.TouchPlateHeight = data.TouchPlateHeight;
+                profile.TouchPlateIsXY = data.TouchPlateIsXY;
                 profile.FixtureHeight = data.FixtureHeight;
             }
         }
@@ -137,14 +140,15 @@ namespace CNC.Controls.Probing
             XmlSerializer xs = new XmlSerializer(typeof(ObservableCollection<ProbingProfile>));
             try
             {
-                FileStream fsout = new FileStream(Core.Resources.Path + "ProbingProfiles.xml", FileMode.Create, FileAccess.Write, FileShare.None);
+                FileStream fsout = new FileStream(Core.Resources.ConfigPath + "ProbingProfiles.xml", FileMode.Create, FileAccess.Write, FileShare.None);
                 using (fsout)
                 {
                     xs.Serialize(fsout, Profiles);
                 }
             }
-            catch
+            catch (Exception e)
             {
+                System.Windows.MessageBox.Show(e.Message, "ioSender", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Exclamation);
             }
         }
 
@@ -154,7 +158,7 @@ namespace CNC.Controls.Probing
 
             try
             {
-                StreamReader reader = new StreamReader(Core.Resources.Path + "ProbingProfiles.xml");
+                StreamReader reader = new StreamReader(Core.Resources.ConfigPath + "ProbingProfiles.xml");
                 Profiles = (ObservableCollection<ProbingProfile>)xs.Deserialize(reader);
                 reader.Close();
 

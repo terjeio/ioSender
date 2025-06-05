@@ -1,7 +1,7 @@
 /*
  * ThreadingWizard.xaml.cs - part of CNC Controls Lathe library
  *
- * v0.31 / 2021-04-27 / Io Engineering (Terje Io)
+ * v0.46 / 2025-04-16 / Io Engineering (Terje Io)
  *
  */
 
@@ -17,7 +17,7 @@
 
 Additional code:
 
-Copyright (c) 2019-2021, Io Engineering (Terje Io)
+Copyright (c) 2019-2025, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -58,13 +58,11 @@ namespace CNC.Controls.Lathe
     /// <summary>
     /// Interaction logic for ThreadingView.xaml
     /// </summary>
-    public partial class ThreadingWizard : UserControl, ICNCView
+    public partial class ThreadingWizard : UserControl, ILatheWizardTab
     {
         private bool initOk = false, resetProfileBindings = true;
 
         private ThreadLogic logic;
-        public WizardConfig config = null;
-
         private ThreadModel model;
 
         public event GCodePushHandler GCodePush;
@@ -113,10 +111,10 @@ namespace CNC.Controls.Lathe
 
         #region Methods and properties required by CNCView interface
 
-        public ViewType ViewType { get { return ViewType.G76Threading; } }
+        public LatheWizardType LatheWizardType { get { return LatheWizardType.Threading; } }
         public bool CanEnable { get { return true; } }
 
-        public void Activate(bool activate, ViewType chgMode)
+        public void Activate(bool activate)
         {
             if (activate && GrblSettings.IsLoaded)
             {
@@ -124,14 +122,7 @@ namespace CNC.Controls.Lathe
                 {
                     initOk = true;
 
-                    if (config == null)
-                    {
-                        //config = new WizardConfig(this, "Threading");
-                        //config.Load();
-                        //cbxProfile.BindOptions(config, mode);
-                        //logic.config = config;
-                    }
-
+                    model.Profiles = model.wz.Load();
                     model.config.Update();
 
                     Converters.IsMetric = model.IsMetric = GrblParserState.IsMetric;;

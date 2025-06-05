@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Io Engineering")]
 [assembly: AssemblyProduct("ioSender")]
-[assembly: AssemblyCopyright("Copyright © 2024 Io Engineering")]
+[assembly: AssemblyCopyright("Copyright © 2025 Io Engineering")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: NeutralResourcesLanguage("en-US", UltimateResourceFallbackLocation.Satellite)]
@@ -35,5 +35,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("2.0.45.0")]
-[assembly: AssemblyFileVersion("2.0.45.0")]
+[assembly: AssemblyVersion("2.0.46.0")]
+[assembly: AssemblyFileVersion("2.0.46.0")]

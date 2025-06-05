@@ -1,13 +1,13 @@
 /*
  * GrblViewModel.cs - part of CNC Controls library
  *
- * v0.45 / 2024-11-11 / Io Engineering (Terje Io)
+ * v0.46 / 2025-06-05 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2024, Io Engineering (Terje Io)
+Copyright (c) 2019-2025, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -49,10 +49,11 @@ namespace CNC.Core
 {
     public class GrblViewModel : MeasureViewModel
     {
-        private string _tool, _message, _WPos, _MPos, _wco, _wcs, _a, _fs, _ov, _pn, _sc, _sd, _fans, _d, _gc, _h, _thcv, _thcs, _spindle;
+        private string _tool, _probe, _message, _WPos, _MPos, _wco, _wcs, _a, _fs, _ov, _pn, _sc, _sd, _fans, _d, _gc, _h, _thcv, _thcs, _spindle;
         private string _mdiCommand, _mdiText, _fileName;
         private string[] _rtState = new string[3];
-        private bool has_wco = false, _hasFans = false;
+        private bool has_wco = false, _hasFans = false, _multiProbe = false;
+        private SDState _sdMounted = SDState.Unmounted;
         private bool _flood, _mist, _fan0, _toolChange, _reset, _isMPos, _isJobRunning, _isProbeSuccess, _pgmEnd, _isParserStateLive, _isTloRefSet;
         private bool _isCameraVisible = false, _responseLogVerbose = false, _isProbing = false, _autoReporting = false;
         private bool? _mpg;
@@ -195,7 +196,7 @@ namespace CNC.Core
             _fileName = _mdiCommand = _mdiText = string.Empty;
             _streamingState = StreamingState.NoFile;
             _isMPos = _reset = _isJobRunning = _isProbeSuccess = _pgmEnd = _isTloRefSet = false;
-            _pb_avail = _rxb_avail = _rtState[0] = _rtState[1] = _rtState[2] = _spindle = string.Empty;
+            _pb_avail = _rxb_avail = _rtState[0] = _rtState[1] = _rtState[2] = _spindle = _probe = string.Empty;
             _mpg = null;
             _line = _pwm = _scrollpos = _spindle_num = 0;
             _auxinValue = -2; // No value read (use a nullable type?)
@@ -214,6 +215,7 @@ namespace CNC.Core
             Set("FS", string.Empty);
             Set("Sc", string.Empty);
             Set("T", "0");
+            Set("P", "0");
             Set("Ov", string.Empty);
             Set("Ex", string.Empty);
             SDCardStatus = string.Empty;
@@ -379,8 +381,12 @@ namespace CNC.Core
         public bool MultiSpindle { get { return GrblSpindles.Spindles.Count > 1; } }
         public ObservableCollection<Spindle> Spindles { get { return GrblSpindles.Spindles; } }
         public ObservableCollection<Tool> Tools { get { return GrblWorkParameters.Tools; } }
+        public ObservableCollection<Axis> Axes { get { return GrblInfo.Axes; } }
+        public ObservableCollection<Probe> Probes { get { return GrblInfo.Probes; } }
+        public bool MultiProbe { get { return _multiProbe; } set { _multiProbe = value; OnPropertyChanged(); } }
         public ObservableCollection<string> SystemInfo { get { return GrblInfo.SystemInfo; } }
         public string Tool { get { return _tool; } set { _tool = GrblParserState.Tool = value; OnPropertyChanged(); } }
+        public int Probe { get { return int.Parse(_probe); } set { _probe = (GrblParserState.Probe = value).ToString(); OnPropertyChanged(); } }
         public double TloReference { get { return _tloReferenceOffset; } private set { _tloReferenceOffset = value; OnPropertyChanged(); } }
         public bool IsTloReferenceSet {
             get { return _isTloRefSet; }
@@ -402,7 +408,8 @@ namespace CNC.Core
         public GrblState GrblState { get { return _grblState; } set { _grblState = value; OnPropertyChanged(); } }
         public bool AutoReportingEnabled { get { return _autoReporting; } set { { _autoReporting = value; OnPropertyChanged(); } } }
         public int AutoReportInterval { get { return _autoReportInterval; } private set { { _autoReportInterval = value; OnPropertyChanged(); } } }
-        public bool IsGCLock { get { return _grblState.State == GrblStates.Alarm; } }
+        public bool IsGCLock { get { return _grblState.State == GrblStates.Hold || _grblState.State == GrblStates.Alarm; } }
+        public bool SystemCommandsAllowed { get { return !(_grblState.State == GrblStates.Hold || (_grblState.State == GrblStates.Alarm && !IsGrblHAL)); } }
         public bool IsCheckMode { get { return _grblState.State == GrblStates.Check; } }
         public bool IsSleepMode { get { return _grblState.State == GrblStates.Sleep; } }
         public bool IsG92Active { get { return GrblParserState.IsActive("G92") != null; } }
@@ -467,6 +474,7 @@ namespace CNC.Core
         public bool? IsMPGActive { get { return _mpg; } private set { if (_mpg != value) { _mpg = value; OnPropertyChanged(); } } }
         public string Scaling { get { return _sc; } private set { _sc = value; OnPropertyChanged(); } }
         public string SDCardStatus { get { return _sd; } private set { _sd = value; OnPropertyChanged(); } }
+        public SDState SDCardMountStatus { get { return _sdMounted; } set { _sdMounted = value; OnPropertyChanged(); } }
         public bool IsHomingEnabled { get { return GrblInfo.HomingEnabled; } }
         public HomedState HomedState { get { return _homedState; } private set { _homedState = value; OnPropertyChanged(); } }
         public LatheMode LatheMode
@@ -992,6 +1000,11 @@ namespace CNC.Core
                     PWM = int.Parse(value);
                     break;
 
+                case "P":
+                    if (_probe != value)
+                        Probe = int.Parse(value);
+                    break;
+
                 case "Pn":
                     if (_pn != value)
                     {
@@ -1082,11 +1095,21 @@ namespace CNC.Core
                 case "SD":
                     if (value != "Pending")
                     {
-                        value = string.Format(LibStrings.FindResource("SdStreamComplete"), value.Split(',')[0]);
-                        if (SDCardStatus != value)
-                            Message = SDCardStatus = value;
-                        if (IsSDCardJob && !JobTimer.IsRunning && GrblState.State == GrblStates.Run)
-                            JobTimer.Start();
+                        var opts = value.Split(',');
+                        if (opts.Length == 1)
+                        {
+                            SDState mntstate;
+                            if(Enum.TryParse(opts[0], out mntstate))
+                                SDCardMountStatus = mntstate;
+                        }
+                        else
+                        {
+                            value = string.Format(LibStrings.FindResource("SdStreamComplete"), opts[0]);
+                            if (SDCardStatus != value)
+                                Message = SDCardStatus = value;
+                            if (IsSDCardJob && !JobTimer.IsRunning && GrblState.State == GrblStates.Run)
+                                JobTimer.Start();
+                        }
                     }
                     break;
 
@@ -1191,7 +1214,7 @@ namespace CNC.Core
                 return;
             }
 
-            bool stateChanged = true;
+            bool stateChanged = true, inAlarm = GrblState.State == GrblStates.Alarm;
 
             if (data.First() == '<')
             {
@@ -1328,7 +1351,11 @@ namespace CNC.Core
                 }
             }
 
-            if (ResponseLogVerbose || !(data.First() == '<' || data.First() == '$' || data.First() == 'o' || (data.First() == '[' && (data.StartsWith("[GC") || DataIsEnumeration(data)))) || data.StartsWith("error"))
+            if (!inAlarm && GrblState.State == GrblStates.Alarm) {
+                Message = GrblAlarms.GetMessage(_grblState.Substate.ToString());
+                ResponseLog.Add(string.Format("Alarm:{0} - {1}", _grblState.Substate, Message));
+            }
+            else if (ResponseLogVerbose || !(data.First() == '<' || data.First() == '$' || data.First() == 'o' || (data.First() == '[' && (data.StartsWith("[GC") || DataIsEnumeration(data)))) || data.StartsWith("error"))
             {
                 if (!(data.First() == '<' && ResponseLogFilterRT))
                 {

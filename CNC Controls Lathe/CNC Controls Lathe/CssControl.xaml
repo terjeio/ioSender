@@ -6,13 +6,18 @@
              xmlns:local="clr-namespace:CNC.Controls.Lathe"
              xmlns:cncontrols="clr-namespace:CNC.Controls;assembly=CNC.Controls.WPF"
              mc:Ignorable="d" 
-             d:DesignHeight="28" d:DesignWidth="365">
+             d:DesignHeight="28" d:DesignWidth="400">
     <Grid x:Name="grid">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="190"/>
-            <ColumnDefinition Width="175"/>
+            <ColumnDefinition Width="140"/>
+            <ColumnDefinition Width="125*"/>
         </Grid.ColumnDefinitions>
         <CheckBox x:Name="chkCSS" Content="CSS (Constand Surface Speed)" IsChecked="{Binding Path=IsCssEnabled, RelativeSource={RelativeSource AncestorType=UserControl}}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-        <cncontrols:NumericField x:Name="data" Grid.Column="1" Format="###0" Label="Spindle:" Value="{Binding Path=Value, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" Unit="RPM" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+        <cncontrols:NumericField x:Name="data" Grid.Column="1" Format="###0" Label="Spindle:" ColonAt="55" Value="{Binding Path=Value, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" Unit="RPM" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+        <ComboBox x:Name="cbxSpindleDir" Grid.Column="2" IsEditable="False" HorizontalAlignment="Left" VerticalAlignment="Center" Width="60" Height="22" Margin="0,2"
+                  DisplayMemberPath="Name" SelectedValuePath="Dir"
+                  ItemsSource="{Binding Path=SpindleDirections}"
+                  SelectedValue="{Binding Path=SpindleDir, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"/>
     </Grid>
 </UserControl>

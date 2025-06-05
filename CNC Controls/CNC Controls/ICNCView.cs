@@ -50,15 +50,12 @@ namespace CNC.Controls
         Offsets,
         PIDTuner,
         SDCard,
-        G76Threading,
-        Turning,
-        Facing,
-        Parting,
         Tools,
         TrinamicTuner,
         GCodeViewer,
         SpindleLinearizer,
-        Probing
+        Probing,
+        LatheWizards
     }
 
     public interface ICNCView

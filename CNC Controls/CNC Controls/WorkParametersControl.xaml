@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CNC.Controls"
              mc:Ignorable="d" 
-             d:DesignHeight="90" d:DesignWidth="250">
+             d:DesignHeight="84" d:DesignWidth="250">
     <UserControl.Resources>
         <local:LogicalNotConverter x:Key="BooleanConverter" />
         <local:BoolToVisibleConverter x:Key="IsVisibleConverter" />
@@ -21,6 +21,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="34"/>
                 <RowDefinition Height="24"/>
+                <RowDefinition Height="26*"/>
             </Grid.RowDefinitions>
             <Label x:Uid="lbl_offset" x:Name="lblOffset" Content="Offset:" HorizontalContentAlignment="Right" HorizontalAlignment="Right" VerticalAlignment="Center" Height="26" Margin="0,7" Width="50"/>
             <ComboBox x:Name="cbxOffset" Grid.Column="1" DisplayMemberPath="Code" SelectedValuePath="Code" ItemsSource="{Binding Path=CoordinateSystems}" SelectedValue="{Binding Path=WorkCoordinateSystem, Mode=OneWay}" HorizontalAlignment="Left" VerticalAlignment="Center" Width="60" Height="22" SelectionChanged="cbxOffset_SelectionChanged"/>
@@ -30,6 +31,8 @@
             </Border>
             <local:LEDControl x:Uid="lbl_tlo" Grid.Row="1" Grid.ColumnSpan="2" Grid.Column="1" Label="TLO" IsSet="{Binding Path=IsToolOffsetActive, Mode=OneWay}" Visibility="{Binding Path=IsParserStateLive, Converter={StaticResource IsVisibleConverter}}" Margin="10,0,0,0"/>
             <local:LEDControl x:Uid="lbl_tlo_refd" Grid.Row="1" Grid.ColumnSpan="2" Grid.Column="2" Label="TLO ref'd" IsSet="{Binding Path=IsTloReferenceSet, Mode=OneWay}" Margin="10,0,0,0"/>
+            <Label x:Uid="lbl_probe" x:Name="lblProbe" Content="Probe:" Visibility="{Binding Path=MultiProbe, Mode=OneWay, Converter={StaticResource IsVisibleConverter}}" Grid.Row="3" HorizontalContentAlignment="Right" HorizontalAlignment="Right" VerticalAlignment="Center" Height="26" Margin="0,7" Width="50"/>
+            <ComboBox x:Name="cbxProbe" Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" DisplayMemberPath="Name" SelectedValuePath="Id" ItemsSource="{Binding Path=Probes}" SelectedValue="{Binding Path=Probe, Mode=OneWay}" Visibility="{Binding Path=MultiProbe, Mode=OneWay, Converter={StaticResource IsVisibleConverter}}" HorizontalAlignment="Left" VerticalAlignment="Center" Width="90" Height="22" SelectionChanged="cbxProbe_SelectionChanged"/>
         </Grid>
     </GroupBox>
 </UserControl>

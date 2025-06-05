@@ -48,10 +48,10 @@
             <local:LEDControl Grid.Row="2" Grid.Column="1" Label="THC up" IsSet="{Binding Path=THCSignals[(core:THCSignals)Up], Mode=OneWay}"/>
             <local:LEDControl Grid.Row="2" Grid.Column="2" Label="THC down" IsSet="{Binding Path=THCSignals[(core:THCSignals)Down], Mode=OneWay}"/>
             <local:LEDControl Grid.Row="3" Label="Torch on" Padding="15,0" IsSet="{Binding Path=THCSignals[(core:THCSignals)TorchOn], Mode=OneWay}"/>
-            <local:LEDControl Grid.Row="3" Grid.Column="1" Label="Float switch" IsSet="{Binding Path=THCSignals[(core:THCSignals)VelocityLock], Mode=OneWay}"/>
+            <local:LEDControl Grid.Row="3" Grid.Column="1" Label="Float switch" IsSet="{Binding Path=THCSignals[(core:THCSignals)FloatSwitch], Mode=OneWay}"/>
             <local:LEDControl Grid.Row="3" Grid.Column="2" Label="Velocity lock" IsSet="{Binding Path=THCSignals[(core:THCSignals)VelocityLock], Mode=OneWay}"/>
             <local:LEDControl Grid.Row="4" Label="Arc ok" Padding="15,0" IsSet="{Binding Path=THCSignals[(core:THCSignals)ArcOk], Mode=OneWay}"/>
-            <local:LEDControl Grid.Row="4" Grid.Column="1" Label="Breakaway" IsSet="{Binding Path=THCSignals[(core:THCSignals)ArcOk], Mode=OneWay}"/>
+            <local:LEDControl Grid.Row="4" Grid.Column="1" Label="Breakaway" IsSet="{Binding Path=THCSignals[(core:THCSignals)Breakaway], Mode=OneWay}"/>
             <local:LEDControl Grid.Row="4" Grid.Column="2" Label="Void lock" IsSet="{Binding Path=THCSignals[(core:THCSignals)VoidLock], Mode=OneWay}"/>
             <Button Content="×" Focusable="False" Style="{StaticResource SmallXButtonStyle}" VerticalContentAlignment="Top" HorizontalAlignment="Right" Margin="0,0,5,0" VerticalAlignment="Top" Width="14" Height="18" Click="btn_Close" Grid.Column="1" Grid.ColumnSpan="2"/>
         </Grid>

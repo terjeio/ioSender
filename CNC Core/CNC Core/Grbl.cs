@@ -1,13 +1,13 @@
 ﻿/*
  * Grbl.cs - part of CNC Controls library
  *
- * v0.45 / 2024-11-08 / Io Engineering (Terje Io)
+ * v0.46 / 2025-05-29 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2024, Io Engineering (Terje Io)
+Copyright (c) 2018-2025, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -128,7 +128,7 @@ namespace CNC.Core
             FORMAT_METRIC = "###0.000",
             FORMAT_IMPERIAL = "##0.0000",
             NO_TOOL = "None",
-            THCSIGNALS = "AERTOVHDU"; // Keep in sync with THCSignals enum below!!
+            THCSIGNALS = "AERTOVHDUBF"; // Keep in sync with THCSignals enum below!!
 
         public const int
             X_AXIS = 0,
@@ -312,6 +312,14 @@ namespace CNC.Core
         Homed
     }
 
+    public enum SDState
+    {
+        Unmounted = 0,
+        Mounted = 1,
+        Undetected = 2,
+        Detected = 3
+    }
+
     [Flags]
     public enum Signals : int // Keep in sync with GrblInfo.SignalLetters constant below
     {
@@ -350,8 +358,20 @@ namespace CNC.Core
         VelocityLock = 1 << 5,
         VoidLock = 1 << 6,
         Down = 1 << 7,
-        Up = 1 << 8
+        Up = 1 << 8,
+        Breakaway = 1 << 9,
+        FloatSwitch = 1 << 10
     }
+
+    [Flags]
+    public enum Probes : int
+    {
+        None = 0,
+        Standard = 1 << 0,
+        Toolsetter = 1 << 1,
+        Probe2 = 1 << 2
+    }
+
     public struct GrblState
     {
         public GrblStates State;
@@ -367,14 +387,14 @@ namespace CNC.Core
         public static string Path { get; set; }
         public static string Locale { get; set; }
         public static string IniName { get; set; }
-        public static string IniFile { get { return (System.IO.Path.IsPathRooted(IniName) ? "" : Path) + IniName; } }
+        public static string IniFile { get { return (System.IO.Path.IsPathRooted(IniName) ? "" : ConfigPath) + IniName; } }
         public static string DebugFile { get; set; } = string.Empty;
-        public static string ConfigName { get; set; }
+        public static string ConfigPath { get; set; }
         public static bool IsLegacyController { get; set; } = false; // Set true if controller is legacy v1.1
 
         static Resources()
         {
-            Path = @"./";
+            ConfigPath = Path = @"./";
             Locale = "en-US";
             IniName = "App.config";
         }
@@ -535,6 +555,18 @@ namespace CNC.Core
                 }
             }
         }
+    }
+
+    public class Axis
+    {
+        public Axis(int index, string letter)
+        {
+            Index = index;
+            Letter = letter;
+        }
+
+        public int Index { get; private set; }
+        public string Letter { get; private set; }
     }
 
     public class AxisLetter : ViewModelBase
@@ -845,6 +877,18 @@ namespace CNC.Core
         public string Code { get { return _code; } set { _code = value; OnPropertyChanged(); } }
     }
 
+    public class Probe
+    {
+        public Probe(int id, string name)
+        {
+            Id = id;
+            Name = name;
+        }
+
+        public int Id { get; private set; }
+        public string Name { get; private set; }
+    }
+
     public class Tool : Position
     {
         public Tool(string code) : base()
@@ -876,6 +920,7 @@ namespace CNC.Core
         public static string Fan { get; set; } = ((char)GrblConstants.CMD_OVERRIDE_FAN0_TOGGLE).ToString();
         public static string SpindleChange { get; set; } = "M104Q{0}";
         public static string ToolChange { get; set; } = "T{0}";
+        public static string ProbeSelect { get; set; } = "G65P5Q{0}";
     }
 
     public static class GrblAuxIO
@@ -904,15 +949,27 @@ namespace CNC.Core
     {
         #region Attributes
 
+        private static Dispatcher dispatcher;
         private static bool _probeProtect = false, _latheUVWMode = false;
         private static int _numAxes;
+        private static string _axisLetters = "XYZABCUVW";
+
+        private static Action<string> dataReceived;
 
         static GrblInfo()
         {
             NumAxes = 3;
+            Probes.Add(new Probe(0, LibStrings.FindResource("ProbePrimary")));
         }
 
-        public static string AxisLetters { get; private set; } = "XYZABCUVW";
+        public static string AxisLetters
+        {
+            get { return _axisLetters; }
+            private set
+            {
+                _axisLetters = value;
+            }
+        }
         public static string SignalLetters { get; private set; } = "XYZABCUVWEPRDHSLTOMF"; // Keep in sync with Signals enum above!!
         public static string PositionFormatString { get; private set; } = string.Empty;
         public static string Version { get; private set; } = string.Empty;
@@ -931,7 +988,7 @@ namespace CNC.Core
         public static bool ExpressionsSupported { get; private set; } = false;
         public static int NumAxes
         {
-            get { return _numAxes;  }
+            get { return _numAxes; }
             private set
             {
                 _numAxes = LatheModeEnabled ? Math.Max(value, 3) : value;
@@ -940,7 +997,7 @@ namespace CNC.Core
                 for (int i = 0; i < _numAxes; i++)
                 {
                     flags = (flags << 1) | 0x01;
-                    if(!LatheModeEnabled || i != 1)
+                    if (!LatheModeEnabled || i != 1)
                         PositionFormatString += AxisIndexToLetter(i) + ": {" + i.ToString() + "}  ";
                 }
                 if (LatheModeEnabled && _numAxes == 3)
@@ -963,11 +1020,12 @@ namespace CNC.Core
         public static bool HasSettingDescriptions { get; private set; }
         public static bool HasSimpleProbeProtect { get { return _probeProtect & IsGrblHAL && Build >= 20200924; } internal set { _probeProtect = value; } }
         public static bool ManualToolChange { get; private set; }
+        public static bool HasFS { get; private set; }
         public static bool HasSDCard { get; private set; }
         public static string UploadProtocol { get; private set; } = string.Empty;
         public static string IpAddress { get; private set; } = string.Empty;
         public static bool HasPIDLog { get; private set; }
-        public static bool HasProbe { get; private set; } = true;
+        public static bool HasProbe { get { return Probes.Count != 0; } }
         public static bool HasRTC { get; private set; } = false;
         public static bool HasVariableSpindle { get; private set; } = false;
         public static bool HasReversableSpindle { get; private set; } = true;
@@ -982,7 +1040,8 @@ namespace CNC.Core
             get { return GrblParserState.LatheMode != LatheMode.Disabled; }
             set
             {
-                if (value && GrblParserState.LatheMode == LatheMode.Disabled) {
+                if (value && GrblParserState.LatheMode == LatheMode.Disabled)
+                {
                     GrblParserState.LatheMode = LatheMode.Radius;
                 }
             }
@@ -1000,6 +1059,9 @@ namespace CNC.Core
         }
         public static bool THCMode { get; internal set; } = false;
         public static ObservableCollection<string> SystemInfo { get; private set; } = new ObservableCollection<string>();
+        public static ObservableCollection<Axis> Axes { get; private set; } = new ObservableCollection<Axis>();
+        public static ObservableCollection<Probe> Probes { get; private set; } = new ObservableCollection<Probe>();
+
         public static bool IsLoaded { get; private set; }
 
         #endregion
@@ -1045,12 +1107,14 @@ namespace CNC.Core
 
             model.Silent = true;
             Firmware = model.Firmware;
+            dispatcher = Dispatcher.CurrentDispatcher;
+            dataReceived += Process;
 
             new Thread(() =>
             {
                 res = WaitFor.AckResponse<string>(
                     cancellationToken,
-                    response => Process(response),
+                    response => dataReceived(response),
                     a => model.OnResponseReceived += a,
                     a => model.OnResponseReceived -= a,
                     1000, () => Comms.com.WriteCommand(getExtended ? GrblConstants.CMD_GETINFO_EXTENDED : GrblConstants.CMD_GETINFO));
@@ -1060,6 +1124,8 @@ namespace CNC.Core
                 EventUtils.DoEvents();
 
             model.Silent = false;
+            dataReceived -= Process;
+
             PollGrbl.Resume();
 
             model.NumAxes = NumAxes;
@@ -1073,14 +1139,22 @@ namespace CNC.Core
 
             model.Firmware = Firmware;
             model.HasFans = NumFans > 0;
+            model.Probe = model.Probe;
+            model.MultiProbe = Probes.Count > 1;
 
-            if(!Resources.IsLegacyController)
+            Axes.Clear();
+            for (int i = 0; i < _numAxes; i++)
+            {
+                Axes.Add(new Axis(i, AxisIndexToLetter(_numAxes == 2 && i == 1 ? 2 : i)));
+            }
+
+            if (!Resources.IsLegacyController)
                 IsGrblHAL = IsGrblHAL || Firmware == "grblHAL";
 
             return res == true;
         }
 
-        internal static void OnSettingsLoaded (GrblViewModel model)
+        internal static void OnSettingsLoaded(GrblViewModel model)
         {
             model.IsMetric = GrblSettings.GetInteger(GrblSetting.ReportInches) != 1;
             model.Keyboard.IsContinuousJoggingEnabled = IsGrblHAL;
@@ -1102,10 +1176,10 @@ namespace CNC.Core
                 } while (!double.IsNaN(stepsmm) && i < TravelResolution.Values.Length);
             }
             else foreach (int i in AxisFlags.ToIndices())
-            {
-                TravelResolution.Values[i] = 1d / GrblSettings.GetDouble(GrblSetting.TravelResolutionBase + i);
-                MaxTravel.Values[i] = GrblSettings.GetDouble(GrblSetting.MaxTravelBase + i);
-            }
+                {
+                    TravelResolution.Values[i] = 1d / GrblSettings.GetDouble(GrblSetting.TravelResolutionBase + i);
+                    MaxTravel.Values[i] = GrblSettings.GetDouble(GrblSetting.MaxTravelBase + i);
+                }
 
             if (HasFirmwareJog)
             {
@@ -1177,7 +1251,7 @@ namespace CNC.Core
                 while (res == null)
                     EventUtils.DoEvents();
             }
-            else if(!Resources.IsLegacyController)
+            else if (!Resources.IsLegacyController)
                 IsGrblHAL = model.Firmware == "grblHAL";
 
             PollGrbl.Resume();
@@ -1185,7 +1259,7 @@ namespace CNC.Core
             return Comms.com.Reply;
         }
 
-        private static void DetectNumAxes (string rt_report)
+        private static void DetectNumAxes(string rt_report)
         {
             var s = rt_report.Split('|');
             if (s.Length > 1)
@@ -1218,8 +1292,31 @@ namespace CNC.Core
                 DetectNumAxes(data);
         }
 
+        private static void UpdateProbes(Probes probes)
+        {
+            if (probes.HasFlag(Core.Probes.Standard))
+            {
+                if (Probes.Where(p => p.Id == 0).FirstOrDefault() == null)
+                    Probes.Add(new Probe(0, LibStrings.FindResource("ProbePrimary")));
+            }
+            else if (Probes.Where(p => p.Id == 0).FirstOrDefault() != null)
+                Probes.Remove(Probes.Where(p => p.Id == 0).FirstOrDefault());
+
+            if (probes.HasFlag(Core.Probes.Toolsetter) && Probes.Where(p => p.Id == 1).FirstOrDefault() == null)
+                Probes.Add(new Probe(1, LibStrings.FindResource("ProbeToolSetter")));
+
+            if (probes.HasFlag(Core.Probes.Probe2) && Probes.Where(p => p.Id == 2).FirstOrDefault() == null)
+                Probes.Add(new Probe(2, LibStrings.FindResource("ProbeSecondary")));
+        }
+
         private static void Process(string data)
         {
+            if (Dispatcher.CurrentDispatcher != dispatcher)
+            {
+                dispatcher.Invoke(dataReceived, data);
+                return;
+            }
+
             if (data.StartsWith("["))
             {
                 string[] valuepair = data.Substring(1).TrimEnd(']').Split(':');
@@ -1279,93 +1376,101 @@ namespace CNC.Core
                         {
                             if (value.StartsWith("TMC="))
                                 TrinamicDrivers = value.Substring(4);
-                            else switch (value)
+                            else if (value.StartsWith("PROBES="))
                             {
-                                case "ENUMS":
-                                    HasEnums = true;
-                                    break;
-
-                                case "EXPR":
-                                    ExpressionsSupported = true;
-                                    break;
-
-                                case "TC":
-                                    ManualToolChange = true;
-                                    break;
-
-                                case "THC":
-                                    THCMode = true;
-                                    break;
-
-                                case "ATC":
-                                    HasATC = true;
-                                    break;
-
-                                case "RTC":
-                                    HasRTC = true;
-                                    break;
-
-                                case "ETH":
-                                    break;
-
-                                case "HOME":
-                                    HomingEnabled = true;
-                                    break;
-
-                                case "SD":
-                                    HasSDCard = true;
-                                    break;
-
-                                case "SED":
-                                    HasSettingDescriptions = true;
-                                    break;
-
-                                case "YM":
-                                    if(UploadProtocol == string.Empty)
-                                        UploadProtocol = "YModem";
-                                    break;
-
-                                case "FTP":
-                                    UploadProtocol = "FTP";
-                                    break;
-
-                                case "PID":
-                                    HasPIDLog = true;
-                                    break;
-
-                                case "NOPROBE":
-                                    HasProbe = false;
-                                    break;
-
-                                case "LATHE":
-                                    LatheModeEnabled = true;
-                                    break;
-
-                                case "LATHEUVW":
-                                    LatheUVWModeEnabled = true;
-                                    break;
-
-                                case "BD":
-                                    OptionalSignals |= Signals.BlockDelete;
-                                    break;
-
-                                case "ES":
-                                    OptionalSignals |= Signals.EStop;
-                                    break;
-
-                                case "MW":
-                                    OptionalSignals |= Signals.MotorWarning;
-                                    break;
-
-                                case "OS":
-                                    OptionalSignals |= Signals.OptionalStop;
-                                    break;
-
-                                case "RT+":
-                                case "RT-":
-                                    UseLegacyRTCommands = false;
-                                    break;
+                                UpdateProbes((Probes)int.Parse(value.Substring(7)));
                             }
+                            else switch (value)
+                                {
+                                    case "ENUMS":
+                                        HasEnums = true;
+                                        break;
+
+                                    case "EXPR":
+                                        ExpressionsSupported = true;
+                                        break;
+
+                                    case "TC":
+                                        ManualToolChange = true;
+                                        break;
+
+                                    case "THC":
+                                        THCMode = true;
+                                        break;
+
+                                    case "ATC":
+                                        HasATC = true;
+                                        break;
+
+                                    case "RTC":
+                                        HasRTC = true;
+                                        break;
+
+                                    case "ETH":
+                                        break;
+
+                                    case "HOME":
+                                        HomingEnabled = true;
+                                        break;
+
+                                    case "FS":
+                                        HasFS = true;
+                                        break;
+
+                                    case "SD":
+                                        HasSDCard = HasFS = true;
+                                        break;
+
+                                    case "SED":
+                                        HasSettingDescriptions = true;
+                                        break;
+
+                                    case "YM":
+                                        if (UploadProtocol == string.Empty)
+                                            UploadProtocol = "YModem";
+                                        break;
+
+                                    case "FTP":
+                                        UploadProtocol = "FTP";
+                                        break;
+
+                                    case "PID":
+                                        HasPIDLog = true;
+                                        break;
+
+                                    case "NOPROBE":
+                                        Probes.Clear();
+                                        break;
+
+                                    case "LATHE":
+                                        LatheModeEnabled = true;
+                                        break;
+
+                                    case "LATHEUVW":
+                                        LatheUVWModeEnabled = true;
+                                        break;
+
+                                    case "BD":
+                                        OptionalSignals |= Signals.BlockDelete;
+                                        break;
+
+                                    case "ES":
+                                        OptionalSignals |= Signals.EStop;
+                                        break;
+
+                                    case "MW":
+                                        OptionalSignals |= Signals.MotorWarning;
+                                        break;
+
+                                    case "OS":
+                                        OptionalSignals |= Signals.OptionalStop;
+                                        break;
+
+                                    case "RT+":
+                                    case "RT-":
+                                        UseLegacyRTCommands = false;
+                                        break;
+                                }
                         }
                         break;
 
@@ -1396,8 +1501,8 @@ namespace CNC.Core
                             GrblAuxIO.ParseConfig(data);
                         else if (data.StartsWith("[FANS:"))
                             NumFans = int.Parse(data.Substring(6).TrimEnd(']'));
-                        else if (data.StartsWith("[IP:"))
-                            IpAddress = data.Substring(4).TrimEnd(']');
+                        else if (data.StartsWith("[IP:") || data.StartsWith("[STA IP:") || data.StartsWith("[AP IP:"))
+                            IpAddress = data.Substring(data.IndexOf(':') + 1).TrimEnd(']');
                         break;
                 }
             }
@@ -1485,6 +1590,7 @@ namespace CNC.Core
                     GrblWorkParameters.Tools.Add(new Tool(_tool.ToString()));
             }
         }
+        public static int Probe { get; set; }
         public static string WorkOffset { get; set; }
         public static bool IsLoaded { get { return state.Count > 0; } }
 
@@ -1949,6 +2055,100 @@ namespace CNC.Core
                 }
             }
         }
+
+        private static List<string> Export()
+        {
+            bool warned = false;
+            List<string> exp = new List<string>();
+
+            if (GrblInfo.IsGrblHAL)
+                exp.Add("%");
+
+            exp.Add(";");
+            exp.Add("; " + DateTime.Now.ToString("yyyy-MM-ddTHH:mm"));
+            exp.Add(";");
+            exp.Add("; " + GrblInfo.Firmware + (GrblInfo.Identity != string.Empty ? ":" + GrblInfo.Identity : ""));
+            exp.Add("; " + GrblInfo.Version);
+            exp.Add(";");
+
+            if (GrblInfo.NumTools > 0)
+            {
+                exp.Add("; Tools:");
+                foreach (var tool in Tools)
+                {
+                    if (tool.Code != "None")
+                        exp.Add(string.Format("G90G10L1{0}", tool.ToString(GrblInfo.AxisFlags)));
+                }
+            }
+
+            exp.Add("; Offsets:");
+            foreach (var coordinateSystem in CoordinateSystems)
+            {
+                if (coordinateSystem.Id > 0)
+                    exp.Add(string.Format("G90G10L2P{0}{1}", coordinateSystem.Id, coordinateSystem.ToString(GrblInfo.AxisFlags)));
+                else
+                {
+                    if (!warned)
+                    {
+                        warned = true;
+                        exp.Add(";");
+                        exp.Add("(MSG,WARNING: axes will be moved to the G28 and G30 positions below, ensure the machine is homed or abort!)");
+                        exp.Add("M0");
+                    }
+                    if (coordinateSystem.Code != "G92")
+                    {
+                        exp.Add(string.Format("G0G53{0}", coordinateSystem.ToString(GrblInfo.AxisFlags)));
+                        exp.Add(string.Format("{0}.1", coordinateSystem.Code));
+                    }
+                }
+            }
+
+            exp.Add("M30");
+
+            if (GrblInfo.IsGrblHAL)
+                exp.Add("%");
+
+            return exp;
+        }
+
+        public static bool Backup(string filename)
+        {
+            bool ok = false;
+
+            List<string> data = Export();
+
+            if (data.Count > 0) try
+                {
+                    StreamWriter file = new StreamWriter(filename);
+                    if ((ok = file != null))
+                    {
+                        foreach (string s in data)
+                            file.WriteLine(s);
+
+                        file.Close();
+                    }
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show(e.Message, "ioSender", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                }
+
+            return ok;
+        }
+    }
+
+    public class SpindleDirection
+    {
+        public SpindleState Dir { get; private set; }
+        public string Name { get; private set; }
+        public string Command { get; private set; }
+
+        public SpindleDirection(SpindleState dir, string name)
+        {
+            Dir = dir;
+            Name = name;
+            Command = dir == SpindleState.CW ? "M3" : "M4";
+        }
     }
 
     public class Spindle
@@ -1963,6 +2163,14 @@ namespace CNC.Core
         //{
         //    get { return GrblSpindles.Spindles.Where(x => x.SpindleId == Id); }
         //}
+
+        public static ObservableCollection<SpindleDirection> Directions { get; private set; } = new ObservableCollection<SpindleDirection>();
+
+        static Spindle ()
+        {
+            Directions.Add(new SpindleDirection(SpindleState.CW, "CW"));
+            Directions.Add(new SpindleDirection(SpindleState.CCW, "CCW"));
+        }
 
         public Spindle(string data)
         {
@@ -2306,6 +2514,11 @@ namespace CNC.Core
     public static class GrblSettingGroups
     {
         public static List<GrblSettingGroup> Groups { get; private set; } = new List<GrblSettingGroup>();
+
+        public static GrblSettingGroup Get(int key)
+        {
+            return Groups.Where(x => x.Id == key).FirstOrDefault();
+        }
 
         public static bool Get()
         {
@@ -2873,6 +3086,9 @@ namespace CNC.Core
             if (GrblInfo.IsGrblHAL)
                 exp.Add("%");
 
+            exp.Add(";");
+            exp.Add("; " + DateTime.Now.ToString("yyyy-MM-ddTHH:mm"));
+            exp.Add(";");
             exp.Add("; " + GrblInfo.Firmware + (GrblInfo.Identity != string.Empty ? ":" + GrblInfo.Identity : ""));
             exp.Add("; " + GrblInfo.Version);
             exp.Add("; [OPT:" + GrblInfo.Options + "]");
@@ -2921,12 +3137,14 @@ namespace CNC.Core
             }
         }
 
-        public static void Backup(string filename)
+        public static bool Backup(string filename)
         {
+            bool ok = false;
+
             if (Settings.Count > 0) try
             {
                 StreamWriter file = new StreamWriter(filename);
-                if (file != null)
+                if ((ok = file != null))
                 {
                     List<string> settings = Export();
 
@@ -2936,9 +3154,12 @@ namespace CNC.Core
                     file.Close();
                 }
             }
-            catch
+            catch (Exception e)
             {
+                MessageBox.Show(e.Message, "ioSender", MessageBoxButton.OK, MessageBoxImage.Exclamation);
             }
+
+            return ok;
         }
 
         public static string FormatFloat(string value, string format)
