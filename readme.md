@@ -13,6 +13,17 @@ Please check out the [Wiki](https://github.com/terjeio/Grbl-GCode-Sender/wiki) f
 Edge pre-releases can be [downloaded from here](https://www.io-engineering.com/downloads), they contains changes yet to be incorporated in a main release and might be buggy and even break existing functionality.  
 Use with care and please [post feedback](https://github.com/terjeio/ioSender/discussions/436) on any issues encountered!
 
+2.0.47p2:
+
+* Allow closing the app when running a job from SD card. Ref. [discussion comment](https://github.com/terjeio/ioSender/discussions/335#discussioncomment-14517412).
+Reconnecting while it is running may terminate the job depending on the controller, if not terminated the app will not be initialized correctly until the _Reset_ button has been pressed.
+
+* Fix for incorrect 3D rendering or arcs when negative scaling (G51) is active.
+
+* Improved keyboard mappings, new can mappings be added and existing ones can be removed by setting the _Method_ to "_None_". Ref. issue [#472](https://github.com/terjeio/ioSender/issues/476)
+
+* Fixed handling of serial port handshake (RTS or Xon/Xoff), the app config file has to be edited manually to set it.
+
 2.0.47p1:
 
 * Fix for regression causing "Start from here" and other menu items in the program listing popup to fail with exception. Ref. disussion [#469](https://github.com/terjeio/ioSender/discussions/469).
