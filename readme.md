@@ -13,6 +13,17 @@ Please check out the [Wiki](https://github.com/terjeio/Grbl-GCode-Sender/wiki) f
 Edge pre-releases can be [downloaded from here](https://www.io-engineering.com/downloads), they contains changes yet to be incorporated in a main release and might be buggy and even break existing functionality.  
 Use with care and please [post feedback](https://github.com/terjeio/ioSender/discussions/436) on any issues encountered!
 
+2.0.47p3:
+
+* Camera view crosshair can be moved (dragged) by \<SHIFT\> left clicking the left mouse button at the cross intersection to compensate for parallax. \<SHIFT\> right click to restore it to the center.
+Ref. [discussion 484](https://github.com/terjeio/ioSender/discussions/484).
+
+* Added parser support for G33.1 and G84.
+
+* Updated _Tools_ tab, list will now show tool name if available from the controller. Changed sort order to numeric.
+
+* Fixed some minor bugs.
+
 2.0.47p2:
 
 * Allow closing the app when running a job from SD card. Ref. [discussion comment](https://github.com/terjeio/ioSender/discussions/335#discussioncomment-14517412).
@@ -90,4 +101,4 @@ Lathe mode.
 Conversational programming for Lathe Mode. Threading requires [grblHAL](https://github.com/grblHAL) controller with driver that has spindle sync support.
 
 ---
-2025-06-21
+2025-11-11

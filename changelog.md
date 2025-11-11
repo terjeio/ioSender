@@ -1,5 +1,7 @@
 ## ioSender changelog
 
+2025-10-01:
+
 2025-06-05: [Release 2.0.46](https://github.com/terjeio/Grbl-GCode-Sender/releases/tag/2.0.46).
 
 * Fix for incorrect distance used for external edge probing.  Ref. issue [#467](https://github.com/terjeio/ioSender/issues/467).
