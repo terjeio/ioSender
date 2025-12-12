@@ -1,0 +1,12 @@
+﻿CNC.Controls.Camera.g.en-US.resources:configcontrol.baml,btn_getPosition:System.Windows.Controls.ContentControl.Content,Button,True,True,,取得目前位置
+CNC.Controls.Camera.g.en-US.resources:cameracontrol.baml,btn_moveOffset:System.Windows.Controls.ContentControl.Content,Button,True,True,,移動偏移
+CNC.Controls.Camera.g.en-US.resources:cameracontrol.baml,btn_useAsProbe:System.Windows.Controls.ContentControl.Content,Button,True,True,,作為探針位置
+CNC.Controls.Camera.g.en-US.resources:configcontrol.baml,chk_confirmMove:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,確認移動
+CNC.Controls.Camera.g.en-US.resources:configcontrol.baml,chk_moveToSpindle:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,初始移動至主軸
+CNC.Controls.Camera.g.en-US.resources:configcontrol.baml,fld_xOffset:CNC.Controls.NumericField.Label,None,False,True,,X 偏移：
+CNC.Controls.Camera.g.en-US.resources:configcontrol.baml,fld_yOffset:CNC.Controls.NumericField.Label,None,False,True,,Y 偏移：
+CNC.Controls.Camera.g.en-US.resources:configcontrol.baml,grp_camera:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,相機
+CNC.Controls.Camera.g.en-US.resources:cameracontrol.baml,lbl_cameraToSpindlePosition:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,相機對準主軸
+CNC.Controls.Camera.g.en-US.resources:configcontrol.baml,lbl_offsetMotion:System.Windows.Controls.ContentControl.Content,Label,True,True,,偏移移動：
+CNC.Controls.Camera.g.en-US.resources:cameracontrol.baml,str_moveCameraTo:System.String.$Content,None,True,True,,要將相機移動到主軸位置嗎？
+CNC.Controls.Camera.g.en-US.resources:cameracontrol.baml,str_moveSpindleTo:System.String.$Content,None,True,True,,要將主軸移動到相機位置嗎？
