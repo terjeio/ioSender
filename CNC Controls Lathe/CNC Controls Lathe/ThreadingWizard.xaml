@@ -230,7 +230,13 @@
                         </MultiBinding>
                     </Controls:NumericField.Value>
                 </Controls:NumericField>
-                <Controls:NumericField Name="cvSpindleRPM" Label="Spindle:" Format="####0" Value="{Binding Path=RPM, Mode=TwoWay}" Unit="RPM" ColonAt="90" Style="{StaticResource ErrorStyle}"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top">
+                    <Controls:NumericField Name="cvSpindleRPM" Label="Spindle:" Format="####0" Value="{Binding Path=RPM, Mode=TwoWay}" Unit="RPM" ColonAt="90" Style="{StaticResource ErrorStyle}"/>
+                    <ComboBox x:Name="cbxSpindleDir" IsEditable="False" HorizontalAlignment="Left" VerticalAlignment="Center" Width="60" Height="22" Margin="0,2"
+                            DisplayMemberPath="Name" SelectedValuePath="Dir"
+                            ItemsSource="{Binding Path=SpindleDirections}"
+                            SelectedValue="{Binding Path=SpindleDir, Mode=TwoWay}"/>
+                </StackPanel>
                 <local:SpringPassControl x:Name="springPasses" IsPassesEnabled="{Binding Path=IsSpringPassesEnabled, Mode=TwoWay}" Value="{Binding Path=SpringPasses, Mode=TwoWay}" Margin="37,0,0,2"/>
             </StackPanel>
         </GroupBox>

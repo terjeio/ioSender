@@ -1142,7 +1142,7 @@ namespace CNC.Controls.Lathe
 
             model.gCode.Clear();
             model.gCode.Add(string.Format("G18 G{0} G{1}", thread.xmode == LatheMode.Radius ? "8" : "7", thread.IsImperial ? "20" : "21"));
-            model.gCode.Add(string.Format("M3S{0} G4P1", ((uint)thread.rpm).ToString()));
+            model.gCode.Add(string.Format("M{0}S{1} G4P1", model.SpindleDir == SpindleState.CW ? "3" : "4", ((uint)thread.rpm).ToString()));
             model.gCode.Add(string.Format("G0 X{0}", model.FormatValue(xstart)));
             model.gCode.Add(string.Format("G0 Z{0}", model.FormatValue(thread.zstart + model.config.ZClearance)));
 
@@ -1219,7 +1219,7 @@ namespace CNC.Controls.Lathe
 
             model.gCode.Clear();
             model.gCode.Add(string.Format("G18 G{0} G{1}", thread.xmode == LatheMode.Radius ? "8" : "7", thread.IsImperial ? "20" : "21"));
-            model.gCode.Add(string.Format("M3S{0} G4P1", ((uint)thread.rpm).ToString()));
+            model.gCode.Add(string.Format("M{0}S{1} G4P1", model.SpindleDir == SpindleState.CW ? "3" : "4", ((uint)thread.rpm).ToString()));
             model.gCode.Add(string.Format("G0 X{0}", model.FormatValue(xstart)));
             model.gCode.Add(string.Format("G0 Z{0}", model.FormatValue(model.config.ZClearance)));
 
