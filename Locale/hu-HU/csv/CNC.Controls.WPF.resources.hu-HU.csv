@@ -31,14 +31,14 @@ CNC.Controls.WPF.g.en-US.resources:portdialog.baml,btn_ok:System.Windows.Control
 CNC.Controls.WPF.g.en-US.resources:about.baml,btn_ok:System.Windows.Controls.ContentControl.Content,Button,True,True,,Ok
 CNC.Controls.WPF.g.en-US.resources:gcoderotatedialog.baml,btn_ok:System.Windows.Controls.ContentControl.Content,Button,True,True,,Ok
 CNC.Controls.WPF.g.en-US.resources:gcodewrapdialog.baml,btn_ok:System.Windows.Controls.ContentControl.Content,Button,True,True,,Ok
-CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,btn_reload:System.Windows.Controls.ContentControl.Content,Button,True,True,,Újratöltés
 CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,btn_reload:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,A beállítások újratöltése a vezérlőről.
+CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,btn_reload:System.Windows.Controls.ContentControl.Content,Button,True,True,,Újratöltés
 CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,btn_reset:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Ctrl+Shift+R
 CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,btn_reset:System.Windows.Controls.ContentControl.Content,Button,True,True,,Visszaállítás
 CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,btn_restore:System.Windows.Controls.ContentControl.Content,Button,True,True,,Visszaállítás
 CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,btn_rewind:System.Windows.Controls.ContentControl.Content,Button,True,True,,Visszatekerés
-CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,btn_save:System.Windows.Controls.ContentControl.Content,Button,True,True,,Mentés
 CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,btn_save:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Mentse el a módosított beállításokat a vezérlőbe.
+CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,btn_save:System.Windows.Controls.ContentControl.Content,Button,True,True,,Mentés
 CNC.Controls.WPF.g.en-US.resources:appconfigview.baml,btn_saveKeyMap:System.Windows.Controls.ContentControl.Content,Button,True,True,,Billentyűkiosztás mentése
 CNC.Controls.WPF.g.en-US.resources:appconfigview.baml,btn_saveSettings:System.Windows.Controls.ContentControl.Content,Button,True,True,,Beállítások mentése
 CNC.Controls.WPF.g.en-US.resources:mdicontrol.baml,btn_send:System.Windows.Controls.ContentControl.Content,Button,True,True,,Küld
@@ -70,11 +70,11 @@ CNC.Controls.WPF.g.en-US.resources:steppercalibrationwizard.baml,fld_distance:CN
 CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_fastDistance:CNC.Controls.NumericField.Label,None,False,True,,Gyors távolság:
 CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_fastFeedrate:CNC.Controls.NumericField.Label,None,False,True,,Gyors előtolás:
 CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_fastFeedrate:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
-CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,fld_findSetting:CNC.Controls.NumericField.Unit,None,True,True,,
-CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,fld_findSetting:CNC.Controls.NumericField.Label,None,True,True,,Setting:
-CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,fld_findSetting:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Search for setting
-CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,fld_findSetting:CNC.Controls.NumericField.Unit,None,True,True,,
 CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,fld_findSetting:CNC.Controls.NumericField.KeyDown,None,True,True,,searchField_KeyDown
+CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,fld_findSetting:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Search for setting
+CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,fld_findSetting:CNC.Controls.NumericField.Label,None,True,True,,Setting:
+CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,fld_findSetting:CNC.Controls.NumericField.Unit,None,True,True,,
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,fld_findSetting:CNC.Controls.NumericField.Unit,None,True,True,,
 CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_maxBuffer:CNC.Controls.NumericField.Label,None,False,True,,Max puffer:
 CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_maxBuffer:CNC.Controls.NumericField.Unit,None,False,True,,bájtok
 CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_maxBuffer:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Maximális felhasznált soros pufferméret (a jelentett érték 90%-ára korlátozva).
@@ -130,6 +130,8 @@ CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,hdr_size:System.Windows.Contr
 CNC.Controls.WPF.g.en-US.resources:toolview.baml,hdr_tool:System.Windows.Controls.DataGridColumn.Header,None,True,True,,Eszköz
 CNC.Controls.WPF.g.en-US.resources:consolecontrol.baml,label_filterRT:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Szűrje ki a valós idejű válaszokat
 CNC.Controls.WPF.g.en-US.resources:consolecontrol.baml,label_showAll:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Az összes valós idejű válasz megjelenítése
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_addLineNumbers:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Add line numbers
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_addLineNumbers:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Add linenumbers if the controller is configured to report them.
 CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_agressiveBuffering:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Egynél több GCode blokkot pufferel a vezérlőben a gördülékenyebb végrehajtás érdekében. Csak a grblHAL számára!
 CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_agressiveBuffering:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Agresszív pufferelés
 CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_autoCompressGcode:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Eltávolítja a felesleges gcode parancselemeket.
@@ -165,6 +167,7 @@ CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_FilterOk:System.W
 CNC.Controls.WPF.g.en-US.resources:consolecontrol.baml,lbl_filterRT:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Szűrje ki a valós idejű válaszokat
 CNC.Controls.WPF.g.en-US.resources:coolantcontrol.baml,lbl_flood:CNC.Controls.ToggleControl.Label,None,False,True,,Árvíz
 CNC.Controls.WPF.g.en-US.resources:portdialog.baml,lbl_ipAddress:System.Windows.Controls.ContentControl.Content,Label,True,True,,IP-cím:
+CNC.Controls.WPF.g.en-US.resources:jogbasecontrol.baml,lbl_jogContinuous:System.Windows.Controls.ContentControl.Content,RadioButton,True,True,,Continuous
 CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_keepMdiFocus:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Egynél több GCode blokkot pufferel a vezérlőben a gördülékenyebb végrehajtás érdekében. Csak a grblHAL számára!
 CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_keepMdiFocus:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Tartsa az MDI fókuszt
 CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,lbl_linkStepToUi:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Lépéstávolság összekapcsolása a felhasználói felület kocogásával
@@ -220,6 +223,7 @@ CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,mnu_enableRewind:System.Windo
 CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,mnu_run:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Fut
 CNC.Controls.WPF.g.en-US.resources:gcodelistcontrol.baml,mnu_sendToController:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Send to controller
 CNC.Controls.WPF.g.en-US.resources:gcodelistcontrol.baml,mnu_startFromHere:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Start from here
+CNC.Controls.WPF.g.en-US.resources:gcodelistcontrol.baml,mnu_ToggleBreak:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,Toggle Break
 CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,mnu_viewAll:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,List CNC files only
 CNC.Controls.WPF.g.en-US.resources:appconfigview.baml,msg_restart:System.String.$Content,None,True,True,,A beállítások módosítása után újraindítás szükséges!
 CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,pnl_kbdJogging:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Figyelem! - A Grbl-nek kiemelkedő hibái vannak a kocogó-megszakításnál (felfelé mutató gombnál).

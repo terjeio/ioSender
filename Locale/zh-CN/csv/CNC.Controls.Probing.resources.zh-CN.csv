@@ -79,15 +79,15 @@ CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,hdr_preview:System.W
 CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,lbl_addOffset:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,添加偏移量
 CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,lbl_addOffset:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,"确定直角工件的X0,Y0"
 CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,lbl_addOffset:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,在左边缘添加一个探测点。
-CNC.Controls.Probing.g.en-US.resources:configcontrol.baml,lbl_chkProbeConnected:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,手动验证探头是否已连接
 CNC.Controls.Probing.g.en-US.resources:configcontrol.baml,lbl_chkProbeConnected:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,将显示一个对话框，直到探测成功或取消该对话框。
+CNC.Controls.Probing.g.en-US.resources:configcontrol.baml,lbl_chkProbeConnected:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,手动验证探头是否已连接
 CNC.Controls.Probing.g.en-US.resources:configcontrol.baml,lbl_chkProbeStatus:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,如果未启用且探头已置位，控制器将生成警报。
 CNC.Controls.Probing.g.en-US.resources:configcontrol.baml,lbl_chkProbeStatus:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,启动前检查探头状态（G59.3）
 CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,lbl_clearToolOffset:System.Windows.Controls.ContentControl.Content,Button,True,True,,清除刀具长度偏置
-CNC.Controls.Probing.g.en-US.resources:edgefinderintcontrol.baml,lbl_edgeoffsetxy:CNC.Controls.NumericField.Label,None,False,True,,Edge offset:
-CNC.Controls.Probing.g.en-US.resources:edgefindercontrol.baml,lbl_edgeoffsetxy:CNC.Controls.NumericField.Label,None,False,True,,Edge offset:
-CNC.Controls.Probing.g.en-US.resources:edgefinderintcontrol.baml,lbl_edgeoffsetxy:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Set to 0 to use 0.5 x probe/tool diameter
 CNC.Controls.Probing.g.en-US.resources:edgefindercontrol.baml,lbl_edgeoffsetxy:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Set to 0 to use 0.5 x probe/tool diameter
+CNC.Controls.Probing.g.en-US.resources:edgefinderintcontrol.baml,lbl_edgeoffsetxy:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Set to 0 to use 0.5 x probe/tool diameter
+CNC.Controls.Probing.g.en-US.resources:edgefindercontrol.baml,lbl_edgeoffsetxy:CNC.Controls.NumericField.Label,None,False,True,,Edge offset:
+CNC.Controls.Probing.g.en-US.resources:edgefinderintcontrol.baml,lbl_edgeoffsetxy:CNC.Controls.NumericField.Label,None,False,True,,Edge offset:
 CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,lbl_height:CNC.Controls.NumericField.Label,None,False,True,,高度:
 CNC.Controls.Probing.g.en-US.resources:edgefinderintcontrol.baml,lbl_height:CNC.Controls.NumericField.Label,None,False,True,,高度:
 CNC.Controls.Probing.g.en-US.resources:edgefindercontrol.baml,lbl_height:CNC.Controls.NumericField.Label,None,False,True,,高度:

@@ -13,6 +13,34 @@ Please check out the [Wiki](https://github.com/terjeio/Grbl-GCode-Sender/wiki) f
 Edge pre-releases can be [downloaded from here](https://www.io-engineering.com/downloads), they contains changes yet to be incorporated in a main release and might be buggy and even break existing functionality.  
 Use with care and please [post feedback](https://github.com/terjeio/ioSender/discussions/436) on any issues encountered!
 
+2.0.47p5:
+
+* [PR #491](https://github.com/terjeio/ioSender/pull/491) merged. Adds spindle dir combobox in threading wizard.
+
+* Added option to set "breakpoints" in programs that will halt execution with a feed hold \(M0\). Press _\<Cycle Start\>_ to continue after a break.
+Breakpoints are set via the popup menu available in the program listing.
+
+* Added option to add line numbers to gcode programs that does not have them. Enable in the _Settings: App_ tab, _Main_ group.
+If the controller is configured to output line numbers and line numbers are present in the program the current executing line will be flagged with "@" in the program listing.
+
+* Fix for arcs not displaying correctly when relative motion is active. Ref. issue [#499](https://github.com/terjeio/ioSender/issues/499).
+
+* Added methods to allow mapping shortcut keys for jogging all axes. Ref. discussion [#494](https://github.com/terjeio/ioSender/discussions/494).
+
+* Added option to select continuous jog in the jog UI, enabled touch control. Ref. issue [#498](https://github.com/terjeio/ioSender/issues/498) and [#468](https://github.com/terjeio/ioSender/issues/468).
+
+* Added support for navigating SD card directories. Note that this feature requires the controller to be configured to handle it, a $650 option for grblHAL.
+
+* Spindle can now be stopped in _Hold_ state.
+
+* Tool table is now sorted numerically, added tool name to listing when available from the controller.
+
+* Internal changes, some are work in progress such as full support for rotation commands and flow control.
+
+2.0.47p4:
+
+* Bug fix.
+
 2.0.47p3:
 
 * Camera view crosshair can be moved (dragged) by \<SHIFT\> left clicking the left mouse button at the cross intersection to compensate for parallax. \<SHIFT\> right click to restore it to the center.

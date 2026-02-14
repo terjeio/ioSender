@@ -79,15 +79,15 @@ CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,hdr_preview:System.W
 CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,lbl_addOffset:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Eltolás hozzáadása
 CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,lbl_addOffset:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,"Determine X0,Y0 for right angled workpiece"
 CNC.Controls.Probing.g.en-US.resources:rotationcontrol.baml,lbl_addOffset:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Adds a probe point on the left edge.
-CNC.Controls.Probing.g.en-US.resources:configcontrol.baml,lbl_chkProbeConnected:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,A szonda manuális ellenőrzése csatlakoztatva van
 CNC.Controls.Probing.g.en-US.resources:configcontrol.baml,lbl_chkProbeConnected:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,"Egy párbeszédpanel jelenik meg mindaddig, amíg a szondát érvényesítik vagy a párbeszédpanelt meg nem szakítják."
+CNC.Controls.Probing.g.en-US.resources:configcontrol.baml,lbl_chkProbeConnected:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,A szonda manuális ellenőrzése csatlakoztatva van
 CNC.Controls.Probing.g.en-US.resources:configcontrol.baml,lbl_chkProbeStatus:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,"A vezérlő riasztást generál, ha nincs engedélyezve, és a szonda érvényesül."
 CNC.Controls.Probing.g.en-US.resources:configcontrol.baml,lbl_chkProbeStatus:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,Indítás előtt ellenőrizze a szonda állapotát (G59.3)
 CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,lbl_clearToolOffset:System.Windows.Controls.ContentControl.Content,Button,True,True,,Tiszta szerszámhossz-eltolás
-CNC.Controls.Probing.g.en-US.resources:edgefinderintcontrol.baml,lbl_edgeoffsetxy:CNC.Controls.NumericField.Label,None,False,True,,Edge offset:
-CNC.Controls.Probing.g.en-US.resources:edgefindercontrol.baml,lbl_edgeoffsetxy:CNC.Controls.NumericField.Label,None,False,True,,Edge offset:
-CNC.Controls.Probing.g.en-US.resources:edgefinderintcontrol.baml,lbl_edgeoffsetxy:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Set to 0 to use 0.5 x probe/tool diameter
 CNC.Controls.Probing.g.en-US.resources:edgefindercontrol.baml,lbl_edgeoffsetxy:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Set to 0 to use 0.5 x probe/tool diameter
+CNC.Controls.Probing.g.en-US.resources:edgefinderintcontrol.baml,lbl_edgeoffsetxy:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Set to 0 to use 0.5 x probe/tool diameter
+CNC.Controls.Probing.g.en-US.resources:edgefindercontrol.baml,lbl_edgeoffsetxy:CNC.Controls.NumericField.Label,None,False,True,,Edge offset:
+CNC.Controls.Probing.g.en-US.resources:edgefinderintcontrol.baml,lbl_edgeoffsetxy:CNC.Controls.NumericField.Label,None,False,True,,Edge offset:
 CNC.Controls.Probing.g.en-US.resources:toollengthcontrol.baml,lbl_height:CNC.Controls.NumericField.Label,None,False,True,,Magasság:
 CNC.Controls.Probing.g.en-US.resources:edgefinderintcontrol.baml,lbl_height:CNC.Controls.NumericField.Label,None,False,True,,Magasság:
 CNC.Controls.Probing.g.en-US.resources:edgefindercontrol.baml,lbl_height:CNC.Controls.NumericField.Label,None,False,True,,Magasság:
