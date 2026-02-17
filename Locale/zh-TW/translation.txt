@@ -1,0 +1,712 @@
+Id	Control	Uid	Category	Original	Translated
+1693	jobparametersdialog	fld_rpm	None		
+1686	grblconfigcontrol	fld_findSetting	None		
+1634	grblconfigview	fld_findSetting	None		
+1692	centerfindercontrol	fld_passes	None		
+1505	configcontrol	fld_toolScalePct	None	%	%
+1410	libstrings	str_contHomeUnlock	None	&lt;Home&gt; or &lt;Unlock&gt; to continue	&lt;歸位&gt; 或者 &lt;解鎖&gt; 然後繼續
+1409	libstrings	str_contHome	None	&lt;Home&gt; to continue	&lt;歸位&gt; 然後繼續
+1411	libstrings	str_contResetUnlock	None	&lt;Reset&gt; then &lt;Unlock&gt; to continue	&lt;復位&gt;然後&lt;解鎖&gt;然後繼續
+1412	libstrings	str_contUnlock	None	&lt;Unlock&gt; to continue	&lt;解鎖&gt;然後繼續
+1059	probingview	btn_addProfile	Button	...	...
+1705	steppercalibrationwizard	str_CalibrationInstructions1	None	1. Select the axis to calibrate, Resolution is set from the underlying setting.	1. Select the axis to calibrate, Resolution is set from the underlying setting.
+1706	steppercalibrationwizard	str_CalibrationInstructions2	None	2. Jog to the starting positition in the same direction as the first &quot;Go&quot; move and mark it.	2. Jog to the starting positition in the same direction as the first &quot;Go&quot; move and mark it.
+1707	steppercalibrationwizard	str_CalibrationInstructions3	None	3. Enter the Distance to measure, Measured distance is linked to Distance so will be equal.	3. Enter the Distance to measure, Measured distance is linked to Distance so will be equal.
+1248	jobview	tab_3DView	Label	3D View	3D仿真
+1181	mainwindow	tab_3DView	Label	3D View	3D仿真
+1708	steppercalibrationwizard	str_CalibrationInstructions4	None	4. Press the appropriate &quot;Go&quot; button to move the entered distance, measure and enter the value in the Measured field.	4. Press the appropriate &quot;Go&quot; button to move the entered distance, measure and enter the value in the Measured field.
+1709	steppercalibrationwizard	str_CalibrationInstructions5	None	5. Press the opposite &quot;Go&quot; button to move back to the origin.\\nThis step can be skipped but avoids repositioning manually to the marked start position if multiple measurements are to be performed.	5. Press the opposite &quot;Go&quot; button to move back to the origin.\\nThis step can be skipped but avoids repositioning manually to the marked start position if multiple measurements are to be performed.
+1710	steppercalibrationwizard	str_CalibrationInstructions6	None	6. Press the &quot;Save&quot; button to update the setting.	6. Press the &quot;Save&quot; button to update the setting.
+1711	steppercalibrationwizard	str_CalibrationInstructions7	None	7. Repeat from step 4 (or 3). until the measured distance matches the commanded distance with the required accuracy.	7. Repeat from step 4 (or 3). until the measured distance matches the commanded distance with the required accuracy.
+1168	mainwindow	mnu_about	Menu	_About	_關於<E2D.tw翻譯>
+1060	heightmapcontrol	btn_apply	Button	_Apply	_應用
+1061	rotationcontrol	btn_apply	Button	_Apply	_應用
+1169	mainwindow	mnu_camera	Menu	_Camera	_攝像頭
+1170	mainwindow	mnu_close	Menu	_Close	_關閉
+1563	mainwindow	mnu_errorsAndAlarms	Menu	_Error and alarm codes	_錯誤和報警代碼
+1171	mainwindow	mnu_exit	Menu	_Exit	_退出
+1172	mainwindow	mnu_file	Menu	_File	_文件
+1485	gotoflyoutcontrol	str_gotoFlyout	None	_Goto	_轉到
+1173	mainwindow	mnu_help	Menu	_Help	_幫助
+1348	mainwindow	tab_jogSidebar	None	_Jog	_Jog
+1486	jogflyoutcontrol	str_jogFlyout	None	_Jog	_Jog
+1066	heightmapcontrol	btn_load	Button	_Load	_加載
+1174	mainwindow	mnu_load	Menu	_Load	_加載
+1368	macroexecutecontrol	str_macrosFlyout	None	_Macros	_宏按鈕
+1175	mainwindow	mnu_open	Menu	_Open	_打開
+1176	mainwindow	mnu_openConsole	Menu	_Open Console	_打開控制檯
+1370	outlineflyout	str_outlineFlyout	None	_Outline	_加工範圍
+1067	heightmapcontrol	btn_probe	Button	_Probe	_探測
+1068	heightmapcontrol	btn_save	Button	_Save	_保存
+1177	mainwindow	mnu_save	Menu	_Save	_保存
+1373	thcmonitorcontrol	str_ThcFlyout	None	_THC monitor	_等離子監控
+1178	mainwindow	mnu_transform	Menu	_Transform	_轉換
+1538	mainwindow	mnu_videoTutorials	Menu	_Video tutorials	_視頻教程
+1180	mainwindow	mnu_wiki	Menu	_Wiki	_幫助
+1565	mainwindow	mnu_briefTour	Menu	A _brief tour	_簡要遊覽
+1577	configcontrol	lbl_chkProbeConnected	ToolTip	A dialog will be shown until the probe is asserted or the dialog is cancelled.	將顯示一個對話框，直到探測成功或取消該對話框。
+1316	heightmapcontrol	str_heightMapInstructions	None	A rapid motion to the map origin including any probe offset will be performed before probing the height map starts.\\nEnsure the initial Z-position is clear of any obstacles that might be encountered during probing.	在開始探測高度圖之前,將執行到 X0Y0 的快速運動。\\n請確保初始Z位置在探測過程中不會碰撞到任何障礙物。
+1627	heightmapcontrol	str_heightMapAreaOrigin	None	A rapid motion to X{0} Y{1} will be performed.	A rapid motion to X{0} Y{1} will be performed.
+1328	appconfigview	msg_restart	None	A restart is required after changing settings!	更改設置後需要重新啓動！
+957	about	dlg_about	Title	About	關於
+1089	csselectcontrol	grp_action	Label	Action	行動
+1702	steppercalibrationwizard	fld_measured	None	Actual distance.	Actual distance.
+1617	macrodialog	mnu_add	Menu	Add	Add
+909	macroeditor	btn_add	Button	Add	添加
+1132	probingview	mnu_add	Menu	Add	添加
+1058	rotationcontrol	btn_addPosition	Button	Add _position	添加位置
+1380	mainwindow	str_mnuDragKnife	None	Add drag knife moves	添加拖刀動作
+1109	toollengthcontrol	lbl_addOffset	CheckBox	Add offset	添加偏移量
+1592	rotationcontrol	lbl_addOffset	ToolTip	Adds a probe point on the left edge.	在左邊緣添加一個探測點。
+989	basicconfigcontrol	lbl_agressiveBuffering	CheckBox	Agressive buffering	多個緩衝區塊
+1453	libstrings	str_grblStateAlarm	None	ALARM	報警代碼
+1560	errorsandalarms	tab_alarms	Label	Alarm codes	報警代碼
+1674	grblconfigcontrol	str_settingsWritten	None	All settings written to {0} in the sender folder.	所有設置均寫入上位機文件夾中的 {0}。
+920	jobcontrol	btn_cycleStart	ToolTip	Alt+R	Alt+R
+949	jobcontrol	btn_stop	ToolTip	Alt+S	Alt+S
+1111	configcontrol	lbl_chkProbeStatus	ToolTip	An alarm will be generated by the controller if not enabled and the probe is asserted.	如果未啓用且探頭已置位，控制器將生成警報。
+961	gcoderotatedialog	fld_angle	None	Angle:	角度：
+1321	rotationcontrol	str_rotationInitFailed	None	Angle: {0} deg	角度：{0} 度
+1221	configcontrol	fld_arcResolution	None	Arc resolution:	圓弧分辨率：
+1378	mainwindow	str_mnuArcsToLines	None	Arcs to lines	弧線到直線
+1600	libstrings	str_verifyStartFrom	None	Are you sure the controller is in the correct state to start from block {0}?	您確定控制器處於從塊 {0} 開始的正確狀態嗎？
+1599	libstrings	str_verifySendController	None	Are you sure you want to send the selected blocks to the controller?	您確定要將選定的行發送到控制器嗎？
+1251	heightmapcontrol	grp_probeArea	Label	Area to probe	探測區域
+1578	probeverify	str_probeVerify	Label	Assert probe to verify connection.	置位探針以驗證連接。
+1508	configcontrol	lbl_toolAutoScale	CheckBox	Auto scale tool	自動縮放工具
+991	basicconfigcontrol	lbl_autoCompressGcode	CheckBox	Auto-compress gcode on transforms	在轉換時自動壓縮G代碼
+1327	toollengthcontrol	str_toolLengthInitFailed	None	Axes must be homed before probing the fixture!	在探測夾具之前必須將軸歸位！
+1414	libstrings	str_gcParserAxisError	None	Axis command conflict	軸命令衝突
+1704	steppercalibrationwizard	lbl_axis	Label	Axis:	Axis:
+1447	libstrings	str_gcParserZPlus	None	Axisword(s) other than Z found	找到除Z以外的軸字
+1639	grblconfigcontrol	btn_backup	Button	Backup	備份
+1415	libstrings	str_gcParserBadExpr	None	Bad expression	不好的表達式
+1675	grblconfigview	tab_basicConfig	Label	Basic settings	基本設定
+1574	portdialog	lbl_serialBaud	Label	Baud rate:	鮑率:
+1585	libstrings	str_themeBlack	None	Black	黑色
+1145	configcontrol	lbl_blackBackgroud	CheckBox	Black background	黑色背景
+982	gcodelistcontrol	hdr_block	None	Block	區塊
+1256	signalscontrol	lbl_signalBlockDelete	ToolTip	Block delete	區塊刪除
+1389	libstrings	str_convBlockOfBlocks	None	Block: {0}/{1}	區塊: {0}/{1}
+1390	libstrings	str_convNumBlocks	None	Blocks: {1}	行：{1}
+1008	basicconfigcontrol	lbl_keepMdiFocus	ToolTip	Buffers more than one GCode block in controller for smoother execution. For grblHAL only!	在控制器中緩衝多行G代碼以使執行更流暢。只限grblHAL!
+990	basicconfigcontrol	lbl_agressiveBuffering	ToolTip	Buffers more than one GCode block in controller for smoother execution. For grblHAL only!	在控制器中緩衝多行G代碼以使執行更流暢。只限grblHAL!
+1669	grblconfigcontrol	str_settingsFail	None	Bummer...\\nContinue loading?	糟糕...\\n繼續加載嗎？
+1277	basicconfigcontrol	fld_maxBuffer	None	bytes	字節
+1050	configcontrol	grp_camera	Label	Camera	攝像頭
+1090	rotationcontrol	grp_camera	Label	Camera	攝像頭
+1533	probingview	str_cameraPosition	None	Camera position {0}, X: {1}, Y: {2}	攝像頭位置 {0}，X：{1}，Y：{2}
+1531	cameracontrol	lbl_cameraToSpindlePosition	CheckBox	camera to spindle	攝像頭到主軸
+1535	gcodewrapdialog	btn_cancel	Button	Cancel	取消
+912	gcoderotatedialog	btn_cancel	Button	Cancel	取消
+911	portdialog	btn_cancel	Button	Cancel	取消
+1052	dragknifedialog	btn_cancel	Button	Cancel	取消
+913	macroeditor	btn_cancel	Button	Cancel	取消
+1161	jobparametersdialog	bn_cancel	Button	Cancel	取消
+1423	libstrings	str_gcParserM66PandE	None	Cannot use both P- and E-word with M66	M66 不能同時使用 P 字和 E 字
+995	spindlecontrol	lbl_ccw	RadioButton	CCW	反轉
+1136	probingview	tab_Center	Label	Center finder	中心點查找
+996	statuscontrol	lbl_check	Label	Check	檢查
+1454	libstrings	str_grblStateCheck	None	CHECK	檢查
+1110	configcontrol	lbl_chkProbeStatus	CheckBox	Check probe status before start (G59.3)	啓動前檢查探頭狀態（G59.3）
+1506	jobcontrol	str_checking	None	Checking...	檢查…
+914	consolecontrol	btn_clear	Button	Clear	清除
+1062	csselectcontrol	btn_clear	Button	Clear	清除
+916	toolview	btn_clear	Button	Clear all	清除全部
+915	offsetview	btn_clear	Button	Clear all	清除全部
+1329	statuscontrol	str_clearEStop	None	Clear E-Stop before &lt;Reset&gt;&gt;	在復位前先清除警報
+1408	libstrings	str_contClearResetUnlock	None	clear then &lt;Reset&gt; then &lt;Unlock&gt; to continue	清除警報 &lt;復位&gt; &lt;解鎖&gt; 繼續
+1112	toollengthcontrol	lbl_clearToolOffset	Button	Clear tool length offset	清除刀具長度偏置
+1322	rotationcontrol	str_rotationInstructions	None	Click edge in image above to select probing action.\\nMove the probe to above the position indicated by green dot before start.	單擊上圖中的邊緣以選擇探測動作。\\n開始前將探頭移動到綠點指示的位置上方。
+1088	rotationcontrol	grd_action	ToolTip	Click edge to select probing action.	單擊邊緣以選擇探測操作。
+1312	edgefinderintcontrol	str_edgeIntFinderInstructions	None	Click edge, corner or center in image above to select probing action.\\nMove the probe to above the position indicated by green dot before start.	單擊上圖中的邊緣、角點或中心來選擇探測動作。\\n開始前將探頭移動到綠點指示的位置上方。
+1297	edgefindercontrol	str_EdgeFinderInstructions	None	Click edge, corner or center in image above to select probing action.\\nMove the probe to above the position indicated by green dot before start.	單擊上圖中的邊緣、角點或中心來選擇探測動作。\\n開始前將探頭移動到綠點指示的位置上方。
+1086	edgefinderintcontrol	grd_action	ToolTip	Click edge, corner or center to select probing action.	單擊邊緣、角或中心來選擇探測操作。
+1085	edgefindercontrol	grd_action	ToolTip	Click edge, corner or center to select probing action.	單擊邊緣、角或中心來選擇探測操作。
+1606	macrodialog	btn_actionMenu	ToolTip	Click for actions menu.	Click for actions menu.
+1296	centerfindercontrol	str_CenterFinderInstructions	None	Click image above to select probing action.\\nPlace the probe above the approximate center of the workpiece before start.	單擊上圖選擇探測動作。\\n開始前將探頭放置在工件大致中心上方。
+1064	probingview	btn_jog	Button	Click to activate keyboard jogging	單擊以激活鍵盤慢跑
+1087	centerfindercontrol	grd_action	ToolTip	Click to select probing action.	單擊以選擇探測操作。
+1101	rotationcontrol	grp_RotationCenter	ToolTip	Click to select rotation center relative to job, if not selected X0,Y0 is used.	單擊選擇相對於作業的旋轉中心，如果不選擇X0，則使用Y0。
+977	gcoderotatedialog	grp_rotationCenter	ToolTip	Click to select rotation center relative to job, if not selected X0,Y0 is used.	單擊選擇相對於工件的旋轉中心，如果不選擇X0，則使用Y0。
+1607	macrodialog	btn_close	Button	Close	關閉
+1556	grblerrorlist	hdr_errorCode	None	Code	代碼
+1554	grblalarmlist	hdr_alarmCode	None	Code	G代碼
+1417	libstrings	str_gcParserCmdUnknown	None	Command word not recognized	命令字無法識別
+1446	libstrings	str_gcParserWordRepeated	None	Command word repeated	命令字重複
+1621	macrodialog	txt_postprobecommands	ToolTip	Commands to after before probing completes.	Commands to after before probing completes.
+1622	macrodialog	txt_preprobecommands	ToolTip	Commands to run before probing starts.	Commands to run before probing starts.
+1379	mainwindow	str_mnuCompress	None	Compress (experimental)	壓縮（實驗）
+1509	renderer	str_toolCone	None	Cone	錐體
+1386	libstrings	str_appconfCreate	None	Config file not found or invalid, create new?	配置文件未找到或無效，是否創建新的？
+997	trinamicview	lbl_configure	Button	Configure	配置
+1516	macroeditor	chk_confirm	CheckBox	Confirm before executing	執行前確認
+1568	configcontrol	chk_confirmMove	CheckBox	Confirm move	確認移動
+1249	jobview	tab_console	Label	Console	控制檯
+1562	errorsandalarms	wnd_errorsAndAlarms	Title	Controller error and alarm codes	控制器錯誤和警報代碼
+1545	jobview	str_msgNoComm	None	Controller is in {0} state and cannot respond, try a soft reset?	控制器處於 {0} 狀態且無法響應，是否嘗試軟重置？
+1523	libstrings	str_msgNoComm	None	Controller is in {0} state and cannot respond, try a soft reset?	控制器處於 {0} 狀態且無法響應，是否嘗試軟重置？
+1524	libstrings	str_msgNoCommAlarm	None	Controller is not able to communicate due to alarm {0}, attempting a soft reset.	由於警報 {0}，控制器無法通信，正在嘗試軟重置。
+1546	jobview	str_msgNoCommAlarm	None	Controller is not able to communicate due to alarm {0}, attempting a soft reset.	由於警報 {0}，控制器無法通信，正在嘗試軟重置。
+1547	jobview	str_msgNoResponse	None	Controller is not responding!	控制器沒有響應！
+1525	libstrings	str_msgNoResponse	None	Controller is not responding!	控制器沒有響應！
+1526	libstrings	str_msgResetExit	None	Controller soft reset failed, exiting.	控制器軟重置失敗，正在退出。
+1527	libstrings	str_msgResetFailed	None	Controller soft reset failed, exiting.	控制器軟重置失敗，正在退出。
+1548	jobview	str_msgResetExit	None	Controller soft reset failed, exiting.	控制器軟重置失敗，正在退出。
+1549	jobview	str_msgResetFailed	None	Controller soft reset failed, exiting.	控制器軟重置失敗，正在退出。
+967	coolantcontrol	grp_coolant	Label	Coolant	冷卻液
+951	about	btn_toClipboard	ToolTip	Copy grbl version information and settings to clipboard	將 grbl 版本信息和設置複製到剪貼板
+1596	gcodelistcontrol	mnu_copyToMDI	Menu	Copy to MDI	複製到 MDI
+1387	libstrings	str_appconfCreateFail	None	Could not save config file.	無法保存配置文件。
+1510	renderer	str_toolCrosshair	None	Crosshair	十字線
+930	statuscontrol	btn_home	ToolTip	Ctrl+H	Ctrl+H
+1065	probingview	btn_jog	ToolTip	Ctrl+Shift to activate	Ctrl+Shift 激活
+938	statuscontrol	btn_reset	ToolTip	Ctrl+Shift+R	Ctrl+Shift+R
+953	statuscontrol	btn_unlock	ToolTip	Ctrl+U	Ctrl+U
+1146	configcontrol	lbl_cutColor	Label	Cut color:	切割顏色：
+1240	jobparametersdialog	fld_cutDepth	None	Cut depth:	銑削深度：
+1196	dragknifedialog	fld_cutDepth	None	Cut depth:	銑削深度：
+998	spindlecontrol	lbl_cw	RadioButton	CW	正轉
+919	jobcontrol	btn_cycleStart	Button	Cycle Start	開始加工
+1257	signalscontrol	lbl_signalCycleStart	ToolTip	Cycle start	開始加工
+1470	sdcardview	mnu_downloadRun	Menu	D_ownload and run	下載並運行
+1586	libstrings	str_themeDark	None	Dark	暗黑
+983	gcodelistcontrol	hdr_data	None	Data	數據
+1587	libstrings	str_themeDefault	None	Default	預設
+1514	configcontrol	fld_toolDiameter	ToolTip	Default tool diameter.	預設刀具直徑。
+1267	dragknifedialog	fld_retractAngle	None	deg	角度
+1269	dragknifedialog	fld_swivelAngle	None	deg	角度
+962	gcoderotatedialog	fld_angle	None	degrees	度
+965	basicconfigcontrol	fld_resetDelay	ToolTip	Delay to allow controller to finish booting before communication starts.	延遲，以便控制器在通訊開始前完成啟動。 
+1133	probingview	mnu_delete	Menu	Delete	刪除
+1039	sdcardview	mnu_delete	Menu	Delete	刪除
+1618	macrodialog	mnu_delete	Menu	Delete	Delete
+1330	sdcardview	str_deleteFile	None	Delete {0}?	刪除{0}？
+1197	dragknifedialog	fld_dentLength	None	Dent length:	凹痕長度:
+1202	probingview	fld_depth	None	Depth:	深度：
+1591	rotationcontrol	lbl_addOffset	CheckBox	Determine X0,Y0 for right angled workpiece	確定直角工件的X0,Y0
+1537	gcodewrapdialog	fld_diameter	None	Diameter:	直徑：
+1203	probingview	fld_diameter	None	Diameter:	直徑：
+1204	rotationcontrol	fld_distance	None	Distance	距離
+1480	jogbasecontrol	grp_jogDistance	Label	Distance	距離
+1232	joguiconfigcontrol	lbl_distance0	None	Distance 0:	距離 0:
+1233	joguiconfigcontrol	lbl_distance1	None	Distance 1:	距離 1:
+1234	joguiconfigcontrol	lbl_distance2	None	Distance 2:	距離 2：
+1235	joguiconfigcontrol	lbl_distance3	None	Distance 3:	距離 3：
+1167	mainwindow	lbl_jogStep	ToolTip	Distance for keyboard step jog (with &lt;CTRL&gt; modifier).	鍵盤步進點動的距離 (with &lt;CTRL&gt; modifier).
+1084	probingview	fld_offset	ToolTip	Distance from corner to probe	角點到探頭的距離
+1384	probingview	lbl_latchDistance	None	Distance to retract for second slow probing move, set to 0 to skip	第二次緩慢探測移動的縮回距離，設置爲 0 以跳過
+1700	steppercalibrationwizard	fld_distance	None	Distance:	Distance:
+1455	libstrings	str_grblStateDoor	None	DOOR	安全門
+1518	libstrings	str_msgDoorOpen	None	Door is open, close door and continue?	門打開，關上門並繼續嗎？
+1540	jobview	str_msgDoorOpen	None	Door is open, close door and continue?	門打開，關上門並繼續嗎？
+1539	jobview	str_msgDoorExit	None	Door is still open, exit?	門還開着,退出嗎？
+1517	libstrings	str_msgDoorExit	None	Door is still open, exit?	門還開着，要退出嗎？
+1519	libstrings	str_msgDoorPersist	None	Door state cannot be cleared with &lt;Reset&gt;	門狀態解除不能用&lt;復位&gt;
+1541	jobview	str_msgDoorPersist	None	Door state cannot be cleared with &lt;Reset&gt;	門狀態解除不能用&lt;復位&gt;
+1471	sdcardview	str_downloadAndRun	None	Download and run {0}?	下載並運行{0}？
+1472	sdcardview	str_downloading	None	Downloading {0}...	正在下載{0}…
+1054	dragknifedialog	dlg_dragKnife	Title	Drag knife parameters	拖刀參數
+968	drocontrol	grp_dro	Label	DRO	工件座標
+1418	libstrings	str_gcParserErrE	None	E word greater than half the drive line length	E字大於驅動線長度的一半
+1258	signalscontrol	lbl_signalEStop	ToolTip	E-Stop	急停
+1520	libstrings	str_msgEStop	None	E-Stop active! - clear before continuing...	急停已觸發！請先解除後再繼續...
+1542	jobview	str_msgEStop	None	E-Stop active! - clear before continuing...	急停已觸發！請先解除後再繼續...
+1543	jobview	str_msgEStopExit	None	E-Stop still active, exit?	急停仍然觸發，要退出嗎？
+1521	libstrings	str_msgEStopExit	None	E-Stop still active, exit?	急停仍然觸發，要退出嗎？
+1138	probingview	tab_edgeInternal	Label	Edge finder, external	尋邊器,外部
+1137	probingview	tab_edgeExternal	Label	Edge finder, internal	尋邊器,內部
+1610	edgefinderintcontrol	lbl_edgeoffsetxy	None	Edge offset:	Edge offset:
+1611	edgefindercontrol	lbl_edgeoffsetxy	None	Edge offset:	Edge offset:
+921	macroexecutecontrol	btn_edit	Button	Edit	編輯添加
+1147	configcontrol	lbl_enable	CheckBox	Enable	使能
+999	jogconfigcontrol	lbl_enable	CheckBox	Enable	使能
+1026	trinamicview	lbl_stallGuardEnable	CheckBox	Enable filter (SFILT)	啓用過濾器 (SFILT)
+1003	basicconfigcontrol	lbl_FilterOk	ToolTip	Enable if ok responses overwhelm console logging, typically happens when sending lots of short commands.	如果 ok 響應覆蓋了控制檯日誌記錄,則啓用,通常在發送大量短命令時發生。
+1040	sdcardview	mnu_enableRewind	Menu	Enable rewind	啓用快退
+1488	outlinebasecontrol	txt_line2	Text	Ensure tool tip is clear of any obstructions!	確保刀具不會碰到障礙物!! 
+1561	errorsandalarms	tab_errors	Label	Error codes	錯誤代碼
+1438	libstrings	str_gcParserRadiusErr	None	Error computing arc radius.	計算圓弧半徑時出錯。
+1129	toollengthcontrol	lbl_setRefernecOffset	CheckBox	Establish reference offset	建立參考偏移
+1487	outlinebasecontrol	txt_line1	Text	Execute moves to outline X and Y program limits.	執行動作,勾勒出程序X/Y的最大範圍。
+1583	mainwindow	tab_facing	Label	Facing	面銑
+1636	coolantcontrol	lbl_fan	None	Fan	風扇
+1223	jogconfigcontrol	fld_fastDistance	None	Fast distance:	快速距離：
+1224	jogconfigcontrol	fld_fastFeedrate	None	Fast feedrate:	快速進給速度：
+922	jobcontrol	btn_feedHold	Button	Feed Hold	進給保持
+1259	signalscontrol	lbl_signalFeedHold	ToolTip	Feed hold	進給保持
+969	feedcontrol	grp_feedrate	Label	Feed rate	進給倍率
+1481	jogbasecontrol	grp_jogFeedrate	Label	Feed rate	進給倍率
+1127	probingview	lbl_searchFeed	ToolTip	Feed rate for initial probing move	初始探測移動的進給速率
+1126	probingview	lbl_rapidsFeed	ToolTip	Feed rate for rapid moves, set to 0 to use controller setting	快速移動的進給速率,設置爲 0 以使用控制器設置
+1113	probingview	lbl_latchFeed	ToolTip	Feed rate for second slow probing move	第二次緩慢探測移動的進給速率
+1241	jobparametersdialog	fld_feedrate	None	Feed rate:	進給速率:
+1001	outlineflyout	lbl_feedrate	None	Feed rate:	進給速度:
+1484	outlinebasecontrol	lbl_feedrate	None	Feed rate:	進給速率:
+1236	joguiconfigcontrol	lbl_feedrate0	None	Feedrate 0:	進給倍率 0:
+1237	joguiconfigcontrol	lbl_feedrate1	None	Feedrate 1:	進給倍率 1:
+1238	joguiconfigcontrol	lbl_feedrate2	None	Feedrate 2:	進給倍率 2:
+1239	joguiconfigcontrol	lbl_feedrate3	None	Feedrate 3:	進給倍率 3:
+1332	sdcardview	str_illegalName	None	File: {0}\\n!,?,~ and SPACE is not supported in filenames, please rename.	文件：{0}\\n!,?,~ 不支援空白於檔名中，請重命名。
+1002	basicconfigcontrol	lbl_FilterOk	CheckBox	Filter &quot;ok&quot; response	過濾“ok” 回覆信息
+1046	consolecontrol	label_filterRT	CheckBox	Filter out realtime responses	過濾掉實時回覆
+1004	consolecontrol	lbl_filterRT	CheckBox	Filter out realtime responses	過濾掉實時回覆
+1205	probingview	fld_fixture	None	Fixture:	夾具：
+1637	coolantcontrol	lbl_flood	None	Flood	水冷
+1429	libstrings	str_gcParserNoG0orG1	None	G0 or G1 not active	G0 或 G1 未激活
+1419	libstrings	str_gcParserG1NoFeed	None	G1 used when feed rate is not set	未設定進給速度時使用G1
+1420	libstrings	str_gcParserG6NoP	None	G4 - missing P word	G4 - 缺少 P 字
+970	stripgcodeconfigcontrol	grp_gcodeStrip	Label	GCode command stripping	G代碼命令剝離
+1391	libstrings	str_rotateG17G18Arcs	None	GCode contains arcs in XZ or YZ plane (G18/19), can&apos;t apply transform. Use &apos;Arcs to Lines&apos; if you really need this.	GCode contains arcs in XZ or YZ plane (G18/19), can&apos;t apply transform. Use &apos;Arcs to Lines&apos; if you really need this.
+1360	libstrings	str_probingRadiusArcs	None	GCode contains arcs in XZ or YZ plane (G18/19), can&apos;t apply transform. Use &apos;Arcs to Lines&apos; if you really need this.	GCode contains arcs in XZ or YZ plane (G18/19), can&apos;t apply transform. Use &apos;Arcs to Lines&apos; if you really need this.
+1392	libstrings	str_rotateRadiusArcs	None	GCode contains radius mode arcs, can&apos;t apply transform. Use &apos;Arcs to Lines&apos; if you really need this.	GCode contains radius mode arcs, can&apos;t apply transform. Use &apos;Arcs to Lines&apos; if you really need this.
+1144	configcontrol	grp_gcodeViewer	Label	GCode Viewer	G代碼查看器
+917	offsetview	btn_currPos	Button	Get current position	獲取當前位置
+918	toolview	btn_currPos	Button	Get current position	獲取當前位置
+1048	configcontrol	btn_getPosition	Button	Get current position	獲取當前位置
+924	trinamicview	btn_getStatus	Button	Get status	獲取狀態
+925	trinamicview	btn_getStatusAll	Button	Get status, all drivers	獲取所有驅動程序的狀態
+926	outlineflyout	btn_go	Button	Go	Go
+1476	outlinebasecontrol	btn_go	Button	Go	Go
+1696	steppercalibrationwizard	btn_gopos	Button	Go+	Go+
+1694	steppercalibrationwizard	btn_goneg	Button	Go-	Go-
+1479	gotocontrol	grp_goto	Label	Goto	Goto
+1477	gotobasecontrol	btn_gotoG28	Button	Goto position 1 (G28)	轉到位置 1 (G28)
+1478	gotobasecontrol	btn_gotoG30	Button	Goto position 2 (G30)	轉到位置 2 (G30)
+1183	mainwindow	tab_grbl	Label	Grbl	Grbl
+1148	configcontrol	lbl_gridColor	Label	Grid color:	網格顏色：
+1246	heightmapcontrol	grp_gridSize	Label	Gridsize	網格尺寸
+1425	libstrings	str_gcParserNegH	None	H word is negative	H字負數
+1212	heightmapcontrol	lbl_height	None	H:	H:
+1139	probingview	tab_heightmap	Label	Height map	高度圖
+1354	libstrings	str_probingHeigthMapNarrow	None	Height map can&apos;t be infinitely narrow.	高度圖不能無限窄。
+1353	libstrings	str_probingHeigthMapMinSize	None	Height map must have at least 4 points.	高度圖必須至少有 4 個點。
+1213	edgefindercontrol	lbl_height	None	Height:	高度:
+1214	edgefinderintcontrol	lbl_height	None	Height:	高度:
+1614	toollengthcontrol	lbl_height	None	Height:	高度:
+1149	configcontrol	lbl_highlightColor	Label	Highlight color:	高亮顯示顏色：
+1150	configcontrol	lbl_highlightCompleted	CheckBox	Highlight completed cuts	高亮顯示已完成的刀路
+1456	libstrings	str_grblStateHold	None	HOLD	進給保持
+1457	libstrings	str_grblStateHome	None	HOME	歸位
+929	statuscontrol	btn_home	Button	Home	歸位
+1522	libstrings	str_msgHome	None	Homing cycle required, &lt;Home&gt; to continue	需要歸位循環,&lt;歸位&gt;然後繼續
+1544	jobview	str_msgHome	None	Homing cycle required, &lt;Home&gt; to continue	需要歸位循環,&lt;歸位&gt;然後繼續
+1430	libstrings	str_gcParserNoIandorJ	None	I and/or J word missing	I 和/或 J 詞缺失
+1442	libstrings	str_gcParserToolNoI	None	I word missing	I字缺失
+1688	grblconfigcontrol	hdr_settingId	None	Id	Id
+1458	libstrings	str_grblStateIdle	None	IDLE	空閒
+1604	libstrings	str_gcParserM66BadParams	None	Illegal M66 parameters	Illegal M66 parameters
+1553	libstrings	str_probingIllegalPosition	None	Illegal probe position, try again.	探頭位置非法,請重試。
+1301	centerfindercontrol	str_centerFinderInitFailed	None	Init failed!	初始化失敗！
+1569	configcontrol	chk_moveToSpindle	CheckBox	Inital move to spindle	初始移動到主軸
+1383	probingview	fld_xyClearance	None	Initial distance away from face to probe	工件表面到探頭的初始距離
+1416	libstrings	str_gcParserCMDInvalid	None	Invalid GCode	無效的 G 代碼
+1396	libstrings	str_validateRange	None	Invalid input: allowed range is {0} - {1}.	輸入無效：允許的範圍爲 {0} - {1}.
+1393	libstrings	str_validateMax	None	Invalid input: maximum allowed value is {0}.	輸入無效：允許的最大值爲 {0}.
+1394	libstrings	str_validateMin	None	Invalid input: minimum allowed value is {0}.	輸入無效：允許的最小值爲 {0}.
+1395	libstrings	str_validateNotIP4	None	Invalid input: not an IP4 address..	輸入無效：不是 IP4 地址。
+1006	portdialog	lbl_ipAddress	Label	IP address:	IP地址:
+1625	probingview	lbl_touchPlateXY	CheckBox	Is touch plate	Is touch plate
+1443	libstrings	str_gcParserToolNoJ	None	J word missing	J字缺失
+1426	libstrings	str_gcParserNegJ	None	J word negative	J字負數
+1331	jobcontrol	str_g28g30	None	Job has G28/G30 moves and machine is not homed.	加工程序有 G28/G30 移動且機器未回零。
+1341	jobcontrol	str_toolchanges	None	Job has {0} tool change(s) using M6, only a few Grbl ports supports that.	加工程序使用M6進行了 {0} 次刀具更換,只有少數 Grbl 端口支持自動換刀。
+1342	jobcontrol	str_toolchangeTLO	None	Job has {0} tool change(s), tool length reference should be established before start.	加工程序有 {0} 次換刀，在加工開始前應建立刀具長度參考。
+1459	libstrings	str_grblStateJog	None	JOG	JOG
+1451	mainwindow	str_jogStep	None	Jog step: {0}	Jog 一步: {0}
+1483	jogcontrol	grp_uijog	Label	Jogging	JOG
+1432	libstrings	str_gcParserNoK	None	K word missing	K字缺失
+1421	libstrings	str_gcParserKlesseqJ	None	K word must be greater than J word	K 字必須大於 J 字
+1427	libstrings	str_gcParserNegK	None	K word negative	K字負數
+1007	basicconfigcontrol	lbl_keepMdiFocus	CheckBox	Keep MDI focus	保持MDI焦點
+973	jogconfigcontrol	grp_kbdJogging	Label	Keyboard jogging	鍵盤JOG
+1317	probingview	str_jogActive	None	Keyboard jogging active	鍵盤點動激活
+1318	probingview	str_jogDisabled	None	Keyboard jogging disabled	鍵盤點動已禁用
+1566	libstrings	str_keymappingsSaved	None	Keymappings saved to {0}	按鍵映射已保存到 {0}
+1055	dragknifedialog	grp_knife	Label	Knife	刀
+1355	libstrings	str_probingLatchDistanceError	None	Latch distance must be less than Probing distance.	閂鎖距離必須小於探測距離。
+1215	probingview	lbl_latchDistance	None	Latch distance:	閂鎖距離：
+1216	probingview	lbl_latchFeed	None	Latch feed rate:	閂鎖進給速度：
+1631	mainwindow	tab_latheWizards	Label	Lathe Wizards	Lathe Wizards
+1588	libstrings	str_themeLight	None	Light	高亮
+1515	jogconfigcontrol	lbl_linkStepToUi	CheckBox	Link step distance to UI jogging	將步距顯示到JOG頁面
+1582	sdcardview	mnu_viewAll	Menu	List CNC files only	查看全部
+1623	sdcardview	chk_viewAll	CheckBox	List CNC files only	List CNC files only
+1024	trinamicview	lbl_sgLoad	Label	Load (SG_RESULT)	加載（SG_RESULT）
+1114	heightmapcontrol	lbl_lock	CheckBox	Lock	鎖
+1115	centerfindercontrol	lbl_lock	CheckBox	Lock	鎖
+1369	machinepositionflyout	str_mposFlyout	None	M_Pos	機械座標
+1009	machinepositionflyout	lbl_machinePosition	Text	Machine Position	機械座標
+958	macroeditor	dlg_macroEditor	Title	Macro Editor	宏編輯器
+1620	libstrings	str_macroChangedSave	None	Macro was changed, save?	Macro was changed, save?
+966	basicconfigcontrol	grb_mainConfig	Label	Main	Main
+1712	steppercalibrationwizard	str_CalibrationWarnings	None	Make sure there is room for the axis to move and avoid collision. Return move will add 0.5mm overshoot to remove any backlash from subsequent measurements.	Make sure there is room for the axis to move and avoid collision. Return move will add 0.5mm overshoot to remove any backlash from subsequent measurements.
+1576	configcontrol	lbl_chkProbeConnected	CheckBox	Manually validate probe is connected	手動驗證探頭是否已連接
+1225	basicconfigcontrol	fld_maxBuffer	None	Max buffer:	最大緩衝區:
+1385	probingview	lbl_probingDistance	None	Max. distance for probing moves	最大限度。 探測移動距離
+963	basicconfigcontrol	fld_maxBuffer	ToolTip	Maximum serial buffer size utilized (limited to 90% of reported value).	使用的最大串行緩衝區大小（限制爲報告值的 90%）。
+974	mdicontrol	grp_mdi	Label	MDI	MDI
+1579	csselectcontrol	btn_setMeasure	RadioButton	Measure	測量
+1701	steppercalibrationwizard	fld_measured	None	Measured:	Measured:
+1555	grblalarmlist	hdr_alarmMessage	None	Message	信息
+1557	grblerrorlist	hdr_errorMessage	None	Message	信息
+1222	configcontrol	fld_minDistance	None	Min distance:	最短距離：
+1638	coolantcontrol	lbl_mist	None	Mist	氣冷
+1266	dragknifedialog	fld_dentLength	None	mm	mm
+1270	dragknifedialog	fld_tipOffset	None	mm	mm
+1282	joguiconfigcontrol	lbl_distance0	None	mm	mm
+1283	joguiconfigcontrol	lbl_distance1	None	mm	mm
+1284	joguiconfigcontrol	lbl_distance2	None	mm	mm
+1265	dragknifedialog	fld_cutDepth	None	mm	mm
+1285	joguiconfigcontrol	lbl_distance3	None	mm	mm
+1290	jobparametersdialog	fld_cutDepth	None	mm	mm
+1513	configcontrol	fld_toolDiameter	None	mm	mm
+1295	jobparametersdialog	fld_toolChange	None	mm	mm
+1293	jobparametersdialog	fld_rapids	None	mm	mm
+1291	jobparametersdialog	fld_feedrate	None	mm/min	mm/min
+1289	joguiconfigcontrol	lbl_feedrate3	None	mm/min	mm/min
+1288	joguiconfigcontrol	lbl_feedrate2	None	mm/min	mm/min
+1292	jobparametersdialog	fld_plungeRate	None	mm/min	mm/min
+1287	joguiconfigcontrol	lbl_feedrate1	None	mm/min	mm/min
+1286	joguiconfigcontrol	lbl_feedrate0	None	mm/min	mm/min
+1281	jogconfigcontrol	fld_stepFeedrate	None	mm/min	mm/min
+1280	jogconfigcontrol	fld_slowFeedrate	None	mm/min	mm/min
+1272	probingview	lbl_latchFeed	None	mm/min	mm/min
+1273	probingview	lbl_rapidsFeed	None	mm/min	mm/min
+1274	probingview	lbl_searchFeed	None	mm/min	mm/min
+1276	jogconfigcontrol	fld_fastFeedrate	None	mm/min	mm/min
+1268	dragknifedialog	fld_retractDepth	None	mm/min	mm/min
+1424	libstrings	str_gcParserModalGrpError	None	Modal group violation	模態組違規
+1095	centerfindercontrol	grp_passes	ToolTip	More than one pass is usually needed to get accurate dimensions.	通常需要多次通過才能獲得準確的尺寸。
+1601	signalscontrol	lbl_signalMotorFault	ToolTip	Motor fault	Motor fault
+1260	signalscontrol	lbl_signalMotorWarning	ToolTip	Motor warning	電機警告
+1551	cameracontrol	str_moveCameraTo	None	Move camera to spindle position?	將相機移動到主軸位置？
+1049	cameracontrol	btn_moveOffset	Button	Move offset	移動偏移
+1552	cameracontrol	str_moveSpindleTo	None	Move spindle to camera position?	將主軸移動到相機位置？
+1011	mpgpending	lbl_mpgModeActive	Label	MPG mode active, waiting for it to be disabled...	MPG 模式已激活,等待其被禁用...
+1279	basicconfigcontrol	fld_resetDelay	None	ms	ms
+1278	basicconfigcontrol	fld_pollInterval	None	ms	ms
+984	sdcardview	hdr_name	None	Name	名字
+1689	grblconfigcontrol	hdr_settingName	None	Name	名字
+1042	portdialog	tab_network	Label	Network	以太網
+1628	sdcardview	str_noCard	None	No card mounted.	No card mounted.
+1473	sdcardview	str_notConnection	None	No connection.	無連接。
+1469	macroexecutecontrol	lbl_noMacrosDefined	Text	No macros defined, use Edit button to add.	沒有定義宏,請使用編輯按鈕添加
+1013	macroexecutecontrol	lbl_noMacrosDefined	Label	No macros defined, use Edit button to add.	沒有定義宏,請使用編輯按鈕添加
+1572	libstrings	str_msgNoResponseExit	None	No response received from controller, exiting.	未收到控制器的響應，正在退出。
+1511	renderer	str_toolNoShow	None	No tool	沒有刀具
+1014	spindlecontrol	lbl_off	RadioButton	Off	關閉
+985	offsetview	hdr_offset	None	Offset	偏移
+1051	configcontrol	lbl_offsetMotion	Label	Offset motion:	偏移運動：
+1015	offsetview	lbl_offset	Label	Offset:	座標系偏移:
+1016	workparameterscontrol	lbl_offset	Label	Offset:	座標系偏移:
+1206	probingview	fld_offset	None	Offset:	抵消：
+1185	mainwindow	tab_offsets	Label	Offsets	偏移量
+1626	probingview	lbl_touchPlateXY	ToolTip	Offsets are horizontal thickness of touchplate	Offsets are horizontal thickness of touchplate
+1536	gcodewrapdialog	btn_ok	Button	Ok	Ok
+932	about	btn_ok	Button	Ok	Ok
+931	portdialog	btn_ok	Button	Ok	Ok
+1053	dragknifedialog	btn_ok	Button	Ok	Ok
+1162	jobparametersdialog	btn_ok	Button	Ok	Ok
+933	gcoderotatedialog	btn_ok	Button	Ok	Ok
+934	macroeditor	btn_ok	Button	Ok	Ok
+1017	portdialog	lbl_onConnect	Label	On connect:	連接時:
+1448	libstrings	str_joggingOnly	None	Only jogging and some system commands are allowed when changing tool!	換刀時只允許點動和一些系統命令！
+1261	signalscontrol	lbl_signalOptionalStop	ToolTip	Optional stop	選擇停
+1482	outlinecontrol	grp_outline	Label	Outline	加工範圍
+1018	overridecontrol	lbl_override	Label	Override	倍率
+1434	libstrings	str_gcParserNoPandorQ	None	P and/or Q word missing	P 和/或 Q 字缺失
+1433	libstrings	str_gcParserNoP	None	P word missing	P字缺失
+1428	libstrings	str_gcParserNegP	None	P word negative	P字負數
+1422	libstrings	str_gcParserM66NoPorE	None	P- or E-word missing for M66	M66 缺少 P 或 E 字
+1186	mainwindow	tab_parting	Label	Parting	Parting
+1094	centerfindercontrol	grp_passes	Label	Passes	Passes
+1207	centerfindercontrol	fld_passes	None	Passes:	通過：
+1474	jobcontrol	str_pause	None	Pause	暫停
+1117	heightmapcontrol	lbl_pause	CheckBox	Pause before probing	探測前暫停
+1676	grblconfigview	tab_pidTuner	Label	PID Tuner	PID調節器
+1436	libstrings	str_gcParserPlaneNotXY	None	Plane not XY	平面不是 XY
+1437	libstrings	str_gcParserPlaneNotZx	None	Plane not ZX	平面不是 ZX
+1242	jobparametersdialog	fld_plungeRate	None	Plunge rate:	下降率：
+1226	basicconfigcontrol	fld_pollInterval	None	Poll interval:	輪詢間隔:
+1012	portdialog	lbl_netPort	Label	Port:	端口:
+1023	portdialog	lbl_serialPort	Label	Port:	端口:
+1615	macrodialog	lbl_postjobmacro	Label	Post job:	Post job:
+1616	macrodialog	lbl_prejobmacro	Label	Pre job:	Pre job:
+1581	libstrings	str_probingVerifyStart	None	Press [Start] again to start probing.	再次按[開始]開始探測。
+1695	steppercalibrationwizard	btn_goneg	ToolTip	Press to move in the negative direction.	Press to move in the negative direction.
+1697	steppercalibrationwizard	btn_gopos	ToolTip	Press to move in the positive direction.	Press to move in the positive direction.
+1118	centerfindercontrol	lbl_preview	CheckBox	Preview	預覽
+1120	rotationcontrol	lbl_preview	CheckBox	Preview	預覽
+1108	rotationcontrol	hdr_preview	Label	Preview	預覽
+1119	edgefinderintcontrol	lbl_preview	CheckBox	Preview	預覽
+1121	edgefindercontrol	lbl_preview	CheckBox	Preview	預覽
+1097	centerfindercontrol	grp_preview	Label	Preview	預覽
+1714	libstrings	str_prbPrimary	None	Primary	Primary
+1262	signalscontrol	lbl_signalProbe	ToolTip	Probe	探測
+1580	libstrings	str_probingNoVerifyContinue	None	Probe connection was not verified, continue anyway?	探針連接未驗證，是否仍繼續？
+1122	toollengthcontrol	lbl_probeFixture	CheckBox	Probe fixture @ G59.3	探針夾具 @G59.3
+1099	probingview	grp_probeTipOrTool	Label	Probe tip/tool	探針/刀具
+1124	edgefindercontrol	lbl_probeZ	CheckBox	Probe Z	探頭Z
+1123	edgefinderintcontrol	lbl_probeZ	CheckBox	Probe Z	探頭Z
+1096	probingview	grp_prbeProperties	Label	Probe/touchplate XY offsets	探頭 XY 偏移
+1713	workparameterscontrol	lbl_probe	Label	Probe:	Probe:
+1188	mainwindow	tab_probing	Label	Probing	探測
+1098	configcontrol	grp_probeConfig	Label	Probing	探測
+1595	libstrings	str_probingProbingAtX0Y0	None	Probing @X0Y0...	探測@X0Y0…
+1352	libstrings	str_probingFailedCancelled	None	Probing cancelled/failed.	探測已取消/失敗。
+1091	probingview	grp_clearances	Label	Probing clearances	探測間隙
+1305	edgefindercontrol	str_edgeFinderCompleted	None	Probing completed.	探測完成。
+1319	rotationcontrol	str_rotationCompleted	None	Probing completed.	探測完成。
+1325	toollengthcontrol	str_toolLengthCompleted	None	Probing completed.	探測完成。
+1309	edgefinderintcontrol	str_edgeIntFinderCompleted	None	Probing completed.	探測完成。
+1299	centerfindercontrol	str_centerFinderCompleted	None	Probing completed: X distance {0}, Y distance {1}.	探測完成：X 距離{0}，Y 距離{1}。
+1314	heightmapcontrol	str_heightMapCompleted	None	Probing completed: Z min: {0}, Z max: {1}.	探測完成:Z最小值:{0},Z最大值:{1}。
+1350	libstrings	str_probingDistanceError	None	Probing distance must be larger than XY Clearance + ½ Probe/tool diameter.	探測距離必須大於 XY 間隙 + ? 探頭/工具直徑。
+1217	probingview	lbl_probingDistance	None	Probing distance:	探測距離：
+1093	probingview	grp_distanceAndSpeed	Label	Probing distances and speed	探測距離和速度
+1320	rotationcontrol	str_rotationFailed	None	Probing failed	探測失敗
+1326	toollengthcontrol	str_toolLengthFailed	None	Probing failed	探測失敗
+1300	centerfindercontrol	str_centerFinderFailed	None	Probing failed	探測失敗
+1315	heightmapcontrol	str_heightMapFailed	None	Probing failed	探測失敗
+1310	edgefinderintcontrol	str_edgeIntFinderFailed	None	Probing failed	探測失敗
+1306	edgefindercontrol	str_edgeFinderFailed	None	Probing failed	探測失敗
+1351	libstrings	str_probingFailedAlarm	None	Probing failed with alarm, clear in Grbl tab.	探測失敗併發出警報，在 Grbl 選項卡中清除。
+1356	libstrings	str_probingNoPos	None	Probing failed, could not establish current machine position.	探測失敗，無法確定當前機器位置。
+1358	libstrings	str_probingNotIdle	None	Probing failed, Grbl is not in idle or tool changing state.	探測失敗,Grbl 未處於空閒或換刀狀態。
+1307	edgefindercontrol	str_edgeFinderInitFailed	None	Probing failed, machine position not known.	探測失敗，機器位置未知。
+1311	edgefinderintcontrol	str_edgeIntFinderInitFailed	None	Probing failed, machine position not known.	探測失敗，機器位置未知。
+1357	libstrings	str_probingNoProbe	None	Probing failed, probe is not connected.	探測失敗,探頭未連接。
+1359	libstrings	str_probingProbeAsserted	None	Probing failed, probe signal is asserted.	探測失敗,探測信號有效。
+1609	macrodialog	dlg_probingMacros	Title	Probing macros	Probing macros
+1594	heightmapcontrol	str_heightMapPointOf	None	Probing point {0} of {1}...	探測點 {0}（共 {1} 個）…
+1298	centerfindercontrol	str_centerFinderClearance	None	Probing XY clearance too large for workpiece {0} size.	探測 XY 間隙對於工件 {0} 尺寸來說太大。
+1302	centerfindercontrol	str_centerFinderPass	None	Probing, pass {0} of {1}...	正在探測，通過了 {0} 個，共 {1} 個…
+1349	libstrings	str_probing	None	Probing...	探測…
+1125	probingview	lbl_profile	Label	Profile:	輪廓：
+1250	jobview	tab_program	Label	Program	程序
+975	limitscontrol	grp_programLimits	Label	Program limits	程序範圍
+1431	libstrings	str_gcParserNoInvalidQ	None	Q word missing or out of range	Q 字缺失或超出範圍
+1439	libstrings	str_gcParserRless1	None	R word less than 1	R字小於1
+1435	libstrings	str_gcParserNoR	None	R word missing	R 字缺失
+1151	configcontrol	lbl_rapidsColor	Label	Rapids color:	快速顏色：
+1218	probingview	lbl_rapidsFeed	None	Rapids feed rate:	快速進給速度:
+1243	jobparametersdialog	fld_rapids	None	Rapids:	快速:
+1019	feedcontrol	lbl_rapids	Label	Rapids:	快速G0:
+1679	grblconfigcontrol	btn_reload	Button	Reload	重新加載
+1680	grblconfigcontrol	btn_reload	ToolTip	Reload settings from controller.	從控制器重新加載設置。
+992	basicconfigcontrol	lbl_autoCompressGcode	ToolTip	Removes superfluous gcode command elements.	刪除多餘的 gcode 命令。
+937	statuscontrol	btn_reset	Button	Reset	復位
+1263	signalscontrol	lbl_signalReset	ToolTip	Reset	復位
+1227	basicconfigcontrol	fld_resetDelay	None	Reset delay:	復位延遲:
+1502	viewer	btn_resetView	Button	Reset view	重置視圖
+1489	rendercontrol	resetView	ToolTip	Reset view (Ctrl+V)	重置視圖 (Ctrl+V)
+1703	steppercalibrationwizard	fld_resolution	None	Resolution:	Resolution:
+1494	rendercontrol	showGrid	Button	Resources/GridOn.png	Resources/GridOn.png
+1496	rendercontrol	showJobEnvelope	Button	Resources/JobBoxOn.png	Resources/JobBoxOn.png
+1503	rendercontrol	resetView	Button	Resources/ResetView.png	Resources/ResetView.png
+1490	rendercontrol	restoreView	Button	Resources/RestoreView.png	Resources/RestoreView.png
+1492	rendercontrol	saveView	Button	Resources/SaveView.png	Resources/SaveView.png
+1498	rendercontrol	showWorkEnvelope	Button	Resources/WorkBoxOn.png	Resources/WorkBoxOn.png
+1500	rendercontrol	showXYZMarkers	Button	Resources/XYZOn.png	Resources/XYZOn.png
+1605	macrodialog	btn_actionMenu	Button	Resources\\menu_22x22.png	Resources\\menu_22x22.png
+1681	grblconfigcontrol	btn_restore	Button	Restore	恢復
+1020	basicconfigcontrol	lbl_restoreWindowSize	CheckBox	Restore last window size on startup	在啓動時恢復上次窗口大小
+1672	grblconfigcontrol	str_settingsRestore	None	Restore settings from file	從文件恢復設置
+1491	rendercontrol	restoreView	ToolTip	Restore view (Ctrl+R)	恢復視圖 (Ctrl+R)
+1021	basicconfigcontrol	lbl_restoreWindowSize	ToolTip	Restore window size on next startup.	下次啓動時恢復窗口大小。
+1056	dragknifedialog	grp_retract	Label	Retract	縮回
+1198	dragknifedialog	fld_retractAngle	None	Retract angle:	縮回角度：
+1152	configcontrol	lbl_retractColor	Label	Retract color:	縮回顏色：
+1199	dragknifedialog	fld_retractDepth	None	Retract depth:	縮回深度：
+1057	dragknifedialog	lbl_retractEnable	CheckBox	Retract enable	縮回啓用
+940	jobcontrol	btn_rewind	Button	Rewind	重置發送列表
+956	sdcardview	dgr_sdcard	ToolTip	Right click for menu, double click to run file.	右鍵單擊菜單，雙擊運行文件。
+1381	mainwindow	str_mnuRotate	None	Rotate	旋轉
+1140	probingview	tab_Rotation	Label	Rotation	旋轉
+976	gcoderotatedialog	grp_rotationCenter	Label	Rotation center	旋轉中心
+1100	rotationcontrol	grp_RotationCenter	Label	Rotation center	旋轉中心
+1022	spindlecontrol	lbl_rpm	Label	RPM	轉速
+1244	jobparametersdialog	fld_rpm	None	RPM:	RPM:
+1041	sdcardview	mnu_run	Menu	Run	運行
+1460	libstrings	str_grblStateRun	None	RUN	運行
+1624	sdcardview	str_runMacro	None	Run macro {0} with no parameters?	Run macro {0} with no parameters?
+1608	macrodialog	chk_runonce	CheckBox	Run once	Run once
+1452	mainwindow	str_runTime	None	Run time: {0}	運行時間：{0}
+1529	macroexecutecontrol	str_runMacro	None	Run {0} macro?	運行 {0} 宏嗎？
+1333	macrotoolbarcontrol	str_runMacro	None	Run {0} macro?	要運行 {0} 宏嗎？
+1324	probingview	str_runMacro	None	Run {0} macro?	運行 {0} 宏嗎？
+1264	signalscontrol	lbl_signalSafetyDoor	ToolTip	Safety door	安全門
+1682	grblconfigcontrol	btn_save	Button	Save	保存
+1699	steppercalibrationwizard	btn_update	Button	Save	Save
+1683	grblconfigcontrol	btn_save	ToolTip	Save changed settings to controller.	將更改的設置保存到控制器。
+1564	appconfigview	btn_saveKeyMap	Button	Save keymappings	保存鍵盤映射
+943	appconfigview	btn_saveSettings	Button	Save settings	保存設置
+1493	rendercontrol	saveView	ToolTip	Save view	保存視圖
+1163	jobparametersdialog	grp_scalingFactors	Label	Scaling factors	比例因子
+1189	mainwindow	tab_sdCard	Label	SD Card	SD卡
+1449	libstrings	str_sdStreamComplete	None	SD Card streaming {0}% complete	SD 卡流式傳輸已完成 {0}%
+1219	probingview	lbl_searchFeed	None	Search feed rate:	搜索進給率：
+1687	grblconfigcontrol	fld_findSetting	ToolTip	Search for setting	Search for setting
+1684	grblconfigcontrol	fld_findSetting	None	searchField_KeyDown	searchField_KeyDown
+1715	libstrings	str_prbSecondary	None	Secondary	Secondary
+1275	configcontrol	fld_arcResolution	None	segments	段
+1313	edgefinderintcontrol	str_edgeIntFinderType	None	Select edge or corner to probe by clicking on the relevant part of the image above.	單擊上圖的相關部分，選擇要探測的邊緣或角點。
+1308	edgefindercontrol	str_edgeFinderType	None	Select edge or corner to probe by clicking on the relevant part of the image above.	單擊上圖的相關部分，選擇要探測的邊緣或角點。
+1323	rotationcontrol	str_rotationType	None	Select edge to probe by clicking on the relevant part of the image above.	單擊上圖的相關部分,選擇要探測的邊緣。
+1303	centerfindercontrol	str_centerFinderType	None	Select type of probe by clicking on one of the images above.	單擊上面的圖像之一選擇探頭類型。
+944	mdicontrol	btn_send	Button	Send	發送
+1629	basicconfigcontrol	lbl_sendComments	CheckBox	Send comments	Send comments
+1630	basicconfigcontrol	lbl_sendComments	ToolTip	Send complete comments.	Send complete comments.
+1597	gcodelistcontrol	mnu_sendToController	Menu	Send to controller	發送至控制器
+960	portdialog	dlg_title	Title	Sender connection	上位機連接
+1160	portdialog	dlg_connection	Title	Sender connection	上位機連接
+959	consolewindow	dlg_senderConsole	Title	Sender Console	上位機控制檯
+1043	portdialog	tab_serial	Label	Serial	串口
+945	coordvaluesetcontrol	btn_set	Button	Set	設置
+946	toolview	btn_setAll	Button	Set all	設置全部
+947	offsetview	btn_setAll	Button	Set all	設置全部
+1128	toollengthcontrol	lbl_setCoordOrOffset	CheckBox	Set coordinate system or offset	設置座標系或偏移
+1135	csselectcontrol	set_coord	RadioButton	Set coordinate system:	設置座標系：
+1063	heightmapcontrol	btn_fromLimits	Button	Set from program limits	從程序限制設置
+1069	csselectcontrol	btn_setG92	RadioButton	Set offset (G92)	設置偏置 (G92)
+1613	edgefindercontrol	lbl_edgeoffsetxy	ToolTip	Set to 0 to use 0.5 x probe/tool diameter	Set to 0 to use 0.5 x probe/tool diameter
+1612	edgefinderintcontrol	lbl_edgeoffsetxy	ToolTip	Set to 0 to use 0.5 x probe/tool diameter	Set to 0 to use 0.5 x probe/tool diameter
+1130	heightmapcontrol	lbl_setZ0AtX0Y0	CheckBox	Set Z = 0 at X0Y0:	Set Z = 0 at X0Y0:
+1668	grblconfigcontrol	str_settingsError	None	Setting {0} returned {1}, continue?	設置 {0} 返回 {1}，是否繼續？
+1685	grblconfigcontrol	fld_findSetting	None	Setting:	Setting:
+1667	grblconfigcontrol	str_saveSettings	None	Settings changed, save now?	設置已更改，現在保存嗎？
+1567	libstrings	str_settingsSaved	None	Settings saved.	設置已保存。
+1182	mainwindow	tab_appConfig	Label	Settings: App	設置：應用程序
+1184	mainwindow	tab_grblConfig	Label	Settings: Grbl	設置：Grbl
+1047	consolecontrol	label_showAll	CheckBox	Show all realtime responses	顯示所有實時回覆
+1025	consolecontrol	lbl_showAll	CheckBox	Show all realtime responses	顯示所有實時回覆
+1153	configcontrol	lbl_showAxes	CheckBox	Show axes	顯示軸
+1154	configcontrol	lbl_showBbox	CheckBox	Show bounding box	顯示邊界框
+1155	configcontrol	lbl_showCoordSys	CheckBox	Show coordinate system	顯示座標系
+1156	configcontrol	lbl_showGrid	CheckBox	Show grid	顯示網格
+1157	configcontrol	lbl_showOverlay	CheckBox	Show text overlay	顯示文本疊加
+1158	configcontrol	lbl_showViewCube	CheckBox	Show ViewCube	顯示視圖立方體
+978	signalscontrol	grp_signals	Label	Signals	信號狀態
+986	sdcardview	hdr_size	None	Size	大小
+1461	libstrings	str_grblStateSleep	None	SLEEP	睡眠
+1228	jogconfigcontrol	fld_slowDistance	None	Slow distance:	慢速距離：
+1229	jogconfigcontrol	fld_slowFeedrate	None	Slow feedrate:	慢速進給：
+1602	libstrings	str_settingsReloadMismatch	None	Some settings were ignored, not supported by the controller.	某些設置被忽略，控制器不支持。
+923	jobcontrol	btn_feedHold	ToolTip	Space	空間
+979	spindlecontrol	grp_spindle	Label	Spindle	主軸
+1164	jobparametersdialog	grp_spindle_feed	Label	Spindle and feed	主軸與進給
+980	trinamicview	grp_stallGuard	Label	stallGuard	檔位保護
+1073	edgefinderintcontrol	btn_start	Button	Start	啓動
+1072	edgefindercontrol	btn_start	Button	Start	啓動
+1075	centerfindercontrol	btn_start	Button	Start	啓動
+1070	heightmapcontrol	btn_start	Button	Start	啓動
+1074	rotationcontrol	btn_start	Button	Start	啓動
+1071	toollengthcontrol	btn_start	Button	Start	啓動
+1598	gcodelistcontrol	mnu_startFromHere	Menu	Start from here	從這裏開始
+1027	statuscontrol	lbl_state	Label	State:	狀態:
+1230	jogconfigcontrol	fld_stepDistance	None	Step distance:	步距：
+1231	jogconfigcontrol	fld_stepFeedrate	None	Step feedrate:	步進進給速度：
+1677	grblconfigview	tab_stepperCalibration	Label	Stepper calibration	Stepper calibration
+1077	heightmapcontrol	btn_stop	Button	Stop	停止
+1698	steppercalibrationwizard	btn_stop	Button	Stop	Stop
+1080	rotationcontrol	btn_stop	Button	Stop	停止
+948	jobcontrol	btn_stop	Button	Stop	停止
+1079	centerfindercontrol	btn_stop	Button	Stop	停止
+1081	edgefinderintcontrol	btn_stop	Button	Stop	停止
+1078	edgefindercontrol	btn_stop	Button	Stop	停止
+1076	toollengthcontrol	btn_stop	Button	Stop	停止
+1475	jobcontrol	str_stop	None	Stop	停止
+1441	libstrings	str_gcParserStripHdr	None	Strip command	剝離命令
+1200	dragknifedialog	fld_swivelAngle	None	Swivel angle:	旋轉角度：
+1670	grblconfigcontrol	str_settingsInvalid	None	The file does not contain any settings.	該文件不包含任何設置。
+1584	basicconfigcontrol	lbl_theme	Label	Theme:	主題:
+1190	mainwindow	tab_threading	Label	Threading	螺紋加工
+964	basicconfigcontrol	fld_pollInterval	ToolTip	Time between status request sent to controller.	狀態請求發送到控制器的間隔時間。
+1673	grblconfigcontrol	str_settingsTimeout	None	Timed out while setting {0}, continue?	設置 {0} 時超時，是否繼續？
+1201	dragknifedialog	fld_tipOffset	None	Tip offset:	尖端偏移：
+1028	toolview	lbl_tipRadius	None	Tip radius:	尖端半徑：
+950	about	btn_toClipboard	Button	To Clipboard	到剪貼板
+1559	gcodewrapdialog	lbl_wrapTarget	Label	to:	to:
+1501	rendercontrol	showXYZMarkers	ToolTip	Toggle axes visibility	切換軸可見性
+1495	rendercontrol	showGrid	ToolTip	Toggle grid visibility (Ctrl+G)	切換網格可見性 (Ctrl+G)
+1497	rendercontrol	showJobEnvelope	ToolTip	Toggle job bounds visibility (Ctrl+J)	切換工作邊界可見性 (Ctrl+J)
+1499	rendercontrol	showWorkEnvelope	ToolTip	Toggle machine work envelope visibility (Ctrl+W)	切換機器工作範圍可見性 (Ctrl+W)
+1462	libstrings	str_grblStateTool	None	TOOL	刀具:
+1165	jobparametersdialog	grp_tool	Label	Tool	刀具
+987	toolview	hdr_tool	None	Tool	刀具
+1245	jobparametersdialog	fld_toolChange	None	Tool change:	換刀：
+1512	configcontrol	fld_toolDiameter	None	Tool diameter:	刀具直徑：
+1141	probingview	tab_toolOffset	Label	Tool length offset	刀具長度偏置
+1444	libstrings	str_gcParserToolProfile	None	Tool {0} not associated with a profile	刀具 {0} 未與配置文件關聯
+1029	workparameterscontrol	lbl_tool	Label	Tool:	刀具:
+1030	toolview	lbl_tool	Label	Tool:	刀具:
+1191	mainwindow	tab_tools	Label	Tools	刀具
+1716	libstrings	str_prbToolSetter	None	Toolsetter	Toolsetter
+1102	probingview	grp_touchOrFixture	Label	Touch plate/fixture height	觸摸板/治具高度
+1208	probingview	fld_touchPlate	None	Touch plate:	觸摸板：
+1343	sdcardview	str_transferAborted	None	Transfer aborted.	傳輸中止。
+1507	jobcontrol	str_transferComplete	None	Transfer complete	傳輸完成
+1344	sdcardview	str_transferDone	None	Transfer done.	傳輸完成。
+1345	sdcardview	str_transferring	None	Transferred {0} of {1} bytes...	已傳輸 {0} 個字節，共 {1} 個字節…
+1678	grblconfigview	tab_trinamic	Label	Trinamic tuner	Trinamic tuner
+1658	steppercalibrationwizard	fld_resolution	None	True	True
+1193	mainwindow	tab_turning	Label	Turning	車削
+1468	joguiconfigcontrol	grp_uiJogging	Label	UI jogging	用戶JOG界面
+1388	libstrings	str_appconfNoConnect	None	Unable to open connection ({0})	無法打開連接 ({0})
+1450	libstrings	str_serialPortError	None	Unable to open serial port: {0}	無法打開串行端口：{0}
+1571	libstrings	str_msgBadResponseExit	None	Unexpected response received from controller: {0}, exiting.	從控制器收到意外響應：{0}，正在退出。
+1690	grblconfigcontrol	hdr_settingUnit	None	Unit	單元
+1463	libstrings	str_grblStateUnknown	None	UNKNOWN	未知
+952	statuscontrol	btn_unlock	Button	Unlock	解鎖
+1116	centerfindercontrol	lbl_lock	ToolTip	Unlock and set X or Y size to 0 to probe in one direction only.	解鎖並將 X 或 Y 尺寸設置爲 0，以便僅在一個方向上進行探測。
+1445	libstrings	str_gcParserUnsupportedCmd	None	Unsupported command	不支持的命令
+1134	probingview	mnu_update	Menu	Update	更新
+1619	macrodialog	mnu_update	Menu	Update	Update
+954	sdcardview	btn_upload	Button	Upload	上傳
+1346	sdcardview	str_uploading	None	Uploading...	正在上傳…
+1179	mainwindow	mnu_usageTips	Menu	Usage _tips	使用提示
+1530	cameracontrol	btn_useAsProbe	Button	Use as probe position	用作探頭位置
+1532	centerfindercontrol	btn_useCamera	Button	Use camera positions	使用相機位置
+1593	rotationcontrol	chk_useXY	CheckBox	Use X,Y	使用 X,Y
+1570	rotationcontrol	chk_useX0Y0	CheckBox	Use X0,Y0	使用X0,Y0
+1691	grblconfigcontrol	hdr_settingValue	None	Value	值
+1031	consolecontrol	lbl_verbose	CheckBox	Verbose	Verbose
+1220	heightmapcontrol	lbl_width	None	W:	W:
+1550	jobview	str_msgWait	None	Waiting for controller ({0})...	正在等待控制器 ({0})…
+1528	libstrings	str_msgWait	None	Waiting for controller ({0})...	正在等待控制器 ({0})…
+1247	jogconfigcontrol	pnl_kbdJogging	ToolTip	Warning! - Grbl has outstanding bug(s) in jog cancel (on key up).	警告！ - Grbl 在點動取消（按鍵上）方面存在衝突的錯誤。
+1142	probingview	txt_warning	Text	Warning! Use with care - incorrect parameters may damage your probe!	警告!小心使用 - 錯誤的參數可能會損壞您的探頭！
+1032	portdialog	lbl_websocket	CheckBox	WebSocket	WebSocket
+1589	libstrings	str_themeWhite	None	White	白色
+1131	toollengthcontrol	lbl_withTool	Label	with tool:	使用刀具:
+981	workparameterscontrol	grp_workparams	Label	Work Parameters	工作參數
+1103	toollengthcontrol	grp_workpiece	Label	Workpiece	工件
+1106	rotationcontrol	grp_workpiece	Label	Workpiece	工件
+1105	edgefinderintcontrol	grp_workpiece	Label	Workpiece	工件
+1104	edgefindercontrol	grp_workpiece	Label	Workpiece	工件
+1092	centerfindercontrol	grp_dimensions	Label	Workpiece dimensions	工件尺寸
+1107	toollengthcontrol	grp_workpieceOffset	Label	Workpiece offset	工件偏置
+1590	rotationcontrol	grp_workpieceOffset	Label	Workpiece offset	工件偏置
+1304	centerfindercontrol	str_centerFinderWpSize	None	Workpiece {0} size cannot be 0.	工件{0}尺寸不能爲0。
+1558	gcodewrapdialog	lbl_wrapSource	Label	Wrap:	Wrap:
+1034	toolview	lbl_xAxis	None	X axis:	X 軸:
+1465	probingview	fld_probeOffsetX	ToolTip	X offset from probe to controlled point	從探頭到控制點的 X 偏移
+1194	configcontrol	fld_xOffset	None	X offset:	X 偏移：
+1209	centerfindercontrol	fld_xSize	None	X size:	X 大小:
+1464	probingview	fld_probeOffsetX	None	X:	X:
+1210	probingview	fld_xyClearance	None	XY Clearance:	XY 間隙：
+1036	toolview	lbl_yAxis	None	Y axis:	Y 軸:
+1467	probingview	fld_probeOffsetY	ToolTip	Y offset from probe to controlled point	從探頭到控制點的 Y 偏移
+1195	configcontrol	fld_yOffset	None	Y offset:	Y 偏移：
+1211	centerfindercontrol	fld_ySize	None	Y size:	Y 大小:
+1466	probingview	fld_probeOffsetY	None	Y:	Y:
+1575	toolview	lbl_zAxis	None	Z axis:	Z 軸:
+1083	probingview	fld_depth	ToolTip	Z offset from current position where probing will take place	距當前探測位置的 Z 偏移量
+1166	jobparametersdialog	grp_zPosition	Label	Z positions (relative to workpiece surface)	Z位置(相對於工件表面)
+955	drocontrol	btn_zeroAll	Button	Zero all	全部清零
+1573	offsetview	lbl_axis	None	{0} axis:	{0} 軸:
+1440	libstrings	str_gcParserStrip	None	{0} command found, strip?	找到 {0} 命令，剝離？
+1534	centerfindercontrol	str_positionsRequired	None	{0} probe positions are required.	需要 {0} 個探針位置。
+1671	grblconfigcontrol	str_settingsReloadMismatch	None	{0} settings were ignored, not supported by the controller.	{0} 設置被忽略，控制器不支持。
+1413	libstrings	str_gcLoadError	None	{0}\\nLine: {1}\\nBlock: {2}\\n\\nContinue loading?	{0}\\nLine: {1}\\nBlock: {2}\\n\\n繼續加載?
