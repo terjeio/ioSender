@@ -17,7 +17,7 @@ Use with care and please [post feedback](https://github.com/terjeio/ioSender/dis
 
 * Fix for cannot close XL version when MPG mode is active. Ref. issue [#499](https://github.com/terjeio/ioSender/issues/499#issuecomment-3910302756).
 
-* Added some special words that can be used to send real time commands from macros:
+* Added some special words that can be used to send real time commands from macros:  
 `{park}` or `{safetydoor}` - send safety door command.  
 `{optionalstop}` - toggle optional stop switch.  
 `{singleblock}` - toggle single block switch.  
