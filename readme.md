@@ -13,6 +13,39 @@ Please check out the [Wiki](https://github.com/terjeio/Grbl-GCode-Sender/wiki) f
 Edge pre-releases can be [downloaded from here](https://www.io-engineering.com/downloads), they contains changes yet to be incorporated in a main release and might be buggy and even break existing functionality.  
 Use with care and please [post feedback](https://github.com/terjeio/ioSender/discussions/436) on any issues encountered!
 
+2.0.47p6:
+
+* Fix for cannot close XL version when MPG mode is active. Ref. issue [#499](https://github.com/terjeio/ioSender/issues/499#issuecomment-3910302756).
+
+* Added some special words that can be used to send real time commands from macros:
+`{park}` or `{safetydoor}` - send safety door command.  
+`{optionalstop}` - toggle optional stop switch.  
+`{singleblock}` - toggle single block switch.  
+`{probeconnected}` - toggle probe connected state.  
+<br>Whether or not these commands are acted upon depends on the controller configuration.
+> [!NOTE]
+> When used the macro has to contain only one special word and no other code. 
+
+* Added coordinate selector and associated _Go_ button to the _Goto_ flyout/panel that will execute a rapid move to the selected coordinate position. Use with care!
+
+* Added `JogBaseControl.KeyJogCancel` method that _has to be added_ on the _up_ event for keys used for triggering UI jog buttons when in _Continuous_ mode.
+
+* Added support for adding or modifying direct keyboard jog keycodes in the keymap file.  
+An example for the B axis:
+```
+  <KeyMapping>
+    <Key>D</Key>
+    <Method>Jogkey.Bplus</Method>
+  </KeyMapping>
+  <KeyMapping>
+    <Key>T</Key>
+    <Method>Jogkey.Bminus</Method>
+  </KeyMapping>
+```
+> [!NOTE]
+> Any keys mapped like this will override other mappings for the same keys when pressed alone, in combination with _\<Ctrl\>_ or in combination with _\<Shift\>_.  
+> Adding support for adding or modifying direct keyboard jog keycodes required a rather large refactoring of the keypress handler. Please report any odd behaviour!
+
 2.0.47p5:
 
 * [PR #491](https://github.com/terjeio/ioSender/pull/491) merged. Adds spindle dir combobox in threading wizard.
