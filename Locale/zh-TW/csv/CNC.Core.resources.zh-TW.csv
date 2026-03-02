@@ -1,0 +1,47 @@
+﻿CNC.Core.g.en-US.resources:libstrings.baml,str_contClearResetUnlock:System.String.$Content,None,True,True,,清除警報，然後 &lt;復位&gt;、&lt;解鎖&gt;，再繼續
+CNC.Core.g.en-US.resources:libstrings.baml,str_contHome:System.String.$Content,None,True,True,,&lt;回零&gt; 然後繼續
+CNC.Core.g.en-US.resources:libstrings.baml,str_contHomeUnlock:System.String.$Content,None,True,True,,&lt;回零&gt; 或 &lt;解鎖&gt; 然後繼續
+CNC.Core.g.en-US.resources:libstrings.baml,str_contResetUnlock:System.String.$Content,None,True,True,,&lt;復位&gt;、&lt;解鎖&gt; 然後繼續
+CNC.Core.g.en-US.resources:libstrings.baml,str_contUnlock:System.String.$Content,None,True,True,,&lt;解鎖&gt; 然後繼續
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcLoadError:System.String.$Content,None,True,True,,{0}\\nLine: {1}\\nBlock: {2}\\n\\n要繼續載入嗎？
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserAxisError:System.String.$Content,None,True,True,,軸命令衝突
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserBadExpr:System.String.$Content,None,True,True,,無效的運算式
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserCMDInvalid:System.String.$Content,None,True,True,,無效的 GCode
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserCmdUnknown:System.String.$Content,None,True,True,,無法識別的命令字
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserErrE:System.String.$Content,None,True,True,,E 字大於驅動線長度的一半
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserG1NoFeed:System.String.$Content,None,True,True,,使用 G1 時未設定進給速度
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserG6NoP:System.String.$Content,None,True,True,,G4 - 缺少 P 字
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserKlesseqJ:System.String.$Content,None,True,True,,K 字必須大於 J 字
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserM66BadParams:System.String.$Content,None,True,True,,M66 參數非法
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserM66NoPorE:System.String.$Content,None,True,True,,M66 缺少 P 或 E 字
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserM66PandE:System.String.$Content,None,True,True,,M66 不可同時使用 P 與 E 字
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserModalGrpError:System.String.$Content,None,True,True,,模態組違規
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNegH:System.String.$Content,None,True,True,,H 字為負值
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNegJ:System.String.$Content,None,True,True,,J 字為負值
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNegK:System.String.$Content,None,True,True,,K 字為負值
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNegP:System.String.$Content,None,True,True,,P 字為負值
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNoG0orG1:System.String.$Content,None,True,True,,G0 或 G1 未啟用
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNoIandorJ:System.String.$Content,None,True,True,,I 和／或 J 字缺失
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNoInvalidQ:System.String.$Content,None,True,True,,Q 字缺失或超出範圍
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNoK:System.String.$Content,None,True,True,,K 字缺失
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNoP:System.String.$Content,None,True,True,,P 字缺失
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNoPandorQ:System.String.$Content,None,True,True,,P 和／或 Q 字缺失
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserNoR:System.String.$Content,None,True,True,,R 字缺失
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserPlaneNotXY:System.String.$Content,None,True,True,,平面不是 XY
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserPlaneNotZx:System.String.$Content,None,True,True,,平面不是 ZX
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserRadiusErr:System.String.$Content,None,True,True,,計算圓弧半徑時發生錯誤
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserRless1:System.String.$Content,None,True,True,,R 字小於 1
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserStrip:System.String.$Content,None,True,True,,找到 {0} 命令，要剝離嗎？
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserStripHdr:System.String.$Content,None,True,True,,剝離命令
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserToolNoI:System.String.$Content,None,True,True,,I 字缺失
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserToolNoJ:System.String.$Content,None,True,True,,J 字缺失
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserToolProfile:System.String.$Content,None,True,True,,刀具 {0} 未與設定檔關聯
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserUnsupportedCmd:System.String.$Content,None,True,True,,不支援的命令
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserWordRepeated:System.String.$Content,None,True,True,,命令字重複
+CNC.Core.g.en-US.resources:libstrings.baml,str_gcParserZPlus:System.String.$Content,None,True,True,,找到 Z 以外的軸字
+CNC.Core.g.en-US.resources:libstrings.baml,str_joggingOnly:System.String.$Content,None,True,True,,換刀時僅允許點動與部分系統命令！
+CNC.Core.g.en-US.resources:libstrings.baml,str_prbPrimary:System.String.$Content,None,True,True,,主要
+CNC.Core.g.en-US.resources:libstrings.baml,str_prbSecondary:System.String.$Content,None,True,True,,次要
+CNC.Core.g.en-US.resources:libstrings.baml,str_prbToolSetter:System.String.$Content,None,True,True,,刀具測高器
+CNC.Core.g.en-US.resources:libstrings.baml,str_sdStreamComplete:System.String.$Content,None,True,True,,SD 卡串流傳輸已完成 {0}%
+CNC.Core.g.en-US.resources:libstrings.baml,str_serialPortError:System.String.$Content,None,True,True,,無法開啟序列埠：{0}
