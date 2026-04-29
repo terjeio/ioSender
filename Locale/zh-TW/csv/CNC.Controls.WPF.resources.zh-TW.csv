@@ -1,0 +1,325 @@
+﻿CNC.Controls.WPF.g.en-US.resources:macroeditor.baml,btn_add:System.Windows.Controls.ContentControl.Content,Button,True,True,,新增
+CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,btn_backup:System.Windows.Controls.ContentControl.Content,Button,True,True,,備份
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,btn_cancel:System.Windows.Controls.ContentControl.Content,Button,True,True,,取消
+CNC.Controls.WPF.g.en-US.resources:gcoderotatedialog.baml,btn_cancel:System.Windows.Controls.ContentControl.Content,Button,True,True,,取消
+CNC.Controls.WPF.g.en-US.resources:macroeditor.baml,btn_cancel:System.Windows.Controls.ContentControl.Content,Button,True,True,,取消
+CNC.Controls.WPF.g.en-US.resources:gcodewrapdialog.baml,btn_cancel:System.Windows.Controls.ContentControl.Content,Button,True,True,,取消
+CNC.Controls.WPF.g.en-US.resources:consolecontrol.baml,btn_clear:System.Windows.Controls.ContentControl.Content,Button,True,True,,清除
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,btn_clear:System.Windows.Controls.ContentControl.Content,Button,True,True,,全部清除
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,btn_clear:System.Windows.Controls.ContentControl.Content,Button,True,True,,全部清除
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,btn_currPos:System.Windows.Controls.ContentControl.Content,Button,True,True,,取得目前位置
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,btn_currPos:System.Windows.Controls.ContentControl.Content,Button,True,True,,取得目前位置
+CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,btn_cycleStart:System.Windows.Controls.ContentControl.Content,Button,True,True,,開始加工
+CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,btn_cycleStart:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Alt+R
+CNC.Controls.WPF.g.en-US.resources:macroexecutecontrol.baml,btn_edit:System.Windows.Controls.ContentControl.Content,Button,True,True,,編輯
+CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,btn_feedHold:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,空白鍵
+CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,btn_feedHold:System.Windows.Controls.ContentControl.Content,Button,True,True,,進給保持
+CNC.Controls.WPF.g.en-US.resources:trinamicview.baml,btn_getStatus:System.Windows.Controls.ContentControl.Content,Button,True,True,,取得狀態
+CNC.Controls.WPF.g.en-US.resources:trinamicview.baml,btn_getStatusAll:System.Windows.Controls.ContentControl.Content,Button,True,True,,取得所有驅動器狀態
+CNC.Controls.WPF.g.en-US.resources:outlineflyout.baml,btn_go:System.Windows.Controls.ContentControl.Content,Button,True,True,,執行
+CNC.Controls.WPF.g.en-US.resources:outlinebasecontrol.baml,btn_go:System.Windows.Controls.ContentControl.Content,Button,True,True,,執行
+CNC.Controls.WPF.g.en-US.resources:steppercalibrationwizard.baml,btn_goneg:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,向負方向移動
+CNC.Controls.WPF.g.en-US.resources:steppercalibrationwizard.baml,btn_goneg:System.Windows.Controls.ContentControl.Content,Button,True,True,,Go-
+CNC.Controls.WPF.g.en-US.resources:steppercalibrationwizard.baml,btn_gopos:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,向正方向移動
+CNC.Controls.WPF.g.en-US.resources:steppercalibrationwizard.baml,btn_gopos:System.Windows.Controls.ContentControl.Content,Button,True,True,,Go+
+CNC.Controls.WPF.g.en-US.resources:gotobasecontrol.baml,btn_gotoG28:System.Windows.Controls.ContentControl.Content,Button,True,True,,前往位置 1 (G28)
+CNC.Controls.WPF.g.en-US.resources:gotobasecontrol.baml,btn_gotoG30:System.Windows.Controls.ContentControl.Content,Button,True,True,,前往位置 2 (G30)
+CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,btn_home:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Ctrl+H
+CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,btn_home:System.Windows.Controls.ContentControl.Content,Button,True,True,,回零
+CNC.Controls.WPF.g.en-US.resources:macroeditor.baml,btn_ok:System.Windows.Controls.ContentControl.Content,Button,True,True,,確定
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,btn_ok:System.Windows.Controls.ContentControl.Content,Button,True,True,,確定
+CNC.Controls.WPF.g.en-US.resources:about.baml,btn_ok:System.Windows.Controls.ContentControl.Content,Button,True,True,,確定
+CNC.Controls.WPF.g.en-US.resources:gcoderotatedialog.baml,btn_ok:System.Windows.Controls.ContentControl.Content,Button,True,True,,確定
+CNC.Controls.WPF.g.en-US.resources:gcodewrapdialog.baml,btn_ok:System.Windows.Controls.ContentControl.Content,Button,True,True,,確定
+CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,btn_reload:System.Windows.Controls.ContentControl.Content,Button,True,True,,重新載入
+CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,btn_reload:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,從控制器重新載入設定
+CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,btn_reset:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Ctrl+Shift+R
+CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,btn_reset:System.Windows.Controls.ContentControl.Content,Button,True,True,,復位
+CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,btn_restore:System.Windows.Controls.ContentControl.Content,Button,True,True,,恢復
+CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,btn_rewind:System.Windows.Controls.ContentControl.Content,Button,True,True,,重置傳送列表
+CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,btn_save:System.Windows.Controls.ContentControl.Content,Button,True,True,,儲存
+CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,btn_save:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,將變更的設定儲存到控制器
+CNC.Controls.WPF.g.en-US.resources:appconfigview.baml,btn_saveKeyMap:System.Windows.Controls.ContentControl.Content,Button,True,True,,儲存鍵盤映射
+CNC.Controls.WPF.g.en-US.resources:appconfigview.baml,btn_saveSettings:System.Windows.Controls.ContentControl.Content,Button,True,True,,儲存設定
+CNC.Controls.WPF.g.en-US.resources:mdicontrol.baml,btn_send:System.Windows.Controls.ContentControl.Content,Button,True,True,,傳送
+CNC.Controls.WPF.g.en-US.resources:coordvaluesetcontrol.baml,btn_set:System.Windows.Controls.ContentControl.Content,Button,True,True,,設定
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,btn_setAll:System.Windows.Controls.ContentControl.Content,Button,True,True,,全部設定
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,btn_setAll:System.Windows.Controls.ContentControl.Content,Button,True,True,,全部設定
+CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,btn_stop:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Alt+S
+CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,btn_stop:System.Windows.Controls.ContentControl.Content,Button,True,True,,停止
+CNC.Controls.WPF.g.en-US.resources:steppercalibrationwizard.baml,btn_stop:System.Windows.Controls.ContentControl.Content,Button,True,True,,停止
+CNC.Controls.WPF.g.en-US.resources:about.baml,btn_toClipboard:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,將 grbl 版本資訊與設定複製到剪貼簿
+CNC.Controls.WPF.g.en-US.resources:about.baml,btn_toClipboard:System.Windows.Controls.ContentControl.Content,Button,True,True,,複製到剪貼簿
+CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,btn_unlock:System.Windows.Controls.ContentControl.Content,Button,True,True,,解鎖
+CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,btn_unlock:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,Ctrl+U
+CNC.Controls.WPF.g.en-US.resources:steppercalibrationwizard.baml,btn_update:System.Windows.Controls.ContentControl.Content,Button,True,True,,儲存
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,btn_upload:System.Windows.Controls.ContentControl.Content,Button,True,True,,上傳
+CNC.Controls.WPF.g.en-US.resources:drocontrol.baml,btn_zeroAll:System.Windows.Controls.ContentControl.Content,Button,True,True,,全部歸零
+CNC.Controls.WPF.g.en-US.resources:macroeditor.baml,chk_confirm:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,執行前確認
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,chk_viewAll:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,僅列出 CNC 檔案
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,dgr_sdcard:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,右鍵開啟選單，雙擊可執行檔案
+CNC.Controls.WPF.g.en-US.resources:about.baml,dlg_about:System.Windows.Window.Title,Title,True,True,,關於
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,dlg_connection:System.Windows.Window.Title,Title,True,True,,主機連線
+CNC.Controls.WPF.g.en-US.resources:macroeditor.baml,dlg_macroEditor:System.Windows.Window.Title,Title,True,True,,巨集編輯器
+CNC.Controls.WPF.g.en-US.resources:consolewindow.baml,dlg_senderConsole:System.Windows.Window.Title,Title,True,True,,主機控制台
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,dlg_title:System.Windows.Window.Title,Title,True,True,,主機連線
+CNC.Controls.WPF.g.en-US.resources:gcoderotatedialog.baml,fld_angle:CNC.Controls.NumericField.Label,None,True,True,,角度：
+CNC.Controls.WPF.g.en-US.resources:gcoderotatedialog.baml,fld_angle:CNC.Controls.NumericField.Unit,None,True,True,,度
+CNC.Controls.WPF.g.en-US.resources:gcodewrapdialog.baml,fld_diameter:CNC.Controls.NumericField.Label,None,True,True,,直徑：
+CNC.Controls.WPF.g.en-US.resources:steppercalibrationwizard.baml,fld_distance:CNC.Controls.NumericField.Label,None,True,True,,距離：
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_fastDistance:CNC.Controls.NumericField.Label,None,False,True,,快速距離：
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_fastFeedrate:CNC.Controls.NumericField.Label,None,False,True,,快速進給速度：
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_fastFeedrate:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,fld_findSetting:CNC.Controls.NumericField.Unit,None,True,True,,
+CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,fld_findSetting:CNC.Controls.NumericField.Label,None,True,True,,設定：
+CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,fld_findSetting:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,搜尋設定
+CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,fld_findSetting:CNC.Controls.NumericField.Unit,None,True,True,,
+CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,fld_findSetting:CNC.Controls.NumericField.KeyDown,None,True,True,,searchField_KeyDown
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_maxBuffer:CNC.Controls.NumericField.Label,None,False,True,,最大緩衝區：
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_maxBuffer:CNC.Controls.NumericField.Unit,None,False,True,,位元組
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_maxBuffer:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,使用的最大序列埠緩衝區大小（限制為回報值的 90%）
+CNC.Controls.WPF.g.en-US.resources:steppercalibrationwizard.baml,fld_measured:CNC.Controls.NumericField.Label,None,True,True,,實測值：
+CNC.Controls.WPF.g.en-US.resources:steppercalibrationwizard.baml,fld_measured:CNC.Controls.NumericField.Tooltip2,None,True,True,,實際距離
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_pollInterval:CNC.Controls.NumericField.Unit,None,False,True,,ms
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_pollInterval:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,向控制器發送狀態請求的間隔時間
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_pollInterval:CNC.Controls.NumericField.Label,None,False,True,,輪詢間隔：
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_resetDelay:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,"延遲，以便控制器在通訊開始前完成啟動"
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_resetDelay:CNC.Controls.NumericField.Label,None,False,True,,復位延遲：
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,fld_resetDelay:CNC.Controls.NumericField.Unit,None,False,True,,ms
+CNC.Controls.WPF.g.en-US.resources:steppercalibrationwizard.baml,fld_resolution:CNC.Controls.NumericField.Label,None,True,True,,解析度：
+CNC.Controls.WPF.g.en-US.resources:steppercalibrationwizard.baml,fld_resolution:CNC.Controls.NumericField.IsReadOnly,None,True,True,,True
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_slowDistance:CNC.Controls.NumericField.Label,None,False,True,,慢速距離：
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_slowFeedrate:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_slowFeedrate:CNC.Controls.NumericField.Label,None,False,True,,慢速進給：
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_stepDistance:CNC.Controls.NumericField.Label,None,False,True,,步距：
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_stepFeedrate:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,fld_stepFeedrate:CNC.Controls.NumericField.Label,None,False,True,,步進進給速度：
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,grb_mainConfig:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,主要設定
+CNC.Controls.WPF.g.en-US.resources:coolantcontrol.baml,grp_coolant:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,冷卻液
+CNC.Controls.WPF.g.en-US.resources:drocontrol.baml,grp_dro:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,工件座標
+CNC.Controls.WPF.g.en-US.resources:feedcontrol.baml,grp_feedrate:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,進給倍率
+CNC.Controls.WPF.g.en-US.resources:stripgcodeconfigcontrol.baml,grp_gcodeStrip:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,GCode 指令剝離
+CNC.Controls.WPF.g.en-US.resources:gotocontrol.baml,grp_goto:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,前往
+CNC.Controls.WPF.g.en-US.resources:jogbasecontrol.baml,grp_jogDistance:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,距離
+CNC.Controls.WPF.g.en-US.resources:jogbasecontrol.baml,grp_jogFeedrate:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,進給倍率
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,grp_kbdJogging:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,鍵盤點動
+CNC.Controls.WPF.g.en-US.resources:mdicontrol.baml,grp_mdi:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,MDI
+CNC.Controls.WPF.g.en-US.resources:outlinecontrol.baml,grp_outline:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,加工範圍
+CNC.Controls.WPF.g.en-US.resources:limitscontrol.baml,grp_programLimits:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,程式範圍
+CNC.Controls.WPF.g.en-US.resources:gcoderotatedialog.baml,grp_rotationCenter:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,點擊以選擇相對於工件的旋轉中心，若未選擇則使用 X0,Y0
+CNC.Controls.WPF.g.en-US.resources:gcoderotatedialog.baml,grp_rotationCenter:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,旋轉中心
+CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,grp_signals:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,訊號狀態
+CNC.Controls.WPF.g.en-US.resources:spindlecontrol.baml,grp_spindle:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,主軸
+CNC.Controls.WPF.g.en-US.resources:trinamicview.baml,grp_stallGuard:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,失速保護
+CNC.Controls.WPF.g.en-US.resources:jogcontrol.baml,grp_uijog:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,點動
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,grp_uiJogging:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,使用者點動介面
+CNC.Controls.WPF.g.en-US.resources:workparameterscontrol.baml,grp_workparams:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,工作參數
+CNC.Controls.WPF.g.en-US.resources:grblalarmlist.baml,hdr_alarmCode:System.Windows.Controls.DataGridColumn.Header,None,True,True,,GCode
+CNC.Controls.WPF.g.en-US.resources:grblalarmlist.baml,hdr_alarmMessage:System.Windows.Controls.DataGridColumn.Header,None,True,True,,訊息
+CNC.Controls.WPF.g.en-US.resources:gcodelistcontrol.baml,hdr_block:System.Windows.Controls.DataGridColumn.Header,None,True,True,,區塊
+CNC.Controls.WPF.g.en-US.resources:gcodelistcontrol.baml,hdr_data:System.Windows.Controls.DataGridColumn.Header,None,True,True,,資料
+CNC.Controls.WPF.g.en-US.resources:grblerrorlist.baml,hdr_errorCode:System.Windows.Controls.DataGridColumn.Header,None,True,True,,代碼
+CNC.Controls.WPF.g.en-US.resources:grblerrorlist.baml,hdr_errorMessage:System.Windows.Controls.DataGridColumn.Header,None,True,True,,訊息
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,hdr_name:System.Windows.Controls.DataGridColumn.Header,None,True,True,,名稱
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,hdr_offset:System.Windows.Controls.DataGridColumn.Header,None,True,True,,偏移
+CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,hdr_settingId:System.Windows.Controls.DataGridColumn.Header,None,True,True,,ID
+CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,hdr_settingName:System.Windows.Controls.DataGridColumn.Header,None,True,True,,名稱
+CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,hdr_settingUnit:System.Windows.Controls.DataGridColumn.Header,None,True,True,,單位
+CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,hdr_settingValue:System.Windows.Controls.DataGridColumn.Header,None,True,True,,值
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,hdr_size:System.Windows.Controls.DataGridColumn.Header,None,True,True,,大小
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,hdr_tool:System.Windows.Controls.DataGridColumn.Header,None,True,True,,刀具
+CNC.Controls.WPF.g.en-US.resources:consolecontrol.baml,label_filterRT:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,過濾即時回應
+CNC.Controls.WPF.g.en-US.resources:consolecontrol.baml,label_showAll:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,顯示所有即時回應
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_agressiveBuffering:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,在控制器中緩衝多行 GCode 以提升執行流暢度（僅限 grblHAL）
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_agressiveBuffering:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,多重緩衝區塊
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_autoCompressGcode:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,刪除多餘的 GCode 指令
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_autoCompressGcode:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,轉換時自動壓縮 GCode
+CNC.Controls.WPF.g.en-US.resources:steppercalibrationwizard.baml,lbl_axis:System.Windows.Controls.ContentControl.Content,Label,True,True,,軸：
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,lbl_axis:System.String.$Content,None,True,True,,{0} 軸：
+CNC.Controls.WPF.g.en-US.resources:spindlecontrol.baml,lbl_ccw:System.Windows.Controls.ContentControl.Content,RadioButton,True,True,,逆時針
+CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,lbl_check:System.Windows.Controls.ContentControl.Content,Label,True,True,,檢查
+CNC.Controls.WPF.g.en-US.resources:trinamicview.baml,lbl_configure:System.Windows.Controls.ContentControl.Content,Button,True,True,,設定
+CNC.Controls.WPF.g.en-US.resources:spindlecontrol.baml,lbl_cw:System.Windows.Controls.ContentControl.Content,RadioButton,True,True,,順時針
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_distance0:CNC.Controls.NumericField.Unit,None,False,True,,mm
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_distance0:CNC.Controls.NumericField.Label,None,False,True,,距離 0：
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_distance1:CNC.Controls.NumericField.Label,None,False,True,,距離 1：
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_distance1:CNC.Controls.NumericField.Unit,None,False,True,,mm
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_distance2:CNC.Controls.NumericField.Label,None,False,True,,距離 2：
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_distance2:CNC.Controls.NumericField.Unit,None,False,True,,mm
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_distance3:CNC.Controls.NumericField.Label,None,False,True,,距離 3：
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_distance3:CNC.Controls.NumericField.Unit,None,False,True,,mm
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,lbl_enable:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,啟用
+CNC.Controls.WPF.g.en-US.resources:coolantcontrol.baml,lbl_fan:CNC.Controls.ToggleControl.Label,None,False,True,,風扇
+CNC.Controls.WPF.g.en-US.resources:outlineflyout.baml,lbl_feedrate:CNC.Controls.NumericField.Label,None,True,True,,進給速度：
+CNC.Controls.WPF.g.en-US.resources:outlinebasecontrol.baml,lbl_feedrate:CNC.Controls.NumericField.Label,None,True,True,,進給速度：
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_feedrate0:CNC.Controls.NumericField.Label,None,False,True,,進給倍率 0：
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_feedrate0:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_feedrate1:CNC.Controls.NumericField.Label,None,False,True,,進給倍率 1：
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_feedrate1:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_feedrate2:CNC.Controls.NumericField.Label,None,False,True,,進給倍率 2：
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_feedrate2:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_feedrate3:CNC.Controls.NumericField.Label,None,False,True,,進給倍率 3：
+CNC.Controls.WPF.g.en-US.resources:joguiconfigcontrol.baml,lbl_feedrate3:CNC.Controls.NumericField.Unit,None,False,True,,mm/min
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_FilterOk:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,過濾「ok」回應
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_FilterOk:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,"若「ok」回應覆蓋控制台紀錄，可啟用此選項，常見於大量短指令傳送時"
+CNC.Controls.WPF.g.en-US.resources:consolecontrol.baml,lbl_filterRT:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,過濾即時回應
+CNC.Controls.WPF.g.en-US.resources:coolantcontrol.baml,lbl_flood:CNC.Controls.ToggleControl.Label,None,False,True,,水冷
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,lbl_ipAddress:System.Windows.Controls.ContentControl.Content,Label,True,True,,IP 位址：
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_keepMdiFocus:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,在控制器中緩衝多行 GCode 以提升執行流暢度（僅限 grblHAL）
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_keepMdiFocus:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,保持 MDI 焦點
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,lbl_linkStepToUi:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,在點動頁面顯示步距
+CNC.Controls.WPF.g.en-US.resources:machinepositionflyout.baml,lbl_machinePosition:System.Windows.Controls.TextBlock.Text,Text,True,True,,機械座標
+CNC.Controls.WPF.g.en-US.resources:coolantcontrol.baml,lbl_mist:CNC.Controls.ToggleControl.Label,None,False,True,,氣冷
+CNC.Controls.WPF.g.en-US.resources:mpgpending.baml,lbl_mpgModeActive:System.Windows.Controls.ContentControl.Content,Label,True,True,,"MPG 模式已啟用，等待停用..."
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,lbl_netPort:System.Windows.Controls.ContentControl.Content,Label,True,True,,連接埠：
+CNC.Controls.WPF.g.en-US.resources:macroexecutecontrol.baml,lbl_noMacrosDefined:System.Windows.Controls.ContentControl.Content,Label,True,True,,"尚未定義巨集，請使用編輯按鈕新增"
+CNC.Controls.WPF.g.en-US.resources:macroexecutecontrol.baml,lbl_noMacrosDefined:System.Windows.Controls.TextBlock.Text,Text,True,True,,"尚未定義巨集，請使用編輯按鈕新增"
+CNC.Controls.WPF.g.en-US.resources:spindlecontrol.baml,lbl_off:System.Windows.Controls.ContentControl.Content,RadioButton,True,True,,關閉
+CNC.Controls.WPF.g.en-US.resources:workparameterscontrol.baml,lbl_offset:System.Windows.Controls.ContentControl.Content,Label,True,True,,座標系偏移：
+CNC.Controls.WPF.g.en-US.resources:offsetview.baml,lbl_offset:System.Windows.Controls.ContentControl.Content,Label,True,True,,座標系偏移：
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,lbl_onConnect:System.Windows.Controls.ContentControl.Content,Label,True,True,,連線時：
+CNC.Controls.WPF.g.en-US.resources:overridecontrol.baml,lbl_override:System.Windows.Controls.ContentControl.Content,Label,True,True,,倍率
+CNC.Controls.WPF.g.en-US.resources:workparameterscontrol.baml,lbl_probe:System.Windows.Controls.ContentControl.Content,Label,True,True,,探針：
+CNC.Controls.WPF.g.en-US.resources:feedcontrol.baml,lbl_rapids:System.Windows.Controls.ContentControl.Content,Label,True,True,,快速 G0：
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_restoreWindowSize:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,啟動時恢復上次視窗大小
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_restoreWindowSize:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,下次啟動時恢復視窗大小
+CNC.Controls.WPF.g.en-US.resources:spindlecontrol.baml,lbl_rpm:System.Windows.Controls.ContentControl.Content,Label,True,True,,轉速
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_sendComments:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,傳送註解
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_sendComments:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,傳送完整註解
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,lbl_serialBaud:System.Windows.Controls.ContentControl.Content,Label,True,True,,鮑率：
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,lbl_serialPort:System.Windows.Controls.ContentControl.Content,Label,True,True,,連接埠：
+CNC.Controls.WPF.g.en-US.resources:trinamicview.baml,lbl_sgLoad:System.Windows.Controls.ContentControl.Content,Label,True,True,,負載（SG_RESULT）
+CNC.Controls.WPF.g.en-US.resources:consolecontrol.baml,lbl_showAll:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,顯示所有即時回應
+CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalBlockDelete:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,區塊刪除
+CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalCycleStart:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,開始加工
+CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalEStop:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,急停
+CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalFeedHold:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,進給保持
+CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalMotorFault:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,馬達故障
+CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalMotorWarning:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,馬達警告
+CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalOptionalStop:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,選擇性停機
+CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalProbe:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,探測
+CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalReset:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,復位
+CNC.Controls.WPF.g.en-US.resources:signalscontrol.baml,lbl_signalSafetyDoor:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,安全門
+CNC.Controls.WPF.g.en-US.resources:trinamicview.baml,lbl_stallGuardEnable:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,啟用過濾器 (SFILT)
+CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,lbl_state:System.Windows.Controls.ContentControl.Content,Label,True,True,,狀態：
+CNC.Controls.WPF.g.en-US.resources:basicconfigcontrol.baml,lbl_theme:System.Windows.Controls.ContentControl.Content,Label,True,True,,主題：
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,lbl_tipRadius:CNC.Controls.CoordValueSetControl.Label,None,True,True,,刀尖半徑：
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,lbl_tool:System.Windows.Controls.ContentControl.Content,Label,True,True,,刀具：
+CNC.Controls.WPF.g.en-US.resources:workparameterscontrol.baml,lbl_tool:System.Windows.Controls.ContentControl.Content,Label,True,True,,刀具：
+CNC.Controls.WPF.g.en-US.resources:consolecontrol.baml,lbl_verbose:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,詳細模式
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,lbl_websocket:System.Windows.Controls.ContentControl.Content,CheckBox,True,True,,WebSocket
+CNC.Controls.WPF.g.en-US.resources:gcodewrapdialog.baml,lbl_wrapSource:System.Windows.Controls.ContentControl.Content,Label,True,True,,來源：
+CNC.Controls.WPF.g.en-US.resources:gcodewrapdialog.baml,lbl_wrapTarget:System.Windows.Controls.ContentControl.Content,Label,True,True,,目標：
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,lbl_xAxis:CNC.Controls.CoordValueSetControl.Label,None,True,True,,X 軸：
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,lbl_yAxis:CNC.Controls.CoordValueSetControl.Label,None,True,True,,Y 軸：
+CNC.Controls.WPF.g.en-US.resources:toolview.baml,lbl_zAxis:CNC.Controls.CoordValueSetControl.Label,None,True,True,,Z 軸：
+CNC.Controls.WPF.g.en-US.resources:gcodelistcontrol.baml,mnu_copyToMDI:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,複製到 MDI
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,mnu_delete:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,刪除
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,mnu_downloadRun:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,下載並執行
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,mnu_enableRewind:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,啟用回退
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,mnu_run:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,執行
+CNC.Controls.WPF.g.en-US.resources:gcodelistcontrol.baml,mnu_sendToController:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,傳送至控制器
+CNC.Controls.WPF.g.en-US.resources:gcodelistcontrol.baml,mnu_startFromHere:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,從此開始
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,mnu_viewAll:System.Windows.Controls.HeaderedItemsControl.Header,Menu,True,True,,查看全部
+CNC.Controls.WPF.g.en-US.resources:appconfigview.baml,msg_restart:System.String.$Content,None,True,True,,變更設定後需要重新啟動！
+CNC.Controls.WPF.g.en-US.resources:jogconfigcontrol.baml,pnl_kbdJogging:System.Windows.FrameworkElement.ToolTip,ToolTip,True,True,,警告！Grbl 在點動取消（按鍵釋放）方面存在衝突錯誤。
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_appconfCreate:System.String.$Content,None,True,True,,找不到或無法讀取設定檔，要建立新的嗎？
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_appconfCreateFail:System.String.$Content,None,True,True,,無法儲存設定檔。
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_appconfNoConnect:System.String.$Content,None,True,True,,無法開啟連線 ({0})
+CNC.Controls.WPF.g.en-US.resources:steppercalibrationwizard.baml,str_CalibrationInstructions1:System.String.$Content,None,True,True,,"1. 選擇要校準的軸，解析度將依據底層設定自動帶入。"
+CNC.Controls.WPF.g.en-US.resources:steppercalibrationwizard.baml,str_CalibrationInstructions2:System.String.$Content,None,True,True,,2. 以與第一次「Go」移動相同方向點動至起始位置，並做好標記。
+CNC.Controls.WPF.g.en-US.resources:steppercalibrationwizard.baml,str_CalibrationInstructions3:System.String.$Content,None,True,True,,"3. 輸入要量測的距離，「實測距離」會與「距離」同步，因此初始值相同。"
+CNC.Controls.WPF.g.en-US.resources:steppercalibrationwizard.baml,str_CalibrationInstructions4:System.String.$Content,None,True,True,,"4. 按下對應的「Go」按鈕移動指定距離，量測後將結果輸入至「實測距離」。"
+CNC.Controls.WPF.g.en-US.resources:steppercalibrationwizard.baml,str_CalibrationInstructions5:System.String.$Content,None,True,True,,5. 按下相反方向的「Go」按鈕返回原點。\\n此步驟可略過，但若需多次量測，可避免手動重新對準起始位置。
+CNC.Controls.WPF.g.en-US.resources:steppercalibrationwizard.baml,str_CalibrationInstructions6:System.String.$Content,None,True,True,,6. 按下「儲存」按鈕以更新設定。
+CNC.Controls.WPF.g.en-US.resources:steppercalibrationwizard.baml,str_CalibrationInstructions7:System.String.$Content,None,True,True,,7. 從步驟 4（或 3）重複，直到實測距離與指令距離達到所需精度。
+CNC.Controls.WPF.g.en-US.resources:steppercalibrationwizard.baml,str_CalibrationWarnings:System.String.$Content,None,True,True,,請確認軸有足夠移動空間並避免碰撞。返回移動會額外加入 0.5mm 以消除背隙，確保後續量測準確。
+CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,str_checking:System.String.$Content,None,True,True,,檢查中…
+CNC.Controls.WPF.g.en-US.resources:statuscontrol.baml,str_clearEStop:System.String.$Content,None,True,True,,在復位之前請先清除警報 >>
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_convBlockOfBlocks:System.String.$Content,None,True,True,,行：{0}/{1}
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_convNumBlocks:System.String.$Content,None,True,True,,行：{1}
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,str_deleteFile:System.String.$Content,None,True,True,,刪除 {0}？
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,str_downloadAndRun:System.String.$Content,None,True,True,,下載並執行 {0}？
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,str_downloading:System.String.$Content,None,True,True,,正在下載 {0}…
+CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,str_g28g30:System.String.$Content,None,True,True,,加工程式包含 G28/G30 移動且機器尚未回零。
+CNC.Controls.WPF.g.en-US.resources:gotoflyoutcontrol.baml,str_gotoFlyout:System.String.$Content,None,True,True,,_前往
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_grblStateAlarm:System.String.$Content,None,True,True,,警報
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_grblStateCheck:System.String.$Content,None,True,True,,檢查
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_grblStateDoor:System.String.$Content,None,True,True,,安全門
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_grblStateHold:System.String.$Content,None,True,True,,進給保持
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_grblStateHome:System.String.$Content,None,True,True,,回零
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_grblStateIdle:System.String.$Content,None,True,True,,閒置
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_grblStateJog:System.String.$Content,None,True,True,,點動
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_grblStateRun:System.String.$Content,None,True,True,,執行中
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_grblStateSleep:System.String.$Content,None,True,True,,睡眠
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_grblStateTool:System.String.$Content,None,True,True,,刀具：
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_grblStateUnknown:System.String.$Content,None,True,True,,未知
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,str_illegalName:System.String.$Content,None,True,True,,"檔案：{0}\\n!,?,~ 及空白不支援於檔名中，請重新命名。"
+CNC.Controls.WPF.g.en-US.resources:jogflyoutcontrol.baml,str_jogFlyout:System.String.$Content,None,True,True,,_點動
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_keymappingsSaved:System.String.$Content,None,True,True,,按鍵映射已儲存至 {0}
+CNC.Controls.WPF.g.en-US.resources:macroexecutecontrol.baml,str_macrosFlyout:System.String.$Content,None,True,True,,_巨集按鈕
+CNC.Controls.WPF.g.en-US.resources:machinepositionflyout.baml,str_mposFlyout:System.String.$Content,None,True,True,,機械座標
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgBadResponseExit:System.String.$Content,None,True,True,,收到控制器的異常回應：{0}，正在退出。
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgDoorExit:System.String.$Content,None,True,True,,安全門仍開啟，要退出嗎？
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgDoorOpen:System.String.$Content,None,True,True,,安全門開啟，關閉後再繼續？
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgDoorPersist:System.String.$Content,None,True,True,,安全門狀態未解除，無法執行〈復位〉
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgEStop:System.String.$Content,None,True,True,,急停已按下！請先解除後再繼續…
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgEStopExit:System.String.$Content,None,True,True,,"急停仍然按下，要退出嗎？"
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgHome:System.String.$Content,None,True,True,,"需要執行回零循環，請〈回零〉後再繼續"
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgNoComm:System.String.$Content,None,True,True,,控制器處於 {0} 狀態且無法回應，是否嘗試軟重置？
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgNoCommAlarm:System.String.$Content,None,True,True,,因警報 {0} 控制器無法通訊，正在嘗試軟重置。
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgNoResponse:System.String.$Content,None,True,True,,控制器沒有回應！
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgNoResponseExit:System.String.$Content,None,True,True,,未收到控制器回應，正在退出。
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgResetExit:System.String.$Content,None,True,True,,控制器軟重置失敗，正在退出。
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgResetFailed:System.String.$Content,None,True,True,,控制器軟重置失敗，正在退出。
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_msgWait:System.String.$Content,None,True,True,,正在等待控制器 ({0})…
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,str_noCard:System.String.$Content,None,True,True,,未掛載記憶卡。
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,str_notConnection:System.String.$Content,None,True,True,,未連線。
+CNC.Controls.WPF.g.en-US.resources:outlineflyout.baml,str_outlineFlyout:System.String.$Content,None,True,True,,_加工範圍
+CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,str_pause:System.String.$Content,None,True,True,,暫停
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_rotateG17G18Arcs:System.String.$Content,None,True,True,,"GCode 在 XZ 或 YZ 平面（G18/19）中包含圓弧，無法套用變換。如確有需要，請使用「弧轉直線」。"
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_rotateRadiusArcs:System.String.$Content,None,True,True,,"GCode 包含半徑模式圓弧，無法套用變換。如確有需要，請使用「弧轉直線」。"
+CNC.Controls.WPF.g.en-US.resources:macrotoolbarcontrol.baml,str_runMacro:System.String.$Content,None,True,True,,要執行巨集 {0} 嗎？
+CNC.Controls.WPF.g.en-US.resources:macroexecutecontrol.baml,str_runMacro:System.String.$Content,None,True,True,,要執行巨集 {0} 嗎？
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,str_runMacro:System.String.$Content,None,True,True,,執行巨集 {0}（無參數）？
+CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,str_saveSettings:System.String.$Content,None,True,True,,設定已變更，現在要儲存嗎？
+CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,str_settingsError:System.String.$Content,None,True,True,,設定 {0} 回傳 {1}，要繼續嗎？
+CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,str_settingsFail:System.String.$Content,None,True,True,,糟糕…\\n要繼續載入嗎？
+CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,str_settingsInvalid:System.String.$Content,None,True,True,,此檔案不包含任何設定。
+CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,str_settingsReloadMismatch:System.String.$Content,None,True,True,,{0} 設定已被忽略，控制器不支援。
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_settingsReloadMismatch:System.String.$Content,None,True,True,,部分設定已被忽略，控制器不支援。
+CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,str_settingsRestore:System.String.$Content,None,True,True,,從檔案還原設定
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_settingsSaved:System.String.$Content,None,True,True,,設定已儲存。
+CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,str_settingsTimeout:System.String.$Content,None,True,True,,設定 {0} 時逾時，要繼續嗎？
+CNC.Controls.WPF.g.en-US.resources:grblconfigcontrol.baml,str_settingsWritten:System.String.$Content,None,True,True,,所有設定已寫入主機資料夾中的 {0}。
+CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,str_stop:System.String.$Content,None,True,True,,停止
+CNC.Controls.WPF.g.en-US.resources:thcmonitorcontrol.baml,str_ThcFlyout:System.String.$Content,None,True,True,,_電漿監控
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_themeBlack:System.String.$Content,None,True,True,,黑色
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_themeDark:System.String.$Content,None,True,True,,深色
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_themeDefault:System.String.$Content,None,True,True,,預設
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_themeLight:System.String.$Content,None,True,True,,亮色
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_themeWhite:System.String.$Content,None,True,True,,白色
+CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,str_toolchanges:System.String.$Content,None,True,True,,"加工程式使用 M6 進行了 {0} 次刀具更換，僅少數 Grbl 版本支援自動換刀。"
+CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,str_toolchangeTLO:System.String.$Content,None,True,True,,加工程式有 {0} 次換刀，開始加工前應建立刀具長度基準。
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,str_transferAborted:System.String.$Content,None,True,True,,傳輸已中止。
+CNC.Controls.WPF.g.en-US.resources:jobcontrol.baml,str_transferComplete:System.String.$Content,None,True,True,,傳輸完成
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,str_transferDone:System.String.$Content,None,True,True,,傳輸完成。
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,str_transferring:System.String.$Content,None,True,True,,已傳輸 {0} 位元組，共 {1} 位元組…
+CNC.Controls.WPF.g.en-US.resources:sdcardview.baml,str_uploading:System.String.$Content,None,True,True,,正在上傳…
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_validateMax:System.String.$Content,None,True,True,,輸入無效：允許的最大值為 {0}。
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_validateMin:System.String.$Content,None,True,True,,輸入無效：允許的最小值為 {0}。
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_validateNotIP4:System.String.$Content,None,True,True,,輸入無效：不是 IPv4 位址。
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_validateRange:System.String.$Content,None,True,True,,輸入無效：允許的範圍為 {0} - {1}。
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_verifySendController:System.String.$Content,None,True,True,,確定要將選取的行傳送至控制器嗎？
+CNC.Controls.WPF.g.en-US.resources:libstrings.baml,str_verifyStartFrom:System.String.$Content,None,True,True,,確定控制器已處於從區塊 {0} 開始的正確狀態嗎？
+CNC.Controls.WPF.g.en-US.resources:errorsandalarms.baml,tab_alarms:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,警報代碼
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,tab_basicConfig:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,基本設定
+CNC.Controls.WPF.g.en-US.resources:errorsandalarms.baml,tab_errors:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,錯誤代碼
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,tab_network:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,乙太網路
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,tab_pidTuner:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,PID 調整器
+CNC.Controls.WPF.g.en-US.resources:portdialog.baml,tab_serial:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,序列埠
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,tab_stepperCalibration:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,步進電機校準
+CNC.Controls.WPF.g.en-US.resources:grblconfigview.baml,tab_trinamic:System.Windows.Controls.HeaderedContentControl.Header,Label,True,True,,Trinamic 調整器
+CNC.Controls.WPF.g.en-US.resources:outlinebasecontrol.baml,txt_line1:System.Windows.Documents.Run.Text,Text,True,True,,"執行動作以勾勒出程式 X/Y 的最大加工範圍。"
+CNC.Controls.WPF.g.en-US.resources:outlinebasecontrol.baml,txt_line2:System.Windows.Documents.Run.Text,Text,True,True,,請確保刀具不會碰到任何障礙物！！
+CNC.Controls.WPF.g.en-US.resources:errorsandalarms.baml,wnd_errorsAndAlarms:System.Windows.Window.Title,Title,True,True,,控制器錯誤與警報代碼
