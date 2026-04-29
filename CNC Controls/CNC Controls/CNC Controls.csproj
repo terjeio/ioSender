@@ -141,6 +141,7 @@
     <Compile Include="IGCodeTransformer.cs" />
     <Compile Include="IGrblConfigTab.cs" />
     <Compile Include="ISidebarControl.cs" />
+    <Compile Include="JogButton.cs" />
     <Compile Include="JobControl.xaml.cs">
       <DependentUpon>JobControl.xaml</DependentUpon>
     </Compile>

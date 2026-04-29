@@ -1,13 +1,13 @@
 ﻿/*
  * Machine.cs - part of CNC Core library
  *
- * v0.45 / 2022-11-10 / Io Engineering (Terje Io)
+ * v0.47 / 2026-01-09 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020-2024, Io Engineering (Terje Io)
+Copyright (c) 2020-2026, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -51,6 +51,8 @@ namespace CNC.Core
         protected bool isRelative = false;
 
         protected int _tool = 0;
+
+        protected double rotation = 0d;
         protected double[] offsets = new double[9];
         protected double[] origin = new double[9];
         protected double[] scaleFactors = new double[9];
@@ -210,6 +212,17 @@ namespace CNC.Core
 
             G92Active = false;
         }
+
+        public double GetRotation()
+        {
+            return coordinateSystem != null && Plane.Plane == GCode.Plane.XY && !double.IsNaN(coordinateSystem.Rotation) ? coordinateSystem.Rotation : 0d;
+        }
+
+        public double GetG5xOffset(int axis)
+        {
+            return coordinateSystem != null && axis < GrblInfo.NumAxes ? coordinateSystem.Values[axis] : 0d;
+        }
+
         public double GetG92Offset(int axis)
         {
             return g92 != null && axis < GrblInfo.NumAxes ? g92.Values[axis] : 0d;
@@ -267,11 +280,16 @@ namespace CNC.Core
 
         public bool SetCoordinateSystem(GCCoordinateSystem token)
         {
-            var csys = coordinateSystems.Where(x => x.Code == token.Code).FirstOrDefault();
+            var csys = token.Code == "Current"
+                        ? coordinateSystem
+                        : coordinateSystems.Where(x => x.Code == token.Code).FirstOrDefault();
 
             if (csys != null)
+            {
                 foreach (int i in token.AxisFlags.ToIndices())
                     csys.Values[i] = token.Values[i];
+                csys.Rotation = token.L == 2 ? token.R : 0d;
+            }
 
             return csys != null;
         }

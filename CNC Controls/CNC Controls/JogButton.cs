@@ -1,13 +1,13 @@
 ﻿/*
- * About.xaml.cs - part of CNC Controls library
+ * JogButton.cs - part of CNC Controls library
  *
- * v0.47 / 2026-02-17 / Io Engineering (Terje Io)
+ * v0.47 / 2026-02-11 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2026, Io Engineering (Terje Io)
+Copyright (c) 2026, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -37,47 +37,64 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-using System.Windows;
-using CNC.Core;
+using System;
+using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace CNC.Controls
 {
-    public partial class About : Window
+    class JogButton : Button
     {
-        string version;
+        public event EventHandler JogStart;
+        public event EventHandler JogEnd;
 
-        public About(string title)
+        public JogButton() :base()
         {
-            InitializeComponent();
-
-            Title = version = title;
+            Width = 60;
+            Height = 60;
+            Focusable = false;
         }
 
-        private void About_Load(object sender, System.EventArgs e)
+        protected override void OnTouchDown(TouchEventArgs e)
         {
-            Title = version;
-            if (CNC.Core.Resources.IsLegacyController)
-                Title += " (legacy mode)";
-            if((DataContext as GrblViewModel).IsMPGActive != true)
-                GrblInfo.Get();
-            txtGrblVersion.Content = GrblInfo.Version;
-            txtGrblOptions.Content = GrblInfo.Options;
-            txtGrblNewOpts.Content = GrblInfo.NewOptions;
-            txtGrblConnection.Content = AppConfig.Settings.Base.PortParams;
-            grpGrbl.Header = GrblInfo.Firmware;
-
-            if (GrblInfo.Identity != "")
-                grpGrbl.Header += ": " + GrblInfo.Identity;
+            base.OnTouchDown(e);
+            JogStart?.Invoke(this, e);
         }
 
-        private void okButton_Click(object sender, System.EventArgs e)
+        protected override void OnTouchUp(TouchEventArgs e)
         {
-            Close();
+            base.OnTouchUp(e);
+            JogEnd?.Invoke(this, e);
         }
 
-        private void clbButton_Click(object sender, System.EventArgs e)
+        //protected override void OnTouchLeave(TouchEventArgs e)
+        //{
+        //    base.OnTouchLeave(e);
+        //    JogEnd?.Invoke(this, e);
+        //}
+
+        //protected override void OnLostTouchCapture(TouchEventArgs e)
+        //{
+        //    base.OnLostTouchCapture(e);
+        //    JogEnd?.Invoke(this, e);
+        //}
+
+        protected override void OnMouseUp(MouseButtonEventArgs e)
         {
-            GrblSettings.CopyToClipboard();
+            base.OnMouseUp(e);
+            JogEnd?.Invoke(this, e);
         }
+
+        protected override void OnMouseDown(MouseButtonEventArgs e)
+        {
+            base.OnMouseDown(e);
+            JogStart?.Invoke(this, e);
+        }
+
+        //protected override void OnMouseLeave(MouseEventArgs e)
+        //{
+        //    base.OnMouseLeave(e);
+        //    JogEnd?.Invoke(this, e);
+        //}
     }
 }

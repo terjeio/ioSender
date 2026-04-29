@@ -11,7 +11,7 @@
               CanUserSortColumns="false" CanUserResizeRows="False" IsReadOnly="true" SelectionChanged="grdGCode_SelectionChanged"
               DragEnter="grdGCode_Drag" DragOver="grdGCode_Drag" DragLeave="grdGCode_Drag" Drop="grdGCode_Drop">
         <DataGrid.Columns>
-            <DataGridTextColumn x:Uid="hdr_block" Header="Block" Binding="{Binding LineNum}" Width="50" MinWidth="50" MaxWidth="60"/>
+            <DataGridTextColumn x:Uid="hdr_block" Header="Block" Binding="{Binding LineNum}" Width="60" MinWidth="60" MaxWidth="70"/>
             <DataGridTextColumn Header="" Binding="{Binding Sent}" Width="*" MinWidth="30" MaxWidth="60"/>
             <DataGridTextColumn x:Uid="hdr_data" Header="Data" Binding="{Binding Data}" Width="*" MinWidth="280"/>
         </DataGrid.Columns>
@@ -20,7 +20,8 @@
                 <MenuItem x:Uid="mnu_sendToController" Header="Send to controller" IsEnabled="{Binding Path=MultipleSelected}" Click="SendController_Click" />
                 <MenuItem x:Uid="mnu_startFromHere" Header="Start from here" IsEnabled="{Binding Path=SingleSelected}" Click="StartHere_Click" />
                 <MenuItem x:Uid="mnu_copyToMDI" Header="Copy to MDI" IsEnabled="{Binding Path=SingleSelected}" Click="CopyMDI_Click" />
-            </ContextMenu>
+				<MenuItem x:Uid="mnu_ToggleBreak" Header="Toggle Break" IsEnabled="{Binding Path=SingleSelected}" Click="ToggleBreak_Click" />
+			</ContextMenu>
         </DataGrid.ContextMenu>
     </DataGrid>
 </UserControl>

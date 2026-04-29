@@ -1,13 +1,13 @@
 ﻿/*
  * GCode.cs - part of CNC Controls library for Grbl
  *
- * v0.46 / 2025-05-31 / Io Engineering (Terje Io)
+ * v0.47 / 2026-02-11 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2025, Io Engineering (Terje Io)
+Copyright (c) 2018-2026, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -267,7 +267,7 @@ namespace CNC.Controls
 
             using (new UIUtils.WaitCursor())
             {
-                Program.LoadFile(filename);
+                Program.LoadFile(filename, GrblInfo.UseLinenumbers && AppConfig.Settings.Base.AddLineNumbers);
             }
 
             Model.Blocks = Blocks;

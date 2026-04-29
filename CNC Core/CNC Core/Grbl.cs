@@ -1,13 +1,13 @@
 ﻿/*
  * Grbl.cs - part of CNC Controls library
  *
- * v0.46 / 2025-05-29 / Io Engineering (Terje Io)
+ * v0.47 / 2026-04-29 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2025, Io Engineering (Terje Io)
+Copyright (c) 2018-2026, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -125,6 +125,8 @@ namespace CNC.Core
             CMD_SDCARD_RUN = "$F=",
             CMD_SDCARD_UNLINK = "$FD=",
             CMD_SDCARD_DUMP = "$F<=",
+            CMD_FS_PWD = "$PWD",
+            AXISLETTERS = "XYZABCUVW",
             FORMAT_METRIC = "###0.000",
             FORMAT_IMPERIAL = "##0.0000",
             NO_TOOL = "None",
@@ -518,6 +520,41 @@ namespace CNC.Core
 
             return res == true;
         }
+
+        public static bool SendRealtimeCommand (string command)
+        {
+            bool ok = true;
+            byte cmd = 0;
+
+            switch(command.ToLower())
+            {
+                case "{park}":
+                case "{safetydoor}":
+                    cmd = GrblConstants.CMD_SAFETY_DOOR;
+                    break;
+
+                case "{optionalstop}":
+                    cmd = GrblConstants.CMD_OPTIONAL_STOP_TOGGLE;
+                    break;
+
+                case "{singleblock}":
+                    cmd = GrblConstants.CMD_SINGLE_BLOCK_TOGGLE;
+                    break;
+
+                case "{probeconnected}":
+                    cmd = GrblConstants.CMD_PROBE_CONNECTED_TOGGLE;
+                    break;
+
+                default:
+                    ok = false;
+                    break;
+            }
+
+            if(ok)
+                Comms.com.WriteByte(cmd);
+
+            return ok;
+        }
     }
 
     public class CoordinateValues<T> : ViewModelBase
@@ -551,7 +588,7 @@ namespace CNC.Core
                 {
                     arr[i] = value;
                     if(!_suspend)
-                        OnPropertyChanged("XYZABCUVW".Substring(i, 1));
+                        OnPropertyChanged(GrblConstants.AXISLETTERS.Substring(i, 1));
                 }
             }
         }
@@ -774,7 +811,7 @@ namespace CNC.Core
             return equal;
         }
 
-        public string Name { get; private set; }
+        public string Name { get; internal set; }
 
         public bool SuspendNotifications
         {
@@ -793,7 +830,7 @@ namespace CNC.Core
 
             try
             {
-                double[] position = dbl.ParseList(values);
+                double[] position = dbl.ParseList(values.Split(':')[0]);
 
                 for (var i = 0; i < position.Length; i++)
                 {
@@ -870,10 +907,15 @@ namespace CNC.Core
                 double id = Math.Round(double.Parse(code.Substring(2), CultureInfo.InvariantCulture) - 3.0d, 1);
 
                 Id = (int)Math.Floor(id) + (int)Math.Round((id - Math.Floor(id)) * 10.0d, 0);
+
+                if (data.Contains(':'))
+                    Rotation = dbl.Parse(data.Split(':')[1]);
             }
         }
 
         public int Id { get; private set; }
+        public double Rotation { get; set; }
+
         public string Code { get { return _code; } set { _code = value; OnPropertyChanged(); } }
     }
 
@@ -891,17 +933,27 @@ namespace CNC.Core
 
     public class Tool : Position
     {
+        private int _id;
+
         public Tool(string code) : base()
         {
             Code = code;
+            Name = string.Empty;
+            if (!int.TryParse(code, out _id))
+                _id = -1;
         }
 
-        public Tool(string code, string offsets) : base(offsets)
+        public Tool(string code, string offsets, string name) : base(offsets)
         {
             Code = code;
+            Name = name;
+            if (!int.TryParse(code, out _id))
+                _id = -1;
         }
 
-        public string Code { get; set; }
+        public int Id { get { return _id; } }
+
+        public string Code { get; private set; }
 
         double _r;
 
@@ -952,7 +1004,7 @@ namespace CNC.Core
         private static Dispatcher dispatcher;
         private static bool _probeProtect = false, _latheUVWMode = false;
         private static int _numAxes;
-        private static string _axisLetters = "XYZABCUVW";
+        private static string _axisLetters = GrblConstants.AXISLETTERS;
 
         private static Action<string> dataReceived;
 
@@ -997,6 +1049,7 @@ namespace CNC.Core
                 for (int i = 0; i < _numAxes; i++)
                 {
                     flags = (flags << 1) | 0x01;
+                 // flags |= (int)AxisIndexToFlag(GrblConstants.AXISLETTERS.IndexOf(AxisLetters[i]));
                     if (!LatheModeEnabled || i != 1)
                         PositionFormatString += AxisIndexToLetter(i) + ": {" + i.ToString() + "}  ";
                 }
@@ -1020,6 +1073,7 @@ namespace CNC.Core
         public static bool HasSettingDescriptions { get; private set; }
         public static bool HasSimpleProbeProtect { get { return _probeProtect & IsGrblHAL && Build >= 20200924; } internal set { _probeProtect = value; } }
         public static bool ManualToolChange { get; private set; }
+        public static bool UseLinenumbers { get; internal set; }
         public static bool HasFS { get; private set; }
         public static bool HasSDCard { get; private set; }
         public static string UploadProtocol { get; private set; } = string.Empty;
@@ -1094,6 +1148,7 @@ namespace CNC.Core
         public static AxisFlags AxisLetterToFlag(char letter)
         {
             return (AxisFlags)(1 << AxisLetters.IndexOf(letter));
+//          return (AxisFlags)(1 << GrblConstants.AXISLETTERS.IndexOf(letter));
         }
 
         public static bool Get(GrblViewModel model)
@@ -1376,6 +1431,8 @@ namespace CNC.Core
                         {
                             if (value.StartsWith("TMC="))
                                 TrinamicDrivers = value.Substring(4);
+                            else if (value.StartsWith("ATC="))
+                                HasATC = true;
                             else if (value.StartsWith("PROBES="))
                             {
                                 UpdateProbes((Probes)int.Parse(value.Substring(7)));
@@ -1960,7 +2017,7 @@ namespace CNC.Core
             Tool tool = Tools.Where(x => x.Code == s1[0]).FirstOrDefault();
             if (tool == null)
             {
-                tool = new Tool(s1[0], s1[1]);
+                tool = new Tool(s1[0], s1[1], s1.Length > 4 ? s1[4] : string.Empty);
                 Tools.Add(tool);
 
             }
@@ -2157,7 +2214,9 @@ namespace CNC.Core
         public int SpindleNum { get; set; }
         public string Name { get; set; }
         public bool Variable { get; set; }
+        public bool LaserEnabled { get; set; }
         public bool Direction { get; set; }
+        public bool IsCurrent { get; set; }
 
         //public IEnumerable<GrblSpindles> Settings
         //{
@@ -2187,7 +2246,9 @@ namespace CNC.Core
             }
             Name = values[4];
             Variable = values[3].Contains('V');
-            Direction = values[3].Contains('D') || values[3].Contains('L');
+            LaserEnabled = values[3].Contains('L');
+            Direction = LaserEnabled || values[3].Contains('D');
+            IsCurrent = values[3].Contains('*');
         }
     }
 
@@ -2232,10 +2293,19 @@ namespace CNC.Core
                 dataReceived -= process;
             }
 
-            if(Spindles.Count == 0)
-                Spindles.Add(new Spindle("0|0|0|" + (GrblInfo.HasReversableSpindle ? "D" : "") + (GrblInfo.HasVariableSpindle ? "V" : "") + "|Default|0.0|1000.0"));
+            AddDefault();
+
+            var current = Spindles.Where(x => x.IsCurrent == true).FirstOrDefault();
+
+            model.SpindleNum = (current == null ? Spindles[0] : current).SpindleNum;
 
             return Spindles.Count > 0;
+        }
+
+        public static void AddDefault ()
+        {
+            if (Spindles.Count == 0)
+                Spindles.Add(new Spindle("0|0|0|*" + ((GrblMode)GrblSettings.GetInteger(GrblSetting.Mode) == GrblMode.Laser ? "L" : "") + (GrblInfo.HasReversableSpindle ? "D" : "") + (GrblInfo.HasVariableSpindle ? "V" : "") + "|Default|0.0|1000.0"));
         }
 
         private static void process(string data)
@@ -3212,6 +3282,7 @@ namespace CNC.Core
                                 if (int.TryParse(valuepair[1], out value))
                                 {
                                     Grbl.GrblViewModel.IsParserStateLive = (value & (1 << 9)) != 0;
+                                    GrblInfo.UseLinenumbers = (value & (1 << 2)) != 0;
                                     GrblInfo.ReportProbeResult = ReportProbeCoordinates = (value & (1 << 7)) != 0;
                                     GrblInfo.HasSimpleProbeProtect = (value & (1 << 11)) != 0;
                                 }

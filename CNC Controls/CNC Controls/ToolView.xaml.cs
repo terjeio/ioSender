@@ -77,7 +77,7 @@ namespace CNC.Controls
 
                 GrblWorkParameters.Get(parameters);
 
-                dgrTools.ItemsSource = new ObservableCollection<Tool>(from tool in GrblWorkParameters.Tools where tool.Code != GrblConstants.NO_TOOL orderby tool.Code select tool);
+                dgrTools.ItemsSource = new ObservableCollection<Tool>(from tool in GrblWorkParameters.Tools where tool.Code != GrblConstants.NO_TOOL orderby tool.Id select tool);
                 dgrTools.SelectedIndex = 0;
             }
             else

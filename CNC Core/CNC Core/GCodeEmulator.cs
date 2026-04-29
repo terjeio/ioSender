@@ -1,13 +1,13 @@
 ﻿/*
  * GCodeEmulator.cs - part of CNC Controls library
  *
- * v0.45 / 2024-11-10 / Io Engineering (Terje Io)
+ * v0.47 / 2026-01-25 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020-2024, Io Engineering (Terje Io)
+Copyright (c) 2020-2026, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -40,8 +40,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows;
 using System.Windows.Media.Media3D;
 using CNC.GCode;
+using RP.Math;
 
 namespace CNC.Core
 {
@@ -50,6 +52,7 @@ namespace CNC.Core
         public Point3D Start;
         public Point3D End;
         public GCodeToken Token;
+        public double Rotation;
         public bool IsRetract;
         public bool IsSpindleSynced;
         public bool IsScaled;
@@ -58,15 +61,50 @@ namespace CNC.Core
         public uint LineNumber;
     }
 
+    public class GCodeSub
+    {
+        public GCodeSub (uint label)
+        {
+            Label = label;
+            Tokens = new List<GCodeToken>();
+        }
+
+        public uint Label;
+        public List<GCodeToken> Tokens;
+    }
+
+    public class GCodeStackEntry
+    {
+        public GCodeStackEntry(uint label, NGCExpr.FlowControl op)
+        {
+            Label = label;
+            Op = op;
+            Skip = Handled = false;
+        }
+
+        public uint Label;
+        public NGCExpr.FlowControl Op;
+        public GCodeSub Sub;
+        public string Expr;
+        public uint Repeats;
+        public bool Skip;
+        public bool Handled;
+        public bool Brk;
+    }
+
     public class GCodeEmulator : Machine
     {
         private bool translate;
         private RunAction action;
         private double retractPosition = double.NaN;
+        private List<GCodeSub> Sub = new List<GCodeSub>();
+        private Stack<GCodeStackEntry> stack = new Stack<GCodeStackEntry>();
+        private NGCExpr ngcexpr;
 
         public GCodeEmulator(bool translate = false) : base()
         {
             this.translate = translate;
+            ngcexpr = new NGCExpr(this);
         }
 
         public void SetStartPosition(Point3D pos)
@@ -78,6 +116,17 @@ namespace CNC.Core
         {
             Reset();
 
+            return run(Tokens);
+        }
+
+        private IEnumerable<RunAction> run(List<GCodeToken> Tokens)
+        {
+            bool addSub = false, skipping = false;
+            double value;
+            int pos = 0;
+            GCodeSub newSub = null;
+            GCodeStackEntry last = new GCodeStackEntry(0, NGCExpr.FlowControl.NoOp);
+
             foreach (GCodeToken token in Tokens)
             {
                 if (action.LineNumber != token.LineNumber)
@@ -87,6 +136,85 @@ namespace CNC.Core
                 action.Token = token;
                 action.IsRetract = action.IsSpindleSynced = false;
 
+                if (token.Command == Commands.FlowControl)
+                {
+                    var fc = (token as GCFlowControl);
+                    switch (fc.FlowControl)
+                    {
+                        case NGCExpr.FlowControl.IF:
+                            pos = 0;
+                            if(!skipping && ngcexpr.Eval(fc.Expression, ref pos, out value) == NGCExpr.OpStatus.OK)
+                            {
+                                stack.Push((last = new GCodeStackEntry(fc.O, fc.FlowControl)));
+                                last.Skip = value == 0.0;
+                                last.Handled = !last.Skip;
+                            }
+                            break;
+
+                        case NGCExpr.FlowControl.ELSEIF:
+                            if (last.Op == NGCExpr.FlowControl.IF || last.Op == NGCExpr.FlowControl.ELSEIF)
+                            {
+                                pos = 0;
+                                if(fc.O == last.Label && !(last.Skip = last.Handled) && !last.Handled && ngcexpr.Eval(fc.Expression, ref pos, out value) == NGCExpr.OpStatus.OK)
+                                {
+                                    if (!(last.Skip = value == 0.0))
+                                    {
+                                        last.Op = fc.FlowControl;
+                                        last.Handled = true;
+                                    }
+                                }
+                            }
+                            break;
+
+                        case NGCExpr.FlowControl.ELSE:
+                            if (last.Op == NGCExpr.FlowControl.IF || last.Op == NGCExpr.FlowControl.ELSEIF)
+                            {
+                                if (fc.O == last.Label)
+                                {
+                                    if (!(last.Skip = last.Handled))
+                                    {
+                                        last.Op = fc.FlowControl;
+                                    }
+                                }
+                            }
+                            break;
+
+                        case NGCExpr.FlowControl.ENDIF:
+                            if (last.Op == NGCExpr.FlowControl.IF || last.Op == NGCExpr.FlowControl.ELSEIF || last.Op == NGCExpr.FlowControl.ELSE)
+                            {
+                                if (fc.O == last.Label)
+                                {
+                                    stack.Pop();
+                                }
+                            }
+                            break;
+
+                        case NGCExpr.FlowControl.SUB:
+                            addSub = true;
+                            Sub.Add((newSub = new GCodeSub(fc.O)));
+                            continue;
+
+                        case NGCExpr.FlowControl.ENDSUB:
+                            addSub = false;
+                            continue;
+
+                        case NGCExpr.FlowControl.CALL:
+                            var sub = Sub.Where(s => s.Label == fc.O).FirstOrDefault();
+                            if(sub != null) foreach (var cmd in run(sub.Tokens))
+                                yield return cmd;
+                            continue;
+                    }
+                }
+
+                if (addSub)
+                {
+                    newSub.Tokens.Add(token);
+                    continue;
+                }
+
+                if (last.Skip)
+                    continue;
+
                 switch (token.Command)
                 {
                     // G0, G1: Linear Move
@@ -94,7 +222,17 @@ namespace CNC.Core
                     case Commands.G1:
                         {
                             var motion = token as GCLinearMotion;
-                            setEndP(motion.Values, motion.AxisFlags);
+                            if (coordinateSystem.Rotation != 0d)
+                            {
+                                var move = new GCLinearMotion(motion.Command, motion.LineNumber, motion.Values.ToArray(), motion.AxisFlags, motion.BlockDelete);
+                                var target = new Vector3(move.X + coordinateSystem.X, move.Y + coordinateSystem.Y, 0d).RotateZ(0d, 0d, coordinateSystem.Rotation);
+                                move.X = target.X;
+                                move.Y = target.Y;
+                                move.AxisFlags |= AxisFlags.XY;
+                                setEndP(move.Values, move.AxisFlags);
+                            }
+                            else
+                                setEndP(motion.Values, motion.AxisFlags);
                         }
                         break;
 
@@ -103,7 +241,24 @@ namespace CNC.Core
                     case Commands.G3:
                         {
                             var arc = token as GCArc;
-                            setEndP(arc.Values, arc.AxisFlags);
+                            if (coordinateSystem.Rotation != 0d)
+                            {
+                                var move = arc.Values.ToArray();
+                                var ijk = arc.IJKvalues.ToArray();
+                                var target = new Vector3(move[0] + coordinateSystem.X, move[1] + coordinateSystem.Y, 0d).RotateZ(0d, 0d, coordinateSystem.Rotation);
+                                move[0] = target.X;
+                                move[1] = target.Y;
+                                if (arc.IjkFlags != IJKFlags.None)
+                                {
+                                    target = new Vector3(ijk[0], ijk[1], 0d).RotateZ(0d, 0d, coordinateSystem.Rotation);
+                                    ijk[0] = target.X;
+                                    ijk[1] = target.Y;
+                                }
+                                action.Token = new GCArc(token.Command, token.LineNumber, move, AxisFlags.XY, ijk, arc.IjkFlags, arc.R, arc.P, arc.IJKMode, arc.BlockDelete);
+                                setEndP((action.Token as GCArc).Values, (action.Token as GCArc).AxisFlags);
+                            }
+                            else
+                                setEndP(arc.Values, arc.AxisFlags);
                         }
                         break;
 
@@ -149,6 +304,7 @@ namespace CNC.Core
                                 if (gcsys.P == 0)
                                     offsets[i] = csys.Values[i];
                             }
+                            csys.Rotation = gcsys.L == 2 && Plane.Plane == GCode.Plane.XY ? gcsys.R * Math.PI / 180d : 0d;
                         }
                         break;
 
@@ -490,6 +646,14 @@ namespace CNC.Core
                         }
                         break;
 
+                    // G68: Rotate
+                    case Commands.G68:
+                        break;
+
+                    // G69: Cancel Rotate
+                    case Commands.G69:
+                        break;
+
                     // G80: Cancel Canned Cycle
                     case Commands.G80:
                         break;
@@ -502,6 +666,8 @@ namespace CNC.Core
                     case Commands.G82:
                     // G83: Peck Drilling Cycle
                     case Commands.G83:
+                    // G85: RH threading cycle
+                    case Commands.G84:
                     // G85: Boring Cycle, Feed Out
                     case Commands.G85:
                     // G86: Boring Cycle, Spindle Stop, Rapid Move Out
@@ -604,6 +770,11 @@ namespace CNC.Core
                         }
                         break;
 
+                    // G92.1: Reset G92 Offsets - Keep Parameters
+                    case Commands.G93:
+
+                        break;
+
                     // G98, G99: Canned cycle return mode
                     case Commands.G98: // Old Z
                     case Commands.G99: // R value
@@ -636,6 +807,11 @@ namespace CNC.Core
                     case Commands.M61:
                     case Commands.ToolSelect:
                         Tool = (token as GCToolSelect).Tool;
+                        break;
+
+                    case Commands.Parameter:
+                        pos = 0;
+                        ngcexpr.ReadSetParameter((token as GCParameter).Expression, ref pos);
                         break;
                 }
 

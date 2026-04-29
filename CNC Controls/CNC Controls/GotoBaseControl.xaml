@@ -7,7 +7,7 @@
              xmlns:local="clr-namespace:CNC.Controls"
              mc:Ignorable="d"
              Focusable="False"
-             d:DesignHeight="70" d:DesignWidth="140">
+             d:DesignHeight="95" d:DesignWidth="140">
     <UserControl.Resources>
         <ResourceDictionary>
             <local:HomedStateToBooleanConverter x:Key="IsHomed" />
@@ -17,5 +17,9 @@
     <StackPanel IsEnabled="{Binding Path=IsJobRunning, Converter={StaticResource LogicalNotConverter}}">
         <Button x:Uid="btn_gotoG28" Tag="G28" Content="Goto position 1 (G28)" Height="28" IsEnabled="{Binding Path=HomedState, Mode=OneWay, Converter={StaticResource IsHomed}}" Focusable="False" HorizontalAlignment="Left" Margin="5,5,0,0" Padding="5,0" VerticalAlignment="Top" Click="button_Click"/>
         <Button x:Uid="btn_gotoG30" Tag="G30" Content="Goto position 2 (G30)" Height="28" IsEnabled="{Binding Path=HomedState, Mode=OneWay, Converter={StaticResource IsHomed}}" Focusable="False" HorizontalAlignment="Left" Margin="5,5,0,0" Padding="5,0" VerticalAlignment="Top" Click="button_Click"/>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Height="Auto" VerticalAlignment="Top" Width="126" Margin="5,5,0,0">
+            <ComboBox DisplayMemberPath="Code" SelectedValuePath="Code" ItemsSource="{Binding Path=CoordinateSystems, RelativeSource={RelativeSource AncestorType=UserControl}}" SelectedValue="{Binding Path=CoordinateSystem, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="80" Height="22"/>
+            <Button x:Uid="btn_goto" Tag="G5x" Content="Go" Height="22" IsEnabled="{Binding Path=HomedState, Mode=OneWay, Converter={StaticResource IsHomed}}" Focusable="False" HorizontalAlignment="Right" Margin="5,0,0,0" Padding="5,0" VerticalAlignment="Top" Click="button_Click"/>
+        </StackPanel>
     </StackPanel>
 </UserControl>

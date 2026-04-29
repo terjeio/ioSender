@@ -1,13 +1,13 @@
 ﻿/*
  * DROControl.xaml.cs - part of CNC Controls library
  *
- * v0.45 / 2024-07-16 / Io Engineering (Terje Io)
+ * v0.47 / 2026-01-16 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2024, Io Engineering (Terje Io)
+Copyright (c) 2018-2026, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -101,6 +101,12 @@ namespace CNC.Controls
                     keyboard.AddHandler(Key.B, ModifierKeys.Control | ModifierKeys.Shift, ZeroB);
                 if (GrblInfo.AxisFlags.HasFlag(AxisFlags.C))
                     keyboard.AddHandler(Key.C, ModifierKeys.Control | ModifierKeys.Shift, ZeroC);
+                if (GrblInfo.AxisFlags.HasFlag(AxisFlags.U))
+                    keyboard.AddFunction(ZeroU, null);
+                if (GrblInfo.AxisFlags.HasFlag(AxisFlags.V))
+                    keyboard.AddFunction(ZeroV, null);
+                if (GrblInfo.AxisFlags.HasFlag(AxisFlags.W))
+                    keyboard.AddFunction(ZeroW, null);
                 keyboard.AddHandler(Key.D0, ModifierKeys.Control | ModifierKeys.Shift, ZeroAxes);
             }
 
@@ -215,6 +221,24 @@ namespace CNC.Controls
         private bool ZeroC(Key key)
         {
             AxisPositionChanged(GrblInfo.AxisIndexToLetter(5), 0d);
+
+            return true;
+        }
+        private bool ZeroU(Key key)
+        {
+            AxisPositionChanged(GrblInfo.AxisIndexToLetter(6), 0d);
+
+            return true;
+        }
+        private bool ZeroV(Key key)
+        {
+            AxisPositionChanged(GrblInfo.AxisIndexToLetter(7), 0d);
+
+            return true;
+        }
+        private bool ZeroW(Key key)
+        {
+            AxisPositionChanged(GrblInfo.AxisIndexToLetter(8), 0d);
 
             return true;
         }

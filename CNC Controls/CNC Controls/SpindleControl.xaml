@@ -25,7 +25,11 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <StackPanel Orientation="Vertical" HorizontalAlignment="Right" Width="100">
-                    <ComboBox x:Name="cbxSpindle" DisplayMemberPath="Name" SelectedValuePath="SpindleNum" ItemsSource="{Binding Path=Spindles}" SelectedValue="{Binding Path=SpindleNum, Mode=OneWay}" IsEnabled="{Binding Path=IsJobRunning, Converter={StaticResource LogicalNotConverter}}" Visibility="{Binding Path=MultiSpindle, Converter={StaticResource IsVisibleConverter}}" HorizontalAlignment="Right" VerticalAlignment="Top" Width="100" Height="22" Margin="0,5,0,5" SelectionChanged="cbxSpindle_SelectionChanged"/>
+                    <ComboBox x:Name="cbxSpindle" HorizontalAlignment="Right" VerticalAlignment="Top" Width="100" Height="22" Margin="0,5,0,5"
+                              DisplayMemberPath="Name" SelectedValuePath="SpindleNum" ItemsSource="{Binding Path=Spindles}" SelectedValue="{Binding Path=SpindleNum, Mode=OneWay}"
+                              IsEnabled="{Binding Path=GcodeCommandsAllowed}"
+                              Visibility="{Binding Path=MultiSpindle, Converter={StaticResource IsVisibleConverter}}"
+                              SelectionChanged="cbxSpindle_SelectionChanged"/>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                         <Label x:Uid="lbl_rpm" x:Name="lblRPM" Content="RPM" HorizontalContentAlignment="Right" VerticalAlignment="Center" Height="24" Width="40"/>
                         <local:NumericTextBox x:Name="cvRPM" Value="{Binding Path=RPM, Mode=TwoWay}" IsEnabled="{Binding Path=IsJobRunning, Converter={StaticResource LogicalNotConverter}}" Format="####0" HorizontalAlignment="Left" Margin="2,0,0,0" TextWrapping="NoWrap" VerticalAlignment="Center"/>
@@ -36,7 +40,7 @@
                     <RadioButton x:Uid="lbl_cw" x:Name="rbSpindleCW" Content="CW" IsChecked="{Binding Path=SpindleState[(gcode:SpindleState)CW], Mode=TwoWay}" HorizontalAlignment="Left" Height="22" Click="rbSpindle_Click"/>
                     <RadioButton x:Uid="lbl_ccw" x:Name="rbSpindleCCW" Content="CCW" IsChecked="{Binding Path=SpindleState[(gcode:SpindleState)CCW], Mode=TwoWay}" HorizontalAlignment="Left" Click="rbSpindle_Click"/>
                 </StackPanel>
-                <local:OverrideControl x:Name="overrideControl" Value="{Binding Path=RPMOverride, Mode=OneWay}" CommandGenerated="override_CommandGenerated" Margin="0,0,0,2" Grid.Row="1" Grid.ColumnSpan="2" VerticalAlignment="Bottom" HorizontalAlignment="Right" EncoderMode="SpindleRPM">
+                <local:OverrideControl x:Name="overrideControl" Value="{Binding Path=RPMOverride, Mode=OneWay}" OverrideDisabled="{Binding Path=RPMOverrideDisabled, Mode=OneWay}" CommandGenerated="override_CommandGenerated" Margin="0,0,0,2" Grid.Row="1" Grid.ColumnSpan="2" VerticalAlignment="Bottom" HorizontalAlignment="Right" EncoderMode="SpindleRPM">
                 </local:OverrideControl>
             </Grid>
         </GroupBox>

@@ -1,13 +1,13 @@
 ﻿/*
  * PortDialog.xaml.cs - part of CNC Controls library
  *
- * v0.41 / 2022-09-25 / Io Engineering (Terje Io)
+ * v0.47 / 2025-09-25 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2022, Io Engineering (Terje Io)
+Copyright (c) 2019-2025, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -37,16 +37,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+using System;
 using System.Windows;
 using CNC.Core;
-using System;
-using System.Windows.Controls;
 
 namespace CNC.Controls
 {
     public partial class PortDialog : Window
     {
-        private string port = null;
+        private string port = null, handshake = string.Empty;
         private PortProperties prop;
         public PortDialog()
         {
@@ -105,6 +104,8 @@ namespace CNC.Controls
 
                         prop.Com.SelectedBaud = values[0];
 
+                        handshake = values.Length > 4 && (values[4] == "X" || values[4] == "P") ? "," + values[4] : string.Empty;
+
                         if (values.Length > 5)
                         {
                             Comms.ResetMode mode = Comms.ResetMode.None;
@@ -133,9 +134,9 @@ namespace CNC.Controls
             }
             else if(prop.Com.Ports.Count > 0)
             {
-                port = prop.Com.SelectedPort + ":" + prop.Com.SelectedBaud + ",N,8,1";
+                port = prop.Com.SelectedPort + ":" + prop.Com.SelectedBaud + ",N,8,1" + handshake;
                 if (prop.Com.SelectedMode.Mode != Comms.ResetMode.None)
-                    port += ",," + prop.Com.SelectedMode.Mode.ToString();
+                    port += (handshake == string.Empty ? ",," : ",") + prop.Com.SelectedMode.Mode.ToString();
             }
 
             Close();

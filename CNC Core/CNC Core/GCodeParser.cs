@@ -1,13 +1,13 @@
 ﻿/*
  * GCodeParser.cs - part of CNC Controls library
  *
- * v0.45 / 2024-10-11 / Io Engineering (Terje Io)
+ * v0.47 / 2026-04-05 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2024, Io Engineering (Terje Io)
+Copyright (c) 2019-2026, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -200,13 +200,14 @@ namespace CNC.GCode
             G13 = 1 << 12,  // [G61] Control mode
             G14 = 1 << 13,  // [G96,G97] Spindle Speed Mode
             G15 = 1 << 14,  // [G7,G8] Lathe Diameter Mode
+            G16 = 1 << 15,  // [G68,G69] Rotation on/off
 
-            M4 = 1 << 15,   // [M0,M1,M2,M30] Stopping
-            M6 = 1 << 16,   // [M6] Tool change
-            M7 = 1 << 17,   // [M3,M4,M5] Spindle turning
-            M8 = 1 << 18,   // [M7,M8,M9] Coolant control
-            M9 = 1 << 19,   // [M49,M50,M51,M53,M56] Override control
-            M10 = 1 << 20   // User defined M commands
+            M4 = 1 << 16,   // [M0,M1,M2,M30] Stopping
+            M6 = 1 << 17,   // [M6] Tool change
+            M7 = 1 << 18,   // [M3,M4,M5] Spindle turning
+            M8 = 1 << 19,   // [M7,M8,M9] Coolant control
+            M9 = 1 << 20,   // [M49,M50,M51,M53,M56] Override control
+            M10 = 1 << 21   // User defined M commands
         }
 
         // Do not change order!
@@ -301,7 +302,7 @@ namespace CNC.GCode
         private Commands cmdNonModal = Commands.Undefined, cmdProgramFlow = Commands.Undefined, cmdPlane = Commands.Undefined, cmdOverride = Commands.Undefined;
         private Commands cmdDistMode = Commands.Undefined, cmdDistModeIJK = Commands.Undefined;
         private Commands cmdLatheMode = Commands.Undefined, cmdRetractMode = Commands.Undefined, cmdSpindleRpmMode = Commands.Undefined, cmdFeedrateMode = Commands.Undefined;
-        private Commands cmdUnits = Commands.Undefined, cmdPathMode = Commands.Undefined;
+        private Commands cmdUnits = Commands.Undefined, cmdPathMode = Commands.Undefined, cmdRotate = Commands.Undefined;
 
         // Do not change order!
         private G65VarMap[] varmap = {
@@ -441,11 +442,12 @@ namespace CNC.GCode
 
         public bool ParseBlock(ref string line, bool quiet)
         {
+            uint lineNumber;
             bool isComment;
-            return ParseBlock(ref line, quiet, out isComment);
+            return ParseBlock(ref line, quiet, out lineNumber, out isComment);
         }
 
-        public bool ParseBlock(ref string line, bool quiet, out bool isComment)
+        public bool ParseBlock(ref string line, bool quiet, out uint lineNumber, out bool isComment)
         {
             WordFlags wordFlags = 0, wordFlag = 0;
             AxisFlags axisWords = AxisFlags.None;
@@ -456,10 +458,12 @@ namespace CNC.GCode
             List<StrReplace> replace = new List<StrReplace>();
 
             int userMCode = 0;
+            lineNumber = 0;
             bool isScaling = false, blockDelete;
             string comment = string.Empty, flowExpression = string.Empty, block;
             double value;
             cmdNonModal = Commands.Undefined;
+            cmdRotate = Commands.Undefined;
 
             block = line = TrimBlock(line);
 
@@ -678,6 +682,15 @@ namespace CNC.GCode
                             cmdNonModal = Commands.G65;
                             break;
 
+                        case 68:
+                        case 69:
+                            if (Dialect != Dialect.GrblHAL)
+                                throw new GCodeException(LibStrings.FindResource("ParserUnsupportedCmd"));
+                            // NOTE: not NIST
+                            modalGroup = ModalGroups.G16;
+                            cmdRotate = iv == 68 ? Commands.G68 : Commands.G69;
+                            break;
+
                         case 80:
                             //                            if (axisCommand != AxisCommand.None)
                             //                                throw new GCodeException(LibStrings.FindResource("ParserAxisError"));
@@ -690,6 +703,7 @@ namespace CNC.GCode
                         case 81:
                         case 82:
                         case 83:
+                        case 84:
                         case 85:
                         case 86:
                         case 89:
@@ -703,7 +717,6 @@ namespace CNC.GCode
                             motionMode = (MotionMode)(iv * 10);
                             break;
 
-                        case 84:
                         case 87:
                         case 88:
                             if (fv == 0) // test to stop compiler complaining 
@@ -889,6 +902,8 @@ namespace CNC.GCode
                     ngcexpr.ReadSetParameter(block, ref pos);
                     if (!ExpressionsSupported)
                         replace.Add(new StrReplace(ppos, pos, "(" + block.Substring(ppos, pos - ppos) + ")"));
+                    else
+                        Tokens.Add(new GCParameter(Commands.Parameter, gcValues.N, block.Substring(ppos, pos - ppos), blockDelete));
                 }
                 else if (block[pos] == ';')
                     pos = block.Length;
@@ -952,7 +967,7 @@ namespace CNC.GCode
                                 break;
 
                             case 'N':
-                                gcValues.K = gcValues.N = (uint)value;
+                                gcValues.K = gcValues.N = lineNumber = (uint)value;
                                 wordFlag = WordFlags.N;
                                 break;
 
@@ -1473,6 +1488,14 @@ namespace CNC.GCode
                 // 19. Go to predefined position, Set G10, or Set axis offsets
                 //
 
+                if (modalGroups.HasFlag(ModalGroups.G16))
+                {
+                    if(cmdRotate == Commands.G68)
+                        Tokens.Add(new GCRotate(Commands.G68, gcValues.N, gcValues.XYZ, axisWords, gcValues.R, blockDelete));
+                    else
+                        Tokens.Add(new GCodeToken(Commands.G69, gcValues.N, blockDelete));
+                }
+
                 // G10, G28, G28.1, G30, G30.1, G92, G92.1, G92.2, G92.3
                 if (modalGroups.HasFlag(ModalGroups.G0) && cmdNonModal != Commands.Undefined)
                 {
@@ -1510,10 +1533,11 @@ namespace CNC.GCode
                                 case 2:
                                 case 20:
                                     {
-                                        var offset = new GCCoordinateSystem(Commands.G10, gcValues.N, (uint)gcValues.L, (uint)gcValues.P, gcValues.XYZ, axisWords, blockDelete);
+                                        var r = gcValues.L == 2 && wordFlags.HasFlag(WordFlags.R) ? gcValues.R : double.NaN;
+                                        var offset = new GCCoordinateSystem(Commands.G10, gcValues.N, (uint)gcValues.L, (uint)gcValues.P, gcValues.XYZ, r, axisWords, blockDelete);
                                         if (SetCoordinateSystem(offset))
                                             Tokens.Add(offset);
-                                        // else erroor?
+                                        //// else erroor?
                                     }
                                     break;
                             }
@@ -1644,7 +1668,8 @@ namespace CNC.GCode
                             if(gcValues.P <= 0d)
                                 throw new GCodeException(LibStrings.FindResource("ParserCMDInvalid"));
                         }
-                        Tokens.Add(new GCArc(motionMode == MotionMode.G2 ? Commands.G2 : Commands.G3, gcValues.N, gcValues.XYZ, axisWords, gcValues.IJK, ijkWords, gcValues.R, wordFlags.HasFlag(WordFlags.P) ? (int)gcValues.P : 0, IJKMode, blockDelete));
+                        bool invert = IsScaled && scaleFactors[Plane.Axis0] * scaleFactors[Plane.Axis1] < 0.0d;
+                        Tokens.Add(new GCArc(motionMode == MotionMode.G2 ? Commands.G2 : Commands.G3, gcValues.N, gcValues.XYZ, axisWords, gcValues.IJK, ijkWords, gcValues.R, wordFlags.HasFlag(WordFlags.P) ? (int)gcValues.P : 0, IJKMode, invert ? motionMode == MotionMode.G3 : motionMode == MotionMode.G2, blockDelete));
                         break;
 
                     case MotionMode.G5:
@@ -1833,6 +1858,14 @@ namespace CNC.GCode
                         }
                         break;
 
+                    case MotionMode.G84:
+                        {
+                            uint repeats = wordFlags.HasFlag(WordFlags.L) ? (uint)gcValues.L : 1;
+                            double dwell = wordFlags.HasFlag(WordFlags.P) ? gcValues.P : 0d;
+                            Tokens.Add(new GCCannedDrill(Commands.G84, gcValues.N, gcValues.XYZ, axisWords, wordFlags.HasFlag(WordFlags.R) ? ToMetric(gcValues.R) : double.NaN, repeats, dwell, blockDelete));
+                        }
+                        break;
+
                     case MotionMode.G85:
                         {
                             uint repeats = wordFlags.HasFlag(WordFlags.L) ? (uint)gcValues.L : 1;
@@ -1914,8 +1947,9 @@ namespace CNC.GCode
                         typeof(GCWaitOnInput),
                         typeof(GCAnalogOutput),
                         typeof(GCUserMCommand),
-                        typeof(GCFlowControl)
-                    });
+                        typeof(GCFlowControl),
+                        typeof(GCParameter)
+                     });
                     bin.Serialize(stream, objToSerialize);
                 }
             }
@@ -2084,6 +2118,7 @@ namespace CNC.GCode
                     case Commands.G81:
                     case Commands.G82:
                     case Commands.G83:
+                    case Commands.G84:
                     case Commands.G85:
                     case Commands.G86:
                     case Commands.G89:
@@ -2385,11 +2420,23 @@ namespace CNC.GCode
             Array.Copy(ijk_values, IJKvalues, 3);
             Array.Copy(Values, end, 3);
 
+            P = p;
             IJKMode = ijkMode;
-            if((IjkFlags = ijkFlags) == IJKFlags.None)
+            IsClocwise = cmd == Commands.G2;
+            if ((IjkFlags = ijkFlags) == IJKFlags.None)
                 R = this.r = r;
+        }
+
+        public GCArc(Commands cmd, uint lnr, double[] xyz_values, AxisFlags axisFlags, double[] ijk_values, IJKFlags ijkFlags, double r, int p, IJKMode ijkMode, bool isClocwise, bool blockDelete) : base(cmd, lnr, xyz_values, axisFlags, blockDelete)
+        {
+            Array.Copy(ijk_values, IJKvalues, 3);
+            Array.Copy(Values, end, 3);
 
             P = p;
+            IJKMode = ijkMode;
+            IsClocwise = isClocwise;
+            if ((IjkFlags = ijkFlags) == IJKFlags.None)
+                R = this.r = r;
         }
 
         public IJKFlags IjkFlags { get; set; }
@@ -2404,7 +2451,7 @@ namespace CNC.GCode
 
         public IJKMode IJKMode { get; set; }
         public bool IsRadiusMode { get { return double.IsNaN(I) && double.IsNaN(J) && double.IsNaN(K); } }
-        public bool IsClocwise { get { return Command == Commands.G2; } }
+        public bool IsClocwise { get; private set; }
 
         public new string ToString()
         {
@@ -2430,7 +2477,7 @@ namespace CNC.GCode
                     for (int i = 0; i < 3; i++)
                     {
                         if(i != plane.AxisLinear)
-                            end[i] += start[i];
+                            end[i] = AxisFlags.HasFlag(GCodeParser.AxisFlag[i]) ? end[i] + start[i] : start[i];
                     }
                 }
 
@@ -2668,28 +2715,15 @@ namespace CNC.GCode
                 h_x2_div_d = -h_x2_div_d;
             }
 
-            // Special message from gcoder to software for which radius
-            // should be used.
-            //if (radius < 0d)
-            //{
-            //    h_x2_div_d = -h_x2_div_d;
-            //    // TODO: Places that use this need to run ABS on radius.
-            //    radius = -radius;
-            //}
-
-            double offsetX = 0.5d * (x - (y * h_x2_div_d));
-            double offsetY = 0.5d * (y + (x * h_x2_div_d));
-
-            if (IJKMode == IJKMode.Incremental)
+            // Special message from gcoder to software for which radius should be used.
+            if (R < 0d)
             {
-                center[0] = start[plane.Axis0] + offsetX;
-                center[1] = start[plane.Axis1] + offsetY;
+                h_x2_div_d = -h_x2_div_d; // TODO: Places that use this need to run ABS on radius.
+                r = -R;
             }
-            else
-            {
-                center[0] = offsetX;
-                center[1] = offsetY;
-            }
+
+            center[0] = start[plane.Axis0] + 0.5d * (x - (y * h_x2_div_d));
+            center[1] = start[plane.Axis1] + 0.5d * (y + (x * h_x2_div_d));
 
             return center;
         }
@@ -2706,6 +2740,12 @@ namespace CNC.GCode
             // Calculate angles from center.
             double startAngle = GetStartAngle(plane, start, isRelative);
             double endAngle = GetEndAngle(plane, start, isRelative);
+            double[] end = new double[3];
+            Array.Copy(this.end, end, 3);
+            if(!AxisFlags.HasFlag(GCodeParser.AxisFlag[plane.AxisLinear]))
+                end[plane.AxisLinear] = start[plane.AxisLinear];
+            else if(isRelative)
+                end[plane.AxisLinear] = start[plane.AxisLinear] + end[plane.AxisLinear];
             double delta_linear = end[plane.AxisLinear] - start[plane.AxisLinear];
 
             if (startAngle == endAngle)
@@ -2800,10 +2840,11 @@ namespace CNC.GCode
     {
         public static List<Point3D> GeneratePoints(double[] start, Point first, Point second, double[] end, double arcResolution, bool isRelative = false)
         {
+            const double min_step = 0.002d, max_step = 0.1d, sigma = 0.1d;
+
+            double t = 0d, step = max_step;
             Point bez_target = new Point(start[0], start[1]);
             List<Point3D> segments = new List<Point3D>();
-
-            double t = 0d, step = 0.1d;
 
             while (t < 1d)
             {
@@ -2818,22 +2859,16 @@ namespace CNC.GCode
                 double new_pos0 = eval_bezier(start[0], first.X, second.X, end[0], new_t),
                        new_pos1 = eval_bezier(start[1], first.Y, second.Y, end[1], new_t);
 
-                if (arcResolution > 1d) // TODO: fix!
-                    arcResolution = 0.002d;
 
-                while (new_t - t >= arcResolution)
+                while (new_t - t >= min_step)
                 {
-
-                    //            if (new_t - t < (BEZIER_MIN_STEP))
-                    //                break;
-
                     double candidate_t = 0.5f * (t + new_t),
                            candidate_pos0 = eval_bezier(start[0], first.X, second.X, end[0], candidate_t),
                            candidate_pos1 = eval_bezier(start[1], first.Y, second.Y, end[1], candidate_t),
                            interp_pos0 = 0.5f * (bez_target.X + new_pos0),
                            interp_pos1 = 0.5f * (bez_target.Y + new_pos1);
 
-                    if (dist1(candidate_pos0, candidate_pos1, interp_pos0, interp_pos1) <= (.1d))
+                    if (dist1(candidate_pos0, candidate_pos1, interp_pos0, interp_pos1) <= sigma)
                         break;
 
                     new_t = candidate_t;
@@ -2842,26 +2877,25 @@ namespace CNC.GCode
                     did_reduce = true;
                 }
 
-                if (!did_reduce) while (new_t - t >= (.002d))
-                    {
+                if (!did_reduce) while (new_t - t > max_step)
+                {
+                    double candidate_t = t + 2d * (new_t - t);
 
-                        double candidate_t = t + 2d * (new_t - t);
+                    if (candidate_t >= 1.0f)
+                        break;
 
-                        if (candidate_t >= 1.0f)
-                            break;
+                    double candidate_pos0 = eval_bezier(start[0], first.X, second.X, end[0], candidate_t),
+                            candidate_pos1 = eval_bezier(start[1], first.Y, second.Y, end[1], candidate_t),
+                            interp_pos0 = 0.5f * (bez_target.X + candidate_pos0),
+                            interp_pos1 = 0.5f * (bez_target.Y + candidate_pos1);
 
-                        double candidate_pos0 = eval_bezier(start[0], first.X, second.X, end[0], candidate_t),
-                               candidate_pos1 = eval_bezier(start[1], first.Y, second.Y, end[1], candidate_t),
-                               interp_pos0 = 0.5f * (bez_target.X + candidate_pos0),
-                               interp_pos1 = 0.5f * (bez_target.Y + candidate_pos1);
+                    if (dist1(new_pos0, new_pos1, interp_pos0, interp_pos1) > sigma)
+                        break;
 
-                        if (dist1(new_pos0, new_pos1, interp_pos0, interp_pos1) > (.1d))
-                            break;
-
-                        new_t = candidate_t;
-                        new_pos0 = candidate_pos0;
-                        new_pos1 = candidate_pos1;
-                    }
+                    new_t = candidate_t;
+                    new_pos0 = candidate_pos0;
+                    new_pos1 = candidate_pos1;
+                }
 
                 step = new_t - t;
                 t = new_t;
@@ -3018,6 +3052,24 @@ namespace CNC.GCode
         public new string ToString()
         {
             return base.ToString() + "P" + P + (L > 1 ? "L" + L : string.Empty) + GCodeParser.GCParameters.ToString(Values);
+        }
+    }
+
+    public class GCRotate : GCAxisCommand3
+    {
+        public GCRotate()
+        { }
+
+        public GCRotate(Commands command, uint lnr, double[] values, AxisFlags axisFlags, double r, bool blockDelete) : base(command, lnr, values, axisFlags, blockDelete)
+        {
+            R = r;
+        }
+
+        public double R { get; set; }
+
+        public new string ToString()
+        {
+            return base.ToString() + "R" + R.ToInvariantString();
         }
     }
 
@@ -3180,11 +3232,11 @@ namespace CNC.GCode
             P = p;
             R = double.NaN;
         }
-        public GCCoordinateSystem(Commands cmd, uint lnr, uint l, uint p, double[] values, AxisFlags axisFlags, bool blockDelete) : base(cmd, lnr, values, axisFlags, blockDelete)
+        public GCCoordinateSystem(Commands cmd, uint lnr, uint l, uint p, double[] values, double r, AxisFlags axisFlags, bool blockDelete) : base(cmd, lnr, values, axisFlags, blockDelete)
         {
             L = l;
             P = p;
-            R = double.NaN;
+            R = l == 2 ? r : double.NaN;
         }
 
         public uint L { get; set; }
@@ -3598,13 +3650,31 @@ namespace CNC.GCode
             Expression = expression;
         }
 
-        public uint O { get; set; }
-        NGCExpr.FlowControl FlowControl;
-        string Expression;
+        public uint O { get; private set; }
+        public NGCExpr.FlowControl FlowControl { get; private set; }
+        public string Expression { get; private set; }
 
         public new string ToString()
         {
             return base.ToString() + "o" + O + FlowControl.ToString().ToLower() + Expression;
+        }
+    }
+
+    public class GCParameter : GCodeToken
+    {
+        public GCParameter()
+        { }
+
+        public GCParameter(Commands command, uint lnr, string expression, bool blockDelete) : base(command, lnr, blockDelete)
+        {
+            Expression = expression;
+        }
+
+        public string Expression { get; private set; }
+
+        public new string ToString()
+        {
+            return Expression;
         }
     }
 }

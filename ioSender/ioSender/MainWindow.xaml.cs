@@ -1,13 +1,13 @@
 /*
  * MainWindow.xaml.cs - part of ioSender
  *
- * v0.46 / 2025-06-05 / Io Engineering (Terje Io)
+ * v0.47 / 2026-04-29 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2024, Io Engineering (Terje Io)
+Copyright (c) 2019-2026, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -56,7 +56,7 @@ namespace GCode_Sender
 
     public partial class MainWindow : Window
     {
-        private const string version = "2.0.46";
+        private const string version = "2.0.47";
         public static MainWindow ui = null;
         public static CNC.Controls.Viewer.Viewer GCodeViewer = null;
         public static UIViewModel UIViewModel { get; } = new UIViewModel();
@@ -203,7 +203,7 @@ namespace GCode_Sender
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if (!(e.Cancel = !menuFile.IsEnabled))
+            if (CNC.Core.Grbl.GrblViewModel.IsSDCardJob || !(e.Cancel = !menuFile.IsEnabled))
             {
                 UIViewModel.CurrentView.Activate(false, ViewType.Shutdown);
 

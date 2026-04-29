@@ -1,13 +1,13 @@
 ﻿/*
  * GCodeRotate.cs - part of CNC Controls library for Grbl
  *
- * v0.45 / 2024-10-11 / Io Engineering (Terje Io)
+ * v0.47 / 2025-09-25 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2021-2024, Io Engineering (Terje Io)
+Copyright (c) 2021-2025, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -140,7 +140,7 @@ namespace CNC.Controls
 
                             pos = target;
 
-                            toolPath.Add(new GCArc(arc.Command, arc.LineNumber, pos.Array, arc.AxisFlags, targetijk.Array, arc.IjkFlags, arc.R, arc.P, arc.IJKMode, arc.BlockDelete));
+                            toolPath.Add(new GCArc(arc.Command, arc.LineNumber, pos.Array, arc.AxisFlags, targetijk.Array, arc.IjkFlags, arc.R, arc.P, arc.IJKMode, arc.IsClocwise, arc.BlockDelete));
                         }
                         break;
 
@@ -181,6 +181,7 @@ namespace CNC.Controls
                     case Commands.G81:
                     case Commands.G82:
                     case Commands.G83:
+                    case Commands.G84:
                     case Commands.G85:
                     case Commands.G86:
                     case Commands.G89:

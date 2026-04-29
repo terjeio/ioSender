@@ -1,6 +1,105 @@
 ## ioSender changelog
 
-2025-10-01:
+2026-04-29: [Release 2.0.47](https://github.com/terjeio/Grbl-GCode-Sender/releases/tag/2.0.47).
+
+* Fix for incremental arc issues, ref issue [#503](https://github.com/terjeio/ioSender/issues/503) - fix adopted from PR [#504](https://github.com/terjeio/ioSender/pull/504). Broken Z plotting of incremental arcs is also fixed. 
+
+* Fix for jog buttons not working, ref. comment on issue [#468](https://github.com/terjeio/ioSender/issues/468#issuecomment-4136646179).
+
+* Added some key map methods:
+```
+KeypressHandler.FeedOverrideFinePlus
+KeypressHandler.FeedOverrideFineMinus
+KeypressHandler.FeedOverrideCoarseMinus
+KeypressHandler.FeedOverrideCoarsePlus
+KeypressHandler.FeedOverrideReset
+KeypressHandler.FeedOverrideRapidsMedium
+KeypressHandler.FeedOverrideRapidsLow
+KeypressHandler.FeedOverrideRapidsReset
+KeypressHandler.SpindleOverrideFinePlus
+KeypressHandler.SpindleOverrideFineMinus
+KeypressHandler.SpindleOverrideCoarseMinus
+KeypressHandler.SpindleOverrideCoarsePlus
+KeypressHandler.SpindleOverrideStop
+KeypressHandler.FloodOverrideToggle
+KeypressHandler.MistOverrideToggle
+KeypressHandler.Fan0Toggle
+KeypressHandler.ProbeConnectedToggle
+KeypressHandler.OptionalStopToggle
+KeypressHandler.SingleBlockToggle
+```
+
+* Fix for cannot close XL version when MPG mode is active. Ref. issue [#499](https://github.com/terjeio/ioSender/issues/499#issuecomment-3910302756).
+
+* Added some special words that can be used to send real time commands from macros:  
+`{park}` or `{safetydoor}` - send safety door command.  
+`{optionalstop}` - toggle optional stop switch.  
+`{singleblock}` - toggle single block switch.  
+`{probeconnected}` - toggle probe connected state.  
+<br>Whether or not these commands are acted upon depends on the controller configuration.
+> [!NOTE]
+> When used the macro has to contain only one special word and no other code. 
+
+* Added coordinate selector and associated _Go_ button to the _Goto_ flyout/panel that will execute a rapid move to the selected coordinate position. Use with care!
+Ref. issue [#500](https://github.com/terjeio/ioSender/issues/500).
+
+* Added `JogBaseControl.KeyJogCancel` method that _has to be added_ on the _up_ event for keys used for triggering UI jog buttons when in _Continuous_ mode.
+
+* Added support for adding or modifying direct keyboard jog keycodes in the keymap file.  
+An example for the B axis:
+```
+  <KeyMapping>
+    <Key>D</Key>
+    <Method>Jogkey.Bplus</Method>
+  </KeyMapping>
+  <KeyMapping>
+    <Key>T</Key>
+    <Method>Jogkey.Bminus</Method>
+  </KeyMapping>
+```
+> [!NOTE]
+> Any keys mapped like this will override other mappings for the same keys when pressed alone, in combination with _\<Ctrl\>_ or in combination with _\<Shift\>_.  
+> Adding support for adding or modifying direct keyboard jog keycodes required a rather large refactoring of the keypress handler. Please report any odd behaviour!
+
+* [PR #491](https://github.com/terjeio/ioSender/pull/491) merged. Adds spindle dir combobox in threading wizard.
+
+* Added option to set "breakpoints" in programs that will halt execution with a feed hold \(M0\). Press _\<Cycle Start\>_ to continue after a break.
+Breakpoints are set via the popup menu available in the program listing.
+
+* Added option to add line numbers to gcode programs that does not have them. Enable in the _Settings: App_ tab, _Main_ group.
+If the controller is configured to output line numbers and line numbers are present in the program the current executing line will be flagged with "@" in the program listing.
+
+* Fix for arcs not displaying correctly when relative motion is active. Ref. issue [#499](https://github.com/terjeio/ioSender/issues/499).
+
+* Added methods to allow mapping shortcut keys for jogging all axes. Ref. discussion [#494](https://github.com/terjeio/ioSender/discussions/494).
+
+* Added option to select continuous jog in the jog UI, enabled touch control. Ref. issue [#498](https://github.com/terjeio/ioSender/issues/498) and [#468](https://github.com/terjeio/ioSender/issues/468).
+
+* Added support for navigating SD card directories. Note that this feature requires the controller to be configured to handle it, a $650 option for grblHAL.
+
+* Spindle can now be stopped in _Hold_ state.
+
+* Tool table is now sorted numerically, added tool name to listing when available from the controller.
+
+* Internal changes, some are work in progress such as full support for rotation commands and flow control.
+
+* Camera view crosshair can be moved (dragged) by \<SHIFT\> left clicking the left mouse button at the cross intersection to compensate for parallax. \<SHIFT\> right click to restore it to the center.
+Ref. [discussion 484](https://github.com/terjeio/ioSender/discussions/484).
+
+* Added parser support for G33.1 and G84.
+
+* Updated _Tools_ tab, list will now show tool name if available from the controller. Changed sort order to numeric.
+
+* Allow closing the app when running a job from SD card. Ref. [discussion comment](https://github.com/terjeio/ioSender/discussions/335#discussioncomment-14517412).
+Reconnecting while it is running may terminate the job depending on the controller, if not terminated the app will not be initialized correctly until the _Reset_ button has been pressed.
+
+* Fix for incorrect 3D rendering or arcs when negative scaling (G51) is active.
+
+* Improved keyboard mappings, new can mappings be added and existing ones can be removed by setting the _Method_ to "_None_". Ref. issue [#472](https://github.com/terjeio/ioSender/issues/476)
+
+* Fixed handling of serial port handshake (RTS or Xon/Xoff), the app config file has to be edited manually to set it.
+
+* Fix for regression causing "Start from here" and other menu items in the program listing popup to fail with exception. Ref. disussion [#469](https://github.com/terjeio/ioSender/discussions/469).
 
 2025-06-05: [Release 2.0.46](https://github.com/terjeio/Grbl-GCode-Sender/releases/tag/2.0.46).
 

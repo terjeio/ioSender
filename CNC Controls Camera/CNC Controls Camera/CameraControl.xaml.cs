@@ -1,13 +1,13 @@
 ﻿/*
  * CameraControl.xaml.cs - part of CNC Controls Camera library
  *
- * v0.42 / 2023-03-22 / Io Engineering (Terje Io)
+ * v0.47 / 2025-11-10 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2023, Io Engineering (Terje Io) - parts derived from AForge example code
+Copyright (c) 2018-2025, Io Engineering (Terje Io) - parts derived from AForge example code
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -47,6 +47,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using AForge.Video.DirectShow;
 using CNC.Core;
+using System.Windows.Input;
+using System;
 
 namespace CNC.Controls.Camera
 {
@@ -55,6 +57,8 @@ namespace CNC.Controls.Camera
     /// </summary>
     public partial class CameraControl : UserControl
     {
+        private static System.Windows.Point crosshairCenter = new System.Windows.Point(640d / 2d, 480d / 2d);
+
         VideoCaptureDevice videoSource = null;
         public FilterInfoCollection LoaclWebCamsCollection;
 
@@ -65,12 +69,72 @@ namespace CNC.Controls.Camera
         private DrawingVisual visual = null;
         private System.Windows.Media.Pen pen = null;
         private double _xOffset = 0d, _yOffset = 0d;
+        private System.Windows.Point scale, offset, org_pos;
+
+        private const double clickTargetRadius = 5d;
 
         public CameraControl()
         {
             InitializeComponent();
 
             DataContext = this;
+            scale = new System.Windows.Point(crosshairCenter.X / frameHolder.Width * 2d, crosshairCenter.Y / frameHolder.Height * 2d);
+
+            frameHolder.MouseLeftButtonDown += FrameHolder_MouseLeftButtonDown;
+            frameHolder.MouseRightButtonDown += FrameHolder_MouseRightButtonDown;
+        }
+
+        private void FrameHolder_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
+            {
+                var pos = e.GetPosition(frameHolder);
+
+                offset = new System.Windows.Point(CrosshairPos.X - pos.X * scale.X, CrosshairPos.Y - pos.Y * scale.Y);
+                if (Math.Abs(offset.X) <= clickTargetRadius && Math.Abs(offset.Y) <= clickTargetRadius)
+                    CrosshairPos = crosshairCenter;
+            }
+        }
+
+        private void FrameHolder_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
+            {
+                var pos = e.GetPosition(frameHolder);
+
+                org_pos = CrosshairPos;
+                offset = new System.Windows.Point(CrosshairPos.X - pos.X * scale.X, CrosshairPos.Y - pos.Y * scale.Y);
+
+                if(Math.Abs(offset.X) <= clickTargetRadius && Math.Abs(offset.Y) <= clickTargetRadius) {
+                    frameHolder.MouseMove += FrameHolder_MouseMove;
+                    frameHolder.MouseLeftButtonUp += FrameHolder_MouseLeftButtonUp;
+                    frameHolder.MouseLeave += FrameHolder_MouseLeave;
+                }
+            }
+        }
+
+        private void FrameHolder_MouseLeave(object sender, MouseEventArgs e)
+        {
+            CrosshairPos = org_pos;
+            frameHolder.MouseMove -= FrameHolder_MouseMove;
+            frameHolder.MouseLeftButtonUp -= FrameHolder_MouseLeftButtonUp;
+            frameHolder.MouseLeave -= FrameHolder_MouseLeave;
+        }
+
+        private void FrameHolder_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            frameHolder.MouseMove -= FrameHolder_MouseMove;
+            frameHolder.MouseLeftButtonUp -= FrameHolder_MouseLeftButtonUp;
+            frameHolder.MouseLeave -= FrameHolder_MouseLeave;
+
+            AppConfig.Settings.Camera.CrosshairPosX = CrosshairPos.X;
+            AppConfig.Settings.Camera.CrosshairPosY = CrosshairPos.Y;
+        }
+
+        private void FrameHolder_MouseMove(object sender, MouseEventArgs e)
+        {
+            var pos = e.GetPosition(frameHolder);
+            CrosshairPos = new System.Windows.Point(pos.X * scale.X, pos.Y * scale.Y);
         }
 
         private void CameraControl_Loaded(object sender, RoutedEventArgs e)
@@ -135,6 +199,8 @@ namespace CNC.Controls.Camera
             get { return (bool)GetValue(MoveCameraToSpindlePositionProperty); }
             set { SetValue(MoveCameraToSpindlePositionProperty, value); }
         }
+
+        public System.Windows.Point CrosshairPos { get; set; } = crosshairCenter;
 
         public GrblViewModel grbl {  get { return Grbl.GrblViewModel;  } }
 
@@ -205,12 +271,10 @@ namespace CNC.Controls.Camera
             }
             else using (var r = visual.RenderOpen())
             {
-                System.Windows.Point center = new System.Windows.Point(bmp.Width / 2.0f, bmp.Height / 2.0f);
-
                 r.DrawImage(bmp, new Rect(0, 0, bmp.Width, bmp.Height));
-                r.DrawLine(pen, new System.Windows.Point(0, center.Y), new System.Windows.Point(bmp.Width, center.Y));
-                r.DrawLine(pen, new System.Windows.Point(center.X, 0), new System.Windows.Point(center.X, bmp.Height));
-                r.DrawEllipse(null, pen, center, center.Y * GuideScale / 100d, center.Y * GuideScale / 100d);
+                r.DrawLine(pen, new System.Windows.Point(0, CrosshairPos.Y), new System.Windows.Point(bmp.Width, CrosshairPos.Y));
+                r.DrawLine(pen, new System.Windows.Point(CrosshairPos.X, 0), new System.Windows.Point(CrosshairPos.X, bmp.Height));
+                r.DrawEllipse(null, pen, CrosshairPos, bmp.Height * GuideScale / 200d, bmp.Height * GuideScale / 200d);
             }
             overlay.Render(visual);
         }

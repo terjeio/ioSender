@@ -1,7 +1,7 @@
 ﻿/*
  * NGCExpr.cs - part of CNC Controls library
  *
- * v0.43 / 2021-10-30 / Io Engineering (Terje Io)
+ * v0.47 / 2026-01-23 / Io Engineering (Terje Io)
  *
  */
 
@@ -136,6 +136,9 @@ namespace CNC.Core
             ENDWHILE,
             REPEAT,
             ENDREPEAT,
+            SUB,
+            ENDSUB,
+            CALL,
             RETURN,
             ALARM,
             ERROR
@@ -184,10 +187,28 @@ namespace CNC.Core
             u,
             v,
             w,
+            abs_x,
+            abs_y,
+            abs_z,
+            abs_a,
+            abs_b,
+            abs_c,
+            abs_u,
+            abs_v,
+            abs_w,
             current_tool,
             current_pocket,
             selected_tool,
             selected_pocket,
+            call_level,
+            probe_state,
+            probe2_state,
+            toolsetter_state,
+            active_probe,
+            homed_state,
+            homed_axes,
+            tool_table_size,
+            free_memory,
             NGCParamLast
         };
 
@@ -1111,7 +1132,7 @@ namespace CNC.Core
             LastError = OpStatus.OK;
             int end = pos;
 
-            while (end < line.Length && line[end] != '[')
+            while (end < line.Length && !(line[end] == '[' || line[end] == '(' || line[end] == ';'))
                 end++;
 
             string stmnt = line.Substring(pos, end - pos).ToUpper();
