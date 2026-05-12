@@ -1,5 +1,5 @@
 ## ioSender - a gcode sender for grblHAL and Grbl controllers
-
+![Sender](Media/SenderDark.png)
 ---
 
 Please check out the [Wiki](https://github.com/terjeio/Grbl-GCode-Sender/wiki) for further details.
