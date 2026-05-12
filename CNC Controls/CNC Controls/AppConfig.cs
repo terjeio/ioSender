@@ -1,13 +1,13 @@
 ﻿/*
  * AppConfig.cs - part of CNC Controls library
  *
- * v0.46 / 2025-02-22 / Io Engineering (Terje Io)
+ * v0.47 / 2026-02-11 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2025, Io Engineering (Terje Io)
+Copyright (c) 2019-2026, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -108,7 +108,7 @@ namespace CNC.Controls
     public class CameraConfig : ViewModelBase
     {
         private string _camera = string.Empty;
-        private double _xoffset = 0d, _yoffset = 0d;
+        private double _xoffset = 0d, _yoffset = 0d, _crossHairX = -1d, _crossHairY = -1d;
         private int _guideScale = 10;
         private bool _moveToSpindle = false, _confirmMove = false;
         private CameraMoveMode _moveMode = CameraMoveMode.BothAxes;
@@ -122,6 +122,8 @@ namespace CNC.Controls
         public string SelectedCamera { get { return _camera; } set { _camera = value; IsDirty = true; OnPropertyChanged(); } }
         public double XOffset { get { return _xoffset; } set { _xoffset = value; OnPropertyChanged(); } }
         public double YOffset { get { return _yoffset; } set { _yoffset = value; OnPropertyChanged(); } }
+        public double CrosshairPosX { get { return _crossHairX; } set { _crossHairX = value; IsDirty = true; OnPropertyChanged(); } }
+        public double CrosshairPosY { get { return _crossHairY; } set { _crossHairY = value; IsDirty = true; OnPropertyChanged(); } }
         public int GuideScale { get { return _guideScale; } set { _guideScale = value; IsDirty = true; OnPropertyChanged(); } }
         public bool InitialMoveToSpindle { get { return _moveToSpindle; } set { _moveToSpindle = value; IsDirty = true; OnPropertyChanged(); } }
         public bool ConfirmMove { get { return _confirmMove; } set { _confirmMove = value; IsDirty = true; OnPropertyChanged(); } }
@@ -240,7 +242,7 @@ namespace CNC.Controls
     public class Config : ViewModelBase
     {
         private int _pollInterval = 200, /* ms*/  _maxBufferSize = 300;
-        private bool _useBuffering = false, _keepMdiFocus = true, _filterOkResponse = false, _saveWindowSize = false, _autoCompress = false, _send_comments = false;
+        private bool _useBuffering = false, _keepMdiFocus = true, _filterOkResponse = false, _saveWindowSize = false, _autoCompress = false, _send_comments = false, _addLinenumbers = false;
         private CommandIgnoreState _ignoreM6 = CommandIgnoreState.No, _ignoreM7 = CommandIgnoreState.No, _ignoreM8 = CommandIgnoreState.No, _ignoreG61G64 = CommandIgnoreState.Strip;
         private string _theme = "default";
 
@@ -271,6 +273,7 @@ namespace CNC.Controls
         public bool FilterOkResponse { get { return _filterOkResponse; } set { _filterOkResponse = value; OnPropertyChanged(); } }
         public bool AutoCompress { get { return _autoCompress; } set { _autoCompress = value; OnPropertyChanged(); } }
         public bool SendComments { get { return _send_comments; } set { _send_comments = value; OnPropertyChanged(); } }
+        public bool AddLineNumbers { get { return _addLinenumbers; } set { _addLinenumbers = value; OnPropertyChanged(); } }
 
         [XmlIgnore]
         public CommandIgnoreState[] CommandIgnoreStates { get { return (CommandIgnoreState[])Enum.GetValues(typeof(CommandIgnoreState)); } }

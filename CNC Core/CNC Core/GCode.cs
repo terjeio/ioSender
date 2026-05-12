@@ -1,13 +1,13 @@
 ﻿/*
  * GCode.cs - part of CNC Controls library
  *
- * v0.45 / 2022-02-28 / Io Engineering (Terje Io)
+ * v0.47 / 2026-01-25 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2024, Io Engineering (Terje Io)
+Copyright (c) 2018-2026, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -128,6 +128,7 @@ namespace CNC.GCode
         G5_1 = 51,
         G5_2 = 52,
         G33 = 330,
+        G33_1 = 332,
         G38_2 = 382,
         G38_3 = 383,
         G38_4 = 384,
@@ -238,6 +239,7 @@ namespace CNC.GCode
         G30,
         G30_1,
         G33,
+        G33_1,
         G38_2,
         G38_3,
         G38_4,
@@ -267,12 +269,17 @@ namespace CNC.GCode
         G61_1,
         G64,
         G65,
+        G66,
+        G67,
+        G68,
+        G69,
         G73,
         G76,
         G80,
         G81,
         G82,
         G83,
+        G84,
         G85,
         G86,
         G89,
@@ -323,6 +330,7 @@ namespace CNC.GCode
         Comment,
         UserMCommand,
         FlowControl,
+        Parameter,
         Undefined
     }
 

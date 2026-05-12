@@ -1,13 +1,13 @@
 ﻿/*
  * GCodeJob.cs - part of CNC Controls library
  *
- * v0.46 / 2025-06-01 / Io Engineering (Terje Io)
+ * v0.47 / 2026-02-13 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2025, Io Engineering (Terje Io)
+Copyright (c) 2018-2026, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -57,7 +57,8 @@ namespace CNC.Core
 
     public class GCodeBlock : ViewModelBase
     {
-        private string _data, _sent;
+        private bool _break;
+        private string _data, _sent = string.Empty;
 
         public GCodeBlock (uint lineNum, string block, int length, bool isComment, bool programEnd)
         {
@@ -71,9 +72,21 @@ namespace CNC.Core
         public uint LineNum { get; set; }
         public int Length { get; set; }
         public string Data { get { return _data; } set { _data = value; OnPropertyChanged(); } }
-        public string Sent { get { return _sent; } set { _sent = value; OnPropertyChanged(); } }
+        public string Sent {
+            get { return _sent; }
+            set { _sent = BreakAt ? "BRK " + value : value; OnPropertyChanged(); }
+        }
         public bool File { get; set; }
         public bool IsComment { get; set; }
+        public bool BreakAt
+        {
+            get { return _break; }
+            set {
+                _break = value;
+                Sent = _sent.Replace("BRK ", string.Empty);
+                Length += _break ? 3 : -3;
+            }
+        }
         public bool ProgramEnd { get; set; }
         public bool Ok { get; set; }
     }
@@ -125,7 +138,7 @@ namespace CNC.Core
         public double min_feed { get; private set; }
         public double max_feed { get; private set; }
 
-        public bool LoadFile(string filename)
+        public bool LoadFile(string filename, bool addLineNumber = false)
         {
             using (StreamReader sr = new FileInfo(filename).OpenText())
                 return Load(filename, sr);
@@ -140,6 +153,7 @@ namespace CNC.Core
         private bool Load(string filename, TextReader sr)
         {
             bool ok = true, isComment;
+            uint ln;
 
             string block = sr.ReadLine();
 
@@ -150,13 +164,28 @@ namespace CNC.Core
                 try
                 {
                     block = block.Trim();
-                    if (Parser.ParseBlock(ref block, false, out isComment))
+                    if (Parser.ParseBlock(ref block, false, out ln, out isComment))
                     {
-                        blocks.Add(new GCodeBlock(LineNumber++, block, block.Length + 1, isComment, Parser.ProgramEnd));
+                        if (ln > 0)
+                        {
+                            LineNumber = ln;
+                            addLineNumber = false;
+                        }
+                        else if (addLineNumber)
+                        {
+                            LineNumber += 10;
+                            block = "N" + LineNumber.ToString() + block;
+                        } else
+                            LineNumber++;
+
+                        blocks.Add(new GCodeBlock(LineNumber, block, block.Length + 1, isComment, Parser.ProgramEnd));
                         while (commands.Count > 0)
                         {
                             block = commands.Dequeue();
-                            blocks.Add(new GCodeBlock(LineNumber++, block, block.Length + 1, false, false));
+                            LineNumber++;
+                            if (addLineNumber)
+                                block = "N" + (LineNumber).ToString() + block;
+                            blocks.Add(new GCodeBlock(LineNumber, block, block.Length + 1, false, false));
                         }
                     }
                     block = sr.ReadLine();
@@ -194,14 +223,26 @@ namespace CNC.Core
             else if (block != null && block.Trim().Length > 0) try
             {
                 bool isComment;
+                uint ln;
+
                 block = block.Trim();
-                if (Parser.ParseBlock(ref block, false, out isComment))
+                if (Parser.ParseBlock(ref block, false, out ln, out isComment))
                 {
-                    blocks.Add(new GCodeBlock(LineNumber++, block, block.Length + 1, isComment, Parser.ProgramEnd));
+                    if(GrblInfo.UseLinenumbers)
+                    {
+                        LineNumber += 10;
+                        block = "N" + LineNumber.ToString() + block;
+                    } else
+                        LineNumber++;
+ 
+                    blocks.Add(new GCodeBlock(LineNumber, block, block.Length + 1, isComment, Parser.ProgramEnd));
                     while (commands.Count > 0)
                     {
                         block = commands.Dequeue();
-                        blocks.Add(new GCodeBlock(LineNumber++, block, block.Length + 1, false, false));
+                        LineNumber++;
+                        if (GrblInfo.UseLinenumbers)
+                            block = "N" + (LineNumber).ToString() + block;
+                        blocks.Add(new GCodeBlock(LineNumber, block, block.Length + 1, false, false));
                     }
                 }
             }
@@ -277,7 +318,7 @@ namespace CNC.Core
             min_feed = double.MaxValue;
             max_feed = double.MinValue;
             BoundingBox.Reset();
-            LineNumber = 1;
+            LineNumber = 0;
             HeightMapApplied = false;
             Parser.Reset();
         }

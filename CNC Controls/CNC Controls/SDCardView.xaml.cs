@@ -1,13 +1,13 @@
 /*
  * SDCardView.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.46 / 2025-03-07 / Io Engineering (Terje Io)
+ * v0.47 / 2026-03-10 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2025, Io Engineering (Terje Io)
+Copyright (c) 2018-2026, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -173,7 +173,7 @@ namespace CNC.Controls
 
         private void DownloadRun_Click(object sender, RoutedEventArgs e)
         {
-            if (currentFile != null && !isMacro((string)currentFile["Name"]) && MessageBox.Show(string.Format((string)FindResource("DownloandRun"), (string)currentFile["Name"]), "ioSender", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes) == MessageBoxResult.Yes)
+            if (currentFile != null && (int)currentFile["Size"] > 0 && !isMacro((string)currentFile["Name"]) && MessageBox.Show(string.Format((string)FindResource("DownloandRun"), (string)currentFile["Name"]), "ioSender", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes) == MessageBoxResult.Yes)
             {
                 var model = DataContext as GrblViewModel;
 
@@ -245,6 +245,28 @@ namespace CNC.Controls
                     else using(new UIUtils.WaitCursor())
                     {
                         model.Message = (string)FindResource("Uploading");
+
+                        if (GrblInfo.Build > 20260308)
+                        {
+                            bool? res = null;
+                            CancellationToken cancellationToken = new CancellationToken();
+
+                            Comms.com.PurgeQueue();
+
+                            new Thread(() =>
+                            {
+                                res = WaitFor.AckResponse<string>(
+                                    cancellationToken,
+                                    null,
+                                    a => model.OnResponseReceived += a,
+                                    a => model.OnResponseReceived -= a,
+                                    300, () => Comms.com.WriteCommand(GrblConstants.CMD_FS_PWD));
+                            }).Start();
+
+                            while (res == null)
+                                EventUtils.DoEvents();
+                        }
+
                         try
                         {
                             using (WebClient client = new WebClient())
@@ -254,8 +276,10 @@ namespace CNC.Controls
                                     port = GrblSettings.GetInteger(grblHALSetting.FtpPort1);
                                 if (port == -1)
                                     port = GrblSettings.GetInteger(grblHALSetting.FtpPort2);
+                                string path = string.Format("{0}{1}{2}", model.FsCwd, model.FsCwd.EndsWith("/") ? "" : "/", System.IO.Path.GetFileName(filename));
+
                                 client.Credentials = new NetworkCredential("grblHAL", "grblHAL");
-                                client.UploadFile(string.Format("ftp://{0}:{1}//{2}", GrblInfo.IpAddress, port == -1 ? 21 : port, System.IO.Path.GetFileName(filename)), WebRequestMethods.Ftp.UploadFile, filename);
+                                client.UploadFile(string.Format("ftp://{0}:{1}{2}", GrblInfo.IpAddress, port == -1 ? 21 : port, path), WebRequestMethods.Ftp.UploadFile, filename);
                                 ok = true;
                             }
                         }
@@ -294,6 +318,7 @@ namespace CNC.Controls
         {
             RunFile();
         }
+
         private void ViewAll_Click(object sender, RoutedEventArgs e)
         {
             GrblSDCard.Load(DataContext as GrblViewModel, ViewAll);
@@ -303,8 +328,8 @@ namespace CNC.Controls
         {
             if (MessageBox.Show(string.Format((string)FindResource("DeleteFile"), (string)currentFile["Name"]), "ioSender", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes) == MessageBoxResult.Yes)
             {
-                Comms.com.WriteCommand(GrblConstants.CMD_SDCARD_UNLINK + (string)currentFile["Name"]);
-                GrblSDCard.Load(DataContext as GrblViewModel, ViewAll);
+                if(Grbl.WaitForResponse(GrblConstants.CMD_SDCARD_UNLINK + (string)currentFile["Name"]))
+                    GrblSDCard.Load(DataContext as GrblViewModel, ViewAll);
             }
         }
 
@@ -318,6 +343,10 @@ namespace CNC.Controls
                 {
                     MessageBox.Show(string.Format(((string)FindResource("IllegalName")).Replace("\\n", "\r\r"), (string)currentFile["Name"]), "ioSender",
                                      MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                else if((int)currentFile["Size"] == -1) {
+                    if(Grbl.WaitForResponse(GrblConstants.CMD_SDCARD_RUN + (string)currentFile["Name"]))
+                        GrblSDCard.Load(DataContext as GrblViewModel, ViewAll);
                 }
                 else
                 {

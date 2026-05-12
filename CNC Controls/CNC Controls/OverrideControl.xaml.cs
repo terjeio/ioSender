@@ -1,13 +1,13 @@
 ﻿/*
  * OverrideControl.xaml.cs - part of CNC Controls library
  *
- * v0.46 / 2025-05-13 / Io Engineering (Terje Io)
+ * v0.47 / 2026-02-21 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2024, Io Engineering (Terje Io)
+Copyright (c) 2018-2026, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -64,6 +64,13 @@ namespace CNC.Controls
         public byte CoarseMinusCommand { set; get; }
 
         #region dependencyproperties
+
+        public static readonly DependencyProperty OverrideDisabledProperty = DependencyProperty.Register(nameof(OverrideDisabled), typeof(bool), typeof(OverrideControl));
+        public bool OverrideDisabled
+        {
+            get { return (bool)GetValue(OverrideDisabledProperty); }
+            set { SetValue(OverrideDisabledProperty, value); }
+        }
 
         public static readonly DependencyProperty MinimumProperty = DependencyProperty.Register(nameof(Minimum), typeof(int), typeof(OverrideControl), new PropertyMetadata(10));
         public int Minimum

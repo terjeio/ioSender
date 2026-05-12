@@ -1,13 +1,13 @@
 /*
  * Converters.cs - part of CNC Controls library for Grbl
  *
- * v0.41 / 2022-09-24 / Io Engineering (Terje Io)
+ * v0.47 / 2026-02-26 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2022, Io Engineering (Terje Io)
+Copyright (c) 2019-2026, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -68,6 +68,7 @@ namespace CNC.Controls
         public static LogicalAndConverter LogicalAndConverter = new LogicalAndConverter();
         public static LogicalOrConverter LogicalOrConverter = new LogicalOrConverter();
         public static BoolToVisibleConverter BoolToVisibleConverter = new BoolToVisibleConverter();
+        public static BoolToColorConverter BoolToColorConverter = new BoolToColorConverter();
         public static IsAxisVisibleConverter HasAxisConverter = new IsAxisVisibleConverter();
         public static IsSignalVisibleConverter IsSignalVisibleConverter = new IsSignalVisibleConverter();
         public static EnumValueToBooleanConverter EnumValueToBooleanConverter = new EnumValueToBooleanConverter();
@@ -515,6 +516,24 @@ namespace CNC.Controls
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             return value is Visibility && (Visibility)value == Visibility.Visible;
+        }
+    }
+
+    public class BoolToColorConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            bool result = true;
+
+            foreach (var value in values)
+                result &= value is bool && (bool)value;
+
+            return values.Length == 3 && values[0] is bool && (bool)values[0] ? values[1] : values[2];
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotImplementedException();
         }
     }
 

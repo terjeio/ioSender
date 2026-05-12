@@ -1,17 +1,17 @@
 ﻿<UserControl x:Class="CNC.Controls.GCodeListControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CNC.Controls"
              mc:Ignorable="d"
              d:DesignHeight="335" d:DesignWidth="400"
              Loaded="UserControl_Loaded">
     <DataGrid x:Name="grdGCode" Grid.Row="0" ItemsSource="{Binding}" AllowDrop="True" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" AutoGenerateColumns="False"
               CanUserSortColumns="false" CanUserResizeRows="False" IsReadOnly="true" SelectionChanged="grdGCode_SelectionChanged"
-              DragEnter="grdGCode_Drag" DragOver="grdGCode_Drag" DragLeave="grdGCode_Drag" Drop="grdGCode_Drop" FontSize="24">
+              DragEnter="grdGCode_Drag" DragOver="grdGCode_Drag" DragLeave="grdGCode_Drag" Drop="grdGCode_Drop">
         <DataGrid.Columns>
-            <DataGridTextColumn x:Uid="hdr_block" Header="Block" Binding="{Binding LineNum}" Width="80" MinWidth="50" MaxWidth="150"/>
+            <DataGridTextColumn x:Uid="hdr_block" Header="Block" Binding="{Binding LineNum}" Width="60" MinWidth="60" MaxWidth="70"/>
             <DataGridTextColumn Header="" Binding="{Binding Sent}" Width="*" MinWidth="30" MaxWidth="60"/>
             <DataGridTextColumn x:Uid="hdr_data" Header="Data" Binding="{Binding Data}" Width="*" MinWidth="280"/>
         </DataGrid.Columns>
@@ -20,7 +20,8 @@
                 <MenuItem x:Uid="mnu_sendToController" Header="Send to controller" IsEnabled="{Binding Path=MultipleSelected}" Click="SendController_Click" />
                 <MenuItem x:Uid="mnu_startFromHere" Header="Start from here" IsEnabled="{Binding Path=SingleSelected}" Click="StartHere_Click" />
                 <MenuItem x:Uid="mnu_copyToMDI" Header="Copy to MDI" IsEnabled="{Binding Path=SingleSelected}" Click="CopyMDI_Click" />
-            </ContextMenu>
+				<MenuItem x:Uid="mnu_ToggleBreak" Header="Toggle Break" IsEnabled="{Binding Path=SingleSelected}" Click="ToggleBreak_Click" />
+			</ContextMenu>
         </DataGrid.ContextMenu>
     </DataGrid>
 </UserControl>

@@ -219,6 +219,7 @@ namespace CNC.Controls
                     case Commands.G81:
                     case Commands.G82:
                     case Commands.G83:
+                    case Commands.G84:
                     case Commands.G85:
                     case Commands.G86:
                     case Commands.G89:

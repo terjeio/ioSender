@@ -1,13 +1,13 @@
 ﻿/*
  * KeypressHandler.xaml.cs - part of CNC Controls library
  *
- * v0.37 / 2022-02-27 / Io Engineering (Terje Io)
+ * v0.47 / 2026-03-23 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020-2022, Io Engineering (Terje Io)
+Copyright (c) 2020-2026, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -50,6 +50,77 @@ namespace CNC.Core
 {
     public class KeypressHandler
     {
+        private int N_AXIS = 3;
+        private bool preCancel = false, allowJog = true;
+        private JogMode jogMode = JogMode.None;
+        private GrblViewModel grbl;
+        private List<KeypressHandlerFn> handlers = new List<KeypressHandlerFn>();
+        private List<HandlerFn> functions = new List<HandlerFn>();
+        private AxisJog[] axisjog = new AxisJog[9];
+        private JogKey[] jogKeys = new JogKey[] {
+            new JogKey(0, Key.Right),
+            new JogKey(0, Key.Left),
+            new JogKey(1, Key.Up),
+            new JogKey(1, Key.Down),
+            new JogKey(2, Key.PageUp),
+            new JogKey(2, Key.PageDown),
+            new JogKey(3, Key.Home),
+            new JogKey(3, Key.End),
+            new JogKey(4),
+            new JogKey(4),
+            new JogKey(5),
+            new JogKey(5),
+            new JogKey(6),
+            new JogKey(6),
+            new JogKey(7),
+            new JogKey(7),
+            new JogKey(8),
+            new JogKey(8)
+        };
+
+        public KeypressHandler(GrblViewModel model)
+        {
+            grbl = model;
+            for (int i = 0; i < axisjog.Length; i++)
+                axisjog[i] = new AxisJog();
+
+            AddFunction(FeedOverrideFinePlus, null);
+            AddFunction(FeedOverrideFineMinus, null);
+            AddFunction(FeedOverrideCoarseMinus, null);
+            AddFunction(FeedOverrideCoarsePlus, null);
+            AddFunction(FeedOverrideReset, null);
+            AddFunction(FeedOverrideRapidsMedium, null);
+            AddFunction(FeedOverrideRapidsLow, null);
+            AddFunction(FeedOverrideRapidsReset, null);
+            AddFunction(FloodOverrideToggle, null);
+            AddFunction(MistOverrideToggle, null);
+            AddFunction(Fan0Toggle, null);
+            AddFunction(SpindleOverrideFinePlus, null);
+            AddFunction(SpindleOverrideFineMinus, null);
+            AddFunction(SpindleOverrideCoarseMinus, null);
+            AddFunction(SpindleOverrideCoarsePlus, null);
+            AddFunction(SpindleOverrideStop, null);
+            AddFunction(ProbeConnectedToggle, null);
+            AddFunction(OptionalStopToggle, null);
+            AddFunction(SingleBlockToggle, null);
+        }
+
+        public void Configure(int numAxes, string axisLetters, bool lathe)
+        {
+            N_AXIS = numAxes;
+            axisLetters = axisLetters.Replace("-", "");
+            for (int i = 0; i < jogKeys.Length; i++)
+            {
+                jogKeys[i].Command = string.Empty;
+            }
+            for (int i = 0; i < numAxes; i++)
+            {
+                var k = lathe ? (i == 0 ? 2 : 0) : i;
+                jogKeys[i * 2].Command = axisLetters.Substring(k, 1) + (lathe && i != 0 ? "-{0}" : "{0}");
+                jogKeys[i * 2 + 1].Command = axisLetters.Substring(k, 1) + (lathe && i != 0 ? "{0}" : "-{0}");
+            }
+        }
+
         public enum JogMode
         {
             Step = 0,
@@ -72,28 +143,68 @@ namespace CNC.Core
             [XmlIgnore]
             public Func<Key, bool> Call;
             public string Context { get { return context == null ? "null" : context.Name; } set { dummy = value; } }
-            public string Method { get { return Call.Method.ReflectedType.Name + "." +  Call.Method.Name; } set { method = value; } }
+            public string Method { get { return Call == null ? method : Call.Method.ReflectedType.Name + "." +  Call.Method.Name; } set { method = value; } }
         }
 
-        private int N_AXIS = 3;
-        private bool preCancel = false, allowJog = true;
-        private volatile Key[] axisjog = new Key[4] { Key.None, Key.None, Key.None, Key.None };
-        private JogMode jogMode = JogMode.None;
-        private GrblViewModel grbl;
-        private List<KeypressHandlerFn> handlers = new List<KeypressHandlerFn>();
+        private class HandlerFn
+        {
+            public UserControl context;
+            public Func<Key, bool> Call;
+            public string Context { get { return context == null ? "null" : context.Name; } }
+            public string Method { get { return Call.Method.ReflectedType.Name + "." + Call.Method.Name; } }
+        }
+
+        private class JogKey
+        {
+            public JogKey (int axisIndex, Key key)
+            {
+                Key = key;
+                Command = string.Empty;
+                AxisIndex = axisIndex;
+            }
+            public JogKey(int axisIndex)
+            {
+                Key = Key.None;
+                Command = string.Empty;
+                AxisIndex = axisIndex;
+            }
+
+            public Key Key { get; set; }
+            public string Command { get; set; }
+            public int AxisIndex { get; private set; }
+            public bool Remapped { get; set; } = false;
+        }
+
+        private class AxisJog
+        {
+            public AxisJog ()
+            {
+                Key = Key.None;
+                Command = String.Empty;
+                Distance = 0d;
+            }
+
+            public Key Key { get; set; }
+            public string Command { get; set; }
+            public double Distance { get; set; }
+        }
+
+        public void AddFunction(Func<Key, bool> call, UserControl context)
+        {
+            var function = functions.Where(k => k.Call == call && k.context == context).FirstOrDefault();
+            if (function == null)
+                functions.Add(new HandlerFn() { Call = call, context = context });
+        }
 
         public void AddHandler(Key key, ModifierKeys modifiers, Func<Key, bool> handler, UserControl context = null, bool onUp = true)
         {
-            handlers.Add(new KeypressHandlerFn(){Key = key, Modifiers = modifiers, Call = handler, context = context, OnUp = onUp });
+            AddFunction(handler, context);
+            handlers.Add(new KeypressHandlerFn(){ Key = key, Modifiers = modifiers, Call = handler, context = context, OnUp = onUp });
         }
         public void AddHandler(Key key, ModifierKeys modifiers, Func<Key, bool> handler, bool onUp)
         {
+            AddFunction(handler, null);
             handlers.Add(new KeypressHandlerFn() { Key = key, Modifiers = modifiers, Call = handler, context = null, OnUp = onUp });
-        }
-
-        public KeypressHandler(GrblViewModel model)
-        {
-            grbl = model;
         }
 
         public double[] JogDistances { get; set; } = new double[3] { 0.01, 500.0, 500.0 };
@@ -122,8 +233,20 @@ namespace CNC.Core
                 FileStream fsout = new FileStream(filename, FileMode.Create, FileAccess.Write, FileShare.None);
                 using (fsout)
                 {
-                    var keymappings = handlers.Where(x => x.Method != "JobControl.FnKeyHandler").ToList();
-                    xs.Serialize(fsout, keymappings);
+                    int remapped_at = handlers.Count, n_remapped = 0;
+                    for(var i = 0; i < jogKeys.Length; i++)
+                    {
+                        if (jogKeys[i].Remapped)
+                        {
+                            n_remapped++;
+                            handlers.Add(new KeypressHandlerFn() { Key = jogKeys[i].Key, Modifiers = ModifierKeys.None, OnUp = false, Method = "Jogkey." + GrblInfo.AxisIndexToLetter(i >> 1) + ((i & 1) == 1 ? "minus" : "plus") });
+                        }
+                    }
+
+                    xs.Serialize(fsout, handlers.Where(x => x.Method != "JobControl.FnKeyHandler").ToList());
+
+                    if (n_remapped > 0)
+                        handlers.RemoveRange(remapped_at, n_remapped);
                     ok = true;
                 }
             }
@@ -150,13 +273,36 @@ namespace CNC.Core
                 keymappings = (List<KeypressHandlerFn>)xs.Deserialize(reader);
                 reader.Close();
 
-                foreach(var keymap in keymappings)
+                foreach (var newmap in keymappings)
                 {
-                    var map = handlers.Where(x => x.Method == keymap.method).FirstOrDefault();
-                    if(map != null)
-                    {
-                        map.Key = keymap.Key;
-                        map.Modifiers = keymap.Modifiers;
+                    if (newmap.method.StartsWith("Jogkey.")) {
+                        int k = GrblInfo.AxisLetterToIndex(newmap.method.Substring(7, 1));
+                        if(k >= 0 && newmap.method.Substring(8) == "plus" || newmap.method.Substring(8) == "minus")
+                        {
+                            k = k * 2 + (newmap.method.Substring(8) == "minus" ? 1 : 0);
+                            jogKeys[k].Key = newmap.Key;
+                            jogKeys[k].Remapped = true;
+                        }
+                    } else {
+
+                        var handler = functions.Where(x => x.Method == newmap.method && x.Context == newmap.Context).FirstOrDefault();
+                        var keymap = handlers.Where(k => k.Modifiers == newmap.Modifiers && k.Key == newmap.Key && k.OnUp == newmap.OnUp && k.Context == newmap.Context).FirstOrDefault();
+
+                        if (handler != null)
+                        {
+                            if (keymap != null)
+                            {
+                                if (keymap.Method != newmap.method)
+                                {
+                                    keymap.OnUp = newmap.OnUp;
+                                    keymap.Call = handler.Call;
+                                }
+                            }
+                            else
+                                handlers.Add(new KeypressHandlerFn() { Key = newmap.Key, Modifiers = newmap.Modifiers, Call = handler.Call, context = handler.context, OnUp = newmap.OnUp });
+                        }
+                        else if (keymap != null && newmap.method == "None")
+                            handlers.Remove(keymap);
                     }
                 }
 
@@ -178,7 +324,7 @@ namespace CNC.Core
                 return false;
 
             bool isJogging = IsJogging, jogkeyPressed = false;
-            double[] dist = new double[4] { 0d, 0d, 0d, 0d };
+            JogKey jogKey = null;
 
             if (e.IsUp && isJogging)
             {
@@ -188,13 +334,14 @@ namespace CNC.Core
 
                 for (int i = 0; i < N_AXIS; i++)
                 {
-                    if (axisjog[i] == e.Key)
+                    if (axisjog[i].Key == e.Key)
                     {
-                        axisjog[i] = Key.None;
+                        axisjog[i].Key = Key.None;
+                        axisjog[i].Distance = 0d;
                         cancel = true;
                     }
                     else
-                        isJogging = isJogging || (axisjog[i] != Key.None);
+                        isJogging = isJogging || (axisjog[i].Key != Key.None);
                 }
 
                 isJogging &= allowJog;
@@ -208,61 +355,23 @@ namespace CNC.Core
 
             this.allowJog = allowJog;
 
-            if (IsJoggingEnabled && e.IsDown && CanJog)
+            if(IsJoggingEnabled && e.IsDown && CanJog && !(Keyboard.Modifiers == ModifierKeys.Alt || Keyboard.Modifiers == (ModifierKeys.Control | ModifierKeys.Shift) || Keyboard.Modifiers == ModifierKeys.Windows))
+                jogKey = jogKeys.Where(p => p.Key == e.Key && p.Command != string.Empty).FirstOrDefault();
+
+            if (jogKey != null)
             {
                 // Do not respond to autorepeats!
                 if (e.IsRepeat)
                     return true;
 
+                if ((context.DataContext is GrblViewModel && (context.DataContext as GrblViewModel).GrblState.State == GrblStates.Alarm))
+                    return true;
+
                 N_AXIS = GrblInfo.AxisFlags.HasFlag(AxisFlags.A) ? 4 : 3;
 
-                switch (e.Key)
-                {
-                    case Key.PageUp:
-                        isJogging = axisjog[GrblConstants.Z_AXIS] != Key.PageUp;
-                        axisjog[GrblConstants.Z_AXIS] = Key.PageUp;
-                        break;
-
-                    case Key.PageDown:
-                        isJogging = axisjog[GrblConstants.Z_AXIS] != Key.PageDown;
-                        axisjog[GrblConstants.Z_AXIS] = Key.PageDown;
-                        break;
-
-                    case Key.Left:
-                        isJogging = axisjog[GrblConstants.X_AXIS] != Key.Left;
-                        axisjog[GrblConstants.X_AXIS] = Key.Left;
-                        break;
-
-                    case Key.Up:
-                        isJogging = axisjog[GrblConstants.Y_AXIS] != Key.Up;
-                        axisjog[GrblConstants.Y_AXIS] = Key.Up;
-                        break;
-
-                    case Key.Right:
-                        isJogging = axisjog[GrblConstants.X_AXIS] != Key.Right;
-                        axisjog[GrblConstants.X_AXIS] = Key.Right;
-                        break;
-
-                    case Key.Down:
-                        isJogging = axisjog[GrblConstants.Y_AXIS] != Key.Down;
-                        axisjog[GrblConstants.Y_AXIS] = Key.Down;
-                        break;
-
-                    case Key.Home:
-                        if(N_AXIS == 4) {
-                            isJogging = axisjog[GrblConstants.A_AXIS] != Key.Home;
-                            axisjog[GrblConstants.A_AXIS] = Key.Home;
-                        }
-                        break;
-
-                    case Key.End:
-                        if (N_AXIS == 4)
-                        {
-                            isJogging = axisjog[GrblConstants.A_AXIS] != Key.End;
-                            axisjog[GrblConstants.A_AXIS] = Key.End;
-                        }
-                        break;
-                }
+                isJogging = axisjog[jogKey.AxisIndex].Key != e.Key;
+                axisjog[jogKey.AxisIndex].Key = e.Key;
+                axisjog[jogKey.AxisIndex].Command = jogKey.Command;
             }
             else
                 jogkeyPressed = !(Keyboard.FocusedElement is System.Windows.Controls.TextBox) && (e.Key == Key.Left || e.Key == Key.Right || e.Key == Key.Up || e.Key == Key.Down || e.Key == Key.PageUp || e.Key == Key.PageDown);
@@ -271,80 +380,28 @@ namespace CNC.Core
             {
                 string command = string.Empty;
 
-                if (GrblInfo.LatheModeEnabled)
+                if ((context.DataContext is GrblViewModel && (context.DataContext as GrblViewModel).GrblState.State == GrblStates.Alarm))
+                    return true;
+
+                isJogging = false;
+
+                for (int i = 0; i < N_AXIS; i++)
                 {
-                    for (int i = 0; i < 2; i++) switch (axisjog[i])
+                    if (axisjog[i].Key != Key.None)
                     {
-                        case Key.Left:
-                            dist[GrblConstants.Z_AXIS] = -1d;
-                            command += "Z-{3}";
-                            break;
-
-                        case Key.Up:
-                            dist[GrblConstants.X_AXIS] = -1d;
-                            command += "X-{1}";
-                            break;
-
-                        case Key.Right:
-                            dist[GrblConstants.Z_AXIS] = 1d;
-                            command += "Z{3}";
-                            break;
-
-                        case Key.Down:
-                            dist[GrblConstants.X_AXIS] = 1d;
-                            command += "X{1}";
-                            break;
+                       isJogging = true;
+                        axisjog[i].Distance = axisjog[i].Command.Contains('-') ? -1d : 1d;
                     }
-                }
-                else for (int i = 0; i < N_AXIS; i++) switch (axisjog[i])
-                {
-                    case Key.PageUp:
-                        dist[GrblConstants.Z_AXIS] = 1d;
-                        command += "Z{3}";
-                        break;
-
-                    case Key.PageDown:
-                        dist[GrblConstants.Z_AXIS] = -1d;
-                        command += "Z-{3}";
-                        break;
-
-                    case Key.Left:
-                        dist[GrblConstants.X_AXIS] = -1d;
-                        command += "X-{1}";
-                        break;
-
-                    case Key.Up:
-                        dist[GrblConstants.Y_AXIS] = 1d;
-                        command += "Y{2}";
-                        break;
-
-                    case Key.Right:
-                        dist[GrblConstants.X_AXIS] = 1d;
-                        command += "X{1}";
-                        break;
-
-                    case Key.Down:
-                        dist[GrblConstants.Y_AXIS] = -1d;
-                        command += "Y-{2}";
-                        break;
-
-                    case Key.Home:
-                        dist[GrblConstants.A_AXIS] = 1d;
-                        command += "A{4}";
-                        break;
-
-                    case Key.End:
-                        dist[GrblConstants.A_AXIS] = -1d;
-                        command += "A-{4}";
-                        break;
+                    else
+                        axisjog[i].Distance = 0d;
                 }
 
-                if ((isJogging = command != string.Empty))
+                if (isJogging)
                 {
                     if ((Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
                     {
                         for (int i = 0; i < N_AXIS; i++)
-                            axisjog[i] = Key.None;
+                            axisjog[i].Key = Key.None;
                         preCancel = !(jogMode == JogMode.Step || jogMode == JogMode.None);
                         jogMode = JogMode.Step;
                         JogDistances[(int)jogMode] = grbl.JogStep;
@@ -360,7 +417,7 @@ namespace CNC.Core
                     else
                     {
                         for (int i = 0; i < N_AXIS; i++)
-                            axisjog[i] = Key.None;
+                            axisjog[i].Key = Key.None;
                         jogMode = JogMode.None;
                     }
 
@@ -369,17 +426,22 @@ namespace CNC.Core
                         if (GrblInfo.IsGrblHAL || !SoftLimits)
                         {
                             var distance = JogDistances[(int)jogMode].ToInvariantString();
-                            SendJogCommand("$J=G91G21" + string.Format(command + "F{0}",
-                                                             JogFeedrates[(int)jogMode].ToInvariantString(),
-                                                              distance, distance, distance, distance));
+
+                            for (int i = 0; i < N_AXIS; i++)
+                            {
+                                if (axisjog[i].Distance != 0d)
+                                    command += string.Format(axisjog[i].Command, distance);
+                            }
+
+                            SendJogCommand("$J=G91G21" + command + string.Format("F{0}", JogFeedrates[(int)jogMode].ToInvariantString()));
                         }
                         else
                         {
                             for (int i = 0; i < N_AXIS; i++)
                             {
-                                if (dist[i] != 0d)
+                                if (axisjog[i].Distance != 0d)
                                 {
-                                    dist[i] = grbl.MachinePosition.Values[i] + JogDistances[(int)jogMode] * dist[i];
+                                    axisjog[i].Distance = grbl.MachinePosition.Values[i] + JogDistances[(int)jogMode] * axisjog[i].Distance;
 
                                     if (i == GrblConstants.A_AXIS && GrblInfo.MaxTravel.Values[GrblConstants.A_AXIS] == 0d)
                                         continue;
@@ -388,34 +450,31 @@ namespace CNC.Core
                                     {
                                         if (!GrblInfo.HomingDirection.HasFlag(GrblInfo.AxisIndexToFlag(i)))
                                         {
-                                            if (dist[i] > 0)
-                                                dist[i] = 0;
-                                            else if(dist[i] < (-GrblInfo.MaxTravel.Values[i] + LimitSwitchesClearance))
-                                                dist[i] = (-GrblInfo.MaxTravel.Values[i] + LimitSwitchesClearance);
+                                            if (axisjog[i].Distance > 0)
+                                                axisjog[i].Distance = 0;
+                                            else if(axisjog[i].Distance < (-GrblInfo.MaxTravel.Values[i] + LimitSwitchesClearance))
+                                                axisjog[i].Distance = (-GrblInfo.MaxTravel.Values[i] + LimitSwitchesClearance);
                                         } else
                                         {
-                                            if (dist[i] < 0d)
-                                                dist[i] = 0d;
-                                            else if (dist[i] > (GrblInfo.MaxTravel.Values[i] - LimitSwitchesClearance))
-                                                dist[i] = GrblInfo.MaxTravel.Values[i] - LimitSwitchesClearance;
+                                            if (axisjog[i].Distance < 0d)
+                                                axisjog[i].Distance = 0d;
+                                            else if (axisjog[i].Distance > (GrblInfo.MaxTravel.Values[i] - LimitSwitchesClearance))
+                                                axisjog[i].Distance = GrblInfo.MaxTravel.Values[i] - LimitSwitchesClearance;
                                         }
                                     }
                                     else
                                     {
-                                        if (dist[i] > -LimitSwitchesClearance)
-                                            dist[i] = -LimitSwitchesClearance;
-                                        else if (dist[i] < -(GrblInfo.MaxTravel.Values[i] - LimitSwitchesClearance))
-                                            dist[i] = -(GrblInfo.MaxTravel.Values[i] - LimitSwitchesClearance);
+                                        if (axisjog[i].Distance > -LimitSwitchesClearance)
+                                            axisjog[i].Distance = -LimitSwitchesClearance;
+                                        else if (axisjog[i].Distance < -(GrblInfo.MaxTravel.Values[i] - LimitSwitchesClearance))
+                                            axisjog[i].Distance = -(GrblInfo.MaxTravel.Values[i] - LimitSwitchesClearance);
                                     }
+
+                                    command += string.Format(axisjog[i].Command, axisjog[i].Distance.ToInvariantString());
                                 }
                             }
 
-                            SendJogCommand("$J=G53G21" + string.Format(command.Replace('-', ' ') + "F{0}",
-                                                             JogFeedrates[(int)jogMode].ToInvariantString(),
-                                                              dist[GrblConstants.X_AXIS].ToInvariantString(),
-                                                               dist[GrblConstants.Y_AXIS].ToInvariantString(),
-                                                                dist[GrblConstants.Z_AXIS].ToInvariantString(),
-                                                                 dist[GrblConstants.A_AXIS].ToInvariantString()));
+                            SendJogCommand("$J=G53G21" + string.Format(command.Replace('-', ' ') + "F{0}", JogFeedrates[(int)jogMode].ToInvariantString()));
                         }
                     }
 
@@ -469,6 +528,121 @@ namespace CNC.Core
                     Comms.com.WriteByte(GrblConstants.CMD_JOG_CANCEL); // Cancel current jog
             }
             Comms.com.WriteCommand(command);
+        }
+
+        private bool FeedOverrideFinePlus(Key key)
+        {
+            Comms.com.WriteByte(GrblConstants.CMD_FEED_OVR_FINE_PLUS);
+
+            return true;
+        }
+        private bool FeedOverrideFineMinus(Key key)
+        {
+            Comms.com.WriteByte(GrblConstants.CMD_FEED_OVR_FINE_MINUS);
+
+            return true;
+        }
+        private bool FeedOverrideCoarseMinus(Key key)
+        {
+            Comms.com.WriteByte(GrblConstants.CMD_FEED_OVR_COARSE_MINUS);
+
+            return true;
+        }
+        private bool FeedOverrideCoarsePlus(Key key)
+        {
+            Comms.com.WriteByte(GrblConstants.CMD_FEED_OVR_COARSE_PLUS);
+
+            return true;
+        }
+        private bool FeedOverrideReset(Key key)
+        {
+            Comms.com.WriteByte(GrblConstants.CMD_FEED_OVR_RESET);
+
+            return true;
+        }
+        private bool FeedOverrideRapidsMedium(Key key)
+        {
+            Comms.com.WriteByte(GrblConstants.CMD_RAPID_OVR_MEDIUM);
+
+            return true;
+        }
+        private bool FeedOverrideRapidsLow(Key key)
+        {
+            Comms.com.WriteByte(GrblConstants.CMD_RAPID_OVR_LOW);
+
+            return true;
+        }
+        private bool FeedOverrideRapidsReset(Key key)
+        {
+            Comms.com.WriteByte(GrblConstants.CMD_RAPID_OVR_RESET);
+
+            return true;
+        }
+        private bool FloodOverrideToggle(Key key)
+        {
+            Comms.com.WriteByte(GrblConstants.CMD_COOLANT_FLOOD_OVR_TOGGLE);
+
+            return true;
+        }
+        private bool MistOverrideToggle(Key key)
+        {
+            Comms.com.WriteByte(GrblConstants.CMD_COOLANT_MIST_OVR_TOGGLE);
+
+            return true;
+        }
+        private bool Fan0Toggle(Key key)
+        {
+            Comms.com.WriteByte(GrblConstants.CMD_OVERRIDE_FAN0_TOGGLE);
+
+            return true;
+        }
+        private bool SpindleOverrideFinePlus(Key key)
+        {
+            Comms.com.WriteByte(GrblConstants.CMD_SPINDLE_OVR_FINE_PLUS);
+
+            return true;
+        }
+        private bool SpindleOverrideFineMinus(Key key)
+        {
+            Comms.com.WriteByte(GrblConstants.CMD_SPINDLE_OVR_FINE_MINUS);
+
+            return true;
+        }
+        private bool SpindleOverrideCoarseMinus(Key key)
+        {
+            Comms.com.WriteByte(GrblConstants.CMD_SPINDLE_OVR_COARSE_PLUS);
+
+            return true;
+        }
+        private bool SpindleOverrideCoarsePlus(Key key)
+        {
+            Comms.com.WriteByte(GrblConstants.CMD_SPINDLE_OVR_COARSE_MINUS);
+
+            return true;
+        }
+        private bool SpindleOverrideStop(Key key)
+        {
+            Comms.com.WriteByte(GrblConstants.CMD_SPINDLE_OVR_STOP);
+
+            return true;
+        }
+        private bool ProbeConnectedToggle(Key key)
+        {
+            Comms.com.WriteByte(GrblConstants.CMD_PROBE_CONNECTED_TOGGLE);
+
+            return true;
+        }
+        private bool OptionalStopToggle(Key key)
+        {
+            Comms.com.WriteByte(GrblConstants.CMD_OPTIONAL_STOP_TOGGLE);
+
+            return true;
+        }
+        private bool SingleBlockToggle(Key key)
+        {
+            Comms.com.WriteByte(GrblConstants.CMD_SINGLE_BLOCK_TOGGLE);
+
+            return true;
         }
     }
 }

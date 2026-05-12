@@ -7,7 +7,7 @@
              xmlns:local="clr-namespace:CNC.Controls"
              mc:Ignorable="d"
              Focusable="False"
-             d:DesignHeight="100" d:DesignWidth="250">
+             d:DesignHeight="122" d:DesignWidth="250">
     <GroupBox x:Uid="grp_goto" x:Name="grpGoto" Header="Goto" HorizontalAlignment="Left" VerticalAlignment="Top" Width="250">
         <local:GotoBaseControl Margin="40,0,0,5"/>
     </GroupBox>

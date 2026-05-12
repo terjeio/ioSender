@@ -1,13 +1,13 @@
 ﻿/*
  * GotoControl.xaml.cs - part of CNC Controls library
  *
- * v0.36 / 2021-11-01 / Io Engineering (Terje Io)
+ * v0.47 / 2026-02-16 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2020-2021, Io Engineering (Terje Io)
+Copyright (c) 2020-2026, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -40,19 +40,46 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using System.Windows;
 using System.Windows.Controls;
 using CNC.Core;
+using System.Collections.ObjectModel;
 
 namespace CNC.Controls
 {
     public partial class GotoBaseControl : UserControl
     {
+        private string _gcs = "G54";
+
         public GotoBaseControl()
         {
             InitializeComponent();
+            GrblWorkParameters.CoordinateSystems.CollectionChanged += CoordinateSystems_CollectionChanged;
         }
+
+        public string CoordinateSystem { get { return _gcs; } set { _gcs = value; } }
+        public ObservableCollection<CoordinateSystem> CoordinateSystems { get; set; } = new ObservableCollection<CoordinateSystem>();
 
         private void button_Click(object sender, RoutedEventArgs e)
         {
-            (DataContext as GrblViewModel).ExecuteCommand((string)(sender as Button).Tag);
+            if((string)(sender as Button).Tag == "G5x") {
+                var cs = GrblWorkParameters.GetCoordinateSystem(CoordinateSystem);
+                if (cs != null)
+                {
+                    var pos = cs.ToString(GrblInfo.AxisFlags);
+
+                    (DataContext as GrblViewModel).ExecuteCommand("G53G0" + pos);
+                }
+            }
+            else
+                (DataContext as GrblViewModel).ExecuteCommand((string)(sender as Button).Tag);
+        }
+
+        private void CoordinateSystems_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if(e.NewItems.Count == 1)
+            {
+                if(((CoordinateSystem)e.NewItems[0]).Code.StartsWith("G5")) {
+                    CoordinateSystems.Add((CoordinateSystem)e.NewItems[0]);
+                }
+            }
         }
     }
 }

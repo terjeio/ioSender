@@ -7,7 +7,7 @@
              xmlns:local="clr-namespace:CNC.Controls"
              mc:Ignorable="d"
              Focusable="False"
-             d:DesignHeight="100" d:DesignWidth="200" MinHeight="100" MinWidth="200">
+             d:DesignHeight="118" d:DesignWidth="200" MinHeight="118" MinWidth="200">
     <UserControl.Resources>
         <ResourceDictionary>
             <system:String x:Uid="str_gotoFlyout" x:Key="MenuLabel">_Goto</system:String>

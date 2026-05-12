@@ -1,13 +1,13 @@
 ﻿/*
  * SpindleControl.xaml.cs - part of CNC Controls library
  *
- * v0.46 / 2025-05-08 / Io Engineering (Terje Io)
+ * v0.47 / 2026-02-05 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2025, Io Engineering (Terje Io)
+Copyright (c) 2018-2026, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -112,7 +112,7 @@ namespace CNC.Controls
         {
             var p = DataContext as GrblViewModel;
 
-            if(p.IsJobRunning && p.GrblState.State == GrblStates.Hold)
+            if(p.GrblState.State == GrblStates.Hold)
                 p.ExecuteCommand(((char)GrblConstants.CMD_SPINDLE_OVR_STOP).ToString());
             else
             {
@@ -130,6 +130,9 @@ namespace CNC.Controls
         {
             if (e.AddedItems.Count == 1 && ((ComboBox)sender).IsDropDownOpen)
             {
+                if ((DataContext as GrblViewModel).GrblError != 0)
+                    (DataContext as GrblViewModel).ExecuteCommand("");
+
                 if (GrblInfo.IsGrblHAL && GrblInfo.Build < 20240812) // Workaround for controller bug
                     (DataContext as GrblViewModel).ExecuteCommand(string.Format(GrblCommand.SpindleChange, ((Spindle)e.AddedItems[0]).SpindleId));
                 else

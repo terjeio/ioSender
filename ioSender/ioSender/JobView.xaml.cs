@@ -1,13 +1,13 @@
 /*
  * JobView.xaml.cs - part of ioSender
  *
- * v0.46 / 2025-05-09 / Io Engineering (Terje Io)
+ * v0.47 / 2026-04-29 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2025, Io Engineering (Terje Io)
+Copyright (c) 2019-2026, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -357,6 +357,9 @@ namespace GCode_Sender
             initOK = true;
             int timeout = 5;
 
+            if (isBooted && model.GrblState.State == GrblStates.Home)
+                return true;
+
             using (new UIUtils.WaitCursor())
             {
                 GCodeSender.EnablePolling(false);
@@ -379,11 +382,14 @@ namespace GCode_Sender
                     GrblSpindles.Get();
                 }
                 else
+                {
+                    GrblSpindles.AddDefault();
                     GrblParserState.Get(true);
+                }
                 GCodeSender.EnablePolling(true);
             }
 
-            GrblCommand.ToolChange = GrblInfo.ManualToolChange ? "M61Q{0}" : "T{0}";
+            GrblCommand.ToolChange = GrblInfo.ManualToolChange ? "M61Q{0}" : (GrblInfo.HasATC ? "T{0}M6" : "T{0}");
 
             showProgramLimits();
 

@@ -1,7 +1,7 @@
 ﻿/*
  * GcodeListControl.xaml.cs - part of CNC Controls library for Grbl
  *
- * v0.46 / 2025-05-31 / Io Engineering (Terje Io)
+ * v0.47 / 2025-12-25 / Io Engineering (Terje Io)
  *
  */
 
@@ -118,7 +118,7 @@ namespace CNC.Controls
         private void StartHere_Click(object sender, RoutedEventArgs e)
         {
             if (grdGCode.SelectedItems.Count == 1 &&
-                 MessageBox.Show(string.Format(LibStrings.FindResource("VerifyStartFrom"), ((DataRowView)(grdGCode.SelectedItems[0])).Row["LineNum"]),
+                 MessageBox.Show(string.Format(LibStrings.FindResource("VerifyStartFrom"), ((GCodeBlock)(grdGCode.SelectedItems[0])).LineNum),
                                   "ioSender", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.Yes)
             {
                 (DataContext as GrblViewModel).StartFromBlock.Execute(grdGCode.SelectedIndex);
@@ -128,7 +128,12 @@ namespace CNC.Controls
         private void CopyMDI_Click(object sender, RoutedEventArgs e)
         {
             if (grdGCode.SelectedItems.Count == 1)
-                (DataContext as GrblViewModel).MDIText = (string)((DataRowView)(grdGCode.SelectedItems[0])).Row["Data"];
+                (DataContext as GrblViewModel).MDIText = ((GCodeBlock)(grdGCode.SelectedItems[0])).Data;
+        }
+        private void ToggleBreak_Click(object sender, RoutedEventArgs e)
+        {
+            if (grdGCode.SelectedItems.Count == 1)
+                ((GCodeBlock)(grdGCode.SelectedItems[0])).BreakAt ^= true;
         }
 
         private void SendController_Click(object sender, RoutedEventArgs e)
@@ -142,24 +147,25 @@ namespace CNC.Controls
                 if (model.GrblError != 0)
                     model.ExecuteCommand("");
 
-                List<DataRow> rows = new List<DataRow>();
+                List<GCodeBlock> rows = new List<GCodeBlock>();
 
                 for (int i = 0; i < grdGCode.SelectedItems.Count; i++)
-                    rows.Add(((DataRowView)(grdGCode.SelectedItems[i])).Row);
+                    rows.Add(((GCodeBlock)(grdGCode.SelectedItems[i])));
 
                 rows.Sort(new RowComparer());
 
-                foreach (DataRow row in rows)
-                    model.ExecuteCommand((string)row["Data"]);
+                foreach (GCodeBlock row in rows)
+                    model.ExecuteCommand(row.Data);
+
             }
         }
     }
 
-    internal class RowComparer : IComparer<DataRow>
+    internal class RowComparer : IComparer<GCodeBlock>
     {
-        public int Compare(DataRow a, DataRow b)
+        public int Compare(GCodeBlock a, GCodeBlock b)
         {
-            return (int)a["LineNum"] - (int)b["LineNum"];
+            return (int)a.LineNum - (int)b.LineNum;
         }
     }
 }

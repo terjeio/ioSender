@@ -1,13 +1,13 @@
 ﻿/*
  * Camera.xaml.cs - part of CNC Controls Camera library
  *
- * v0.38 / 2022-04-20 / Io Engineering (Terje Io)
+ * v0.47 / 2025-11-10 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2018-2022, Io Engineering (Terje Io) - parts derived from AForge example code
+Copyright (c) 2018-2025, Io Engineering (Terje Io) - parts derived from AForge example code
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -75,6 +75,8 @@ namespace CNC.Controls.Camera
             CameraControl.XOffset = config.XOffset;
             CameraControl.YOffset = config.YOffset;
             CameraControl.Mode = config.MoveMode;
+            CameraControl.CrosshairPos = new Point(config.CrosshairPosX >= 0d ? config.CrosshairPosX : CameraControl.CrosshairPos.X,
+                                                       config.CrosshairPosY >= 0d ? config.CrosshairPosY : CameraControl.CrosshairPos.Y);
 
             model.ConfigControls.Add(new ConfigControl());
         }

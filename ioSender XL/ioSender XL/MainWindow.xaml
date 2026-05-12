@@ -30,7 +30,7 @@
     <Window.DataContext>
         <cnccore:GrblViewModel />
     </Window.DataContext>
-    <DockPanel IsEnabled="{Binding Path=IsMPGActive, Converter={StaticResource BooleanConverter}}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+    <DockPanel VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
         <Menu IsEnabled="{Binding Path=IsJobRunning, Converter={StaticResource BooleanConverter}}" DockPanel.Dock="Top">
             <MenuItem x:Uid="mnu_file" x:Name="menuFile" Header="_File">
                 <MenuItem x:Uid="mnu_load" Header="_Load" Click="fileOpenMenuItem_Click"/>

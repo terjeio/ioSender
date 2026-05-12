@@ -8,6 +8,7 @@
              d:DesignHeight="36.448" d:DesignWidth="240">
     <UserControl.Resources>
         <local:EncoderModeToColorConverter x:Key="EncoderModeConverter" />
+        <local:BoolToColorConverter x:Key="ToColorConverter" />
         <local:LogicalNotConverter x:Key="BooleanConverter" />
     </UserControl.Resources>
     <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Height="30" VerticalAlignment="Center" Width="240">
@@ -25,6 +26,21 @@
                     <Binding Path="EncoderMode" Mode="OneWay" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
                 </MultiBinding>
             </TextBox.Background>
+            <TextBox.Foreground>
+                <MultiBinding Converter="{StaticResource ToColorConverter}">
+                    <Binding Path="OverrideDisabled" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
+                    <Binding>
+                        <Binding.Source>
+                            <Brush>Red</Brush>
+                        </Binding.Source>
+                    </Binding>
+                    <Binding>
+                        <Binding.Source>
+                            <Brush>Black</Brush>
+                        </Binding.Source>
+                    </Binding>
+                </MultiBinding>
+            </TextBox.Foreground>
         </TextBox>
         <Button x:Name="btnOvReset" Focusable="False" Margin="2,0,0,0" Click="btnOverrideClick" Height="24" Width="24" Padding="2">
             <Viewbox Stretch="Uniform">
