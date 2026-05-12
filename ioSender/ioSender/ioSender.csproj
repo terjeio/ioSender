@@ -128,6 +128,8 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
+    <Resource Include="Syntax\\Dark.xshd" />
+    <Resource Include="Syntax\\Light.xshd" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">

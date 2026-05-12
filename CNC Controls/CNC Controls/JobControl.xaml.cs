@@ -1069,6 +1069,12 @@ namespace CNC.Controls
             grblState.MPG = newstate.MPG;
         }
 
+        private void tswSingle_Click(object sender, RoutedEventArgs e)
+        {
+            //toggle single block on/off
+            Comms.com.WriteByte((byte)GrblConstants.CMD_SINGLE_BLOCK_TOGGLE);
+        }
+
         private void ResponseReceived(string response)
         {
             if (streamingHandler.Count)

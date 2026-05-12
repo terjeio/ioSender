@@ -452,10 +452,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Resources\open-file.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="SDCardView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -538,7 +534,6 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
-    <EmbeddedResource Include="Resources\gcode.xshd" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\CNC Core\CNC Core\CNC Core.csproj">
@@ -578,9 +573,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\save.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Resources\open_file.svg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

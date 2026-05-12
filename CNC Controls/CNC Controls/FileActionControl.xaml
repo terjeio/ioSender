@@ -36,7 +36,7 @@
                 </Canvas>
             </Viewbox>
         </Button>
-        <Button ToolTip="Close file" IsEnabled="{Binding Path=CanCloseFile}" Click="btnClose_Click">
+        <Button ToolTip="Close file" IsEnabled="{Binding Path=CanCloseFile}" Click="btnClose_Click" Margin="2,0,0,0">
             <Viewbox Stretch="Uniform">
                 <Canvas Width="32" Height="32" Canvas.Left="0" Canvas.Top="0">
                     <Canvas>
@@ -45,7 +45,7 @@
                 </Canvas>
             </Viewbox>
         </Button>
-        <Button ToolTip="Reload file" IsEnabled="{Binding Path=CanReloadFile}" Click="btnReload_Click">
+        <Button ToolTip="Reload file" IsEnabled="{Binding Path=CanReloadFile}" Click="btnReload_Click" Margin="2,0,0,0">
             <Viewbox Stretch="Uniform">
                 <Canvas Width="32" Height="32" Canvas.Left="0" Canvas.Top="0">
                     <Canvas>
@@ -57,7 +57,7 @@
                 </Canvas>
             </Viewbox>
         </Button>
-        <Button ToolTip="Allow edit" IsEnabled="{Binding Path=IsFileLoaded}" Click="btnEdit_Click">
+        <Button ToolTip="Allow edit" IsEnabled="{Binding Path=IsFileLoaded}" Click="btnEdit_Click" Margin="2,0,0,0">
             <Viewbox Stretch="Uniform">
                 <Canvas Width="32" Height="32" Canvas.Left="0" Canvas.Top="0">
                     <Path Data="M0.058,31.873l3.219,-10.11L23.904,1.272c1.63,-1.627,4.283,-1.625,5.912,0.006l0.959,0.96c0.79,0.791,1.225,1.842,1.224,2.96c-0.001,1.118,-0.438,2.168,-1.229,2.958L10.14,28.628L0.058,31.873zM4.915,23.209l-1.773,5.57l5.525,-1.778C7.554,25.197,6.379,24.008,4.915,23.209zM6.224,21.654c1.544,0.922,2.831,2.232,4.003,4.07L26.603,9.472l-4,-4.089L6.224,21.654zM24.023,3.973l4,4.09l1.336,-1.326c0.411,-0.41,0.639,-0.958,0.64,-1.542c0,-0.583,-0.226,-1.132,-0.639,-1.545l-0.959,-0.96c-0.85,-0.851,-2.234,-0.852,-3.086,-0.002L24.023,3.973z"/>
@@ -65,7 +65,7 @@
             </Viewbox>
         </Button>
 
-        <Button ToolTip="Save file" IsEnabled="{Binding Path=IsFileLoaded}" Click="btnSave_Click">
+        <Button ToolTip="Save file" IsEnabled="{Binding Path=CanSaveFile}" Click="btnSave_Click" Margin="2,0,0,0">
             <Viewbox Stretch="Uniform">
                 <Canvas Width="32" Height="32" Canvas.Left="0" Canvas.Top="0">
                     <Path Data="M27.95,30H6.667L2,25.426V4.05C2,2.92,2.92,2,4.05,2h23.9c1.13,0,2.05,0.92,2.05,2.05v23.9C30,29.08,29.08,30,27.95,30zM22,28h5.95c0.028,0,0.05,-0.022,0.05,-0.05v-23.9c0,-0.028,-0.022,-0.05,-0.05,-0.05H24v10H8V4H4.05c-0.028,0,-0.05,0.022,-0.05,0.05v20.536L7.483,28H8V18h14V28zM10,28h10v-8H10V28zM10,12h12V4H10V12zM14,26h-2v-4h2V26z"/>

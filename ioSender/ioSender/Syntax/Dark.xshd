@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <SyntaxDefinition xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
   <Property name="DefaultFont" value="Segoe UI, 12pt" />
   <Property name="DefaultForeground" value="#086B80" />

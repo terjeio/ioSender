@@ -16,6 +16,25 @@
                 <Controls:BoolToVisibleConverter />
             </Controls:LogicalNotConverter.FinalConverter>
         </Controls:LogicalNotConverter>
+        <BitmapImage x:Key="ResetViewIcon" UriSource="pack://application:,,,/CNC.Controls.Viewer;component/Resources/ResetView.png" />
+        <BitmapImage x:Key="RestoreViewIcon" UriSource="pack://application:,,,/CNC.Controls.Viewer;component/Resources/RestoreView.png" />
+        <BitmapImage x:Key="GridOnIcon" UriSource="pack://application:,,,/CNC.Controls.Viewer;component/Resources/GridOn.png" />
+        <BitmapImage x:Key="GridOffIcon" UriSource="pack://application:,,,/CNC.Controls.Viewer;component/Resources/GridOff.png" />
+        <BitmapImage x:Key="JobBoxOnIcon" UriSource="pack://application:,,,/CNC.Controls.Viewer;component/Resources/JobBoxOn.png" />
+        <BitmapImage x:Key="JobBoxOffIcon" UriSource="pack://application:,,,/CNC.Controls.Viewer;component/Resources/JobBoxOff.png" />
+        <BitmapImage x:Key="WorkBoxOnIcon" UriSource="pack://application:,,,/CNC.Controls.Viewer;component/Resources/WorkBoxOn.png" />
+        <BitmapImage x:Key="WorkBoxOffIcon" UriSource="pack://application:,,,/CNC.Controls.Viewer;component/Resources/WorkBoxOff.png" />
+        <BitmapImage x:Key="XYZOnIcon" UriSource="pack://application:,,,/CNC.Controls.Viewer;component/Resources/XYZOn.png" />
+        <BitmapImage x:Key="XYZOffIcon" UriSource="pack://application:,,,/CNC.Controls.Viewer;component/Resources/XYZOff.png" />
+        <BitmapImage x:Key="SaveViewIcon" UriSource="pack://application:,,,/CNC.Controls.Viewer;component/Resources/SaveView.png" />
+        <Style x:Key="IconButton" TargetType="Button">
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Width" Value="22"/>
+            <Setter Property="Height" Value="22"/>
+            <Setter Property="Margin" Value="3,0,0,0"/>
+        </Style>
         <Style x:Key="Flag" TargetType="ToggleButton">
             <Style.Triggers>
                 <Trigger Property="IsChecked" Value="True">
@@ -48,13 +67,19 @@
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom" HorizontalAlignment="Right">
             <ComboBox IsEnabled="{Binding Path=IsJobRunning, Converter={StaticResource IsNotRunningConverter}}" Visibility="{Binding Path=LatheModeEnabled, Converter={StaticResource IsNotVisibleConverter}}" ItemsSource="{Binding Path=MachineView.RenderModes, RelativeSource={RelativeSource AncestorType=UserControl}}" DisplayMemberPath="Value" SelectedValuePath="Key" SelectedValue="{Binding Path=MachineView.RenderMode, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" Width="50"/>
             <ComboBox Margin="3,0,0,0" ItemsSource="{Binding Path=MachineView.ToolModes, RelativeSource={RelativeSource AncestorType=UserControl}}" DisplayMemberPath="Value" SelectedValuePath="Key" SelectedValue="{Binding Path=MachineView.ToolMode, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" Width="80"/>
-            <Button x:Uid="resetView" Content="Resources/ResetView.png" Click="ResetView_Click" ToolTip="Reset view (Ctrl+V)"/>
-            <Button x:Uid="restoreView" Content="Resources/RestoreView.png" IsEnabled="{Binding Path=MachineView.CanRestoreView, RelativeSource={RelativeSource AncestorType=UserControl}}" Click="RestoreView_Click" ToolTip="Restore view (Ctrl+R)"/>
-            <ToggleButton x:Uid="showGrid" Content="Resources/GridOn.png" Tag="Resources/GridOff.png" Style="{StaticResource Flag}" IsChecked="{Binding Path=MachineView.ShowGrid, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" ToolTip="Toggle grid visibility (Ctrl+G)"/>
-            <ToggleButton x:Uid="showJobEnvelope" Content="Resources/JobBoxOn.png" Tag="Resources/JobBoxOff.png" Style="{StaticResource Flag}" IsChecked="{Binding Path=MachineView.ShowJobEnvelope, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" ToolTip="Toggle job bounds visibility (Ctrl+J)"/>
-            <ToggleButton x:Uid="showWorkEnvelope" Content="Resources/WorkBoxOn.png" Tag="Resources/WorkBoxOff.png" Style="{StaticResource Flag}" IsChecked="{Binding Path=MachineView.ShowWorkEnvelope, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" IsEnabled="{Binding Path=HomedState, Mode=OneWay, Converter={StaticResource IsHomed}}" ToolTip="Toggle machine work envelope visibility (Ctrl+W)"/>
-            <ToggleButton x:Uid="showXYZMarkers" Content="Resources/XYZOn.png" Tag="Resources/XYZOff.png" Style="{StaticResource Flag}" IsChecked="{Binding Path=MachineView.ShowAxes, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" ToolTip="Toggle axes visibility"/>
-            <Button x:Uid="saveView" Content="Resources/SaveView.png" IsEnabled="{Binding Path=IsFileLoaded}" Click="SaveView_Click" ToolTip="Save view"/>
+            <Button x:Uid="resetView" Style="{StaticResource IconButton}" Click="ResetView_Click" ToolTip="Reset view (Ctrl+V)">
+                <Image Source="{StaticResource ResetViewIcon}"/>
+            </Button>
+            <Button x:Uid="restoreView" Style="{StaticResource IconButton}" IsEnabled="{Binding Path=MachineView.CanRestoreView, RelativeSource={RelativeSource AncestorType=UserControl}}" Click="RestoreView_Click" ToolTip="Restore view (Ctrl+R)">
+                <Image Source="{StaticResource RestoreViewIcon}"/>
+            </Button>
+            <ToggleButton x:Uid="showGrid" Content="{StaticResource GridOnIcon}" Tag="{StaticResource GridOffIcon}" Style="{StaticResource Flag}" IsChecked="{Binding Path=MachineView.ShowGrid, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" ToolTip="Toggle grid visibility (Ctrl+G)"/>
+            <ToggleButton x:Uid="showJobEnvelope" Content="{StaticResource JobBoxOnIcon}" Tag="{StaticResource JobBoxOffIcon}" Style="{StaticResource Flag}" IsChecked="{Binding Path=MachineView.ShowJobEnvelope, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" ToolTip="Toggle job bounds visibility (Ctrl+J)"/>
+            <ToggleButton x:Uid="showWorkEnvelope" Content="{StaticResource WorkBoxOnIcon}" Tag="{StaticResource WorkBoxOffIcon}" Style="{StaticResource Flag}" IsChecked="{Binding Path=MachineView.ShowWorkEnvelope, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" IsEnabled="{Binding Path=HomedState, Mode=OneWay, Converter={StaticResource IsHomed}}" ToolTip="Toggle machine work envelope visibility (Ctrl+W)"/>
+            <ToggleButton x:Uid="showXYZMarkers" Content="{StaticResource XYZOnIcon}" Tag="{StaticResource XYZOffIcon}" Style="{StaticResource Flag}" IsChecked="{Binding Path=MachineView.ShowAxes, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" ToolTip="Toggle axes visibility"/>
+            <Button x:Uid="saveView" Style="{StaticResource IconButton}" IsEnabled="{Binding Path=IsFileLoaded}" Click="SaveView_Click" ToolTip="Save view">
+                <Image Source="{StaticResource SaveViewIcon}"/>
+            </Button>
         </StackPanel>
         <Grid DockPanel.Dock="Top">
         <local:Renderer x:Name="gcodeView"/>

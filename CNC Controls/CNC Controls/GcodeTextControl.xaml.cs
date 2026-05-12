@@ -1,13 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Globalization;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Xml;
+using System.Xml.Linq;
 using System.ComponentModel;
 using System.Windows.Input;
+using System.Text;
+using System.Windows.Controls.Primitives;
 using ICSharpCode.AvalonEdit.Editing;
 using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Highlighting.Xshd;
@@ -31,21 +35,275 @@ namespace CNC.Controls
     /// </summary>
     public partial class GcodeTextControl : UserControl
     {
-        private readonly RangeLineNumberMargin statusMargin = new RangeLineNumberMargin();
+        private readonly GCodeLineStatusMargin statusMargin = new GCodeLineStatusMargin();
         private GrblViewModel model;
 
         public GcodeTextControl()
         {
             InitializeComponent();
 
-            using (var stream = GetType().Assembly.GetManifestResourceStream("CNC.Controls.Resources.gcode.xshd"))
-            using (var reader = XmlReader.Create(stream))
-                Editor.SyntaxHighlighting = HighlightingLoader.Load(reader, HighlightingManager.Instance);
+            statusMargin.Opacity = 0d;
+            ApplySyntaxHighlightingForTheme();
 
-            Editor.TextArea.LeftMargins.Insert(0, statusMargin);
+            Editor.TextArea.LeftMargins.Insert(1, statusMargin);
             Editor.TextArea.SelectionChanged += Editor_SelectionChanged;
             GCode.File.GetEditedText = () => Editor.Text;
             ctxMenu.DataContext = this;
+
+            Unloaded += UserControl_Unloaded;
+        }
+
+        private void ApplySyntaxHighlightingForTheme()
+        {
+            Editor.SyntaxHighlighting = LoadSyntaxDefinition();
+            ApplyGutterThemeFromHighlighting(Editor.SyntaxHighlighting);
+        }
+
+        private IHighlightingDefinition LoadSyntaxDefinition()
+        {
+            bool darkTheme = IsDarkThemeSelected();
+            string syntaxFile = darkTheme ? "Dark.xshd" : "Light.xshd";
+            EnsureUserSyntaxFile(syntaxFile);
+
+            string userSyntaxPath = GetUserSyntaxPath(syntaxFile);
+            if (File.Exists(userSyntaxPath))
+            {
+                using (var stream = File.OpenRead(userSyntaxPath))
+                {
+                    var highlighting = LoadHighlightingFromStream(stream);
+                    if (highlighting != null)
+                        return highlighting;
+                }
+            }
+
+            using (var stream = OpenBundledSyntaxStream(syntaxFile))
+            {
+                var highlighting = LoadHighlightingFromStream(stream);
+                if (highlighting != null)
+                    return highlighting;
+            }
+
+            using (var stream = GetType().Assembly.GetManifestResourceStream("CNC.Controls.Resources.gcode.xshd"))
+            {
+                if (stream != null)
+                {
+                    using (var reader = XmlReader.Create(stream))
+                        return HighlightingLoader.Load(reader, HighlightingManager.Instance);
+                }
+            }
+
+            return HighlightingManager.Instance.GetDefinition("C#");
+        }
+
+        private static string GetUserSyntaxPath(string syntaxFile)
+        {
+            string basePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ioSender", "Syntax");
+            return Path.Combine(basePath, syntaxFile);
+        }
+
+        private static void EnsureUserSyntaxFile(string syntaxFile)
+        {
+            string userPath = GetUserSyntaxPath(syntaxFile);
+            string userFolder = Path.GetDirectoryName(userPath);
+
+            if (string.IsNullOrEmpty(userFolder))
+                return;
+
+            if (!Directory.Exists(userFolder))
+                Directory.CreateDirectory(userFolder);
+
+            if (File.Exists(userPath))
+                return;
+
+            using (var bundled = OpenBundledSyntaxStream(syntaxFile))
+            {
+                if (bundled == null)
+                    return;
+
+                using (var output = File.Create(userPath))
+                    bundled.CopyTo(output);
+            }
+        }
+
+        private static Stream OpenBundledSyntaxStream(string syntaxFile)
+        {
+            if (Application.Current == null)
+                return null;
+
+            var info = Application.GetResourceStream(new Uri(string.Format("pack://application:,,,/Syntax/{0}", syntaxFile), UriKind.Absolute));
+            return info?.Stream;
+        }
+
+        private IHighlightingDefinition LoadHighlightingFromStream(Stream stream)
+        {
+            if (stream == null)
+                return null;
+
+            try
+            {
+                using (var copy = new MemoryStream())
+                {
+                    stream.CopyTo(copy);
+                    copy.Position = 0;
+
+                    using (var reader = XmlReader.Create(copy))
+                        return HighlightingLoader.Load(reader, HighlightingManager.Instance);
+                }
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private void ApplyGutterThemeFromHighlighting(IHighlightingDefinition highlighting)
+        {
+            if (Editor == null)
+                return;
+
+            statusMargin.SetTheme(Editor.Background, Editor.Foreground);
+        }
+
+        private static string GetHighlightingProperty(IHighlightingDefinition highlighting, string propertyName)
+        {
+            foreach (var property in highlighting.Properties)
+            {
+                if (string.Equals(property.Key, propertyName, StringComparison.OrdinalIgnoreCase))
+                    return property.Value;
+            }
+
+            return null;
+        }
+
+        private void ApplyGutterThemeFromSyntaxStream(Stream stream)
+        {
+            if (stream == null || !stream.CanRead)
+                return;
+
+            try
+            {
+                var doc = XDocument.Load(stream);
+                ApplyGutterThemeFromSyntaxDocument(doc);
+            }
+            catch
+            {
+            }
+        }
+
+        private void ApplyGutterThemeFromSyntaxDocument(XDocument doc)
+        {
+            if (doc == null || doc.Root == null)
+                return;
+
+            XNamespace ns = doc.Root.Name.Namespace;
+
+            string back = GetSyntaxPropertyValue(doc, ns, "GutterBackColor");
+            string fore = GetSyntaxPropertyValue(doc, ns, "GutterForeColor");
+
+            if (TryParseSyntaxBrush(back, out var backBrush) && TryParseSyntaxBrush(fore, out var foreBrush))
+                statusMargin.SetTheme(backBrush, foreBrush);
+        }
+
+        private static string GetSyntaxPropertyValue(XDocument doc, XNamespace ns, string propertyName)
+        {
+            foreach (var property in doc.Root.Elements(ns + "Property"))
+            {
+                var name = (string)property.Attribute("name");
+                if (string.Equals(name, propertyName, StringComparison.OrdinalIgnoreCase))
+                    return (string)property.Attribute("value");
+            }
+
+            return null;
+        }
+
+        private static bool TryParseSyntaxBrush(string value, out Brush brush)
+        {
+            if (TryParseLegacyBgrBrush(value, out brush))
+                return true;
+
+            return TryParseBrush(value, out brush);
+        }
+
+        private static bool TryParseLegacyBgrBrush(string value, out Brush brush)
+        {
+            brush = null;
+
+            if (string.IsNullOrWhiteSpace(value) || value[0] != '#')
+                return false;
+
+            string hex = value.Substring(1);
+
+            try
+            {
+                byte a = 0xFF;
+                byte r;
+                byte g;
+                byte b;
+
+                // Legacy ordering used by some syntax definitions: #BBGGRR / #AABBGGRR
+                if (hex.Length == 6)
+                {
+                    b = byte.Parse(hex.Substring(0, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+                    g = byte.Parse(hex.Substring(2, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+                    r = byte.Parse(hex.Substring(4, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+                }
+                else if (hex.Length == 8)
+                {
+                    a = byte.Parse(hex.Substring(0, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+                    b = byte.Parse(hex.Substring(2, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+                    g = byte.Parse(hex.Substring(4, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+                    r = byte.Parse(hex.Substring(6, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+                }
+                else
+                {
+                    return false;
+                }
+
+                var solid = new SolidColorBrush(Color.FromArgb(a, r, g, b));
+                if (solid.CanFreeze)
+                    solid.Freeze();
+
+                brush = solid;
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private static bool TryParseBrush(string value, out Brush brush)
+        {
+            brush = null;
+
+            if (string.IsNullOrWhiteSpace(value))
+                return false;
+
+            try
+            {
+                var converted = ColorConverter.ConvertFromString(value);
+                if (!(converted is Color color))
+                    return false;
+
+                var solid = new SolidColorBrush(color);
+                if (solid.CanFreeze)
+                    solid.Freeze();
+
+                brush = solid;
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private static bool IsDarkThemeSelected()
+        {
+            string colorMode = AppConfig.ColorMode;
+            return !string.IsNullOrEmpty(colorMode) &&
+                   (colorMode.Equals("Dark", StringComparison.OrdinalIgnoreCase) ||
+                    colorMode.Equals("Black", StringComparison.OrdinalIgnoreCase));
         }
 
         #region Dependency properties
@@ -76,9 +334,23 @@ namespace CNC.Controls
         public void LoadFile(string filename)
         {
             if (!string.IsNullOrEmpty(filename) && File.Exists(filename))
-                Editor.Load(filename);
+            {
+                try
+                {
+                    // Load the raw file text into the editor so original spacing is preserved
+                    var raw = System.IO.File.ReadAllText(filename);
+                    Editor.Text = raw ?? string.Empty;
+                }
+                catch
+                {
+                    // Fall back to the editor's load if direct read fails for any reason
+                    Editor.Load(filename);
+                }
+            }
             else
+            {
                 Editor.Clear();
+            }
 
             Editor.IsModified = false;
         }
@@ -119,6 +391,13 @@ namespace CNC.Controls
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
+            AttachGCodeStatusHandlers();
+
+            AppConfig.Settings.PropertyChanged -= AppConfig_PropertyChanged;
+            AppConfig.Settings.PropertyChanged += AppConfig_PropertyChanged;
+            ApplySyntaxHighlightingForTheme();
+            statusMargin.Opacity = 1d;
+
             if (DataContext is GrblViewModel newModel)
             {
                 if (model != null)
@@ -126,6 +405,90 @@ namespace CNC.Controls
 
                 model = newModel;
                 model.PropertyChanged += GcodeTextControl_PropertyChanged;
+            }
+
+            statusMargin.Refresh();
+        }
+
+        private void UserControl_Unloaded(object sender, RoutedEventArgs e)
+        {
+            if (model != null)
+                model.PropertyChanged -= GcodeTextControl_PropertyChanged;
+
+            AppConfig.Settings.PropertyChanged -= AppConfig_PropertyChanged;
+
+            DetachGCodeStatusHandlers();
+        }
+
+        private void AppConfig_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(AppConfig.ColorMode) || string.IsNullOrEmpty(e.PropertyName))
+            {
+                if (!Dispatcher.CheckAccess())
+                    Dispatcher.BeginInvoke((System.Action)(() => ApplySyntaxHighlightingForTheme()));
+                else
+                    ApplySyntaxHighlightingForTheme();
+            }
+        }
+
+        private void AttachGCodeStatusHandlers()
+        {
+            var data = GCode.File.Data;
+            if (data == null)
+                return;
+
+            data.CollectionChanged -= GCodeData_CollectionChanged;
+            data.CollectionChanged += GCodeData_CollectionChanged;
+
+            foreach (var row in data)
+                row.PropertyChanged += GCodeRow_PropertyChanged;
+        }
+
+        private void DetachGCodeStatusHandlers()
+        {
+            var data = GCode.File.Data;
+            if (data == null)
+                return;
+
+            data.CollectionChanged -= GCodeData_CollectionChanged;
+
+            foreach (var row in data)
+                row.PropertyChanged -= GCodeRow_PropertyChanged;
+        }
+
+        private void GCodeData_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.OldItems != null)
+            {
+                foreach (var item in e.OldItems)
+                {
+                    var row = item as GCodeBlock;
+                    if (row != null)
+                        row.PropertyChanged -= GCodeRow_PropertyChanged;
+                }
+            }
+
+            if (e.NewItems != null)
+            {
+                foreach (var item in e.NewItems)
+                {
+                    var row = item as GCodeBlock;
+                    if (row != null)
+                        row.PropertyChanged += GCodeRow_PropertyChanged;
+                }
+            }
+
+            statusMargin.Refresh();
+        }
+
+        private void GCodeRow_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(GCodeBlock.Sent) || string.IsNullOrEmpty(e.PropertyName))
+            {
+                if (!Dispatcher.CheckAccess())
+                    Dispatcher.BeginInvoke((System.Action)(() => statusMargin.Refresh()));
+                else
+                    statusMargin.Refresh();
             }
         }
 
@@ -361,8 +724,14 @@ namespace CNC.Controls
     }
 
 
-    class RangeLineNumberMargin : AbstractMargin
+    class GCodeLineStatusMargin : AbstractMargin
     {
+        private struct StatusIndicator
+        {
+            public string Glyph { get; set; }
+            public Brush Brush { get; set; }
+        }
+
         private struct StatusRange
         {
             public int StartLine { get; set; }
@@ -370,20 +739,47 @@ namespace CNC.Controls
             public GCodeLineStatus Status { get; set; }
         }
 
-        private static readonly Brush BackgroundBrush = new SolidColorBrush(Color.FromRgb(40, 40, 40));
-        private static readonly Pen DividerPen = new Pen(new SolidColorBrush(Color.FromRgb(80, 80, 80)), 1d);
+        private Brush backgroundBrush;
+        private Pen dividerPen;
         private readonly List<StatusRange> ranges = new List<StatusRange>();
+        private string currentToolTip;
+        private readonly ToolTip hoverToolTip = new ToolTip();
+        private static readonly Typeface IndicatorTypeface = new Typeface(new FontFamily("Segoe UI Symbol"), FontStyles.Normal, FontWeights.Bold, FontStretches.Normal);
+        private const double IndicatorFontSize = 10d;
 
-        static RangeLineNumberMargin()
-        {
-            BackgroundBrush.Freeze();
-            DividerPen.Brush.Freeze();
-            DividerPen.Freeze();
-        }
-
-        public RangeLineNumberMargin()
+        public GCodeLineStatusMargin()
         {
             Width = 18d;
+            hoverToolTip.Placement = PlacementMode.Mouse;
+            hoverToolTip.PlacementTarget = this;
+            hoverToolTip.StaysOpen = true;
+            hoverToolTip.HasDropShadow = true;
+            hoverToolTip.Padding = new Thickness(8, 6, 8, 6);
+            SetTheme(new SolidColorBrush(Color.FromRgb(40, 40, 40)), new SolidColorBrush(Color.FromRgb(80, 80, 80)));
+        }
+
+        public void SetTheme(Brush background, Brush divider)
+        {
+            if (background == null || divider == null)
+                return;
+
+            backgroundBrush = background;
+            if (backgroundBrush.CanFreeze)
+                backgroundBrush.Freeze();
+
+            var pen = new Pen(divider, .25d);
+            if (pen.Brush != null && pen.Brush.CanFreeze)
+                pen.Brush.Freeze();
+            if (pen.CanFreeze)
+                pen.Freeze();
+
+            dividerPen = pen;
+            InvalidateVisual();
+        }
+
+        public void Refresh()
+        {
+            InvalidateVisual();
         }
 
         public void SetRange(int startLine, int endLine, GCodeLineStatus status)
@@ -420,35 +816,197 @@ namespace CNC.Controls
             InvalidateVisual();
         }
 
-        private Brush GetBrush(int lineNumber)
+        private StatusIndicator? GetIndicator(int lineNumber)
         {
-            for (int i = ranges.Count - 1; i >= 0; i--)
+            var data = GCode.File.Data;
+            if (data != null && lineNumber >= 1 && lineNumber <= data.Count)
             {
-                if (lineNumber >= ranges[i].StartLine && lineNumber <= ranges[i].EndLine)
+                string sent = data[lineNumber - 1].Sent;
+
+                if (!string.IsNullOrEmpty(sent))
                 {
-                    switch (ranges[i].Status)
-                    {
-                        case GCodeLineStatus.Ready:
-                            return Brushes.Gray;
-                        case GCodeLineStatus.Complete:
-                            return Brushes.LimeGreen;
-                        case GCodeLineStatus.Error:
-                            return Brushes.Red;
-                        case GCodeLineStatus.Info:
-                            return Brushes.Yellow;
-                    }
+                    if (sent.StartsWith("error", StringComparison.OrdinalIgnoreCase))
+                        return GetIndicator(GCodeLineStatus.Error);
+
+                    if (sent == "ok")
+                        return GetIndicator(GCodeLineStatus.Complete);
+
+                    return GetIndicator(GCodeLineStatus.Info);
                 }
             }
 
+            for (int i = ranges.Count - 1; i >= 0; i--)
+            {
+                if (lineNumber >= ranges[i].StartLine && lineNumber <= ranges[i].EndLine)
+                    return GetIndicator(ranges[i].Status);
+            }
+
             return null;
+        }
+
+        private StatusIndicator GetIndicator(GCodeLineStatus status)
+        {
+            switch (status)
+            {
+                case GCodeLineStatus.Complete:
+                    return new StatusIndicator { Glyph = "✓", Brush = Brushes.LimeGreen };
+                case GCodeLineStatus.Error:
+                    return new StatusIndicator { Glyph = "✗", Brush = Brushes.Red };
+                case GCodeLineStatus.Info:
+                    return new StatusIndicator { Glyph = "?", Brush = Brushes.Yellow };
+                default:
+                    return new StatusIndicator { Glyph = "", Brush = Brushes.Gray };
+            }
+        }
+
+        private bool TryGetToolTipInfo(int lineNumber, out string title, out string message)
+        {
+            title = null;
+            message = null;
+
+            var data = GCode.File.Data;
+            if (data == null || lineNumber < 1 || lineNumber > data.Count)
+                return false;
+
+            string sent = data[lineNumber - 1].Sent;
+            if (string.IsNullOrWhiteSpace(sent) || !sent.StartsWith("error", StringComparison.OrdinalIgnoreCase))
+                return false;
+
+            string code = GetErrorCode(sent);
+            if (string.IsNullOrEmpty(code))
+            {
+                title = "Controller error";
+                message = sent;
+                return true;
+            }
+
+            title = string.Format("Error {0}", code);
+            message = GrblErrors.GetMessage(code);
+
+            if (string.IsNullOrEmpty(message) || string.Equals(message, sent, StringComparison.OrdinalIgnoreCase) || string.Equals(message, string.Format("error:{0}", code), StringComparison.OrdinalIgnoreCase))
+                message = null;
+
+            return true;
+        }
+
+        private object CreateToolTipContent(string title, string message)
+        {
+            var root = new StackPanel
+            {
+                Orientation = Orientation.Horizontal
+            };
+
+            var icon = new TextBlock
+            {
+                Text = "⚠",
+                Foreground = Brushes.OrangeRed,
+                FontSize = 16,
+                FontWeight = FontWeights.Bold,
+                Margin = new Thickness(0, 0, 8, 0),
+                VerticalAlignment = VerticalAlignment.Top
+            };
+
+            var textPanel = new StackPanel();
+            textPanel.Children.Add(new TextBlock
+            {
+                Text = title,
+                FontWeight = FontWeights.Bold
+            });
+
+            if (!string.IsNullOrWhiteSpace(message))
+            {
+                textPanel.Children.Add(new TextBlock
+                {
+                    Text = message,
+                    TextWrapping = TextWrapping.Wrap,
+                    MaxWidth = 320,
+                    Margin = new Thickness(0, 2, 0, 0)
+                });
+            }
+
+            root.Children.Add(icon);
+            root.Children.Add(textPanel);
+
+            return root;
+        }
+
+        private static string GetErrorCode(string sent)
+        {
+            if (string.IsNullOrWhiteSpace(sent))
+                return null;
+
+            int separator = sent.IndexOf(':');
+            if (separator < 0 || separator == sent.Length - 1)
+                return null;
+
+            var code = new StringBuilder();
+
+            for (int i = separator + 1; i < sent.Length; i++)
+            {
+                char c = sent[i];
+                if (char.IsDigit(c))
+                    code.Append(c);
+                else if (code.Length != 0)
+                    break;
+            }
+
+            return code.Length == 0 ? null : code.ToString();
+        }
+
+        private int GetLineNumberFromPoint(Point position)
+        {
+            if (TextView == null || !TextView.VisualLinesValid)
+                return 0;
+
+            double y = position.Y + TextView.VerticalOffset;
+
+            foreach (var visualLine in TextView.VisualLines)
+            {
+                double top = visualLine.VisualTop;
+                double bottom = top + visualLine.Height;
+
+                if (y >= top && y < bottom)
+                    return visualLine.FirstDocumentLine.LineNumber;
+            }
+
+            return 0;
+        }
+
+        protected override void OnMouseMove(MouseEventArgs e)
+        {
+            base.OnMouseMove(e);
+
+            string title;
+            string message;
+            if (!TryGetToolTipInfo(GetLineNumberFromPoint(e.GetPosition(this)), out title, out message))
+            {
+                currentToolTip = null;
+                hoverToolTip.IsOpen = false;
+                return;
+            }
+
+            string toolTip = title + "\n" + (message ?? string.Empty);
+            if (toolTip == currentToolTip)
+                return;
+
+            currentToolTip = toolTip;
+            hoverToolTip.Content = CreateToolTipContent(title, message);
+            hoverToolTip.IsOpen = true;
+        }
+
+        protected override void OnMouseLeave(MouseEventArgs e)
+        {
+            currentToolTip = null;
+            hoverToolTip.IsOpen = false;
+            base.OnMouseLeave(e);
         }
 
         protected override void OnRender(DrawingContext drawingContext)
         {
             base.OnRender(drawingContext);
 
-            drawingContext.DrawRectangle(BackgroundBrush, null, new Rect(0, 0, RenderSize.Width, RenderSize.Height));
-            drawingContext.DrawLine(DividerPen, new Point(RenderSize.Width - 0.5d, 0), new Point(RenderSize.Width - 0.5d, RenderSize.Height));
+            drawingContext.DrawRectangle(backgroundBrush, null, new Rect(0, 0, RenderSize.Width, RenderSize.Height));
+            drawingContext.DrawLine(dividerPen, new Point(0, 0), new Point(0, RenderSize.Height));
 
             if (TextView == null || !TextView.VisualLinesValid)
                 return;
@@ -460,12 +1018,22 @@ namespace CNC.Controls
                 if (visualLine.TextLines.Count == 0)
                     continue;
 
-                Brush brush = GetBrush(lineNumber);
-                if (brush == null)
+                var indicator = GetIndicator(lineNumber);
+                if (!indicator.HasValue || string.IsNullOrEmpty(indicator.Value.Glyph))
                     continue;
 
                 double y = visualLine.GetTextLineVisualYPosition(visualLine.TextLines[0], VisualYPosition.TextMiddle) - TextView.VerticalOffset;
-                drawingContext.DrawEllipse(brush, null, new Point(RenderSize.Width / 2d, Math.Max(0d, y)), 4d, 4d);
+                var formattedText = new FormattedText(
+                    indicator.Value.Glyph,
+                    CultureInfo.CurrentUICulture,
+                    FlowDirection.LeftToRight,
+                    IndicatorTypeface,
+                    IndicatorFontSize,
+                    indicator.Value.Brush);
+
+                var x = (RenderSize.Width - formattedText.Width) / 2d;
+                var textY = Math.Max(0d, y - (formattedText.Height / 2d));
+                drawingContext.DrawText(formattedText, new Point(x, textY));
             }
         }
     }

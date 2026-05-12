@@ -11,4 +11,7 @@
     <SolidColorBrush x:Key="AppLEDBorderBrush" Color="LightGray"/>
     <SolidColorBrush x:Key="AppPanelBorderBrush" Color="#FF707070"/>
     <SolidColorBrush x:Key="IconBrush" Color="Black"/>
+    <SolidColorBrush x:Key="IconDisabledBrush" Color="#FF888888"/>
 </ResourceDictionary>
+
+

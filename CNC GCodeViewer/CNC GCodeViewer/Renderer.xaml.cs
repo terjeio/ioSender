@@ -268,6 +268,7 @@ namespace CNC.Controls.Viewer
         private IEnumerator<RunAction> job = null;
         private GCodeEmulator emu = new GCodeEmulator(true);
         private List<GCodeToken> tokens;
+        private ProgramLimits renderedProgramLimits = null;
 
         private Point3D gridOffset;
         private GridLinesVisual3D grid = null;
@@ -278,6 +279,7 @@ namespace CNC.Controls.Viewer
         private Point3DCollection positionPoints = new Point3DCollection();
         private Point3DCollection toolPathHistory = new Point3DCollection();
         private List<Point3DCollection> toolCircleHistoryLayers = new List<Point3DCollection>();
+        private const int ToolTraceMaxElements = 100;
         private const int ToolCircleSegments = 24;
         private const int ToolCircleHistoryCount = 10;
         private LinesVisual3D toolTrailVisual;
@@ -664,6 +666,10 @@ namespace CNC.Controls.Viewer
             if (model.UnitFactor != 1d)
                 bbox = new ProgramLimits(bbox, model.UnitFactor);
 
+            double centerX = (bbox.MaxX + bbox.MinX) / 2d;
+            double centerY = (bbox.MaxY + bbox.MinY) / 2d;
+            double centerZ = (bbox.MaxZ + bbox.MinZ) / 2d;
+
             if (model.LatheMode == LatheMode.Disabled)
             {
                 double pos;
@@ -672,22 +678,22 @@ namespace CNC.Controls.Viewer
                     case RenderMode.Mode3D:
                     case RenderMode.Mode2DXY:
                         pos = Math.Max(5d, Math.Max(bbox.SizeX, bbox.SizeY) / Math.Tan(ccamera.FieldOfView * Math.PI / 360d));
-                        viewport.Camera.Position = new Point3D((bbox.MaxX + bbox.MinX) / 2d, (bbox.MaxY + bbox.MinY) / 2d, pos);
-                        viewport.Camera.LookDirection = new Vector3D(0d, 0d, -100d);
+                        viewport.Camera.Position = new Point3D(centerX, centerY, centerZ + pos);
+                        viewport.Camera.LookDirection = new Vector3D(0d, 0d, -pos);
                         viewport.Camera.UpDirection = new Vector3D(0d, 1d, 1d);
                         break;
 
                     case RenderMode.Mode2DXZ:
                         pos = Math.Max(5d, Math.Max(bbox.SizeX, bbox.SizeZ) / Math.Tan(ccamera.FieldOfView * Math.PI / 360d));
-                        viewport.Camera.Position = new Point3D((bbox.MaxX + bbox.MinX) / 2d, -pos, (bbox.MaxZ + bbox.MinZ) / 2d);
-                        viewport.Camera.LookDirection = new Vector3D(0d, 100d, 0d);
+                        viewport.Camera.Position = new Point3D(centerX, centerY - pos, centerZ);
+                        viewport.Camera.LookDirection = new Vector3D(0d, pos, 0d);
                         viewport.Camera.UpDirection = new Vector3D(0d, 1d, 1d);
                         break;
 
                     case RenderMode.Mode2DYZ:
                         pos = Math.Max(5d, Math.Max(bbox.SizeY, bbox.SizeZ) / Math.Tan(ccamera.FieldOfView * Math.PI / 360d));
-                        viewport.Camera.Position = new Point3D(pos, (bbox.MaxX + bbox.MinX) / 2d, (bbox.MaxY + bbox.MinY) / 2d);
-                        viewport.Camera.LookDirection = new Vector3D(-100d, 0d, 0d);
+                        viewport.Camera.Position = new Point3D(centerX + pos, centerY, centerZ);
+                        viewport.Camera.LookDirection = new Vector3D(-pos, 0d, 0d);
                         viewport.Camera.UpDirection = new Vector3D(1d, 0d, 1d);
                         break;
                 }
@@ -695,8 +701,8 @@ namespace CNC.Controls.Viewer
             else
             {
                 double ypos = Math.Max(5d, Math.Max(bbox.SizeX, bbox.SizeZ) / Math.Tan(ccamera.FieldOfView * Math.PI / 360d));
-                viewport.Camera.Position = new Point3D((bbox.MaxX + bbox.MinX) / 2d, -ypos, (bbox.MaxZ + bbox.MinZ) / 2d);
-                viewport.Camera.LookDirection = new Vector3D(0d, 100d, 0d);
+                viewport.Camera.Position = new Point3D(centerX, centerY - ypos, centerZ);
+                viewport.Camera.LookDirection = new Vector3D(0d, ypos, 0d);
                 viewport.Camera.UpDirection = new Vector3D(-1d, 0d, 0d);
             }
             //                viewport.CameraController.AddRotateForce(0.001, 0.001); // emulate move camera 
@@ -724,6 +730,8 @@ namespace CNC.Controls.Viewer
                 tokens = null;
             }
 
+            renderedProgramLimits = null;
+
             if (Machine.Grid != null)
                 viewport.Children.Remove(Machine.Grid);
             Machine.Grid = grid = null;
@@ -747,6 +755,7 @@ namespace CNC.Controls.Viewer
         public void ResetView()
         {
             RefreshView(((GrblViewModel)DataContext).ProgramLimits);
+                return;
         }
 
         private void AddWorkEnvelope()
@@ -790,6 +799,8 @@ namespace CNC.Controls.Viewer
                     toolPathHistory.Add(historyPoint);
                 }
 
+                TrimToolPathHistory();
+
                 lastToolPosition = historyPoint;
                 Machine.ToolTrail = toolPathHistory;
 
@@ -812,6 +823,15 @@ namespace CNC.Controls.Viewer
                         ShowCrosshairTool();
                         break;
                 }
+        }
+
+        private void TrimToolPathHistory()
+        {
+            while (toolPathHistory.Count > ToolTraceMaxElements)
+            {
+                toolPathHistory.RemoveAt(0);
+                toolPathHistory.RemoveAt(0);
+            }
         }
 
         private Point3D GetToolCirclePoint(Point3D center, double radius, double angle)
@@ -1356,6 +1376,8 @@ namespace CNC.Controls.Viewer
             var bbox = (DataContext as GrblViewModel).ProgramLimits;
 
             ClearViewport();
+
+            renderedProgramLimits = new ProgramLimits(bbox, 1d);
 
             this.tokens = tokens;
             renderExecuted = RenderExecuted && !Machine.HighlightColor.Equals(Machine.CutMotionColor) && _animateSubscribed;

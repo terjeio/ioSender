@@ -81,8 +81,8 @@
         <ToggleButton x:Name="tsw"
                       Style="{StaticResource PillToggleSwitchStyle}"
                       IsChecked="{Binding Path=IsChecked, Mode=OneWay, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                      Margin="0,3,0,0" Height="20" Width="40" Tag="Flood"
-                      HorizontalAlignment="Left" VerticalAlignment="Top"/>
-        <Label x:Uid="lbl_ToggleSwitch" Grid.Column="1" Content="{Binding Path=Label, RelativeSource={RelativeSource AncestorType=UserControl}}" Height="26"/>
+                      Margin="0,3,0,0" Height="20" Width="40"
+                      HorizontalAlignment="Left" VerticalAlignment="Center"/>
+        <Label x:Uid="lbl_ToggleSwitch" Grid.Column="1" Content="{Binding Path=Label, RelativeSource={RelativeSource AncestorType=UserControl}}" Height="26" VerticalAlignment="Center" VerticalContentAlignment="Center"/>
     </Grid>
 </UserControl>

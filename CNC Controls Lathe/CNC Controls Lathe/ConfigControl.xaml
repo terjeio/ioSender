@@ -15,7 +15,7 @@
                     <ColumnDefinition Width="100*"/>
                 </Grid.ColumnDefinitions>
                 <Label Content="Mode:" HorizontalAlignment="Right" Margin="0,0,0,0" VerticalAlignment="Top"/>
-                <ComboBox ItemsSource="{Binding Path=Lathe.LatheModes}" SelectedItem="{Binding Path=Lathe.XMode, Mode=TwoWay}" Grid.Column="1" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top" Width="80"/>
+                <ComboBox ItemsSource="{Binding Path=Lathe.LatheModes}" SelectedItem="{Binding Path=Lathe.XMode, Mode=TwoWay}" Grid.Column="1" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top" Width="100"/>
             </Grid>
             <Grid Height="29" Margin="0,2,0,2">
                 <Grid.ColumnDefinitions>
@@ -23,7 +23,7 @@
                     <ColumnDefinition Width="100*"/>
                 </Grid.ColumnDefinitions>
                 <Label Content="Z direction:" HorizontalAlignment="Right" Margin="0,0,0,0" VerticalAlignment="Top"/>
-                <ComboBox ItemsSource="{Binding Path=Lathe.ZDirections}" SelectedItem="{Binding Path=Lathe.ZDirection, Mode=TwoWay}" IsEnabled="{Binding Path=Lathe.IsEnabled, Mode=OneWay}" Grid.Column="1" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top" Width="80"/>
+                <ComboBox ItemsSource="{Binding Path=Lathe.ZDirections}" SelectedItem="{Binding Path=Lathe.ZDirection, Mode=TwoWay}" IsEnabled="{Binding Path=Lathe.IsEnabled, Mode=OneWay}" Grid.Column="1" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top" Width="100"/>
             </Grid>
             <Controls:NumericField Label="Feedrate:" ColonAt="140" Unit="mm/min" Format="###0" Value="{Binding Path=Lathe.FeedRate, Mode=TwoWay}" IsEnabled="{Binding Path=Lathe.IsEnabled, Mode=OneWay}" Margin="0,2,0,2"/>
             <Controls:NumericField Label="Last passdepth:" ColonAt="140" Value="{Binding Path=Lathe.PassDepthLast, Mode=TwoWay}" IsEnabled="{Binding Path=Lathe.IsEnabled, Mode=OneWay}" Margin="0,2,0,2"/>

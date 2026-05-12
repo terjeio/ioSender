@@ -71,6 +71,9 @@ namespace CNC.Controls
         void btnSave_Click(object sender, RoutedEventArgs e)
         {
             GCode.File.Save();
+
+            if (DataContext is GrblViewModel model)
+                model.IsFileEditing = false;
         }
         void btnEdit_Click(object sender, RoutedEventArgs e)
         {

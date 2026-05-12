@@ -19,7 +19,7 @@
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
                 <Label x:Uid="lbl_offsetMotion" Content="Offset motion:" HorizontalAlignment="Center" VerticalAlignment="Top" Width="103" Height="26"/>
-                <ComboBox x:Name="comboBox" ItemsSource="{Binding Path=Camera.MoveModes}" SelectedItem="{Binding Path=Camera.MoveMode, Mode=TwoWay}" Grid.Column="1" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top" Width="82" RenderTransformOrigin="0.609,0.514" Height="22"/>
+                <ComboBox x:Name="comboBox" ItemsSource="{Binding Path=Camera.MoveModes}" SelectedItem="{Binding Path=Camera.MoveMode, Mode=TwoWay}" Grid.Column="1" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top" Width="100" RenderTransformOrigin="0.609,0.514" Height="22"/>
             </Grid>
             <Button x:Uid="btn_getPosition" x:Name="getPosition" Content="Get current position" Width="150" Margin="0,6,0,0" Click="getPosition_Click"/>
         </StackPanel>

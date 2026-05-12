@@ -497,11 +497,11 @@ namespace CNC.Controls
                     return 1;
             }
 
-            Base.Themes.Add("Standard", LibStrings.FindResource("ThemeDefault"));
-            Base.Themes.Add("Black", LibStrings.FindResource("ThemeBlack"));
+            //Base.Themes.Add("Standard", LibStrings.FindResource("ThemeDefault"));
+            //Base.Themes.Add("Black", LibStrings.FindResource("ThemeBlack"));
             Base.Themes.Add("Dark", LibStrings.FindResource("ThemeDark"));
             Base.Themes.Add("Light", LibStrings.FindResource("ThemeLight"));
-            Base.Themes.Add("White", LibStrings.FindResource("ThemeWhite"));
+            //Base.Themes.Add("White", LibStrings.FindResource("ThemeWhite"));
 
             if (jogMode != -1)
                 Base.Jog.Mode = (JogConfig.JogMode)jogMode;

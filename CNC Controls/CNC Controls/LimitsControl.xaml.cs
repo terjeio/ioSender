@@ -98,11 +98,24 @@ namespace CNC.Controls
         {
             if (Comms.com != null && Comms.com.IsOpen)
             {
-                Comms.com.WriteCommand(isMetric ? "G21" : "G20");
-                Comms.com.AwaitAck();
-                Comms.com.WriteCommand(isMetric ? "$13=0" : "$13=1");
-                Comms.com.AwaitAck();
-                Comms.com.WriteCommand("$G");
+                bool restoreSingleBlock = DataContext is GrblViewModel model && model.Signals[Signals.SingleBlock];
+
+                try
+                {
+                    if (restoreSingleBlock)
+                        Comms.com.WriteByte((byte)GrblConstants.CMD_SINGLE_BLOCK_TOGGLE);
+
+                    Comms.com.WriteCommand(isMetric ? "G21" : "G20");
+                    Comms.com.AwaitAck();
+                    Comms.com.WriteCommand(isMetric ? "$13=0" : "$13=1");
+                    Comms.com.AwaitAck();
+                    Comms.com.WriteCommand("$G");
+                }
+                finally
+                {
+                    if (restoreSingleBlock)
+                        Comms.com.WriteByte((byte)GrblConstants.CMD_SINGLE_BLOCK_TOGGLE);
+                }
             }
             else
                 SyncRadioButtons(isMetric);
@@ -110,26 +123,14 @@ namespace CNC.Controls
 
         private void rbIN_Checked(object sender, RoutedEventArgs e)
         {
-            if (!_suppressUnitCommand && Comms.com != null && Comms.com.IsOpen)
-            {
-                Comms.com.WriteCommand("G20");
-                Comms.com.AwaitAck();
-                Comms.com.WriteCommand("$13=1");
-                Comms.com.AwaitAck();
-                Comms.com.WriteCommand("$G");
-            }
+            if (!_suppressUnitCommand)
+                SetUnits(false);
         }
 
         private void rbMM_Checked(object sender, RoutedEventArgs e)
         {
-            if (!_suppressUnitCommand && Comms.com != null && Comms.com.IsOpen)
-            {
-                Comms.com.WriteCommand("G21");
-                Comms.com.AwaitAck();
-                Comms.com.WriteCommand("$13=0");
-                Comms.com.AwaitAck();
-                Comms.com.WriteCommand("$G");
-            }
+            if (!_suppressUnitCommand)
+                SetUnits(true);
         }
     }
 }

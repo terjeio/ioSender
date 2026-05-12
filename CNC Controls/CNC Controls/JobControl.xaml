@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:local="clr-namespace:CNC.Controls"
+             xmlns:core="clr-namespace:CNC.Core;assembly=CNC.Core"
              mc:Ignorable="d" 
              d:DesignHeight="46" d:DesignWidth="400" HorizontalAlignment="Center" VerticalAlignment="Center">
     <UserControl.Resources>
@@ -25,17 +26,36 @@
         </Style>
         <Style TargetType="{x:Type Path}" BasedOn="{StaticResource IconPathStyle}" />
         <Style x:Key="StartIconStyle" TargetType="{x:Type Path}" BasedOn="{StaticResource IconPathStyle}">
-            <Setter Property="Fill" Value="Green" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsEnabled, RelativeSource={RelativeSource AncestorType=Button}}" Value="True">
+                    <Setter Property="Fill" Value="Green" />
+                </DataTrigger>
+            </Style.Triggers>
         </Style>
         <Style x:Key="StopIconStyle" TargetType="{x:Type Path}" BasedOn="{StaticResource IconPathStyle}">
-            <Setter Property="Fill" Value="Firebrick" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsEnabled, RelativeSource={RelativeSource AncestorType=Button}}" Value="True">
+                    <Setter Property="Fill" Value="Firebrick" />
+                </DataTrigger>
+            </Style.Triggers>
         </Style>
         <Style x:Key="HoldIconStyle" TargetType="{x:Type Path}" BasedOn="{StaticResource IconPathStyle}">
-            <Setter Property="Fill" Value="DarkOrange" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsEnabled, RelativeSource={RelativeSource AncestorType=Button}}" Value="True">
+                    <Setter Property="Fill" Value="DarkOrange" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="RewindIconStyle" TargetType="{x:Type Path}" BasedOn="{StaticResource IconPathStyle}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsEnabled, RelativeSource={RelativeSource AncestorType=Button}}" Value="True">
+                    <Setter Property="Fill" Value="SteelBlue" />
+                </DataTrigger>
+            </Style.Triggers>
         </Style>
         <local:LogicalNotConverter x:Key="BooleanConverter" />
     </UserControl.Resources>
-    <StackPanel Orientation="Horizontal" Height="46">
+    <StackPanel Orientation="Horizontal" Height="46" IsEnabled="{Binding Path=IsFileEditing, Mode=OneWay, Converter={StaticResource BooleanConverter}}">
         <Button IsEnabled="{Binding Path=IsJobRunning, Mode=OneWay, Converter={StaticResource BooleanConverter}}" x:Uid="btn_cycleStart" x:Name="btnStart" ToolTip="Alt+R" Click="btnStart_Click"
             Padding="4"
 >
@@ -68,11 +88,12 @@
 >
             <Viewbox Stretch="Uniform">
                 <Canvas  Width="42" Height="42" Canvas.Left="0" Canvas.Top="0">
-                    <Path Height="42" Stretch="Fill" Width="42"  Data="M16.99,27.606L0.778,16.044L16.99,4.481v8.78l13,-8.713v22.99l-13,-8.713V27.606zM16.99,16.418l11,7.372V8.297l-11,7.372V16.418zM4.222,16.044l10.768,7.68V8.364L4.222,16.044z"/>
+                    <Path Style="{StaticResource RewindIconStyle}" Height="42" Stretch="Fill" Width="42"  Data="M16.99,27.606L0.778,16.044L16.99,4.481v8.78l13,-8.713v22.99l-13,-8.713V27.606zM16.99,16.418l11,7.372V8.297l-11,7.372V16.418zM4.222,16.044l10.768,7.68V8.364L4.222,16.044z"/>
                 </Canvas>
             </Viewbox>
 
         </Button>
+        <local:ToggleControl x:Name="tswSingle" Label="Single block" Click="tswSingle_Click" IsChecked="{Binding Path=Signals[(core:Signals)SingleBlock], Mode=OneWay}" VerticalAlignment="Center" Margin="4,0,0,0" Height="35" />
 
     </StackPanel>
 </UserControl>
