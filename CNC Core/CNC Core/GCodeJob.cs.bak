@@ -150,12 +150,10 @@ namespace CNC.Core
                 return Load(filename, sr);
         }
 
-        private bool Load(string filename, TextReader sr, bool addLineNumber = false)
+        private bool Load(string filename, TextReader sr)
         {
             bool ok = true, isComment;
             uint ln;
-
-            FileInfo file = new FileInfo(filename);
 
             string block = sr.ReadLine();
 
@@ -200,7 +198,6 @@ namespace CNC.Core
                         block = null;
                 }
             }
-            sr.Close();
 
             if (ok)
                 AddBlock("", Action.End);

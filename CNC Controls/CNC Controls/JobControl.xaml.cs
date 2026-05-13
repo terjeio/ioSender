@@ -1097,7 +1097,7 @@ namespace CNC.Controls
                     break;
 
                 case GrblStates.Hold:
-                    streamingHandler.Call(StreamingState.FeedHold, false);
+                    streamingHandler.Call(StreamingState.FeedHold, true);
                     break;
 
                 case GrblStates.Home:

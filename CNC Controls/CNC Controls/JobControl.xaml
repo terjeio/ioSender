@@ -1,4 +1,5 @@
 ﻿<UserControl x:Class="CNC.Controls.JobControl"
+             x:Name="jobControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -56,7 +57,7 @@
         <local:LogicalNotConverter x:Key="BooleanConverter" />
     </UserControl.Resources>
     <StackPanel Orientation="Horizontal" Height="46" IsEnabled="{Binding Path=IsFileEditing, Mode=OneWay, Converter={StaticResource BooleanConverter}}">
-        <Button IsEnabled="{Binding Path=IsJobRunning, Mode=OneWay, Converter={StaticResource BooleanConverter}}" x:Uid="btn_cycleStart" x:Name="btnStart" ToolTip="Alt+R" Click="btnStart_Click"
+        <Button IsEnabled="{Binding ElementName=jobControl, Path=IsCycleStartEnabled, Mode=OneWay}" x:Uid="btn_cycleStart" x:Name="btnStart" ToolTip="Alt+R" Click="btnStart_Click"
             Padding="4"
 >
             <Viewbox>
@@ -65,7 +66,7 @@
                 </Canvas>
             </Viewbox>
         </Button>
-        <Button x:Uid="btn_feedHold" x:Name="btnHold" ToolTip="Space" Margin="5,0,0,0" Click="btnHold_Click"
+        <Button IsEnabled="{Binding ElementName=jobControl, Path=IsFeedHoldEnabled, Mode=OneWay}" x:Uid="btn_feedHold" x:Name="btnHold" ToolTip="Space" Margin="5,0,0,0" Click="btnHold_Click"
             Padding="4"
 >
             <Viewbox Stretch="Uniform">
@@ -74,7 +75,7 @@
                 </Canvas>
             </Viewbox>
         </Button>
-        <Button x:Uid="btn_stop" x:Name="btnStop" ToolTip="Alt+S" Margin="5,0,0,0" Click="btnStop_Click"
+        <Button IsEnabled="{Binding ElementName=jobControl, Path=IsStopEnabled, Mode=OneWay}" x:Uid="btn_stop" x:Name="btnStop" ToolTip="Alt+S" Margin="5,0,0,0" Click="btnStop_Click"
             Padding="4"
 >
             <Viewbox Stretch="Uniform">
@@ -83,7 +84,7 @@
                 </Canvas>
             </Viewbox>
         </Button>
-        <Button x:Uid="btn_rewind" x:Name="btnRewind" Margin="5,0,0,0" Click="btnRewind_Click"
+        <Button IsEnabled="{Binding ElementName=jobControl, Path=IsRewindEnabled, Mode=OneWay}" x:Uid="btn_rewind" x:Name="btnRewind" Margin="5,0,0,0" Click="btnRewind_Click"
             Padding="4"
 >
             <Viewbox Stretch="Uniform">
