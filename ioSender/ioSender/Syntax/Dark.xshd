@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<SyntaxDefinition xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+  <Property name="DefaultFont" value="Segoe UI, 12pt" />
+  <Property name="DefaultForeground" value="#086B80" />
+  <Property name="GutterFont" value="Tahoma, 8pt" />
+  <Property name="BackColor" value="#000000" />
+  <Property name="GutterBackColor" value="#111A08" />
+  <Property name="GutterForeColor" value="#A9A9A9" />
+  <Property name="BookmarkColor" value="#7FFF00" />
+  <Property name="TextRangeBoxColor" value="#9ACD32" />
+  <Property name="Indent" value="1" />
+  <RuleSet>
+    <Rule fontFamily="[FontFamily: Name=Segoe UI]" foreground="#7FFF00">[A-Z]{2,}</Rule>
+    <Rule fontFamily="[FontFamily: Name=Segoe UI]" foreground="#F5DEB3">\#[-+]?[0-9]*[\.,]*[0-9]*</Rule>
+    <Rule fontFamily="[FontFamily: Name=Segoe UI]" foreground="#5F9EA0">X{1,2}[-+]?[0-9]*[\.,]*[0-9]*</Rule>
+    <Rule fontFamily="[FontFamily: Name=Segoe UI]" foreground="#639806">Y{1,2}[-+]?[0-9]*[\.,]*[0-9]*</Rule>
+    <Rule fontFamily="[FontFamily: Name=Segoe UI]" foreground="#9CB204">Z{1,2}[-+]?[0-9]*[\.,]*[0-9]*</Rule>
+    <Rule fontFamily="[FontFamily: Name=Segoe UI]" foreground="#6B8E23">G0?0(?=[^\d])</Rule>
+    <Rule fontFamily="[FontFamily: Name=Segoe UI]" foreground="#7FFFD4">G0?1(?=[^\d])</Rule>
+    <Rule fontFamily="[FontFamily: Name=Segoe UI]" foreground="#7FFFD4">G0?2(?=[^\d])</Rule>
+    <Rule fontFamily="[FontFamily: Name=Segoe UI]" foreground="#7FFFD4">G0?3(?=[^\d])</Rule>
+    <Rule fontFamily="[FontFamily: Name=Segoe UI]" foreground="#DEB887">G41</Rule>
+    <Rule fontFamily="[FontFamily: Name=Segoe UI]" foreground="#DEB887">G42</Rule>
+    <Rule fontFamily="[FontFamily: Name=Segoe UI]" foreground="#DEB887">G40</Rule>
+    <Rule fontFamily="[FontFamily: Name=Segoe UI]" foreground="#7FFFD4">G91</Rule>
+    <Rule fontFamily="[FontFamily: Name=Segoe UI]" foreground="#7FFFD4">G90</Rule>
+    <Span fontFamily="[FontFamily: Name=Segoe UI]" foreground="#FAFAD2" multiline="true">
+      <Begin>\(</Begin>
+      <End>\)</End>
+    </Span>
+    <Span fontFamily="[FontFamily: Name=Segoe UI]" foreground="#FAFAD2">
+      <Begin>;</Begin>
+      <End>$</End>
+    </Span>
+  </RuleSet>
+</SyntaxDefinition>

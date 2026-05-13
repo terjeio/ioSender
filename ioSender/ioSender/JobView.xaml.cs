@@ -146,6 +146,7 @@ namespace GCode_Sender
                 case nameof(GrblViewModel.FileName):
                     string filename = (sender as GrblViewModel).FileName;
                     MainWindow.ui.WindowTitle = filename;
+                    gcodeTextControl.LoadFile(filename);
 
                         if (string.IsNullOrEmpty(filename))
                             MainWindow.CloseFile();

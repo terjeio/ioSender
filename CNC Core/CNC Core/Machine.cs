@@ -299,6 +299,17 @@ namespace CNC.Core
             return toolOffsets[axis];
         }
 
+        public double GetToolDiameter(int toolNumber)
+        {
+            double diameter = 0d;
+            var tool = toolTable.Where(t => t.Code == toolNumber.ToString()).FirstOrDefault();
+
+            if (tool != null)
+                diameter = tool.R * 2d;
+
+            return diameter;
+        }
+
         public bool SetToolOffset(GCToolOffset token)
         {
             var tool = SelectedTool;

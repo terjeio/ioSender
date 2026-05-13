@@ -1097,7 +1097,7 @@ namespace CNC.Controls
                     break;
 
                 case GrblStates.Hold:
-                    streamingHandler.Call(StreamingState.FeedHold, false);
+                    streamingHandler.Call(StreamingState.FeedHold, true);
                     break;
 
                 case GrblStates.Home:
@@ -1136,6 +1136,12 @@ namespace CNC.Controls
             grblState.State = newstate.State;
             grblState.Substate = newstate.Substate;
             grblState.MPG = newstate.MPG;
+        }
+
+        private void tswSingle_Click(object sender, RoutedEventArgs e)
+        {
+            //toggle single block on/off
+            Comms.com.WriteByte((byte)GrblConstants.CMD_SINGLE_BLOCK_TOGGLE);
         }
 
         private void ResponseReceived(string response)

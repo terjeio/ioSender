@@ -10,7 +10,7 @@
         Title="Macro Editor" Height="275" Width="310" Icon="App.ico" ResizeMode="NoResize" ShowInTaskbar="False"
         WindowStartupLocation="CenterOwner"
         Loaded="Window_Loaded" Closing="Window_Closing">
-    <Grid Background="#FFE5E5E5">
+    <Grid Background="{DynamicResource AppDialogBackgroundBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="40*"/>
             <RowDefinition Height="25*"/>

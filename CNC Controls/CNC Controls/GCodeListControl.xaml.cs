@@ -45,6 +45,7 @@ using CNC.Core;
 
 namespace CNC.Controls
 {
+
     /// <summary>
     /// Interaction logic for GCodeListControl.xaml
     /// </summary>

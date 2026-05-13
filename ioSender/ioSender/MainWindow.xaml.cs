@@ -79,6 +79,8 @@ namespace GCode_Sender
 
             BaseWindowTitle = Title;
 
+            App.ApplyTheme(AppConfig.Settings.Base.Theme);
+
             CNC.Core.Grbl.GrblViewModel = (GrblViewModel)DataContext;
             GrblInfo.LatheModeEnabled = AppConfig.Settings.Lathe.IsEnabled;
 
@@ -283,6 +285,10 @@ namespace GCode_Sender
                     AppConfig.Settings.Base.WindowWidth = Width;
                     AppConfig.Settings.Base.WindowHeight = Height;
                 }
+            }
+            else if(e.PropertyName == nameof(Config.Theme))
+            {
+                App.ApplyTheme((sender as Config).Theme);
             }
         }
 

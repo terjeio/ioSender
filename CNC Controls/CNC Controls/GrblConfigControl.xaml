@@ -54,12 +54,6 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
-        <Style x:Key="ConfigButtonStyle" TargetType="Button">
-            <Setter Property="MinWidth" Value="90" />
-            <Setter Property="MaxWidth" Value="120" />
-            <Setter Property="Padding" Value="5,0" />
-            <Setter Property="VerticalAlignment" Value="Top" />
-        </Style>
     </UserControl.Resources>
     <DockPanel>
         <Grid>
@@ -99,8 +93,8 @@
         <DockPanel x:Name="dpan" DockPanel.Dock="Left">
             <DockPanel DockPanel.Dock="Bottom" HorizontalAlignment="Stretch" Height="Auto" Margin="10,0,10,10" VerticalAlignment="Top" Width="Auto">
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Left" Height="Auto" VerticalAlignment="Top">
-                    <Button x:Uid="btn_reload" x:Name="btnReload" Content="Reload" ToolTip="Reload settings from controller." HorizontalAlignment="Left" Style="{StaticResource ConfigButtonStyle}" Click="btnReload_Click"/>
-                    <Button x:Uid="btn_save" x:Name="btnSave" Content="Save" ToolTip="Save changed settings to controller." HorizontalAlignment="Left" Margin="5,0,0,0" VerticalAlignment="Top" Style="{StaticResource ConfigButtonStyle}" Click="btnSave_Click">
+                    <Button x:Uid="btn_reload" x:Name="btnReload" Content="Reload" ToolTip="Reload settings from controller." HorizontalAlignment="Left" Click="btnReload_Click"/>
+                    <Button x:Uid="btn_save" x:Name="btnSave" Content="Save" ToolTip="Save changed settings to controller." HorizontalAlignment="Left" Margin="5,0,0,0" VerticalAlignment="Top" Click="btnSave_Click">
                         <!--- TODO                        <Button.IsEnabled>
                             <Binding Converter="IsNotConverter">
                             <MultiBinding Converter="{StaticResource StateToBooleanConverter}">
@@ -116,13 +110,13 @@
                     </Button>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" Height="Auto" VerticalAlignment="Top" HorizontalAlignment="Right">
-                    <Button x:Uid="btn_backup" x:Name="btnBackup" Content="Backup" HorizontalAlignment="Left" VerticalAlignment="Top" Style="{StaticResource ConfigButtonStyle}" Click="btnBackup_Click"/>
-                    <Button x:Uid="btn_restore" x:Name="btnRestore" Content="Restore" HorizontalAlignment="Right" Margin="5,0,0,0" VerticalAlignment="Top" Style="{StaticResource ConfigButtonStyle}" Click="btnRestore_Click"/>
+                    <Button x:Uid="btn_backup" x:Name="btnBackup" Content="Backup" HorizontalAlignment="Left" VerticalAlignment="Top" Click="btnBackup_Click"/>
+                    <Button x:Uid="btn_restore" x:Name="btnRestore" Content="Restore" HorizontalAlignment="Right" Margin="5,0,0,0" VerticalAlignment="Top" Click="btnRestore_Click"/>
                 </StackPanel>
             </DockPanel>
             <StackPanel x:Name="details" DockPanel.Dock="Top" HorizontalAlignment="Left" Height="Auto" Margin="5,5,0,0" VerticalAlignment="Top">
                 <StackPanel x:Name="canvas" HorizontalAlignment="Left" Height="Auto" VerticalAlignment="Center" Width="455"/>
-                <TextBox x:Name="txtDescription" Background="#FFF8F8F8" IsReadOnly="True" Margin="5,0,0,0" HorizontalAlignment="Left" Height="180" TextWrapping="Wrap" VerticalAlignment="Top" Width="550"/>
+                <TextBox x:Name="txtDescription" Background="{DynamicResource AppReadOnlyTextBoxBrush}" IsReadOnly="True" Margin="5,0,0,0" HorizontalAlignment="Left" Height="180" TextWrapping="Wrap" VerticalAlignment="Top" Width="550"/>
             </StackPanel>
         </DockPanel>
     </DockPanel>

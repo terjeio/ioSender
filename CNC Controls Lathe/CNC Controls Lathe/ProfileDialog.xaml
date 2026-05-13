@@ -13,7 +13,7 @@
         <DialogConverters:LatheModeRadiusBoolConverter x:Key="RadiusConverter" />
         <DialogConverters:LatheModeDiameterBoolConverter x:Key="DiameterConverter" />
     </Window.Resources>
-    <Grid Background="#FFE5E5E5">
+    <Grid Background="{DynamicResource AppDialogBackgroundBrush}">
         <StackPanel Orientation="Horizontal" Margin="5,10,0,0" Height="24" VerticalAlignment="Top">
         <Label x:Name="lblProfile" Content="Profile:" HorizontalContentAlignment="Right" HorizontalAlignment="Right" VerticalAlignment="Top"/>
         <ComboBox x:Name="cbxProfile" IsEditable="True" ItemsSource="{Binding Path=Profiles}" DisplayMemberPath="Name" SelectedValuePath="Id" SelectedItem="{Binding Path=Profile, Mode=TwoWay}" HorizontalAlignment="Left" Margin="1,0,0,0" VerticalAlignment="Center" Width="280" SelectionChanged="cbxProfile_SelectionChanged" TextBoxBase.TextChanged="cbxProfile_TextChanged"/>

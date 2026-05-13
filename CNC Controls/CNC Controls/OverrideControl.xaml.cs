@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using CNC.Core;
 
 namespace CNC.Controls
@@ -126,6 +127,13 @@ namespace CNC.Controls
         {
             get { return (GrblEncoderMode)GetValue(EncoderModeProperty); }
             set { SetValue(EncoderModeProperty, value); }
+        }
+
+        public static readonly DependencyProperty SliderBrushProperty = DependencyProperty.Register(nameof(SliderBrush), typeof(Brush), typeof(OverrideControl), new PropertyMetadata(SystemColors.HighlightBrush));
+        public Brush SliderBrush
+        {
+            get { return (Brush)GetValue(SliderBrushProperty); }
+            set { SetValue(SliderBrushProperty, value); }
         }
 
         #endregion

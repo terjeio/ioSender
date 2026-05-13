@@ -11,7 +11,7 @@
     <Window.Resources>
         <local:StringCollectionToTextConverter x:Key="OcToString" />
     </Window.Resources>
-    <Grid Background="#FFF8F8F8">
+    <Grid Background="{DynamicResource AppDialogBackgroundBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="28"/>
             <RowDefinition Height="250"/>

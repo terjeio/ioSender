@@ -11,20 +11,8 @@
     <UserControl.Resources>
         <system:String x:Uid="str_macrosFlyout" x:Key="MenuLabel">_Macros</system:String>
         <system:String x:Uid="str_runMacro" x:Key="RunMacro">Run {0} macro?</system:String>
-        <Style x:Key="SmallXButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Grid Background="{TemplateBinding Background}">
-                            <ContentPresenter HorizontalAlignment="Center"/>
-                        </Grid>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
     </UserControl.Resources>
-    <Border BorderBrush="DarkGray" BorderThickness="1" CornerRadius="3" Background="#FFE5E5EA">
+    <Border BorderBrush="{DynamicResource AppFlyoutBorderBrush}" BorderThickness="1" CornerRadius="3" Background="{DynamicResource AppFlyoutBackgroundBrush}">
         <Grid Width="315" Height="220">
             <ItemsControl ItemsSource="{Binding Path=Macros, RelativeSource={RelativeSource AncestorType=UserControl}}">
                 <ItemsControl.ItemTemplate>
@@ -41,7 +29,7 @@
             </ItemsControl>
             <TextBlock x:Uid="lbl_noMacrosDefined" Text="No macros defined, use Edit button to add." TextWrapping="Wrap" Visibility="{Binding Path=IsMessageVisible, RelativeSource={RelativeSource AncestorType=UserControl}}" HorizontalAlignment="Center" Margin="0,80,0,0" Width="290" VerticalAlignment="Top"/>
             <Button x:Uid="btn_edit" Content="Edit" Padding="5,0" MinWidth="60" Height="25" HorizontalAlignment="Right" Margin="0,0,8,8" VerticalAlignment="Bottom" Click="button_Edit" />
-            <Button Content="×" Focusable="False" Style="{StaticResource SmallXButtonStyle}" VerticalContentAlignment="Top" HorizontalAlignment="Left" Margin="297,0,0,0" VerticalAlignment="Top" Width="14" Height="18" Click="btn_Close"/>
+            <Button Content="×" Focusable="False" VerticalContentAlignment="Top" HorizontalAlignment="Left" Margin="297,0,0,0" VerticalAlignment="Top" Width="14" Height="18" Click="btn_Close"/>
         </Grid>
     </Border>
 </UserControl>

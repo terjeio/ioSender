@@ -72,7 +72,8 @@ namespace CNC.Controls.Viewer
         public void Open(List<GCodeToken> tokens)
         {
             gcodeView.Render(tokens);
-//            gcodeView.ShowPosition();
+            gcodeView.UpdatePauseMarkerSizes();
+            //            gcodeView.ShowPosition();
         }
 
         #region Keypresshandlers

@@ -27,35 +27,6 @@
             <SolidColorBrush x:Key="Button.Disabled.Background" Color="#FFF4F4F4"/>
             <SolidColorBrush x:Key="Button.Disabled.Border" Color="#FFADB2B5"/>
             <SolidColorBrush x:Key="Button.Disabled.Foreground" Color="#FF838383"/>
-            <Style x:Key="ButtonStyle1" TargetType="{x:Type Button}">
-                <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
-                <Setter Property="Background" Value="{StaticResource Button.Static.Background}"/>
-                <Setter Property="BorderBrush" Value="{StaticResource Button.Static.Border}"/>
-                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
-                <Setter Property="BorderThickness" Value="1"/>
-                <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                <Setter Property="VerticalContentAlignment" Value="Center"/>
-                <Setter Property="Padding" Value="1"/>
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="{x:Type Button}">
-                            <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="true">
-                                <ContentPresenter x:Name="contentPresenter" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
-                            </Border>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsDefaulted" Value="true">
-                                    <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
-                                </Trigger>
-                                <Trigger Property="IsEnabled" Value="false">
-                                    <Setter Property="Background" TargetName="border" Value="{StaticResource Button.Disabled.Background}"/>
-                                    <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource Button.Disabled.Border}"/>
-                                    <Setter Property="TextElement.Foreground" TargetName="contentPresenter" Value="{StaticResource Button.Disabled.Foreground}"/>
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/CNC.Controls.WPF;component/SharedStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
@@ -67,18 +38,18 @@
             <ColumnDefinition Width="22*"/>
         </Grid.ColumnDefinitions>
         <Border Width="88" Height="22" Background="White" BorderBrush="DarkGray" BorderThickness="1 1 0 1">
-            <Button x:Name="cbut" Width="83" Height="16" Focusable="False" BorderThickness="0" HorizontalAlignment="Center" VerticalAlignment="Center" Style="{DynamicResource ButtonStyle1}">
+            <Button x:Name="cbut" Width="83" Height="16" Focusable="False" BorderThickness="0" HorizontalAlignment="Center" VerticalAlignment="Center">
 
             </Button>
         </Border>
-        <Button Grid.Column="1" Content="v" Style="{DynamicResource ButtonStyle1}" Width="22" Height="22" BorderBrush="DarkGray" Click="Popup_Open" LostFocus="Popup_Close"/>
+        <Button Grid.Column="1" Content="v" Width="22" Height="22" BorderBrush="DarkGray" Click="Popup_Open" LostFocus="Popup_Close"/>
         <Popup IsOpen = "{Binding IsPickerOpen, RelativeSource={RelativeSource AncestorType=UserControl}}"    
                PlacementTarget = "{Binding ElementName = colorPicker}"
                AllowsTransparency = "True"
                PopupAnimation = "Slide"
                LostFocus="Popup_Close">
             <Canvas x:Name="popup" Width = "225" Height = "300" Background = "LightGray">
-                <Button Content="×" Focusable="False" Style="{StaticResource SmallXButtonStyle}" VerticalContentAlignment="Top" HorizontalAlignment="Right" Margin="205,0,5,0" VerticalAlignment="Top" Width="14" Height="18" Click="Popup_Close"/>
+                <Button Content="×" Focusable="False" VerticalContentAlignment="Top" HorizontalAlignment="Right" Margin="205,0,5,0" VerticalAlignment="Top" Width="14" Height="18" Click="Popup_Close"/>
             </Canvas>
         </Popup>
     </Grid>

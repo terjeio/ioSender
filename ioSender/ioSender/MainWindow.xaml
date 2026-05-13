@@ -10,7 +10,11 @@
         xmlns:cncprobingcontrols="clr-namespace:CNC.Controls.Probing;assembly=CNC.Controls.Probing"
         xmlns:local="clr-namespace:GCode_Sender"
         mc:Ignorable="d"
-        Background="#FFE5E5E5"
+        Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"
+        TextElement.FontSize="14"
+        TextElement.FontFamily="Segoe UI"
+        TextBlock.FontSize="14"
+        TextBlock.FontFamily="Segoe UI"
         Title="Sender ({0})" Height="640" Width="925" MinHeight="685" MinWidth="1020"
         Loaded="Window_Load"
         SizeChanged="Window_SizeChanged"
@@ -114,13 +118,7 @@
             <cnccontrols:THCMonitorControl x:Name="thcControl" Visibility="Hidden" Canvas.Right="22"/>
         </Canvas>
         <TabControl IsEnabled="{Binding Path=IsMPGActive, Converter={StaticResource BooleanConverter}}" Background="Transparent" DockPanel.Dock="Left" x:Name="tabMode" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Focusable="False" SelectionChanged="TabMode_SelectionChanged">
-            <TabControl.Resources>
-                <Style TargetType="{x:Type TabItem}">
-                    <Setter Property="Height" Value="32" />
-                    <Setter Property="MinWidth" Value="40" />
-                </Style>
-            </TabControl.Resources>
-            <TabItem x:Uid="tab_grbl" x:Name="tabGrbl" Header="Grbl" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <TabItem x:Uid="tab_grbl" x:Name="tabGrbl" Header="Grbl" Height="32" MinWidth="40" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                 <local:JobView x:Name="Grbl"/>
             </TabItem>
             <!---
@@ -128,25 +126,25 @@
                 <cncviewer:Viewer x:Name="viewer"/>
             </TabItem>
             -->
-            <TabItem x:Uid="tab_probing" x:Name="tabProbing" Header="Probing">
+            <TabItem x:Uid="tab_probing" x:Name="tabProbing" Header="Probing" Height="32" MinWidth="40">
                 <cncprobingcontrols:ProbingView x:Name="probingView"/>
             </TabItem>
-            <TabItem x:Uid="tab_sdCard" x:Name="tabSDCard" Header="SD Card">
+            <TabItem x:Uid="tab_sdCard" x:Name="tabSDCard" Header="SD Card" Height="32" MinWidth="40">
                 <cnccontrols:SDCardView x:Name="SDCardView" FileSelected="SDCardView_FileSelected"/>
             </TabItem>
-            <TabItem x:Uid="tab_latheWizards" x:Name="tabLatheWizards" Header="Lathe Wizards">
+            <TabItem x:Uid="tab_latheWizards" x:Name="tabLatheWizards" Header="Lathe Wizards" Height="32" MinWidth="40">
                 <cnclathecontrols:LatheWizardsView x:Name="latheWizards"/>
             </TabItem>
-            <TabItem x:Uid="tab_offsets" x:Name="tabOffsets" Header="Offsets">
+            <TabItem x:Uid="tab_offsets" x:Name="tabOffsets" Header="Offsets" Height="32" MinWidth="40">
                 <cnccontrols:OffsetView x:Name="offsetControl"/>
             </TabItem>
-            <TabItem x:Uid="tab_tools" x:Name="tabTools" Header="Tools">
+            <TabItem x:Uid="tab_tools" x:Name="tabTools" Header="Tools" Height="32" MinWidth="40">
                 <cnccontrols:ToolView x:Name="toolControl"/>
             </TabItem>
-            <TabItem x:Uid="tab_grblConfig" x:Name="tabConfig" Header="Settings: Grbl">
+            <TabItem x:Uid="tab_grblConfig" x:Name="tabConfig" Header="Settings: Grbl" Height="32" MinWidth="40">
                 <cnccontrols:GrblConfigView x:Name="configControl"/>
             </TabItem>
-            <TabItem x:Uid="tab_appConfig" x:Name="tabAppConfig" Header="Settings: App">
+            <TabItem x:Uid="tab_appConfig" x:Name="tabAppConfig" Header="Settings: App" Height="32" MinWidth="40">
                 <cnccontrols:AppConfigView x:Name="appConfigControl"/>
             </TabItem>
         </TabControl>

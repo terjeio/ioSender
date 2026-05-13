@@ -1,0 +1,17 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Default (light) theme: defines semantic brushes used by CNC.Controls.* user controls
+         that previously hard-coded colors. The dark theme overrides these with dark variants. -->
+
+    <SolidColorBrush x:Key="AppDialogBackgroundBrush" Color="#FFE5E5E5"/>
+    <SolidColorBrush x:Key="AppFlyoutBackgroundBrush" Color="#FFE5E5EA"/>
+    <SolidColorBrush x:Key="AppFlyoutBorderBrush" Color="DarkGray"/>
+    <SolidColorBrush x:Key="AppReadOnlyTextBoxBrush" Color="#FFF8F8F8"/>
+    <SolidColorBrush x:Key="AppPlotBackgroundBrush" Color="WhiteSmoke"/>
+    <SolidColorBrush x:Key="AppLEDBorderBrush" Color="LightGray"/>
+    <SolidColorBrush x:Key="AppPanelBorderBrush" Color="#FF707070"/>
+    <SolidColorBrush x:Key="IconBrush" Color="Black"/>
+    <SolidColorBrush x:Key="IconDisabledBrush" Color="#FF888888"/>
+</ResourceDictionary>
+
+

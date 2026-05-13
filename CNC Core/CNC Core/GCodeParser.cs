@@ -1,13 +1,13 @@
 ﻿/*
  * GCodeParser.cs - part of CNC Controls library
  *
- * v0.47 / 2026-04-05 / Io Engineering (Terje Io)
+ * v0.45 / 2024-10-11 / Io Engineering (Terje Io)
  *
  */
 
 /*
 
-Copyright (c) 2019-2026, Io Engineering (Terje Io)
+Copyright (c) 2019-2024, Io Engineering (Terje Io)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -302,7 +302,7 @@ namespace CNC.GCode
         private Commands cmdNonModal = Commands.Undefined, cmdProgramFlow = Commands.Undefined, cmdPlane = Commands.Undefined, cmdOverride = Commands.Undefined;
         private Commands cmdDistMode = Commands.Undefined, cmdDistModeIJK = Commands.Undefined;
         private Commands cmdLatheMode = Commands.Undefined, cmdRetractMode = Commands.Undefined, cmdSpindleRpmMode = Commands.Undefined, cmdFeedrateMode = Commands.Undefined;
-        private Commands cmdUnits = Commands.Undefined, cmdPathMode = Commands.Undefined, cmdRotate = Commands.Undefined;
+        private Commands cmdUnits = Commands.Undefined, cmdPathMode = Commands.Undefined, cmdCutterComp = Commands.G40, cmdRotate = Commands.Undefined;
 
         // Do not change order!
         private G65VarMap[] varmap = {
@@ -353,6 +353,8 @@ namespace CNC.GCode
         public int ToolChanges { get; private set; }
         public bool ProgramEnd { get; private set; }
         public bool HasGoPredefinedPosition { get; private set; }
+        public double ToolDiameter { get; private set; }
+        public double LastToolDiameter { get; private set; }
         public List<GCodeToken> Tokens { get; private set; } = new List<GCodeToken>();
 
         public new void Reset()
@@ -370,6 +372,9 @@ namespace CNC.GCode
             IsScaled = motionModeChanged = false;
             Decimals = 3;
             zorg = feedRate = 0d;
+            ToolDiameter = 0d;
+            LastToolDiameter = 0d;
+            cmdCutterComp = Commands.G40;
             remapU2A = !GrblInfo.AxisLetters.Contains('A') && !GrblInfo.LatheUVWModeEnabled;
             remapV2B = !GrblInfo.AxisLetters.Contains('B') && !GrblInfo.LatheUVWModeEnabled;
             remapW2C = !GrblInfo.AxisLetters.Contains('C') && !GrblInfo.LatheUVWModeEnabled;
@@ -620,6 +625,18 @@ namespace CNC.GCode
 
                         case 40:
                             modalGroup = ModalGroups.G7;
+                            cmdCutterComp = Commands.G40;
+                            break;
+
+                        case 41:
+                        case 42:
+                            modalGroup = ModalGroups.G7;
+                            if (fv == 0)
+                                cmdCutterComp = iv == 41 ? Commands.G41 : Commands.G42;
+                            else if (fv == 1)
+                                cmdCutterComp = iv == 41 ? Commands.G41_1 : Commands.G42_1;
+                            else
+                                throw new GCodeException(LibStrings.FindResource("ParserUnsupportedCmd"));
                             break;
 
                         case 43:
@@ -1387,7 +1404,31 @@ namespace CNC.GCode
                 // G40, G41, G42
                 if (modalGroups.HasFlag(ModalGroups.G7))
                 {
-                    Tokens.Add(new GCPlane(Commands.G40, gcValues.N, blockDelete));
+                    switch (cmdCutterComp)
+                    {
+                        case Commands.G40:
+                            ToolDiameter = 0d;
+                            break;
+
+                        case Commands.G41_1:
+                        case Commands.G42_1:
+                            if (wordFlags.HasFlag(WordFlags.D))
+                                ToolDiameter = Math.Abs(gcValues.D);
+                            break;
+
+                        case Commands.G41:
+                        case Commands.G42:
+                            {
+                                int toolNumber = wordFlags.HasFlag(WordFlags.T) ? gcValues.T : Tool;
+                                ToolDiameter = GetToolDiameter(toolNumber);
+                            }
+                            break;
+                    }
+
+                    if (ToolDiameter > 0d)
+                        LastToolDiameter = ToolDiameter;
+
+                    Tokens.Add(new GCodeToken(cmdCutterComp, gcValues.N, blockDelete));
                 }
 
                 //

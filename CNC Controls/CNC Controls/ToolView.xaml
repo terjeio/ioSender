@@ -41,7 +41,7 @@
                     </DataGridTextColumn.Visibility>
                 </DataGridTextColumn>
                 <DataGridTextColumn Header="Z" Binding="{Binding Z}" Width="70"/>
-                <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="300"/>
+                <DataGridTextColumn Header="R" Binding="{Binding R}" Width="70"/>
             </DataGrid.Columns>
         </DataGrid>
         <StackPanel Grid.Column="1" HorizontalAlignment="Left" Margin="20,15,0,0" VerticalAlignment="Top">
@@ -52,7 +52,7 @@
             <local:CoordValueSetControl x:Uid="lbl_xAxis" x:Name="cvXOffset" Label="X axis:" Tag="X" Value="{Binding Path=offset.X, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" Click="cvOffset_Click"/>
             <local:CoordValueSetControl x:Uid="lbl_yAxis" x:Name="cvYOffset" Label="Y axis:" Tag="Y" Value="{Binding Path=offset.Y, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" Style="{StaticResource YAxisVisibleStyle}" Click="cvOffset_Click"/>
             <local:CoordValueSetControl x:Uid="lbl_zAxis" x:Name="cvZOffset" Label="Z axis:" Tag="Z" Value="{Binding Path=offset.Z, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" Click="cvOffset_Click"/>
-            <local:CoordValueSetControl x:Uid="lbl_tipRadius" x:Name="cvTipRadius" Label="Tip radius:" Tag="R" IsEnabled="False" Click="cvOffset_Click"/>
+            <local:CoordValueSetControl x:Uid="lbl_tipRadius" x:Name="cvTipRadius" Label="Radius:" Tag="R" Value="{Binding Path=ToolRadius, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" Click="cvOffset_Click"/>
             <StackPanel Orientation="Horizontal" Margin="5,5">
                 <Button x:Uid="btn_currPos" x:Name="btnCurrPos" Content="Get current position" Margin="3,0" Click="btnCurrPos_Click"/>
                 <Button x:Uid="btn_clear" x:Name="btnClear" Content="Clear all" Click="btnClearAll_Click"/>

@@ -139,7 +139,7 @@ namespace CNC.Controls
         private bool _showGrid = true, _showAxes = true, _showBoundingBox = false, _showViewCube = true, _showCoordSystem = false, _showWorkEnvelope = false;
         private bool _showTextOverlay = false, _renderExecuted = false, _blackBackground = false, _scaleTool = true;
         Color _cutMotion = Colors.Black, _rapidMotion = Colors.LightPink, _retractMotion = Colors.Green, _toolOrigin = Colors.Green, _grid = Colors.Gray, _highlight = Colors.Crimson;
-
+        Color _toolTrail = Colors.Crimson;
         [XmlIgnore]
         public bool IsHomingEnabled { get { return _isEnabled && GrblInfo.HomingEnabled; } set { OnPropertyChanged(); } }
 
@@ -163,6 +163,7 @@ namespace CNC.Controls
         public Color ToolOriginColor { get { return _toolOrigin; } set { _toolOrigin = value; OnPropertyChanged(); } }
         public Color GridColor { get { return _grid; } set { _grid = value; OnPropertyChanged(); } }
         public Color HighlightColor { get { return _highlight; } set { _highlight = value; OnPropertyChanged(); } }
+        public Color ToolTrailColor { get { return _toolTrail; } set { _toolTrail = value; OnPropertyChanged(); } }
         public int ViewMode { get; set; } = -1;
         public int ToolVisualizer { get; set; } = 1;
         public Point3D CameraPosition { get; set; }
@@ -499,11 +500,11 @@ namespace CNC.Controls
                     return 1;
             }
 
-            Base.Themes.Add("Standard", LibStrings.FindResource("ThemeDefault"));
-            Base.Themes.Add("Black", LibStrings.FindResource("ThemeBlack"));
+            //Base.Themes.Add("Standard", LibStrings.FindResource("ThemeDefault"));
+            //Base.Themes.Add("Black", LibStrings.FindResource("ThemeBlack"));
             Base.Themes.Add("Dark", LibStrings.FindResource("ThemeDark"));
             Base.Themes.Add("Light", LibStrings.FindResource("ThemeLight"));
-            Base.Themes.Add("White", LibStrings.FindResource("ThemeWhite"));
+            //Base.Themes.Add("White", LibStrings.FindResource("ThemeWhite"));
 
             if (jogMode != -1)
                 Base.Jog.Mode = (JogConfig.JogMode)jogMode;
