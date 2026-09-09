@@ -15,7 +15,7 @@ Use with care and please [post feedback](https://github.com/terjeio/ioSender/dis
 
 2.0.48p3:
 
-* Fix for Goto coordinate system moving to stale position, ref. issue [#506](https://github.com/terjeio/ioSender/issues/506).
+* Fix for Goto coordinate system moving to stale position, ref. issue [#512](https://github.com/terjeio/ioSender/issues/512s).
 
 2.0.48p2:
 
