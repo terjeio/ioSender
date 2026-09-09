@@ -13,9 +13,9 @@ Please check out the [Wiki](https://github.com/terjeio/Grbl-GCode-Sender/wiki) f
 Edge pre-releases can be [downloaded from here](https://www.io-engineering.com/downloads), they contains changes yet to be incorporated in a main release and might be buggy and even break existing functionality.  
 Use with care and please [post feedback](https://github.com/terjeio/ioSender/discussions/436) on any issues encountered!
 
-2.0.48p1:
+2.0.48p3:
 
-* Fix for jog buttons firing twice on touch screens, ref. issue [#506](https://github.com/terjeio/ioSender/issues/506).
+* Fix for Goto coordinate system moving to stale position, ref. issue [#506](https://github.com/terjeio/ioSender/issues/506).
 
 2.0.48p2:
 
@@ -24,6 +24,10 @@ Use with care and please [post feedback](https://github.com/terjeio/ioSender/dis
 * Fix for add linenumbers option corrupting lines starting with block delete character. Ref. issue [#509](https://github.com/terjeio/ioSender/issues/509).
 
 * Updated uk-UA translation from PR [#507](https://github.com/terjeio/ioSender/pull/507), added zh-TW translation from PR [#488](https://github.com/terjeio/ioSender/pull/488).
+
+2.0.48p1:
+
+* Fix for jog buttons firing twice on touch screens, ref. issue [#512(https://github.com/terjeio/ioSender/issues/512.
 
 #### General
 
@@ -87,4 +91,4 @@ Lathe mode.
 Conversational programming for Lathe Mode. Threading requires [grblHAL](https://github.com/grblHAL) controller with driver that has spindle sync support.
 
 ---
-2026-04-29
+2026-09-09
