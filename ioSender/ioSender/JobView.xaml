@@ -44,7 +44,7 @@
                 <cnccontrols:StatusControl x:Name="statusControl" Margin="0,5,0,0" VerticalAlignment="Bottom"/>
             </StackPanel>
         </DockPanel>
-        <StackPanel DockPanel.Dock="Right" Margin="5,5,5,0" Width="250" VerticalAlignment="Stretch">
+        <StackPanel DockPanel.Dock="Right" Margin="5,5,5,5" Width="250" VerticalAlignment="Stretch">
             <cnccontrols:WorkParametersControl x:Name="workParametersControl" HorizontalAlignment="Left" VerticalAlignment="Top" IsToolChanging="{Binding IsToolChanging}"/>
             <cnccontrols:CoolantControl HorizontalAlignment="Left" VerticalAlignment="Top" x:Name="coolantControl"/>
             <cnccontrols:SpindleControl x:Name="spindleControl" HorizontalAlignment="Left" VerticalAlignment="Top"/>
@@ -54,10 +54,16 @@
             <cnccontrols:JobControl x:Name="GCodeSender" Margin="0,5,0,0" DockPanel.Dock="Bottom"/>
             <TabControl x:Name="tabGCode" TabStripPlacement="Bottom" DockPanel.Dock="Top" >
                 <TabItem x:Uid="tab_program" Header="Program">
-                    <cnccontrols:GCodeListControl/>
-                </TabItem>
-                <TabItem x:Uid="tab_3DView" x:Name="tab3D" Header="3D View">
-                    <cncviewer:RenderControl x:Name="gcodeRenderer"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition x:Name="colGcodeText" Width="*"/>
+                            <ColumnDefinition x:Name="colRendererSplitter" Width="Auto"/>
+                            <ColumnDefinition x:Name="colRenderer" Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <cnccontrols:GcodeTextControl x:Name="gcodeTextControl" Grid.Column="0"/>
+                        <GridSplitter x:Name="rendererSplitter" Grid.Column="1" Width="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ResizeBehavior="PreviousAndNext" DragCompleted="rendererSplitter_DragCompleted"/>
+                        <cncviewer:RenderControl x:Name="gcodeRenderer" Grid.Column="2"/>
+                    </Grid>
                 </TabItem>
                 <TabItem x:Uid="tab_console" x:Name="tabConsole" Header="Console">
                     <cnccontrols:ConsoleControl/>

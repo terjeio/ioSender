@@ -74,6 +74,7 @@ namespace CNC.Controls
         private static readonly Lazy<GCode> file = new Lazy<GCode>(() => new GCode());
 
         public event GCodeJob.ToolChangedHandler ToolChanged = null;
+        public Func<string> GetEditedText = null;
 
         private GCode()
         {
@@ -273,38 +274,72 @@ namespace CNC.Controls
             Model.Blocks = Blocks;
         }
 
+        public void LoadFromEditor(string filename, string text)
+        {
+            using (new UIUtils.WaitCursor())
+            {
+                Program.LoadText(filename ?? string.Empty, text);
+            }
+
+            Model.Blocks = Blocks;
+        }
+
         public void Save()
         {
-            SaveFileDialog saveDialog = new SaveFileDialog()
-            {
-                Filter = "GCode file (*.nc)|*.nc",
-                AddExtension = true,
-                DefaultExt = ".nc",
-            };
+            string filename = Model != null && Model.IsPhysicalFileLoaded ? Model.FileName : string.Empty;
 
-            if (saveDialog.ShowDialog() == true)
+            if (filename == string.Empty)
+            {
+                SaveFileDialog saveDialog = new SaveFileDialog()
+                {
+                    Filter = "GCode file (*.nc)|*.nc",
+                    AddExtension = true,
+                    DefaultExt = ".nc",
+                };
+
+                if (saveDialog.ShowDialog() == true)
+                    filename = saveDialog.FileName;
+            }
+
+            if (filename != string.Empty)
             {
                 try
                 {
-                    //using (new UIUtils.WaitCursor())
-                    //{
-                    //    GCodeParser.Save(saveDialog.FileName, GCodeParser.TokensToGCode(File.Tokens));
-                    //}
-
-                    using (StreamWriter stream = new StreamWriter(saveDialog.FileName))
+                    if (Model != null && Model.IsFileEditing && GetEditedText != null)
                     {
+                        string text = GetEditedText() ?? string.Empty;
+
                         using (new UIUtils.WaitCursor())
+                        {
+                            using (StreamWriter stream = new StreamWriter(filename))
+                                stream.Write(text);
+
+                            Program.LoadText(filename, text);
+                        }
+
+                        Model.Blocks = Blocks;
+                    }
+                    else
+                    {
+                        using (StreamWriter stream = new StreamWriter(filename))
                         {
                             foreach (var line in Program.Blocks)
                                 stream.WriteLine(line.Data);
                         }
+
+                        using (new UIUtils.WaitCursor())
+                        {
+                            Program.LoadFile(filename);
+                        }
+
+                        Model.Blocks = Blocks;
                     }
                 }
                 catch (IOException)
                 {
                 }
 
-                Model.FileName = saveDialog.FileName;
+                Model.FileName = filename;
             }
         }
     }

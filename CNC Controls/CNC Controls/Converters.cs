@@ -299,7 +299,7 @@ namespace CNC.Controls
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            Brush result = Brushes.White;
+            Brush result = Brushes.Blue;
 
             if (value is GrblState)
                 result = new SolidColorBrush(((GrblState)value).Color);
@@ -387,7 +387,15 @@ namespace CNC.Controls
             foreach (var value in values)
                 result &= value is bool && (bool)value;
 
-            return values.Length == 2 && values[0] is GrblEncoderMode && !values[0].Equals(GrblEncoderMode.Unknown) && values[1] is GrblEncoderMode && values[0].Equals(values[1]) ? Brushes.Salmon : ReadOnlyBackGround;
+            bool active = values.Length == 2 && values[0] is GrblEncoderMode && !values[0].Equals(GrblEncoderMode.Unknown) && values[1] is GrblEncoderMode && values[0].Equals(values[1]);
+
+            if (active)
+                return Brushes.Salmon;
+
+            // Returning UnsetValue clears the local Background, so the TextBox falls back to the
+            // implicit theme style. This automatically reflects light/dark theme switches without
+            // needing the converter to re-run when the active ResourceDictionary is swapped.
+            return DependencyProperty.UnsetValue;
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, System.Globalization.CultureInfo culture)

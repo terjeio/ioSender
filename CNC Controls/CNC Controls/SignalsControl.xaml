@@ -117,6 +117,20 @@
                             </Setter.Value>
                         </Setter>
                     </Style>
+                    <Style x:Key="SingleBlockVisibleStyle">
+                        <Setter Property="Control.Visibility">
+                            <Setter.Value>
+                                <MultiBinding Converter="{StaticResource IsSignalVisibleConverter}">
+                                    <Binding Path="OptionalSignals" />
+                                    <Binding>
+                                        <Binding.Source>
+                                            <core:Signals>SingleBlock</core:Signals>
+                                        </Binding.Source>
+                                    </Binding>
+                                </MultiBinding>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
@@ -139,6 +153,7 @@
                 <local:SignalControl x:Uid="lbl_signalMotorFault" Label="F" ToolTip="Motor fault" IsSet="{Binding Path=Signals[(core:Signals)MotorFault], Mode=OneWay}" Style="{StaticResource MotorFaultVisibleStyle}"/>
                 <local:SignalControl x:Uid="lbl_signalBlockDelete" Label="B" ToolTip="Block delete" IsSet="{Binding Path=Signals[(core:Signals)BlockDelete], Mode=OneWay}" Style="{StaticResource BlockDeleteVisibleStyle}"/>
                 <local:SignalControl x:Uid="lbl_signalOptionalStop" Label="O" ToolTip="Optional stop" IsSet="{Binding Path=Signals[(core:Signals)OptionalStop], Mode=OneWay}" Style="{StaticResource OptionalStopVisibleStyle}"/>
+                <local:SignalControl x:Uid="lbl_signalSingleBlock" Label="Q" ToolTip="Single block" IsSet="{Binding Path=Signals[(core:Signals)SingleBlock], Mode=OneWay}" Style="{StaticResource SingleBlockVisibleStyle}"/>
                 <local:SignalControl x:Uid="lbl_signalFeedHold" Label="H" ToolTip="Feed hold" IsSet="{Binding Path=Signals[(core:Signals)Hold], Mode=OneWay}"/>
                 <local:SignalControl x:Uid="lbl_signalCycleStart" Label="S" ToolTip="Cycle start" IsSet="{Binding Path=Signals[(core:Signals)CycleStart], Mode=OneWay}"/>
                 <local:SignalControl x:Uid="lbl_signalReset" Label="R" ToolTip="Reset" IsSet="{Binding Path=Signals[(core:Signals)Reset], Mode=OneWay}" Style="{StaticResource ResetVisibleStyle}"/>

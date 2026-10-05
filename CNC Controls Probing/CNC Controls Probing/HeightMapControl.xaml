@@ -47,7 +47,7 @@
             <CheckBox x:Uid="lbl_setZ0AtX0Y0" Content="Set Z = 0 at X0Y0:" Margin="5,0,0,0" IsChecked="{Binding Path=HeightMap.SetToolOffset, Mode=TwoWay}"/>
             <local:CsSelectControl IsEnabled="{Binding Path=HeightMap.SetToolOffset}"/>
         </StackPanel>
-        <helix:HelixViewport3D BorderBrush="DarkGray" BorderThickness="1" Width="300" Height="300" Margin="280,10,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" x:Name="viewport" Panel.ZIndex="0" ZoomExtentsWhenLoaded="False" RotateAroundMouseDownPoint="true" ZoomAroundMouseDownPoint="true"
+        <helix:HelixViewport3D BorderBrush="{DynamicResource AppFlyoutBorderBrush}" BorderThickness="1"
                                 AllowDrop="True" DragEnter="viewport_Drag" DragOver="viewport_Drag" DragLeave="viewport_Drag" Drop="viewport_Drop">
             <helix:HelixViewport3D.Camera>
                 <PerspectiveCamera x:Name="camera"

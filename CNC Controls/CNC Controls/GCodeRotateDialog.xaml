@@ -11,7 +11,7 @@
     <Window.Resources>
         <local:EnumValueToBooleanConverter x:Key="EnumToEdgeConverter" />
     </Window.Resources>
-    <Grid Background="#FFE5E5E5">
+    <Grid Background="{DynamicResource AppDialogBackgroundBrush}">
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Height="Auto" Margin="5,5">
             <local:NumericField x:Uid="fld_angle" x:Name="Angle" Label="Angle:" ColonAt="50" Unit="degrees" Format="-##0.#" Value="{Binding Path=Angle, Mode=TwoWay}"/>
             <GroupBox x:Uid="grp_rotationCenter" Header="Rotation center" Width="100" HorizontalAlignment="Left" Margin="10,0" ToolTip="Click to select rotation center relative to job, if not selected X0,Y0 is used.">

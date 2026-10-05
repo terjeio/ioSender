@@ -12,8 +12,8 @@
             <RowDefinition Height="80*"/>
             <RowDefinition Height="7*"/>
         </Grid.RowDefinitions>
-        <Border BorderThickness="1" BorderBrush="DarkGray" Height="432" Width="642" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,5,0,0">
-            <Canvas x:Name="PIDPlot" Background="WhiteSmoke" Height="430" Width="640" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+        <Border BorderThickness="1" BorderBrush="{DynamicResource AppFlyoutBorderBrush}" Height="432" Width="642" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,5,0,0">
+            <Canvas x:Name="PIDPlot" Background="{DynamicResource AppPlotBackgroundBrush}" Height="430" Width="640" HorizontalAlignment="Left" VerticalAlignment="Top"/>
         </Border>
         <StackPanel Margin="660,12,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="50">
             <TextBlock Text="{Binding Path=GridLabel4, StringFormat=\{0\} µm}" Width="50" Margin="0,00,0,0" Height="20" Foreground="Red"/>

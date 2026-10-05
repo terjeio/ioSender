@@ -345,7 +345,8 @@ namespace CNC.Core
         OptionalStop = 1 << 16,
         ProbeDisconnected = 1 << 17,
         MotorWarning = 1 << 18,
-        MotorFault = 1 << 19
+        MotorFault = 1 << 19,
+        SingleBlock = 1 << 20
     }
 
     [Flags]
@@ -957,7 +958,7 @@ namespace CNC.Core
 
         double _r;
 
-        public double R { get { return R; } set { _r = value; OnPropertyChanged(); } }
+        public double R { get { return _r; } set { _r = value; OnPropertyChanged(); } }
 
         public new string ToString(AxisFlags axisflags, int precision = 3)
         {
@@ -1022,7 +1023,7 @@ namespace CNC.Core
                 _axisLetters = value;
             }
         }
-        public static string SignalLetters { get; private set; } = "XYZABCUVWEPRDHSLTOMF"; // Keep in sync with Signals enum above!!
+        public static string SignalLetters { get; private set; } = "XYZABCUVWEPRDHSLTOMFQ"; // Keep in sync with Signals enum above!!
         public static string PositionFormatString { get; private set; } = string.Empty;
         public static string Version { get; private set; } = string.Empty;
         public static int Build { get; private set; } = 0;
@@ -1089,6 +1090,7 @@ namespace CNC.Core
         public static bool MPGMode { get; set; }
         public static bool HasFirmwareJog { get; internal set; } = false;
         public static bool LightBurnCluster { get; internal set; } = false;
+        public static bool HasCutterComp { get; internal set; } = false;
         public static bool LatheModeEnabled
         {
             get { return GrblParserState.LatheMode != LatheMode.Disabled; }
@@ -1521,6 +1523,9 @@ namespace CNC.Core
 
                                     case "OS":
                                         OptionalSignals |= Signals.OptionalStop;
+                                        break;
+                                    case "CCMP":
+                                        HasCutterComp = true;
                                         break;
 
                                     case "RT+":

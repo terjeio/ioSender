@@ -125,7 +125,7 @@ namespace CNC.Controls.Probing
                                         axisFlags &= ~AxisFlags.Z;
                                 }
 
-                                newToolPath.Add(last_segment = new GCArc(arc.Command, lnr++, target.Array, axisFlags, ijk, arc.IjkFlags, arc.R, arc.P, arc.IJKMode, arc.IsClocwise, arc.BlockDelete));
+                                newToolPath.Add(last_segment = new GCArc(arc.Command, lnr++, target.Array, axisFlags, ijk, arc.IjkFlags, arc.R, arc.P, arc.IJKMode, arc.BlockDelete));
                             }
 //                            if (last_segment != null)
 //                                pos = ToAbsolute(pos, last_segment.Values);

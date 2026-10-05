@@ -318,6 +318,11 @@ namespace CNC.Core
 
         public bool ProcessKeypress(KeyEventArgs e, bool allowJog, UserControl context = null)
         {
+            // While the user is editing the loaded file, do not consume keystrokes
+            // (jog keys, shortcuts, etc.) so they reach the editor.
+            if (grbl != null && grbl.IsFileEditing)
+                return false;
+
             bool isJogging = IsJogging, jogkeyPressed = false;
             JogKey jogKey = null;
 

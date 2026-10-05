@@ -12,6 +12,7 @@
     <UserControl.Resources>
         <system:String x:Uid="str_toolNoShow" x:Key="ToolNone">No tool</system:String>
         <system:String x:Uid="str_toolCone" x:Key="ToolCone">Cone</system:String>
+        <system:String x:Uid="str_toolTrace" x:Key="ToolTrace">Tool trace</system:String>
         <system:String x:Uid="str_toolCrosshair" x:Key="ToolCrosshair">Crosshair</system:String>
     </UserControl.Resources>
     <helix:HelixViewport3D x:Name="viewport" Panel.ZIndex="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
@@ -19,6 +20,7 @@
                            ShowViewCube="{Binding Path=ShowViewCube}"
                            ShowCoordinateSystem="{Binding Path=ShowCoordinateSystem}"
                            Background="{Binding Path=CanvasColor}"
+                           CameraInertiaFactor="0"
                            AllowDrop="True" DragEnter="viewport_Drag" DragOver="viewport_Drag" DragLeave="viewport_Drag" Drop="viewport_Drop" Orthographic="True">
         <helix:HelixViewport3D.Camera>
             <PerspectiveCamera x:Name="ccamera"
@@ -32,7 +34,7 @@
         <!-->            <helix:TruncatedConeVisual3D Height="5" BaseRadius="0" >
 
             </helix:TruncatedConeVisual3D> <!-->
-        <helix:LinesVisual3D Thickness="2" Color="{Binding Path=HighlightColor}" Points="{Binding Path=ExecutedLines}"/>
+         <helix:LinesVisual3D Thickness="2" Color="{Binding Path=HighlightColor}" Points="{Binding Path=ExecutedLines}"/>
         <helix:LinesVisual3D Thickness="1" Color="{Binding Path=CutMotionColor}" Points="{Binding Path=CutLines}"/>
         <helix:LinesVisual3D Thickness="0.5" Color="{Binding Path=RapidMotionColor}" Points="{Binding Path=RapidLines}"/>
         <helix:LinesVisual3D Thickness="0.5" Color="{Binding Path=RetractMotionColor}" Points="{Binding Path=RetractLines}"/>

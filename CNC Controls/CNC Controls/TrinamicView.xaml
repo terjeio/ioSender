@@ -23,8 +23,8 @@
     <DockPanel Background="Transparent" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
         <DockPanel x:Name="dp" DockPanel.Dock="Left" Margin="5,5,5,0" Width="520" HorizontalAlignment="Left" VerticalAlignment="Stretch">
             <StackPanel DockPanel.Dock="Top" Width="520" VerticalAlignment="Stretch">
-                <Border BorderThickness="1" BorderBrush="DarkGray" Height="242" Width="514" HorizontalAlignment="Left" VerticalAlignment="Top">
-                    <Canvas x:Name="SGPlot" Background="WhiteSmoke" HorizontalAlignment="Left" Height="240" VerticalAlignment="Top" Width="512"/>
+                <Border BorderThickness="1" BorderBrush="{DynamicResource AppFlyoutBorderBrush}" Height="242" Width="514" HorizontalAlignment="Left" VerticalAlignment="Top">
+                    <Canvas x:Name="SGPlot" Background="{DynamicResource AppPlotBackgroundBrush}" HorizontalAlignment="Left" Height="240" VerticalAlignment="Top" Width="512"/>
                 </Border>
                 <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                     <StackPanel Orientation="Horizontal" Height="24">

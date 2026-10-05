@@ -265,7 +265,7 @@ namespace CNC.Controls
                 case nameof(GrblViewModel.LineNumber):
                     if(job.CurrBlock > 0)
                     {
-                            int found = 0;
+                        int found = 0;
                         var block = job.CurrBlock;
                         var lineNum = (sender as GrblViewModel).LineNumber;
                         do
@@ -274,9 +274,11 @@ namespace CNC.Controls
                             {
                                 found = block - 1;
                                 GCode.File.Data[block].Sent = "@";
+                                model.ScrollPosition = block > 5 ? block - 5 : 0;
                                 break;
                             }
-                        } while (--block > job.LastExecuting);
+                        } while (--block >= job.LastExecuting);
+
                         while (job.LastExecuting < found)
                         {
                             GCode.File.Data[++job.LastExecuting].Sent = "ok";
@@ -802,8 +804,15 @@ namespace CNC.Controls
                         if (grblState.State == GrblStates.Idle || grblState.State == GrblStates.Check)
                             newState = StreamingState.Idle;
                         job.Complete = job.Transferred = true;
-                        job.ACKPending = job.CurrBlock = 0;
+                        job.ACKPending = 0;
+                        // Keep job.CurrBlock referencing the last block (instead of 0) so that
+                        // the Ln: driven current line indicator (OnDataContextPropertyChanged) keeps
+                        // updating while the controller physically finishes executing the buffered
+                        // lines. It is properly reset by RewindFile() once the controller reports it
+                        // is actually idle.
+                        job.CurrBlock = job.PgmEndLine;
                         job.CurrentRow = job.NextRow = null;
+                        model.BlockExecuting = 0;
                         SetStreamingHandler(StreamingHandler.AwaitIdle);
                         break;
 
@@ -1097,7 +1106,7 @@ namespace CNC.Controls
                     break;
 
                 case GrblStates.Hold:
-                    streamingHandler.Call(StreamingState.FeedHold, false);
+                    streamingHandler.Call(StreamingState.FeedHold, true);
                     break;
 
                 case GrblStates.Home:
@@ -1138,6 +1147,12 @@ namespace CNC.Controls
             grblState.MPG = newstate.MPG;
         }
 
+        private void tswSingle_Click(object sender, RoutedEventArgs e)
+        {
+            //toggle single block on/off
+            Comms.com.WriteByte((byte)GrblConstants.CMD_SINGLE_BLOCK_TOGGLE);
+        }
+
         private void ResponseReceived(string response)
         {
             if (streamingHandler.Count)
@@ -1164,9 +1179,6 @@ namespace CNC.Controls
                     if (!job.HasError)
                     {
                         GCode.File.Data[job.PendingLine].Sent = response;
-
-                        if (job.PendingLine > 5)
-                            model.ScrollPosition = job.PendingLine - 5;
                     }
 
                     if(streamingHandler.Call == StreamingAwaitAction)
@@ -1178,8 +1190,6 @@ namespace CNC.Controls
                     streamingHandler.Call(StreamingState.Error, true);
                     if(job.IsChecking && !job.HasError)
                     {
-                        if (job.PendingLine > 5)
-                            model.ScrollPosition = job.PendingLine - 5;
                         GCode.File.Data[job.PendingLine].Sent = response;
                     }
                     job.HasError = model.IsGrblHAL;
@@ -1265,6 +1275,15 @@ namespace CNC.Controls
                             job.PgmEndLine = job.CurrBlock;
                         job.NextRow = job.PgmEndLine == job.CurrBlock ? null : GCode.File.Data[++job.CurrBlock];
                         //            ParseBlock(line + "\r");
+
+                        // Strip existing line number and add new sequence number if enabled
+                        if (AppConfig.Settings.Base.AddLineNumbers)
+                        {
+                            line = GCodeParser.StripLineNumber(line);
+                            line = $"N{job.CurrentRow.LineNum}{line}";
+                            job.CurrentRow.Length = line.Length + 1;
+                        }
+
                         job.serialUsed += (int)job.CurrentRow.Length;
                         Comms.com.WriteString(line + '\r');
                         if (job.CurrentRow.BreakAt)

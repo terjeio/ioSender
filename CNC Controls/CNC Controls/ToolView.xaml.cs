@@ -55,6 +55,13 @@ namespace CNC.Controls
         private volatile bool awaitCoord = false;
         private Action<string> GotPosition;
 
+        public static readonly DependencyProperty ToolRadiusProperty = DependencyProperty.Register(nameof(ToolRadius), typeof(double), typeof(ToolView), new PropertyMetadata(0d));
+        public double ToolRadius
+        {
+            get { return (double)GetValue(ToolRadiusProperty); }
+            set { SetValue(ToolRadiusProperty, value); }
+        }
+
         public ToolView()
         {
             InitializeComponent();
@@ -93,6 +100,7 @@ namespace CNC.Controls
 
         public void Setup(UIViewModel model, AppConfig profile)
         {
+
         }
 
         #endregion
@@ -122,7 +130,23 @@ namespace CNC.Controls
             {
                 dgrTools.Columns[1].Header = string.Format("X offset ({0})", GrblWorkParameters.LatheMode == LatheMode.Radius ? "R" : "D");
                 cvXOffset.Label = dgrTools.Columns[1].Header + ":";
+            } else if (GrblInfo.HasCutterComp)
+            {
+                dgrTools.Columns[1].Header = "Cutter Radius";
+                cvXOffset.Label = dgrTools.Columns[1].Header + ":";
             }
+        }
+
+        private double ToDisplayUnits(double mmValue)
+        {
+            var model = DataContext as GrblViewModel;
+            return model != null && !model.IsMetric ? mmValue / 25.4d : mmValue;
+        }
+
+        private double ToMM(double displayValue)
+        {
+            var model = DataContext as GrblViewModel;
+            return model != null && !model.IsMetric ? displayValue * 25.4d : displayValue;
         }
 
         private void dgrTools_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -137,6 +161,7 @@ namespace CNC.Controls
 
                     offset.Values[i] = selectedTool.Values[i];
                 }
+                ToolRadius = selectedTool.R;
                 txtTool.Text = selectedTool.Code;
             }
             else
@@ -151,26 +176,38 @@ namespace CNC.Controls
         void saveOffset(string axis)
         {
             string axes;
-            Position newpos = new Position(offset);
 
-            newpos.X = GrblWorkParameters.ConvertX(GrblWorkParameters.LatheMode, GrblParserState.LatheMode, selectedTool.X);
+            // Convert display values back to mm for the G10 command
+            Position mmpos = new Position(offset);
+            for (var i = 0; i < mmpos.Values.Length; i++)
+                mmpos.Values[i] = ToMM(mmpos.Values[i]);
+
+            mmpos.X = GrblWorkParameters.ConvertX(GrblWorkParameters.LatheMode, GrblParserState.LatheMode, mmpos.X);
 
             switch (axis)
             {
                 case "R":
-                    axes = "R{4}";
+                    axes = string.Format("R{0}", ToMM(ToolRadius).ToString(System.Globalization.CultureInfo.InvariantCulture));
                     break;
 
                 case "All":
-                    axes = newpos.ToString(GrblInfo.AxisFlags);
+                    axes = mmpos.ToString(GrblInfo.AxisFlags);
                     break;
 
-                default:                    
-                    axes = newpos.ToString(GrblInfo.AxisLetterToFlag(axis));
+                default:
+                    axes = mmpos.ToString(GrblInfo.AxisLetterToFlag(axis));
                     break;
             }
 
-            Comms.com.WriteCommand(string.Format("G10L1P{0}{1}", selectedTool.Code, axes));
+            string cmd = string.Format("G10L1P{0}{1}", selectedTool.Code, axes);
+
+            if (!GrblParserState.IsMetric)
+            {
+                Comms.com.WriteCommand("G21" + cmd);
+                Comms.com.WriteCommand("G20");
+            }
+            else
+                Comms.com.WriteCommand(cmd);
         }
 
         void cvOffset_Click(object sender, RoutedEventArgs e)
@@ -178,10 +215,18 @@ namespace CNC.Controls
             if (selectedTool != null)
             {
                 string axisletter = (string)((CoordValueSetControl)sender).Tag;
-                int axis = GrblInfo.AxisLetterToIndex(axisletter);
 
-                selectedTool.Values[axis] = offset.Values[axis];
-                saveOffset(axisletter);
+                if (axisletter == "R")
+                {
+                    selectedTool.R = ToMM(ToolRadius);
+                    saveOffset("R");
+                }
+                else
+                {
+                    int axis = GrblInfo.AxisLetterToIndex(axisletter);
+                    selectedTool.Values[axis] = ToMM(offset.Values[axis]);
+                    saveOffset(axisletter);
+                }
             }
         }
 
@@ -190,7 +235,8 @@ namespace CNC.Controls
             if (selectedTool != null)
             {
                 for (var i = 0; i < offset.Values.Length; i++)
-                    selectedTool.Values[i] = offset.Values[i];
+                    selectedTool.Values[i] = ToMM(offset.Values[i]);
+                selectedTool.R = ToMM(ToolRadius);
             }
 
             saveOffset("All");
@@ -202,6 +248,7 @@ namespace CNC.Controls
             {
                 for (var i = 0; i < offset.Values.Length; i++)
                     offset.Values[i] = selectedTool.Values[i] = 0d;
+                ToolRadius = selectedTool.R = 0d;
 
                 saveOffset("All");
             }
