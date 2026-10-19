@@ -3267,7 +3267,9 @@ namespace CNC.Core
                             break;
 
                         case (GrblSetting)grblHALSetting.EnableLegacyRTCommands: // TODO: remove!
-                            GrblInfo.UseLegacyRTCommands = valuepair[1] != "0";
+                            // Vendor Grbl forks may reuse $39 for an unrelated setting.
+                            if (GrblInfo.IsGrblHAL)
+                                GrblInfo.UseLegacyRTCommands = valuepair[1] != "0";
                             break;
 
                         case (GrblSetting)grblHALSetting.JogStepDistance:
