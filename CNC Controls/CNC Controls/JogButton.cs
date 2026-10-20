@@ -58,12 +58,15 @@ namespace CNC.Controls
         protected override void OnTouchDown(TouchEventArgs e)
         {
             base.OnTouchDown(e);
+            // We handle jogging here; do not promote this touch to a second mouse jog.
+            e.Handled = true;
             JogStart?.Invoke(this, e);
         }
 
         protected override void OnTouchUp(TouchEventArgs e)
         {
             base.OnTouchUp(e);
+            e.Handled = true;
             JogEnd?.Invoke(this, e);
         }
 
@@ -81,12 +84,18 @@ namespace CNC.Controls
 
         protected override void OnMouseUp(MouseButtonEventArgs e)
         {
+            // Some touch stacks still promote handled touch events to mouse events.
+            // Touch has its own JogEnd; keep ordinary mouse and pen input working.
+            if (e.StylusDevice != null && e.StylusDevice.TabletDevice.Type == TabletDeviceType.Touch)
+                return;
             base.OnMouseUp(e);
             JogEnd?.Invoke(this, e);
         }
 
         protected override void OnMouseDown(MouseButtonEventArgs e)
         {
+            if (e.StylusDevice != null && e.StylusDevice.TabletDevice.Type == TabletDeviceType.Touch)
+                return;
             base.OnMouseDown(e);
             JogStart?.Invoke(this, e);
         }
