@@ -1,12 +1,14 @@
 ﻿<UserControl x:Class="CNC.Controls.JobControl"
+             x:Name="jobControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:local="clr-namespace:CNC.Controls"
+             xmlns:core="clr-namespace:CNC.Core;assembly=CNC.Core"
              mc:Ignorable="d" 
-             d:DesignHeight="36" d:DesignWidth="400">
+             d:DesignHeight="46" d:DesignWidth="400" HorizontalAlignment="Center" VerticalAlignment="Center">
     <UserControl.Resources>
         <system:String x:Uid="str_toolchanges" x:Key="JobToolChanges">Job has {0} tool change(s) using M6, only a few Grbl ports supports that.</system:String>
         <system:String x:Uid="str_toolchangeTLO" x:Key="JobToolReference">Job has {0} tool change(s), tool length reference should be established before start.</system:String>
@@ -15,18 +17,84 @@
         <system:String x:Uid="str_pause" x:Key="JobPause">Pause</system:String>
         <system:String x:Uid="str_checking" x:Key="Checking">Checking...</system:String>
         <system:String x:Uid="str_transferComplete" x:Key="TransferComplete">Transfer complete</system:String>
-        <Style x:Key="JobButtonStyle" TargetType="Button">
-            <Setter Property="MinWidth" Value="95" />
-            <Setter Property="MaxWidth" Value="120" />
-            <Setter Property="Padding" Value="5,0" />
-            <Setter Property="Height" Value="36" />
-            <Setter Property="Focusable" Value="False" />
+        <Style x:Key="IconPathStyle" TargetType="{x:Type Path}">
+            <Setter Property="Fill" Value="{DynamicResource IconBrush}" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsEnabled, RelativeSource={RelativeSource AncestorType=Button}}" Value="False">
+                    <Setter Property="Fill" Value="{DynamicResource IconDisabledBrush}" />
+                </DataTrigger>
+            </Style.Triggers>
         </Style>
+        <Style TargetType="{x:Type Path}" BasedOn="{StaticResource IconPathStyle}" />
+        <Style x:Key="StartIconStyle" TargetType="{x:Type Path}" BasedOn="{StaticResource IconPathStyle}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsEnabled, RelativeSource={RelativeSource AncestorType=Button}}" Value="True">
+                    <Setter Property="Fill" Value="Green" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="StopIconStyle" TargetType="{x:Type Path}" BasedOn="{StaticResource IconPathStyle}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsEnabled, RelativeSource={RelativeSource AncestorType=Button}}" Value="True">
+                    <Setter Property="Fill" Value="Firebrick" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="HoldIconStyle" TargetType="{x:Type Path}" BasedOn="{StaticResource IconPathStyle}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsEnabled, RelativeSource={RelativeSource AncestorType=Button}}" Value="True">
+                    <Setter Property="Fill" Value="DarkOrange" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="RewindIconStyle" TargetType="{x:Type Path}" BasedOn="{StaticResource IconPathStyle}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsEnabled, RelativeSource={RelativeSource AncestorType=Button}}" Value="True">
+                    <Setter Property="Fill" Value="SteelBlue" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <local:LogicalNotConverter x:Key="BooleanConverter" />
     </UserControl.Resources>
-    <StackPanel Orientation="Horizontal">
-        <Button x:Uid="btn_cycleStart" x:Name="btnStart" Content="Cycle Start" ToolTip="Alt+R" Style="{StaticResource JobButtonStyle}" IsEnabled="{Binding Path=IsCycleStartEnabled, RelativeSource={RelativeSource AncestorType=UserControl}}" Click="btnStart_Click"/>
-        <Button x:Uid="btn_feedHold" x:Name="btnHold" Content="Feed Hold" ToolTip="Space" Style="{StaticResource JobButtonStyle}" IsEnabled="{Binding Path=IsFeedHoldEnabled, RelativeSource={RelativeSource AncestorType=UserControl}}" Margin="5,0,0,0" Click="btnHold_Click"/>
-        <Button x:Uid="btn_stop" x:Name="btnStop" Content="Stop" ToolTip="Alt+S" Style="{StaticResource JobButtonStyle}" IsEnabled="{Binding Path=IsStopEnabled, RelativeSource={RelativeSource AncestorType=UserControl}}" Margin="5,0,0,0" Click="btnStop_Click"/>
-        <Button x:Uid="btn_rewind" x:Name="btnRewind" Content="Rewind" Style="{StaticResource JobButtonStyle}" IsEnabled="{Binding Path=IsRewindEnabled, RelativeSource={RelativeSource AncestorType=UserControl}}" Margin="5,0,0,0" Click="btnRewind_Click"/>
+    <StackPanel Orientation="Horizontal" Height="46" IsEnabled="{Binding Path=IsFileEditing, Mode=OneWay, Converter={StaticResource BooleanConverter}}">
+        <Button IsEnabled="{Binding ElementName=jobControl, Path=IsCycleStartEnabled, Mode=OneWay}" x:Uid="btn_cycleStart" x:Name="btnStart" ToolTip="Alt+R" Click="btnStart_Click"
+            Padding="4"
+>
+            <Viewbox>
+                <Canvas Width="42" Height="42" Canvas.Left="0" Canvas.Top="0">
+                    <Path Style="{StaticResource StartIconStyle}" Data="M6,28.379V3.721L28.761,16.05L6,28.379zM8,7.079v17.942l16.562,-8.971L8,7.079z" Height="42" Stretch="Fill" Width="42"/>
+                </Canvas>
+            </Viewbox>
+        </Button>
+        <Button IsEnabled="{Binding ElementName=jobControl, Path=IsFeedHoldEnabled, Mode=OneWay}" x:Uid="btn_feedHold" x:Name="btnHold" ToolTip="Space" Margin="5,0,0,0" Click="btnHold_Click"
+            Padding="4"
+>
+            <Viewbox Stretch="Uniform">
+                <Canvas Width="42" Height="42" Canvas.Left="0" Canvas.Top="0">
+                    <Path Style="{StaticResource HoldIconStyle}" Data="M24,28h-2V4h2V28zM10,28H8V4h2V28z" Height="42" Stretch="Fill" Width="42"/>
+                </Canvas>
+            </Viewbox>
+        </Button>
+        <Button IsEnabled="{Binding ElementName=jobControl, Path=IsStopEnabled, Mode=OneWay}" x:Uid="btn_stop" x:Name="btnStop" ToolTip="Alt+S" Margin="5,0,0,0" Click="btnStop_Click"
+            Padding="4"
+>
+            <Viewbox Stretch="Uniform">
+                <Canvas Canvas.Left="0" Canvas.Top="0" Width="42" Height="42">
+                    <Path Style="{StaticResource StopIconStyle}" Data="M26,26H6V6h20V26zM8,24h16V8H8V24z" Height="42" Stretch="Fill" Width="42"/>
+                </Canvas>
+            </Viewbox>
+        </Button>
+        <Button IsEnabled="{Binding ElementName=jobControl, Path=IsRewindEnabled, Mode=OneWay}" x:Uid="btn_rewind" x:Name="btnRewind" Margin="5,0,0,0" Click="btnRewind_Click"
+            Padding="4"
+>
+            <Viewbox Stretch="Uniform">
+                <Canvas  Width="42" Height="42" Canvas.Left="0" Canvas.Top="0">
+                    <Path Style="{StaticResource RewindIconStyle}" Height="42" Stretch="Fill" Width="42"  Data="M16.99,27.606L0.778,16.044L16.99,4.481v8.78l13,-8.713v22.99l-13,-8.713V27.606zM16.99,16.418l11,7.372V8.297l-11,7.372V16.418zM4.222,16.044l10.768,7.68V8.364L4.222,16.044z"/>
+                </Canvas>
+            </Viewbox>
+
+        </Button>
+        <local:ToggleControl x:Name="tswSingle" Label="Single block" Click="tswSingle_Click" IsChecked="{Binding Path=Signals[(core:Signals)SingleBlock], Mode=OneWay}" VerticalAlignment="Center" Margin="4,0,0,0" Height="35" />
+
     </StackPanel>
 </UserControl>

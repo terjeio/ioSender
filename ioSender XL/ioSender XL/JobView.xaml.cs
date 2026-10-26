@@ -68,6 +68,13 @@ namespace GCode_Sender
 
             DRO.DROEnabledChanged += DRO_DROEnabledChanged;
             DataContextChanged += View_DataContextChanged;
+            gcodeTextControl.SelectedLineRangeChanged += GcodeTextControl_SelectedLineRangeChanged;
+        }
+
+        private void GcodeTextControl_SelectedLineRangeChanged(int startLine, int endLine)
+        {
+            if (AppConfig.Settings.GCodeViewer.IsEnabled)
+                gcodeRenderer.HighlightLines(startLine, endLine);
         }
 
         private void View_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)

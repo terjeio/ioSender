@@ -7,7 +7,7 @@
              xmlns:local="clr-namespace:CNC.Controls.Camera"
              mc:Ignorable="d" 
              d:DesignHeight="370" d:DesignWidth="500"
-             Background="#FFF0F0F0" Loaded="CameraControl_Loaded">
+             Background="{DynamicResource AppDialogBackgroundBrush}" Loaded="CameraControl_Loaded">
     <UserControl.Resources>
         <system:String x:Uid="str_moveSpindleTo" x:Key="MoveSpindleTo">Move spindle to camera position?</system:String>
         <system:String x:Uid="str_moveCameraTo" x:Key="MoveCameraTo">Move camera to spindle position?</system:String>

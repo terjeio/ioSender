@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -39,8 +39,11 @@
     <Localizable>False</Localizable>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ICSharpCode.AvalonEdit, Version=6.3.1.120, Culture=neutral, PublicKeyToken=9cc39be672370310, processorArchitecture=MSIL">
+      <HintPath>..\..\ioSender\packages\AvalonEdit.6.3.1.120\lib\net462\ICSharpCode.AvalonEdit.dll</HintPath>
+    </Reference>
     <Reference Include="RP.Math.Vector3">
-      <HintPath>..\..\Vector-master\RP.Math.Vector3\bin\Release\RP.Math.Vector3.dll</HintPath>
+      <HintPath>..\..\lib\RP.Math.Vector3.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -70,6 +73,9 @@
     <Compile Include="ArcsToLines.cs" />
     <Compile Include="BasicConfigControl.xaml.cs">
       <DependentUpon>BasicConfigControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="GcodeTextControl.xaml.cs">
+      <DependentUpon>GcodeTextControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="GrblConfigControl.xaml.cs">
       <DependentUpon>GrblConfigControl.xaml</DependentUpon>
@@ -254,6 +260,10 @@
       <DependentUpon>WorkParametersControl.xaml</DependentUpon>
     </Compile>
     <Page Include="About.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="GcodeTextControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -519,6 +529,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="app.config" />
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>PublicSettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -560,6 +571,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\reset.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\save.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

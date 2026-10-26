@@ -3,39 +3,74 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:CNC.Controls"
+             xmlns:local="clr-namespace:CNC.Controls" d:DataContext="{d:DesignInstance Type=local:UIViewModel}"
              mc:Ignorable="d" 
-             d:DesignHeight="36" d:DesignWidth="145">
+             d:DesignHeight="42" d:DesignWidth="188.859">
     <UserControl.Resources>
         <local:LogicalNotConverter x:Key="BooleanConverter" />
-        <Style x:Key="ActionButtonStyle" TargetType="Button">
+        <Style TargetType="{x:Type Path}">
+            <Setter Property="Fill" Value="{DynamicResource IconBrush}" />
             <Style.Triggers>
-                <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Opacity" Value="0.5"/>
-                </Trigger>
+                <DataTrigger Binding="{Binding IsEnabled, RelativeSource={RelativeSource AncestorType=Button}}" Value="False">
+                    <Setter Property="Fill" Value="{DynamicResource IconDisabledBrush}" />
+                </DataTrigger>
             </Style.Triggers>
-            <Setter Property="Height" Value="36"/>
-            <Setter Property="Focusable" Value="False"/>
-            <Setter Property="Margin" Value="3,0"/>
-            <Setter Property="HorizontalAlignment" Value="Center"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border BorderThickness="{TemplateBinding BorderThickness}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                Background="Transparent">
-                            <Image Source="{Binding Path=Content, RelativeSource={RelativeSource TemplatedParent}}"/>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
+        </Style>
+        <Style TargetType="{x:Type Polygon}">
+            <Setter Property="Fill" Value="{DynamicResource IconBrush}" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsEnabled, RelativeSource={RelativeSource AncestorType=Button}}" Value="False">
+                    <Setter Property="Fill" Value="{DynamicResource IconDisabledBrush}" />
+                </DataTrigger>
+            </Style.Triggers>
         </Style>
     </UserControl.Resources>
     <StackPanel IsEnabled="{Binding Path=IsJobRunning, Mode=OneWay, Converter={StaticResource BooleanConverter}}" Orientation="Horizontal" HorizontalAlignment="Left" Height="36" VerticalAlignment="Top">
-        <Button Content="Resources\open.png" ToolTip="Open file" Width="37" Style="{StaticResource ActionButtonStyle}" Click="btnOpen_Click"/>
-        <Button Content="Resources\reload.png" ToolTip="Reload file" Width="23" IsEnabled="{Binding Path=IsPhysicalFileLoaded}"  Style="{StaticResource ActionButtonStyle}" Click="btnReload_Click"/>
-        <Button Content="Resources\edit.png" ToolTip="Edit file" Width="31" IsEnabled="{Binding Path=IsPhysicalFileLoaded}" Style="{StaticResource ActionButtonStyle}" Click="btnEdit_Click"/>
-        <Button Content="Resources\close.png" ToolTip="Close file" Width="26" IsEnabled="{Binding Path=IsFileLoaded}"  Style="{StaticResource ActionButtonStyle}" Click="btnClose_Click"/>
+        <Button ToolTip="Open file" IsEnabled="{Binding Path=CanOpenFile}" Click="btnOpen_Click">
+            <Viewbox Stretch="Uniform">
+                <Canvas Width="32" Height="32" Canvas.Left="0" Canvas.Top="0">
+                    <Polygon Points="1.954,31.999 0,31.934 0,6 11.414,6 15.316,10 28,10 28,17 26,17 26,12 14.473,12 10.571,8 2,8 2,30 2.022,30.001 2,30.644 2,30.967 1.989,30.967" StrokeLineJoin="Miter"/>
+                    <Path Data="M28.82,32 H0.754 L4.297,16 H32.02 L28.82,32 Z M3.246,30 H27.18 L29.58,18 H5.903 L3.246,30 Z"/>
+                    <Path Data="M30.299,7.713 L27.827,5.285 C26.345,3.803 24.384,2.99 22.3,2.99 S18.255,3.803 16.779,5.289 L15.365,3.875 C19.189,0.051 25.412,0.051 29.236,3.875 L31.701,6.297 30.299,7.713 Z"/>
+                    <Polygon Points="32,8 24,8 24,6 30,6 30,0 32,0" StrokeLineJoin="Miter"/>
+                </Canvas>
+            </Viewbox>
+        </Button>
+        <Button ToolTip="Close file" IsEnabled="{Binding Path=CanCloseFile}" Click="btnClose_Click" Margin="2,0,0,0">
+            <Viewbox Stretch="Uniform">
+                <Canvas Width="32" Height="32" Canvas.Left="0" Canvas.Top="0">
+                    <Canvas>
+                        <Path Data="M30,30H2V2h28V30zM4,28h24V4H4V28zM21.084,22.498L16,17.414l-5.084,5.084l-1.414,-1.414L14.586,16l-5.084,-5.084l1.414,-1.414L16,14.586l5.084,-5.084l1.414,1.414L17.414,16l5.084,5.084L21.084,22.498z"/>
+                    </Canvas>
+                </Canvas>
+            </Viewbox>
+        </Button>
+        <Button ToolTip="Reload file" IsEnabled="{Binding Path=CanReloadFile}" Click="btnReload_Click" Margin="2,0,0,0">
+            <Viewbox Stretch="Uniform">
+                <Canvas Width="32" Height="32" Canvas.Left="0" Canvas.Top="0">
+                    <Canvas>
+                        <Path Data="M2,30C6.667,30,11.33,30,16,30C15.99,29.34,16.03,28.63,15.98,28C11.99,28,7.993,28,4,28C4,19.33,4,10.67,4,2C8.863,2.005,13.73,1.991,18.59,2.007C20.39,3.814,22.21,5.613,24,7.424C24.01,10.33,23.99,13.27,24.01,16.16C24.67,16.07,25.36,16.09,26,16.15C26,12.96,26.01,9.762,25.99,6.579C23.8,4.388,21.61,2.179,19.4,0C13.6,0,7.801,0,2,0C2,10,2,20,2,30z" />
+                    </Canvas>
+                    <Canvas>
+                        <Path Data="M20,32h-2v-6h6v2h-2.854c0.919,1.128,2.383,1.86,3.848,1.86c2.149,0,4.013,-1.557,4.532,-3.787l1.948,0.454c-0.731,3.14,-3.396,5.333,-6.48,5.333c-1.877,0,-3.705,-0.814,-4.994,-2.14V32zM32,24h-6v-2h2.892c-0.916,-1.155,-2.402,-1.909,-3.887,-1.909c-2.149,0,-4.013,1.557,-4.532,3.787l-1.948,-0.454c0.731,-3.14,3.396,-5.333,6.48,-5.333c1.878,0,3.706,0.815,4.995,2.141V18h2V24z"/>
+                    </Canvas>
+                </Canvas>
+            </Viewbox>
+        </Button>
+        <Button ToolTip="Allow edit" IsEnabled="{Binding Path=IsFileLoaded}" Click="btnEdit_Click" Margin="2,0,0,0">
+            <Viewbox Stretch="Uniform">
+                <Canvas Width="32" Height="32" Canvas.Left="0" Canvas.Top="0">
+                    <Path Data="M0.058,31.873l3.219,-10.11L23.904,1.272c1.63,-1.627,4.283,-1.625,5.912,0.006l0.959,0.96c0.79,0.791,1.225,1.842,1.224,2.96c-0.001,1.118,-0.438,2.168,-1.229,2.958L10.14,28.628L0.058,31.873zM4.915,23.209l-1.773,5.57l5.525,-1.778C7.554,25.197,6.379,24.008,4.915,23.209zM6.224,21.654c1.544,0.922,2.831,2.232,4.003,4.07L26.603,9.472l-4,-4.089L6.224,21.654zM24.023,3.973l4,4.09l1.336,-1.326c0.411,-0.41,0.639,-0.958,0.64,-1.542c0,-0.583,-0.226,-1.132,-0.639,-1.545l-0.959,-0.96c-0.85,-0.851,-2.234,-0.852,-3.086,-0.002L24.023,3.973z"/>
+                </Canvas>
+            </Viewbox>
+        </Button>
+
+        <Button ToolTip="Save file" IsEnabled="{Binding Path=CanSaveFile}" Click="btnSave_Click" Margin="2,0,0,0">
+            <Viewbox Stretch="Uniform">
+                <Canvas Width="32" Height="32" Canvas.Left="0" Canvas.Top="0">
+                    <Path Data="M27.95,30H6.667L2,25.426V4.05C2,2.92,2.92,2,4.05,2h23.9c1.13,0,2.05,0.92,2.05,2.05v23.9C30,29.08,29.08,30,27.95,30zM22,28h5.95c0.028,0,0.05,-0.022,0.05,-0.05v-23.9c0,-0.028,-0.022,-0.05,-0.05,-0.05H24v10H8V4H4.05c-0.028,0,-0.05,0.022,-0.05,0.05v20.536L7.483,28H8V18h14V28zM10,28h10v-8H10V28zM10,12h12V4H10V12zM14,26h-2v-4h2V26z"/>
+                </Canvas>
+            </Viewbox>
+        </Button>
     </StackPanel>
 </UserControl>

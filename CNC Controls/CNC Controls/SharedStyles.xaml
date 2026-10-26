@@ -3,18 +3,6 @@
                     xmlns:gcode="clr-namespace:CNC.GCode;assembly=CNC.Core"
                     xmlns:local="clr-namespace:CNC.Controls">
     <local:IsAxisVisibleConverter x:Key="IsAxisVisibleConverter" />
-    <Style x:Key="SmallXButtonStyle" TargetType="Button">
-        <Setter Property="Background" Value="Transparent" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="Button">
-                    <Grid Background="{TemplateBinding Background}">
-                        <ContentPresenter HorizontalAlignment="Center"/>
-                    </Grid>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
     <Style x:Key="YAxisVisibleStyle">
         <Setter Property="Control.Visibility">
             <Setter.Value>

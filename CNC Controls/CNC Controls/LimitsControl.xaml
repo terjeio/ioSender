@@ -5,36 +5,50 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CNC.Controls"
              mc:Ignorable="d" 
-             d:DesignWidth="216">
+             d:DesignWidth="241.96">
     <UserControl.Resources>
-        <ResourceDictionary Source="SharedStyles.xaml"/>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="SharedStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <local:LogicalNotConverter x:Key="BooleanNotConverter"/>
+        </ResourceDictionary>
     </UserControl.Resources>
-    <GroupBox x:Uid="grp_programLimits" x:Name="grpLimits" Header="Program limits" HorizontalAlignment="Center" VerticalAlignment="Top" Width="216">
-        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="2,5,0,5">
-            <local:LimitsBaseControl x:Name="axisX" Label="X"
-                MinValue="{Binding Path=ProgramLimits.MinX, Mode=OneWay}"
-                MaxValue="{Binding Path=ProgramLimits.MaxX, Mode=OneWay}"
-            />
-            <local:LimitsBaseControl x:Name="axisY" Label="Y" Style="{StaticResource YAxisVisibleStyle}"
-                MinValue="{Binding Path=ProgramLimits.MinY, Mode=OneWay}"
-                MaxValue="{Binding Path=ProgramLimits.MaxY, Mode=OneWay}"
-            />
-            <local:LimitsBaseControl x:Name="axisZ" Label="Z" Style="{StaticResource ZAxisVisibleStyle}"
-                MinValue="{Binding Path=ProgramLimits.MinZ, Mode=OneWay}"
-                MaxValue="{Binding Path=ProgramLimits.MaxZ, Mode=OneWay}"
-            />
-            <local:LimitsBaseControl x:Name="axisA" Label="{Binding Path=AxisLetter.A, Mode=OneWay}" Style="{StaticResource AAxisVisibleStyle}"
-                MinValue="{Binding Path=ProgramLimits.MinA, Mode=OneWay}"
-                MaxValue="{Binding Path=ProgramLimits.MaxA, Mode=OneWay}"
-            />
-            <local:LimitsBaseControl x:Name="axisB" Label="{Binding Path=AxisLetter.B, Mode=OneWay}" Style="{StaticResource BAxisVisibleStyle}"
-                MinValue="{Binding Path=ProgramLimits.MinB, Mode=OneWay}"
-                MaxValue="{Binding Path=ProgramLimits.MaxB, Mode=OneWay}"
-            />
-            <local:LimitsBaseControl x:Name="axisC" Label="{Binding Path=AxisLetter.C, Mode=OneWay}" Style="{StaticResource CAxisVisibleStyle}"
-                MinValue="{Binding Path=ProgramLimits.MinC, Mode=OneWay}"
-                MaxValue="{Binding Path=ProgramLimits.MaxC, Mode=OneWay}"
-            />
-        </StackPanel>
-    </GroupBox>
+    <StackPanel>
+        <GroupBox x:Uid="grp_programLimits" x:Name="grpLimits" Header="Program limits" HorizontalAlignment="Center" VerticalAlignment="Top" Width="216">
+            <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="2,5,0,5">
+                <local:LimitsBaseControl x:Name="axisX" Label="X"
+                    MinValue="{Binding Path=ProgramLimits.MinX, Mode=OneWay}"
+                    MaxValue="{Binding Path=ProgramLimits.MaxX, Mode=OneWay}"
+                />
+                <local:LimitsBaseControl x:Name="axisY" Label="Y" Style="{StaticResource YAxisVisibleStyle}"
+                    MinValue="{Binding Path=ProgramLimits.MinY, Mode=OneWay}"
+                    MaxValue="{Binding Path=ProgramLimits.MaxY, Mode=OneWay}"
+                />
+                <local:LimitsBaseControl x:Name="axisZ" Label="Z" Style="{StaticResource ZAxisVisibleStyle}"
+                    MinValue="{Binding Path=ProgramLimits.MinZ, Mode=OneWay}"
+                    MaxValue="{Binding Path=ProgramLimits.MaxZ, Mode=OneWay}"
+                />
+                <local:LimitsBaseControl x:Name="axisA" Label="{Binding Path=AxisLetter.A, Mode=OneWay}" Style="{StaticResource AAxisVisibleStyle}"
+                    MinValue="{Binding Path=ProgramLimits.MinA, Mode=OneWay}"
+                    MaxValue="{Binding Path=ProgramLimits.MaxA, Mode=OneWay}"
+                />
+                <local:LimitsBaseControl x:Name="axisB" Label="{Binding Path=AxisLetter.B, Mode=OneWay}" Style="{StaticResource BAxisVisibleStyle}"
+                    MinValue="{Binding Path=ProgramLimits.MinB, Mode=OneWay}"
+                    MaxValue="{Binding Path=ProgramLimits.MaxB, Mode=OneWay}"
+                />
+                <local:LimitsBaseControl x:Name="axisC" Label="{Binding Path=AxisLetter.C, Mode=OneWay}" Style="{StaticResource CAxisVisibleStyle}"
+                    MinValue="{Binding Path=ProgramLimits.MinC, Mode=OneWay}"
+                    MaxValue="{Binding Path=ProgramLimits.MaxC, Mode=OneWay}"
+                />
+            </StackPanel>
+        </GroupBox>
+        <GroupBox x:Name="grpUnits" Header="Units" HorizontalAlignment="Center" VerticalAlignment="Top" Width="216"
+                  IsEnabled="{Binding IsJobRunning, Converter={StaticResource BooleanNotConverter}}">
+            <StackPanel Orientation="Horizontal" Margin="2,5,0,5">
+                <RadioButton x:Name="rbIN" Content="IN" GroupName="Units" Margin="0,0,10,0" Checked="rbIN_Checked"/>
+                <RadioButton x:Name="rbMM" Content="MM" GroupName="Units" Checked="rbMM_Checked"/>
+            </StackPanel>
+        </GroupBox>
+    </StackPanel>
 </UserControl>

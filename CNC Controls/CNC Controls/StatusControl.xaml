@@ -6,7 +6,7 @@
              xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:local="clr-namespace:CNC.Controls"
              mc:Ignorable="d" 
-             d:DesignHeight="66" d:DesignWidth="216">
+             d:DesignHeight="66" d:DesignWidth="216" HorizontalAlignment="Center" VerticalAlignment="Center">
     <UserControl.Resources>
         <system:String x:Uid="str_clearEStop" x:Key="ClearEStop">Clear E-Stop before &lt;Reset&gt;></system:String>
         <local:GrblStateToColorConverter x:Key="ToColorConverter" />
@@ -19,37 +19,20 @@
                 <local:LogicalNotConverter />
             </local:LogicalOrConverter.FinalConverter>
         </local:LogicalOrConverter>
-        <Style x:Key="StatusButtonStyle" TargetType="Button">
-            <Setter Property="Width" Value="66" />
-            <Setter Property="Height" Value="36" />
-            <Setter Property="Focusable" Value="False" />
-        </Style>
-        <Style x:Key="ResetButtonStyle" TargetType="{x:Type Button}">
-            <Setter Property="Background" Value="LightBlue" />
-            <Setter Property="Width" Value="66" />
-            <Setter Property="Height" Value="36" />
-            <Setter Property="Focusable" Value="False" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type Button}">
-                        <Border x:Name="Border" Background="{TemplateBinding Background}" BorderThickness="1" BorderBrush="#FF707070" >
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="BorderBrush" Value="Red" TargetName="Border" />
-                                <Setter Property="Background" Value="#FFFF5050" TargetName="Border" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
+        <Style TargetType="{x:Type Path}">
+            <Setter Property="Fill" Value="{DynamicResource IconBrush}" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsEnabled, RelativeSource={RelativeSource AncestorType=Button}}" Value="False">
+                    <Setter Property="Fill" Value="{DynamicResource IconDisabledBrush}" />
+                </DataTrigger>
+            </Style.Triggers>
         </Style>
     </UserControl.Resources>
     <StackPanel Orientation="Vertical">
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
             <Label x:Uid="lbl_state" x:Name="lblState" Content="State:" HorizontalContentAlignment="Right" HorizontalAlignment="Left" VerticalAlignment="Center" Height="26" Width="50"/>
             <TextBox x:Name="txtState" HorizontalAlignment="Left" Height="24" Margin="2,0" TextWrapping="NoWrap" IsReadOnly="True" TextAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center" Width="74"
+                     FontWeight="SemiBold" Foreground="Black"
                      Text="{Binding Path=GrblState, Converter={StaticResource ToStringConverter}}"
                      Background="{Binding Path=GrblState, Converter={StaticResource ToColorConverter}}"
              />
@@ -65,7 +48,7 @@
             <Label x:Uid="lbl_check" Content="Check" VerticalAlignment="Center" Height="26"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,4,0,0" VerticalAlignment="Bottom">
-            <Button x:Uid="btn_home" x:Name="btnHome" Content="Home" ToolTip="Ctrl+H" Background="{Binding Path=HomedState, Converter={StaticResource HomedStateConverter}}" Style="{StaticResource StatusButtonStyle}" Click="btn_Click">
+            <Button x:Uid="btn_home" x:Name="btnHome" ToolTip="Ctrl+H" Click="btn_Click">
                 <Button.IsEnabled>
                     <MultiBinding Converter="{StaticResource HomingEnabledConverter}">
                         <Binding Path="GrblState" Mode="OneWay"/>
@@ -73,11 +56,42 @@
                         <Binding Path="IsSleepMode" Mode="OneWay"/>
                     </MultiBinding>
                 </Button.IsEnabled>
+                <Viewbox Stretch="Uniform">
+                    <Canvas Width="32" Height="32" Canvas.Left="0" Canvas.Top="0">
+                        <Path Data="M28,30H18V20h-4v10H4V12.822l-2.377,1.892L0.377,13.15L15.986,0.726L31.594,13.15l-1.246,1.565L28,12.845V30zM20,28h6V11.253L15.986,3.282L6,11.23V28h6V18h8V28z">
+                            <Path.Style>
+                                <Style TargetType="Path">
+                                    <Setter Property="Fill" Value="{Binding Path=HomedState, Converter={StaticResource HomedStateConverter}}"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsEnabled, RelativeSource={RelativeSource AncestorType=Button}}" Value="False">
+                                            <Setter Property="Fill" Value="{DynamicResource IconDisabledBrush}"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Path.Style>
+                        </Path>
+                    </Canvas>
+                </Viewbox>
+
             </Button>
-            <Button x:Uid="btn_unlock" x:Name="btnUnlock" Content="Unlock" ToolTip="Ctrl+U" Style="{StaticResource StatusButtonStyle}" Margin="5,0,0,0" Click="btn_Click"
+            <Button x:Uid="btn_unlock" x:Name="btnUnlock" ToolTip="Ctrl+U" Margin="5,0,0,0" Click="btn_Click"
                 IsEnabled="{Binding Path=IsSleepMode, Converter={StaticResource SleepEnabledConverter}, Mode=OneWay}"
-            />
-            <Button x:Uid="btn_reset" x:Name="btnReset" Content="Reset" ToolTip="Ctrl+Shift+R" Style="{StaticResource ResetButtonStyle}" Margin="5,0,0,0" Background="Red" Foreground="White" Click="btn_Click" FontFamily="Segoe UI Semibold" FontSize="14"/>
+            >
+                <Viewbox Stretch="Uniform">
+                    <Canvas Width="32" Height="32" Canvas.Left="0" Canvas.Top="0">
+                        <Path Data="M28,32H4V14h18V8.015c0,-3.308,-2.692,-6,-6,-6s-6,2.692,-6,6H8c0,-4.411,3.589,-8,8,-8s8,3.589,8,8V14h4V32zM6,30h20V16H6V30zM17,26h-2v-4h2V26z"/>
+                    </Canvas>
+                </Viewbox>
+
+            </Button>
+            <Button x:Uid="btn_reset" x:Name="btnReset" ToolTip="Ctrl+Shift+R" Margin="5,0,0,0" Click="btn_Click">
+                <Viewbox Stretch="Uniform">
+                    <Canvas Width="32" Height="32" Canvas.Left="0" Canvas.Top="0">
+                        <Path Data="M16,32c-3.74,0,-7.255,-1.456,-9.9,-4.1C0.642,22.441,0.642,13.559,6.1,8.101c1.576,-1.576,3.524,-2.765,5.634,-3.438l0.608,1.905c-1.833,0.585,-3.457,1.576,-4.827,2.947c-4.679,4.679,-4.679,12.292,0,16.971C9.781,28.752,12.795,30,16,30s6.219,-1.248,8.485,-3.515c4.679,-4.679,4.679,-12.292,0,-16.971c-1.359,-1.359,-2.967,-2.345,-4.782,-2.932l0.615,-1.903C22.438,5.365,24.315,6.516,25.9,8.1c5.459,5.459,5.459,14.34,0,19.799C23.255,30.544,19.74,32,16,32zM17,20h-2V0h2V20z" />
+                    </Canvas>
+                </Viewbox>
+
+            </Button>
         </StackPanel>
     </StackPanel>
 </UserControl>

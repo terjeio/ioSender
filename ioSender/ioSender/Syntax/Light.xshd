@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<SyntaxDefinition xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+  <Property name="DefaultFont" value="Tahoma, 12pt" />
+  <Property name="DefaultForeground" value="#000000" />
+  <Property name="GutterFont" value="Tahoma, 8pt" />
+  <Property name="BackColor" value="#FFFFFF" />
+  <Property name="GutterBackColor" value="#FFFFFF" />
+  <Property name="GutterForeColor" value="#000000" />
+  <Property name="BookmarkColor" value="#11FF81" />
+  <Property name="TextRangeBoxColor" value="#B2B4BF" />
+  <Property name="Indent" value="1" />
+  <RuleSet>
+    <Rule fontFamily="[FontFamily: Name=Tahoma]" foreground="#800000">X{1,2}[-+]?[0-9]*[\.,]*[0-9]*</Rule>
+    <Rule fontFamily="[FontFamily: Name=Tahoma]" foreground="#3E5B0B">Y{1,2}[-+]?[0-9]*[\.,]*[0-9]*</Rule>
+    <Rule fontFamily="[FontFamily: Name=Tahoma]" foreground="#065298">Z{1,2}[-+]?[0-9]*[\.,]*[0-9]*</Rule>
+    <Span fontFamily="[FontFamily: Name=Tahoma]" foreground="#000000" multiline="true">
+      <Begin>\(</Begin>
+      <End>\)</End>
+    </Span>
+    <Span fontFamily="[FontFamily: Name=Tahoma]" foreground="#000000">
+      <Begin>;</Begin>
+      <End>$</End>
+    </Span>
+  </RuleSet>
+</SyntaxDefinition>

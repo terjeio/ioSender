@@ -50,5 +50,10 @@ namespace CNC.Controls.Viewer
         {
             InitializeComponent();
         }
+
+        private void UserControl_Loaded(object sender, System.Windows.RoutedEventArgs e)
+        {
+
+        }
     }
 }

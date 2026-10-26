@@ -5,33 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CNC.Controls.Probing"
         mc:Ignorable="d" Height="255" Width="475"
-        WindowStartupLocation="Manual" Icon="App.ico" ResizeMode="NoResize" ShowInTaskbar="False" Background="#FFE5E5E5"
+        Background="{DynamicResource AppDialogBackgroundBrush}"
         x:Uid="dlg_probingMacros" Title="Probing macros" Closed="Window_Closed" >
     <Window.Resources>
-        <Style x:Key="MenuButtonStyle" TargetType="Button">
-            <Style.Triggers>
-                <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Opacity" Value="0.5"/>
-                </Trigger>
-            </Style.Triggers>
-            <Setter Property="Height" Value="24"/>
-            <Setter Property="Width" Value="24"/>
-            <Setter Property="Focusable" Value="False"/>
-            <Setter Property="HorizontalAlignment" Value="Center"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border BorderThickness="{TemplateBinding BorderThickness}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                Background="Transparent">
-                            <Image Source="{Binding Path=Content, RelativeSource={RelativeSource TemplatedParent}}"/>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -48,7 +24,7 @@
                       SelectedItem="{Binding SelectedMacro, Mode=TwoWay}"
                       ItemsSource="{Binding Macros, UpdateSourceTrigger=PropertyChanged}"/>
             <CheckBox x:Uid="chk_runonce" Content="Run once" Margin="10,0,0,0" VerticalAlignment="Center" IsChecked="{Binding RunOnce, Mode=TwoWay, FallbackValue=true}" IsEnabled="{Binding Path=CanEdit}"/>
-            <Button x:Uid="btn_actionMenu" x:Name="btnActionMenu" ToolTip="Click for actions menu." Content="Resources\menu_22x22.png" Style="{StaticResource MenuButtonStyle}" Margin="10,0,0,0" Click="btnActionMenu_Click">
+            <Button x:Uid="btn_actionMenu" x:Name="btnActionMenu" ToolTip="Click for actions menu." Content="Resources\menu_22x22.png" Margin="10,0,0,0" Click="btnActionMenu_Click">
                 <Button.ContextMenu>
                     <ContextMenu x:Name="cm">
                         <MenuItem x:Uid="mnu_add" x:Name="mnuAdd" Header="Add" IsEnabled="{Binding Path=CanAdd}" Command="{Binding AddCommand}"/>

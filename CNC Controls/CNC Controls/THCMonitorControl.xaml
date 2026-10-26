@@ -24,7 +24,7 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
-    <Border BorderBrush="DarkGray" BorderThickness="1" CornerRadius="3" Background="#FFE5E5EA">
+    <Border BorderBrush="{DynamicResource AppFlyoutBorderBrush}" BorderThickness="1" CornerRadius="3" Background="{DynamicResource AppFlyoutBackgroundBrush}">
         <Grid Width="320" Margin="10,0,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="130*"/>
@@ -53,7 +53,7 @@
             <local:LEDControl Grid.Row="4" Label="Arc ok" Padding="15,0" IsSet="{Binding Path=THCSignals[(core:THCSignals)ArcOk], Mode=OneWay}"/>
             <local:LEDControl Grid.Row="4" Grid.Column="1" Label="Breakaway" IsSet="{Binding Path=THCSignals[(core:THCSignals)Breakaway], Mode=OneWay}"/>
             <local:LEDControl Grid.Row="4" Grid.Column="2" Label="Void lock" IsSet="{Binding Path=THCSignals[(core:THCSignals)VoidLock], Mode=OneWay}"/>
-            <Button Content="×" Focusable="False" Style="{StaticResource SmallXButtonStyle}" VerticalContentAlignment="Top" HorizontalAlignment="Right" Margin="0,0,5,0" VerticalAlignment="Top" Width="14" Height="18" Click="btn_Close" Grid.Column="1" Grid.ColumnSpan="2"/>
+            <Button Content="×" Focusable="False" VerticalContentAlignment="Top" HorizontalAlignment="Right" Margin="0,0,5,0" VerticalAlignment="Top" Width="14" Height="18" Click="btn_Close" Grid.Column="1" Grid.ColumnSpan="2"/>
         </Grid>
     </Border>
 </UserControl>

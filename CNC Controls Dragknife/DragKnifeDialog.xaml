@@ -10,7 +10,7 @@
              SizeToContent="WidthAndHeight" ResizeMode="NoResize"
              x:Uid="dlg_dragKnife"
              Title="Drag knife parameters" Loaded="Window_Loaded" Icon="App.ico">
-    <Grid Background="#FFE5E5E5">
+    <Grid Background="{DynamicResource AppDialogBackgroundBrush}">
         <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Height="Auto" Margin="5,5">
             <GroupBox x:Uid="grp_knife" Header="Knife" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Height="Auto" Width="280">
                 <StackPanel>

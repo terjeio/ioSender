@@ -59,18 +59,61 @@ namespace GCode_Sender
             AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
             Application.Current.DispatcherUnhandledException += DispatcherOnUnhandledException;
             TaskScheduler.UnobservedTaskException += TaskSchedulerOnUnobservedTaskException;
+
+            // Apply the current title-bar theme to every Window as it is loaded
+            // (covers dialogs opened after theme switch / after startup).
+            EventManager.RegisterClassHandler(typeof(Window), FrameworkElement.LoadedEvent,
+                new RoutedEventHandler((s, e) => WindowDarkMode.Apply(s as Window, IsDarkMode)));
         }
 
         public ResourceDictionary ThemeDictionary
         {
-            // You could probably get it via its name with some query logic as well.
             get { return Resources.MergedDictionaries[0]; }
         }
 
         public void ChangeTheme(Uri uri)
         {
-            ThemeDictionary.MergedDictionaries.Clear();
-            ThemeDictionary.MergedDictionaries.Add(new ResourceDictionary() { Source = uri });
+            // Replace the merged theme dictionary at the application level. Replacing the
+            // entry (rather than mutating a nested dictionary) makes WPF re-evaluate
+            // implicit styles on already-loaded elements so the theme switch propagates
+            // to all controls.
+            var merged = Resources.MergedDictionaries;
+            var newTheme = new ResourceDictionary { Source = uri };
+            if (merged.Count == 0)
+                merged.Add(newTheme);
+            else
+                merged[0] = newTheme;
+        }
+
+        private static readonly Uri LightThemeUri = new Uri("Themes/LightTheme.xaml", UriKind.Relative);
+        private static readonly Uri DarkThemeUri = new Uri("Themes/DarkTheme.xaml", UriKind.Relative);
+
+        public static bool IsDarkMode { get; private set; }
+
+        /// <summary>
+        /// Applies the WPF theme matching the supplied theme name from <see cref="Config.Theme"/>.
+        /// "Black" and "Dark" are treated as dark themes; everything else falls back to light.
+        /// </summary>
+        public static void ApplyTheme(string themeName)
+        {
+            bool dark = !string.IsNullOrEmpty(themeName) &&
+                        (themeName.Equals("Dark", StringComparison.OrdinalIgnoreCase) ||
+                         themeName.Equals("Black", StringComparison.OrdinalIgnoreCase));
+            ApplyTheme(dark);
+        }
+
+        public static void ApplyTheme(bool dark)
+        {
+            var app = Current as App;
+            if (app == null)
+                return;
+
+            app.ChangeTheme(dark ? DarkThemeUri : LightThemeUri);
+            IsDarkMode = dark;
+
+            // Apply the OS-level title-bar theme to every currently open window.
+            foreach (Window w in app.Windows)
+                WindowDarkMode.Apply(w, dark);
         }
 
         protected override void OnStartup(StartupEventArgs e)

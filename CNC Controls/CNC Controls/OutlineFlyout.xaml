@@ -10,23 +10,11 @@
              Loaded="OutlineFlyout_Loaded">
     <UserControl.Resources>
         <system:String x:Uid="str_outlineFlyout" x:Key="MenuLabel">_Outline</system:String>
-        <Style x:Key="SmallXButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Grid Background="{TemplateBinding Background}">
-                            <ContentPresenter HorizontalAlignment="Center"/>
-                        </Grid>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
     </UserControl.Resources>
-    <Border BorderBrush="DarkGray" BorderThickness="1" CornerRadius="3" Background="#FFE5E5EA">
+    <Border BorderBrush="{DynamicResource AppFlyoutBorderBrush}" BorderThickness="1" CornerRadius="3" Background="{DynamicResource AppFlyoutBackgroundBrush}">
         <Grid Height="120">
             <local:OutlineBaseControl Margin="0,15,0,0"/>
-            <Button Content="×" Focusable="False" Style="{StaticResource SmallXButtonStyle}" VerticalContentAlignment="Top" HorizontalAlignment="Left" Margin="285,0,0,0" VerticalAlignment="Top" Width="14" Height="18" Click="btn_Close"/>
+            <Button Content="×" Style="{DynamicResource FlyoutCloseButtonStyle}" Focusable="False" VerticalContentAlignment="Top" HorizontalAlignment="Left" Margin="285,0,0,0" VerticalAlignment="Top" Width="14" Height="18" Click="btn_Close"/>
         </Grid>
     </Border>
 </UserControl>

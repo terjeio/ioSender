@@ -4,67 +4,54 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CNC.Controls"
+             xmlns:media="clr-namespace:System.Windows.Media;assembly=PresentationCore"
              mc:Ignorable="d" 
-             d:DesignHeight="30" d:DesignWidth="240">
+             d:DesignHeight="36.448" d:DesignWidth="240">
     <UserControl.Resources>
         <local:EncoderModeToColorConverter x:Key="EncoderModeConverter" />
-        <local:BoolToColorConverter x:Key="ToColorConverter" />
         <local:LogicalNotConverter x:Key="BooleanConverter" />
-            <Style x:Key="ResetButtonStyle" TargetType="Button">
-            <Style.Triggers>
-                <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Opacity" Value="0.5"/>
-                </Trigger>
-            </Style.Triggers>
-            <Setter Property="Height" Value="36"/>
-            <Setter Property="Focusable" Value="False"/>
-            <Setter Property="Margin" Value="3,0"/>
-            <Setter Property="HorizontalAlignment" Value="Center"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border BorderThickness="{TemplateBinding BorderThickness}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            Background="Transparent">
-                            <Image Source="{Binding Path=Content, RelativeSource={RelativeSource TemplatedParent}}"/>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
     </UserControl.Resources>
     <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Height="30" VerticalAlignment="Center" Width="240">
-        <Label x:Uid="lbl_override" x:Name="lblOverride" HorizontalContentAlignment="Right" Content="Override" VerticalAlignment="Center" VerticalContentAlignment="Center" Height="24" Width="75"/>
-        <Slider x:Name="xxx" Width="100" TickPlacement="TopLeft" IsSnapToTickEnabled="True" SmallChange="1" LargeChange="10" LostMouseCapture="Slider_LostMouseCapture" GotMouseCapture="Slider_GotMouseCapture"
+        <Slider x:Name="xxx" Width="154" TickPlacement="TopLeft" IsSnapToTickEnabled="True" SmallChange="1" LargeChange="10" LostMouseCapture="Slider_LostMouseCapture" GotMouseCapture="Slider_GotMouseCapture"
+                Foreground="{Binding SliderBrush, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                 Value="{Binding SliderValue, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                 Ticks="{Binding Ticks, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                 TickFrequency="{Binding TickFrequency, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                 Minimum="{Binding Minimum, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
-                Maximum="{Binding Maximum, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"/>
-        <TextBox x:Name="txtOverride" TextWrapping="NoWrap" Text="200%" IsReadOnly="True" Height="24" Width="37" Margin="4,0,0,0" VerticalAlignment="Center" HorizontalContentAlignment="Right" VerticalContentAlignment="Center">
-            <TextBox.Background>
-                <MultiBinding Converter="{StaticResource EncoderModeConverter}">
-                    <Binding Path="OverrideEncoderMode" Mode="OneWay"/>
-                    <Binding Path="EncoderMode" Mode="OneWay" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
-                </MultiBinding>
-            </TextBox.Background>
-            <TextBox.Foreground>
-                <MultiBinding Converter="{StaticResource ToColorConverter}">
-                    <Binding Path="OverrideDisabled" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
-                    <Binding>
-                        <Binding.Source>
-                            <Brush>Red</Brush>
-                        </Binding.Source>
-                    </Binding>
-                    <Binding>
-                        <Binding.Source>
-                            <Brush>Black</Brush>
-                        </Binding.Source>
-                    </Binding>
-                </MultiBinding>
-            </TextBox.Foreground>
+                Maximum="{Binding Maximum, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" Margin="4,0,0,0"/>
+        <TextBox x:Name="txtOverride" TextWrapping="NoWrap" Text="200%" IsReadOnly="True" Height="24" Width="41" Margin="4,0,0,0" VerticalAlignment="Center" HorizontalContentAlignment="Right" VerticalContentAlignment="Center">
+            <TextBox.Style>
+                <Style TargetType="{x:Type TextBox}">
+                    <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"/>
+                    <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+                    <Setter Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}"/>
+                    <Setter Property="CaretBrush" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+                    <Setter Property="SelectionBrush" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
+                    <Style.Triggers>
+                        <DataTrigger Value="{x:Static media:Brushes.Salmon}">
+                            <DataTrigger.Binding>
+                                <MultiBinding Converter="{StaticResource EncoderModeConverter}">
+                                    <Binding Path="OverrideEncoderMode" Mode="OneWay"/>
+                                    <Binding Path="EncoderMode" Mode="OneWay" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
+                                </MultiBinding>
+                            </DataTrigger.Binding>
+                            <Setter Property="Background" Value="Salmon"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding Path=OverrideDisabled, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="True">
+                            <Setter Property="Foreground" Value="Red"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBox.Style>
         </TextBox>
-        <Button x:Name="btnOvReset" Content="Resources\reset.png" Focusable="False" Style="{StaticResource ResetButtonStyle}" Margin="2,0,0,0" Height="22" Width="22" Click="btnOverrideClick"/>
+        <Button x:Name="btnOvReset" Focusable="False" Margin="2,0,0,0" Click="btnOverrideClick" Height="24" Width="24" Padding="2">
+            <Viewbox Stretch="Uniform">
+                <Canvas Width="22" Height="22" Canvas.Left="0" Canvas.Top="0" Margin="0,0,0,2">
+                    <Path  Fill="{DynamicResource IconBrush}"
+                           Data="M16.02,28c-6.617,0,-12,-5.383,-12,-12c0,-6.617,5.383,-12,12,-12c2.335,0,4.654,0.655,6.706,1.893c1.289,0.778,2.394,1.739,3.274,2.838V3h2v9h-2.012v-0.504V12H19v-2h5.45c-1.935,-2.422,-5.152,-4,-8.43,-4c-5.514,0,-10,4.486,-10,10c0,5.514,4.486,10,10,10c4.402,0,8.346,-2.945,9.592,-7.162l1.918,0.567c-0.718,2.432,-2.232,4.62,-4.263,6.161C21.168,27.158,18.662,28,16.02,28z" Stretch="Fill"/>
+                </Canvas>
+            </Viewbox>
+
+        </Button>
     </StackPanel>
 </UserControl>

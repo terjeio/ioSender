@@ -68,58 +68,26 @@ namespace CNC.Controls
             GCode.File.Load((DataContext as GrblViewModel).FileName);
         }
 
+        void btnSave_Click(object sender, RoutedEventArgs e)
+        {
+            GCode.File.Save();
+
+            if (DataContext is GrblViewModel model)
+                model.IsFileEditing = false;
+        }
+        void btnEdit_Click(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is GrblViewModel model)
+                model.IsFileEditing = !model.IsFileEditing;
+        }
+
+
         void btnClose_Click(object sender, RoutedEventArgs e)
         {
             GCode.File.Close();
         }
 
-        void btnEdit_Click(object sender, RoutedEventArgs e)
-        {
-            editFile();
-        }
-
-        private async void editFile()
-        {
-            string fileName = (DataContext as GrblViewModel).FileName;
-
-            var process = new Process()
-            {
-                StartInfo = new ProcessStartInfo()
-                {
-                    //FileName = @"D:\Notepad++\notepad++.exe",
-                    //Arguments = '"' + fileName + '"'+ " -multiInst"
-                    FileName = AppConfig.Settings.Base.Editor,
-                    Arguments = '"' + fileName + '"'
-                }
-            };
-
-            if (process.Start())
-            {
-                fileChanged = false;
-
-                using (var watch = new FileSystemWatcher()
-                {
-                    Path = Path.GetDirectoryName(fileName),
-                    Filter = Path.GetFileName(fileName),
-                    NotifyFilter = NotifyFilters.LastWrite,
-                    EnableRaisingEvents = true
-                })
-                {
-                    watch.Changed += File_Changed;
-
-                    (DataContext as GrblViewModel).IsJobRunning = true;
-
-                    await process.WaitForExitAsync();
-
-                    (DataContext as GrblViewModel).IsJobRunning = false;
-
-                    if (fileChanged)
-                        GCode.File.Load(fileName);
-                }
-            }
-        }
-
-        private void File_Changed(object sender, FileSystemEventArgs e)
+         private void File_Changed(object sender, FileSystemEventArgs e)
         {
             fileChanged = true;
         }

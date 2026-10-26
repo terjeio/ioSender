@@ -8,7 +8,7 @@
         Title="Wrap parameters" Height="150" Width="200"
         SizeToContent="WidthAndHeight" ResizeMode="NoResize" MinWidth="190"
         Loaded="Window_Loaded" Icon="App.ico">
-    <Grid Background="#FFE5E5E5">
+    <Grid Background="{DynamicResource AppDialogBackgroundBrush}">
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top" Height="Auto" Margin="5,5">
             <local:NumericField x:Uid="fld_diameter" x:Name="Diameter" Label="Diameter:" Format="-##0.###" Value="{Binding Path=Diameter, Mode=TwoWay}"/>
             <Grid>

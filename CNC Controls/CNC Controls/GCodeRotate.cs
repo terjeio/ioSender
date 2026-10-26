@@ -140,7 +140,7 @@ namespace CNC.Controls
 
                             pos = target;
 
-                            toolPath.Add(new GCArc(arc.Command, arc.LineNumber, pos.Array, arc.AxisFlags, targetijk.Array, arc.IjkFlags, arc.R, arc.P, arc.IJKMode, arc.IsClocwise, arc.BlockDelete));
+                            toolPath.Add(new GCArc(arc.Command, arc.LineNumber, pos.Array, arc.AxisFlags, targetijk.Array, arc.IjkFlags, arc.R, arc.P, arc.IJKMode, arc.BlockDelete));
                         }
                         break;
 

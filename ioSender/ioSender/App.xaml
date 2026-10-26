@@ -4,20 +4,33 @@
              xmlns:local="clr-namespace:GCode_Sender"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-        <Style TargetType="Button" x:Key="btnSidebar">
-            <Setter Property="Background" Value="#FFEFEFEF"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}" CornerRadius="3" BorderThickness="1" BorderBrush="DarkGray">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <!--
-        <ResourceDictionary Source="pack://application:,,,/CNC.Controls.WPF;component/Themes/ThemeSelector.xaml"/>
-        -->
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- Active theme. App.ChangeTheme() in App.xaml.cs replaces this entry. -->
+                <ResourceDictionary Source="Themes/LightTheme.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <Style TargetType="Button" x:Key="btnSidebar">
+                <Setter Property="Background" Value="{DynamicResource AppFlyoutBackgroundBrush}"/>
+                <Setter Property="Foreground" Value="{DynamicResource DarkTabTextBrush}"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="{TemplateBinding Background}" CornerRadius="3" BorderThickness="1" BorderBrush="{DynamicResource AppFlyoutBorderBrush}">
+                                <ContentPresenter HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center"
+                                                  TextElement.Foreground="{TemplateBinding Foreground}">
+                                    <ContentPresenter.Resources>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Foreground"
+                                                    Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                                        </Style>
+                                    </ContentPresenter.Resources>
+                                </ContentPresenter>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

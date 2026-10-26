@@ -5,12 +5,12 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CNC.Controls"
              mc:Ignorable="d" 
-             d:DesignHeight="80" d:DesignWidth="250">
+             d:DesignHeight="90" d:DesignWidth="250">
     <UserControl.Resources>
         <local:BoolToVisibleConverter x:Key="IsVisibleConverter" />
     </UserControl.Resources>
     <GroupBox x:Uid="grp_coolant" x:Name="grpCoolant" Header="Coolant" HorizontalAlignment="Left" VerticalAlignment="Top" Width="250">
-        <StackPanel HorizontalAlignment="Left" Margin="3,0,0,0" Grid.Row="1" VerticalAlignment="Top" Width="184">
+        <StackPanel HorizontalAlignment="Left" Margin="3,0,0,4" Grid.Row="1" VerticalAlignment="Top" Width="184">
             <local:ToggleControl x:Uid="lbl_flood" x:Name="tswFlood" Tag="Flood" Label="Flood" IsChecked="{Binding Path=Flood, Mode=OneWay}" HorizontalAlignment="Left" Margin="20,0,0,0" VerticalAlignment="Top" Click="chkCoolant_Click"/>
             <local:ToggleControl x:Uid="lbl_mist" x:Name="tswMist" Tag="Mist" Label="Mist" IsChecked="{Binding Path=Mist, Mode=OneWay}" HorizontalAlignment="Left" Margin="20,0,0,0" VerticalAlignment="Top" Click="chkCoolant_Click"/>
             <local:ToggleControl x:Uid="lbl_fan" x:Name="tswFan" Tag="Fan" Label="Fan" IsChecked="{Binding Path=Fan0, Mode=OneWay}" Visibility="{Binding Path=HasFans, Mode=OneWay, Converter={StaticResource IsVisibleConverter}}" HorizontalAlignment="Left" Margin="20,0,0,0" VerticalAlignment="Top" Click="chkCoolant_Click"/>
