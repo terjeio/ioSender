@@ -1152,8 +1152,13 @@ namespace CNC.Controls
                 if (job.ACKPending > 0)
                     job.ACKPending--;
 
-                if (!job.IsSDFile && (job.IsChecking || (string)GCode.File.Data[job.PendingLine].Sent == "*"))
-                    job.serialUsed = Math.Max(0, job.serialUsed - (int)GCode.File.Data[job.PendingLine].Length);
+                if (!job.IsSDFile)
+                {
+                    var row = GCode.File.Data[job.PendingLine];
+                    if (job.IsChecking || row.InFlight)
+                        job.serialUsed = Math.Max(0, job.serialUsed - row.Length);
+                    row.InFlight = false;
+                }
 
                 //if (streamingState == StreamingState.Send || streamingState == StreamingState.Paused)
                 //{
@@ -1252,8 +1257,9 @@ namespace CNC.Controls
                     else
                     {
                         job.CurrentRow = job.NextRow;
+                        job.CurrentRow.InFlight = true;
 
-                        if(!job.IsChecking)
+                        if (!job.IsChecking)
                             job.CurrentRow.Sent = "*";
 
                         if (line == "%")

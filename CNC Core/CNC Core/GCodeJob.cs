@@ -89,6 +89,7 @@ namespace CNC.Core
         }
         public bool ProgramEnd { get; set; }
         public bool Ok { get; set; }
+        public bool InFlight { get; set; }
     }
 
     public class GCodeJob
