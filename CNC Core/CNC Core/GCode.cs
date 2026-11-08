@@ -1,7 +1,7 @@
 ﻿/*
  * GCode.cs - part of CNC Controls library
  *
- * v0.47 / 2026-01-25 / Io Engineering (Terje Io)
+ * v0.48 / 2026-09-23 / Io Engineering (Terje Io)
  *
  */
 
@@ -245,6 +245,10 @@ namespace CNC.GCode
         G38_4,
         G38_5,
         G40,
+        G41,
+        G41_1,
+        G42,
+        G42_1,
         G43,
         G43_1,
         G43_2,

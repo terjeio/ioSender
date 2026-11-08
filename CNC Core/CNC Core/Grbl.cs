@@ -1,7 +1,7 @@
 ﻿/*
  * Grbl.cs - part of CNC Controls library
  *
- * v0.47 / 2026-04-29 / Io Engineering (Terje Io)
+ * v0.48 / 2026-09-23 / Io Engineering (Terje Io)
  *
  */
 
@@ -86,6 +86,7 @@ namespace CNC.Core
             CMD_RAPID_OVR_RESET = 0x95,
             CMD_RAPID_OVR_MEDIUM = 0x96,
             CMD_RAPID_OVR_LOW = 0x97,
+            CMD_RAPID_OVR_VERY_LOW = 0x98,
             CMD_SPINDLE_OVR_RESET = 0x99,
             CMD_SPINDLE_OVR_COARSE_PLUS = 0x9A,
             CMD_SPINDLE_OVR_COARSE_MINUS = 0x9B,
@@ -126,6 +127,7 @@ namespace CNC.Core
             CMD_SDCARD_UNLINK = "$FD=",
             CMD_SDCARD_DUMP = "$F<=",
             CMD_FS_PWD = "$PWD",
+            CMD_YMODEM_DOWNLOAD = "$YUP=",
             AXISLETTERS = "XYZABCUVW",
             FORMAT_METRIC = "###0.000",
             FORMAT_IMPERIAL = "##0.0000",
@@ -142,6 +144,8 @@ namespace CNC.Core
             U_AXIS = 6,
             V_AXIS = 7,
             W_AXIS = 8;
+
+        public const double TOOLSETTER_RADIUS = 5d;
     }
 
     public enum CameraMoveMode
@@ -345,7 +349,8 @@ namespace CNC.Core
         OptionalStop = 1 << 16,
         ProbeDisconnected = 1 << 17,
         MotorWarning = 1 << 18,
-        MotorFault = 1 << 19
+        MotorFault = 1 << 19,
+        SingleBlock = 1 << 20
     }
 
     [Flags]
@@ -399,6 +404,70 @@ namespace CNC.Core
             ConfigPath = Path = @"./";
             Locale = "en-US";
             IniName = "App.config";
+        }
+    }
+
+    public class Toolsetter
+    {
+        public bool AtG53 { get; internal set; } = false;
+        public Position Position { get; internal set; } = new Position(); // MPOS
+        public int ToolAxis { get; internal set; } = GrblConstants.Z_AXIS;
+        public bool Referenced
+        {
+            get
+            {
+                return !double.IsNaN(Position.Values[ToolAxis == 0 ? 1 : ToolAxis - 1]);
+            }
+        }
+
+        public void Clear ()
+        {
+            AtG53 = false;
+            ToolAxis = GrblConstants.Z_AXIS;
+            Position.Clear();
+        }
+
+        // Format p1,p1:tool axis:at g53
+        public bool Parse (string data)
+        {
+            var p = data.Split(':');
+            if (p.Length <= 3)
+            {
+                ToolAxis = int.Parse(p[1]);
+                AtG53 = p[2] == "1";
+                int n = 0;
+                var pos = p[0].Split(',');
+                for (int i = 0; n < 2; i++)
+                {
+                    if (i != ToolAxis)
+                        Position.Values[i] = dbl.Parse(pos[n]);
+                    n++;
+                }
+            }
+            else
+                Clear();
+
+            return p.Length <= 3;
+        }
+
+        public bool IsAt (Position mpos)
+        {
+            int n = 0;
+            double x = double.NaN, y = double.NaN;
+
+            for(int i = 0; i <= GrblConstants.Z_AXIS; i++)
+            {
+                if(n != ToolAxis)
+                {
+                    if(n == 0)
+                        x = mpos.Values[0] - Position.Values[i];
+                    else
+                        y = mpos.Values[1] - Position.Values[i];
+                    n++;
+                }
+            }
+
+            return (double.IsNaN(x) || double.IsNaN(y) ? (GrblConstants.TOOLSETTER_RADIUS + 1d) : Math.Sqrt(x * x + y * y)) <= GrblConstants.TOOLSETTER_RADIUS;
         }
     }
 
@@ -951,17 +1020,29 @@ namespace CNC.Core
                 _id = -1;
         }
 
+        public Tool(Tool tool) : base(tool)
+        {
+            _id = Id;
+            Code = tool.Code;
+            Name = tool.Name;
+            R = tool.R;
+        }
+
         public int Id { get { return _id; } }
 
         public string Code { get; private set; }
 
         double _r;
 
-        public double R { get { return R; } set { _r = value; OnPropertyChanged(); } }
+        public double R { get { return _r; } set { _r = value; OnPropertyChanged(); } }
 
         public new string ToString(AxisFlags axisflags, int precision = 3)
         {
             return "P" + Code + base.ToString(axisflags, precision);
+        }
+        public string OffsetsToString(AxisFlags axisflags, int precision = 3)
+        {
+            return base.ToString(axisflags, precision);
         }
     }
 
@@ -1022,7 +1103,7 @@ namespace CNC.Core
                 _axisLetters = value;
             }
         }
-        public static string SignalLetters { get; private set; } = "XYZABCUVWEPRDHSLTOMF"; // Keep in sync with Signals enum above!!
+        public static string SignalLetters { get; private set; } = "XYZABCUVWEPRDHSLTOMFQ"; // Keep in sync with Signals enum above!!
         public static string PositionFormatString { get; private set; } = string.Empty;
         public static string Version { get; private set; } = string.Empty;
         public static int Build { get; private set; } = 0;
@@ -1077,6 +1158,7 @@ namespace CNC.Core
         public static bool HasFS { get; private set; }
         public static bool HasSDCard { get; private set; }
         public static string UploadProtocol { get; private set; } = string.Empty;
+        public static string DownloadProtocol { get; private set; } = string.Empty;
         public static string IpAddress { get; private set; } = string.Empty;
         public static bool HasPIDLog { get; private set; }
         public static bool HasProbe { get { return Probes.Count != 0; } }
@@ -1089,6 +1171,7 @@ namespace CNC.Core
         public static bool MPGMode { get; set; }
         public static bool HasFirmwareJog { get; internal set; } = false;
         public static bool LightBurnCluster { get; internal set; } = false;
+        public static bool HasCutterComp { get; internal set; } = false;
         public static bool LatheModeEnabled
         {
             get { return GrblParserState.LatheMode != LatheMode.Disabled; }
@@ -1485,6 +1568,8 @@ namespace CNC.Core
                                     case "YM":
                                         if (UploadProtocol == string.Empty)
                                             UploadProtocol = "YModem";
+                                        if (DownloadProtocol == string.Empty && Build >= 20260910)
+                                            DownloadProtocol = "YModem";
                                         break;
 
                                     case "FTP":
@@ -1521,6 +1606,10 @@ namespace CNC.Core
 
                                     case "OS":
                                         OptionalSignals |= Signals.OptionalStop;
+                                        break;
+
+                                    case "CCMP":
+                                        HasCutterComp = true;
                                         break;
 
                                     case "RT+":
@@ -1903,12 +1992,13 @@ namespace CNC.Core
         private static Dispatcher dispatcher;
         public static bool IsLoaded { get { return CoordinateSystems.Count > 0; } }
         public static LatheMode LatheMode { get; private set; }
-        public static double ToolLengthOffsetReference { get; private set; } = double.NaN;
+        public static double ToolLengthOffsetReference { get; internal set; } = double.NaN;
         public static ObservableCollection<CoordinateSystem> CoordinateSystems { get; private set; } = new ObservableCollection<CoordinateSystem>();
         public static ObservableCollection<Tool> Tools { get; private set; } = new ObservableCollection<Tool>();
         public static CoordinateSystem ToolLengtOffset { get; private set; } = new CoordinateSystem("TLO", "");
         public static CoordinateSystem ProbePosition { get; private set; } = new CoordinateSystem("PRB", "");
         public static bool ProbeSuccesful { get; private set; } = false;
+        public static Toolsetter Toolsetter { get; private set; } = new Toolsetter();
 
         private static Action<string> dataReceived;
 
@@ -1936,6 +2026,7 @@ namespace CNC.Core
         public static bool Get(GrblViewModel model)
         {
             bool? res = null;
+            double tlo = ToolLengthOffsetReference;
             CancellationToken cancellationToken = new CancellationToken();
 
             if (Tools.Count == 0)
@@ -1947,6 +2038,8 @@ namespace CNC.Core
             dispatcher = Dispatcher.CurrentDispatcher;
             dataReceived += process;
             LatheMode = GrblParserState.LatheMode;
+            Toolsetter.Clear();
+            ToolLengthOffsetReference = double.NaN;
 
             model.Silent = true;
 
@@ -2053,6 +2146,7 @@ namespace CNC.Core
             if (data.StartsWith("["))
             {
                 string parameters, gCode = extractValues(data, out parameters);
+
                 switch (gCode)
                 {
                     case "G28":
@@ -2079,7 +2173,7 @@ namespace CNC.Core
                         ToolLengtOffset.SuspendNotifications = true;
                         ToolLengtOffset.Z = double.NaN;
                         ToolLengtOffset.SuspendNotifications = false;
-                        // End workaround   
+                        // End workaround
 
                         ToolLengtOffset.Parse(parameters);
 
@@ -2095,9 +2189,11 @@ namespace CNC.Core
                         break;
 
                     case "TLR":
-                        double tlr;
-                        if(double.TryParse(parameters, out tlr))
-                            ToolLengthOffsetReference = tlr;
+                        ToolLengthOffsetReference = dbl.Parse(parameters);
+                        break;
+
+                    case "TLR@":
+                        Toolsetter.Parse(parameters);
                         break;
 
                     case "PRB":
@@ -2373,7 +2469,7 @@ namespace CNC.Core
 
                     if (file != null)
                     {
-                        string msg, line = file.ReadLine(); // Skip header  
+                        string msg, line = file.ReadLine(); // Skip header
 
                         line = file.ReadLine();
 
@@ -2635,7 +2731,7 @@ namespace CNC.Core
                         while (line != null)
                         {
                             string[] columns = line.Split('\t');
-                            
+
                             if (columns.Length == 3)
                             {
                                 var group = Groups.Where(x => x.Id == int.Parse(columns[0])).FirstOrDefault();
@@ -3038,7 +3134,7 @@ namespace CNC.Core
                     {
                         string line = file.ReadLine();
 
-                        line = file.ReadLine(); // Skip header  
+                        line = file.ReadLine(); // Skip header
 
                         while (line != null)
                         {
@@ -3060,7 +3156,7 @@ namespace CNC.Core
                                         {
                                             setting.DataType = GrblSettingDetails.DataTypes.TEXT;
                                         }
-                                        
+
                                         setting.Name = values[1];
                                         setting.Format = values[4];
 
@@ -3267,9 +3363,7 @@ namespace CNC.Core
                             break;
 
                         case (GrblSetting)grblHALSetting.EnableLegacyRTCommands: // TODO: remove!
-                            // Vendor Grbl forks may reuse $39 for an unrelated setting.
-                            if (GrblInfo.IsGrblHAL)
-                                GrblInfo.UseLegacyRTCommands = valuepair[1] != "0";
+                            GrblInfo.UseLegacyRTCommands = valuepair[1] != "0";
                             break;
 
                         case (GrblSetting)grblHALSetting.JogStepDistance:

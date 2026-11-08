@@ -13,6 +13,18 @@ Please check out the [Wiki](https://github.com/terjeio/Grbl-GCode-Sender/wiki) f
 Edge pre-releases can be [downloaded from here](https://www.io-engineering.com/downloads), they contains changes yet to be incorporated in a main release and might be buggy and even break existing functionality.  
 Use with care and please [post feedback](https://github.com/terjeio/ioSender/discussions/436) on any issues encountered!
 
+2.0.48p7:
+
+* Added Plasma Material support in new tab, available when running grblHAL builds >= 20261020 with [plasma plugin](https://grblhal.org/docs/reference/plugins/#plasma-plugin) enabled.
+
+* Keep THC flyout open in _Grbl_ tab when switching between tabs.
+
+* Improved tool length probing.
+
+* Some minor UI improvements.
+
+* Added support for 5% rapids override, tool radius editing and YModem upload  when available in the controller.
+
 2.0.48p3:
 
 * Fix for Goto coordinate system moving to stale position, ref. issue [#512](https://github.com/terjeio/ioSender/issues/512).
@@ -91,4 +103,4 @@ Lathe mode.
 Conversational programming for Lathe Mode. Threading requires [grblHAL](https://github.com/grblHAL) controller with driver that has spindle sync support.
 
 ---
-2026-09-09
+2026-11-08
